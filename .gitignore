@@ -31,4 +31,18 @@ cache.log
 .project
 
 # ignore project ide folders
+*.class
+*.log
 .idea
+
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/target/
+project/project/
