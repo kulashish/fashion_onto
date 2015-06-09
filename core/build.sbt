@@ -1,8 +1,8 @@
 name := "Alchemy"
 
-version := "0.1"
+version := "1.0"
 
-scalaVersion := "2.10.5"
+scalaVersion := "2.11.6"
 
 resolvers += Resolver.sonatypeRepo("public")
 
@@ -15,4 +15,3 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "1.4.0-rc4" % "provi
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.4.0-rc4" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.4.0-rc4" % "provided"
-
