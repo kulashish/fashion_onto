@@ -1,4 +1,6 @@
-package com.jabong.erp
+package com.jabong.data.collection.erp
+
+import scala.io._
 
 /**
  * Created by Rachit on 8/6/15.

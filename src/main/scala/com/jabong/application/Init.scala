@@ -1,5 +1,6 @@
 package com.jabong.application
 
+import com.jabong.data.collection.erp.Erp
 import scopt.OptionParser
 import com.jabong.itr.Itr
 
@@ -30,7 +31,7 @@ object Init {
         .required()
         .action((x, c) => c.copy(component = x))
         .validate(x =>
-        if (x == "itr") success else failure("Option <component> must contain valid value. Like itr"))
+        if (x == "itr" || x == "erp") success else failure("Option <component> must contain valid value. Like itr"))
 
       arg[String]("<master>")
       .text("Master name like 'local' etc.")
@@ -49,6 +50,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr(params.master).start()
+      case "erp" => new Erp(params.master).start()
     }
   }
 }
