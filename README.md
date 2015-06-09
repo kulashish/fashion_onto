@@ -1,3 +1,3 @@
 # Alchemy
- DAP (Data Analytics Platform) repository
+ DAP (Data & Analytics Platform) repository
 
