@@ -21,17 +21,13 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
     val dbconn = new DbConnection(source)
     val connectionString = dbconn.getConnectionString
 
+    val driver="sqlserver"                // pick from source config
+
 
     if (mode == "full"){
-      GetData.getFullData( tableName, limit, source, connectionString, saveFormat )
-
+      GetData.getFullData( tableName, limit, driver, connectionString, saveFormat)
     }
 
-    val condition = ConditionBuilder.getCondition(mode, rangeStart, rangeEnd, dateColumn, primaryKey)
-    println("condition: %s".format(condition))
-
-    val dbTableQuery = "(SELECT * FROM %s %s) AS t1".format(tableName, condition)
-    println("dbtablequery: %s".format(dbTableQuery))
 
 //    val jdbcDF = {
 //      if (primaryKey != null) {
