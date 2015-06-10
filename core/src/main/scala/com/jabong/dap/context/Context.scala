@@ -1,6 +1,7 @@
 package com.jabong.dap.context
 
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkContext, SparkConf}
 
 /**
@@ -10,4 +11,5 @@ object Context {
   val conf = new SparkConf().setAppName("Inventory tracking report").setMaster("local[*]")
   val sContext = new SparkContext(conf)
   val sqlContext = new SQLContext(sContext)
+  val hiveContext = new HiveContext(sContext)
 }
