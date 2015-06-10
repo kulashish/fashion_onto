@@ -1,6 +1,6 @@
 package com.jabong.dap.init
 
-import com.jabong.data.collection.erp.Erp
+import com.jabong.dap.data.acq.delegator.Parser
 import scopt.OptionParser
 import com.jabong.dap.model.product.itr.Itr
 
@@ -31,7 +31,7 @@ object Init {
         .required()
         .action((x, c) => c.copy(component = x))
         .validate(x =>
-        if (x == "itr" || x == "erp") success else failure("Option <component> must contain valid value. Like itr"))
+        if (x == "itr" || x == "data-acquisition") success else failure("Option <component> must contain valid value. Like itr"))
 
       arg[String]("<master>")
       .text("Master name like 'local' etc.")
@@ -50,7 +50,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr(params.master).start()
-      case "erp" => new Erp(params.master).start()
+      case "data-acquisition" => new Parser(params.master).start()
     }
   }
 }

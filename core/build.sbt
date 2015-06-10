@@ -15,3 +15,5 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "1.4.0-rc4" % "provi
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.4.0-rc4" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.4.0-rc4" % "provided"
+
+libraryDependencies += "net.liftweb" %% "lift-json" % "2.6"
