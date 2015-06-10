@@ -7,21 +7,22 @@ package com.jabong.dap.data.acq.common
 class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
   def fetch(): Unit = {
 
-    val source = "erp"
-    val tableName = "tabletest"
-    val primaryKey = "pktest"
-    val mode = "full"                  // can be full, incremental, limit , range
-    val dateColumn = null               //
-    val rangeFrom = null               // for range and limit mode (int and date respectively)
-    val rangeTo = null                 // for range and limit mode (int and date respectively)
-    val limit = null
-    val joinTables = null
+    val source = tableInfo.source
+    val tableName = tableInfo.tableName
+    val primaryKey = tableInfo.primaryKey
+    val mode = tableInfo.mode                  // can be full, incremental, limit , range
+    val dateColumn = tableInfo.dateColumn              //
+    val saveFormat = tableInfo.saveFormat
+    val rangeStart = tableInfo.rangeStart              // for range and limit mode (int and date respectively)
+    val rangeEnd = tableInfo.rangeEnd                 // for range and limit mode (int and date respectively)
+    val limit = tableInfo.limit
+    val joinTables = tableInfo.joinTables
 
-    val dbconn = new DbConnection("sqlserver","1.1.1.1","1234","Jasda","user","password")
+    val dbconn = new DbConnection(source)
     val connectionString = dbconn.getConnectionString
     println(connectionString)
 
-    val condition = ConditionBuilder.getCondition(mode, rangeFrom, rangeTo, dateColumn, primaryKey)
+    val condition = ConditionBuilder.getCondition(mode, rangeStart, rangeEnd, dateColumn, primaryKey)
     println("condition: %s".format(condition))
 
     val dbTableQuery = "(SELECT * FROM %s %s) AS t1".format(tableName, condition)
