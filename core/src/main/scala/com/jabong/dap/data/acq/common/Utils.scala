@@ -9,7 +9,7 @@ import com.jabong.dap.common.json.parser.EmptyClass
 // Classes for storing the JSON schema.
 case class JoinTables(name: String, foreignKey: String)
 
-case class TableInfo(source: String, name: String, primaryKey: String, mode: String, saveFormat: String,
+case class TableInfo(source: String, tableName: String, primaryKey: String, mode: String, saveFormat: String,
                      dateColumn: String, rangeStart: String, rangeEnd: String, limit: String,
                      joinTables: List[JoinTables])
 
