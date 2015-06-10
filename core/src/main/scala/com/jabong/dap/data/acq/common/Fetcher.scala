@@ -7,20 +7,25 @@ package com.jabong.dap.data.acq.common
 class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
   def fetch(): Unit = {
 
-    val source = tableInfo.source
-    val tableName = tableInfo.tableName
-    val primaryKey = tableInfo.primaryKey
-    val mode = tableInfo.mode                  // can be full, incremental, limit , range
-    val dateColumn = tableInfo.dateColumn              //
-    val saveFormat = tableInfo.saveFormat
-    val rangeStart = tableInfo.rangeStart              // for range and limit mode (int and date respectively)
-    val rangeEnd = tableInfo.rangeEnd                 // for range and limit mode (int and date respectively)
-    val limit = tableInfo.limit
-    val joinTables = tableInfo.joinTables
+    val source = tableInfo.source                           // source
+    val tableName = tableInfo.tableName                    //table name
+    val primaryKey = tableInfo.primaryKey                // table primary key
+    val mode = tableInfo.mode                           // can be full, daily, monthly
+    val dateColumn = tableInfo.dateColumn              // column for date
+    val saveFormat = tableInfo.saveFormat               // orc or parquet
+    val rangeStart = tableInfo.rangeStart              // for range mode (date)
+    val rangeEnd = tableInfo.rangeEnd                 // for range mode (date)
+    val limit = tableInfo.limit                        // for full mode
+    val joinTables = tableInfo.joinTables              //
 
     val dbconn = new DbConnection(source)
     val connectionString = dbconn.getConnectionString
-    println(connectionString)
+
+
+    if (mode == "full"){
+      GetData.getFullData( tableName, limit, source, connectionString, saveFormat )
+
+    }
 
     val condition = ConditionBuilder.getCondition(mode, rangeStart, rangeEnd, dateColumn, primaryKey)
     println("condition: %s".format(condition))
