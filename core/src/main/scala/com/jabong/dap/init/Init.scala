@@ -1,6 +1,6 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.data.acq.delegator.Parser
+import com.jabong.dap.data.acq.delegator.Delegator
 import scopt.OptionParser
 import com.jabong.dap.model.product.itr.Itr
 
@@ -50,7 +50,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr(params.master).start()
-      case "data-acquisition" => new Parser(params.master).start()
+      case "data-acquisition" => new Delegator(params.master).start()
     }
   }
 }

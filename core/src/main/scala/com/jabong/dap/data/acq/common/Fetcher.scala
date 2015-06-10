@@ -7,7 +7,7 @@ import com.jabong.dap.context.Context
  * Created by Abhay on 8/6/15.
  */
 class Fetcher(master: String) extends java.io.Serializable {
-  def start(): Unit = {
+  def fetch(): Unit = {
 
     val source = "erp"
     val tableName = "tabletest"
