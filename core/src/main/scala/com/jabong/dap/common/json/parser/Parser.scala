@@ -1,7 +1,8 @@
 package com.jabong.dap.common.json.parser
 
-import scala.io.Source
 import net.liftweb.json.{DefaultFormats, parse}
+
+import scala.io.Source
 
 /**
  * Created by Rachit Gupta on 10/6/15.

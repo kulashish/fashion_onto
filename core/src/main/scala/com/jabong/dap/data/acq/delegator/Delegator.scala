@@ -2,7 +2,7 @@ package com.jabong.dap.data.acq.delegator
 
 
 import com.jabong.dap.common.json.parser.Parser
-import com.jabong.dap.data.acq.common.{ImportInfo, Fetcher}
+import com.jabong.dap.data.acq.common.{Fetcher, ImportInfo}
 
 /**
  * Reads and parses the JSON file to run various
