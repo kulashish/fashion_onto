@@ -20,7 +20,6 @@ object Parser {
     val source = Source.fromFile(filePath)
     val lines = try source.getLines.mkString("\n") finally source.close()
     val json = parse(lines)
-    val info = json.extract[T]
-    info
+    json.extract[T]
   }
 }
