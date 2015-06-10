@@ -1,12 +1,10 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.context.Context
-
 
 /**
  * Created by Abhay on 8/6/15.
  */
-class Fetcher(master: String) extends java.io.Serializable {
+class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
   def fetch(): Unit = {
 
     val source = "erp"
