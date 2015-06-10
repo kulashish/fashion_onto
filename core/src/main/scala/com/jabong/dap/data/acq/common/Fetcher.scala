@@ -19,13 +19,13 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
     val joinTables = tableInfo.joinTables              //
 
     val dbconn = new DbConnection(source)
-    val connectionString = dbconn.getConnectionString
+
 
     val driver="sqlserver"                // pick from source config
 
 
     if (mode == "full"){
-      GetData.getFullData( tableName, limit, driver, connectionString, saveFormat)
+      GetData.getFullData(tableName, limit, source, dbconn, saveFormat, primaryKey)
     }
 
 
