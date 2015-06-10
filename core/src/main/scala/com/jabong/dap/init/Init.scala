@@ -1,8 +1,8 @@
-package com.jabong.application
+package com.jabong.dap.init
 
 import com.jabong.data.collection.erp.Erp
 import scopt.OptionParser
-import com.jabong.itr.Itr
+import com.jabong.dap.model.product.itr.Itr
 
 /**
  * Created by Apoorva Moghey on 04/06/15.

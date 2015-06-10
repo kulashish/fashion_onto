@@ -1,4 +1,4 @@
-package com.jabong.context
+package com.jabong.dap.context
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkContext, SparkConf}
