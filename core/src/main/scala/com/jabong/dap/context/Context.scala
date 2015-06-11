@@ -2,7 +2,7 @@ package com.jabong.dap.context
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{ SparkContext, SparkConf }
 
 /**
  * Created by geek on 08/06/15.

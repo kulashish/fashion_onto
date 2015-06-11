@@ -31,13 +31,13 @@ object Init {
         .required()
         .action((x, c) => c.copy(component = x))
         .validate(x =>
-        if (x == "itr" || x == "data-acquisition") success else failure("Option <component> must contain valid value. Like itr"))
+          if (x == "itr" || x == "data-acquisition") success else failure("Option <component> must contain valid value. Like itr"))
 
       arg[String]("<master>")
-      .text("Master name like 'local' etc.")
-      .required()
-      .action((x, c) => c.copy(master = x))
-      .validate((x) => if (x == "local" || x == "local[4]") success else failure("Option <master> must contain valid value. Like local"))
+        .text("Master name like 'local' etc.")
+        .required()
+        .action((x, c) => c.copy(master = x))
+        .validate((x) => if (x == "local" || x == "local[4]") success else failure("Option <master> must contain valid value. Like local"))
     }
 
     parser.parse(args, defaultParams).map { params =>

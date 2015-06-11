@@ -66,12 +66,10 @@ class Itr(master: String) extends java.io.Serializable {
                                                  WHERE is_reserved = 1
                                                  AND catalog_simple.id_catalog_simple = %s""".format(row.getString(6)))
 
-
     val stock = Context.sqlContext.sql("""SELECT
                                            quantity
                                          FROM catalog_stock
                                          WHERE fk_catalog_simple = %s""".format(row.getString(6)))
-
 
     if (stock.count().==(0)) {
       Row.fromSeq((row.mkString(",") + "," + 0).split(",").toSeq)

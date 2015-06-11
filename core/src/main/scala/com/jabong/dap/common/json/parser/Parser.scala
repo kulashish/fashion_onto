@@ -1,6 +1,6 @@
 package com.jabong.dap.common.json.parser
 
-import net.liftweb.json.{DefaultFormats, parse}
+import net.liftweb.json.{ DefaultFormats, parse }
 
 import scala.io.Source
 
@@ -16,7 +16,7 @@ import scala.io.Source
 class EmptyClass
 
 object Parser {
-  def parseJson[T <: EmptyClass : Manifest](filePath: String) : T = {
+  def parseJson[T <: EmptyClass: Manifest](filePath: String): T = {
     implicit val formats = DefaultFormats
     val source = Source.fromFile(filePath)
     val lines = try source.getLines.mkString("\n") finally source.close()
