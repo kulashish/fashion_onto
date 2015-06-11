@@ -23,10 +23,13 @@ object GetMinMaxPK {
     try {
       val stmt: Statement = connection.createStatement
       try {
+        println("executing query")
         val rs: ResultSet  = stmt.executeQuery(minMaxSql)
+        println("done executing query")
+
         try {
           while (rs.next()) {
-            minMax = new MinMax(rs.getInt(1), rs.getInt(2))
+            minMax = new MinMax(rs.getString(1).toLong, rs.getString(2).toLong)
           }
         } finally {
           rs.close()

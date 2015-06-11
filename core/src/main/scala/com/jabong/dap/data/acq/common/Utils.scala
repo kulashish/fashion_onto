@@ -21,7 +21,7 @@ case class ImportInfo(acquisition: List[TableInfo]) extends EmptyClass
 object DaoUtil {
 
 
-  private var driverLoaded = scala.collection.mutable.Map("mysql" -> false, "sqlserver" -> false)
+  private val driverLoaded = scala.collection.mutable.Map("mysql" -> false, "sqlserver" -> false)
 
   private def loadDriver(dbc: DbConnection)  {
     try{
