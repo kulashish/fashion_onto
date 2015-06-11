@@ -7,8 +7,8 @@ import com.jabong.dap.context.Context
  */
 object GetData {
 
-  def remSpace(str: String): String = {
-    str.replaceAll("( |-)", "")
+  def cleanString(str: String): String = {
+    str.replaceAll("( |-|%)", "")
   }
 
   def getFullData(tableName: String, limit: String, driver: String, dbconn: DbConnection, saveFormat: String, saveMode: String, tablePrimaryKey: String) = {
@@ -34,7 +34,7 @@ object GetData {
     }
     jdbcDF.printSchema()
     val columnList = jdbcDF.columns
-    val newColumnList = columnList.map(remSpace)
+    val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/Documents")
