@@ -11,7 +11,7 @@ object GetData {
     str.replaceAll("( |-)", "")
   }
 
-  def getFullData(tableName: String, limit: String, driver: String,  dbconn: DbConnection, saveFormat: String, tablePrimaryKey: String) = {
+  def getFullData(tableName: String, limit: String, driver: String,  dbconn: DbConnection, saveFormat: String, saveMode: String, tablePrimaryKey: String) = {
 
     val connectionString = dbconn.getConnectionString
     val dbTableQuery =  QueryBuilder.getFullDataQuery(driver, tableName, limit, tablePrimaryKey)
@@ -41,10 +41,7 @@ object GetData {
     val newColumnList= columnList.map(remSpace)
     val newJdbcDF = jdbcDF.toDF(newColumnList:_*)
 
-    newJdbcDF.write.format(saveFormat).mode("overwrite").save("/home/test/Documents")
-
-
-
+    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/Documents")
 
   }
 
