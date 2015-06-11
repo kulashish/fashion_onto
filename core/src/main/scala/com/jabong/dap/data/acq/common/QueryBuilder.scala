@@ -16,19 +16,21 @@ object QueryBuilder {
       else {
         ""
       }
+      println(limitString)
       "(SELECT %s * FROM %s) as t1".format(limitString, tableName)
     }
-    else if (driver == "mysqlserver"){
+    else if (driver == "mysql"){
       val limitString = if (limit != null){
         "LIMIT %s".format(limit)
       }
       else {
         ""
       }
+      println(limitString)
       "(SELECT * FROM %s %s) as t1".format(tableName, limitString)
     }
     else {
-      ""
+      "no query"
     }
 
   }

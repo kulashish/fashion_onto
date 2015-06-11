@@ -7,16 +7,31 @@ import java.sql.{ResultSet, Statement}
  * Created by Abhay on 9/6/15.
  */
 object GetMinMaxPK {
-  def getMinMax(dbc: DbConnection, tableName: String, cond: String, tablePrimaryKey: String) : MinMax = {
-    var minMax = new MinMax(0,0);
-    var minMaxSql = ""
-    if (null != cond && cond.length > 0) {
-      minMaxSql = "SELECT MIN(%s), MAX(%s) FROM %s WHERE %s".
-        format(tablePrimaryKey,tablePrimaryKey,tableName,cond)
-    } else {
-      minMaxSql = "SELECT MIN(%s), MAX(%s) FROM %s".
-        format(tablePrimaryKey, tablePrimaryKey,tableName)
+  def getMinMax(dbc: DbConnection, tableName: String, cond: String, tablePrimaryKey: String, limit: String) : MinMax = {
+    var minMax = new MinMax(0,0)
+
+    val minMaxSql = if (limit == null){
+      if (null != cond && cond.length > 0) {
+        "SELECT MIN(%s), MAX(%s) FROM %s WHERE %s".format(tablePrimaryKey,tablePrimaryKey,tableName,cond)
+      }
+      else {
+        "SELECT MIN(%s), MAX(%s) FROM %s".format(tablePrimaryKey, tablePrimaryKey,tableName)
+      }
     }
+    else {
+      if (dbc.driver == "mysql"){
+        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT * FROM %s LIMIT %s) AS t1".
+          format(tablePrimaryKey, tablePrimaryKey, tableName, limit)
+      }
+      else if (dbc.driver == "sqlserver"){
+        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT TOP %s * FROM %s) AS t1".
+          format(tablePrimaryKey, tablePrimaryKey, limit, tableName)
+      }
+      else{
+        ""
+      }
+    }
+
     println(minMaxSql)
 
     val connection = DaoUtil.getConnection(dbc)

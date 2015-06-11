@@ -25,7 +25,7 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
 
 
     if (mode == "full"){
-      GetData.getFullData(tableName, limit, source, dbconn, saveFormat, primaryKey)
+      GetData.getFullData(tableName, limit, driver, dbconn, saveFormat, primaryKey)
     }
 
 

@@ -5,15 +5,15 @@ package com.jabong.dap.data.acq.common
  */
 object GetData {
 
-  def getFullData(tableName: String, limit: String, source: String,  dbconn: DbConnection, saveFormat: String, tablePrimaryKey: String) = {
+  def getFullData(tableName: String, limit: String, driver: String,  dbconn: DbConnection, saveFormat: String, tablePrimaryKey: String) = {
 
     val connectionString = dbconn.getConnectionString
 
-    val query =  QueryBuilder.getFullDataQuery(source, tableName, limit)
+    val query =  QueryBuilder.getFullDataQuery(driver, tableName, limit)
     println(query)
 
 
-    lazy val minMax = GetMinMaxPK.getMinMax(dbconn, tableName, "", tablePrimaryKey)
+    lazy val minMax = GetMinMaxPK.getMinMax(dbconn, tableName, "", tablePrimaryKey, limit)
 
 
     println("%s ...... %s".format(minMax.min,minMax.max))
