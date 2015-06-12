@@ -16,6 +16,14 @@ case class DbConnection(source: String) {
       userName = "report"
       password = "re@port"
     }
+    case "bob" => {
+      driver = "mysql"
+      server = "43.252.89.76"
+      port = "3306"
+      dbName = "bob_live"
+      userName = "apoorva"
+      password = "apoorva"
+    }
   }
 
   def getConnectionString =

@@ -20,7 +20,13 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
 
     val dbConn = new DbConnection(source)
 
-    val driver = "sqlserver" // pick from source config
+    val driver = if (source == "bob") {
+      "mysql" // pick from source config
+    } else if (source == "erp") {
+      "sqlserver"
+    } else {
+      ""
+    }
 
     if (mode == "full") {
       GetData.getFullData(driver, dbConn, tableName, primaryKey, limit, saveFormat, saveMode)
