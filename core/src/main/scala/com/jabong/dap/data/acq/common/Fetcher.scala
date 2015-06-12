@@ -24,6 +24,8 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
 
     if (mode == "full") {
       GetData.getFullData(tableName, limit, driver, dbconn, saveFormat, saveMode, primaryKey)
+    } else if (mode == "daily") {
+      GetData.getDailyData(tableName, driver, dbconn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
     }
   }
 
