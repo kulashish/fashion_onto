@@ -14,9 +14,9 @@ object GetData {
   def getData(mode: String, driver: String, dbConn: DbConnection, tableName: String, primaryKey: String,
     dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
     saveMode: String) = {
-    val context = if (driver == "mysql") {
+    val context = if (saveFormat == "parquet") {
       Context.sqlContext
-    } else if (driver == "sqlserver") {
+    } else if (saveFormat == "orc") {
       Context.hiveContext
     } else {
       null
@@ -47,7 +47,7 @@ object GetData {
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
-    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/rachit/spark-data/data")
+    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/sparkData/data")
   }
 
   def getFullData(driver: String, dbConn: DbConnection, tableName: String, primaryKey: String, limit: String,
