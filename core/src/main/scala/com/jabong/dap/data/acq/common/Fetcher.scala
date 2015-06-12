@@ -18,14 +18,14 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
     val limit = tableInfo.limit // for full mode
     val joinTables = tableInfo.joinTables //
 
-    val dbconn = new DbConnection(source)
+    val dbConn = new DbConnection(source)
 
     val driver = "sqlserver" // pick from source config
 
     if (mode == "full") {
-      GetData.getFullData(tableName, limit, driver, dbconn, saveFormat, saveMode, primaryKey)
+      GetData.getFullData(driver, dbConn, tableName, primaryKey, limit, saveFormat, saveMode)
     } else if (mode == "daily") {
-      GetData.getDailyData(tableName, driver, dbconn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
+      GetData.getDailyData(tableName, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
     }
   }
 

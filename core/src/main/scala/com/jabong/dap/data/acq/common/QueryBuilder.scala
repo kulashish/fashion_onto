@@ -23,8 +23,12 @@ object QueryBuilder {
       }
       "(SELECT * FROM %s %s %s) as t1".format(tableName, limitString._1, limitString._2)
     } else {
-      "no query"
+      ""
     }
+  }
+
+  def getDailyDataQuery(tableName: String, condition: String): String = {
+    "(SELECT * FROM %S %S) AS t1".format(tableName, condition)
   }
 
   def getCondition(dateColumn: String, rangeStart: String, rangeEnd: String) = {

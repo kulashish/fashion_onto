@@ -11,8 +11,9 @@ object GetData {
     str.replaceAll("( |-|%)", "")
   }
 
-  def getFullData(tableName: String, limit: String, driver: String, dbconn: DbConnection, saveFormat: String,
-                  saveMode: String, primaryKey: String) = {
+  def getData(mode: String, driver: String, dbConn: DbConnection, tableName: String, primaryKey: String,
+              dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
+              saveMode: String) = {
     val context = if (driver == "mysql") {
       Context.sqlContext
     } else if (driver == "sqlserver") {
@@ -20,64 +21,43 @@ object GetData {
     } else {
       null
     }
-    val connectionString = dbconn.getConnectionString
+
+    val connectionString = dbConn.getConnectionString
     val dbTableQuery = QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey)
     println(dbTableQuery)
-    lazy val minMax = GetMinMaxPK.getMinMax(dbconn, tableName, "", primaryKey, limit)
-
+    lazy val minMax = GetMinMaxPK.getMinMax(dbConn, tableName, "", primaryKey, limit)
     println("%s ..... %s".format(minMax.min, minMax.max))
 
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
-        "url" -> connectionString,
-        "dbtable" -> dbTableQuery))
+      "url" -> connectionString,
+      "dbtable" -> dbTableQuery))
     } else {
       context.load("jdbc", Map(
-        "url" -> connectionString,
-        "dbtable" -> dbTableQuery,
-        "partitionColumn" -> primaryKey,
-        "lowerBound" -> minMax.min.toString,
-        "upperBound" -> minMax.max.toString,
-        "numPartitions" -> "8"))
+      "url" -> connectionString,
+      "dbtable" -> dbTableQuery,
+      "partitionColumn" -> primaryKey,
+      "lowerBound" -> minMax.min.toString,
+      "upperBound" -> minMax.max.toString,
+      "numPartitions" -> "8"))
     }
+
     jdbcDF.printSchema()
     val columnList = jdbcDF.columns
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
-    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/Documents")
+    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/rachit/spark-data/data")
   }
 
-  def getDailyData(tableName: String, driver: String, dbconn: DbConnection, saveFormat: String, saveMode: String,
+  def getFullData(driver: String, dbConn: DbConnection, tableName: String, primaryKey: String, limit: String,
+                  saveFormat: String, saveMode: String) = {
+    getData("full", driver, dbConn, tableName, primaryKey, null, limit, null, null, saveFormat, saveMode)
+  }
+
+  def getDailyData(tableName: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
                    primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
-    val condition = QueryBuilder.getCondition(dateColumn, rangeStart, rangeEnd)
-    println(condition)
-    val connectionString = dbconn.getConnectionString
-//    val dbTableQuery = QueryBuilder.getDailyDataQuery(driver, tableName, null, primaryKey)
-//    println(dbTableQuery)
-//    lazy val minMax = GetMinMaxPK.getMinMax(dbconn, tableName, "", primaryKey, null)
-//
-//    println("%s ..... %s".format(minMax.min, minMax.max))
-//
-//    val jdbcDF = if (tablePrimaryKey == null) {
-//      Context.hiveContext.load("jdbc", Map(
-//        "url" -> connectionString,
-//        "dbtable" -> dbTableQuery))
-//    } else {
-//      Context.hiveContext.load("jdbc", Map(
-//        "url" -> connectionString,
-//        "dbtable" -> dbTableQuery,
-//        "partitionColumn" -> tablePrimaryKey,
-//        "lowerBound" -> minMax.min.toString,
-//        "upperBound" -> minMax.max.toString,
-//        "numPartitions" -> "8"))
-//    }
-//    jdbcDF.printSchema()
-//    val columnList = jdbcDF.columns
-//    val newColumnList = columnList.map(cleanString)
-//    val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
-//
-//    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/Documents")
+    getData("daily", driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode)
   }
 
 }
