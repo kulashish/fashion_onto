@@ -1,14 +1,11 @@
 package com.jabong.dap.common
 
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.{SparkContext, SparkConf}
-import org.apache.spark.sql._
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, _}
 
-object MergeUtils {
+object MergeUtils extends MergeData {
 
-  def insertOrUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String) : RDD[Row] = {
+  def InsertUpdateMerge (dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String) : RDD[Row] = {
 
     // rename dfIncr column names with new_ as prefix
     var dfIncrVar = dfIncr;
@@ -22,11 +19,11 @@ object MergeUtils {
     val joinedDF = dfBase.join(dfIncrVar, dfBase(primaryKey) === dfIncrVar("new_" + primaryKey), "outer")
 
     def reduceFunc(x: Row): Row = {
-      val hello = x.toSeq.splitAt(numOfColumns)
+      val splitSeq = x.toSeq.splitAt(numOfColumns)
       if (x(incrPrimayKeyColumn + numOfColumns) == null)
-        Row.fromSeq(hello._1)
+        Row.fromSeq(splitSeq._1)
       else
-        Row.fromSeq(hello._2)
+        Row.fromSeq(splitSeq._2)
     }
 
     val mergedDF = joinedDF.map(x => reduceFunc(x))
