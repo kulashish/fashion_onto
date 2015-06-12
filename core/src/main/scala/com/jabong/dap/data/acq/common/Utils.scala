@@ -2,7 +2,7 @@ package com.jabong.dap.data.acq.common
 
 import java.sql.{ DriverManager, Connection }
 
-import com.jabong.dap.common.json.parser.EmptyClass
+import com.jabong.dap.common.json.EmptyClass
 
 /**
  * Created by Rachit on 10/6/15.

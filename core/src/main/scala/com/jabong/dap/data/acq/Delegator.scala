@@ -1,6 +1,6 @@
-package com.jabong.dap.data.acq.delegator
+package com.jabong.dap.data.acq
 
-import com.jabong.dap.common.json.parser.Parser
+import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.common.{ Fetcher, ImportInfo }
 
 /**

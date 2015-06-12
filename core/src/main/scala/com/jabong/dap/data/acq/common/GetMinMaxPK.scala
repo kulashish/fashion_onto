@@ -5,6 +5,9 @@ import java.sql.{ ResultSet, Statement }
 /**
  * Created by Abhay on 9/6/15.
  */
+
+case class MinMax(min: Long, max: Long)
+
 object GetMinMaxPK {
   def getMinMax(dbc: DbConnection, tableName: String, cond: String, tablePrimaryKey: String, limit: String): MinMax = {
     var minMax = new MinMax(0, 0)

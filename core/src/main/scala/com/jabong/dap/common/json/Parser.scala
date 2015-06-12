@@ -1,4 +1,4 @@
-package com.jabong.dap.common.json.parser
+package com.jabong.dap.common.json
 
 import net.liftweb.json.{ DefaultFormats, parse }
 

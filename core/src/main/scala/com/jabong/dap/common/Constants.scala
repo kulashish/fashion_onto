@@ -1,4 +1,4 @@
-package com.jabong.dap.common.constants
+package com.jabong.dap.common
 
 /**
  * Created by Rachit on 12/6/15.

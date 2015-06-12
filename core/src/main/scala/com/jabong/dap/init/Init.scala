@@ -1,6 +1,6 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.data.acq.delegator.Delegator
+import com.jabong.dap.data.acq.Delegator
 import scopt.OptionParser
 import com.jabong.dap.model.product.itr.Itr
 
