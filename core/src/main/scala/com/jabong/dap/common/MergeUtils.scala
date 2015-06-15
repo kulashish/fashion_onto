@@ -26,7 +26,7 @@ object MergeUtils extends MergeData {
 
     val mergedDF = joinedDF.map(x => reduceFunc(x))
 
-    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
+    Context.getSqlContext().createDataFrame(mergedDF, dfSchema)
   }
 }
 
