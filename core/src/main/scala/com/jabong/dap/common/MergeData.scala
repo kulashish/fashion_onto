@@ -1,6 +1,5 @@
 package com.jabong.dap.common
 
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.DataFrame
 
 trait MergeData {
