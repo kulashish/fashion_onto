@@ -13,7 +13,7 @@ object GetData {
 
   def getData(mode: String, driver: String, dbConn: DbConnection, tableName: String, primaryKey: String,
     dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
-    saveMode: String) = {
+    saveMode: String): Any = {
     val context = if (saveFormat == "parquet") {
       Context.sqlContext
     } else if (saveFormat == "orc") {
@@ -35,14 +35,16 @@ object GetData {
     }
 
     println(dbTableQuery)
-    lazy val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
-    println("%s ..... %s".format(minMax.min, minMax.max))
 
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
-        "url" -> connectionString,
-        "dbtable" -> dbTableQuery))
+      "url" -> connectionString,
+      "dbtable" -> dbTableQuery))
     } else {
+      val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
+      println("%s ..... %s".format(minMax.min, minMax.max))
+      if (minMax.min == 0 && minMax.max == 0)
+        return
       context.load("jdbc", Map(
         "url" -> connectionString,
         "dbtable" -> dbTableQuery,
