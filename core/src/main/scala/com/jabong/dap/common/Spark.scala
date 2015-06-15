@@ -23,4 +23,8 @@ object Spark {
     sc
   }
 
+  def getSqlContext():SQLContext = {
+    sqlContext
+  }
+
 }
