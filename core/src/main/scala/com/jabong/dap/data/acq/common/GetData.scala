@@ -22,16 +22,16 @@ object GetData {
       null
     }
 
+    val condition = QueryBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd)
+
     val connectionString = dbConn.getConnectionString
-    val (dbTableQuery,condition) = if (mode == "full") {
+    val dbTableQuery = if (mode == "full") {
       QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey)
-    }  else if (mode == "daily" ) {
-      QueryBuilder.getDataQuery(mode, driver, tableName, rangeStart, rangeEnd, dateColumn)
-    } else if (mode == "hourly") {
-      QueryBuilder.getDataQuery( mode, driver, tableName, rangeStart, rangeEnd, dateColumn)
+    }  else if (mode == "daily" ||  mode == "hourly" ) {
+      QueryBuilder.getDataQuery(mode, driver, tableName, rangeStart, rangeEnd, dateColumn, condition)
     }
     else {
-      ("","")
+      ""
     }
 
     println(dbTableQuery)
