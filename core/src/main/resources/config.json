@@ -1,0 +1,4 @@
+{
+    "applicationName": "Alchemy",
+    "master": "local[4]"
+}
