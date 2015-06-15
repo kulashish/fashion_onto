@@ -37,12 +37,12 @@ For data acquisition, we are reading and parsing a JSON configuration file. The 
 
 The meaning of various fields in the JSON are:
 
-* **source**: The source of the data. Possible values: bob/erp/unicommerce/nextbee.
-* **tableName**: Name of the table. (Give exact string for the table. Use [] for tables with space in their names).
+* **source**: The source of the data. Possible values: bob/erp/unicommerce/nextbee. **Required**
+* **tableName**: Name of the table. (Give exact string for the table. Use [] for tables with space in their names).  **Required**
 * **primaryKey**: Name of the primary key. (Give exact strings. Use [] for key with space in their names).
-* **mode**: Mode for the import. Explained below.
-* **saveFormat**: Format to save the data in. Possible values: parquet/orc.
-* **saveMode**: The mode for saving the data. Possible values: append/overwrite/error/ignore.
+* **mode**: Mode for the import. Explained below. **Required**
+* **saveFormat**: Format to save the data in. Possible values: parquet/orc. **Required**
+* **saveMode**: The mode for saving the data. Possible values: append/overwrite/error/ignore. **Required**
 * **dateColumn**: The column on which the range can be applied. (Give exact strings. Use [] for columns with space in 
 their names)
 * **rangeStart**: The date time from which data is to be fetched.
