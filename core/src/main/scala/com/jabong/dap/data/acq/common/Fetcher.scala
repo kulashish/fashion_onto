@@ -32,6 +32,8 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
       GetData.getFullData(driver, dbConn, tableName, primaryKey, limit, saveFormat, saveMode)
     } else if (mode == "daily") {
       GetData.getDailyData(tableName, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
+    } else if (mode == "hourly") {
+      GetData.getHourlyData(tableName, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
     }
   }
 

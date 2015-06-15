@@ -23,9 +23,19 @@ object GetData {
     }
 
     val connectionString = dbConn.getConnectionString
-    val dbTableQuery = QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey)
+    val (dbTableQuery,condition) = if (mode == "full") {
+      QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey)
+    }  else if (mode == "daily" ) {
+      QueryBuilder.getDataQuery(mode, driver, tableName, rangeStart, rangeEnd, dateColumn)
+    } else if (mode == "hourly") {
+      QueryBuilder.getDataQuery( mode, driver, tableName, rangeStart, rangeEnd, dateColumn)
+    }
+    else {
+      ("","")
+    }
+
     println(dbTableQuery)
-    lazy val minMax = GetMinMaxPK.getMinMax(dbConn, tableName, "", primaryKey, limit)
+    lazy val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
     println("%s ..... %s".format(minMax.min, minMax.max))
 
     val jdbcDF = if (primaryKey == null) {
@@ -39,7 +49,7 @@ object GetData {
         "partitionColumn" -> primaryKey,
         "lowerBound" -> minMax.min.toString,
         "upperBound" -> minMax.max.toString,
-        "numPartitions" -> "8"))
+        "numPartitions" -> "3"))
     }
 
     jdbcDF.printSchema()
@@ -47,7 +57,7 @@ object GetData {
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
-    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/sparkData/data")
+    newJdbcDF.write.format(saveFormat).mode(saveMode).save("/home/test/sparkData/datadaily")
   }
 
   def getFullData(driver: String, dbConn: DbConnection, tableName: String, primaryKey: String, limit: String,
@@ -58,6 +68,11 @@ object GetData {
   def getDailyData(tableName: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
     primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
     getData("daily", driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode)
+  }
+
+  def getHourlyData(tableName: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
+                   primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
+    getData("hourly", driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode)
   }
 
 }

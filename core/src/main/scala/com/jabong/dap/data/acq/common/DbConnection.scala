@@ -18,11 +18,11 @@ case class DbConnection(source: String) {
     }
     case "bob" => {
       driver = "mysql"
-      server = "43.252.89.76"
+      server = "172.16.84.45"
       port = "3306"
       dbName = "bob_live"
-      userName = "apoorva"
-      password = "apoorva"
+      userName = "Blr_catalog_team"
+      password = "CatalogTeam@123"
     }
   }
 
