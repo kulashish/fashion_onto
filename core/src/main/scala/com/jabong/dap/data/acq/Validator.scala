@@ -133,7 +133,10 @@ object Validator {
       validateRequiredValues(table)
       validatePossibleValues(table)
       validateDateTimes(table)
-      validateRanges(table)
+      if ((table.rangeStart != null && table.rangeStart.length() == 0) &&
+        (table.rangeEnd != null && table.rangeEnd.length() == 0)) {
+        validateRanges(table)
+      }
     }
   }
 }
