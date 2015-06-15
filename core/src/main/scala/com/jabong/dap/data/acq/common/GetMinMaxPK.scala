@@ -39,6 +39,8 @@ object GetMinMaxPK {
           while (rs.next()) {
             minMax = new MinMax(rs.getString(1).toLong, rs.getString(2).toLong)
           }
+        } catch {
+          case e: NumberFormatException => println("Data not found in table for requested duration.")
         } finally {
           rs.close()
         }
