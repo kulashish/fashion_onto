@@ -1,0 +1,9 @@
+// "Do NOT make any changes to 'config.json.template' that are specific to your machine.
+// Only add new configurations to it On your system, copy config.json.template to config.json,
+// and put your configuration and then launch the program.
+// config.json is in gitignore. Do not try to commit it",
+
+{
+    "applicationName": "<Name of your application>",
+    "master": "local or local[4] or local[*] or spark://master:7077 to run on a Spark standalone cluster"
+}

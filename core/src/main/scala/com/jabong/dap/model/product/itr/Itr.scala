@@ -1,84 +1,93 @@
 package com.jabong.dap.model.product.itr
 
-import org.apache.spark.sql.Row
-import com.jabong.dap.context.Context
+import com.jabong.dap.common.Spark
+import org.apache.spark.sql.{ Row }
 
 /**
  * Created by Apoorva Moghey on 04/06/15.
  */
-class Itr(master: String) extends java.io.Serializable {
+
+class Itr extends java.io.Serializable {
   def start(): Unit = {
-    val catalogConfig = Context.sqlContext.parquetFile("hdfs://localhost/user/geek/bob/catalog_config/full/2015/06/07/13/")
-    catalogConfig.registerTempTable("catalog_config")
+    val out = Model.config.select(
+      "id_catalog_config",
+      "name",
+      "special_margin",
+      "margin",
+      "activated_at",
+      "sku",
+      "fk_catalog_supplier",
+      "fk_catalog_brand"
+    ).withColumnRenamed("", "").
+      join(
+        Model.simple.select(
+          "id_catalog_simple",
+          "special_price",
+          "special_to_date",
+          "special_from_date",
+          "barcode_ean",
+          "sku",
+          "fk_catalog_config"
+        ).withColumnRenamed("sku", "simpleSku"),
+        Model.config("id_catalog_config") === Model.simple("fk_catalog_config"), "leftouter"
+      ).
+        join(
+          Model.supplier.value.select("status", "id_catalog_supplier"),
+          Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier"), "leftouter"
+        ).
+          join(
+            Model.brand.value.select("name", "id_catalog_brand").withColumnRenamed("name", "brandName"),
+            Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand"), "leftouter"
+          ).limit(30)
 
-    val catalogSimple = Context.sqlContext.parquetFile("hdfs://localhost/user/geek/bob/catalog_simple/full/2015/06/06/19/")
-    catalogSimple.registerTempTable("catalog_simple")
+    val itr = out.select(
+      "id_catalog_config",
+      "name",
+      "special_margin",
+      "margin",
+      "activated_at",
+      "sku",
+      "id_catalog_simple",
+      "special_price",
+      "special_to_date",
+      "special_from_date",
+      "barcode_ean",
+      "simpleSku",
+      "status",
+      "brandName"
+    ).map(addColumn)
 
-    val catalogSupplier = Context.sqlContext.parquetFile("hdfs://localhost/user/geek/bob/catalog_supplier/full/2015/06/06/11")
-    catalogSupplier.registerTempTable("catalog_supplier")
-    Context.sContext.broadcast(catalogSupplier)
-
-    val catalogBrand = Context.sqlContext.parquetFile("hdfs://localhost/user/geek/bob/catalog_brand/full/2015/06/06/11")
-    catalogBrand.registerTempTable("catalog_brand")
-    Context.sContext.broadcast(catalogBrand)
-
-    val resultSet = Context.sqlContext.sql("""SELECT
-                                               cc.id_catalog_config AS idCatalogConfig,
-                                               cc.name AS productName,
-                                               cc.special_margin AS specialMargin,
-                                               cc.margin AS margin,
-                                               cc.activated_at AS activationDate,
-                                               cc.sku AS configSku,
-                                               cs.id_catalog_simple AS idCatalogSimple,
-                                               cs.special_price AS specialPrice,
-                                               cs.special_to_date AS specialToDate,
-                                               cs.special_from_date AS specialFromDate,
-                                               cs.barcode_ean AS petStyleCode,
-                                               cs.sku AS simpleSku,
-                                               cas.status AS supplierStatus,
-                                               cb.name AS brandName
-                                             FROM catalog_config AS cc
-                                             INNER JOIN catalog_simple AS cs
-                                               ON cc.id_catalog_config = cs.fk_catalog_config
-                                             INNER JOIN catalog_supplier AS cas
-                                               ON cc.fk_catalog_supplier = cas.id_catalog_supplier
-                                             INNER JOIN catalog_brand AS cb
-                                               ON cb.id_catalog_brand = cc.fk_catalog_brand limit 30""")
-
-    val set = resultSet.cache().map(addUrl).cache().map(addQuantity).collect().foreach(println)
+    Spark.getSqlContext().createDataFrame(itr, Schema.schema).show(2)
   }
 
-  def addUrl(row: Row): Row = {
-    val url = row(13).toString().toLowerCase().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(1).toString().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(0).toString()
-    Row.fromSeq((row.mkString(",") + "," + url).split(",").toSeq)
+  def addColumn(row: Row): Row = {
+    addVisiblity(row)
+    Row.fromSeq((row.mkString(",") + "," + getUrl(row) + "," + getStock(row).toString).split(",").toSeq)
   }
 
-  def addQuantity(row: Row): Row = {
-    val salesOrderItem = Context.sqlContext.parquetFile("hdfs://localhost/user/geek/bob/sales_order_item/full/2015/06/06/20/")
-    salesOrderItem.registerTempTable("sales_order_item")
-    val catalogStock = Context.sqlContext.parquetFile("hdfs://localhost/user/geek/bob/catalog_stock/full/2015/06/06/11")
-    catalogStock.registerTempTable("catalog_stock")
-    val reservedCount = Context.sqlContext.sql("""SELECT
-                                                   COUNT(1) as reserved
-                                                 FROM sales_order_item
-                                                 INNER JOIN catalog_simple ON
-                                                 catalog_simple.sku = sales_order_item.sku
-                                                 WHERE is_reserved = 1
-                                                 AND catalog_simple.id_catalog_simple = %s""".format(row.getString(6)))
+  def getStock(row: Row): Long = {
+    val reservedCount = Model.salesOrderItem.where(Model.salesOrderItem.col("is_reserved") === 1).
+      where(Model.salesOrderItem.col("sku") === row.getString(11)).
+      count()
 
-    val stock = Context.sqlContext.sql("""SELECT
-                                           quantity
-                                         FROM catalog_stock
-                                         WHERE fk_catalog_simple = %s""".format(row.getString(6)))
+    val stock = Model.catalogStock.where(Model.catalogStock.col("fk_catalog_simple") === row.getInt(6))
 
     if (stock.count().==(0)) {
-      Row.fromSeq((row.mkString(",") + "," + 0).split(",").toSeq)
-    } else {
-      Row.fromSeq((row.mkString(",") + "," + (stock.first().getLong(0) - reservedCount.first().getLong(0))).split(",").toSeq)
+      return 0
     }
+
+    return stock.first().getLong(0) - reservedCount
+  }
+
+  def getUrl(row: Row): String = {
+    row(13).toString().toLowerCase().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(1).toString().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(0).toString()
   }
 
   def addVisiblity(row: Row): Unit = {
+
+    val status = Model.config.where(Model.config.col("status") === "active").
+      where(Model.config.col("status_supplier_config") === "active").
+      where(Model.config.col("id_catalog_config") === row.getInt(0)).count()
 
   }
 }
