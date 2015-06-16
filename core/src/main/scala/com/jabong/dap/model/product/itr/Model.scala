@@ -17,4 +17,8 @@ object Model {
   val salesOrderItem = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/sales_order_item/full/2015/06/06/20/")
 
   val catalogStock = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_stock/full/2015/06/06/11")
+
+  val productImage = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_product_image")
+
+  val category = Spark.getContext().broadcast(Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_category/full/2015/06/06/11"))
 }

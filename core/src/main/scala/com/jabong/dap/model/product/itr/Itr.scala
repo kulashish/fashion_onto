@@ -57,7 +57,7 @@ class Itr extends java.io.Serializable {
       "brandName"
     ).map(addColumn)
 
-    Spark.getSqlContext().createDataFrame(itr, Schema.schema).show(2)
+    Spark.getSqlContext().createDataFrame(itr, Schema.schema).show(1)
   }
 
   def addColumn(row: Row): Row = {
@@ -83,11 +83,38 @@ class Itr extends java.io.Serializable {
     row(13).toString().toLowerCase().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(1).toString().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(0).toString()
   }
 
-  def addVisiblity(row: Row): Unit = {
-
-    val status = Model.config.where(Model.config.col("status") === "active").
+  def addVisiblity(row: Row): Boolean = {
+    val status = Model.config.select(
+      "id_catalog_config",
+      "fk_catalog_supplier",
+      "status_supplier_config",
+      "status"
+    ).where(Model.config.col("status") === "active").
       where(Model.config.col("status_supplier_config") === "active").
-      where(Model.config.col("id_catalog_config") === row.getInt(0)).count()
+      where(Model.config.col("id_catalog_config") === row.getInt(0))
 
+    if (status.count() == 0) {
+      return false
+    }
+    println("===========================================")
+    println(status.head().getInt(1))
+    println("===========================================")
+    val supplierStatus = Model.supplier.value.select("id_catalog_supplier", "status").
+      where(Model.supplier.value.col("id_catalog_supplier") === status.head().getInt(1)).
+      where(Model.supplier.value.col("status") === "active").count()
+
+    println("===========================================")
+    println(supplierStatus)
+    println("===========================================")
+
+    
+    val image = Model.productImage.where(Model.productImage.col("fk_catalog_config") === row.getInt(0)).count()
+
+    if (image == 0) {
+      return false
+    }
+
+
+    return true
   }
 }
