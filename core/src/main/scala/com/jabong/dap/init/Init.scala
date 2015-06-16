@@ -3,6 +3,7 @@ package com.jabong.dap.init
 import com.jabong.dap.common.{ Config, AppConfig }
 import com.jabong.dap.common.json.Parser
 import com.jabong.dap.common.Spark
+import com.jabong.dap.data.acq.Delegator
 import org.apache.spark.SparkConf
 import scopt.OptionParser
 import java.nio.file.{ Paths, Files }
@@ -72,7 +73,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => // do your stuff here
-      case "acquisition" => // do your stuff here
+      case "acquisition" => new Delegator().start(params.tableJson, params.config)// do your stuff here
     }
   }
 }

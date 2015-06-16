@@ -1,10 +1,14 @@
 package com.jabong.dap.data.acq.common
 
+import com.jabong.dap.common.AppConfig
+
 /**
  * Created by Abhay on 8/6/15.
  */
 class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
-  def fetch(): Unit = {
+  def fetch(configFilePath: String): Unit = {
+
+    println(AppConfig.config.master)
 
     val source = tableInfo.source // source
     val tableName = tableInfo.tableName //table name
