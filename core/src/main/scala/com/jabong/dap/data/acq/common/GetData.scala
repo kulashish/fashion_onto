@@ -1,6 +1,6 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.context.Context
+import com.jabong.dap.common.Spark
 
 /**
  * Created by Abhay on 10/6/15.
@@ -15,9 +15,9 @@ object GetData {
               dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
               saveMode: String): Any = {
     val context = if (saveFormat == "parquet") {
-      Context.sqlContext
+      Spark.getSqlContext()
     } else if (saveFormat == "orc") {
-      Context.hiveContext
+      Spark.getHiveContext()
     } else {
       null
     }
