@@ -1,13 +1,13 @@
 package com.jabong.dap.model.product.itr
 
+import com.jabong.dap.common.Spark
 import org.apache.spark.sql.{ Row }
-import com.jabong.dap.context.Context
 
 /**
  * Created by Apoorva Moghey on 04/06/15.
  */
 
-class Itr(master: String) extends java.io.Serializable {
+class Itr extends java.io.Serializable {
   def start(): Unit = {
     val out = Model.config.select(
       "id_catalog_config",
@@ -57,7 +57,7 @@ class Itr(master: String) extends java.io.Serializable {
       "brandName"
     ).map(addColumn)
 
-    Context.sqlContext.createDataFrame(itr, Schema.schema).show(2)
+    Spark.getSqlContext().createDataFrame(itr, Schema.schema).show(2)
   }
 
   def addColumn(row: Row): Row = {
@@ -85,10 +85,9 @@ class Itr(master: String) extends java.io.Serializable {
 
   def addVisiblity(row: Row): Unit = {
 
-  val status =  Model.config.where(Model.config.col("status") === "active").
+    val status = Model.config.where(Model.config.col("status") === "active").
       where(Model.config.col("status_supplier_config") === "active").
       where(Model.config.col("id_catalog_config") === row.getInt(0)).count()
-
 
   }
 }
