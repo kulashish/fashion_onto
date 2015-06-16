@@ -1,11 +1,10 @@
 package com.jabong.dap.common
 
-import org.apache.spark.sql.{DataFrame, _}
+import org.apache.spark.sql.{ DataFrame, _ }
 
 object MergeUtils extends MergeData {
 
-  def InsertUpdateMerge (dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String) : DataFrame = {
-
+  def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
     // rename dfIncr column names with new_ as prefix
     var dfIncrVar = dfIncr;
 
@@ -27,7 +26,7 @@ object MergeUtils extends MergeData {
 
     val mergedDF = joinedDF.map(x => reduceFunc(x))
 
-    Spark.getSqlContext().createDataFrame(mergedDF,dfSchema)
+    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
   }
 }
 

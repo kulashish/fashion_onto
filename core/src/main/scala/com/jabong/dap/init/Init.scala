@@ -1,16 +1,26 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.data.acq.Delegator
+import com.jabong.dap.common.{ Config, AppConfig }
+import com.jabong.dap.common.json.Parser
+import com.jabong.dap.common.Spark
+import org.apache.spark.SparkConf
 import scopt.OptionParser
-import com.jabong.dap.model.product.itr.Itr
-
-/**
- * Created by Apoorva Moghey on 04/06/15.
- */
+import java.nio.file.{ Paths, Files }
 
 object Init {
 
-  case class Params(component: String = null, master: String = null)
+  /**
+   * Define command line option parameters
+   *
+   * @param component String Name of the component
+   * @param tableJson String Path of data acquisition config json file
+   * @param config String Path of application config json file
+   */
+  case class Params(
+    component: String = null,
+    tableJson: String = null,
+    config: String = null
+  )
 
   def main(args: Array[String]) {
     options(args)
@@ -26,31 +36,43 @@ object Init {
     val defaultParams = Params()
 
     val parser = new OptionParser[Params]("Alchemy") {
-      arg[String]("<component>")
-        .text("Component name like 'itr' etc.")
+      opt[String]("component")
+        .text("Component name like 'itr/acquisition' etc.")
         .required()
         .action((x, c) => c.copy(component = x))
-        .validate(x =>
-          if (x == "itr" || x == "data-acquisition") success else failure("Option <component> must contain valid value. Like itr"))
 
-      arg[String]("<master>")
-        .text("Master name like 'local' etc.")
+      opt[String]("tablesJson")
+        .text("Path to data acquisition tables json config file.")
+        .action((x, c) => c.copy(tableJson = x))
+        .validate(x => if (Files.exists(Paths.get(x))) success else failure("Option --tablesJson path to data acquisition tables list json."))
+
+      opt[String]("config")
+        .text("Path to Alchemy config file.")
         .required()
-        .action((x, c) => c.copy(master = x))
-        .validate((x) => if (x == "local" || x == "local[4]") success else failure("Option <master> must contain valid value. Like local"))
+        .action((x, c) => c.copy(config = x))
+        .validate(x => if (Files.exists(Paths.get(x))) success else failure("Option --config path to Alchemy config json."))
     }
 
     parser.parse(args, defaultParams).map { params =>
+      // read application file
+      val config = Parser.parseJson[Config](params.config)
+      AppConfig.config = config
+      // initialize spark context
+      Spark.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
       run(params)
     }.getOrElse {
       sys.exit(1)
     }
   }
 
+  /**
+   * Trigger action based upon the component passed
+   * @param params
+   */
   def run(params: Params): Unit = {
     params.component match {
-      case "itr" => new Itr(params.master).start()
-      case "data-acquisition" => new Delegator(params.master).start()
+      case "itr" => // do your stuff here
+      case "acquisition" => // do your stuff here
     }
   }
 }

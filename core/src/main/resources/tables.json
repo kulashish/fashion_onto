@@ -1,0 +1,27 @@
+{
+  "acquisition": [
+    {
+      "source": "bob",
+      "tableName": "catalog_product_image",
+      "primaryKey": "id_catalog_product_image",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "overwrite",
+      "dateColumn": "[Last Modification Date Time]",
+      "rangeStart": "2014-06-12",
+      "rangeEnd": "2014-06-12",
+      "limit": "3000",
+      "joinTables": [
+        {
+            "name": "abc",
+            "foreignKey": "fk_erp" 
+        },
+        {
+            "name": "abd",
+            "foreignKey": "fk_erp" 
+        }
+    ]
+    }
+  ]
+}
+
