@@ -61,8 +61,14 @@ class Itr extends java.io.Serializable {
   }
 
   def addColumn(row: Row): Row = {
-    addVisiblity(row)
-    Row.fromSeq((row.mkString(",") + "," + getUrl(row) + "," + getStock(row).toString).split(",").toSeq)
+    Row.fromSeq((
+      row.mkString(",") +
+      "," +
+      getUrl(row) + "," +
+      getStock(row).toString + "," +
+      addVisiblity(row).toString
+    ).
+      split(",").toSeq)
   }
 
   def getStock(row: Row): Long = {
@@ -84,6 +90,7 @@ class Itr extends java.io.Serializable {
   }
 
   def addVisiblity(row: Row): Boolean = {
+    // product is active
     val status = Model.config.select(
       "id_catalog_config",
       "fk_catalog_supplier",
@@ -96,24 +103,44 @@ class Itr extends java.io.Serializable {
     if (status.count() == 0) {
       return false
     }
-    println("===========================================")
-    println(status.head().getInt(1))
-    println("===========================================")
+
+    // supplier must be active
     val supplierStatus = Model.supplier.value.select("id_catalog_supplier", "status").
       where(Model.supplier.value.col("id_catalog_supplier") === status.head().getInt(1)).
       where(Model.supplier.value.col("status") === "active").count()
 
-    println("===========================================")
-    println(supplierStatus)
-    println("===========================================")
+    if (supplierStatus == 0) {
+      return false
+    }
 
-    
+    // category must be active
+    val categoryStatus = Model.category.value.select(
+      "id_catalog_category",
+      "status"
+    ).
+      join(
+        Model.categoryMapping.select("fk_catalog_category", "fk_catalog_config"),
+        Model.categoryMapping.col("fk_catalog_category") === Model.category.value.col("id_catalog_category")
+      ).where(Model.categoryMapping.col("fk_catalog_config") === status.head().get(0)).
+        where(Model.category.value.col("status") === "active").count()
+
+    if (categoryStatus == 0) {
+      return false
+    }
+
+    // stock must be positive
+    val stock = getStock(row)
+
+    if (stock <= 0) {
+      return false
+    }
+
+    // at least one image should exist
     val image = Model.productImage.where(Model.productImage.col("fk_catalog_config") === row.getInt(0)).count()
 
     if (image == 0) {
       return false
     }
-
 
     return true
   }
