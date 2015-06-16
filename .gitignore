@@ -32,3 +32,4 @@ cache.log
 
 # ignore project ide folders
 .idea
+dev.json

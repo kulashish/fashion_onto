@@ -5,7 +5,7 @@ import com.jabong.dap.common.json.EmptyClass
 /**
  * Case class for application configuration
  * here we will define application configuration
- * parameters which matches to the keys in config.json
+ * parameters which matches to the keys in config.json.template
  *
  * @param applicationName String Set a name for your application. Shown in the Spark web UI
  * @param master String The master URL to connect to, such as "local" to run locally with one thread, "local[4]" to
