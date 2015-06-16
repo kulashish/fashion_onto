@@ -46,4 +46,4 @@ project/boot/
 project/plugins/project/
 project/target/
 project/project/
-dev.json
+config.json
