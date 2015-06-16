@@ -1,7 +1,7 @@
 // "Do NOT make any changes to 'config.json.template' that are specific to your machine.
-// Only add new configurations to it On your system, copy config.json.template to dev.json,
+// Only add new configurations to it On your system, copy config.json.template to config.json,
 // and put your configuration and then launch the program.
-// dev.json is in gitignore. Do not try to commit it",
+// config.json is in gitignore. Do not try to commit it",
 
 {
     "applicationName": "<Name of your application>",
