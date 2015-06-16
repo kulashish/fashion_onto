@@ -1,30 +1,38 @@
 package com.jabong.dap.common
 
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.{ SparkConf, SparkContext }
 
 /**
- * Created by pooja on 12/6/15.
+ * Application singleton Context. Every component
+ * will use this class to access spark context.
  */
 object Spark {
-
   private var sc: SparkContext = null
+  private var sqlContext: SQLContext = null
 
-  private var sqlContext:SQLContext = null
-
-  def init(sconf: SparkConf) {
-
-    sc = new SparkContext(sconf)
+  /**
+   * Initialize spark context as well as sqlContext instances
+   * @param sConf SparkConf
+   */
+  def init(sConf: SparkConf) {
+    sc = new SparkContext(sConf)
     sqlContext = new org.apache.spark.sql.SQLContext(sc)
-
   }
 
-  def getContext():SparkContext = {
+  /**
+   * Return application specific spark context instance
+   * @return SparkContext
+   */
+  def getContext(): SparkContext = {
     sc
   }
 
-  def getSqlContext():SQLContext = {
+  /**
+   * Return application specific sql context instance
+   * @return SQLContext
+   */
+  def getSqlContext(): SQLContext = {
     sqlContext
   }
-
 }
