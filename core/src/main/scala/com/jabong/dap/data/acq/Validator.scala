@@ -1,10 +1,10 @@
 package com.jabong.dap.data.acq
 
-import java.text.{ParseException, SimpleDateFormat}
+import java.text.{ ParseException, SimpleDateFormat }
 import java.util.Calendar
 
 import com.jabong.dap.common.Constants
-import com.jabong.dap.data.acq.common.{ImportInfo, TableInfo}
+import com.jabong.dap.data.acq.common.{ ImportInfo, TableInfo }
 
 /**
  * Created by Rachit on 15/6/15.
@@ -104,8 +104,8 @@ object Validator {
       if (table.mode == "daily") {
         if ((start.get(Calendar.YEAR) != end.get(Calendar.YEAR)) ||
           (start.get(Calendar.MONTH) != end.get(Calendar.MONTH))) {
-            "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
-              "want data spanning multiple months."
+          "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
+            "want data spanning multiple months."
         } else {
           ""
         }

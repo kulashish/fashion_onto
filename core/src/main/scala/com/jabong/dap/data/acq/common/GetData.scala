@@ -12,8 +12,8 @@ object GetData {
   }
 
   def getData(mode: String, driver: String, dbConn: DbConnection, tableName: String, primaryKey: String,
-    dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
-    saveMode: String): Any = {
+              dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
+              saveMode: String): Any = {
     val context = if (saveFormat == "parquet") {
       Context.sqlContext
     } else if (saveFormat == "orc") {
@@ -27,10 +27,9 @@ object GetData {
     val connectionString = dbConn.getConnectionString
     val dbTableQuery = if (mode == "full") {
       QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey)
-    }  else if (mode == "daily" ||  mode == "hourly" ) {
+    } else if (mode == "daily" || mode == "hourly") {
       QueryBuilder.getDataQuery(mode, driver, tableName, rangeStart, rangeEnd, dateColumn, condition)
-    }
-    else {
+    } else {
       ""
     }
 
@@ -38,8 +37,8 @@ object GetData {
 
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
-      "url" -> connectionString,
-      "dbtable" -> dbTableQuery))
+        "url" -> connectionString,
+        "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
       println("%s ..... %s".format(minMax.min, minMax.max))
@@ -63,17 +62,17 @@ object GetData {
   }
 
   def getFullData(driver: String, dbConn: DbConnection, tableName: String, primaryKey: String, limit: String,
-    saveFormat: String, saveMode: String) = {
+                  saveFormat: String, saveMode: String) = {
     getData("full", driver, dbConn, tableName, primaryKey, null, limit, null, null, saveFormat, saveMode)
   }
 
   def getDailyData(tableName: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
-    primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
+                   primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
     getData("daily", driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode)
   }
 
   def getHourlyData(tableName: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
-                   primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
+                    primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String) = {
     getData("hourly", driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode)
   }
 

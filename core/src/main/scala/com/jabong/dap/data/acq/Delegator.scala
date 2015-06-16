@@ -17,9 +17,11 @@ class Delegator(master: String) extends Serializable {
       Validator.validate(info)
       true
     } catch {
-      case e: ValidationException => println("Error while validating JSON: " + e.getMessage)
+      case e: ValidationException =>
+        println("Error while validating JSON: " + e.getMessage)
         false
-      case e: Exception => println("Some unknown error occurred: " + e.getMessage)
+      case e: Exception =>
+        println("Some unknown error occurred: " + e.getMessage)
         throw e
         false
     }
