@@ -11,7 +11,7 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    sqlContext = new SQLContext(Context.getContext())
+    sqlContext = new SQLContext(Spark.getContext())
 
     // TOFIX: make the path relative to test/resources
     df1 = sqlContext.read.json("test/1.json")

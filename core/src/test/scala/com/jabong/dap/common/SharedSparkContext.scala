@@ -11,12 +11,12 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
   val conf = new SparkConf().setMaster("local[4]").setAppName("test")
 
   override def beforeAll() {
-    Context.init(conf)
+    Spark.init(conf)
     super.beforeAll()
   }
 
   override def afterAll() {
-    val sc = Context.getContext()
+    val sc = Spark.getContext()
     if (sc != null) {
       sc.stop()
     }

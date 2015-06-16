@@ -7,7 +7,7 @@ import org.apache.spark.{ SparkConf, SparkContext }
  * Application singleton Context. Every component
  * will use this class to access spark context.
  */
-object Context {
+object Spark {
   private var sc: SparkContext = null
   private var sqlContext: SQLContext = null
 

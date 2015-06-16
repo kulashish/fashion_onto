@@ -2,7 +2,7 @@ package com.jabong.dap.init
 
 import com.jabong.dap.common.{ Config, AppConfig }
 import com.jabong.dap.common.json.Parser
-import com.jabong.dap.common.Context
+import com.jabong.dap.common.Spark
 import org.apache.spark.SparkConf
 import scopt.OptionParser
 import java.nio.file.{ Paths, Files }
@@ -58,7 +58,7 @@ object Init {
       val config = Parser.parseJson[Config](params.config)
       AppConfig.config = config
       // initialize spark context
-      Context.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
+      Spark.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
       run(params)
     }.getOrElse {
       sys.exit(1)
