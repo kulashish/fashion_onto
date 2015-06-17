@@ -26,12 +26,12 @@ object Time {
   }
 
   def getTodayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
+    val sdf = new SimpleDateFormat(Constants.DateFormat)
     sdf.format(new Date())
   }
 
   def getYesterdayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
+    val sdf = new SimpleDateFormat(Constants.DateFormat)
     val cal = Calendar.getInstance()
     cal.add(Calendar.DAY_OF_MONTH, -1)
     sdf.format(cal.getTime)
@@ -47,7 +47,7 @@ object Time {
   def getMonthAndYear(dt: String): MonthYear = {
     val cal = Calendar.getInstance()
     if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DATE_FORMAT)
+      val df = new SimpleDateFormat(Constants.DateFormat)
       val date = df.parse(dt)
       cal.setTime(date)
     }
@@ -57,7 +57,7 @@ object Time {
   def getMaxDaysOfMonth(dt: String): Int = {
     val cal = Calendar.getInstance()
     if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DATE_FORMAT)
+      val df = new SimpleDateFormat(Constants.DateFormat)
       val date = df.parse(dt)
       cal.setTime(date)
     }

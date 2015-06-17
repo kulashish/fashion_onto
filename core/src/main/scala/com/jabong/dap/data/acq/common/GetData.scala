@@ -11,20 +11,18 @@ object GetData {
     str.replaceAll("( |-|%)", "")
   }
 
+  def getContext(saveFormat: String) = saveFormat match {
+    case "parquet" => Spark.getSqlContext()
+    case "orc" => Spark.getHiveContext()
+    case _ => null
+  }
+
   def getData(mode: String, source: String, driver: String, dbConn: DbConnection, tableName: String, primaryKey: String,
               dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
               saveMode: String): Any = {
-    val context = if (saveFormat == "parquet") {
-      Spark.getSqlContext()
-    } else if (saveFormat == "orc") {
-      Spark.getHiveContext()
-    } else {
-      null
-    }
-
+    val context = getContext(saveFormat)
     val condition = ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd)
 
-    val connectionString = dbConn.getConnectionString
     val dbTableQuery = if (mode == "full") {
       QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey)
     } else if (mode == "daily" || mode == "hourly") {
@@ -37,7 +35,7 @@ object GetData {
 
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
-        "url" -> connectionString,
+        "url" -> dbConn.getConnectionString,
         "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
@@ -45,7 +43,7 @@ object GetData {
       if (minMax.min == 0 && minMax.max == 0)
         return
       context.load("jdbc", Map(
-        "url" -> connectionString,
+        "url" -> dbConn.getConnectionString,
         "dbtable" -> dbTableQuery,
         "partitionColumn" -> primaryKey,
         "lowerBound" -> minMax.min.toString,
@@ -58,7 +56,7 @@ object GetData {
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
-    val savePath = SavePathBuilder.getSavePath(mode, source, tableName, rangeStart, rangeEnd)
+    val savePath = PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd)
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
   }

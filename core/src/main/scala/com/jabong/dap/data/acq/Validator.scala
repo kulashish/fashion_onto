@@ -74,7 +74,7 @@ object Validator {
       } else if (table.rangeEnd == null || table.rangeEnd.length() == 0) {
         "rangeStart and rangeEnd both should have values, or none of them should have a value"
       } else {
-        val format = new SimpleDateFormat(Constants.DATETIME_FORMAT)
+        val format = new SimpleDateFormat(Constants.DateTimeFormat)
         try {
           val start = format.parse(table.rangeStart)
           val end = format.parse(table.rangeEnd)
@@ -84,7 +84,7 @@ object Validator {
             ""
           }
         } catch {
-          case e: ParseException => "Date should be of the format: %s".format(Constants.DATETIME_FORMAT)
+          case e: ParseException => "Date should be of the format: %s".format(Constants.DateTimeFormat)
         }
       }
     }
@@ -96,7 +96,7 @@ object Validator {
 
   def validateRanges(table: TableInfo) = {
     val message = {
-      val format = new SimpleDateFormat(Constants.DATETIME_FORMAT)
+      val format = new SimpleDateFormat(Constants.DateTimeFormat)
       val start = Calendar.getInstance()
       val end = Calendar.getInstance()
       start.setTime(format.parse(table.rangeStart))

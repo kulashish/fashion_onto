@@ -74,7 +74,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
-      case "acquisition" => new Delegator().start(params.tableJson, params.config)// do your stuff here
+      case "acquisition" => new Delegator().start(params.tableJson)// do your stuff here
     }
   }
 }

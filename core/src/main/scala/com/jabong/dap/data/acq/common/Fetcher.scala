@@ -6,7 +6,7 @@ import com.jabong.dap.common.AppConfig
  * Created by Abhay on 8/6/15.
  */
 class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
-  def fetch(configFilePath: String): Unit = {
+  def fetch(): Unit = {
 
     println(AppConfig.config.master)
 

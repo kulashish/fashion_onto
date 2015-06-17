@@ -8,8 +8,8 @@ import com.jabong.dap.data.acq.common.{ Fetcher, ImportInfo }
  * data collection jobs.
  */
 class Delegator() extends Serializable {
-  def start(confFilePath: String, configFilePath: String ) = {
-    val info = Parser.parseJson[ImportInfo](confFilePath)
+  def start(tableJsonPath: String ) = {
+    val info = Parser.parseJson[ImportInfo](tableJsonPath)
 
     // Validate the JSON and it's parameters.
     val validated = try {
@@ -29,7 +29,7 @@ class Delegator() extends Serializable {
     if (validated) {
       for (table <- info.acquisition) {
         table.source match {
-          case "erp" | "bob" | "unicommerce" => new Fetcher(table).fetch(configFilePath)
+          case "erp" | "bob" | "unicommerce" => new Fetcher(table).fetch()
           case _ => println("Unknown table source.")
         }
       }
