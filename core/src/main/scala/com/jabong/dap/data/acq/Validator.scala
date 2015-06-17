@@ -44,11 +44,14 @@ object Validator {
     }
   }
 
-  def validateRanges(table: TableInfo) = {
-    require(table.mode == "daily" && isSameMonth(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
+  def validateRanges(table: TableInfo) =  table.mode match {
+    case "daily" =>
+    require(isSameMonth(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
       "want data spanning multiple months.")
-    require(table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
+    case "hourly" =>
+      require(table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
       "want data spanning multiple days.")
+    case _ => 
   }
 
   def validate(info: ImportInfo) = {
