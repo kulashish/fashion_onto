@@ -11,12 +11,12 @@ import com.jabong.dap.common.Constants
 object Time {
 
   def daysBetweenTwoDates(date1: Date, date2: Date): BigInt = {
-    Math.abs(date1.getTime - date2.getTime) / Constants.CONVERT_MILLISEC_TO_DAYS
+    Math.abs(date1.getTime - date2.getTime) / Constants.ConvertMillisecToDays
   }
 
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
-    Math.abs(today.getTime - date.getTime) / Constants.CONVERT_MILLISEC_TO_DAYS
+    Math.abs(today.getTime - date.getTime) / Constants.ConvertMillisecToDays
   }
 
   def dateBefore30Days(): Date = {
