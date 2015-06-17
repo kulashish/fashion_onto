@@ -10,7 +10,7 @@ import com.jabong.dap.common.utils.Time
 /**
  * Created by Abhay on 16/6/15.
  */
-object SavePathBuilder {
+object PathBuilder {
 
   def getSavePath (mode: String, source: String, tableName: String, rangeStart: String, rangeEnd: String) ={
     val basePath = "/home/test/sparkData"
