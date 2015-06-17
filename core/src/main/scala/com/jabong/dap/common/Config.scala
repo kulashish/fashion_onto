@@ -13,12 +13,17 @@ import com.jabong.dap.common.json.EmptyClass
  */
 case class Config(
   var applicationName: String = null,
-  var master: String = null
+  var master: String = null,
+  var hdfs: String = null
 ) extends EmptyClass
 
 /**
  * Object to access config variables application wide
  */
-object AppConfig extends Config {
+object AppConfig {
   var config: Config = null
+  val PathSeparator = "/"
+  val OneDayMilliSeconds = 24 * 60 * 60 * 1000
+  val DateTimeFormat = "yyyy-MM-dd HH:mm:ss"
+  val DateFormat = "yyyy-MM-dd"
 }

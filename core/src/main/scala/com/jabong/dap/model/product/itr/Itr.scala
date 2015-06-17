@@ -1,13 +1,17 @@
 package com.jabong.dap.model.product.itr
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ AppConfig, Spark }
 import org.apache.spark.sql.{ Row }
+import com.jabong.dap.common.utils.Time
+import grizzled.slf4j.Logging
 
-/**
- * Created by Apoorva Moghey on 04/06/15.
- */
+class Itr extends java.io.Serializable with Logging {
 
-class Itr extends java.io.Serializable {
+  /**
+   * Kick ITR process
+   *
+   * @return Unit
+   */
   def start(): Unit = {
     val out = Model.config.select(
       "id_catalog_config",
@@ -29,15 +33,15 @@ class Itr extends java.io.Serializable {
           "sku",
           "fk_catalog_config"
         ).withColumnRenamed("sku", "simpleSku"),
-        Model.config("id_catalog_config") === Model.simple("fk_catalog_config"), "leftouter"
+        Model.config("id_catalog_config") === Model.simple("fk_catalog_config")
       ).
         join(
           Model.supplier.value.select("status", "id_catalog_supplier"),
-          Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier"), "leftouter"
+          Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier")
         ).
           join(
             Model.brand.value.select("name", "id_catalog_brand").withColumnRenamed("name", "brandName"),
-            Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand"), "leftouter"
+            Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand")
           ).limit(30)
 
     val itr = out.select(
@@ -55,27 +59,52 @@ class Itr extends java.io.Serializable {
       "simpleSku",
       "status",
       "brandName"
-    ).map(addColumn)
+    ).map(addColumns)
 
-    Spark.getSqlContext().createDataFrame(itr, Schema.schema).show(1)
+    Spark.getSqlContext().createDataFrame(itr, Schema.schema).
+      write.format("parquet").
+      mode("overwrite").
+      save(getPath())
   }
 
-  def addColumn(row: Row): Row = {
-    Row.fromSeq((
-      row.mkString(",") +
-      "," +
-      getUrl(row) + "," +
-      getStock(row).toString + "," +
-      addVisiblity(row).toString
-    ).
-      split(",").toSeq)
+  /**
+   * Build columns & data of ITR
+   *
+   * @param row org.apache.spark.sql.Row
+   * @return org.apache.spark.sql.Row
+   */
+  def addColumns(row: Row): Row = {
+    Row.fromTuple((
+      row(0),
+      row(1),
+      row(2),
+      row(3),
+      row(4),
+      row(5),
+      row(6),
+      row(7),
+      row(8),
+      row(9),
+      row(10),
+      row(11),
+      row(12),
+      row(13),
+      getUrl(row),
+      getStock(row),
+      getVisibility(row)
+    ))
   }
 
+  /**
+   * Calculate stock of simple product
+   *
+   * @param row org.apache.spark.sql.Row
+   * @return Long
+   */
   def getStock(row: Row): Long = {
     val reservedCount = Model.salesOrderItem.where(Model.salesOrderItem.col("is_reserved") === 1).
       where(Model.salesOrderItem.col("sku") === row.getString(11)).
       count()
-
     val stock = Model.catalogStock.where(Model.catalogStock.col("fk_catalog_simple") === row.getInt(6))
 
     if (stock.count().==(0)) {
@@ -85,11 +114,23 @@ class Itr extends java.io.Serializable {
     return stock.first().getLong(0) - reservedCount
   }
 
+  /**
+   * Calculate url of product
+   *
+   * @param row org.apache.spark.sql.Row
+   * @return String
+   */
   def getUrl(row: Row): String = {
     row(13).toString().toLowerCase().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(1).toString().replaceAll(" ", "-").replaceAll("/", "") + "-" + row(0).toString()
   }
 
-  def addVisiblity(row: Row): Boolean = {
+  /**
+   * Calculate visibility of simple product
+   *
+   * @param row org.apache.spark.sql.Row
+   * @return Boolean
+   */
+  def getVisibility(row: Row): Boolean = {
     // product is active
     val status = Model.config.select(
       "id_catalog_config",
@@ -143,5 +184,15 @@ class Itr extends java.io.Serializable {
     }
 
     return true
+  }
+
+  def getPath(): String = {
+    "%s/%s/".
+      format(
+        AppConfig.config.hdfs +
+          AppConfig.PathSeparator + "itr",
+        Time.getTodayDateWithHrs().
+          replaceAll("-", AppConfig.PathSeparator)
+      )
   }
 }
