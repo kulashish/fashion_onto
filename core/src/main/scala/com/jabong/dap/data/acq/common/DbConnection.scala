@@ -26,13 +26,14 @@ case class DbConnection(source: String) {
     }
   }
 
-  def getConnectionString =
-    if (driver == "sqlserver") {
+  def getConnectionString = driver match {
+    case "sqlserver" => {
       "jdbc:sqlserver://%s:%s;database=%s;userName=%s;password=%s".format(server, port, dbName, userName, password)
-    } else if (driver == "mysql") {
-      "jdbc:mysql://%s:%s/%s?zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&user=%s&password=%s".format(server, port, dbName, userName, password)
-    } else {
-      ""
     }
-
+    case "mysql" => {
+      "jdbc:mysql://%s:%s/%s?zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&user=%s&password=%s"
+        .format(server, port, dbName, userName, password)
+    }
+    case _ => ""
+  }
 }

@@ -1,11 +1,9 @@
 package com.jabong.dap.data.acq
 
-import java.text.{ ParseException, SimpleDateFormat }
-import java.util.Calendar
-
+import java.text.ParseException
 import com.jabong.dap.common.Constants
 import com.jabong.dap.data.acq.common.{ ImportInfo, TableInfo }
-
+import com.jabong.dap.common.utils.Time._
 /**
  * Created by Rachit on 15/6/15.
  */
@@ -38,67 +36,19 @@ object Validator {
   }
 
   def validateDateTimes(table: TableInfo) = {
-    val message = {
-      if ((table.rangeStart == null || table.rangeStart.length() == 0) &&
-        (table.rangeEnd == null || table.rangeEnd.length() == 0)) {
-        ""
-      } else if (table.rangeStart == null || table.rangeStart.length() == 0) {
-        "rangeStart and rangeEnd both should have values, or none of them should have a value"
-      } else if (table.rangeEnd == null || table.rangeEnd.length() == 0) {
-        "rangeStart and rangeEnd both should have values, or none of them should have a value"
-      } else {
-        val format = new SimpleDateFormat(Constants.DateTimeFormat)
-        try {
-          val start = format.parse(table.rangeStart)
-          val end = format.parse(table.rangeEnd)
-          if (start.getTime >= end.getTime) {
-            "Start date time should be strictly less than End date time"
-          } else {
-            ""
-          }
-        } catch {
-          case e: ParseException => "Date should be of the format: %s".format(Constants.DateTimeFormat)
-        }
-      }
-    }
-
-    if (message.length != 0) {
-      throw ValidationException(message)
+    require(!(dateStringEmpty(table.rangeStart) ^ dateStringEmpty(table.rangeEnd)), "rangeStart and rangeEnd both should have values, or none of them should have a value" )
+    try {
+      require(isStrictlyLessThan(table.rangeStart, table.rangeEnd), "Start date time should be strictly less than End date time")
+    } catch {
+    case e: ParseException => "Date should be of the format: %s".format(Constants.DateTimeFormat)
     }
   }
 
   def validateRanges(table: TableInfo) = {
-    val message = {
-      val format = new SimpleDateFormat(Constants.DateTimeFormat)
-      val start = Calendar.getInstance()
-      val end = Calendar.getInstance()
-      start.setTime(format.parse(table.rangeStart))
-      end.setTime(format.parse(table.rangeEnd))
-      if (table.mode == "daily") {
-        if ((start.get(Calendar.YEAR) != end.get(Calendar.YEAR)) ||
-          (start.get(Calendar.MONTH) != end.get(Calendar.MONTH))) {
-          "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
-            "want data spanning multiple months."
-        } else {
-          ""
-        }
-      } else if (table.mode == "hourly") {
-        if ((start.get(Calendar.YEAR) != end.get(Calendar.YEAR)) ||
-          (start.get(Calendar.MONTH) != end.get(Calendar.MONTH)) ||
-          (start.get(Calendar.DATE) != end.get(Calendar.DATE))) {
-          "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
-            "want data spanning multiple days."
-        } else {
-          ""
-        }
-      } else {
-        ""
-      }
-    }
-
-    if (message.length != 0) {
-      throw ValidationException(message)
-    }
+    require(table.mode == "daily" && isSameMonth(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
+      "want data spanning multiple months.")
+    require(table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
+      "want data spanning multiple days.")
   }
 
   def validate(info: ImportInfo) = {

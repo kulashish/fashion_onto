@@ -64,4 +64,48 @@ object Time {
     cal.getActualMaximum(Calendar.DAY_OF_MONTH)
   }
 
+  def dateStringEmpty(dt: String): Boolean = {
+    if (dt == null || dt.length() == 0)
+      true
+    else
+      false
+  }
+
+  def isStrictlyLessThan(dt1: String, dt2: String): Boolean = {
+    val format = new SimpleDateFormat(Constants.DateTimeFormat)
+    try{
+      val start = format.parse(dt1)
+      val end = format.parse(dt2)
+      if (start.getTime < end.getTime)
+        true
+      else
+        false
+    }
+  }
+
+  def isSameMonth(dt1: String, dt2: String) : Boolean = {
+    val format = new SimpleDateFormat(Constants.DateTimeFormat)
+    val start = Calendar.getInstance()
+    val end = Calendar.getInstance()
+    start.setTime(format.parse(dt1))
+    end.setTime(format.parse(dt2))
+    if ((start.get(Calendar.YEAR) == end.get(Calendar.YEAR)) && (start.get(Calendar.MONTH) == end.get(Calendar.MONTH)))
+      true
+    else
+      false
+  }
+
+  def isSameDay(dt1: String, dt2: String) : Boolean = {
+    val format = new SimpleDateFormat(Constants.DateTimeFormat)
+    val start = Calendar.getInstance()
+    val end = Calendar.getInstance()
+    start.setTime(format.parse(dt1))
+    end.setTime(format.parse(dt2))
+    if ((start.get(Calendar.YEAR) == end.get(Calendar.YEAR)) && (start.get(Calendar.MONTH) == end.get(Calendar.MONTH))
+          && (start.get(Calendar.DATE) == end.get(Calendar.DATE)))
+      true
+    else
+      false
+  }
+
 }
