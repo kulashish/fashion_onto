@@ -31,8 +31,9 @@ object PathBuilder {
           val end = Calendar.getInstance()
           start.setTime(format.parse(rangeStart))
           end.setTime(format.parse(rangeEnd))
-          "%s/%s/%s/%s/%s/%s_%s".format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH)),
-            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
+          "%s/%s/%s/%s/%s/%s_%s"
+            .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH)),
+              withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
         }
       }
       case "hourly" => {
@@ -41,10 +42,10 @@ object PathBuilder {
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        println(start)
-        println(end)
-        "%s/%s/%s/%s/%s/%s/%s_%s".format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH)),
-          withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+        "%s/%s/%s/%s/%s/%s/%s_%s"
+          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH)),
+            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)),
+            withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
       }
       case _ => ""
     }

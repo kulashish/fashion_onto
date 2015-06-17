@@ -18,25 +18,11 @@ case class ValidationException(message: String) extends Exception(message)
 object Validator {
 
   def validateRequiredValues(table: TableInfo) = {
-    val message = {
-      if (table.source == null || table.source.length() == 0) {
-        "Source cannot be null or empty."
-      } else if (table.tableName == null || table.tableName.length() == 0) {
-        "Table name cannot be null or empty."
-      } else if (table.mode == null || table.mode.length() == 0) {
-        "Mode cannot be null or empty."
-      } else if (table.saveMode == null || table.saveMode.length() == 0) {
-        "Save mode cannot be null or empty."
-      } else if (table.saveFormat == null || table.saveFormat.length() == 0) {
-        "Save format cannot be null or empty."
-      } else {
-        ""
-      }
-    }
-
-    if (message.length != 0) {
-      throw ValidationException(message)
-    }
+    require(table.source != null && table.source.length() != 0, "Source cannot be null or empty.")
+    require(table.tableName != null && table.tableName.length() != 0, "Table name cannot be null or empty.")
+    require(table.mode != null && table.mode.length() != 0, "Mode cannot be null or empty.")
+    require(table.saveMode != null && table.saveMode.length() != 0, "Save mode cannot be null or empty.")
+    require(table.saveFormat != null && table.saveFormat.length() != 0, "Save format cannot be null or empty.")
   }
 
   def validatePossibleValues(table: TableInfo) = {
@@ -45,23 +31,10 @@ object Validator {
     val possibleSaveFormats = Array("orc", "parquet")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 
-    val message = {
-      if (!possibleSources.contains(table.source)) {
-        "Source '%s' not recognized. Possible values: %s".format(table.source, possibleSources.mkString(","))
-      } else if (!possibleModes.contains(table.mode)) {
-        "Mode '%s' not recognized. Possible values: %s".format(table.mode, possibleModes.mkString(","))
-      } else if (!possibleSaveFormats.contains(table.saveFormat)) {
-        "Save format '%s' not recognized. Possible values: %s".format(table.saveFormat, possibleSaveFormats.mkString(","))
-      } else if (!possibleSaveModes.contains(table.saveMode)) {
-        "Save mode '%s' not recognized. Possible values: %s".format(table.saveMode, possibleSaveModes.mkString(","))
-      } else {
-        ""
-      }
-    }
-
-    if (message.length != 0) {
-      throw ValidationException(message)
-    }
+    require(possibleSources.contains(table.source), "Source '%s' not recognized. Possible values: %s".format(table.source, possibleSources.mkString(",") ))
+    require(possibleModes.contains(table.mode), "Mode '%s' not recognized. Possible values: %s".format(table.mode, possibleModes.mkString(",") ))
+    require(possibleSaveFormats.contains(table.saveFormat), "Save format '%s' not recognized. Possible values: %s".format(table.saveFormat, possibleSaveFormats.mkString(",") ))
+    require(possibleSaveModes.contains(table.saveMode), "Save mode '%s' not recognized. Possible values: %s".format(table.saveMode, possibleSaveModes.mkString(",") ))
   }
 
   def validateDateTimes(table: TableInfo) = {
