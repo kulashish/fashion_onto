@@ -11,6 +11,7 @@
       "rangeStart": "2014-06-12",
       "rangeEnd": "2014-06-12",
       "limit": "3000",
+      "filterCondition": "id_catalog_product_image NOT LIKE 'R%'"
       "joinTables": [
         {
             "name": "abc",
