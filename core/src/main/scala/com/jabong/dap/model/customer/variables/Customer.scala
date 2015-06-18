@@ -90,6 +90,14 @@ object Customer {
    // AND max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
    def getAccRegDateAndUpdatedAt(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame): DataFrame = {
 
+     if(dfCustomer == null || dfNLS == null || dfSalesOrder == null ){
+
+        log("Data frame should not be null")
+
+        return null
+
+     }
+
        val customer = dfCustomer.select("email", "created_at", "updated_at")
 
        val nls = dfNLS.select("email", "created_at", "updated_at")
