@@ -23,4 +23,6 @@ object Model {
   val category = Spark.getContext().broadcast(Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_category/full/2015/06/06/11"))
 
   val categoryMapping = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_config_has_catalog_category")
-}
+
+  val itemMaster = Spark.getHiveContext().read.format("orc").load("hdfs://localhost/home/test/sparkData/erp/item_master/full/2015/06/18/14")
+ }
