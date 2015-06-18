@@ -17,6 +17,7 @@ For data acquisition, we are reading and parsing a JSON configuration file. The 
       "rangeStart": "",
       "rangeEnd": "",
       "limit": "",
+      "filterCondition": "",
       "joinTables": [
         {
             "name": "",
@@ -48,6 +49,7 @@ their names)
 * **rangeStart**: The date time from which data is to be fetched.
 * **rangeEnd**: The date time upto which data is to be fetched.
 * **limit**: Use if limited data is to be fetched.
+* **filterCondition**: Condition to filter the data to be fetched.
 * **joinTables**: Contains information of tables that need to be joined with the original table.
 
 ## Mode

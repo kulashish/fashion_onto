@@ -20,6 +20,7 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
     val rangeStart = tableInfo.rangeStart // for range mode (date)
     val rangeEnd = tableInfo.rangeEnd // for range mode (date)
     val limit = tableInfo.limit // for full mode
+    val filterCondition = tableInfo.filterCondition
     val joinTables = tableInfo.joinTables //
 
     val dbConn = new DbConnection(source)
@@ -33,11 +34,11 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
     }
 
     if (mode == "full") {
-      GetData.getFullData(driver, source, dbConn, tableName, primaryKey, limit, saveFormat, saveMode)
+      GetData.getFullData(driver, source, dbConn, tableName, primaryKey, limit, filterCondition, saveFormat, saveMode)
     } else if (mode == "daily") {
-      GetData.getDailyData(tableName,source, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
+      GetData.getDailyData(tableName,source, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition)
     } else if (mode == "hourly") {
-      GetData.getHourlyData(tableName,source, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd)
+      GetData.getHourlyData(tableName,source, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition)
     }
   }
 

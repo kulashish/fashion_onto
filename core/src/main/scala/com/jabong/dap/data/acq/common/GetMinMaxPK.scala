@@ -9,18 +9,18 @@ import java.sql.{ ResultSet, Statement }
 case class MinMax(min: Long, max: Long)
 
 object GetMinMaxPK {
-  def getMinMax(mode: String, dbc: DbConnection, tableName: String, cond: String, tablePrimaryKey: String, limit: String): MinMax = {
+  def getMinMax(mode: String, dbc: DbConnection, tableName: String, condition: String, tablePrimaryKey: String, limit: String): MinMax = {
     var minMax = new MinMax(0, 0)
 
     val minMaxSql = if ((mode == "full" && limit == null) || (mode == "daily") || mode == "hourly") {
-      "SELECT MIN(%s), MAX(%s) FROM %s %s".format(tablePrimaryKey, tablePrimaryKey, tableName, cond)
+      "SELECT MIN(%s), MAX(%s) FROM %s %s".format(tablePrimaryKey, tablePrimaryKey, tableName, condition)
     } else {
       if (dbc.driver == "mysql") {
-        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT * FROM %s ORDER BY %s desc LIMIT %s ) AS t1".
-          format(tablePrimaryKey, tablePrimaryKey, tableName, tablePrimaryKey, limit)
+        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT * FROM %s %s ORDER BY %s desc LIMIT %s ) AS t1".
+          format(tablePrimaryKey, tablePrimaryKey, tableName, condition,  tablePrimaryKey, limit)
       } else if (dbc.driver == "sqlserver") {
-        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT TOP %s * FROM %s ORDER BY %s desc) AS t1".
-          format(tablePrimaryKey, tablePrimaryKey, limit, tableName, tablePrimaryKey)
+        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT TOP %s * FROM %s %s ORDER BY %s desc) AS t1".
+          format(tablePrimaryKey, tablePrimaryKey, limit, tableName, condition, tablePrimaryKey)
       } else {
         ""
       }

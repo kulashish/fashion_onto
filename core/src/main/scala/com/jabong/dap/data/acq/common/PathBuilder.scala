@@ -51,6 +51,9 @@ object PathBuilder {
     }
   }
 
+  /**
+   * Converts integer containing day or month of date to a string with the format MM or dd, respectively.
+   */
   def withLeadingZeros (input: Int) :String = {
     if (input < 10) {
       "0%s".format(input)

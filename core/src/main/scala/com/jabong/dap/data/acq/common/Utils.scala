@@ -28,6 +28,7 @@ case class JoinTables(
  * @param rangeStart String The date time from which the data is to be fetched.
  * @param rangeEnd String The date time till which the data is to be fetched.
  * @param limit String The number of rows to be fetched.
+ * @param filterCondition String Condition to filter the primary key while fetching data.
  * @param joinTables List[JoinTables] List of tables to be joined.
  */
 case class TableInfo(
@@ -41,6 +42,7 @@ case class TableInfo(
   rangeStart: String,
   rangeEnd: String,
   limit: String,
+  filterCondition: String,
   joinTables: List[JoinTables]
 )
 
