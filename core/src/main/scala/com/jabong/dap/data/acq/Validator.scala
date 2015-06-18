@@ -37,21 +37,24 @@ object Validator {
 
   def validateDateTimes(table: TableInfo) = {
     require(!(dateStringEmpty(table.rangeStart) ^ dateStringEmpty(table.rangeEnd)), "rangeStart and rangeEnd both should have values, or none of them should have a value" )
+  }
+
+  def validateRanges(table: TableInfo) = {
     try {
       require(isStrictlyLessThan(table.rangeStart, table.rangeEnd), "Start date time should be strictly less than End date time")
     } catch {
-    case e: ParseException => "Date should be of the format: %s".format(Constants.DateTimeFormat)
+      case e: ParseException => "Date should be of the format: %s".format(Constants.DateTimeFormat)
     }
-  }
 
-  def validateRanges(table: TableInfo) =  table.mode match {
-    case "daily" =>
-    require(isSameMonth(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
-      "want data spanning multiple months.")
-    case "hourly" =>
-      require(table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd),"rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
-      "want data spanning multiple days.")
-    case _ => 
+    table.mode match {
+      case "daily" =>
+        require(isSameMonth(table.rangeStart, table.rangeEnd), "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
+          "want data spanning multiple months.")
+      case "hourly" =>
+        require(table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd), "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
+          "want data spanning multiple days.")
+      case _ =>
+    }
   }
 
   def validate(info: ImportInfo) = {
@@ -59,8 +62,7 @@ object Validator {
       validateRequiredValues(table)
       validatePossibleValues(table)
       validateDateTimes(table)
-      if ((table.rangeStart != null && table.rangeStart.length() != 0) &&
-        (table.rangeEnd != null && table.rangeEnd.length() != 0)) {
+      if (!(dateStringEmpty(table.rangeStart) && dateStringEmpty(table.rangeEnd))) {
         validateRanges(table)
       }
     }
