@@ -105,7 +105,7 @@ object Time {
    */
   def isStrictlyLessThan(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DateTimeFormat)
-    try{
+    try {
       val start = format.parse(dt1)
       val end = format.parse(dt2)
       if (start.getTime < end.getTime)
@@ -120,7 +120,7 @@ object Time {
    * year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
    */
-  def isSameMonth(dt1: String, dt2: String) : Boolean = {
+  def isSameMonth(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DateTimeFormat)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
@@ -137,14 +137,14 @@ object Time {
    * month of the same year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
    */
-  def isSameDay(dt1: String, dt2: String) : Boolean = {
+  def isSameDay(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DateTimeFormat)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
     start.setTime(format.parse(dt1))
     end.setTime(format.parse(dt2))
     if ((start.get(Calendar.YEAR) == end.get(Calendar.YEAR)) && (start.get(Calendar.MONTH) == end.get(Calendar.MONTH))
-          && (start.get(Calendar.DATE) == end.get(Calendar.DATE)))
+      && (start.get(Calendar.DATE) == end.get(Calendar.DATE)))
       true
     else
       false

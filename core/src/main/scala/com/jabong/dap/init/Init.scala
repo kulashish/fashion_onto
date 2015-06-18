@@ -21,8 +21,7 @@ object Init {
   case class Params(
     component: String = null,
     tableJson: String = null,
-    config: String = null
-  )
+    config: String = null)
 
   def main(args: Array[String]) {
     options(args)
@@ -74,7 +73,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
-      case "acquisition" => new Delegator().start(params.tableJson)// do your stuff here
+      case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
     }
   }
 }

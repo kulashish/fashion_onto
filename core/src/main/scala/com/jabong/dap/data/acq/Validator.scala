@@ -29,14 +29,14 @@ object Validator {
     val possibleSaveFormats = Array("orc", "parquet")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 
-    require(possibleSources.contains(table.source), "Source '%s' not recognized. Possible values: %s".format(table.source, possibleSources.mkString(",") ))
-    require(possibleModes.contains(table.mode), "Mode '%s' not recognized. Possible values: %s".format(table.mode, possibleModes.mkString(",") ))
-    require(possibleSaveFormats.contains(table.saveFormat), "Save format '%s' not recognized. Possible values: %s".format(table.saveFormat, possibleSaveFormats.mkString(",") ))
-    require(possibleSaveModes.contains(table.saveMode), "Save mode '%s' not recognized. Possible values: %s".format(table.saveMode, possibleSaveModes.mkString(",") ))
+    require(possibleSources.contains(table.source), "Source '%s' not recognized. Possible values: %s".format(table.source, possibleSources.mkString(",")))
+    require(possibleModes.contains(table.mode), "Mode '%s' not recognized. Possible values: %s".format(table.mode, possibleModes.mkString(",")))
+    require(possibleSaveFormats.contains(table.saveFormat), "Save format '%s' not recognized. Possible values: %s".format(table.saveFormat, possibleSaveFormats.mkString(",")))
+    require(possibleSaveModes.contains(table.saveMode), "Save mode '%s' not recognized. Possible values: %s".format(table.saveMode, possibleSaveModes.mkString(",")))
   }
 
   def validateDateTimes(table: TableInfo) = {
-    require(!(dateStringEmpty(table.rangeStart) ^ dateStringEmpty(table.rangeEnd)), "rangeStart and rangeEnd both should have values, or none of them should have a value" )
+    require(!(dateStringEmpty(table.rangeStart) ^ dateStringEmpty(table.rangeEnd)), "rangeStart and rangeEnd both should have values, or none of them should have a value")
   }
 
   def validateRanges(table: TableInfo) = {

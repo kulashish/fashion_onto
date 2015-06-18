@@ -16,8 +16,7 @@ object ConditionBuilder {
       } else {
         "WHERE %s >= '%s' AND %s <= '%s'".format(dateColumn, rangeStart, dateColumn, rangeEnd)
       }
-    }
-    else {
+    } else {
       if (rangeStart == null && rangeEnd == null && mode == "daily") {
         val prevDayDate = Time.getYesterdayDate()
         "WHERE %s >= '%s 00:00:00' AND %s <= '%s 23:59:59' AND %s".format(dateColumn, prevDayDate, dateColumn, prevDayDate, filterCondition)

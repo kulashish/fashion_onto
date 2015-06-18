@@ -17,7 +17,7 @@ object GetMinMaxPK {
     } else {
       if (dbc.driver == "mysql") {
         "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT * FROM %s %s ORDER BY %s desc LIMIT %s ) AS t1".
-          format(tablePrimaryKey, tablePrimaryKey, tableName, condition,  tablePrimaryKey, limit)
+          format(tablePrimaryKey, tablePrimaryKey, tableName, condition, tablePrimaryKey, limit)
       } else if (dbc.driver == "sqlserver") {
         "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT TOP %s * FROM %s %s ORDER BY %s desc) AS t1".
           format(tablePrimaryKey, tablePrimaryKey, limit, tableName, condition, tablePrimaryKey)
