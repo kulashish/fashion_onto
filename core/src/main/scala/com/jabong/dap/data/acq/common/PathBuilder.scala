@@ -4,7 +4,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.Constants
+import com.jabong.dap.common.{AppConfig, Constants}
 import com.jabong.dap.common.utils.Time
 
 /**
@@ -14,7 +14,7 @@ import com.jabong.dap.common.utils.Time
 object PathBuilder {
 
   def getPath (mode: String, source: String, tableName: String, rangeStart: String, rangeEnd: String) ={
-    val basePath = "/home/test/sparkData" //from config file
+    val basePath = AppConfig.config.basePath
 
     mode match {
       case "full" => {

@@ -8,8 +8,6 @@ import com.jabong.dap.common.AppConfig
 class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
   def fetch(): Unit = {
 
-    println(AppConfig.config.master)
-
     val source = tableInfo.source // source
     val tableName = tableInfo.tableName //table name
     val primaryKey = tableInfo.primaryKey // table primary key
@@ -25,20 +23,12 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
 
     val dbConn = new DbConnection(source)
 
-    val driver = if (source == "bob") {
-      "mysql" // pick from source config
-    } else if (source == "erp") {
-      "sqlserver"
-    } else {
-      ""
-    }
-
     if (mode == "full") {
-      GetData.getFullData(driver, source, dbConn, tableName, primaryKey, limit, filterCondition, saveFormat, saveMode)
+      GetData.getFullData(dbConn, source, tableName, primaryKey, limit, filterCondition, saveFormat, saveMode)
     } else if (mode == "daily") {
-      GetData.getDailyData(tableName,source, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition)
+      GetData.getDailyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
     } else if (mode == "hourly") {
-      GetData.getHourlyData(tableName,source, driver, dbConn, saveFormat, saveMode, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition)
+      GetData.getHourlyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
     }
   }
 

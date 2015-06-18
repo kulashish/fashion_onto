@@ -7,8 +7,8 @@ import com.jabong.dap.data.acq.common.{ Fetcher, ImportInfo }
  * Reads and parses the JSON file to run various
  * data collection jobs.
  */
-class Delegator() extends Serializable {
-  def start(tableJsonPath: String ) = {
+class Delegator extends Serializable {
+  def start(tableJsonPath: String) = {
     val info = Parser.parseJson[ImportInfo](tableJsonPath)
 
     // Validate the JSON and it's parameters.
@@ -16,19 +16,18 @@ class Delegator() extends Serializable {
       Validator.validate(info)
       true
     } catch {
-      case e: IllegalArgumentException => {
+      case e: IllegalArgumentException =>
         println("Error while validating JSON: " + e.getMessage)
         false
-      }
-      case e: ValidationException => {
+
+      case e: ValidationException =>
         println("Error while validating JSON: " + e.getMessage)
         false
-      }
-      case e: Exception => {
+
+      case e: Exception =>
         println("Some unknown error occurred: " + e.getMessage)
         throw e
         false
-      }
     }
 
     // Fetch the data if validation succeeded.

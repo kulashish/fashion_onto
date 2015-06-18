@@ -17,18 +17,18 @@ object GetData {
     case _ => null
   }
 
-  def getData(mode: String, source: String, driver: String, dbConn: DbConnection, tableName: String, primaryKey: String,
-              dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, saveFormat: String,
-              saveMode: String , filterCondition: String): Any = {
+  def getData(mode: String, dbConn: DbConnection, source: String, tableName: String, primaryKey: String,
+              dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, filterCondition: String,
+              saveFormat: String, saveMode: String): Any = {
     val context = getContext(saveFormat)
     val condition = ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition)
 
     println(condition)
 
     val dbTableQuery = if (mode == "full") {
-      QueryBuilder.getFullDataQuery(driver, tableName, limit, primaryKey, condition)
+      QueryBuilder.getFullDataQuery(dbConn.getDriver, tableName, limit, primaryKey, condition)
     } else if (mode == "daily" || mode == "hourly") {
-      QueryBuilder.getDataQuery(mode, driver, tableName, rangeStart, rangeEnd, dateColumn, condition)
+      QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, rangeStart, rangeEnd, dateColumn, condition)
     } else {
       ""
     }
@@ -63,19 +63,19 @@ object GetData {
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
   }
 
-  def getFullData(driver: String, source: String, dbConn: DbConnection, tableName: String, primaryKey: String, limit: String,
+  def getFullData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, limit: String,
                   filterCondition: String, saveFormat: String, saveMode: String) = {
-    getData("full", source, driver, dbConn, tableName, primaryKey, null, limit, null, null, saveFormat, saveMode, filterCondition)
+    getData("full", dbConn, source, tableName, primaryKey, null, limit, null, null, filterCondition, saveFormat, saveMode)
   }
 
-  def getDailyData(tableName: String, source: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
-                   primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String, filterCondition: String) = {
-    getData("daily", source, driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode,  filterCondition)
+  def getDailyData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, dateColumn: String,
+                   rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String) = {
+    getData("daily", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
   }
 
-  def getHourlyData(tableName: String, source: String, driver: String, dbConn: DbConnection, saveFormat: String, saveMode: String,
-                    primaryKey: String, dateColumn: String, rangeStart: String, rangeEnd: String, filterCondition: String) = {
-    getData("hourly", source, driver, dbConn, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, saveFormat, saveMode, filterCondition)
+  def getHourlyData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, dateColumn: String,
+                    rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String) = {
+    getData("hourly", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
   }
 
 }

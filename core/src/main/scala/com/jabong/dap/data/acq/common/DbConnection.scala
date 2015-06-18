@@ -1,5 +1,7 @@
 package com.jabong.dap.data.acq.common
 
+import com.jabong.dap.common.AppConfig
+
 /**
  * Created by Abhay on 9/6/15.
  */
@@ -7,33 +9,32 @@ case class DbConnection(source: String) {
   require(source != null, "Source Type is null")
   var driver, server, port, dbName, userName, password = ""
 
-  source match {
-    case "erp" => {
-      driver = "sqlserver"
-      server = "103.29.235.143"
-      port = "1433"
-      dbName = "JADE"
-      userName = "report"
-      password = "re@port"
-    }
-    case "bob" => {
-      driver = "mysql"
-      server = "172.16.84.45"
-      port = "3306"
-      dbName = "bob_live"
-      userName = "Blr_catalog_team"
-      password = "CatalogTeam@123"
+  for (c <- AppConfig.config.credentials) {
+    if (c.source == source) {
+      driver = c.driver
+      server = c.server
+      port = c.port
+      dbName = c.dbName
+      userName = c.userName
+      password = c.password
     }
   }
 
-  def getConnectionString = driver match {
-    case "sqlserver" => {
-      "jdbc:sqlserver://%s:%s;database=%s;userName=%s;password=%s".format(server, port, dbName, userName, password)
+  require(driver != "", "Credentials not provided for source %s".format(source))
+
+  def getConnectionString = {
+    driver match {
+      case "sqlserver" =>
+        "jdbc:sqlserver://%s:%s;database=%s;userName=%s;password=%s".
+          format(server, port, dbName, userName, password)
+
+      case "mysql" =>
+        "jdbc:mysql://%s:%s/%s?zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&user=%s&password=%s"
+          .format(server, port, dbName, userName, password)
+
+      case _ => ""
     }
-    case "mysql" => {
-      "jdbc:mysql://%s:%s/%s?zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&user=%s&password=%s"
-        .format(server, port, dbName, userName, password)
-    }
-    case _ => ""
   }
+
+  def getDriver = driver
 }
