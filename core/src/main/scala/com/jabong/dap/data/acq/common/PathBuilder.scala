@@ -17,11 +17,10 @@ object PathBuilder {
     val basePath = AppConfig.config.basePath
 
     mode match {
-      case "full" => {
+      case "full" => 
         val dateNow = Time.getTodayDateWithHrs().replaceAll("-", File.separator)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
-      }
-      case "daily" => {
+      case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
           val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
           "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
@@ -35,8 +34,7 @@ object PathBuilder {
             .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH)),
               withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
         }
-      }
-      case "hourly" => {
+      case "hourly" =>
         val format = new SimpleDateFormat(Constants.DateTimeFormat)
         val start = Calendar.getInstance()
         val end = Calendar.getInstance()
@@ -46,7 +44,6 @@ object PathBuilder {
           .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH)),
             withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)),
             withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
-      }
       case _ => ""
     }
   }

@@ -1,6 +1,5 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.AppConfig
 
 /**
  * Created by Abhay on 8/6/15.
@@ -23,13 +22,12 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
 
     val dbConn = new DbConnection(source)
 
-    if (mode == "full") {
-      GetData.getFullData(dbConn, source, tableName, primaryKey, limit, filterCondition, saveFormat, saveMode)
-    } else if (mode == "daily") {
-      GetData.getDailyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
-    } else if (mode == "hourly") {
-      GetData.getHourlyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
+    mode match {
+      case "full" => GetData.getFullData(dbConn, source, tableName, primaryKey, limit, filterCondition, saveFormat, saveMode)
+      case "daily" => GetData.getDailyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
+      case "hourly" => GetData.getHourlyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
     }
   }
+
 
 }

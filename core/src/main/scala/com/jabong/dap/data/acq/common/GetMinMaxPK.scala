@@ -15,15 +15,18 @@ object GetMinMaxPK {
     val minMaxSql = if ((mode == "full" && limit == null) || (mode == "daily") || mode == "hourly") {
       "SELECT MIN(%s), MAX(%s) FROM %s %s".format(tablePrimaryKey, tablePrimaryKey, tableName, condition)
     } else {
-      if (dbc.driver == "mysql") {
-        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT * FROM %s %s ORDER BY %s desc LIMIT %s ) AS t1".
-          format(tablePrimaryKey, tablePrimaryKey, tableName, condition, tablePrimaryKey, limit)
-      } else if (dbc.driver == "sqlserver") {
-        "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT TOP %s * FROM %s %s ORDER BY %s desc) AS t1".
-          format(tablePrimaryKey, tablePrimaryKey, limit, tableName, condition, tablePrimaryKey)
-      } else {
-        ""
+      dbc.driver match {
+        case "mysql" => {
+          "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT * FROM %s %s ORDER BY %s desc LIMIT %s ) AS t1".
+            format(tablePrimaryKey, tablePrimaryKey, tableName, condition, tablePrimaryKey, limit)
+        }
+        case "sqlserver" => {
+          "SELECT MIN(t1.%s), MAX(t1.%s) FROM (SELECT TOP %s * FROM %s %s ORDER BY %s desc) AS t1".
+            format(tablePrimaryKey, tablePrimaryKey, limit, tableName, condition, tablePrimaryKey)
+        }
+        case _ => ""
       }
+
     }
 
     println(minMaxSql)

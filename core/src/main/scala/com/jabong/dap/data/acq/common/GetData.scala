@@ -25,14 +25,13 @@ object GetData {
 
     println(condition)
 
-    val dbTableQuery = if (mode == "full") {
-      QueryBuilder.getFullDataQuery(dbConn.getDriver, tableName, limit, primaryKey, condition)
-    } else if (mode == "daily" || mode == "hourly") {
-      QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, rangeStart, rangeEnd, dateColumn, condition)
-    } else {
-      ""
+    val dbTableQuery = mode match {
+      case "full" =>
+        QueryBuilder.getFullDataQuery(dbConn.getDriver, tableName, limit, primaryKey, condition)
+      case "daily" | "hourly" =>
+        QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, rangeStart, rangeEnd, dateColumn, condition)
+      case _ => ""
     }
-
     println(dbTableQuery)
 
     val jdbcDF = if (primaryKey == null) {
