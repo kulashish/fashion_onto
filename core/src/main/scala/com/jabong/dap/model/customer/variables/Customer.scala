@@ -90,13 +90,25 @@ object Customer {
    // AND max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
    def getAccRegDateAndUpdatedAt(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame): DataFrame = {
 
-     if(dfCustomer == null || dfNLS == null || dfSalesOrder == null ){
+       if(dfCustomer == null || dfNLS == null || dfSalesOrder == null ){
 
-        log("Data frame should not be null")
+          log("Data frame should not be null")
 
-        return null
+          return null
 
-     }
+       }
+
+       if(!isCustomerSchema(dfCustomer)){
+            return null
+       }
+
+       if(!isNLSSchema(dfNLS)){
+         return null
+       }
+
+       if(!isSalesOrderSchema(dfSalesOrder)){
+         return null
+       }
 
        val customer = dfCustomer.select("email", "created_at", "updated_at")
 
@@ -113,6 +125,55 @@ object Customer {
 
        dfAccRegDateAndUpdatedAt
    }
+
+  //schema check for customer data frame
+  def isCustomerSchema(dfCustomer: DataFrame): Boolean = {
+
+      val schemaCustomer = dfCustomer.schema.simpleString
+      if( !schemaCustomer.contains("email") ||
+          !schemaCustomer.contains("created_at") ||
+          !schemaCustomer.contains("updated_at")){
+
+        log("attribute email, created_at, updated_at should present in customer data frame")
+
+        return false
+      }
+
+      return true
+  }
+
+  //schema check for NLS data frame
+  def isNLSSchema(dfNLS: DataFrame): Boolean = {
+
+      val schemaNLS = dfNLS.schema.simpleString
+      if( !schemaNLS.contains("email") ||
+          !schemaNLS.contains("created_at") ||
+          !schemaNLS.contains("updated_at")){
+
+        log("attribute email, created_at, updated_at should present in NLS data frame")
+
+        return false
+      }
+
+      return true
+  }
+
+  //schema check for Sales Order data frame
+  def isSalesOrderSchema(dfSalesOrder: DataFrame): Boolean = {
+
+      val schemaSalesOrder = dfSalesOrder.schema.simpleString
+      if( !schemaSalesOrder.contains("customer_email") ||
+          !schemaSalesOrder.contains("created_at") ||
+          !schemaSalesOrder.contains("updated_at")){
+
+        log("attribute customer_email, created_at, updated_at should present in Sales Order data frame")
+
+        return false
+      }
+
+      return true
+  }
+
 
    //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
    def getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame): DataFrame = {

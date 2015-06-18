@@ -55,7 +55,6 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   }
 
 
-
   "AccRegDateAndUpdatedAt Data Frame" should "match to resultant Data Frame" in {
 
      //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
@@ -64,7 +63,6 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
                                                                        dfSalesOrder: DataFrame)
 
      result.collect().foreach(println)
-     result.printSchema()
 
 //     result.limit(10).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
      val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt")
@@ -83,5 +81,17 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
     assert(result == null)
 
   }
+
+  "attribute" should "present in data frames" in {
+
+    //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
+    val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
+                                                    dfNLS: DataFrame,
+                                                    dfSalesOrder: DataFrame)
+    assert(result != null)
+
+  }
+
+
 
  }
