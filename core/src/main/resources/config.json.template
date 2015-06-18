@@ -6,7 +6,7 @@
 {
     "applicationName": "<Name of your application>",
     "master": "local or local[4] or local[*] or spark://master:7077 to run on a Spark standalone cluster"
-    "basePath": "Base path of the location where the data will be saved",
+    "basePath": "hdfs path of the location where the data will be saved",
     "credentials": [
         {
         "source": "source of the data",

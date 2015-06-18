@@ -42,6 +42,6 @@ case class Config(
 /**
  * Object to access config variables application wide
  */
-object AppConfig extends Config {
+object AppConfig {
   var config: Config = null
 }
