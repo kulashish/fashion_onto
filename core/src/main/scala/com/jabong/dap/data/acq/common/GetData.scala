@@ -24,7 +24,7 @@ object GetData extends Logging {
     val context = getContext(saveFormat)
     val condition = ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition)
 
-    logger.debug(condition)
+    logger.info(condition)
 
     val dbTableQuery = mode match {
       case "full" =>
@@ -33,7 +33,7 @@ object GetData extends Logging {
         QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, rangeStart, rangeEnd, dateColumn, condition)
       case _ => ""
     }
-    logger.debug(dbTableQuery)
+    logger.info(dbTableQuery)
 
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
@@ -41,7 +41,7 @@ object GetData extends Logging {
         "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
-      logger.debug("%s ..... %s".format(minMax.min, minMax.max))
+      logger.info("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0)
         return
       context.load("jdbc", Map(

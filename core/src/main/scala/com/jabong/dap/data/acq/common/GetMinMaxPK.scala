@@ -31,7 +31,7 @@ object GetMinMaxPK extends Logging {
 
     }
 
-    logger.debug(minMaxSql)
+    logger.info(minMaxSql)
 
     val connection = DaoUtil.getConnection(dbc)
     try {
