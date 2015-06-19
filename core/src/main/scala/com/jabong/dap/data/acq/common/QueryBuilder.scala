@@ -20,7 +20,7 @@ object QueryBuilder {
       } else {
         ("", "")
       }
-      "(SELECT * FROM %s %s %s %s) as t1".format(tableName, condition, limitString._1, limitString._2)
+      "(SELECT * FROM %s %s %s %s) as t1".format(tableName, condition, limitString._2, limitString._1)
     case _ => ""
   }
 
