@@ -1,8 +1,7 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.common.{ Config, AppConfig }
+import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.common.json.Parser
-import com.jabong.dap.common.Spark
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.model.product.itr.Itr
 import org.apache.spark.SparkConf

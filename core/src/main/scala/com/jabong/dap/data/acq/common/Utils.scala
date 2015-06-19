@@ -3,6 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.sql.{ DriverManager, Connection }
 
 import com.jabong.dap.common.json.EmptyClass
+import grizzled.slf4j.Logging
 
 /**
  * Case class for storing information about join tables.
@@ -52,7 +53,7 @@ case class TableInfo(
 case class ImportInfo(
   acquisition: List[TableInfo]) extends EmptyClass
 
-object DaoUtil {
+object DaoUtil extends Logging {
 
   private val driverLoaded = scala.collection.mutable.Map("mysql" -> false, "sqlserver" -> false)
 
@@ -68,7 +69,7 @@ object DaoUtil {
       }
     } catch {
       case e: Exception => {
-        println("ERROR: Driver not available: " + e.getMessage)
+        logger.error("Driver not available: " + e.getMessage)
         throw e
       }
     }
@@ -85,7 +86,7 @@ object DaoUtil {
       DriverManager.getConnection(dbc.getConnectionString)
     } catch {
       case e: Exception => {
-        println("ERROR: No connection: " + e.getMessage)
+        logger.error("No connection: " + e.getMessage)
         throw e
       }
     }

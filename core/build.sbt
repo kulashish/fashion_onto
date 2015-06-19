@@ -22,4 +22,6 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.35"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4"
 
-libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.6.4"
+libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
+  "org.slf4j" % "slf4j-simple" % "1.7.5",
+  "org.clapper" %% "grizzled-slf4j" % "1.0.1")

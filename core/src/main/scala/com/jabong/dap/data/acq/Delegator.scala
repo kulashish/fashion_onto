@@ -2,30 +2,32 @@ package com.jabong.dap.data.acq
 
 import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.common.{ Fetcher, ImportInfo }
+import grizzled.slf4j.Logging
+import net.liftweb.json.JsonParser.ParseException
 
 /**
  * Reads and parses the JSON file to run various
  * data collection jobs.
  */
-class Delegator extends Serializable {
+class Delegator extends Serializable with Logging {
   def start(tableJsonPath: String) = {
-    val info = Parser.parseJson[ImportInfo](tableJsonPath)
-
-    // Validate the JSON and it's parameters.
+    var info: ImportInfo = null
+    // Parse and validate the JSON and it's parameters.
     val validated = try {
+      info = Parser.parseJson[ImportInfo](tableJsonPath)
       Validator.validate(info)
       true
     } catch {
-      case e: IllegalArgumentException =>
-        println("Error while validating JSON: " + e.getMessage)
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
         false
 
-      case e: ValidationException =>
-        println("Error while validating JSON: " + e.getMessage)
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
         false
 
       case e: Exception =>
-        println("Some unknown error occurred: " + e.getMessage)
+        logger.error("Some unknown error occurred: " + e.getMessage)
         throw e
         false
     }
@@ -35,7 +37,7 @@ class Delegator extends Serializable {
       for (table <- info.acquisition) {
         table.source match {
           case "erp" | "bob" | "unicommerce" => new Fetcher(table).fetch()
-          case _ => println("Unknown table source.")
+          case _ => logger.error("Unknown table source.")
         }
       }
     }

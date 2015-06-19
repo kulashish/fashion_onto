@@ -1,11 +1,12 @@
 package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.Spark
+import grizzled.slf4j.Logging
 
 /**
  * Created by Abhay on 10/6/15.
  */
-object GetData {
+object GetData extends Logging {
 
   def cleanString(str: String): String = {
     str.replaceAll("( |-|%)", "")
@@ -23,7 +24,7 @@ object GetData {
     val context = getContext(saveFormat)
     val condition = ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition)
 
-    println(condition)
+    logger.debug(condition)
 
     val dbTableQuery = mode match {
       case "full" =>
@@ -32,7 +33,7 @@ object GetData {
         QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, rangeStart, rangeEnd, dateColumn, condition)
       case _ => ""
     }
-    println(dbTableQuery)
+    logger.debug(dbTableQuery)
 
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
@@ -40,7 +41,7 @@ object GetData {
         "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
-      println("%s ..... %s".format(minMax.min, minMax.max))
+      logger.debug("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0)
         return
       context.load("jdbc", Map(

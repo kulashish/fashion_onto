@@ -2,13 +2,15 @@ package com.jabong.dap.data.acq.common
 
 import java.sql.{ ResultSet, Statement }
 
+import grizzled.slf4j.Logging
+
 /**
  * Created by Abhay on 9/6/15.
  */
 
 case class MinMax(min: Long, max: Long)
 
-object GetMinMaxPK {
+object GetMinMaxPK extends Logging {
   def getMinMax(mode: String, dbc: DbConnection, tableName: String, condition: String, tablePrimaryKey: String, limit: String): MinMax = {
     var minMax = new MinMax(0, 0)
 
@@ -29,13 +31,13 @@ object GetMinMaxPK {
 
     }
 
-    println(minMaxSql)
+    logger.debug(minMaxSql)
 
     val connection = DaoUtil.getConnection(dbc)
     try {
       val stmt: Statement = connection.createStatement
       try {
-        println("executing query")
+        logger.info("executing query")
         val rs: ResultSet = stmt.executeQuery(minMaxSql)
 
         try {
@@ -43,7 +45,7 @@ object GetMinMaxPK {
             minMax = new MinMax(rs.getString(1).toLong, rs.getString(2).toLong)
           }
         } catch {
-          case e: NumberFormatException => println("Data not found in table for requested duration.")
+          case e: NumberFormatException => logger.error("Data not found in table for requested duration.")
         } finally {
           rs.close()
         }

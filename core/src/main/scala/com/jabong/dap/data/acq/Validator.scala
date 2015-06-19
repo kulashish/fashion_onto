@@ -8,8 +8,6 @@ import com.jabong.dap.common.utils.Time._
  * Created by Rachit on 15/6/15.
  */
 
-case class ValidationException(message: String) extends Exception(message)
-
 /**
  * Validator for the JSON file used for data acquisition.
  */
