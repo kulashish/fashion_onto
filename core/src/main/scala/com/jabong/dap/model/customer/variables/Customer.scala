@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.{Time, DataFiles, Spark}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.reflect.io.File
@@ -161,17 +161,68 @@ object Customer {
   //schema check for Sales Order data frame
   def isSalesOrderSchema(dfSalesOrder: DataFrame): Boolean = {
 
-      val schemaSalesOrder = dfSalesOrder.schema.simpleString
-      if( !schemaSalesOrder.contains("customer_email") ||
-          !schemaSalesOrder.contains("created_at") ||
-          !schemaSalesOrder.contains("updated_at")){
+      val schema = StructType(Array(StructField("id_sales_order", IntegerType , true),
+                                    StructField("fk_sales_order_address_billing", IntegerType , true),
+                                    StructField("fk_sales_order_address_shipping", IntegerType , true),
+                                    StructField("fk_customer", IntegerType , true),
+                                    StructField("customer_first_name", StringType, true),
+                                    StructField("customer_last_name", StringType, true),
+                                    StructField("customer_email", StringType, true),
+                                    StructField("order_nr", StringType, true),
+                                    StructField("customer_session_id", StringType, true),
+                                    StructField("store_id", IntegerType , true),
+                                    StructField("grand_total", DecimalType(10,2), true),
+                                    StructField("tax_amount", DecimalType(10,2), true),
+                                    StructField("shipping_amount", DecimalType(10,2), true),
+                                    StructField("shipping_method", StringType, true),
+                                    StructField("coupon_code", StringType, true),
+                                    StructField("payment_method", StringType, true),
+                                    StructField("created_at", TimestampType, true),
+                                    StructField("updated_at", TimestampType, true),
+                                    StructField("fk_shipping_carrier", IntegerType , true),
+                                    StructField("tracking_url", StringType, true),
+                                    StructField("otrs_ticket", StringType, true),
+                                    StructField("fk_sales_order_process", IntegerType , true),
+                                    StructField("shipping_discount_amount", DecimalType(10,0), true),
+                                    StructField("ip", StringType, true),
+                                    StructField("invoice_file", StringType, true),
+                                    StructField("invoice_nr", StringType, true),
+                                    StructField("is_recurring", BooleanType, true),
+                                    StructField("ccavenue_order_number", StringType, true),
+                                    StructField("cod_charge", DecimalType(10,2), true),
+                                    StructField("retrial", BooleanType, true),
+                                    StructField("id_sales_order_additional_info", IntegerType , true),
+                                    StructField("fk_sales_order", IntegerType , true),
+                                    StructField("fk_affiliate_partner", IntegerType , true),
+                                    StructField("fk_shipping_partner_agent", IntegerType , true),
+                                    StructField("domain", StringType, true),
+                                    StructField("user_device_type", StringType, true),
+                                    StructField("shipment_delay_days", IntegerType , true),
+                                    StructField("mobile_verification", StringType, true),
+                                    StructField("address_mismatch", IntegerType , true),
+                                    StructField("earn_method", StringType, true),
+                                    StructField("parent_order_id", IntegerType , true),
+                                    StructField("utm_campaign", StringType, true),
+                                    StructField("reward_points", DecimalType(10,2), true),
+                                    StructField("app_version", StringType, true),
+                                    StructField("fk_corporate_customer", IntegerType , true),
+                                    StructField("corporate_currency_value", DecimalType(10,2), true),
+                                    StructField("corporate_transaction_id", StringType, true),
+                                    StructField("device_id", StringType, true)))
 
-        log("attribute customer_email, created_at, updated_at should present in Sales Order data frame")
+          println(dfSalesOrder.schema.simpleString.equals(schema.simpleString))
 
-        return false
-      }
 
-      return true
+  //    var array: Array[(String, String)] = _
+        val schemaSalesOrder = dfSalesOrder.schema.simpleString
+        if(!dfSalesOrder.schema.simpleString.equals(schema.simpleString)){
+
+          log("attribute customer_email, created_at, updated_at should present in Sales Order data frame")
+
+          return false
+        }
+
+        return true
   }
 
 

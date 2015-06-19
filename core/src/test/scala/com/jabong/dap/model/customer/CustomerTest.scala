@@ -55,40 +55,54 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   }
 
 
-  "AccRegDateAndUpdatedAt Data Frame" should "match to resultant Data Frame" in {
+//  "AccRegDateAndUpdatedAt Data Frame" should "match to resultant Data Frame" in {
+//
+//     //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
+//     val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
+//                                                                       dfNLS: DataFrame,
+//                                                                       dfSalesOrder: DataFrame)
+//
+//     result.collect().foreach(println)
+//
+////     result.limit(10).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
+//     val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt")
+//     dfAccRegDateAndUpdatedAt.collect().foreach(println)
+//     dfAccRegDateAndUpdatedAt.printSchema()
+//
+//     assert(2 == 2)
+//
+//   }
+//
+//  "Data Frame" should "null" in {
+//
+//    //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
+//    val result = Customer.getAccRegDateAndUpdatedAt(null, null, null)
+//
+//    assert(result == null)
+//
+//  }
 
-     //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
-     val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
-                                                                       dfNLS: DataFrame,
-                                                                       dfSalesOrder: DataFrame)
+  "schema attributes" should "present in data frames" in {
 
-     result.collect().foreach(println)
+      val BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
 
-//     result.limit(10).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
-     val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt")
-     dfAccRegDateAndUpdatedAt.collect().foreach(println)
-     dfAccRegDateAndUpdatedAt.printSchema()
+      val dfCustomer = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER + "/")
+      val dfNLS = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.NEWSLETTER_SUBSCRIPTION + "/")
+      val dfSalesOrder = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.SALES_ORDER + "/")
+      val dfCSH = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_STORECREDITS_HISTORY + "/")
+      val dfCustomerSegments = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_SEGMENTS + "/")
 
-     assert(2 == 2)
+      var result = true
 
-   }
+      if(!Customer.isCustomerSchema(dfCustomer) ||
+         !Customer.isNLSSchema(dfNLS) ||
+         !Customer.isSalesOrderSchema(dfSalesOrder) ){
 
-  "Data Frame" should "null" in {
+        result = false
 
-    //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
-    val result = Customer.getAccRegDateAndUpdatedAt(null, null, null)
+      }
 
-    assert(result == null)
-
-  }
-
-  "attribute" should "present in data frames" in {
-
-    //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
-    val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
-                                                    dfNLS: DataFrame,
-                                                    dfSalesOrder: DataFrame)
-    assert(result != null)
+      assert(result == true)
 
   }
 
