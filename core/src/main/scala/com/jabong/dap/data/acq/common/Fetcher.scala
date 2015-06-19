@@ -1,6 +1,5 @@
 package com.jabong.dap.data.acq.common
 
-
 /**
  * Created by Abhay on 8/6/15.
  */
@@ -28,6 +27,5 @@ class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
       case "hourly" => GetData.getHourlyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
     }
   }
-
 
 }

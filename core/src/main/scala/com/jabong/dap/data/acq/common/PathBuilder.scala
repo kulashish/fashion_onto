@@ -17,7 +17,7 @@ object PathBuilder {
     val basePath = AppConfig.config.basePath
 
     mode match {
-      case "full" => 
+      case "full" =>
         val dateNow = Time.getTodayDateWithHrs().replaceAll("-", File.separator)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
       case "daily" =>

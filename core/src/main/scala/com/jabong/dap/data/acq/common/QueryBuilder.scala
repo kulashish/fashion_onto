@@ -6,7 +6,7 @@ package com.jabong.dap.data.acq.common
 
 object QueryBuilder {
 
-  def getFullDataQuery(driver: String, tableName: String, limit: String, primaryKey: String, condition: String) = driver match{
+  def getFullDataQuery(driver: String, tableName: String, limit: String, primaryKey: String, condition: String) = driver match {
     case "sqlserver" =>
       val limitString = if (limit != null) {
         ("TOP %s".format(limit), "ORDER BY %s desc".format(primaryKey))

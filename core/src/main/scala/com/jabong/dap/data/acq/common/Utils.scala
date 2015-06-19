@@ -59,12 +59,12 @@ object DaoUtil {
   private def loadDriver(dbc: DbConnection) {
     try {
       dbc.driver match {
-      case "mysql" =>
-        Class.forName ("com.mysql.jdbc.Driver").newInstance
-        driverLoaded ("mysql") = true
-      case "sqlserver" =>
-        Class.forName ("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance
-        driverLoaded ("sqlserver") = true
+        case "mysql" =>
+          Class.forName ("com.mysql.jdbc.Driver").newInstance
+          driverLoaded ("mysql") = true
+        case "sqlserver" =>
+          Class.forName ("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance
+          driverLoaded ("sqlserver") = true
       }
     } catch {
       case e: Exception => {
