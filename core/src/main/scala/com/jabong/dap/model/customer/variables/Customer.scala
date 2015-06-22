@@ -5,6 +5,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
 
+
 import scala.reflect.io.File
 
 /**
@@ -98,18 +99,6 @@ object Customer {
 
        }
 
-       if(!isCustomerSchema(dfCustomer)){
-            return null
-       }
-
-       if(!isNLSSchema(dfNLS)){
-         return null
-       }
-
-       if(!isSalesOrderSchema(dfSalesOrder)){
-         return null
-       }
-
        val customer = dfCustomer.select("email", "created_at", "updated_at")
 
        val nls = dfNLS.select("email", "created_at", "updated_at")
@@ -125,105 +114,6 @@ object Customer {
 
        dfAccRegDateAndUpdatedAt
    }
-
-  //schema check for customer data frame
-  def isCustomerSchema(dfCustomer: DataFrame): Boolean = {
-
-      val schemaCustomer = dfCustomer.schema.simpleString
-      if( !schemaCustomer.contains("email") ||
-          !schemaCustomer.contains("created_at") ||
-          !schemaCustomer.contains("updated_at")){
-
-        log("attribute email, created_at, updated_at should present in customer data frame")
-
-        return false
-      }
-
-      return true
-  }
-
-  //schema check for NLS data frame
-  def isNLSSchema(dfNLS: DataFrame): Boolean = {
-
-      val schemaNLS = dfNLS.schema.simpleString
-      if( !schemaNLS.contains("email") ||
-          !schemaNLS.contains("created_at") ||
-          !schemaNLS.contains("updated_at")){
-
-        log("attribute email, created_at, updated_at should present in NLS data frame")
-
-        return false
-      }
-
-      return true
-  }
-
-  //schema check for Sales Order data frame
-  def isSalesOrderSchema(dfSalesOrder: DataFrame): Boolean = {
-
-      val schema = StructType(Array(StructField("id_sales_order", IntegerType , true),
-                                    StructField("fk_sales_order_address_billing", IntegerType , true),
-                                    StructField("fk_sales_order_address_shipping", IntegerType , true),
-                                    StructField("fk_customer", IntegerType , true),
-                                    StructField("customer_first_name", StringType, true),
-                                    StructField("customer_last_name", StringType, true),
-                                    StructField("customer_email", StringType, true),
-                                    StructField("order_nr", StringType, true),
-                                    StructField("customer_session_id", StringType, true),
-                                    StructField("store_id", IntegerType , true),
-                                    StructField("grand_total", DecimalType(10,2), true),
-                                    StructField("tax_amount", DecimalType(10,2), true),
-                                    StructField("shipping_amount", DecimalType(10,2), true),
-                                    StructField("shipping_method", StringType, true),
-                                    StructField("coupon_code", StringType, true),
-                                    StructField("payment_method", StringType, true),
-                                    StructField("created_at", TimestampType, true),
-                                    StructField("updated_at", TimestampType, true),
-                                    StructField("fk_shipping_carrier", IntegerType , true),
-                                    StructField("tracking_url", StringType, true),
-                                    StructField("otrs_ticket", StringType, true),
-                                    StructField("fk_sales_order_process", IntegerType , true),
-                                    StructField("shipping_discount_amount", DecimalType(10,0), true),
-                                    StructField("ip", StringType, true),
-                                    StructField("invoice_file", StringType, true),
-                                    StructField("invoice_nr", StringType, true),
-                                    StructField("is_recurring", BooleanType, true),
-                                    StructField("ccavenue_order_number", StringType, true),
-                                    StructField("cod_charge", DecimalType(10,2), true),
-                                    StructField("retrial", BooleanType, true),
-                                    StructField("id_sales_order_additional_info", IntegerType , true),
-                                    StructField("fk_sales_order", IntegerType , true),
-                                    StructField("fk_affiliate_partner", IntegerType , true),
-                                    StructField("fk_shipping_partner_agent", IntegerType , true),
-                                    StructField("domain", StringType, true),
-                                    StructField("user_device_type", StringType, true),
-                                    StructField("shipment_delay_days", IntegerType , true),
-                                    StructField("mobile_verification", StringType, true),
-                                    StructField("address_mismatch", IntegerType , true),
-                                    StructField("earn_method", StringType, true),
-                                    StructField("parent_order_id", IntegerType , true),
-                                    StructField("utm_campaign", StringType, true),
-                                    StructField("reward_points", DecimalType(10,2), true),
-                                    StructField("app_version", StringType, true),
-                                    StructField("fk_corporate_customer", IntegerType , true),
-                                    StructField("corporate_currency_value", DecimalType(10,2), true),
-                                    StructField("corporate_transaction_id", StringType, true),
-                                    StructField("device_id", StringType, true)))
-
-          println(dfSalesOrder.schema.simpleString.equals(schema.simpleString))
-
-
-  //    var array: Array[(String, String)] = _
-        val schemaSalesOrder = dfSalesOrder.schema.simpleString
-        if(!dfSalesOrder.schema.simpleString.equals(schema.simpleString)){
-
-          log("attribute customer_email, created_at, updated_at should present in Sales Order data frame")
-
-          return false
-        }
-
-        return true
-  }
 
 
    //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
@@ -245,7 +135,7 @@ object Customer {
                                            .map(fieldName => StructField(fieldName, StringType, true)))
 
        // Convert records of the RDD (segments) to Rows.
-       val rowRDD = dfMap.map(_.split(",")).map(p => Row(p(0).trim, p(1).trim))
+       val rowRDD = dfMap.map(_.split(",")).map(r => Row(r(0).trim, r(1).trim))
 
 
        // Apply the schema to the RDD.
@@ -275,7 +165,7 @@ object Customer {
 
          val salesOrder = dfSalesOrder.select("fk_customer", "created_at").sort("fk_customer", "created_at")
 
-         val soMapReduce=salesOrder.map(t=> ((t(0), Time.timeToSlot(t(1).toString)),1)).reduceByKey(_+_)
+         val soMapReduce=salesOrder.map(r=> ((r(0), Time.timeToSlot(r(1).toString)),1)).reduceByKey(_+_)
 
          val soNewMap = soMapReduce.map{case(key,value)=>(key._1,(key._2.asInstanceOf[Int],value.toInt))}
 
@@ -354,7 +244,7 @@ object Customer {
 
    def getSeg(dfCustSegVars: DataFrame): DataFrame = {
 
-       val segments = dfCustSegVars.map(e => e(0) + "," + e(1) + "," + getSegValue(e(2).toString))
+       val segments = dfCustSegVars.map(r => r(0) + "," + r(1) + "," + getSegValue(r(2).toString))
 
        val schemaString = "fk_customer1 mvp_score segment0 segment1 segment2 segment3 segment4 segment5 segment6"
 
@@ -364,15 +254,15 @@ object Customer {
 
        // Convert records of the RDD (segments) to Rows.
        val rowRDD = segments.map(_.split(","))
-                            .map(p => Row(p(0).trim,
-                                           p(1).trim,
-                                           p(2).trim,
-                                           p(3).trim,
-                                           p(4).trim,
-                                           p(5).trim,
-                                           p(6).trim,
-                                           p(7).trim,
-                                           p(8).trim))
+                            .map(r => Row(r(0).trim,
+                                          r(1).trim,
+                                          r(2).trim,
+                                          r(3).trim,
+                                          r(4).trim,
+                                          r(5).trim,
+                                          r(6).trim,
+                                          r(7).trim,
+                                          r(8).trim))
 
        // Apply the schema to the RDD.
        val toInt = udf[Int, String](_.toInt)
