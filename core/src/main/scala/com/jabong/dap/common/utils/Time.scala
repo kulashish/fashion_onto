@@ -26,14 +26,6 @@ object Time {
   }
 
   /**
-   * Returns the date 30 days back from today's date
-   */
-  def dateBefore30Days(): Date = {
-    val cal = Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, -30)
-    cal.getTime
-  }
-  /**
    * Returns today's date as a string in the format yyyy-MM-dd.
    */
   def getTodayDate(): String = {
@@ -59,36 +51,6 @@ object Time {
     sdf.format(new Date())
   }
 
-  case class MonthYear(month: Int, year: Int, day: Int)
-
-  /**
-   * Returns an instance of MonthYear for the date input.
-   */
-  def getMonthAndYear(dt: String): MonthYear = {
-    val cal = Calendar.getInstance()
-    if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DateFormat)
-      val date = df.parse(dt)
-      cal.setTime(date)
-    }
-    // Uses an index that starts from 0 for month. Hence need to add 1 to the month.
-    new MonthYear(cal.get(Calendar.MONTH)+1, cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
-  }
-
-  /**
-   * Returns the maximum date of the month for the inputted date.
-   * e.g. for input 2015-2-13, the output would be 28.
-   */
-  def getMaxDaysOfMonth(dt: String): Int = {
-    val cal = Calendar.getInstance()
-    if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DateFormat)
-      val date = df.parse(dt)
-      cal.setTime(date)
-    }
-    cal.getActualMaximum(Calendar.DAY_OF_MONTH)
-  }
-
   /**
    * Boolean test to check whether a given date string is empty (returns true) or not (returns false).
    */
@@ -106,14 +68,12 @@ object Time {
    */
   def isStrictlyLessThan(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DateTimeFormat)
-    try {
-      val start = format.parse(dt1)
-      val end = format.parse(dt2)
-      if (start.getTime < end.getTime)
-        true
-      else
-        false
-    }
+    val start = format.parse(dt1)
+    val end = format.parse(dt2)
+    if (start.getTime < end.getTime)
+      true
+    else
+      false
   }
 
   /**
