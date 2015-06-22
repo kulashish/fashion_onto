@@ -7,24 +7,24 @@ import com.jabong.dap.common.utils.Time
  */
 object ConditionBuilder {
   def getCondition(mode: String, dateColumn: String, rangeStart: String, rangeEnd: String, filterCondition: String): String = {
-    if (filterCondition == null) {
-      if (rangeStart == null && rangeEnd == null && mode == "daily") {
-        val prevDayDate = Time.getYesterdayDate()
-        "WHERE %s >= '%s 00:00:00' AND %s <= '%s 23:59:59'".format(dateColumn, prevDayDate, dateColumn, prevDayDate)
-      } else if (mode == "full") {
-        ""
-      } else {
-        "WHERE %s >= '%s' AND %s <= '%s'".format(dateColumn, rangeStart, dateColumn, rangeEnd)
-      }
+
+    val tempFilterCondition = if (filterCondition == null) {
+      ""
     } else {
-      if (rangeStart == null && rangeEnd == null && mode == "daily") {
-        val prevDayDate = Time.getYesterdayDate()
-        "WHERE %s >= '%s 00:00:00' AND %s <= '%s 23:59:59' AND %s".format(dateColumn, prevDayDate, dateColumn, prevDayDate, filterCondition)
-      } else if (mode == "full") {
-        "WHERE %s".format(filterCondition)
-      } else {
-        "WHERE %s >= '%s' AND %s <= '%s' AND %s".format(dateColumn, rangeStart, dateColumn, rangeEnd, filterCondition)
-      }
+      "AND %s".format(filterCondition)
+    }
+
+    if (rangeStart == null && rangeEnd == null && mode == "daily") {
+      val prevDayDate = Time.getYesterdayDate()
+      "WHERE %s >= '%s 00:00:00' AND %s <= '%s 23:59:59' %s".format(dateColumn, prevDayDate, dateColumn, prevDayDate, tempFilterCondition)
+    } else if (mode == "full" && filterCondition == null) {
+      ""
+    } else if (mode == "full" && filterCondition != null) {
+      "WHERE %s".format(filterCondition)
+    } else if (mode == "hourly") {
+      "WHERE %s >= '%s' AND %s <= '%s' %s".format(dateColumn, rangeStart, dateColumn, rangeEnd, tempFilterCondition)
+    } else {
+      ""
     }
   }
 }
