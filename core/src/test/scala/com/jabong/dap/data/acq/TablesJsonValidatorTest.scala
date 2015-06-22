@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, FlatSpec}
  * Unit Test class for validator.
  */
 
-class ValidatorTest extends FlatSpec with Matchers {
+class TablesJsonValidatorTest extends FlatSpec with Matchers {
 
   // Unit tests for required values.
   "validator" should "throw IllegalArgumentException for null source" in {
@@ -17,7 +17,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -26,7 +26,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -35,7 +35,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -44,7 +44,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -53,7 +53,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveFormat = null, saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -62,7 +62,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveFormat = null, saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -71,7 +71,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveFormat = null, saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -80,7 +80,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveFormat = null, saveMode = "", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -89,7 +89,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveFormat = null, saveMode = "overwrite", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -98,7 +98,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveFormat = "", saveMode = "overwrite", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRequiredValues(tableInfo)
+      TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
 
@@ -109,7 +109,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validatePossibleValues(tableInfo)
+      TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
 
@@ -118,7 +118,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validatePossibleValues(tableInfo)
+      TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
 
@@ -127,7 +127,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = "abc", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validatePossibleValues(tableInfo)
+      TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
 
@@ -136,7 +136,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = "abc", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validatePossibleValues(tableInfo)
+      TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
 
@@ -147,7 +147,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateDateTimes(tableInfo)
+      TablesJsonValidator.validateDateTimes(tableInfo)
     }
   }
 
@@ -156,7 +156,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = "2015-06", rangeEnd = null,
       limit = null, filterCondition = null, joinTables = null)
     a [ParseException] should be thrownBy {
-      Validator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges(tableInfo)
     }
   }
 
@@ -165,7 +165,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = "2015-05-21 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges(tableInfo)
     }
   }
 
@@ -174,7 +174,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-06-21 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges(tableInfo)
     }
   }
 
@@ -183,7 +183,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-04-23 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
     a [IllegalArgumentException] should be thrownBy {
-      Validator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges(tableInfo)
     }
   }
 
@@ -194,7 +194,7 @@ class ValidatorTest extends FlatSpec with Matchers {
       rangeStart = "2015-06-20 15:00:00", rangeEnd = "2015-06-30 15:00:00", limit = null, filterCondition = null,
       joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo))
-    Validator.validate(importInfo)
+    TablesJsonValidator.validate(importInfo)
   }
 
   "validator" should "not throw any exception if everything is correct (full mode)" in {
@@ -202,6 +202,6 @@ class ValidatorTest extends FlatSpec with Matchers {
       mode = "full", saveFormat = "orc", saveMode = "overwrite", dateColumn = "created_at", rangeStart = null,
       rangeEnd = null, limit = "3000", filterCondition = null, joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo))
-    Validator.validate(importInfo)
+    TablesJsonValidator.validate(importInfo)
   }
 }

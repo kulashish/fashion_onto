@@ -6,7 +6,7 @@ import com.jabong.dap.common.utils.Time._
 /**
  * Validator for the JSON file used for data acquisition.
  */
-object Validator {
+object TablesJsonValidator {
 
   def validateRequiredValues(table: TableInfo) = {
     require(table.source != null && table.source.length() != 0, "Source cannot be null or empty.")

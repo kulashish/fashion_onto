@@ -15,7 +15,7 @@ class Delegator extends Serializable with Logging {
     // Parse and validate the JSON and it's parameters.
     val validated = try {
       info = Parser.parseJson[ImportInfo](tableJsonPath)
-      Validator.validate(info)
+      TablesJsonValidator.validate(info)
       true
     } catch {
       case e: ParseException =>
