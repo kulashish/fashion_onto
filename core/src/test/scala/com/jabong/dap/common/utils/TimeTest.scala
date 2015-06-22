@@ -54,8 +54,19 @@ class TimeTest extends FlatSpec with Matchers {
     Time.getMonthAndYear("2015-06-19") should be (my)
   }
 
+  "getMonthYear" should "return correct value on passing null" in {
+    val cal = Calendar.getInstance()
+    val my = new MonthYear(cal.get(Calendar.MONTH) +1, cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
+    Time.getMonthAndYear(null) should be (my)
+  }
+
   "getMaxDaysOfMonth" should "return 30" in {
     Time.getMaxDaysOfMonth("2015-06-19") should be (30)
+  }
+
+  "getMaxDaysOfMonth" should "return correct value on passing null" in {
+    val cal = Calendar.getInstance()
+    Time.getMaxDaysOfMonth(null) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
   }
 
   "dateStringEmpty" should "return true" in {

@@ -71,7 +71,8 @@ object Time {
       val date = df.parse(dt)
       cal.setTime(date)
     }
-    new MonthYear(cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
+    // Uses an index that starts from 0 for month. Hence need to add 1 to the month.
+    new MonthYear(cal.get(Calendar.MONTH)+1, cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
   }
 
   /**
