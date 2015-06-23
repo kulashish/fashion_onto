@@ -164,9 +164,9 @@ object Schema {
 
 
       //schema check for customer data frame
-      def isCustomerSchema(dfCustomer: DataFrame): Boolean = {
+      def isCustomerSchema(schema: StructType): Boolean = {
 
-          if(!Schema.isEquals(dfCustomer.schema, Schema.customer)){
+          if(!Schema.isEquals(schema, Schema.customer)){
 
             log("schema attributes or data type mismatch, it should be: " + Schema.customer)
 
@@ -177,9 +177,9 @@ object Schema {
       }
 
       //schema check for NLS data frame
-      def isNLSSchema(dfNLS: DataFrame): Boolean = {
+      def isNLSSchema(schema: StructType): Boolean = {
 
-          if(!Schema.isEquals(dfNLS.schema, Schema.nls)){
+          if(!Schema.isEquals(schema, Schema.nls)){
 
             log("schema attributes or data type mismatch, it should be: " + Schema.nls)
 
@@ -190,9 +190,9 @@ object Schema {
       }
 
       //schema check for Sales Order data frame
-      def isSalesOrderSchema(dfSalesOrder: DataFrame): Boolean = {
+      def isSalesOrderSchema(schema: StructType): Boolean = {
 
-          if(!Schema.isEquals(dfSalesOrder.schema, Schema.salesOrder)){
+          if(!Schema.isEquals(schema, Schema.salesOrder)){
 
             log("schema attributes or data type mismatch, it should be: " + Schema.salesOrder)
 
@@ -203,9 +203,9 @@ object Schema {
       }
 
       //schema check for CSH data frame
-      def isCSHSchema(dfNLS: DataFrame): Boolean = {
+      def isCSHSchema(schema: StructType): Boolean = {
 
-          if(!Schema.isEquals(dfNLS.schema, Schema.csh)){
+          if(!Schema.isEquals(schema, Schema.csh)){
 
             log("schema attributes or data type mismatch, it should be: " + Schema.csh)
 
@@ -216,9 +216,9 @@ object Schema {
       }
 
       //schema check for Customer Segments data frame
-      def isCustomerSegmentsSchema(dfNLS: DataFrame): Boolean = {
+      def isCustomerSegmentsSchema(schema: StructType): Boolean = {
 
-          if(!Schema.isEquals(dfNLS.schema, Schema.customerSegments)){
+          if(!Schema.isEquals(schema, Schema.customerSegments)){
 
             log("schema attributes or data type mismatch, it should be: " + Schema.customerSegments)
 

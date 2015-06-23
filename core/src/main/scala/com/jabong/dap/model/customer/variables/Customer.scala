@@ -1,6 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.{Time, DataFiles, Spark}
+import com.jabong.dap.model.schema.Schema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
@@ -99,6 +100,17 @@ object Customer {
 
        }
 
+//       if(!Schema.isCustomerSchema(dfCustomer.schema) ||
+//          !Schema.isNLSSchema(dfNLS.schema) ||
+//          !Schema.isSalesOrderSchema(dfSalesOrder.schema)){
+//
+//         log("schema attributes or data type mismatch")
+//
+//         return null
+//
+//       }
+
+
        val customer = dfCustomer.select("email", "created_at", "updated_at")
 
        val nls = dfNLS.select("email", "created_at", "updated_at")
@@ -119,33 +131,28 @@ object Customer {
    //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
    def getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame): DataFrame = {
 
+       if(dfCustomer == null || dfNLS == null){
+
+         log("Data frame should not be null")
+
+         return null
+
+       }
+
        val customer = dfCustomer.select("id_customer", "email")
 
        val nls = dfNLS.select("email", "status")
 
-       val dfJoin = customer.join(nls.select("email", "status"), customer("email") === nls("email"), "left")
+       val dfJoin = customer.join(nls.select("email", "status"), customer("email") === nls("email"), "outer")
                             .select("id_customer", "status")
 
-       val dfMap = dfJoin.map(e=> e(0) + ","  +  getStatusValue(e))
+       val dfMap = dfJoin.map(e=> Row(e(0),  getStatusValue(e)))
 
-       val schemaString = "id_customer1 status"
-
-       // Generate the schema based on the string of schema
-       val schema = StructType(schemaString.split(" ")
-                                           .map(fieldName => StructField(fieldName, StringType, true)))
-
-       // Convert records of the RDD (segments) to Rows.
-       val rowRDD = dfMap.map(_.split(",")).map(r => Row(r(0).trim, r(1).trim))
-
+       val schema = StructType(Array(StructField("id_customer", IntegerType, true),
+                                     StructField("status", StringType, true)))
 
        // Apply the schema to the RDD.
-       val toInt = udf[Int, String](_.toInt)
-
-       // Apply the schema to the RDD.
-       val dfs = Spark.getSqlContext().createDataFrame(rowRDD, schema)
-
-       val dfEmailOptInStatus = dfs.withColumn("id_customer", toInt(dfs("id_customer1")))
-         .select("id_customer", "status")
+       val dfEmailOptInStatus = Spark.getSqlContext().createDataFrame(dfMap, schema)
 
        dfEmailOptInStatus
    }
@@ -161,28 +168,36 @@ object Customer {
    }
 
    //CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
-   def  getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame): DataFrame = {
+   def getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame): DataFrame = {
 
-         val salesOrder = dfSalesOrder.select("fk_customer", "created_at").sort("fk_customer", "created_at")
+       if(dfSalesOrder == null ){
 
-         val soMapReduce=salesOrder.map(r=> ((r(0), Time.timeToSlot(r(1).toString)),1)).reduceByKey(_+_)
+         log("Data frame should not be null")
 
-         val soNewMap = soMapReduce.map{case(key,value)=>(key._1,(key._2.asInstanceOf[Int],value.toInt))}
+         return null
 
-         val soGrouped = soNewMap.groupByKey()
+       }
 
-         val finalData =  soGrouped.map{case(key,value)=> (key.toString, getCompleteSlotData(value))}
+       val salesOrder = dfSalesOrder.select("fk_customer", "created_at").sort("fk_customer", "created_at")
 
-         val rowRDD = finalData.map({case(key,value) => Row(key,value._1,value._2)})
+       val soMapReduce=salesOrder.map(r=> ((r(0), Time.timeToSlot(r(1).toString)),1)).reduceByKey(_+_)
 
-         val schema = StructType(Array(StructField("fk_customer", StringType, true),
-                                       StructField("customer_all_order_timeslot",StringType,true),
-                                       StructField("customer_preferred_order_timeslot", IntegerType,true)))
+       val soNewMap = soMapReduce.map{case(key,value)=>(key._1,(key._2.asInstanceOf[Int],value.toInt))}
 
-         // Apply the schema to the RDD.
-         val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+       val soGrouped = soNewMap.groupByKey()
 
-         df
+       val finalData =  soGrouped.map{case(key,value)=> (key.toString, getCompleteSlotData(value))}
+
+       val rowRDD = finalData.map({case(key,value) => Row(key,value._1,value._2)})
+
+       val schema = StructType(Array(StructField("fk_customer", StringType, true),
+                                     StructField("customer_all_order_timeslot",StringType,true),
+                                     StructField("customer_preferred_order_timeslot", IntegerType,true)))
+
+       // Apply the schema to the RDD.
+       val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+
+       df
    }
 
 
@@ -221,6 +236,14 @@ object Customer {
    //customer_storecredits_history.operation_type = "nextbee_points_added", latest date for fk_customer
    def getLastJrCovertDate(dfCSH: DataFrame): DataFrame = {
 
+       if(dfCSH == null){
+
+         log("Data frame should not be null")
+
+         return null
+
+       }
+
        val dfLastJrCovertDate = dfCSH.select("fk_customer", "created_at")
                                      .groupBy("fk_customer")
                                      .agg(max("created_at") as "last_jr_covert_date")
@@ -235,7 +258,7 @@ object Customer {
                                              .sort(col("fk_customer"), desc("updated_at"))
                                              .groupBy("fk_customer")
                                              .agg(first("mvp_score") as "mvp_score",
-                                                   first("segment") as "segment")
+                                                  first("segment") as "segment")
 
    //    val segments = getSeg(dfCustSegVars)
 
@@ -244,15 +267,20 @@ object Customer {
 
    def getSeg(dfCustSegVars: DataFrame): DataFrame = {
 
-       val segments = dfCustSegVars.map(r => r(0) + "," + r(1) + "," + getSegValue(r(2).toString))
+       val schema = StructType(Array(StructField("fk_customer", IntegerType, true),
+                                     StructField("mvp_score", StringType, true),
+                                     StructField("segment0", StringType, true),
+                                     StructField("segment1", StringType, true),
+                                     StructField("segment2", StringType, true),
+                                     StructField("segment3", StringType, true),
+                                     StructField("segment4", StringType, true),
+                                     StructField("segment5", StringType, true),
+                                     StructField("segment6", StringType, true)))
 
-       val schemaString = "fk_customer1 mvp_score segment0 segment1 segment2 segment3 segment4 segment5 segment6"
+     val segments = dfCustSegVars.map(r => r(0) + "," + r(1) + "," + getSegValue(r(2).toString))
 
-       // Generate the schema based on the string of schema
-       val schema = StructType(schemaString.split(" ")
-                                           .map(fieldName => StructField(fieldName, StringType, true)))
 
-       // Convert records of the RDD (segments) to Rows.
+     // Convert records of the RDD (segments) to Rows.
        val rowRDD = segments.map(_.split(","))
                             .map(r => Row(r(0).trim,
                                           r(1).trim,
@@ -265,22 +293,9 @@ object Customer {
                                           r(8).trim))
 
        // Apply the schema to the RDD.
-       val toInt = udf[Int, String](_.toInt)
-
-       // Apply the schema to the RDD.
        val dfs = Spark.getSqlContext().createDataFrame(rowRDD, schema)
 
-       val dfs1 = dfs.withColumn("fk_customer", toInt(dfs("fk_customer1")))
-                     .select("fk_customer",
-                             "mvp_score",
-                             "segment0",
-                             "segment1",
-                             "segment2",
-                             "segment3",
-                             "segment4",
-                             "segment5",
-                             "segment6")
-       dfs1
+       dfs
    }
    def getSegValue(i: String): String = {
        val x = Integer.parseInt(i)
