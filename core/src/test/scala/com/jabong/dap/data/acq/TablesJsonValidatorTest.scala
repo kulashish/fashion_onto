@@ -151,6 +151,24 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     }
   }
 
+  "validator" should "throw IllegalArgumentException if range start is not provided for hourly mode" in {
+    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
+      saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
+      filterCondition = null, joinTables = null)
+    a [IllegalArgumentException] should be thrownBy {
+      TablesJsonValidator.validateDateTimes(tableInfo)
+    }
+  }
+
+  "validator" should "throw IllegalArgumentException if range end is not provided for hourly mode" in {
+    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
+      saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = null, limit = null,
+      filterCondition = null, joinTables = null)
+    a [IllegalArgumentException] should be thrownBy {
+      TablesJsonValidator.validateDateTimes(tableInfo)
+    }
+  }
+
   "validator" should "throw ParseException if format of rangeStart is not proper" in {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-06", rangeEnd = null,
@@ -185,6 +203,13 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     a [IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges(tableInfo)
     }
+  }
+
+  "validator" should "not throw any exception if the ranges are provided with full mode" in {
+    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "full", saveFormat = null,
+      saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-04-23 15:00:00",
+      limit = null, filterCondition = null, joinTables = null)
+      TablesJsonValidator.validateRanges(tableInfo)
   }
 
   // Integration test.
