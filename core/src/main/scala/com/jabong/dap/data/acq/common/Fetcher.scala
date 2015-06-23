@@ -3,9 +3,8 @@ package com.jabong.dap.data.acq.common
 /**
  * Created by Abhay on 8/6/15.
  */
-class Fetcher(tableInfo: TableInfo) extends java.io.Serializable {
-  def fetch(): Unit = {
-
+class Fetcher() extends java.io.Serializable {
+  def fetch(tableInfo: TableInfo): Unit = {
     val source = tableInfo.source // source
     val tableName = tableInfo.tableName //table name
     val primaryKey = tableInfo.primaryKey // table primary key

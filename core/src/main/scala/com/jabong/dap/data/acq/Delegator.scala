@@ -36,7 +36,7 @@ class Delegator extends Serializable with Logging {
     if (validated) {
       for (table <- info.acquisition) {
         table.source match {
-          case "erp" | "bob" | "unicommerce" => new Fetcher(table).fetch()
+          case "erp" | "bob" | "unicommerce" => new Fetcher().fetch(table)
           case _ => logger.error("Unknown table source.")
         }
       }
