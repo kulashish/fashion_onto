@@ -1,7 +1,7 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.{AppConfig, Config, Credentials}
-import org.scalatest.{Matchers, FlatSpec}
+import com.jabong.dap.common.{ AppConfig, Config, Credentials }
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by Abhay on 22/6/15.
@@ -9,18 +9,18 @@ import org.scalatest.{Matchers, FlatSpec}
 class DbConnectionTest extends FlatSpec with Matchers {
 
   "dbConnection" should "throw an exception for null source" in {
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       new DbConnection(null)
     }
   }
 
   "dbConnection" should "throw an exception if credentials not found for source" in {
-    val credentials = new Credentials(source = "erp", driver = null, server = null, port = null, dbName = null ,
+    val credentials = new Credentials(source = "erp", driver = null, server = null, port = null, dbName = null,
       userName = null, password = null)
     val credentialsList = List(credentials)
     val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       new DbConnection("bob")
     }
   }
@@ -68,5 +68,4 @@ class DbConnectionTest extends FlatSpec with Matchers {
   }
 
 }
-
 

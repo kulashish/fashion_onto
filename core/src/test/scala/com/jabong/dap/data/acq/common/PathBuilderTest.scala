@@ -2,9 +2,9 @@ package com.jabong.dap.data.acq.common
 
 import java.io.File
 
-import com.jabong.dap.common.{AppConfig, Config}
+import com.jabong.dap.common.{ AppConfig, Config }
 import com.jabong.dap.common.utils.Time
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by Abhay on 22/6/15.
@@ -31,8 +31,8 @@ class PathBuilderTest extends FlatSpec with Matchers {
 
   "getPath" should "return empty string if mode is not full, hourly, or daily" in {
     val mode = "otherMode"
-      PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be ("")
-    }
+    PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be ("")
+  }
 
   "getPath" should "return correct path if mode is full" in {
     val mode = "full"
@@ -63,6 +63,5 @@ class PathBuilderTest extends FlatSpec with Matchers {
     val outputPath = "basePath/source/tableName/2015/06/13/01_15"
     PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
   }
-
 
 }

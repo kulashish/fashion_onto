@@ -3,8 +3,8 @@ package com.jabong.dap.common.utils
 import java.text.SimpleDateFormat
 
 import com.jabong.dap.common.Constants
-import org.scalatest.{Matchers, FlatSpec}
-import java.util.{Calendar, Date}
+import org.scalatest.{ Matchers, FlatSpec }
+import java.util.{ Calendar, Date }
 
 /**
  * Created by Rachit on 19/6/15.

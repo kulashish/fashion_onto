@@ -51,11 +51,11 @@ object TablesJsonValidator {
       case "daily" =>
         require(isSameMonth(table.rangeStart, table.rangeEnd),
           "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
-          "want data spanning multiple months.")
+            "want data spanning multiple months.")
       case "hourly" =>
         require(table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd),
           "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
-          "want data spanning multiple days.")
+            "want data spanning multiple days.")
       case "full" =>
     }
   }

@@ -2,8 +2,8 @@ package com.jabong.dap.data.acq
 
 import java.text.ParseException
 
-import com.jabong.dap.data.acq.common.{ImportInfo, TableInfo}
-import org.scalatest.{Matchers, FlatSpec}
+import com.jabong.dap.data.acq.common.{ ImportInfo, TableInfo }
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Unit Test class for Tables JSON validator.
@@ -16,7 +16,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -25,7 +25,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "", tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -34,7 +34,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -43,7 +43,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "", primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -52,7 +52,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = null, mode = null,
       saveFormat = null, saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -61,7 +61,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = null, mode = "",
       saveFormat = null, saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -70,7 +70,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = null, mode = "full",
       saveFormat = null, saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -79,7 +79,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = null, mode = "full",
       saveFormat = null, saveMode = "", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -88,7 +88,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = null, mode = "full",
       saveFormat = null, saveMode = "overwrite", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -97,7 +97,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = null, mode = "full",
       saveFormat = "", saveMode = "overwrite", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRequiredValues(tableInfo)
     }
   }
@@ -108,7 +108,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "abc", tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
@@ -117,7 +117,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = null, primaryKey = null, mode = "abc", saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
@@ -126,7 +126,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = null, primaryKey = null, mode = "full", saveFormat = "abc",
       saveMode = "abc", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
@@ -135,7 +135,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = null, primaryKey = null, mode = "full", saveFormat = "orc",
       saveMode = "abc", dateColumn = null, rangeStart = null, rangeEnd = null, limit = null, filterCondition = null,
       joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validatePossibleValues(tableInfo)
     }
   }
@@ -146,7 +146,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateDateTimes(tableInfo)
     }
   }
@@ -155,7 +155,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateDateTimes(tableInfo)
     }
   }
@@ -164,7 +164,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateDateTimes(tableInfo)
     }
   }
@@ -173,7 +173,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-06", rangeEnd = null,
       limit = null, filterCondition = null, joinTables = null)
-    a [ParseException] should be thrownBy {
+    a[ParseException] should be thrownBy {
       TablesJsonValidator.validateRanges(tableInfo)
     }
   }
@@ -182,7 +182,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = "2015-05-21 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges(tableInfo)
     }
   }
@@ -191,7 +191,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily", saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-06-21 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges(tableInfo)
     }
   }
@@ -200,7 +200,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-04-23 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
-    a [IllegalArgumentException] should be thrownBy {
+    a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges(tableInfo)
     }
   }
@@ -209,7 +209,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "full", saveFormat = null,
       saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-04-23 15:00:00",
       limit = null, filterCondition = null, joinTables = null)
-      TablesJsonValidator.validateRanges(tableInfo)
+    TablesJsonValidator.validateRanges(tableInfo)
   }
 
   // Integration test.
