@@ -48,7 +48,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
-  "getCondition" should "return correct condition when mode hourly and filterCondition is null" in {
+  "getCondition" should "return correct condition when mode is hourly and filterCondition is null" in {
     val mode = "hourly"
     rangeStart = "rangeStart"
     rangeEnd =  "rangeEnd"
@@ -57,8 +57,26 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
-  "getCondition" should "return correct condition when mode hourly and filterCondition is not null" in {
+  "getCondition" should "return correct condition when mode is hourly and filterCondition is not null" in {
     val mode = "hourly"
+    val filterCondition = "filterCondition"
+    rangeStart = "rangeStart"
+    rangeEnd =  "rangeEnd"
+    val output = "WHERE dateColumn >= 'rangeStart' AND dateColumn <= 'rangeEnd' AND filterCondition"
+    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+  }
+
+  "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition null" in {
+    val mode = "daily"
+    rangeStart = "rangeStart"
+    rangeEnd =  "rangeEnd"
+    val filterCondition = null
+    val output = "WHERE dateColumn >= 'rangeStart' AND dateColumn <= 'rangeEnd' "
+    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+  }
+
+  "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition is not null" in {
+    val mode = "daily"
     val filterCondition = "filterCondition"
     rangeStart = "rangeStart"
     rangeEnd =  "rangeEnd"

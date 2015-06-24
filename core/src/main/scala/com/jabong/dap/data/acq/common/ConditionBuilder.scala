@@ -21,7 +21,7 @@ object ConditionBuilder {
       ""
     } else if (mode == "full" && filterCondition != null) {
       "WHERE %s".format(filterCondition)
-    } else if (mode == "hourly") {
+    } else if (mode == "hourly"  || (mode == "daily" && rangeStart != null && rangeEnd != null)) {
       "WHERE %s >= '%s' AND %s <= '%s' %s".format(dateColumn, rangeStart, dateColumn, rangeEnd, tempFilterCondition)
     } else {
       ""
