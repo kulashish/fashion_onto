@@ -100,15 +100,15 @@ object Customer {
 
        }
 
-//       if(!Schema.isCustomerSchema(dfCustomer.schema) ||
-//          !Schema.isNLSSchema(dfNLS.schema) ||
-//          !Schema.isSalesOrderSchema(dfSalesOrder.schema)){
-//
-//         log("schema attributes or data type mismatch")
-//
-//         return null
-//
-//       }
+       if(!Schema.isCustomerSchema(dfCustomer.schema) ||
+          !Schema.isNLSSchema(dfNLS.schema) ||
+          !Schema.isSalesOrderSchema(dfSalesOrder.schema)){
+
+         log("schema attributes or data type mismatch")
+
+         return null
+
+       }
 
 
        val customer = dfCustomer.select("email", "created_at", "updated_at")
@@ -139,22 +139,28 @@ object Customer {
 
        }
 
+       if(!Schema.isCustomerSchema(dfCustomer.schema) ||
+         !Schema.isNLSSchema(dfNLS.schema)){
+
+         log("schema attributes or data type mismatch")
+
+         return null
+
+       }
+
        val customer = dfCustomer.select("id_customer", "email")
 
        val nls = dfNLS.select("email", "status")
 
-       val dfJoin = customer.join(nls.select("email", "status"), customer("email") === nls("email"), "outer")
+       val dfJoin = customer.join(nls.select("email", "status"), customer("email") === nls("email"), "left")
                             .select("id_customer", "status")
 
        val dfMap = dfJoin.map(e=> Row(e(0),  getStatusValue(e)))
 
-       val schema = StructType(Array(StructField("id_customer", IntegerType, true),
-                                     StructField("status", StringType, true)))
-
        // Apply the schema to the RDD.
-       val dfEmailOptInStatus = Spark.getSqlContext().createDataFrame(dfMap, schema)
+       val dfEmailOptInStatus = Spark.getSqlContext().createDataFrame(dfMap, Schema.email_opt_in_status)
 
-       dfEmailOptInStatus
+       return dfEmailOptInStatus
    }
 
    def getStatusValue(e: Row): String = {
@@ -178,6 +184,14 @@ object Customer {
 
        }
 
+       if(!Schema.isSalesOrderSchema(dfSalesOrder.schema)){
+
+         log("schema attributes or data type mismatch")
+
+         return null
+
+       }
+
        val salesOrder = dfSalesOrder.select("fk_customer", "created_at").sort("fk_customer", "created_at")
 
        val soMapReduce=salesOrder.map(r=> ((r(0), Time.timeToSlot(r(1).toString)),1)).reduceByKey(_+_)
@@ -188,14 +202,10 @@ object Customer {
 
        val finalData =  soGrouped.map{case(key,value)=> (key.toString, getCompleteSlotData(value))}
 
-       val rowRDD = finalData.map({case(key,value) => Row(key,value._1,value._2)})
-
-       val schema = StructType(Array(StructField("fk_customer", StringType, true),
-                                     StructField("customer_all_order_timeslot",StringType,true),
-                                     StructField("customer_preferred_order_timeslot", IntegerType,true)))
+       val rowRDD = finalData.map({case(key,value) => Row(key.toInt, value._1, value._2)})
 
        // Apply the schema to the RDD.
-       val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+       val df = Spark.getSqlContext().createDataFrame(rowRDD, Schema.customers_preferred_order_timeslot)
 
        df
    }
@@ -244,6 +254,14 @@ object Customer {
 
        }
 
+       if(!Schema.isCSHSchema(dfCSH.schema)){
+
+         log("schema attributes or data type mismatch")
+
+         return null
+
+       }
+
        val dfLastJrCovertDate = dfCSH.select("fk_customer", "created_at")
                                      .groupBy("fk_customer")
                                      .agg(max("created_at") as "last_jr_covert_date")
@@ -253,6 +271,22 @@ object Customer {
 
    //calculate mvp_score and  latest updated value of mvp_score from customer_segments
    def getMvpAndSeg(dfCustomerSegments: DataFrame): DataFrame = {
+
+       if(dfCustomerSegments == null){
+
+         log("Data frame should not be null")
+
+         return null
+
+       }
+
+       if(!Schema.isCustomerSegmentsSchema(dfCustomerSegments.schema)){
+
+         log("schema attributes or data type mismatch")
+
+         return null
+
+       }
 
        val dfCustSegVars = dfCustomerSegments.select("fk_customer", "updated_at", "mvp_score", "segment")
                                              .sort(col("fk_customer"), desc("updated_at"))
@@ -268,7 +302,7 @@ object Customer {
    def getSeg(dfCustSegVars: DataFrame): DataFrame = {
 
        val schema = StructType(Array(StructField("fk_customer", IntegerType, true),
-                                     StructField("mvp_score", StringType, true),
+                                     StructField("mvp_score", IntegerType, true),
                                      StructField("segment0", StringType, true),
                                      StructField("segment1", StringType, true),
                                      StructField("segment2", StringType, true),

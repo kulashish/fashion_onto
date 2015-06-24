@@ -4,7 +4,8 @@ import com.jabong.dap.common.{DataFiles, SharedSparkContext, Spark}
 import com.jabong.dap.model.customer.variables.Customer
 import org.apache.spark.sql.functions._
 import com.jabong.dap.model.schema.Schema
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{Row, DataFrame, SQLContext}
 import org.scalatest.{FlatSpec}
 
 /**
@@ -31,11 +32,11 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   //     writeToJson(DataFiles.CUSTOMER_STORECREDITS_HISTORY)
   //     writeToJson(DataFiles.CUSTOMER_SEGMENTS)
 
-     dfCustomer = readFromJson(DataFiles.CUSTOMER, DataFiles.CUSTOMER)
-     dfNLS = readFromJson(DataFiles.NEWSLETTER_SUBSCRIPTION, DataFiles.NEWSLETTER_SUBSCRIPTION)
-     dfSalesOrder = readFromJson(DataFiles.SALES_ORDER, DataFiles.SALES_ORDER)
-     dfCSH = readFromJson(DataFiles.CUSTOMER_STORECREDITS_HISTORY, DataFiles.CUSTOMER_STORECREDITS_HISTORY)
-     dfCustomerSegments = readFromJson(DataFiles.CUSTOMER_SEGMENTS, DataFiles.CUSTOMER_SEGMENTS)
+     dfCustomer = readFromJson(DataFiles.CUSTOMER, DataFiles.CUSTOMER, Schema.customer)
+     dfNLS = readFromJson(DataFiles.NEWSLETTER_SUBSCRIPTION, DataFiles.NEWSLETTER_SUBSCRIPTION, Schema.nls)
+     dfSalesOrder = readFromJson(DataFiles.SALES_ORDER, DataFiles.SALES_ORDER, Schema.salesOrder)
+     dfCSH = readFromJson(DataFiles.CUSTOMER_STORECREDITS_HISTORY, DataFiles.CUSTOMER_STORECREDITS_HISTORY, Schema.csh)
+     dfCustomerSegments = readFromJson(DataFiles.CUSTOMER_SEGMENTS, DataFiles.CUSTOMER_SEGMENTS, Schema.customerSegments)
 
    }
 
@@ -49,9 +50,9 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
    }
 
-  def readFromJson(directoryName:String, fileName: String): DataFrame = {
+  def readFromJson(directoryName:String, fileName: String, schema: StructType): DataFrame = {
 
-      val df = Spark.getSqlContext().read.format("json")
+      val df = Spark.getSqlContext().read.schema(schema).format("json")
                     .load(DataFiles.TEST_RESOURCES + directoryName + "/" + fileName + ".json")
 
       return df
@@ -63,39 +64,39 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "schema attributes and type" should "match into DataFrames" in {
 
-    val BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
+        val BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
 
-    val dfCustomer = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER + "/")
-    val dfNLS = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.NEWSLETTER_SUBSCRIPTION + "/")
-    val dfSalesOrder = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.SALES_ORDER + "/")
-    val dfCSH = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_STORECREDITS_HISTORY + "/")
-    val dfCustomerSegments = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_SEGMENTS + "/")
+        val dfCustomer = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER + "/")
+        val dfNLS = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.NEWSLETTER_SUBSCRIPTION + "/")
+        val dfSalesOrder = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.SALES_ORDER + "/")
+        val dfCSH = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_STORECREDITS_HISTORY + "/")
+        val dfCustomerSegments = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_SEGMENTS + "/")
 
-    var result = true
+        var result = true
 
-    if(dfCustomer == null ||
-      dfNLS == null ||
-      dfSalesOrder == null ||
-      dfCSH == null ||
-      dfCustomerSegments == null){
+        if(dfCustomer == null ||
+          dfNLS == null ||
+          dfSalesOrder == null ||
+          dfCSH == null ||
+          dfCustomerSegments == null){
 
-      log("Data frame should not be null")
+          log("Data frame should not be null")
 
-      result = false
-    }
-    else if(!Schema.isCustomerSchema(dfCustomer.schema) ||
-            !Schema.isNLSSchema(dfNLS.schema) ||
-            !Schema.isSalesOrderSchema(dfSalesOrder.schema) ||
-            !Schema.isCSHSchema(dfCSH.schema) ||
-            !Schema.isCustomerSegmentsSchema(dfCustomerSegments.schema)){
+          result = false
+        }
+        else if(!Schema.isCustomerSchema(dfCustomer.schema) ||
+                !Schema.isNLSSchema(dfNLS.schema) ||
+                !Schema.isSalesOrderSchema(dfSalesOrder.schema) ||
+                !Schema.isCSHSchema(dfCSH.schema) ||
+                !Schema.isCustomerSegmentsSchema(dfCustomerSegments.schema)){
 
-      log("schema attributes or data type mismatch")
+          log("schema attributes or data type mismatch")
 
-      result = false
+          result = false
 
-    }
+        }
 
-    assert(result == true)
+        assert(result == true)
 
   }
 
@@ -105,21 +106,21 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "getAccRegDateAndUpdatedAt: Data Frame dfCustomer, dfNLS, dfSalesOrder" should "null" in {
 
-    val result = Customer.getAccRegDateAndUpdatedAt(null, null, null)
+        val result = Customer.getAccRegDateAndUpdatedAt(null, null, null)
 
-    assert(result == null)
+        assert(result == null)
 
   }
 
-//  "getAccRegDateAndUpdatedAt: schema attributes and data type" should
-//          "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
-//
-//    val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
-//                                                    dfNLS: DataFrame,
-//                                                    dfSalesOrder: DataFrame)
-//    assert(result != null)
-//
-//  }
+  "getAccRegDateAndUpdatedAt: schema attributes and data type" should
+          "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
+
+        val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
+                                                        dfNLS: DataFrame,
+                                                        dfSalesOrder: DataFrame)
+        assert(result != null)
+
+  }
 
   "getAccRegDateAndUpdatedAt: Data Frame" should "match to resultant Data Frame" in {
 
@@ -127,11 +128,12 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
                                                        dfNLS: DataFrame,
                                                        dfSalesOrder: DataFrame).limit(30).collect().toSet
 
-//           result.limit(30).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
+//       result.limit(30).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
 
-       val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt")
-                                                    .select("email", "acc_reg_date", "updated_at")
-                                                    .collect().toSet
+       val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER,
+                                                   "accRegDate_updatedAt",
+                                                   Schema.accRegDateAndUpdatedAt)
+                                                  .collect().toSet
 
        assert(result.equals(dfAccRegDateAndUpdatedAt) == true)
 
@@ -141,8 +143,166 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Name of variable: id_customer, EMAIL_OPT_IN_STATUS
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  val dfEmailOptInStatus = getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame)
+  "getEmailOptInStatus: Data Frame dfCustomer, dfNLS" should "null" in {
+
+        val result = Customer.getEmailOptInStatus(null, null)
+
+        assert(result == null)
+
+  }
+
+  "getEmailOptInStatus: Data Frame" should "match to resultant Data Frame" in {
+
+        val result = Customer.getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame)
+                             .limit(10).collect().toSet
+
+    //    result.limit(10).write.json(DataFiles.TEST_RESOURCES + "emailOptInStatus" + ".json")
+
+        val dfEmailOptInStatus = readFromJson(DataFiles.CUSTOMER, "email_opt_in_status", Schema.email_opt_in_status)
+                                            .collect().toSet
+
+        assert(result.equals(dfEmailOptInStatus) == true)
+
+  }
+
+  "getEmailOptInStatus: getStatusValue " should "o" in {
+
+        val row = Row("", null)
+
+        val result = Customer.getStatusValue(row)
+
+        assert(result == "o")
+
+  }
+
+  "getEmailOptInStatus: getStatusValue " should "iou" in {
+
+        val row = Row("", "subscribed")
+
+        val result = Customer.getStatusValue(row)
+
+        assert(result == "iou")
+
+  }
+
+  "getEmailOptInStatus: getStatusValue " should "u" in {
+
+        val row = Row("", "unsubscribed")
+
+        val result = Customer.getStatusValue(row)
+
+        assert(result == "u")
+
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Name of variable: id_customer, CUSTOMERS PREFERRED ORDER TIMESLOT
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  "getCustomersPreferredOrderTimeslot: Data Frame dfSalesOrder" should "null" in {
+
+        val result = Customer.getCustomersPreferredOrderTimeslot(null)
+
+        assert(result == null)
+
+  }
+
+  "getCustomersPreferredOrderTimeslot: schema attributes and data type" should
+    "match into DataFrames(dfSalesOrder)" in {
+
+        val result = Customer.getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame)
+        assert(result != null)
+
+  }
+
+  "getCustomersPreferredOrderTimeslot: Data Frame" should "match to resultant Data Frame" in {
+
+        val result = Customer.getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame)
+                             .limit(30).collect().toSet
+
+//        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+
+        val dfCustomersPreferredOrderTimeslot = readFromJson(DataFiles.CUSTOMER,
+                                                      "customers_preferred_order_timeslot",
+                                                      Schema.customers_preferred_order_timeslot)
+                                                      .collect().toSet
+
+        assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
+
+  }
 
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Name of variable: fk_customer, LAST_JR_COVERT_DATE
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  "getLastJrCovertDate: Data Frame dfCSH" should "null" in {
+
+        val result = Customer.getLastJrCovertDate(null)
+
+        assert(result == null)
+
+  }
+
+  "getLastJrCovertDate: schema attributes and data type" should
+    "match into DataFrame(dfCSH)" in {
+
+        val result = Customer.getLastJrCovertDate(dfCSH: DataFrame)
+
+        assert(result != null)
+
+  }
+
+  "getLastJrCovertDate: Data Frame" should "match to resultant Data Frame" in {
+
+        val result = Customer.getLastJrCovertDate(dfCSH: DataFrame)
+                             .limit(30).collect().toSet
+
+//                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
+
+        val dfLastJrCovertDate = readFromJson(DataFiles.CUSTOMER, "last_jr_covert_date",
+                                                      Schema.last_jr_covert_date)
+                                                      .collect().toSet
+
+        assert(result.equals(dfLastJrCovertDate) == true)
+
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Name of variable: fk_customer, MVP, Segment0, Segment1,Segment2, Segment3, Segment4, Segment5, Segment6
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  "getMvpAndSeg: Data Frame dfCustomerSegments" should "null" in {
+
+        val result = Customer.getMvpAndSeg(null)
+
+        assert(result == null)
+
+  }
+
+  "getMvpAndSeg: schema attributes and data type" should
+    "match into DataFrame(dfCSH)" in {
+
+        val result = Customer.getMvpAndSeg(dfCustomerSegments: DataFrame)
+
+        assert(result != null)
+
+  }
+
+  "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
+
+        val result = Customer.getMvpAndSeg(dfCustomerSegments: DataFrame)
+                             .limit(30).collect().toSet
+
+        //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
+
+        val dfMvpSeg = readFromJson(DataFiles.CUSTOMER, "mvp_seg",
+                                                    Schema.mvp_seg)
+                                                    .collect().toSet
+
+        assert(result.equals(dfMvpSeg) == true)
+
+  }
 
  }
