@@ -6,27 +6,31 @@ package com.jabong.dap.data.acq.common
 
 object QueryBuilder {
 
-  def getFullDataQuery(driver: String, tableName: String, limit: String, primaryKey: String, condition: String) = driver match {
+  def getFullDataQuery(driver: String, tableName: String, limit: String, primaryKey: String, condition: String) =
+    driver match {
     case "sqlserver" =>
       val limitString = if (limit != null) {
-        ("TOP %s".format(limit), "ORDER BY %s desc".format(primaryKey))
+        ("TOP %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
       } else {
         ("", "")
       }
-      "(SELECT %s * FROM %s %s %s) as t1".format(limitString._1, tableName, condition, limitString._2)
+      "(SELECT %s * FROM %s %s %s) AS t1".format(limitString._1, tableName, condition, limitString._2)
     case "mysql" =>
       val limitString = if (limit != null) {
-        ("LIMIT %s".format(limit), "ORDER BY %s desc".format(primaryKey))
+        ("LIMIT %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
       } else {
         ("", "")
       }
-      "(SELECT * FROM %s %s %s %s) as t1".format(tableName, condition, limitString._2, limitString._1)
+      "(SELECT * FROM %s %s %s %s) AS t1".format(tableName, condition, limitString._2, limitString._1)
     case _ => ""
   }
 
-  def getDataQuery(mode: String, driver: String, tableName: String, rangeStart: String, rangeEnd: String,
-                   dateColumn: String, condition: String) = {
-    "(SELECT * FROM %s %s) AS t1".format(tableName, condition)
-
+  def getDataQuery(mode: String, driver: String, tableName: String, limit: String, primaryKey: String,
+                   condition: String) = {
+    mode match {
+      case "full" => getFullDataQuery(driver, tableName, limit, primaryKey, condition)
+      case "daily" | "hourly" => "(SELECT * FROM %s %s) AS t1".format (tableName, condition)
+      case _ => ""
+    }
   }
 }

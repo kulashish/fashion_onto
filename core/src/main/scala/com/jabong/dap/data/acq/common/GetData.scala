@@ -20,19 +20,13 @@ object GetData extends Logging {
 
   def getData(mode: String, dbConn: DbConnection, source: String, tableName: String, primaryKey: String,
               dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, filterCondition: String,
-              saveFormat: String, saveMode: String): Any = {
+              saveFormat: String, saveMode: String, joinTables: List[JoinTables]): Any = {
     val context = getContext(saveFormat)
     val condition = ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition)
 
     logger.info(condition)
 
-    val dbTableQuery = mode match {
-      case "full" =>
-        QueryBuilder.getFullDataQuery(dbConn.getDriver, tableName, limit, primaryKey, condition)
-      case "daily" | "hourly" =>
-        QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, rangeStart, rangeEnd, dateColumn, condition)
-      case _ => ""
-    }
+    val dbTableQuery = QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, limit, primaryKey, condition)
     logger.info(dbTableQuery)
 
     val jdbcDF = if (primaryKey == null) {
@@ -64,18 +58,23 @@ object GetData extends Logging {
   }
 
   def getFullData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, limit: String,
-                  filterCondition: String, saveFormat: String, saveMode: String) = {
-    getData("full", dbConn, source, tableName, primaryKey, null, limit, null, null, filterCondition, saveFormat, saveMode)
+                  filterCondition: String, saveFormat: String, saveMode: String, joinTables: List[JoinTables]) = {
+    getData("full", dbConn, source, tableName, primaryKey, null, limit, null, null, filterCondition, saveFormat,
+      saveMode, joinTables)
   }
 
   def getDailyData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, dateColumn: String,
-                   rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String) = {
-    getData("daily", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
+                   rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String,
+                   joinTables: List[JoinTables]) = {
+    getData("daily", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition,
+      saveFormat, saveMode, joinTables)
   }
 
   def getHourlyData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, dateColumn: String,
-                    rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String) = {
-    getData("hourly", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
+                    rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String,
+                    joinTables: List[JoinTables]) = {
+    getData("hourly", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition,
+      saveFormat, saveMode, joinTables)
   }
 
 }

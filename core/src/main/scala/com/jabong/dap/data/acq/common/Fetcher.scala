@@ -21,9 +21,12 @@ class Fetcher() extends java.io.Serializable {
     val dbConn = new DbConnection(source)
 
     mode match {
-      case "full" => GetData.getFullData(dbConn, source, tableName, primaryKey, limit, filterCondition, saveFormat, saveMode)
-      case "daily" => GetData.getDailyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
-      case "hourly" => GetData.getHourlyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd, filterCondition, saveFormat, saveMode)
+      case "full" => GetData.getFullData(dbConn, source, tableName, primaryKey, limit, filterCondition, saveFormat,
+        saveMode, joinTables)
+      case "daily" => GetData.getDailyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd,
+        filterCondition, saveFormat, saveMode, joinTables)
+      case "hourly" => GetData.getHourlyData(dbConn, source, tableName, primaryKey, dateColumn, rangeStart, rangeEnd,
+        filterCondition, saveFormat, saveMode, joinTables)
     }
   }
 
