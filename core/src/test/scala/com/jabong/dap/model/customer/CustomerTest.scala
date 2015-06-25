@@ -58,47 +58,47 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
       return df
   }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // //schema attributes or data type should be match
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "schema attributes and type" should "match into DataFrames" in {
-
-        val BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
-
-        val dfCustomer = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER + "/")
-        val dfNLS = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.NEWSLETTER_SUBSCRIPTION + "/")
-        val dfSalesOrder = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.SALES_ORDER + "/")
-        val dfCSH = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_STORECREDITS_HISTORY + "/")
-        val dfCustomerSegments = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_SEGMENTS + "/")
-
-        var result = true
-
-        if(dfCustomer == null ||
-          dfNLS == null ||
-          dfSalesOrder == null ||
-          dfCSH == null ||
-          dfCustomerSegments == null){
-
-          log("Data frame should not be null")
-
-          result = false
-        }
-        else if(!Schema.isCustomerSchema(dfCustomer.schema) ||
-                !Schema.isNLSSchema(dfNLS.schema) ||
-                !Schema.isSalesOrderSchema(dfSalesOrder.schema) ||
-                !Schema.isCSHSchema(dfCSH.schema) ||
-                !Schema.isCustomerSegmentsSchema(dfCustomerSegments.schema)){
-
-          log("schema attributes or data type mismatch")
-
-          result = false
-
-        }
-
-        assert(result == true)
-
-  }
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  // //schema attributes or data type should be match
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  "schema attributes and type" should "match into DataFrames" in {
+//
+//        val BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
+//
+//        val dfCustomer = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER + "/")
+//        val dfNLS = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.NEWSLETTER_SUBSCRIPTION + "/")
+//        val dfSalesOrder = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.SALES_ORDER + "/")
+//        val dfCSH = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_STORECREDITS_HISTORY + "/")
+//        val dfCustomerSegments = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_SEGMENTS + "/")
+//
+//        var result = true
+//
+//        if(dfCustomer == null ||
+//          dfNLS == null ||
+//          dfSalesOrder == null ||
+//          dfCSH == null ||
+//          dfCustomerSegments == null){
+//
+//          log("Data frame should not be null")
+//
+//          result = false
+//        }
+//        else if(!Schema.isEquals(dfCustomer.schema, Schema.customer) ||
+//                !Schema.isEquals(dfNLS.schema, Schema.nls) ||
+//                !Schema.isEquals(dfSalesOrder.schema, Schema.salesOrder) ||
+//                !Schema.isEquals(dfCSH.schema, Schema.csh) ||
+//                !Schema.isEquals(dfCustomerSegments.schema, Schema.customerSegments)){
+//
+//          log("schema attributes or data type mismatch")
+//
+//          result = false
+//
+//        }
+//
+//        assert(result == true)
+//
+//  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT

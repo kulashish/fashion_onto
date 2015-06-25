@@ -186,80 +186,20 @@ object Schema {
 
 
 
-  //check two schema is Equals
+      //check two schema is Equals
       def isEquals(schemaFirst: StructType, schemaSecond: StructType): Boolean ={
 
             val fieldTypesFirst = schemaFirst.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
             val fieldTypesSecond = schemaSecond.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
 
-            return fieldTypesFirst.equals(fieldTypesSecond)
+            if(!fieldTypesFirst.equals(fieldTypesSecond)){
+
+              log("schema attributes or data type mismatch, it should be: " + Schema.customer)
+
+              return false
+            }
+
+            return true
         }
-
-
-      //schema check for customer data frame
-      def isCustomerSchema(schema: StructType): Boolean = {
-
-          if(!Schema.isEquals(schema, Schema.customer)){
-
-            log("schema attributes or data type mismatch, it should be: " + Schema.customer)
-
-            return false
-          }
-
-          return true
-      }
-
-      //schema check for NLS data frame
-      def isNLSSchema(schema: StructType): Boolean = {
-
-          if(!Schema.isEquals(schema, Schema.nls)){
-
-            log("schema attributes or data type mismatch, it should be: " + Schema.nls)
-
-            return false
-          }
-
-          return true
-      }
-
-      //schema check for Sales Order data frame
-      def isSalesOrderSchema(schema: StructType): Boolean = {
-
-          if(!Schema.isEquals(schema, Schema.salesOrder)){
-
-            log("schema attributes or data type mismatch, it should be: " + Schema.salesOrder)
-
-            return false
-          }
-
-          return true
-      }
-
-      //schema check for CSH data frame
-      def isCSHSchema(schema: StructType): Boolean = {
-
-          if(!Schema.isEquals(schema, Schema.csh)){
-
-            log("schema attributes or data type mismatch, it should be: " + Schema.csh)
-
-            return false
-          }
-
-          return true
-      }
-
-      //schema check for Customer Segments data frame
-      def isCustomerSegmentsSchema(schema: StructType): Boolean = {
-
-          if(!Schema.isEquals(schema, Schema.customerSegments)){
-
-            log("schema attributes or data type mismatch, it should be: " + Schema.customerSegments)
-
-            return false
-          }
-
-          return true
-      }
-
 
 }

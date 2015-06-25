@@ -100,9 +100,9 @@ object Customer {
 
        }
 
-       if(!Schema.isCustomerSchema(dfCustomer.schema) ||
-          !Schema.isNLSSchema(dfNLS.schema) ||
-          !Schema.isSalesOrderSchema(dfSalesOrder.schema)){
+       if(!Schema.isEquals(dfCustomer.schema, Schema.customer) ||
+          !Schema.isEquals(dfNLS.schema, Schema.nls) ||
+          !Schema.isEquals(dfSalesOrder.schema, Schema.salesOrder)){
 
          log("schema attributes or data type mismatch")
 
@@ -139,8 +139,8 @@ object Customer {
 
        }
 
-       if(!Schema.isCustomerSchema(dfCustomer.schema) ||
-         !Schema.isNLSSchema(dfNLS.schema)){
+       if(!Schema.isEquals(dfCustomer.schema, Schema.customer) ||
+         !Schema.isEquals(dfNLS.schema, Schema.nls)){
 
          log("schema attributes or data type mismatch")
 
@@ -184,7 +184,7 @@ object Customer {
 
        }
 
-       if(!Schema.isSalesOrderSchema(dfSalesOrder.schema)){
+       if(!Schema.isEquals(dfSalesOrder.schema, Schema.salesOrder)){
 
          log("schema attributes or data type mismatch")
 
@@ -254,7 +254,7 @@ object Customer {
 
        }
 
-       if(!Schema.isCSHSchema(dfCSH.schema)){
+       if(!Schema.isEquals(dfCSH.schema, Schema.csh)){
 
          log("schema attributes or data type mismatch")
 
@@ -280,7 +280,7 @@ object Customer {
 
        }
 
-       if(!Schema.isCustomerSegmentsSchema(dfCustomerSegments.schema)){
+       if(!Schema.isEquals(dfCustomerSegments.schema, Schema.customerSegments)){
 
          log("schema attributes or data type mismatch")
 
