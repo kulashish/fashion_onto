@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer
 
 import com.jabong.dap.common.{DataFiles, SharedSparkContext, Spark}
-import com.jabong.dap.model.customer.variables.Customer
+import com.jabong.dap.model.customer.variables.{CustomerSegments, CustomerStorecreditsHistory, Customer}
 import org.apache.spark.sql.functions._
 import com.jabong.dap.model.schema.Schema
 import org.apache.spark.sql.types.StructType
@@ -55,7 +55,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
       val df = Spark.getSqlContext().read.schema(schema).format("json")
                     .load(DataFiles.TEST_RESOURCES + directoryName + "/" + fileName + ".json")
 
-      return df
+      df
   }
 
 //  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,9 +130,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
 //       result.limit(30).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
 
-       val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER,
-                                                   "accRegDate_updatedAt",
-                                                   Schema.accRegDateAndUpdatedAt)
+       val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt",
+                                                   Customer.accRegDateAndUpdatedAt)
                                                   .collect().toSet
 
        assert(result.equals(dfAccRegDateAndUpdatedAt) == true)
@@ -158,8 +157,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
     //    result.limit(10).write.json(DataFiles.TEST_RESOURCES + "emailOptInStatus" + ".json")
 
-        val dfEmailOptInStatus = readFromJson(DataFiles.CUSTOMER, "email_opt_in_status", Schema.email_opt_in_status)
-                                            .collect().toSet
+        val dfEmailOptInStatus = readFromJson(DataFiles.CUSTOMER, "email_opt_in_status",  Customer.email_opt_in_status)
+                                             .collect().toSet
 
         assert(result.equals(dfEmailOptInStatus) == true)
 
@@ -222,10 +221,9 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
 //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
-        val dfCustomersPreferredOrderTimeslot = readFromJson(DataFiles.CUSTOMER,
-                                                      "customers_preferred_order_timeslot",
-                                                      Schema.customers_preferred_order_timeslot)
-                                                      .collect().toSet
+        val dfCustomersPreferredOrderTimeslot = readFromJson(DataFiles.CUSTOMER, "customers_preferred_order_timeslot",
+                                                             Customer.customers_preferred_order_timeslot)
+                                                            .collect().toSet
 
         assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
 
@@ -238,7 +236,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "getLastJrCovertDate: Data Frame dfCSH" should "null" in {
 
-        val result = Customer.getLastJrCovertDate(null)
+        val result = CustomerStorecreditsHistory.getLastJrCovertDate(null)
 
         assert(result == null)
 
@@ -247,7 +245,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getLastJrCovertDate: schema attributes and data type" should
     "match into DataFrame(dfCSH)" in {
 
-        val result = Customer.getLastJrCovertDate(dfCSH: DataFrame)
+        val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
 
         assert(result != null)
 
@@ -255,14 +253,14 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "getLastJrCovertDate: Data Frame" should "match to resultant Data Frame" in {
 
-        val result = Customer.getLastJrCovertDate(dfCSH: DataFrame)
+        val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
                              .limit(30).collect().toSet
 
 //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
         val dfLastJrCovertDate = readFromJson(DataFiles.CUSTOMER, "last_jr_covert_date",
-                                                      Schema.last_jr_covert_date)
-                                                      .collect().toSet
+                                              CustomerStorecreditsHistory.last_jr_covert_date)
+                                              .collect().toSet
 
         assert(result.equals(dfLastJrCovertDate) == true)
 
@@ -275,7 +273,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "getMvpAndSeg: Data Frame dfCustomerSegments" should "null" in {
 
-        val result = Customer.getMvpAndSeg(null)
+        val result = CustomerSegments.getMvpAndSeg(null)
 
         assert(result == null)
 
@@ -284,7 +282,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getMvpAndSeg: schema attributes and data type" should
     "match into DataFrame(dfCSH)" in {
 
-        val result = Customer.getMvpAndSeg(dfCustomerSegments: DataFrame)
+        val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
 
         assert(result != null)
 
@@ -292,14 +290,13 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
 
-        val result = Customer.getMvpAndSeg(dfCustomerSegments: DataFrame)
+        val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
                              .limit(30).collect().toSet
 
         //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
 
-        val dfMvpSeg = readFromJson(DataFiles.CUSTOMER, "mvp_seg",
-                                                    Schema.mvp_seg)
-                                                    .collect().toSet
+        val dfMvpSeg = readFromJson(DataFiles.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
+                                    .collect().toSet
 
         assert(result.equals(dfMvpSeg) == true)
 

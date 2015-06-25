@@ -1,8 +1,6 @@
 package com.jabong.dap.model.schema
 
-import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
 
 /**
  * Created by raghu on 22/6/15.
@@ -151,55 +149,5 @@ object Schema {
                                               StructField("fk_customer", IntegerType , true),
                                               StructField("created_at", TimestampType, true),
                                               StructField("updated_at", TimestampType, true)))
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      val email_opt_in_status = StructType(Array(StructField("id_customer", IntegerType, true),
-                                              StructField("status", StringType, true)))
-
-      val accRegDateAndUpdatedAt = StructType(Array(StructField("email", StringType, true),
-                                                    StructField("acc_reg_date", TimestampType, true),
-                                                    StructField("updated_at", TimestampType, true)))
-
-      val customers_preferred_order_timeslot = StructType(Array(StructField("fk_customer", IntegerType, true),
-                                            StructField("customer_all_order_timeslot", StringType, true),
-                                            StructField("customer_preferred_order_timeslot", IntegerType, true)))
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer_storecredits_history variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      val last_jr_covert_date = StructType(Array(StructField("fk_customer", IntegerType, true),
-                                                 StructField("last_jr_covert_date", TimestampType, true)))
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer_segments variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  val mvp_seg = StructType(Array(StructField("fk_customer", IntegerType, true),
-                                 StructField("mvp_score", IntegerType, true),
-                                 StructField("segment", IntegerType, true)))
-
-
-
-      //check two schema is Equals
-      def isEquals(schemaFirst: StructType, schemaSecond: StructType): Boolean ={
-
-            val fieldTypesFirst = schemaFirst.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
-            val fieldTypesSecond = schemaSecond.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
-
-            if(!fieldTypesFirst.equals(fieldTypesSecond)){
-
-              log("schema attributes or data type mismatch, it should be: " + Schema.customer)
-
-              return false
-            }
-
-            return true
-        }
 
 }

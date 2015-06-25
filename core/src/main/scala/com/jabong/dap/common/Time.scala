@@ -1,8 +1,9 @@
-package com.jabong.dap.common
+package com.jabong.dap.utils
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{Date,Calendar}
+import com.jabong.dap.common.Constants
 
 import scala.collection.immutable.HashMap
 
@@ -12,97 +13,75 @@ import scala.collection.immutable.HashMap
  */
 object Time {
 
-  def daysBetweenTwoDates( date1:Date, date2:Date ) : BigInt = {
-      return Math.abs(date1.getTime-date2.getTime)/Constants.CONVERT_MILLISEC_TO_DAYS
-  }
+      def daysBetweenTwoDates( date1:Date, date2:Date ) : BigInt = {
+          Math.abs(date1.getTime-date2.getTime)/Constants.CONVERT_MILLISEC_TO_DAYS
+      }
 
 
-  def daysFromToday(date : Date): BigInt = {
-    val today = new Date
-    return Math.abs(today.getTime-date.getTime)/Constants.CONVERT_MILLISEC_TO_DAYS
-  }
+      def daysFromToday(date : Date): BigInt = {
+          val today = new Date
+          daysBetweenTwoDates(today, date)
+      }
 
-  def dateBeforeDays(n :Int): Date = {
-    val format = new SimpleDateFormat(Constants.DATETIME_FORMAT)
-    val cal=Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, n)
-    return cal.getTime
-  }
+      def dateBeforeDays(n :Int, dateFormat:String): Date = {
+          val format = new SimpleDateFormat(dateFormat)
+          val cal=Calendar.getInstance()
+          cal.add(Calendar.DAY_OF_MONTH, n)
+          cal.getTime
+      }
 
-  def getTimeStamp(date: String): Timestamp={
-    val dateFormat = new SimpleDateFormat("dd/MM/yyyy")
-    val dat = dateFormat.parse(date)
-    val time = dat.getTime()
-    val ts= new Timestamp(time)
-    return ts
-  }
+      def getTimeStamp(date: String, dateFormat:String): Timestamp={
+          val format = new SimpleDateFormat(dateFormat)
+          val dat = format.parse(date)
+          val time = dat.getTime()
+          val ts = new Timestamp(time)
+          ts
+      }
 
-  def getTodayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    return sdf.format(new Date())
-  }
+      def getTodayDate(dateFormat:String): String = {
+          val sdf = new SimpleDateFormat(dateFormat)
+          sdf.format(new Date())
+      }
 
-  def getYesterdayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    val cal=Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, -1)
-    return sdf.format(cal.getTime())
-  }
+      case class MonthYear(val month: Int, val year: Int, val day: Int)
 
-  def getTodayDateWithHrs(): String = {
-    val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
-    return sdf.format(new Date())
-  }
+      def getMonthAndYear(dt: String, dateFormat: String): MonthYear = {
+          val cal = Calendar.getInstance()
+          if (null != dt) {
+            val df = new SimpleDateFormat(dateFormat)
+            var date = df.parse(dt)
+            cal.setTime(date)
+          }
+          val my = new MonthYear(cal.get(Calendar.MONTH),cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
+          my
+      }
 
-  case class MonthYear(val month: Int, val year: Int, val day: Int)
+      def getMaxDaysOfMonth(dt: String, dateFormat: String): Int = {
+          val cal = Calendar.getInstance()
+          if (null != dt) {
+            val df = new SimpleDateFormat(dateFormat)
+            var date = df.parse(dt)
+            cal.setTime(date)
+          }
+          cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+      }
 
-  def getMonthAndYear(dt : String): MonthYear = {
-    val cal = Calendar.getInstance()
-    if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DATE_FORMAT)
-      var date = df.parse(dt)
-      cal.setTime(date)
-    }
-    val my = new MonthYear(cal.get(Calendar.MONTH),cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
-    return my
-  }
+      def timeToSlot(dateString: String, dateFormat: String): Int = {
 
-  def getYear(dt : String): Int = {
-    val cal = Calendar.getInstance()
-    if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DATE_FORMAT)
-      var date = df.parse(dt)
-      cal.setTime(date)
-    }
-    return cal.get(Calendar.YEAR)
-  }
+          var timeToSlotMap = new HashMap[Int, Int]
+          timeToSlotMap +=(7 -> 1, 8 -> 1, 9 -> 2, 10 -> 2, 11 -> 3, 12 -> 3, 13 -> 4, 14 -> 4
+            , 15 -> 5, 16 -> 5, 17 -> 6, 18 -> 6, 19 -> 7, 20 -> 7, 21 -> 8, 22 -> 8, 23 -> 9, 0 -> 9, 1 -> 10
+            , 2 -> 10, 3 -> 11, 4 -> 11, 5 -> 12, 6 -> 12)
 
-  def getMaxDaysOfMonth(dt: String): Int = {
-    val cal = Calendar.getInstance()
-    if (null != dt) {
-      val df = new SimpleDateFormat(Constants.DATE_FORMAT)
-      var date = df.parse(dt)
-      cal.setTime(date)
-    }
-    return cal.getActualMaximum(Calendar.DAY_OF_MONTH)
-  }
+          val formatter = new SimpleDateFormat(dateFormat)
+          var date : java.util.Date=null
+          date = formatter.parse(dateString)
 
-  def timeToSlot(dateString: String): Int = {
-
-    var timeToSlotMap = new HashMap[Int, Int]
-    timeToSlotMap +=(7 -> 1, 8 -> 1, 9 -> 2, 10 -> 2, 11 -> 3, 12 -> 3, 13 -> 4, 14 -> 4
-      , 15 -> 5, 16 -> 5, 17 -> 6, 18 -> 6, 19 -> 7, 20 -> 7, 21 -> 8, 22 -> 8, 23 -> 9, 0 -> 9, 1 -> 10
-      , 2 -> 10, 3 -> 11, 4 -> 11, 5 -> 12, 6 -> 12)
-
-    val formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-    var date : java.util.Date=null
-    date = formatter.parse(dateString);
-
-    val calendar = Calendar.getInstance()
-    calendar.setTime(date)
-    val hours = calendar.get(Calendar.HOUR_OF_DAY);
-    val timeSlot = timeToSlotMap.getOrElse(hours, 0)
-    return timeSlot
-  }
+          val calendar = Calendar.getInstance()
+          calendar.setTime(date)
+          val hours = calendar.get(Calendar.HOUR_OF_DAY)
+          val timeSlot = timeToSlotMap.getOrElse(hours, 0)
+          timeSlot
+      }
 
 }
