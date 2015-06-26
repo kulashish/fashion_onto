@@ -1,11 +1,13 @@
 package com.jabong.dap.model.customer.variables
 
+import java.sql.Timestamp
+
 import com.jabong.dap.common.{Constants, Utils, Spark}
 import com.jabong.dap.model.schema.Schema
 import com.jabong.dap.utils.Time
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{Column, DataFrame, Row}
 
 
 /**
@@ -58,19 +60,70 @@ object Customer {
           }
 
           if(!Utils.isSchemaEquals(dfCustomer.schema, Schema.customer) ||
-            !Utils.isSchemaEquals(dfNLS.schema, Schema.nls) ||
-            !Utils.isSchemaEquals(dfSalesOrder.schema, Schema.salesOrder)){
+             !Utils.isSchemaEquals(dfNLS.schema, Schema.nls) ||
+             !Utils.isSchemaEquals(dfSalesOrder.schema, Schema.salesOrder)){
 
-            log("schema attributes or data type mismatch")
+             log("schema attributes or data type mismatch")
 
-            return null
+             return null
 
           }
 
-          //Name of variable: id_customer, ACC_REG_DATE, UPDATED_AT
-          val dfAccRegDateAndUpdatedAt = getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
-            dfNLS: DataFrame,
-            dfSalesOrder: DataFrame)
+
+        val NLS = dfNLS.withColumnRenamed("email", "nls_email").select("nls_email", "status", "created_at", "updated_at")
+          .withColumnRenamed("created_at","nls_created_at").withColumnRenamed("updated_at","nls_updated_at")
+
+         val dfJoin = dfCustomer.select("id_customer",
+                                         "giftcard_credits_available",
+                                         "store_credits_available",
+                                         "birthday",
+                                         "gender",
+                                         "reward_type",
+                                         "email",
+                                         "created_at",
+                                         "updated_at")
+                                        .join(NLS,
+                                                         dfCustomer("email") === NLS("nls_email"), "outer")
+                                        .join(dfSalesOrder.select(col("fk_customer"),
+                                                                 col("created_at") as "so_created_at",
+                                                                 col("updated_at") as "so_updated_at"),
+                                                                 dfCustomer("id_customer") === dfSalesOrder("fk_customer"), "outer")
+
+
+        // Define User Defined Functions
+        val sqlContext = Spark.getSqlContext()
+        import sqlContext.implicits._
+
+        //min(customer.created_at, sales_order.created_at)
+        val udfAccRegDate = udf((cust_created_at: Timestamp, nls_created_at: Timestamp)
+                             =>min(cust_created_at: Timestamp, nls_created_at: Timestamp))
+
+        //max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
+        val udfMaxUpdatedAt = udf((cust_updated_at: Timestamp, nls_updated_at: Timestamp, so_updated_at: Timestamp)
+                              =>max(max(cust_updated_at: Timestamp, nls_updated_at: Timestamp), so_updated_at: Timestamp))
+
+
+        val dfResult = dfJoin.select(col("id_customer"),
+                                     col("giftcard_credits_available"),
+                                     col("store_credits_available"),
+                                     col("birthday"),
+                                     col("gender"),
+                                     col("reward_type"),
+                                     col("email"),
+                                     col("created_at"),
+                                     col("updated_at"),
+
+                                     udfAccRegDate(dfJoin("created_at"),
+                                                   dfJoin("nls_created_at")) as "acc_reg_date",
+
+                                     udfMaxUpdatedAt(dfJoin("updated_at"),
+                                                     dfJoin("nls_created_at"),
+                                                     dfJoin("so_updated_at")) as "max_updated_at")
+
+//          //Name of variable: id_customer, ACC_REG_DATE, UPDATED_AT
+//          val dfAccRegDateAndUpdatedAt = getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
+//                                                                   dfNLS: DataFrame,
+//                                                                   dfSalesOrder: DataFrame)
 
           //Name of variable: id_customer, EMAIL_OPT_IN_STATUS
           val dfEmailOptInStatus = getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame)
@@ -85,77 +138,55 @@ object Customer {
                                     BIRTHDAY,
                                     GENDER,
                                     PLATINUM_STATUS*/
-          val customer = dfCustomer.select("id_customer",
-            "giftcard_credits_available",
-            "store_credits_available",
-            "email",
-            "birthday",
-            "gender",
-            "reward_type")
+//          val customer = dfCustomer.select("id_customer",
+//                                           "giftcard_credits_available",
+//                                           "store_credits_available",
+//                                           "email",
+//                                           "birthday",
+//                                           "gender",
+//                                           "reward_type")
 
-         return customer
+        dfResult.limit(10).collect().foreach(println)
+        dfResult.printSchema()
+
+         return dfJoin
       }
 
+      def min(t1: Timestamp, t2: Timestamp): Timestamp ={
 
-       //min(customer.created_at, newsletter_subscription.created_at, sales_order.created_at)
-       // AND max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
-       def getAccRegDateAndUpdatedAt(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame): DataFrame = {
+          if(t1==null){
+            return t2
+          }
 
-           if(dfCustomer == null || dfNLS == null || dfSalesOrder == null ){
+          if(t2==null){
+            return t1
+          }
 
-              log("Data frame should not be null")
+          if (t1.compareTo(t2) >= 0)
+            t1
+          else
+            t2
 
-              return null
+      }
 
-           }
+      def max(t1: Timestamp, t2: Timestamp): Timestamp ={
 
-           if(!Utils.isSchemaEquals(dfCustomer.schema, Schema.customer) ||
-              !Utils.isSchemaEquals(dfNLS.schema, Schema.nls) ||
-              !Utils.isSchemaEquals(dfSalesOrder.schema, Schema.salesOrder)){
+          if(t1==null){
+            return t2
+          }
 
-             log("schema attributes or data type mismatch")
+          if(t2==null){
+            return t1
+          }
 
-             return null
+          if (t1.compareTo(t2) >= 0)
+            t2
+          else
+            t1
 
-           }
-
-
-           val customer = dfCustomer.select("email", "created_at", "updated_at")
-
-           val nls = dfNLS.select("email", "created_at", "updated_at")
-
-           val so = dfSalesOrder.select("customer_email", "created_at", "updated_at")
-                                .withColumnRenamed("customer_email", "email")
-
-           val dfCustNlsSO = customer.unionAll(nls).unionAll(so)
-
-           val dfAccRegDateAndUpdatedAt = dfCustNlsSO.groupBy("email")
-                                                     .agg(min(dfCustNlsSO("created_at")) as "acc_reg_date",
-                                                           max(dfCustNlsSO("updated_at")) as "updated_at")
-
-         return dfAccRegDateAndUpdatedAt
-       }
-
-
+      }
        //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
        def getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame): DataFrame = {
-
-           if(dfCustomer == null || dfNLS == null){
-
-             log("Data frame should not be null")
-
-             return null
-
-           }
-
-           if(!Utils.isSchemaEquals(dfCustomer.schema, Schema.customer) ||
-             !Utils.isSchemaEquals(dfNLS.schema, Schema.nls)){
-
-             log("schema attributes or data type mismatch")
-
-             return null
-
-           }
 
            val customer = dfCustomer.select("id_customer", "email")
 
@@ -184,22 +215,6 @@ object Customer {
 
        //CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
        def getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame): DataFrame = {
-
-           if(dfSalesOrder == null ){
-
-             log("Data frame should not be null")
-
-             return null
-
-           }
-
-           if(!Utils.isSchemaEquals(dfSalesOrder.schema, Schema.salesOrder)){
-
-             log("schema attributes or data type mismatch")
-
-             return null
-
-           }
 
            val salesOrder = dfSalesOrder.select("fk_customer", "created_at").sort("fk_customer", "created_at")
 

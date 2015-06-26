@@ -104,202 +104,200 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   // //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  "getAccRegDateAndUpdatedAt: Data Frame dfCustomer, dfNLS, dfSalesOrder" should "null" in {
+  "getCustomer: Data Frame dfCustomer, dfNLS, dfSalesOrder" should "null" in {
 
-        val result = Customer.getAccRegDateAndUpdatedAt(null, null, null)
+    val result = Customer.getCustomer(null, null, null)
 
-        assert(result == null)
-
-  }
-
-  "getAccRegDateAndUpdatedAt: schema attributes and data type" should
-          "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
-
-        val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
-                                                        dfNLS: DataFrame,
-                                                        dfSalesOrder: DataFrame)
-        assert(result != null)
+    assert(result == null)
 
   }
 
-  "getAccRegDateAndUpdatedAt: Data Frame" should "match to resultant Data Frame" in {
+  "getCustomer: schema attributes and data type" should
+    "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
 
-       val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
-                                                       dfNLS: DataFrame,
-                                                       dfSalesOrder: DataFrame).limit(30).collect().toSet
-
-//       result.limit(30).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
-
-       val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt",
-                                                   Customer.accRegDateAndUpdatedAt)
-                                                  .collect().toSet
-
-       assert(result.equals(dfAccRegDateAndUpdatedAt) == true)
-
-   }
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Name of variable: id_customer, EMAIL_OPT_IN_STATUS
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  "getEmailOptInStatus: Data Frame dfCustomer, dfNLS" should "null" in {
-
-        val result = Customer.getEmailOptInStatus(null, null)
-
-        assert(result == null)
+    val result = Customer.getCustomer(dfCustomer: DataFrame,
+                                      dfNLS: DataFrame,
+                                      dfSalesOrder: DataFrame)
+    assert(result != null)
 
   }
 
-  "getEmailOptInStatus: Data Frame" should "match to resultant Data Frame" in {
+  "getCustomer: Data Frame" should "match to resultant Data Frame" in {
 
-        val result = Customer.getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame)
-                             .limit(10).collect().toSet
+    val result = Customer.getCustomer(dfCustomer: DataFrame,
+                                                    dfNLS: DataFrame,
+                                                    dfSalesOrder: DataFrame)
+//                          .limit(30).collect().toSet
 
-    //    result.limit(10).write.json(DataFiles.TEST_RESOURCES + "emailOptInStatus" + ".json")
+//           result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
-        val dfEmailOptInStatus = readFromJson(DataFiles.CUSTOMER, "email_opt_in_status",  Customer.email_opt_in_status)
-                                             .collect().toSet
-
-        assert(result.equals(dfEmailOptInStatus) == true)
-
-  }
-
-  "getEmailOptInStatus: getStatusValue " should "o" in {
-
-        val row = Row("", null)
-
-        val result = Customer.getStatusValue(row)
-
-        assert(result == "o")
+//    val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt",
+//                                                Customer.accRegDateAndUpdatedAt)
+//                                                .collect().toSet
+//
+//    assert(result.equals(dfAccRegDateAndUpdatedAt) == true)
 
   }
-
-  "getEmailOptInStatus: getStatusValue " should "iou" in {
-
-        val row = Row("", "subscribed")
-
-        val result = Customer.getStatusValue(row)
-
-        assert(result == "iou")
-
-  }
-
-  "getEmailOptInStatus: getStatusValue " should "u" in {
-
-        val row = Row("", "unsubscribed")
-
-        val result = Customer.getStatusValue(row)
-
-        assert(result == "u")
-
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Name of variable: id_customer, CUSTOMERS PREFERRED ORDER TIMESLOT
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getCustomersPreferredOrderTimeslot: Data Frame dfSalesOrder" should "null" in {
-
-        val result = Customer.getCustomersPreferredOrderTimeslot(null)
-
-        assert(result == null)
-
-  }
-
-  "getCustomersPreferredOrderTimeslot: schema attributes and data type" should
-    "match into DataFrames(dfSalesOrder)" in {
-
-        val result = Customer.getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame)
-        assert(result != null)
-
-  }
-
-  "getCustomersPreferredOrderTimeslot: Data Frame" should "match to resultant Data Frame" in {
-
-        val result = Customer.getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame)
-                             .limit(30).collect().toSet
-
-//        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
-
-        val dfCustomersPreferredOrderTimeslot = readFromJson(DataFiles.CUSTOMER, "customers_preferred_order_timeslot",
-                                                             Customer.customers_preferred_order_timeslot)
-                                                            .collect().toSet
-
-        assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
-
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Name of variable: fk_customer, LAST_JR_COVERT_DATE
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getLastJrCovertDate: Data Frame dfCSH" should "null" in {
-
-        val result = CustomerStorecreditsHistory.getLastJrCovertDate(null)
-
-        assert(result == null)
-
-  }
-
-  "getLastJrCovertDate: schema attributes and data type" should
-    "match into DataFrame(dfCSH)" in {
-
-        val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
-
-        assert(result != null)
-
-  }
-
-  "getLastJrCovertDate: Data Frame" should "match to resultant Data Frame" in {
-
-        val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
-                             .limit(30).collect().toSet
-
-//                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
-
-        val dfLastJrCovertDate = readFromJson(DataFiles.CUSTOMER, "last_jr_covert_date",
-                                              CustomerStorecreditsHistory.last_jr_covert_date)
-                                              .collect().toSet
-
-        assert(result.equals(dfLastJrCovertDate) == true)
-
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Name of variable: fk_customer, MVP, Segment0, Segment1,Segment2, Segment3, Segment4, Segment5, Segment6
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getMvpAndSeg: Data Frame dfCustomerSegments" should "null" in {
-
-        val result = CustomerSegments.getMvpAndSeg(null)
-
-        assert(result == null)
-
-  }
-
-  "getMvpAndSeg: schema attributes and data type" should
-    "match into DataFrame(dfCSH)" in {
-
-        val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
-
-        assert(result != null)
-
-  }
-
-  "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
-
-        val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
-                             .limit(30).collect().toSet
-
-        //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
-
-        val dfMvpSeg = readFromJson(DataFiles.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
-                                    .collect().toSet
-
-        assert(result.equals(dfMvpSeg) == true)
-
-  }
+//
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  // //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  "getAccRegDateAndUpdatedAt: Data Frame" should "match to resultant Data Frame" in {
+//
+//       val result = Customer.getAccRegDateAndUpdatedAt(dfCustomer: DataFrame,
+//                                                       dfNLS: DataFrame,
+//                                                       dfSalesOrder: DataFrame).limit(30).collect().toSet
+//
+////       result.limit(30).write.json(DataFiles.TEST_RESOURCES + "accRegDate_updatedAt" + ".json")
+//
+//       val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt",
+//                                                   Customer.accRegDateAndUpdatedAt)
+//                                                  .collect().toSet
+//
+//       assert(result.equals(dfAccRegDateAndUpdatedAt) == true)
+//
+//   }
+//
+//
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  //Name of variable: id_customer, EMAIL_OPT_IN_STATUS
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  "getEmailOptInStatus: Data Frame" should "match to resultant Data Frame" in {
+//
+//        val result = Customer.getEmailOptInStatus(dfCustomer: DataFrame, dfNLS: DataFrame)
+//                             .limit(10).collect().toSet
+//
+//    //    result.limit(10).write.json(DataFiles.TEST_RESOURCES + "emailOptInStatus" + ".json")
+//
+//        val dfEmailOptInStatus = readFromJson(DataFiles.CUSTOMER, "email_opt_in_status",  Customer.email_opt_in_status)
+//                                             .collect().toSet
+//
+//        assert(result.equals(dfEmailOptInStatus) == true)
+//
+//  }
+//
+//  "getEmailOptInStatus: getStatusValue " should "o" in {
+//
+//        val row = Row("", null)
+//
+//        val result = Customer.getStatusValue(row)
+//
+//        assert(result == "o")
+//
+//  }
+//
+//  "getEmailOptInStatus: getStatusValue " should "iou" in {
+//
+//        val row = Row("", "subscribed")
+//
+//        val result = Customer.getStatusValue(row)
+//
+//        assert(result == "iou")
+//
+//  }
+//
+//  "getEmailOptInStatus: getStatusValue " should "u" in {
+//
+//        val row = Row("", "unsubscribed")
+//
+//        val result = Customer.getStatusValue(row)
+//
+//        assert(result == "u")
+//
+//  }
+//
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  //Name of variable: id_customer, CUSTOMERS PREFERRED ORDER TIMESLOT
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  "getCustomersPreferredOrderTimeslot: Data Frame" should "match to resultant Data Frame" in {
+//
+//        val result = Customer.getCustomersPreferredOrderTimeslot(dfSalesOrder: DataFrame)
+//                             .limit(30).collect().toSet
+//
+////        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+//
+//        val dfCustomersPreferredOrderTimeslot = readFromJson(DataFiles.CUSTOMER, "customers_preferred_order_timeslot",
+//                                                             Customer.customers_preferred_order_timeslot)
+//                                                            .collect().toSet
+//
+//        assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
+//
+//  }
+//
+//
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  //Name of variable: fk_customer, LAST_JR_COVERT_DATE
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  "getLastJrCovertDate: Data Frame dfCSH" should "null" in {
+//
+//        val result = CustomerStorecreditsHistory.getLastJrCovertDate(null)
+//
+//        assert(result == null)
+//
+//  }
+//
+//  "getLastJrCovertDate: schema attributes and data type" should
+//    "match into DataFrame(dfCSH)" in {
+//
+//        val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
+//
+//        assert(result != null)
+//
+//  }
+//
+//  "getLastJrCovertDate: Data Frame" should "match to resultant Data Frame" in {
+//
+//        val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
+//                             .limit(30).collect().toSet
+//
+////                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
+//
+//        val dfLastJrCovertDate = readFromJson(DataFiles.CUSTOMER, "last_jr_covert_date",
+//                                              CustomerStorecreditsHistory.last_jr_covert_date)
+//                                              .collect().toSet
+//
+//        assert(result.equals(dfLastJrCovertDate) == true)
+//
+//  }
+//
+//
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  //Name of variable: fk_customer, MVP, Segment0, Segment1,Segment2, Segment3, Segment4, Segment5, Segment6
+//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  "getMvpAndSeg: Data Frame dfCustomerSegments" should "null" in {
+//
+//        val result = CustomerSegments.getMvpAndSeg(null)
+//
+//        assert(result == null)
+//
+//  }
+//
+//  "getMvpAndSeg: schema attributes and data type" should
+//    "match into DataFrame(dfCSH)" in {
+//
+//        val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
+//
+//        assert(result != null)
+//
+//  }
+//
+//  "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
+//
+//        val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
+//                             .limit(30).collect().toSet
+//
+//        //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
+//
+//        val dfMvpSeg = readFromJson(DataFiles.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
+//                                    .collect().toSet
+//
+//        assert(result.equals(dfMvpSeg) == true)
+//
+//  }
 
  }
