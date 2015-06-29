@@ -17,14 +17,15 @@ object ConditionBuilder {
 
     if (rangeStart == null && rangeEnd == null && mode == "daily") {
       val prevDayDate = Time.getYesterdayDate()
-      "WHERE %s >= '%s 00:00:00' AND %s <= '%s 23:59:59' %s".format(dateColumn, prevDayDate, dateColumn, prevDayDate,
-        tempFilterCondition)
+      "WHERE t1.%s >= '%s 00:00:00' AND t1.%s <= '%s 23:59:59' %s".format(dateColumn, prevDayDate, dateColumn,
+        prevDayDate, tempFilterCondition)
     } else if (mode == "full" && filterCondition == null) {
       ""
     } else if (mode == "full" && filterCondition != null) {
-      "WHERE %s".format(filterCondition)
+      "WHERE t1.%s".format(filterCondition)
     } else if (mode == "hourly" || (mode == "daily" && rangeStart != null && rangeEnd != null)) {
-      "WHERE %s >= '%s' AND %s <= '%s' %s".format(dateColumn, rangeStart, dateColumn, rangeEnd, tempFilterCondition)
+      "WHERE t1.%s >= '%s' AND t1.%s <= '%s' %s".format(dateColumn, rangeStart, dateColumn, rangeEnd,
+        tempFilterCondition)
     } else {
       ""
     }
