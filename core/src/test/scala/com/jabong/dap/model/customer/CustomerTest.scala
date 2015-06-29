@@ -126,18 +126,18 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
   "getCustomer: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = Customer.getCustomer(dfCustomer: DataFrame,
-                                                    dfNLS: DataFrame,
-                                                    dfSalesOrder: DataFrame)
-//                          .limit(30).collect().toSet
+        val result = Customer.getCustomer(dfCustomer: DataFrame,
+                                                        dfNLS: DataFrame,
+                                                        dfSalesOrder: DataFrame)
+                              .limit(30).collect().toSet
 
-//           result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
+    //           result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
-//    val dfAccRegDateAndUpdatedAt = readFromJson(DataFiles.CUSTOMER, "accRegDate_updatedAt",
-//                                                Customer.accRegDateAndUpdatedAt)
-//                                                .collect().toSet
-//
-//    assert(result.equals(dfAccRegDateAndUpdatedAt) == true)
+        val dfResultCustomer = readFromJson(DataFiles.CUSTOMER, "result_customer",
+                                                    Customer.result_customer)
+                                                    .collect().toSet
+
+        assert(result.equals(dfResultCustomer) == true)
 
   }
 
@@ -146,9 +146,9 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   "getMin(): timestamp t1 and t2 value " should "be null" in {
-       
+
        val t1 = null
-    
+
        val t2 = null
 
        val result = Customer.getMin(t1, t2)
@@ -158,13 +158,13 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
    }
 
   "getMin(): timestamp t1" should "be null" in {
-    
+
         val t1 = null
-        
-        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0") 
-    
+
+        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
         val result = Customer.getMin(t1, t2)
-    
+
         assert(result.compareTo(t2) == 0)
 
   }
@@ -172,35 +172,35 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getMin(): timestamp t2" should "be null" in {
 
         val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-        
+
         val t2 = null
-    
+
         val result = Customer.getMin(t1, t2)
-    
+
         assert(result.compareTo(t1) == 0)
 
   }
 
   "getMin(): return timestamp " should "t1" in {
 
-        val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0") 
-    
-        val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0") 
-    
+        val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
+        val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0")
+
         val result = Customer.getMin(t1, t2)
-    
+
         assert(result.compareTo(t1) >= 0)
 
   }
 
   "getMin(): return timestamp " should "t2" in {
 
-        val t1 = Timestamp.valueOf("2015-04-30 00:05:09.0") 
-    
-        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0") 
-    
+        val t1 = Timestamp.valueOf("2015-04-30 00:05:09.0")
+
+        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
         val result = Customer.getMin(t1, t2)
-    
+
         assert(result.compareTo(t2) >= 0)
 
   }
@@ -214,11 +214,11 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getMax(): timestamp t1 and t2 value " should "be null" in {
 
         val t1 = null
-    
+
         val t2 = null
-    
+
         val result = Customer.getMax(t1, t2)
-    
+
         assert(result == null)
 
   }
@@ -226,11 +226,11 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getMax(): timestamp t1" should "be null" in {
 
         val t1 = null
-        
-        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0") 
-    
+
+        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
         val result = Customer.getMax(t1, t2)
-    
+
         assert(result.compareTo(t2) == 0)
 
   }
@@ -238,39 +238,39 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getMax(): timestamp t2" should "be null" in {
 
         val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-        
+
         val t2 = null
-    
+
         val result = Customer.getMax(t1, t2)
-    
+
         assert(result.compareTo(t1) == 0)
 
   }
 
   "getMax(): return timestamp " should "t2" in {
 
-        val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0") 
-    
-        val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0") 
-    
+        val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
+        val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0")
+
         val result = Customer.getMax(t1, t2)
-    
+
         assert(result.compareTo(t2) == 0)
 
   }
 
   "getMax(): return timestamp " should "t1" in {
 
-        val t1 = Timestamp.valueOf("2015-04-30 00:05:09.0") 
-    
-        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0") 
-    
+        val t1 = Timestamp.valueOf("2015-04-30 00:05:09.0")
+
+        val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
         val result = Customer.getMax(t1, t2)
-    
+
         assert(result.compareTo(t1) == 0)
 
   }
-  
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Name of variable: EMAIL_OPT_IN_STATUS
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   "getEmailOptInStatus: getStatusValue " should "o" in {
 
         val result = Customer.getEmailOptInStatus(null, null)
-    
+
         assert(result == "o")
 
   }

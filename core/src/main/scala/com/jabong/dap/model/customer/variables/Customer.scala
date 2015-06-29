@@ -30,9 +30,21 @@ object Customer {
                                                                 StructField("customer_all_order_timeslot", StringType, true),
                                                                 StructField("customer_preferred_order_timeslot", IntegerType, true)))
 
-
-
-
+      val result_customer =  StructType(Array(StructField("id_customer", IntegerType, true),
+                             StructField("giftcard_credits_available", DecimalType(10,2), true),
+                             StructField("store_credits_available", DecimalType(10,2), true),
+                             StructField("birthday", DateType, true),
+                             StructField("gender", StringType, true),
+                             StructField("reward_type", StringType, true),
+                             StructField("email", StringType, true),
+                             StructField("created_at", TimestampType, true),
+                             StructField("updated_at", TimestampType, true),
+                             StructField("customer_all_order_timeslot", StringType, true),
+                             StructField("customer_preferred_order_timeslot", IntegerType, true),
+                             StructField("acc_reg_date", TimestampType, true),
+                             StructField("max_updated_at", TimestampType, true),
+                             StructField("email_opt_in_status", StringType, true)))
+    
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DataFrame Customer,NLS, SalesOrder operations
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
