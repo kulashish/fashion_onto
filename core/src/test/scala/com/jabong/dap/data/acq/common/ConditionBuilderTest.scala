@@ -18,9 +18,9 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
   }
 
   "getCondition" should "return correct condition when filterCondition is not null and mode is full" in {
-    val filterCondition = "filterCondition"
+    val filterCondition = "tableColumn NOT LIKE 'R%'"
     val mode = "full"
-    val output = "WHERE filterCondition"
+    val output = "WHERE tableColumn NOT LIKE 'R%'"
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
@@ -35,15 +35,15 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
     val mode = "daily"
     val filterCondition = null
     val prevDayDate = Time.getYesterdayDate()
-    val output = "WHERE dateColumn >= '%s 00:00:00' AND dateColumn <= '%s 23:59:59' ".format(prevDayDate, prevDayDate)
+    val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' ".format(prevDayDate, prevDayDate)
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd are null and filterCondition is not null" in {
     val mode = "daily"
-    val filterCondition = "filterCondition"
+    val filterCondition = "tableColumn NOT LIKE 'R..'"
     val prevDayDate = Time.getYesterdayDate()
-    val output = "WHERE dateColumn >= '%s 00:00:00' AND dateColumn <= '%s 23:59:59' AND filterCondition".format(prevDayDate, prevDayDate)
+    val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' AND tableColumn NOT LIKE 'R..'".format(prevDayDate, prevDayDate)
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
@@ -52,16 +52,16 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
     rangeStart = "rangeStart"
     rangeEnd = "rangeEnd"
     val filterCondition = null
-    val output = "WHERE dateColumn >= 'rangeStart' AND dateColumn <= 'rangeEnd' "
+    val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is hourly and filterCondition is not null" in {
     val mode = "hourly"
-    val filterCondition = "filterCondition"
+    val filterCondition = "tableColumn NOT LIKE 'R%'"
     rangeStart = "rangeStart"
     rangeEnd = "rangeEnd"
-    val output = "WHERE dateColumn >= 'rangeStart' AND dateColumn <= 'rangeEnd' AND filterCondition"
+    val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' AND tableColumn NOT LIKE 'R%'"
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
@@ -70,16 +70,16 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
     rangeStart = "rangeStart"
     rangeEnd = "rangeEnd"
     val filterCondition = null
-    val output = "WHERE dateColumn >= 'rangeStart' AND dateColumn <= 'rangeEnd' "
+    val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition is not null" in {
     val mode = "daily"
-    val filterCondition = "filterCondition"
+    val filterCondition = "tableColumn NOT LIKE 'R%'"
     rangeStart = "rangeStart"
     rangeEnd = "rangeEnd"
-    val output = "WHERE dateColumn >= 'rangeStart' AND dateColumn <= 'rangeEnd' AND filterCondition"
+    val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' AND tableColumn NOT LIKE 'R%'"
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
 
