@@ -26,7 +26,7 @@ object QueryBuilder {
     }
 
   def getDataQuery(mode: String, driver: String, tableName: String, limit: String, primaryKey: String,
-                   condition: String) = {
+                   condition: String, joinTables: List[JoinTables]) = {
     mode match {
       case "full" => getFullDataQuery(driver, tableName, limit, primaryKey, condition)
       case "daily" | "hourly" => "(SELECT * FROM %s %s) AS t1".format (tableName, condition)

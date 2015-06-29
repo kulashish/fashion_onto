@@ -1,6 +1,6 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.common.{Credentials, Config}
+import com.jabong.dap.common.{ Credentials, Config }
 
 /**
  * Validator for the Config JSON file.

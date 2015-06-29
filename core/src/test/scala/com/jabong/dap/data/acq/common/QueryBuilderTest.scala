@@ -51,18 +51,18 @@ class QueryBuilderTest extends FlatSpec with Matchers {
     val limit = "1000"
     val primaryKey = "primaryKey"
     val query = "(SELECT * FROM tableName condition ORDER BY primaryKey DESC LIMIT 1000) AS t1"
-    QueryBuilder.getDataQuery(mode, driver, tableName, limit, primaryKey, condition) should be (query)
+    QueryBuilder.getDataQuery(mode, driver, tableName, limit, primaryKey, condition, null) should be (query)
   }
 
   "getDataQuery" should "return correct query for daily mode" in {
     val mode = "daily"
     val query = "(SELECT * FROM tableName condition) AS t1"
-    QueryBuilder.getDataQuery(mode, null, tableName, null, null, condition) should be (query)
+    QueryBuilder.getDataQuery(mode, null, tableName, null, null, condition, null) should be (query)
   }
 
   "getDataQuery" should "return empty query for unknown mode" in {
     val query = ""
-    QueryBuilder.getDataQuery("abc", null, tableName, null, null, condition) should be (query)
+    QueryBuilder.getDataQuery("abc", null, tableName, null, null, condition, null) should be (query)
   }
 
 }

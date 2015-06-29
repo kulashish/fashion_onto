@@ -26,7 +26,8 @@ object GetData extends Logging {
 
     logger.info(condition)
 
-    val dbTableQuery = QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, limit, primaryKey, condition)
+    val dbTableQuery = QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, limit, primaryKey, condition,
+      joinTables)
     logger.info(dbTableQuery)
 
     val jdbcDF = if (primaryKey == null) {
