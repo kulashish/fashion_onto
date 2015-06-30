@@ -48,7 +48,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
        val df = Spark.getSqlContext().read.parquet(BOB_PATH + fileName + "/")
 
-       df.limit(10).select("*").write.format("json").json(DataFiles.TEST_RESOURCES + fileName + ".json")
+       df.limit(5).select("*").write.format("json").json(DataFiles.TEST_RESOURCES + fileName + ".json")
 
    }
 
@@ -131,7 +131,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
                                                         dfSalesOrder: DataFrame)
                               .limit(30).collect().toSet
 
-    //           result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
+//               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
         val dfResultCustomer = readFromJson(DataFiles.CUSTOMER, "result_customer",
                                                     Customer.result_customer)
@@ -395,7 +395,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
         val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
                              .limit(30).collect().toSet
 
-        //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
+//                        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
 
         val dfMvpSeg = readFromJson(DataFiles.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
                                     .collect().toSet

@@ -1,10 +1,5 @@
-{"id_customer_segments":4787377,"segment":3,"frequency":2,"recency":169,"mvp_score":1,"discount_score":5,"fk_customer":10151969,"created_at":"2014-11-02 07:31:30.0","updated_at":"2015-06-01 04:33:15.0"}
-{"id_customer_segments":4788873,"segment":4,"frequency":3,"recency":6,"mvp_score":2,"discount_score":3,"fk_customer":11466785,"created_at":"2014-11-02 11:04:44.0","updated_at":"2015-06-01 04:15:04.0"}
-{"id_customer_segments":4789419,"segment":4,"frequency":7,"recency":5,"mvp_score":0,"discount_score":5,"fk_customer":9968651,"created_at":"2014-11-02 11:45:27.0","updated_at":"2015-06-01 04:14:00.0"}
-{"id_customer_segments":4789613,"segment":2,"frequency":7,"recency":8,"mvp_score":2,"discount_score":4,"fk_customer":11468165,"created_at":"2014-11-02 11:58:33.0","updated_at":"2015-06-01 04:15:04.0"}
-{"id_customer_segments":4790993,"segment":6,"frequency":4,"recency":1,"mvp_score":0,"discount_score":2,"fk_customer":11470409,"created_at":"2014-11-02 13:11:03.0","updated_at":"2015-06-01 04:15:04.0"}
-{"id_customer_segments":4791917,"segment":2,"frequency":8,"recency":2,"mvp_score":1,"discount_score":4,"fk_customer":11470165,"created_at":"2014-11-02 13:56:15.0","updated_at":"2015-06-01 04:15:04.0"}
-{"id_customer_segments":4793579,"segment":3,"frequency":5,"recency":1,"mvp_score":2,"discount_score":3,"fk_customer":11473875,"created_at":"2014-11-02 15:21:15.0","updated_at":"2015-06-01 04:15:04.0"}
-{"id_customer_segments":4794313,"segment":2,"frequency":1,"recency":210,"mvp_score":0,"discount_score":5,"fk_customer":9544566,"created_at":"2014-11-02 15:58:59.0","updated_at":"2015-06-01 04:33:06.0"}
-{"id_customer_segments":4796407,"segment":1,"frequency":4,"recency":126,"mvp_score":1,"discount_score":3,"fk_customer":11479251,"created_at":"2014-11-02 18:01:17.0","updated_at":"2015-06-01 04:33:25.0"}
-{"id_customer_segments":4797001,"segment":2,"frequency":6,"recency":1,"mvp_score":2,"discount_score":5,"fk_customer":11480171,"created_at":"2014-11-02 18:34:18.0","updated_at":"2015-06-01 04:15:05.0"}
+{"id_customer_segments":4787377,"segment":3,"frequency":2,"recency":169,"mvp_score":1,"discount_score":5,"fk_customer":909090,"created_at":"2014-11-02 07:31:30.0","updated_at":"2015-06-01 04:33:15.0"}
+{"id_customer_segments":4788873,"segment":4,"frequency":3,"recency":6,"mvp_score":2,"discount_score":3,"fk_customer":3141790,"created_at":"2014-11-02 11:04:44.0","updated_at":"2015-06-01 04:15:04.0"}
+{"id_customer_segments":4789419,"segment":4,"frequency":7,"recency":5,"mvp_score":0,"discount_score":5,"fk_customer":1436938,"created_at":"2014-11-02 11:45:27.0","updated_at":"2015-06-01 04:14:00.0"}
+{"id_customer_segments":4789613,"segment":2,"frequency":7,"recency":8,"mvp_score":2,"discount_score":4,"fk_customer":657444,"created_at":"2014-11-02 11:58:33.0","updated_at":"2015-06-01 04:15:04.0"}
+{"id_customer_segments":4790993,"segment":6,"frequency":4,"recency":1,"mvp_score":0,"discount_score":2,"fk_customer":690661,"created_at":"2014-11-02 13:11:03.0","updated_at":"2015-06-01 04:15:04.0"}

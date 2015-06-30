@@ -90,12 +90,6 @@ object Customer {
           //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
           val udfCPOT = getCPOT(dfSalesOrder: DataFrame)
 
-          val salesOrder = dfSalesOrder.select(col("fk_customer"),
-                                               col("created_at") as "so_created_at",
-                                               col("updated_at") as "so_updated_at")
-                                               .join(udfCPOT,
-                                                     dfSalesOrder("fk_customer") === udfCPOT("fk_customer_cpot"), "outer")
-
           val dfJoin = dfCustomer.select("id_customer",
                                          "giftcard_credits_available",
                                          "store_credits_available",
@@ -106,7 +100,12 @@ object Customer {
                                          "created_at",
                                          "updated_at")
                                         .join(NLS, dfCustomer("email") === NLS("nls_email"), "outer")
-                                        .join(salesOrder, dfCustomer("id_customer") === salesOrder("fk_customer"), "outer")
+                                        .join(dfSalesOrder.select(col("fk_customer"),
+                                                                  col("created_at") as "so_created_at",
+                                                                  col("updated_at") as "so_updated_at"),
+                                         dfCustomer("id_customer") === dfSalesOrder("fk_customer"), "outer")
+                                        .join(udfCPOT,
+                                        dfCustomer("id_customer") === udfCPOT("fk_customer_cpot"), "outer")
 
 
           // Define User Defined Functions
