@@ -68,7 +68,7 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
 
   "Order Items data input  " should "return sku and sorted by quantity dataframe" in {
     val topSkus =  basicRecommender.topProductsSold(orderItemDataFrame,10)
-    assert(topSkus.count()==4)
+    assert(topSkus.count()==5)
   }
 
 
@@ -83,6 +83,12 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
     val recInput =  basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
     val recInputbrand = recInput.filter(ProductVariables.Sku+"='XW574WA35AZGINDFAS'").select(ProductVariables.Brand).collect()(0)(0).toString()
     assert(recInputbrand=="adidas")
+  }
+
+  " skus BR828MA28TMPINDFAS input and itr" should "return WOMEN GENDER" in {
+    val recInput =  basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
+    val recInputbrand = recInput.filter(ProductVariables.Sku+"='BR828MA28TMPINDFAS'").select(ProductVariables.Gender).collect()(0)(0).toString()
+    assert(recInputbrand=="WOMEN")
   }
 
 
@@ -105,5 +111,24 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
   }
 
 
+  "No category for inventory last week not sold " should "return false means should get filtered" in {
+    val inventorySoldStatus = basicRecommender.inventoryWeekNotSold(null,40,20)
+    assert(inventorySoldStatus==false)
+  }
+
+  "Stock less than weekly average " should "return false means should get filtered" in {
+    val inventorySoldStatus = basicRecommender.inventoryWeekNotSold("SUNGLASSES",20,30)
+    assert(inventorySoldStatus==false)
+  }
+
+  "Sunglasses category has stock more than double the weekly average " should "return true" in {
+    val inventorySoldStatus = basicRecommender.inventoryWeekNotSold("SUNGLASSES",50,20)
+    assert(inventorySoldStatus==true)
+  }
+
+  "Sunglasses category has stock less than double the weekly average " should "return false" in {
+    val inventorySoldStatus = basicRecommender.inventoryWeekNotSold("SUNGLASSES",35,20)
+    assert(inventorySoldStatus==false)
+  }
 
 }
