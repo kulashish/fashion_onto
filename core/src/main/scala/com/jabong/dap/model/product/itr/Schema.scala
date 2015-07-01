@@ -9,23 +9,52 @@ import org.apache.spark.sql.types._
 object Schema {
   val schema =
     StructType(
-      StructField("idCatalogConfig", IntegerType, false) ::
-        StructField("productName", StringType, false) ::
+      StructField("barcodeEan", StringType, true) ::
+        StructField("vendorItemNo", StringType, true) ::
+        StructField("heelHeight", StringType, true) ::
+        StructField("sleeve", StringType, true) ::
+        StructField("fit", StringType, true) ::
+        StructField("neck", StringType, true) ::
+        StructField("style", StringType, true) ::
+        StructField("material", StringType, true) ::
+        StructField("supplierColor", StringType, true) ::
+        StructField("styleName", StringType, true) ::
+        StructField("supplierStyleCode", StringType, true) ::
+        StructField("dispatchLocation", StringType, true) ::
+        StructField("packaging", StringType, true) ::
+        StructField("shipping", StringType, true) ::
+        StructField("reportingSubcategory", StringType, true) ::
+        StructField("reportingCategory", StringType, true) ::
+        StructField("brandType", StringType, true) ::
+        StructField("itemType", StringType, true) ::
+        StructField("season", StringType, true) ::
+        StructField("mrpPrice", DecimalType.apply(38, 20), true) ::
+        StructField("color", StringType, true) ::
+        StructField("size", StringType, true) ::
+        StructField("jabongCode", StringType, true) ::
+        StructField("petStyleCode", StringType, true) ::
+        StructField("gender", StringType, true) ::
+        StructField("brick", StringType, true) ::
+        StructField("class", StringType, true) ::
+        StructField("family", StringType, true) ::
+        StructField("segment", StringType, true) ::
+        StructField("businessUnit", StringType, true) ::
+        StructField("idCatalogConfig", IntegerType, true) ::
+        StructField("productName", StringType, true) ::
         StructField("specialMargin", DecimalType.apply(6, 2), true) ::
         StructField("margin", DecimalType.apply(6, 2), true) ::
-        StructField("activationDate", TimestampType, true) ::
-        StructField("configSku", StringType, false) ::
-        StructField("idCatalogSimple", IntegerType, false) ::
+        StructField("activatedAt", TimestampType, true) ::
+        StructField("sku", StringType, true) ::
+        StructField("idCatalogSimple", IntegerType, true) ::
         StructField("specialPrice", DecimalType.apply(10, 2), true) ::
         StructField("specialToDate", DateType, true) ::
         StructField("specialFromDate", DateType, true) ::
-        StructField("petStyleCode", StringType, false) ::
-        StructField("simpleSku", StringType, false) ::
-        StructField("supplierStatus", StringType, false) ::
-        StructField("brandName", StringType, false) ::
-        StructField("productUrl", StringType, false) ::
-        StructField("quantity", LongType, false) ::
-        StructField("bobVisibility", BooleanType, false) :: Nil
+        StructField("simpleSku", StringType, true) ::
+        StructField("supplierStatus", StringType, true) ::
+        StructField("brandUrlKey", StringType, true) ::
+        StructField("visibility", BooleanType, true) ::
+        StructField("quantity", LongType, true) ::
+        StructField("productUrl", StringType, true) :: Nil
     )
 }
 
