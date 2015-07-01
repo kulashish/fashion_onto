@@ -11,7 +11,7 @@ import org.apache.spark.sql.functions._
 object Utils {
 
   //checks if two schemas are Equal
-  def isSchemaEquals(schemaFirst: StructType, schemaSecond: StructType): Boolean ={
+  def isSchemaEqual(schemaFirst: StructType, schemaSecond: StructType): Boolean ={
 
     val fieldTypesFirst = schemaFirst.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
 

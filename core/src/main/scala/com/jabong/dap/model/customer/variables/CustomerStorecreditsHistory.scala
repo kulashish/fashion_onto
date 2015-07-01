@@ -35,7 +35,7 @@ object CustomerStorecreditsHistory {
 
         }
 
-        if(!Utils.isSchemaEquals(dfCSH.schema, Schema.csh)){
+        if(!Utils.isSchemaEqual(dfCSH.schema, Schema.csh)){
 
           log("schema attributes or data type mismatch")
 

@@ -36,7 +36,7 @@ object CustomerSegments {
 
           }
 
-          if(!Utils.isSchemaEquals(dfCustomerSegments.schema, Schema.customerSegments)){
+          if(!Utils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)){
 
             log("schema attributes or data type mismatch")
 
