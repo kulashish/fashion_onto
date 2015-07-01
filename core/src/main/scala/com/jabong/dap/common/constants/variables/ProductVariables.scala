@@ -3,7 +3,7 @@ package com.jabong.dap.common.constants.variables
 /**
  * Created by jabong1145 on 24/6/15.
  */
-object git ProductVariables {
+object ProductVariables {
 
   val Sku ="sku"
   val Brand = "brand"
