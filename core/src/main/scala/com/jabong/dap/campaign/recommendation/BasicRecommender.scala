@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.recommendation
 
 import java.util
 
-import com.jabong.dap.common.Constants.Variables.ProductVariables
+import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.Spark
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.TimestampType

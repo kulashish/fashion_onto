@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.common
 
 import javax.jdo.annotations.Columns
 
-import com.jabong.dap.common.Constants.Variables.{CustomerVariables, ACartVariables}
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ACartVariables}
 import com.jabong.dap.common.Spark
 import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{Column, SQLContext, DataFrame}
