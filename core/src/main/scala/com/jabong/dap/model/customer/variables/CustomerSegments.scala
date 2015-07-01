@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.variables
 
+import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
 import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{Row, DataFrame}
@@ -15,9 +16,9 @@ object CustomerSegments {
       //customer_segments variable schemas
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      val mvp_seg = StructType(Array(StructField("fk_customer", IntegerType, true),
-                                     StructField("mvp_score", IntegerType, true),
-                                     StructField("segment", IntegerType, true)))
+      val mvp_seg = StructType(Array(StructField(CustomerSegmentsVariables.FkCustomer, IntegerType, true),
+                                     StructField(CustomerSegmentsVariables.MvpScore, IntegerType, true),
+                                     StructField(CustomerSegmentsVariables.Segment, IntegerType, true)))
 
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,11 +45,15 @@ object CustomerSegments {
 
           }
 
-          val dfCustSegVars = dfCustomerSegments.select("fk_customer", "updated_at", "mvp_score", "segment")
-            .sort(col("fk_customer"), desc("updated_at"))
-            .groupBy("fk_customer")
-            .agg(first("mvp_score") as "mvp_score",
-              first("segment") as "segment")
+          val dfCustSegVars = dfCustomerSegments.select(CustomerSegmentsVariables.FkCustomer,
+                                                        CustomerSegmentsVariables.UpdatedAt,
+                                                        CustomerSegmentsVariables.MvpScore,
+                                                        CustomerSegmentsVariables.Segment)
+                                                .sort(col(CustomerSegmentsVariables.FkCustomer),
+                                                    desc(CustomerSegmentsVariables.FkCustomer))
+                                                .groupBy(CustomerSegmentsVariables.FkCustomer)
+                                                .agg(first(CustomerSegmentsVariables.MvpScore),
+                                                  first(CustomerSegmentsVariables.Segment))
 
           //    val segments = getSeg(dfCustSegVars)
 
@@ -57,15 +62,15 @@ object CustomerSegments {
 
       def getSeg(dfCustSegVars: DataFrame): DataFrame = {
 
-          val schema = StructType(Array(StructField("fk_customer", IntegerType, true),
-                                        StructField("mvp_score", IntegerType, true),
-                                        StructField("segment0", StringType, true),
-                                        StructField("segment1", StringType, true),
-                                        StructField("segment2", StringType, true),
-                                        StructField("segment3", StringType, true),
-                                        StructField("segment4", StringType, true),
-                                        StructField("segment5", StringType, true),
-                                        StructField("segment6", StringType, true)))
+          val schema = StructType(Array(StructField(CustomerSegmentsVariables.FkCustomer, IntegerType, true),
+                                        StructField(CustomerSegmentsVariables.MvpScore, IntegerType, true),
+                                        StructField(CustomerSegmentsVariables.Segment0, StringType, true),
+                                        StructField(CustomerSegmentsVariables.Segment1, StringType, true),
+                                        StructField(CustomerSegmentsVariables.Segment2, StringType, true),
+                                        StructField(CustomerSegmentsVariables.Segment3, StringType, true),
+                                        StructField(CustomerSegmentsVariables.Segment4, StringType, true),
+                                        StructField(CustomerSegmentsVariables.Segment5, StringType, true),
+                                        StructField(CustomerSegmentsVariables.Segment6, StringType, true)))
 
           val segments = dfCustSegVars.map(r => r(0) + "," + r(1) + "," + getSegValue(r(2).toString))
 
@@ -87,6 +92,7 @@ object CustomerSegments {
 
           dfs
       }
+
       def getSegValue(i: String): String = {
           val x = Integer.parseInt(i)
           x match {

@@ -68,7 +68,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
         val dfResultCustomer = Utils.readFromJson(DataSets.CUSTOMER, "result_customer",
-                                                    Customer.result_customer)
+                                                    Customer.resultCustomer)
                                                     .collect().toSet
 
         assert(result.equals(dfResultCustomer) == true)
@@ -249,7 +249,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
         val dfCustomersPreferredOrderTimeslot = Utils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-                                                             Customer.customers_preferred_order_timeslot)
+                                                             Customer.customersPreferredOrderTimeslot)
                                                             .collect().toSet
 
         assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
