@@ -209,31 +209,31 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
   //Name of variable: EMAIL_OPT_IN_STATUS
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  "getEmailOptInStatus: getStatusValue " should "o" in {
+  "getEmailOptInStatus: getStatusValue " should "O" in {
 
         val result = Customer.getEmailOptInStatus(null, null)
 
-        assert(result == "o")
+        assert(result == "O")
 
   }
 
-  "getEmailOptInStatus: getStatusValue " should "iou" in {
+  "getEmailOptInStatus: getStatusValue " should "I" in {
 
         val row = Row("", "subscribed")
 
         val result = Customer.getEmailOptInStatus("1", "subscribed")
 
-        assert(result == "iou")
+        assert(result == "I")
 
   }
 
-  "getEmailOptInStatus: getStatusValue " should "u" in {
+  "getEmailOptInStatus: getStatusValue " should "U" in {
 
         val row = Row("", "unsubscribed")
 
         val result = Customer.getEmailOptInStatus("1", "unsubscribed")
 
-        assert(result == "u")
+        assert(result == "U")
 
   }
 

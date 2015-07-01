@@ -67,7 +67,7 @@ object Customer {
 
             log("Data frame should not be null")
 
-            null
+            return null
 
           }
 
@@ -77,7 +77,7 @@ object Customer {
 
              log("schema attributes or data type mismatch")
 
-             null
+            return null
 
           }
 
@@ -179,11 +179,11 @@ object Customer {
       def getMin(t1: Timestamp, t2: Timestamp): Timestamp ={
 
           if(t1==null){
-            t2
+            return t2
           }
 
           if(t2==null){
-            t1
+            return t1
           }
 
           if (t1.compareTo(t2) >= 0)
@@ -197,11 +197,11 @@ object Customer {
       def getMax(t1: Timestamp, t2: Timestamp): Timestamp ={
 
           if(t1==null){
-            t2
+            return t2
           }
 
           if(t2==null){
-            t1
+            return t1
           }
 
           if (t1.compareTo(t2) < 0)
@@ -215,12 +215,12 @@ object Customer {
        def getEmailOptInStatus(nls_email: String, status: String): String = {
 
            if(nls_email == null){
-             "o"
+             return "O"
            }
 
            status match {
-             case "subscribed" => "iou"
-             case "unsubscribed" => "u"
+             case "subscribed" => "I"
+             case "unsubscribed" => "U"
            }
 
        }
