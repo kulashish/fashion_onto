@@ -51,7 +51,6 @@ class ACartCampaign(sQLContext: SQLContext) extends Campaign with java.io.Serial
 
     return filteredData
 
-
   }
 
   def skuPriceFilter(sku:Any,Price:Any,TodayPrice:Any): String ={

@@ -98,6 +98,15 @@ class BasicRecommender extends Recommender{
     return RecommendationInput
   }
 
+  def createRow(row: Row,array: Array[Int]):Row={
+    var sequence = new Seq[Int] = 
+    for(value <- array){
+      sequence+=(value)
+    }
+    row.get()
+    Row.apply()
+    return data
+  }
   // Input: recommendationInput: contains sorted list of all skus sold in last x days
   //        schema: {sku, brick, mvp, brand, gender, sp, weeklyAverage of number sold}
   // Ouput: (mvp, brick, gender) and its sorted list of recommendations
@@ -108,8 +117,20 @@ class BasicRecommender extends Recommender{
     }
 
 
+
+
+
+//    val pivotArray = Array(1,2)
+//    for (pivot <- pivotArray){
+//      row => row(pivot)
+//    }
+    val test =  recommendationInput.rdd.keyBy(row =>createRow(row,pivotArray))
+
+
     // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),(row(0).toString,row(4).toString,row(3).toString,row(5).asInstanceOf[Int],row(6).asInstanceOf[Int])))
+   // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
     val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
+
     //mappedRecommendationInput.collect().foreach(println)
 
 
@@ -117,13 +138,14 @@ class BasicRecommender extends Recommender{
 
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case(key,value)=>(key,genSku(value).toList)}
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
-    val check = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1,key._2,value._1,value._2.sortBy(-_._1))))}
-    check.collect().foreach(println)
+    val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Int],value._1,value._2.sortBy(-_._1))))}
+    val recommendDataFrame = hiveContext.createDataFrame(recommendations)
+    recommendations.collect().foreach(println)
    // recommendationOutput.collect().foreach(println)
    // val testrec = recommendationOutput.map{case(key,value)=>(key,value.flatMap(t=>testMap(t)))}
     //testrec.collect().foreach(println)
 
-    return null
+    return recommendDataFrame
   }
 
 
@@ -167,7 +189,6 @@ def testMap(x :(String,scala.collection.mutable.MutableList[(Long,String)])) = (
 
 
   def generateSku(x:Row,y:Row): Row ={
-    println("HELLO"+x+"\t"+y)
     if(x ==null || y==null || x(4)==null || y(4)==null){
       return null
     }
