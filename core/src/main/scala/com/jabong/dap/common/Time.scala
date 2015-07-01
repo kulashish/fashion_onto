@@ -23,11 +23,11 @@ object Time {
           daysBetweenTwoDates(today, date)
       }
 
-      def dateBeforeDays(n :Int, dateFormat:String): Date = {
+      def dateBeforeDays(n :Int, dateFormat:String): String = {
           val format = new SimpleDateFormat(dateFormat)
           val cal=Calendar.getInstance()
           cal.add(Calendar.DAY_OF_MONTH, n)
-          cal.getTime
+          format.format(cal.getTime())
       }
 
       def getTimeStamp(date: String, dateFormat:String): Timestamp={

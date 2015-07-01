@@ -2,12 +2,12 @@ package com.jabong.dap.model.customer.variables
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.{DataFiles, Constants, Utils, Spark}
-import com.jabong.dap.model.schema.Schema
+import com.jabong.dap.common.{Constants, Spark, Utils}
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.utils.Time
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame, Row}
+import org.apache.spark.sql.{DataFrame, Row}
 
 
 /**
@@ -67,7 +67,7 @@ object Customer {
 
             log("Data frame should not be null")
 
-            return null
+            null
 
           }
 
@@ -77,7 +77,7 @@ object Customer {
 
              log("schema attributes or data type mismatch")
 
-             return null
+             null
 
           }
 
@@ -110,7 +110,6 @@ object Customer {
 
           // Define User Defined Functions
           val sqlContext = Spark.getSqlContext()
-          import sqlContext.implicits._
 
           //min(customer.created_at, sales_order.created_at)
           val udfAccRegDate = udf((cust_created_at: Timestamp, nls_created_at: Timestamp)
@@ -173,18 +172,18 @@ object Customer {
 //            dfResult = MergeDataImpl.InsertUpdateMerge(dfCustomerFull, custBCVar.value, "id_customer")
 //          }
 
-         return dfResult
+         dfResult
       }
 
       //min(customer.created_at, sales_order.created_at)
       def getMin(t1: Timestamp, t2: Timestamp): Timestamp ={
 
           if(t1==null){
-            return t2
+            t2
           }
 
           if(t2==null){
-            return t1
+            t1
           }
 
           if (t1.compareTo(t2) >= 0)
@@ -198,11 +197,11 @@ object Customer {
       def getMax(t1: Timestamp, t2: Timestamp): Timestamp ={
 
           if(t1==null){
-            return t2
+            t2
           }
 
           if(t2==null){
-            return t1
+            t1
           }
 
           if (t1.compareTo(t2) < 0)
@@ -216,12 +215,12 @@ object Customer {
        def getEmailOptInStatus(nls_email: String, status: String): String = {
 
            if(nls_email == null){
-             return "o"
+             "o"
            }
 
            status match {
-             case "subscribed" => return "iou"
-             case "unsubscribed" => return "u"
+             case "subscribed" => "iou"
+             case "unsubscribed" => "u"
            }
 
        }
@@ -266,18 +265,14 @@ object Customer {
 
            var arrayConverted:String = ""
 
-           for( i  <- 1 to array.length-1){
+           for(i <- 1 to array.length-1) {
 
-             if(i==1){
+             if(i == 1) {
                arrayConverted=array(i).toString
-             }
-             else{
+             } else {
                arrayConverted= arrayConverted+"!"+array(i).toString
              }
-
-
            }
            arrayConverted
        }
-
  }

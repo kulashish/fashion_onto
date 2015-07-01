@@ -2,13 +2,12 @@ package com.jabong.dap.model.customer
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.{Utils, DataFiles, SharedSparkContext, Spark}
-import com.jabong.dap.model.customer.variables.{CustomerSegments, CustomerStorecreditsHistory, Customer}
-import org.apache.spark.sql.functions._
-import com.jabong.dap.model.schema.Schema
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{Row, DataFrame, SQLContext}
-import org.scalatest.{FlatSpec}
+import com.jabong.dap.common.{SharedSparkContext, Utils}
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments, CustomerStorecreditsHistory}
+import com.jabong.dap.data.storage.schema.Schema
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.scalatest.FlatSpec
 
 /**
   * Created by raghu on 16/6/15.
@@ -28,62 +27,14 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
      super.beforeAll()
 
-  //     Utils.writeToJson(DataFiles.CUSTOMER)
-  //     Utils.writeToJson(DataFiles.NEWSLETTER_SUBSCRIPTION)
-  //     Utils.writeToJson(DataFiles.SALES_ORDER)
-  //     Utils.writeToJson(DataFiles.CUSTOMER_STORECREDITS_HISTORY)
-  //     Utils.writeToJson(DataFiles.CUSTOMER_SEGMENTS)
-
-     dfCustomer = Utils.readFromJson(DataFiles.CUSTOMER, DataFiles.CUSTOMER, Schema.customer)
-     dfNLS = Utils.readFromJson(DataFiles.NEWSLETTER_SUBSCRIPTION, DataFiles.NEWSLETTER_SUBSCRIPTION, Schema.nls)
-     dfSalesOrder = Utils.readFromJson(DataFiles.SALES_ORDER, DataFiles.SALES_ORDER, Schema.salesOrder)
-     dfCSH = Utils.readFromJson(DataFiles.CUSTOMER_STORECREDITS_HISTORY, DataFiles.CUSTOMER_STORECREDITS_HISTORY, Schema.csh)
-     dfCustomerSegments = Utils.readFromJson(DataFiles.CUSTOMER_SEGMENTS, DataFiles.CUSTOMER_SEGMENTS, Schema.customerSegments)
+     dfCustomer = Utils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
+     dfNLS = Utils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
+     dfSalesOrder = Utils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)
+     dfCSH = Utils.readFromJson(DataSets.CUSTOMER_STORECREDITS_HISTORY, DataSets.CUSTOMER_STORECREDITS_HISTORY, Schema.csh)
+     dfCustomerSegments = Utils.readFromJson(DataSets.CUSTOMER_SEGMENTS, DataSets.CUSTOMER_SEGMENTS, Schema.customerSegments)
 
    }
   
-
-//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  // //schema attributes or data type should be match
-//  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  "schema attributes and type" should "match into DataFrames" in {
-//
-//        val BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
-//
-//        val dfCustomer = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER + "/")
-//        val dfNLS = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.NEWSLETTER_SUBSCRIPTION + "/")
-//        val dfSalesOrder = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.SALES_ORDER + "/")
-//        val dfCSH = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_STORECREDITS_HISTORY + "/")
-//        val dfCustomerSegments = Spark.getSqlContext().read.parquet(BOB_PATH + DataFiles.CUSTOMER_SEGMENTS + "/")
-//
-//        var result = true
-//
-//        if(dfCustomer == null ||
-//          dfNLS == null ||
-//          dfSalesOrder == null ||
-//          dfCSH == null ||
-//          dfCustomerSegments == null){
-//
-//          log("Data frame should not be null")
-//
-//          result = false
-//        }
-//        else if(!Schema.isEquals(dfCustomer.schema, Schema.customer) ||
-//                !Schema.isEquals(dfNLS.schema, Schema.nls) ||
-//                !Schema.isEquals(dfSalesOrder.schema, Schema.salesOrder) ||
-//                !Schema.isEquals(dfCSH.schema, Schema.csh) ||
-//                !Schema.isEquals(dfCustomerSegments.schema, Schema.customerSegments)){
-//
-//          log("schema attributes or data type mismatch")
-//
-//          result = false
-//
-//        }
-//
-//        assert(result == true)
-//
-//  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
@@ -116,7 +67,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
 //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
-        val dfResultCustomer = Utils.readFromJson(DataFiles.CUSTOMER, "result_customer",
+        val dfResultCustomer = Utils.readFromJson(DataSets.CUSTOMER, "result_customer",
                                                     Customer.result_customer)
                                                     .collect().toSet
 
@@ -297,7 +248,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
 //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
-        val dfCustomersPreferredOrderTimeslot = Utils.readFromJson(DataFiles.CUSTOMER, "customers_preferred_order_timeslot",
+        val dfCustomersPreferredOrderTimeslot = Utils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
                                                              Customer.customers_preferred_order_timeslot)
                                                             .collect().toSet
 
@@ -340,7 +291,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
 //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
-        val dfLastJrCovertDate = Utils.readFromJson(DataFiles.CUSTOMER, "last_jr_covert_date",
+        val dfLastJrCovertDate = Utils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
                                               CustomerStorecreditsHistory.last_jr_covert_date)
                                               .collect().toSet
 
@@ -380,7 +331,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext{
 
 //                        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
 
-        val dfMvpSeg = Utils.readFromJson(DataFiles.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
+        val dfMvpSeg = Utils.readFromJson(DataSets.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
                                     .collect().toSet
 
         assert(result.equals(dfMvpSeg) == true)
