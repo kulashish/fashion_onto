@@ -16,11 +16,11 @@ class ACartCampaign(sQLContext: SQLContext) extends Campaign with java.io.Serial
 
   //Logic to select the cutomer
   // In this case cutomers with abundant cart in last 30days
-  def customerSelection(customerData:DataFrame):DataFrame={
-    if(customerData==null ){
+  def customerSelection(customerVariableData:DataFrame):DataFrame={
+    if(customerVariableData==null ){
       return null
     }
-    val ACartCustomers = customerData.filter(ACartVariables.ACartStatus+"=1")
+    val ACartCustomers = customerVariableData.filter(ACartVariables.ACartStatus+"=1")
     return ACartCustomers
   }
 
@@ -67,8 +67,7 @@ class ACartCampaign(sQLContext: SQLContext) extends Campaign with java.io.Serial
 
   //UDFs
   val skuFilter = udf((sku:Any,Price:Any,TodayPrice:Any)=>skuPriceFilter(sku:Any,Price:Any,TodayPrice:Any))
-
-  val skuOrdered = udf((sku:String,skuOrderedList:List[String]) => SkuOrdered(sku:String,skuOrderedList:List[String]))
+    val skuOrdered = udf((sku:String,skuOrderedList:List[String]) => SkuOrdered(sku:String,skuOrderedList:List[String]))
 
   def groupCustomerData(orderData:DataFrame): DataFrame = {
 
