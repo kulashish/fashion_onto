@@ -13,6 +13,6 @@ object ProductVariables {
   val Stock = "stock"
   val SpecialPrice ="specialPrice"
   val WeeklyAverageSale = "weeklyAverageSale"
-
+  val Category = "category"
 
 }
