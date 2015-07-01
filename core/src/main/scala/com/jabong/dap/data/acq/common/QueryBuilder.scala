@@ -6,8 +6,7 @@ package com.jabong.dap.data.acq.common
 
 object QueryBuilder {
 
-  def getJoinTableStrings(joinTables: List[JoinTables], primaryKey: String):
-    (String, String) = {
+  def getJoinTableStrings(joinTables: List[JoinTables], primaryKey: String): (String, String) = {
     if (joinTables.isEmpty) {
       return ("", "")
     }
@@ -28,7 +27,7 @@ object QueryBuilder {
   }
 
   def getFullDataQuery(driver: String, tableName: String, limit: String, primaryKey: String, condition: String,
-                        joinSelect: String, joinFrom: String) =
+    joinSelect: String, joinFrom: String) =
     driver match {
       case "sqlserver" =>
         val limitString = if (limit != null) {
@@ -50,7 +49,7 @@ object QueryBuilder {
     }
 
   def getDataQuery(mode: String, driver: String, tableName: String, limit: String, primaryKey: String,
-                   condition: String, joinTables: List[JoinTables]) = {
+    condition: String, joinTables: List[JoinTables]) = {
     val joinStrings = getJoinTableStrings(joinTables, primaryKey)
     mode match {
       case "full" => getFullDataQuery(driver, tableName, limit, primaryKey, condition, joinStrings._1, joinStrings._2)

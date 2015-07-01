@@ -20,7 +20,8 @@ case class Credentials(
   port: String,
   dbName: String,
   userName: String,
-  password: String)
+  password: String
+)
 
 /**
  * Case class for application configuration
@@ -37,7 +38,8 @@ case class Config(
   applicationName: String = null,
   master: String = null,
   basePath: String = null,
-  credentials: List[Credentials] = null) extends EmptyClass
+  credentials: List[Credentials] = null
+) extends EmptyClass
 
 /**
  * Object to access config variables application wide

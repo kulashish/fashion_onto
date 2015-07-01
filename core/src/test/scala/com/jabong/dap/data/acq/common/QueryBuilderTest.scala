@@ -11,20 +11,20 @@ class QueryBuilderTest extends FlatSpec with Matchers {
   val primaryKey = "pk"
   val mode = "mode"
 
-
   "getJoinTableStrings" should "return empty strings when joinTables is an empty list" in {
     val joinTablesList = List()
-    QueryBuilder.getJoinTableStrings(joinTablesList, primaryKey) should be ("","")
+    QueryBuilder.getJoinTableStrings(joinTablesList, primaryKey) should be ("", "")
   }
 
   "getJoinTableStrings" should "return correct strings when tables are passed in joinTables" in {
-    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey =  "fk_testTable1"),
-      new JoinTables(name = "testTable2", foreignKey = "fk_testTable2" ))
+    val joinTablesList = List(
+      new JoinTables(name = "testTable1", foreignKey = "fk_testTable1"),
+      new JoinTables(name = "testTable2", foreignKey = "fk_testTable2")
+    )
     val selectString = ", j1.*, j2.*"
     val joinString = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk LEFT JOIN testTable2 AS j2 ON j2.fk_testTable2 = t1.pk"
     QueryBuilder.getJoinTableStrings(joinTablesList, primaryKey) should be (selectString, joinString)
   }
-
 
   "getFullDataQuery" should "return empty query when driver is not matched" in {
     val driver = "noMatch"
@@ -74,7 +74,7 @@ class QueryBuilderTest extends FlatSpec with Matchers {
     val mode = "full"
     val driver = "mysql"
     val limit = "1000"
-    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey =  "fk_testTable1"))
+    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1"))
     val primaryKey = "pk"
     val query = "(SELECT t1.* , j1.* FROM tableName AS t1  LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk condition ORDER BY pk DESC LIMIT 1000) AS t"
     QueryBuilder.getDataQuery(mode, driver, tableName, limit, primaryKey, condition, joinTablesList) should be (query)
@@ -83,7 +83,7 @@ class QueryBuilderTest extends FlatSpec with Matchers {
   "getDataQuery" should "return correct query for daily mode" in {
     val mode = "daily"
     val primaryKey = "pk"
-    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey =  "fk_testTable1"))
+    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1"))
     val query = "(SELECT t1.* , j1.* FROM tableName AS t1  LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk condition) AS t"
     QueryBuilder.getDataQuery(mode, null, tableName, null, primaryKey, condition, joinTablesList) should be (query)
   }
@@ -91,7 +91,7 @@ class QueryBuilderTest extends FlatSpec with Matchers {
   "getDataQuery" should "return correct query for hourly mode" in {
     val mode = "hourly"
     val primaryKey = "pk"
-    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey =  "fk_testTable1"))
+    val joinTablesList = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1"))
     val query = "(SELECT t1.* , j1.* FROM tableName AS t1  LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk condition) AS t"
     QueryBuilder.getDataQuery(mode, null, tableName, null, primaryKey, condition, joinTablesList) should be (query)
   }

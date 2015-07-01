@@ -44,6 +44,7 @@ object Spark {
    * @return HiveContext
    */
   def getHiveContext(): HiveContext = {
+
     hiveContext
   }
 }

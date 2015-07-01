@@ -13,7 +13,8 @@ import grizzled.slf4j.Logging
  */
 case class JoinTables(
   name: String,
-  foreignKey: String)
+  foreignKey: String
+)
 
 /**
  * Case class for storing information about data acquisition from a table.
@@ -43,7 +44,8 @@ case class TableInfo(
   rangeEnd: String,
   limit: String,
   filterCondition: String,
-  joinTables: List[JoinTables])
+  joinTables: List[JoinTables]
+)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -51,7 +53,8 @@ case class TableInfo(
  * @param acquisition List[TableInfo] List of tables to acquire the data from.
  */
 case class ImportInfo(
-  acquisition: List[TableInfo]) extends EmptyClass
+  acquisition: List[TableInfo]
+) extends EmptyClass
 
 object DaoUtil extends Logging {
 

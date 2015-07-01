@@ -46,3 +46,5 @@ project/boot/
 project/plugins/project/
 project/target/
 project/project/
+tables.json
+metastore_db
