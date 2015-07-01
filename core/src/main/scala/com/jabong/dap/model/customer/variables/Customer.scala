@@ -71,9 +71,9 @@ object Customer {
 
           }
 
-          if(!Utils.isSchemaEquals(dfCustomer.schema, Schema.customer) ||
-             !Utils.isSchemaEquals(dfNLS.schema, Schema.nls) ||
-             !Utils.isSchemaEquals(dfSalesOrder.schema, Schema.salesOrder)){
+          if(!Utils.isSchemaEqual(dfCustomer.schema, Schema.customer) ||
+             !Utils.isSchemaEqual(dfNLS.schema, Schema.nls) ||
+             !Utils.isSchemaEqual(dfSalesOrder.schema, Schema.salesOrder)){
 
              log("schema attributes or data type mismatch")
 
@@ -178,11 +178,11 @@ object Customer {
       //min(customer.created_at, sales_order.created_at)
       def getMin(t1: Timestamp, t2: Timestamp): Timestamp ={
 
-          if(t1==null){
+          if(t1 == null) {
             return t2
           }
 
-          if(t2==null){
+          if(t2 == null) {
             return t1
           }
 
@@ -196,11 +196,11 @@ object Customer {
       //max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
       def getMax(t1: Timestamp, t2: Timestamp): Timestamp ={
 
-          if(t1==null){
+          if(t1 == null) {
             return t2
           }
 
-          if(t2==null){
+          if(t2 == null) {
             return t1
           }
 
