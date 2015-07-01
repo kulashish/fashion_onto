@@ -1,6 +1,6 @@
 package com.jabong.dap.common
 
-import org.apache.spark.sql.{ DataFrame, SQLContext }
+import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest.FlatSpec
 
 class MergeUtilsTest extends FlatSpec with SharedSparkContext {

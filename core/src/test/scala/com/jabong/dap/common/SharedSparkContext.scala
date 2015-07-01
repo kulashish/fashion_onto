@@ -1,9 +1,7 @@
 package com.jabong.dap.common
 
 import org.apache.spark._
-
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.{BeforeAndAfterAll, Suite}
 
 /** Shares a local `SparkContext` between all tests in a suite and closes it at the end */
 trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
