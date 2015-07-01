@@ -1,12 +1,10 @@
 package com.jabong.dap.common
 
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, _}
+import org.apache.spark.sql.{ DataFrame, _ }
 
 object MergeUtils extends MergeData {
 
-  def InsertUpdateMerge (dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String) : RDD[Row] = {
-
+  def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
     // rename dfIncr column names with new_ as prefix
     var dfIncrVar = dfIncr;
 
@@ -27,7 +25,8 @@ object MergeUtils extends MergeData {
     }
 
     val mergedDF = joinedDF.map(x => reduceFunc(x))
-    mergedDF
+
+    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
   }
 }
 
