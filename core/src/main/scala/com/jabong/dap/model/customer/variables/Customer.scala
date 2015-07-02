@@ -23,7 +23,7 @@ object Customer {
   val emailOptInStatus = StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
     StructField(NewsletterVariables.STATUS, StringType, true)))
 
-  val accRegDateAndUpdatedAt = StructType(Array(StructField(CustomerVariables.Email, StringType, true),
+  val accRegDateAndUpdatedAt = StructType(Array(StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
     StructField(CustomerVariables.UPDATED_AT, TimestampType, true)))
 
@@ -37,7 +37,7 @@ object Customer {
     StructField(CustomerVariables.BIRTHDAY, DateType, true),
     StructField(CustomerVariables.GENDER, StringType, true),
     StructField(CustomerVariables.REWARD_TYPE, StringType, true),
-    StructField(CustomerVariables.Email, StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CustomerVariables.CREATED_AT, TimestampType, true),
     StructField(CustomerVariables.UPDATED_AT, TimestampType, true),
     StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
@@ -95,11 +95,11 @@ object Customer {
       CustomerVariables.BIRTHDAY,
       CustomerVariables.GENDER,
       CustomerVariables.REWARD_TYPE,
-      CustomerVariables.Email,
+      CustomerVariables.EMAIL,
       CustomerVariables.CREATED_AT,
       CustomerVariables.UPDATED_AT)
 
-      .join(NLS, dfCustomer(CustomerVariables.Email) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
+      .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
 
       .join(dfSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
@@ -141,7 +141,7 @@ object Customer {
       col(CustomerVariables.BIRTHDAY),
       col(CustomerVariables.GENDER),
       col(CustomerVariables.REWARD_TYPE),
-      col(CustomerVariables.Email),
+      col(CustomerVariables.EMAIL),
       col(CustomerVariables.CREATED_AT),
       col(CustomerVariables.UPDATED_AT),
       col(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT),
@@ -273,120 +273,5 @@ object Customer {
     arrayConverted
   }
 
-  ///////////////////////////////////Merge Data Concept/////////////////////////////////////////////////////////////////
-
-  def mergeData(dataFrame: DataFrame): RDD[(String, Long, Long, (String, Int))] = {
-    val mergedFrame = dataFrame.map(t => (mergeId(t(0), t(4)), checkLong(t(5)), sumValues(t(1), t(5)), mergeSlots(t(2), t(6))))
-    return mergedFrame
-  }
-
-  def checkLong(value: Any): Long = {
-    if (value == null) {
-      return 0
-    }
-    return value.asInstanceOf[Long]
-  }
-
-  def mergeSlots(oldSlot: Any, newSlot: Any): (String, Int) = {
-    if (oldSlot == null && newSlot == null) {
-      return null
-    }
-    if (oldSlot == null) {
-      return (newSlot.toString, getMax(newSlot))
-    }
-    if (newSlot == null) {
-      return (oldSlot.toString, getMax(oldSlot))
-    }
-    var max = 0
-
-    var maxSlot = 0
-    val oldSlotArray = oldSlot.toString.split("!")
-    val newSlotArray = newSlot.toString.split("!")
-    var finalSlotArray = new Array[Int](oldSlotArray.length)
-
-    for (i <- 0 to oldSlotArray.length - 1) {
-      finalSlotArray(i) = oldSlotArray(i).toInt + newSlotArray(i).toInt
-      if (finalSlotArray(i) > max) {
-        max = finalSlotArray(i)
-        maxSlot = i + 1
-      }
-    }
-
-    return (arrayToString(finalSlotArray, 0), maxSlot)
-  }
-
-  def arrayToString(array: Array[Int], index: Int): String = {
-    var arrayConverted: String = "";
-
-    for (i <- index to array.length - 1) {
-      if (i == index) {
-        arrayConverted = array(i).toString
-      } else {
-        arrayConverted = arrayConverted + "!" + array(i).toString
-      }
-
-    }
-    return arrayConverted
-  }
-
-  def getMax(slots: Any): Int = {
-    var max = 0
-    var maxSlot = 0
-    val slotArray = slots.toString.split("!")
-    for (i <- 0 to slotArray.length - 1) {
-      if (slotArray(i).toInt > max) {
-        max = slotArray(i).toInt
-        maxSlot = i + 1
-      }
-    }
-    return maxSlot
-
-  }
-
-  def sumValues(any1: Any, any2: Any): Long = {
-    if (any1 == null && any2 == null) {
-      return 0
-    }
-    if (any1 == null) {
-      return any2.asInstanceOf[Long]
-    }
-    if (any2 == null) {
-      return any1.asInstanceOf[Long]
-    }
-    return any1.asInstanceOf[Long] + any2.asInstanceOf[Long]
-  }
-
-  def mergeId(oldId: Any, newId: Any): String = {
-    if (oldId == null)
-      return newId.toString
-    else
-      return oldId.toString
-  }
-  def diff(any1: Any, any2: Any): Long = {
-    if (any1 == null && any2 == null) {
-      return 0
-    }
-    if (any1 == null) {
-      return 0
-    }
-    if (any2 == null) {
-      return any1.asInstanceOf[Long]
-    }
-    return any1.asInstanceOf[Long] - any2.asInstanceOf[Long]
-  }
-
-  def checkString(any: Any): String = {
-    if (any == null) {
-      return null
-    }
-    return any.toString
-  }
-
-  def checkType(any: Any): (String, Int) = {
-    if (any == null) {
-      return null
-    }
-    return any.asInstanceOf[(String, Int)]
-  }
-
+ 
 }

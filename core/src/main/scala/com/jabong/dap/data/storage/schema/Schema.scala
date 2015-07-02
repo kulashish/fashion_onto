@@ -9,7 +9,7 @@ import org.apache.spark.sql.types._
 object Schema {
 
   val customer = StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
-    StructField(CustomerVariables.Email, StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CustomerVariables.INCREMENT_ID, StringType, true),
     StructField(CustomerVariables.PREFIX, StringType, true),
     StructField(CustomerVariables.FIRST_NAME, StringType, true),

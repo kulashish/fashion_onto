@@ -7,7 +7,7 @@ object CustomerVariables {
 
   //customer schema variables
   val ID_CUSTOMER = "id_customer"
-  val Email = "email"
+  val EMAIL = "email"
   val INCREMENT_ID = "increment_id"
   val PREFIX = "prefix"
   val FIRST_NAME = "first_name"
