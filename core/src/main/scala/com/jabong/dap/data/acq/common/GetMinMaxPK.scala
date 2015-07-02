@@ -11,7 +11,12 @@ import grizzled.slf4j.Logging
 case class MinMax(min: Long, max: Long)
 
 object GetMinMaxPK extends Logging {
-  def getMinMax(mode: String, dbc: DbConnection, tableName: String, condition: String, tablePrimaryKey: String, limit: String): MinMax = {
+  def getMinMax(dbc: DbConnection, condition: String): MinMax = {
+    val mode = AcqImportInfo.tableInfo.mode
+    val tableName = AcqImportInfo.tableInfo.tableName
+    val tablePrimaryKey = AcqImportInfo.tableInfo.primaryKey
+    val limit = AcqImportInfo.tableInfo.limit
+
     var minMax = new MinMax(0, 0)
 
     val minMaxSql = if ((mode == "full" && limit == null) || (mode == "daily") || mode == "hourly") {

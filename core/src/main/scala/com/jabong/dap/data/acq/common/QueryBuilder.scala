@@ -6,7 +6,9 @@ package com.jabong.dap.data.acq.common
 
 object QueryBuilder {
 
-  def getJoinTableStrings(joinTables: List[JoinTables], primaryKey: String): (String, String) = {
+  def getJoinTableStrings(): (String, String) = {
+    val joinTables = AcqImportInfo.tableInfo.joinTables
+    val primaryKey = AcqImportInfo.tableInfo.primaryKey
     if (joinTables.isEmpty) {
       return ("", "")
     }
@@ -26,8 +28,11 @@ object QueryBuilder {
     (selectString, joinString)
   }
 
-  def getFullDataQuery(driver: String, tableName: String, limit: String, primaryKey: String, condition: String,
-    joinSelect: String, joinFrom: String) =
+  def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String) = {
+    val tableName = AcqImportInfo.tableInfo.tableName
+    val limit = AcqImportInfo.tableInfo.limit
+    val primaryKey = AcqImportInfo.tableInfo.primaryKey
+
     driver match {
       case "sqlserver" =>
         val limitString = if (limit != null) {
@@ -47,12 +52,15 @@ object QueryBuilder {
           limitString._2, limitString._1)
       case _ => ""
     }
+}
 
-  def getDataQuery(mode: String, driver: String, tableName: String, limit: String, primaryKey: String,
-    condition: String, joinTables: List[JoinTables]) = {
-    val joinStrings = getJoinTableStrings(joinTables, primaryKey)
+  def getDataQuery(driver: String, condition: String) = {
+    val mode = AcqImportInfo.tableInfo.mode
+    val tableName = AcqImportInfo.tableInfo.tableName
+
+    val joinStrings = getJoinTableStrings()
     mode match {
-      case "full" => getFullDataQuery(driver, tableName, limit, primaryKey, condition, joinStrings._1, joinStrings._2)
+      case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2)
       case "daily" | "hourly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
         joinStrings._2, condition)
       case _ => ""

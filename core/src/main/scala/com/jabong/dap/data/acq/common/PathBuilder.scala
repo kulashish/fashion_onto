@@ -13,10 +13,14 @@ import com.jabong.dap.common.utils.Time
 
 object PathBuilder {
 
-  def getPath(mode: String, source: String, tableName: String, rangeStart: String, rangeEnd: String) = {
+  def getPath() = {
     val basePath = AppConfig.config.basePath
+    val source = AcqImportInfo.tableInfo.source
+    val tableName = AcqImportInfo.tableInfo.tableName
+    val rangeStart = AcqImportInfo.tableInfo.rangeStart
+    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
 
-    mode match {
+    AcqImportInfo.tableInfo.mode match {
       case "full" =>
         val dateNow = Time.getTodayDateWithHrs().replaceAll("-", File.separator)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)

@@ -18,16 +18,16 @@ object GetData extends Logging {
     case _ => null
   }
 
-  def getData(mode: String, dbConn: DbConnection, source: String, tableName: String, primaryKey: String,
-    dateColumn: String, limit: String, rangeStart: String, rangeEnd: String, filterCondition: String,
-    saveFormat: String, saveMode: String, joinTables: List[JoinTables]): Any = {
+  def getData(dbConn: DbConnection): Any = {
+    val primaryKey = AcqImportInfo.tableInfo.primaryKey
+    val saveFormat = AcqImportInfo.tableInfo.saveFormat
+    val saveMode = AcqImportInfo.tableInfo.saveMode
     val context = getContext(saveFormat)
-    val condition = ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition)
+    val condition = ConditionBuilder.getCondition()
 
     logger.info(condition)
 
-    val dbTableQuery = QueryBuilder.getDataQuery(mode, dbConn.getDriver, tableName, limit, primaryKey, condition,
-      joinTables)
+    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver,condition)
     logger.info(dbTableQuery)
 
     val jdbcDF = if (primaryKey == null) {
@@ -36,7 +36,7 @@ object GetData extends Logging {
         "dbtable" -> dbTableQuery
       ))
     } else {
-      val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
+      val minMax = GetMinMaxPK.getMinMax(dbConn, condition)
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0)
         return
@@ -55,29 +55,11 @@ object GetData extends Logging {
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
-    val savePath = PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd)
+    val savePath = PathBuilder.getPath()
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
   }
 
-  def getFullData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, limit: String,
-    filterCondition: String, saveFormat: String, saveMode: String, joinTables: List[JoinTables]) = {
-    getData("full", dbConn, source, tableName, primaryKey, null, limit, null, null, filterCondition, saveFormat,
-      saveMode, joinTables)
-  }
 
-  def getDailyData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, dateColumn: String,
-    rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String,
-    joinTables: List[JoinTables]) = {
-    getData("daily", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition,
-      saveFormat, saveMode, joinTables)
-  }
-
-  def getHourlyData(dbConn: DbConnection, source: String, tableName: String, primaryKey: String, dateColumn: String,
-    rangeStart: String, rangeEnd: String, filterCondition: String, saveFormat: String, saveMode: String,
-    joinTables: List[JoinTables]) = {
-    getData("hourly", dbConn, source, tableName, primaryKey, dateColumn, null, rangeStart, rangeEnd, filterCondition,
-      saveFormat, saveMode, joinTables)
-  }
 
 }

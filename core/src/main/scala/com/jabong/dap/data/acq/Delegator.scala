@@ -1,7 +1,7 @@
 package com.jabong.dap.data.acq
 
 import com.jabong.dap.common.json.Parser
-import com.jabong.dap.data.acq.common.{ Fetcher, ImportInfo }
+import com.jabong.dap.data.acq.common._
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 
@@ -10,12 +10,13 @@ import net.liftweb.json.JsonParser.ParseException
  * data collection jobs.
  */
 class Delegator extends Serializable with Logging {
+
+
+
   def start(tableJsonPath: String) = {
-    var info: ImportInfo = null
-    // Parse and validate the JSON and it's parameters.
     val validated = try {
-      info = Parser.parseJson[ImportInfo](tableJsonPath)
-      TablesJsonValidator.validate(info)
+      AcqImportInfo.importInfo = Parser.parseJson[ImportInfo](tableJsonPath)
+      TablesJsonValidator.validate(AcqImportInfo.importInfo)
       true
     } catch {
       case e: ParseException =>
@@ -34,7 +35,8 @@ class Delegator extends Serializable with Logging {
 
     // Fetch the data if validation succeeded.
     if (validated) {
-      for (table <- info.acquisition) {
+      for (table <- AcqImportInfo.importInfo.acquisition) {
+        AcqImportInfo.tableInfo = table
         table.source match {
           case "erp" | "bob" | "unicommerce" => new Fetcher().fetch(table)
           case _ => logger.error("Unknown table source.")
