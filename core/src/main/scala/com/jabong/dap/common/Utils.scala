@@ -11,8 +11,7 @@ import org.apache.spark.sql.functions._
 object Utils {
 
   //checks if two schemas are Equal
-  def isSchemaEquals(schemaFirst: StructType, schemaSecond: StructType): Boolean = {
-
+  def isSchemaEqual(schemaFirst: StructType, schemaSecond: StructType): Boolean = {
     val fieldTypesFirst = schemaFirst.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
 
     val fieldTypesSecond = schemaSecond.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
@@ -23,7 +22,6 @@ object Utils {
 
       return false
     }
-
     return true
   }
 
@@ -38,7 +36,6 @@ object Utils {
 
   //read Json file
   def readFromJson(directoryName: String, fileName: String, schema: StructType): DataFrame = {
-
     val df = Spark.getSqlContext().read.schema(schema).format("json")
       .load(DataSets.TEST_RESOURCES + directoryName + "/" + fileName + ".json")
 
