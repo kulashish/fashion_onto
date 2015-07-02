@@ -33,8 +33,7 @@ object GetData extends Logging {
     val jdbcDF = if (primaryKey == null) {
       context.load("jdbc", Map(
         "url" -> dbConn.getConnectionString,
-        "dbtable" -> dbTableQuery
-      ))
+        "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
@@ -46,8 +45,7 @@ object GetData extends Logging {
         "partitionColumn" -> primaryKey,
         "lowerBound" -> minMax.min.toString,
         "upperBound" -> minMax.max.toString,
-        "numPartitions" -> "3"
-      ))
+        "numPartitions" -> "3"))
     }
 
     jdbcDF.printSchema()

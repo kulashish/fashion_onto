@@ -6,6 +6,7 @@ import com.jabong.dap.common.{ SharedSparkContext, Utils }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
 import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
 
@@ -66,7 +67,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
     val dfResultCustomer = Utils.readFromJson(DataSets.CUSTOMER, "result_customer",
-      Customer.resultCustomer)
+      SchemaVariables.resultCustomer)
       .collect().toSet
 
     assert(result.equals(dfResultCustomer) == true)
@@ -245,7 +246,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
     val dfCustomersPreferredOrderTimeslot = Utils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-      Customer.customersPreferredOrderTimeslot)
+      SchemaVariables.customersPreferredOrderTimeslot)
       .collect().toSet
 
     assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
@@ -281,7 +282,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
     val dfLastJrCovertDate = Utils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
-      CustomerStorecreditsHistory.last_jr_covert_date)
+      SchemaVariables.last_jr_covert_date)
       .collect().toSet
 
     assert(result.equals(dfLastJrCovertDate) == true)
@@ -316,7 +317,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     //                        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
 
-    val dfMvpSeg = Utils.readFromJson(DataSets.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
+    val dfMvpSeg = Utils.readFromJson(DataSets.CUSTOMER, "mvp_seg", SchemaVariables.mvp_seg)
       .collect().toSet
 
     assert(result.equals(dfMvpSeg) == true)

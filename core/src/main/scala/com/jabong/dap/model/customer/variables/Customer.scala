@@ -4,47 +4,16 @@ import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, CustomerVariables }
 import com.jabong.dap.common.utils.Time
-import com.jabong.dap.common.{Constants, Spark, Utils}
+import com.jabong.dap.common.{ Constants, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.rdd.RDD
+import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 27/5/15.
  */
 object Customer {
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  val emailOptInStatus = StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
-    StructField(NewsletterVariables.STATUS, StringType, true)))
-
-  val accRegDateAndUpdatedAt = StructType(Array(StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
-    StructField(CustomerVariables.UPDATED_AT, TimestampType, true)))
-
-  val customersPreferredOrderTimeslot = StructType(Array(StructField(CustomerVariables.FK_CUSTOMER_CPOT, IntegerType, true),
-    StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
-    StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true)))
-
-  val resultCustomer = StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
-    StructField(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE, DecimalType(10, 2), true),
-    StructField(CustomerVariables.STORE_CREDITS_AVAILABLE, DecimalType(10, 2), true),
-    StructField(CustomerVariables.BIRTHDAY, DateType, true),
-    StructField(CustomerVariables.GENDER, StringType, true),
-    StructField(CustomerVariables.REWARD_TYPE, StringType, true),
-    StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.CREATED_AT, TimestampType, true),
-    StructField(CustomerVariables.UPDATED_AT, TimestampType, true),
-    StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
-    StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true),
-    StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
-    StructField(CustomerVariables.MAX_UPDATED_AT, TimestampType, true),
-    StructField(CustomerVariables.EMAIL_OPT_IN_STATUS, StringType, true)))
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // DataFrame Customer,NLS, SalesOrder operations
@@ -237,7 +206,7 @@ object Customer {
     val rowRDD = finalData.map({ case (key, value) => Row(key.toInt, value._1, value._2) })
 
     // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, customersPreferredOrderTimeslot)
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, SchemaVariables.customersPreferredOrderTimeslot)
 
     df
   }
@@ -273,5 +242,4 @@ object Customer {
     arrayConverted
   }
 
- 
 }
