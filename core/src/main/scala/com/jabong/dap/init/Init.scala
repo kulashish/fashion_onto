@@ -3,6 +3,7 @@ package com.jabong.dap.init
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.Delegator
+import com.jabong.dap.data.merge.MergeDelegator
 import com.jabong.dap.model.product.itr.Itr
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
@@ -16,11 +17,13 @@ object Init {
    *
    * @param component String Name of the component
    * @param tableJson String Path of data acquisition config json file
+   * @param mergeJson String Path of merge job config json file
    * @param config String Path of application config json file
    */
   case class Params(
     component: String = null,
     tableJson: String = null,
+    mergeJson: String = null,
     config: String = null
   )
 
@@ -42,6 +45,12 @@ object Init {
         .text("Component name like 'itr/acquisition' etc.")
         .required()
         .action((x, c) => c.copy(component = x))
+
+      opt[String]("mergeJson")
+        .text("Path to merge job json config file.")
+        .action((x,c) => c.copy(mergeJson = x))
+        .validate(x => if (Files.exists(Paths.get(x))) success else failure("Option --mergeJson path to merge job list json."))
+
 
       opt[String]("tablesJson")
         .text("Path to data acquisition tables json config file.")
@@ -88,6 +97,7 @@ object Init {
     params.component match {
       case "itr" => new Itr().start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
+      case "merge" => new MergeDelegator().start(params.mergeJson)
     }
   }
 }

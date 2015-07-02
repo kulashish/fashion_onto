@@ -47,6 +47,16 @@ object Time {
   }
 
   /**
+   * Returns day before yesterday's date as a string in the format yyyy-MM-dd
+   */
+  def  getDayBeforeYesterdayDate(): String = {
+    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
+    val cal = Calendar.getInstance()
+    cal.add(Calendar.DAY_OF_MONTH, -2)
+    sdf.format(cal.getTime)
+  }
+
+  /**
    * Returns today's date as a string in the format yyyy-MM-dd--HH.
    */
   def getTodayDateWithHrs(): String = {
