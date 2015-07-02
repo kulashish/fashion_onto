@@ -1,4 +1,4 @@
-package com.jabong.dap.utils
+package com.jabong.dap.common
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat

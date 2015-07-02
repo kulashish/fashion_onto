@@ -40,30 +40,24 @@ object SalesOrder {
    * @param salesOrders
    * @return
    */
-  def ordersPlaced(salesOrders: DataFrame): DataFrame = {
-    val resultsRDD = salesOrders.groupBy("fk_customer").agg(count("created_at") as "Count")
-    resultsRDD
-  }
-
-  /**
-   *
-   * @param salesOrders
-   * @return
-   */
   def couponScore(salesOrders: DataFrame): DataFrame = {
     val salesOrderNew = salesOrders.select("fk_customer", "coupon_code").na.drop()
     val couponScore = salesOrderNew.groupBy("fk_customer").agg(count("coupon_code") as "coupn_score")
     return couponScore
   }
 
-  def salesOrders(prev : DataFrame, curr: DataFrame): DataFrame   = {
+  def processData(prev : DataFrame, curr: DataFrame): DataFrame   = {
     val gRDD = curr.groupBy("fk_customer").agg( max("created_at") as "last_order_date",
                                                 min("created_at") as "first_order_date",
-                                                count("created_at") as "orders_count")
+                                                count("created_at") as "orders_count",
+                                                max("grand_total") as "highest_value_order",
+                                                count("created_at")-count("created_at") as "days_since_last_order")
     val joinedRDD = prev.unionAll(gRDD)
     val res =joinedRDD.groupBy("fk_customer").agg(max("created_at") as "last_order_date",
                                                   min("created_at") as "first_order_date",
-                                                  sum("orders_count") as "orders_count")
+                                                  sum("orders_count") as "orders_count",
+                                                  max("grand_total") as "highest_value_order",
+                                                  min("days_since_last_order")+1 as "days_since_last_order")
 
     return res
   }
