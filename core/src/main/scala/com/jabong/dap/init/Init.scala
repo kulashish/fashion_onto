@@ -19,7 +19,8 @@ object Init {
   case class Params(
     component: String = null,
     tableJson: String = null,
-    config: String = null)
+    config:    String = null
+  )
 
   def main(args: Array[String]) {
     options(args)

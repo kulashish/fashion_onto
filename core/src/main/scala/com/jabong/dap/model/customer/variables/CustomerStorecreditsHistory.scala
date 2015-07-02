@@ -15,8 +15,10 @@ object CustomerStorecreditsHistory {
   //customer_storecredits_history variable schemas
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  val last_jr_covert_date = StructType(Array(StructField("fk_customer", IntegerType, true),
-    StructField("last_jr_covert_date", TimestampType, true)))
+  val last_jr_covert_date = StructType(Array(
+    StructField("fk_customer", IntegerType, true),
+    StructField("last_jr_covert_date", TimestampType, true)
+  ))
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // DataFrame CUSTOMER_STORECREDITS_HISTORY operations

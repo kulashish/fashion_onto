@@ -18,18 +18,25 @@ object Customer {
   //customer variable schemas
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  val email_opt_in_status = StructType(Array(StructField("id_customer", IntegerType, true),
-    StructField("status", StringType, true)))
+  val email_opt_in_status = StructType(Array(
+    StructField("id_customer", IntegerType, true),
+    StructField("status", StringType, true)
+  ))
 
-  val accRegDateAndUpdatedAt = StructType(Array(StructField("email", StringType, true),
+  val accRegDateAndUpdatedAt = StructType(Array(
+    StructField("email", StringType, true),
     StructField("acc_reg_date", TimestampType, true),
-    StructField("updated_at", TimestampType, true)))
+    StructField("updated_at", TimestampType, true)
+  ))
 
-  val customers_preferred_order_timeslot = StructType(Array(StructField("fk_customer_cpot", IntegerType, true),
+  val customers_preferred_order_timeslot = StructType(Array(
+    StructField("fk_customer_cpot", IntegerType, true),
     StructField("customer_all_order_timeslot", StringType, true),
-    StructField("customer_preferred_order_timeslot", IntegerType, true)))
+    StructField("customer_preferred_order_timeslot", IntegerType, true)
+  ))
 
-  val result_customer = StructType(Array(StructField("id_customer", IntegerType, true),
+  val result_customer = StructType(Array(
+    StructField("id_customer", IntegerType, true),
     StructField("giftcard_credits_available", DecimalType(10, 2), true),
     StructField("store_credits_available", DecimalType(10, 2), true),
     StructField("birthday", DateType, true),
@@ -42,7 +49,8 @@ object Customer {
     StructField("customer_preferred_order_timeslot", IntegerType, true),
     StructField("acc_reg_date", TimestampType, true),
     StructField("max_updated_at", TimestampType, true),
-    StructField("email_opt_in_status", StringType, true)))
+    StructField("email_opt_in_status", StringType, true)
+  ))
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // DataFrame Customer,NLS, SalesOrder operations
@@ -79,15 +87,18 @@ object Customer {
 
     }
 
-    val NLS = dfNLS.select(col("email") as "nls_email",
+    val NLS = dfNLS.select(
+      col("email") as "nls_email",
       col("status"),
       col("created_at") as "nls_created_at",
-      col("updated_at") as "nls_updated_at")
+      col("updated_at") as "nls_updated_at"
+    )
 
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     val udfCPOT = getCPOT(dfSalesOrder: DataFrame)
 
-    val dfJoin = dfCustomer.select("id_customer",
+    val dfJoin = dfCustomer.select(
+      "id_customer",
       "giftcard_credits_available",
       "store_credits_available",
       "birthday",
@@ -95,14 +106,21 @@ object Customer {
       "reward_type",
       "email",
       "created_at",
-      "updated_at")
+      "updated_at"
+    )
       .join(NLS, dfCustomer("email") === NLS("nls_email"), "outer")
-      .join(dfSalesOrder.select(col("fk_customer"),
+      .join(
+        dfSalesOrder.select(
+        col("fk_customer"),
         col("created_at") as "so_created_at",
-        col("updated_at") as "so_updated_at"),
-        dfCustomer("id_customer") === dfSalesOrder("fk_customer"), "outer")
-      .join(udfCPOT,
-        dfCustomer("id_customer") === udfCPOT("fk_customer_cpot"), "outer")
+        col("updated_at") as "so_updated_at"
+      ),
+        dfCustomer("id_customer") === dfSalesOrder("fk_customer"), "outer"
+      )
+      .join(
+        udfCPOT,
+        dfCustomer("id_customer") === udfCPOT("fk_customer_cpot"), "outer"
+      )
 
     // Define User Defined Functions
     val sqlContext = Spark.getSqlContext()
@@ -131,7 +149,8 @@ object Customer {
                                      ACC_REG_DATE,
                                      MAX_UPDATED_AT,
                                      EMAIL_OPT_IN_STATUS,*/
-    val dfResult = dfJoin.select(col("id_customer"),
+    val dfResult = dfJoin.select(
+      col("id_customer"),
       col("giftcard_credits_available"),
       col("store_credits_available"),
       col("birthday"),
@@ -143,15 +162,22 @@ object Customer {
       col("customer_all_order_timeslot"),
       col("customer_preferred_order_timeslot"),
 
-      udfAccRegDate(dfJoin("created_at"),
-        dfJoin("nls_created_at")) as "acc_reg_date",
+      udfAccRegDate(
+        dfJoin("created_at"),
+        dfJoin("nls_created_at")
+      ) as "acc_reg_date",
 
-      udfMaxUpdatedAt(dfJoin("updated_at"),
+      udfMaxUpdatedAt(
+        dfJoin("updated_at"),
         dfJoin("nls_created_at"),
-        dfJoin("so_updated_at")) as "max_updated_at",
+        dfJoin("so_updated_at")
+      ) as "max_updated_at",
 
-      udfEmailOptInStatus(dfJoin("nls_email"),
-        dfJoin("status")) as "email_opt_in_status")
+      udfEmailOptInStatus(
+        dfJoin("nls_email"),
+        dfJoin("status")
+      ) as "email_opt_in_status"
+    )
 
     //
     //          if (isOldDate) {

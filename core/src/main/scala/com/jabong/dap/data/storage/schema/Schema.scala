@@ -7,7 +7,8 @@ import org.apache.spark.sql.types._
  */
 object Schema {
 
-  val customer = StructType(Array(StructField("id_customer", IntegerType, true),
+  val customer = StructType(Array(
+    StructField("id_customer", IntegerType, true),
     StructField("email", StringType, true),
     StructField("increment_id", StringType, true),
     StructField("prefix", StringType, true),
@@ -58,9 +59,11 @@ object Schema {
     StructField("app_version", StringType, true),
     StructField("fk_corporate_customer", IntegerType, true),
     StructField("fk_referral_code", IntegerType, true),
-    StructField("sms_opt", BooleanType, true)))
+    StructField("sms_opt", BooleanType, true)
+  ))
 
-  val nls = StructType(Array(StructField("id_newsletter_subscription", IntegerType, true),
+  val nls = StructType(Array(
+    StructField("id_newsletter_subscription", IntegerType, true),
     StructField("fk_customer", IntegerType, true),
     StructField("email", StringType, true),
     StructField("unsubscribe_key", StringType, true),
@@ -74,9 +77,11 @@ object Schema {
     StructField("fk_affiliate_partner", IntegerType, true),
     StructField("src_sub", StringType, true),
     StructField("src_unsub", StringType, true),
-    StructField("frequency", StringType, true)))
+    StructField("frequency", StringType, true)
+  ))
 
-  val salesOrder = StructType(Array(StructField("id_sales_order", IntegerType, true),
+  val salesOrder = StructType(Array(
+    StructField("id_sales_order", IntegerType, true),
     StructField("fk_sales_order_address_billing", IntegerType, true),
     StructField("fk_sales_order_address_shipping", IntegerType, true),
     StructField("fk_customer", IntegerType, true),
@@ -123,9 +128,11 @@ object Schema {
     StructField("fk_corporate_customer", IntegerType, true),
     StructField("corporate_currency_value", DecimalType(10, 2), true),
     StructField("corporate_transaction_id", StringType, true),
-    StructField("device_id", StringType, true)))
+    StructField("device_id", StringType, true)
+  ))
 
-  val csh = StructType(Array(StructField("id_customer_storecredits_history", IntegerType, true),
+  val csh = StructType(Array(
+    StructField("id_customer_storecredits_history", IntegerType, true),
     StructField("fk_customer", IntegerType, true),
     StructField("created_at", TimestampType, true),
     StructField("operation_type", StringType, true),
@@ -138,9 +145,11 @@ object Schema {
     StructField("fk_acl_user", IntegerType, true),
     StructField("updated_at", TimestampType, true),
     StructField("balance", DecimalType(10, 2), true),
-    StructField("expiry_date", DateType, true)))
+    StructField("expiry_date", DateType, true)
+  ))
 
-  val customerSegments = StructType(Array(StructField("id_customer_segments", IntegerType, true),
+  val customerSegments = StructType(Array(
+    StructField("id_customer_segments", IntegerType, true),
     StructField("segment", IntegerType, true),
     StructField("frequency", IntegerType, true),
     StructField("recency", IntegerType, true),
@@ -148,6 +157,7 @@ object Schema {
     StructField("discount_score", IntegerType, true),
     StructField("fk_customer", IntegerType, true),
     StructField("created_at", TimestampType, true),
-    StructField("updated_at", TimestampType, true)))
+    StructField("updated_at", TimestampType, true)
+  ))
 
 }
