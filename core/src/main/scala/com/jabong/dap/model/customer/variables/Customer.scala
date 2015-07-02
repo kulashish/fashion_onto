@@ -3,7 +3,8 @@ package com.jabong.dap.model.customer.variables
 import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, CustomerVariables }
-import com.jabong.dap.common.{ Constants, Spark, Utils }
+import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.{Constants, Spark, Utils}
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
@@ -225,7 +226,7 @@ object Customer {
     val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
       .sort(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
 
-    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DATETIME_FORMAT)), 1)).reduceByKey(_ + _)
+    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
 
     val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 
