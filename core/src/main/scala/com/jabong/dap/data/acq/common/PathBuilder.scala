@@ -25,7 +25,7 @@ object PathBuilder {
           val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
           "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
         } else {
-          val format = new SimpleDateFormat(Constants.DateTimeFormat)
+          val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
           val start = Calendar.getInstance()
           val end = Calendar.getInstance()
           start.setTime(format.parse(rangeStart))
@@ -35,7 +35,7 @@ object PathBuilder {
               withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
         }
       case "hourly" =>
-        val format = new SimpleDateFormat(Constants.DateTimeFormat)
+        val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
         val start = Calendar.getInstance()
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))

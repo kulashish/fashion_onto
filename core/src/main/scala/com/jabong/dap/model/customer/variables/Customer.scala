@@ -248,7 +248,7 @@ object Customer {
     val salesOrder = dfSalesOrder.select("fk_customer", "created_at")
       .sort("fk_customer", "created_at")
 
-    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DateTimeFormat)), 1)).reduceByKey(_ + _)
+    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
 
     val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 

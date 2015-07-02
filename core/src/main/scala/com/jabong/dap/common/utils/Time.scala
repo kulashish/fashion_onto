@@ -17,7 +17,7 @@ object Time {
    * Returns the total number of days between two given date inputs
    */
   def daysBetweenTwoDates(date1: Date, date2: Date): BigInt = {
-    Math.abs(date1.getTime - date2.getTime) / Constants.ConvertMillisecondToDays
+    Math.abs(date1.getTime - date2.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
   }
 
   /**
@@ -25,14 +25,14 @@ object Time {
    */
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
-    Math.abs(today.getTime - date.getTime) / Constants.ConvertMillisecondToDays
+    Math.abs(today.getTime - date.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
   }
 
   /**
    * Returns today's date as a string in the format yyyy-MM-dd.
    */
   def getTodayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DateFormat)
+    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
     sdf.format(new Date())
   }
 
@@ -40,7 +40,7 @@ object Time {
    * Returns yesterday's date as a string in the format yyyy-MM-dd
    */
   def getYesterdayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DateFormat)
+    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
     val cal = Calendar.getInstance()
     cal.add(Calendar.DAY_OF_MONTH, -1)
     sdf.format(cal.getTime)
@@ -70,7 +70,7 @@ object Time {
    * WARNING: can raise ParseException if input dates not in the correct format.
    */
   def isStrictlyLessThan(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DateTimeFormat)
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val start = format.parse(dt1)
     val end = format.parse(dt2)
     if (start.getTime < end.getTime)
@@ -85,7 +85,7 @@ object Time {
    * WARNING: can raise ParseException if input dates not in the correct format.
    */
   def isSameMonth(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DateTimeFormat)
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
     start.setTime(format.parse(dt1))
@@ -102,7 +102,7 @@ object Time {
    * WARNING: can raise ParseException if input dates not in the correct format.
    */
   def isSameDay(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DateTimeFormat)
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
     start.setTime(format.parse(dt1))
