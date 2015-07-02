@@ -49,28 +49,24 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   "getCustomer: schema attributes and data type" should
     "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
 
-      val result = Customer.getCustomer(
-        dfCustomer: DataFrame,
+      val result = Customer.getCustomer(dfCustomer: DataFrame,
         dfNLS: DataFrame,
-        dfSalesOrder: DataFrame
-      )
+        dfSalesOrder: DataFrame)
       assert(result != null)
 
     }
 
   "getCustomer: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = Customer.getCustomer(
-      dfCustomer: DataFrame,
+    val result = Customer.getCustomer(dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame
-    )
+      dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
 
     //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
     val dfResultCustomer = Utils.readFromJson(DataSets.CUSTOMER, "result_customer",
-      Customer.result_customer)
+      Customer.resultCustomer)
       .collect().toSet
 
     assert(result.equals(dfResultCustomer) == true)
@@ -209,31 +205,31 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   //Name of variable: EMAIL_OPT_IN_STATUS
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  "getEmailOptInStatus: getStatusValue " should "o" in {
+  "getEmailOptInStatus: getStatusValue " should "O" in {
 
     val result = Customer.getEmailOptInStatus(null, null)
 
-    assert(result == "o")
+    assert(result == "O")
 
   }
 
-  "getEmailOptInStatus: getStatusValue " should "iou" in {
+  "getEmailOptInStatus: getStatusValue " should "I" in {
 
     val row = Row("", "subscribed")
 
     val result = Customer.getEmailOptInStatus("1", "subscribed")
 
-    assert(result == "iou")
+    assert(result == "I")
 
   }
 
-  "getEmailOptInStatus: getStatusValue " should "u" in {
+  "getEmailOptInStatus: getStatusValue " should "U" in {
 
     val row = Row("", "unsubscribed")
 
     val result = Customer.getEmailOptInStatus("1", "unsubscribed")
 
-    assert(result == "u")
+    assert(result == "U")
 
   }
 
@@ -249,7 +245,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
     val dfCustomersPreferredOrderTimeslot = Utils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-      Customer.customers_preferred_order_timeslot)
+      Customer.customersPreferredOrderTimeslot)
       .collect().toSet
 
     assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)

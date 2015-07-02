@@ -1,6 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Utils
+import com.jabong.dap.common.constants.variables.CustomerStoreVariables
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -15,10 +16,8 @@ object CustomerStorecreditsHistory {
   //customer_storecredits_history variable schemas
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  val last_jr_covert_date = StructType(Array(
-    StructField("fk_customer", IntegerType, true),
-    StructField("last_jr_covert_date", TimestampType, true)
-  ))
+  val last_jr_covert_date = StructType(Array(StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true)))
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // DataFrame CUSTOMER_STORECREDITS_HISTORY operations
@@ -29,18 +28,24 @@ object CustomerStorecreditsHistory {
   def getLastJrCovertDate(dfCSH: DataFrame): DataFrame = {
 
     if (dfCSH == null) {
+
       log("Data frame should not be null")
+
       return null
+
     }
 
     if (!Utils.isSchemaEqual(dfCSH.schema, Schema.csh)) {
+
       log("schema attributes or data type mismatch")
+
       return null
+
     }
 
-    val dfLastJrCovertDate = dfCSH.select("fk_customer", "created_at")
-      .groupBy("fk_customer")
-      .agg(max("created_at") as "last_jr_covert_date")
+    val dfLastJrCovertDate = dfCSH.select(CustomerStoreVariables.FK_CUSTOMER, CustomerStoreVariables.CREATED_AT)
+      .groupBy(CustomerStoreVariables.FK_CUSTOMER)
+      .agg(max(CustomerStoreVariables.CREATED_AT) as CustomerStoreVariables.LAST_JR_COVERT_DATE)
 
     dfLastJrCovertDate
   }
