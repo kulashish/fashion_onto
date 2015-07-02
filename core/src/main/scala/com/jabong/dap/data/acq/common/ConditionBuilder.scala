@@ -7,7 +7,7 @@ import com.jabong.dap.common.utils.Time
  */
 object ConditionBuilder {
   def getCondition(mode: String, dateColumn: String, rangeStart: String, rangeEnd: String,
-    filterCondition: String): String = {
+                   filterCondition: String): String = {
 
     val tempFilterCondition = if (filterCondition == null) {
       ""
