@@ -1,4 +1,4 @@
-package com.jabong.dap.model.schema
+package com.jabong.dap.data.storage.schema
 
 import org.apache.spark.sql.types._
 

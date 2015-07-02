@@ -2,12 +2,12 @@ package com.jabong.dap.model.customer.variables
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.{DataFiles, Constants, Utils, Spark}
-import com.jabong.dap.model.schema.Schema
+import com.jabong.dap.common.{Constants, Spark, Utils}
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.utils.Time
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame, Row}
+import org.apache.spark.sql.{DataFrame, Row}
 
 
 /**
@@ -71,13 +71,13 @@ object Customer {
 
           }
 
-          if(!Utils.isSchemaEquals(dfCustomer.schema, Schema.customer) ||
-             !Utils.isSchemaEquals(dfNLS.schema, Schema.nls) ||
-             !Utils.isSchemaEquals(dfSalesOrder.schema, Schema.salesOrder)){
+          if(!Utils.isSchemaEqual(dfCustomer.schema, Schema.customer) ||
+             !Utils.isSchemaEqual(dfNLS.schema, Schema.nls) ||
+             !Utils.isSchemaEqual(dfSalesOrder.schema, Schema.salesOrder)){
 
              log("schema attributes or data type mismatch")
 
-             return null
+            return null
 
           }
 
@@ -110,7 +110,6 @@ object Customer {
 
           // Define User Defined Functions
           val sqlContext = Spark.getSqlContext()
-          import sqlContext.implicits._
 
           //min(customer.created_at, sales_order.created_at)
           val udfAccRegDate = udf((cust_created_at: Timestamp, nls_created_at: Timestamp)
@@ -173,17 +172,17 @@ object Customer {
 //            dfResult = MergeDataImpl.InsertUpdateMerge(dfCustomerFull, custBCVar.value, "id_customer")
 //          }
 
-         return dfResult
+         dfResult
       }
 
       //min(customer.created_at, sales_order.created_at)
       def getMin(t1: Timestamp, t2: Timestamp): Timestamp ={
 
-          if(t1==null){
+          if(t1 == null) {
             return t2
           }
 
-          if(t2==null){
+          if(t2 == null) {
             return t1
           }
 
@@ -197,11 +196,11 @@ object Customer {
       //max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
       def getMax(t1: Timestamp, t2: Timestamp): Timestamp ={
 
-          if(t1==null){
+          if(t1 == null) {
             return t2
           }
 
-          if(t2==null){
+          if(t2 == null) {
             return t1
           }
 
@@ -220,8 +219,8 @@ object Customer {
            }
 
            status match {
-             case "subscribed" => return "iou"
-             case "unsubscribed" => return "u"
+             case "subscribed" => "iou"
+             case "unsubscribed" => "u"
            }
 
        }
@@ -266,18 +265,14 @@ object Customer {
 
            var arrayConverted:String = ""
 
-           for( i  <- 1 to array.length-1){
+           for(i <- 1 to array.length-1) {
 
-             if(i==1){
+             if(i == 1) {
                arrayConverted=array(i).toString
-             }
-             else{
+             } else {
                arrayConverted= arrayConverted+"!"+array(i).toString
              }
-
-
            }
            arrayConverted
        }
-
  }

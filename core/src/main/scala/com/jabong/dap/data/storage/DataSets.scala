@@ -1,9 +1,9 @@
-package com.jabong.dap.common
+package com.jabong.dap.data.storage
 
 /**
  * Created by jabong on 28/5/15.
  */
-object DataFiles {
+object DataSets {
 
   val BOB_PATH = "hdfs://bigdata-master.jabong.com:8020/data/bob/"
   val VARIABLE_PATH = "hdfs://bigdata-master/data/variables/"
@@ -16,9 +16,6 @@ object DataFiles {
   val SALES_ORDER_ITEM = "sales_order_item"
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
-  val WELCOME1 = "welcome1"
-  val WELCOME2 = "welcome2"
-
 
   //customer
   val CUSTOMER = "customer"

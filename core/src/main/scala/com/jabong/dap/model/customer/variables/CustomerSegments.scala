@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.{Spark, Utils}
-import com.jabong.dap.model.schema.Schema
+import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StringType, IntegerType, StructField, StructType}
@@ -36,7 +36,7 @@ object CustomerSegments {
 
           }
 
-          if(!Utils.isSchemaEquals(dfCustomerSegments.schema, Schema.customerSegments)){
+          if(!Utils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)){
 
             log("schema attributes or data type mismatch")
 

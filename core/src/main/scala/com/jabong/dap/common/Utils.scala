@@ -1,5 +1,6 @@
 package com.jabong.dap.common
 
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
@@ -9,8 +10,8 @@ import org.apache.spark.sql.functions._
  */
 object Utils {
 
-  //check two schema is Equals
-  def isSchemaEquals(schemaFirst: StructType, schemaSecond: StructType): Boolean ={
+  //checks if two schemas are Equal
+  def isSchemaEqual(schemaFirst: StructType, schemaSecond: StructType): Boolean ={
 
     val fieldTypesFirst = schemaFirst.map(field => s"${field.name}:${field.dataType.simpleString}").toSet
 
@@ -26,15 +27,12 @@ object Utils {
     return true
   }
 
-//write file Parquet to Json
-  def writeToJson(fileName: String): Any={
+  //Reads Parquet file, convert to dataframe, writes it in Json format file for test cases
+  def writeToJson(fileName: String, parquetFilePath: String): Any = {
 
-    //change this path according to your file path
-    var BOB_PATH =  "/home/raghu/bigData/parquetFiles/"
+    val df = Spark.getSqlContext().read.parquet(parquetFilePath + fileName + "/")
 
-    val df = Spark.getSqlContext().read.parquet(BOB_PATH + fileName + "/")
-
-    df.limit(5).select("*").write.format("json").json(DataFiles.TEST_RESOURCES + fileName + ".json")
+    df.limit(5).select("*").write.format("json").json(DataSets.TEST_RESOURCES + fileName + ".json")
 
   }
 
@@ -42,7 +40,7 @@ object Utils {
   def readFromJson(directoryName:String, fileName: String, schema: StructType): DataFrame = {
 
     val df = Spark.getSqlContext().read.schema(schema).format("json")
-      .load(DataFiles.TEST_RESOURCES + directoryName + "/" + fileName + ".json")
+      .load(DataSets.TEST_RESOURCES + directoryName + "/" + fileName + ".json")
 
     df
   }
