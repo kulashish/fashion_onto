@@ -30,19 +30,13 @@ object CustomerSegments {
   def getMvpAndSeg(dfCustomerSegments: DataFrame): DataFrame = {
 
     if (dfCustomerSegments == null) {
-
       log("Data frame should not be null")
-
       return null
-
     }
 
     if (!Utils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
-
       log("schema attributes or data type mismatch")
-
       return null
-
     }
 
     val dfCustSegVars = dfCustomerSegments.select("fk_customer", "updated_at", "mvp_score", "segment")

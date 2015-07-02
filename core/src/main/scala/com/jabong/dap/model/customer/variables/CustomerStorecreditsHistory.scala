@@ -29,19 +29,13 @@ object CustomerStorecreditsHistory {
   def getLastJrCovertDate(dfCSH: DataFrame): DataFrame = {
 
     if (dfCSH == null) {
-
       log("Data frame should not be null")
-
       return null
-
     }
 
     if (!Utils.isSchemaEqual(dfCSH.schema, Schema.csh)) {
-
       log("schema attributes or data type mismatch")
-
       return null
-
     }
 
     val dfLastJrCovertDate = dfCSH.select("fk_customer", "created_at")

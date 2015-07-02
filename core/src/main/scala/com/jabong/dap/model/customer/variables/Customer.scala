@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import com.jabong.dap.common.{ Constants, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.utils.Time
+import com.jabong.dap.common.utils.Time
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -70,21 +70,15 @@ object Customer {
   def getCustomer(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame): DataFrame = {
 
     if (dfCustomer == null || dfNLS == null || dfSalesOrder == null) {
-
       log("Data frame should not be null")
-
       return null
-
     }
 
     if (!Utils.isSchemaEqual(dfCustomer.schema, Schema.customer) ||
       !Utils.isSchemaEqual(dfNLS.schema, Schema.nls) ||
       !Utils.isSchemaEqual(dfSalesOrder.schema, Schema.salesOrder)) {
-
       log("schema attributes or data type mismatch")
-
       return null
-
     }
 
     val NLS = dfNLS.select(
@@ -111,10 +105,10 @@ object Customer {
       .join(NLS, dfCustomer("email") === NLS("nls_email"), "outer")
       .join(
         dfSalesOrder.select(
-        col("fk_customer"),
-        col("created_at") as "so_created_at",
-        col("updated_at") as "so_updated_at"
-      ),
+          col("fk_customer"),
+          col("created_at") as "so_created_at",
+          col("updated_at") as "so_updated_at"
+        ),
         dfCustomer("id_customer") === dfSalesOrder("fk_customer"), "outer"
       )
       .join(
@@ -204,10 +198,9 @@ object Customer {
     }
 
     if (t1.compareTo(t2) >= 0)
-      t1
+      return t1
     else
-      t2
-
+      return t2
   }
 
   //max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
@@ -222,9 +215,9 @@ object Customer {
     }
 
     if (t1.compareTo(t2) < 0)
-      t2
+      return t2
     else
-      t1
+      return t1
 
   }
 
@@ -248,7 +241,7 @@ object Customer {
     val salesOrder = dfSalesOrder.select("fk_customer", "created_at")
       .sort("fk_customer", "created_at")
 
-    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DATETIME_FORMAT)), 1)).reduceByKey(_ + _)
+    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
 
     val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 
