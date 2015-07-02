@@ -5,8 +5,7 @@ package com.jabong.dap.common.constants.variables
  */
 object ACartVariables {
 
-
-  val UID ="UID"
+  val UID = "UID"
   val ACartStatus = "ACART_STATUS"
   val ACartSku1 = "ACART_PRICE_SKU1"
   val ACartSku2 = "ACART_PRICE_SKU2"
@@ -33,7 +32,6 @@ object ACartVariables {
   val ACartPriceSku2TodayPrice = "MAX_MRP_ACART_SKU2_TODAY_PRICE"
   val ACartPriceSku2Promotion30 = "MAX_MRP_ACART_SKU2_PROMOTION30"
 
-
   val ACartStockSku1 = "LOW_STOCK_ACART_SKU1"
   val ACartStockSku1Date = "LOW_STOCK_ACART_SKU1_DATE"
   val ACartStockSku1Mvp = "LOW_STOCK_ACART_SKU1_MVP"
@@ -56,10 +54,5 @@ object ACartVariables {
   val ACartStockSku2Quantity = "LOW_STOCK_ACART_SKU2_QTY"
   val ACartStockSku2TodayQuantity = "LOW_STOCK_ACART_SKU2_TODAY_QTY"
   val ACartStockSku2Promotion30 = "LOW_STOCK_ACART_SKU2_PROMOTION30"
-
-
-
-
-
 
 }
