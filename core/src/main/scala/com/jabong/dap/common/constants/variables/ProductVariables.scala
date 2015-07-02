@@ -1,8 +1,6 @@
 package com.jabong.dap.common.constants.variables
 
-/**
- * Created by jabong1145 on 24/6/15.
- */
+
 object ProductVariables {
 
   val SKU ="sku"

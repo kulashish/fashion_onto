@@ -20,7 +20,8 @@ object Spark {
    */
   def init(sConf: SparkConf) {
     sc = new SparkContext(sConf)
-    sqlContext = new org.apache.spark.sql.SQLContext(sc)
+    sqlContext = new SQLContext(sc)
+
   }
 
   /**
@@ -39,16 +40,14 @@ object Spark {
     sqlContext
   }
 
-
   /**
    * Return application specific hive context instance
    * @return HiveContext
    */
   def getHiveContext(): HiveContext = {
-    if(hiveContext==null){
+    if (hiveContext == null) {
       hiveContext = new HiveContext(sc)
     }
     hiveContext
   }
-
 }

@@ -1,8 +1,13 @@
 package com.jabong.dap.common.json
 
+import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json.{ DefaultFormats, parse }
 
 import scala.io.Source
+
+/**
+ * Created by Rachit Gupta on 10/6/15.
+ */
 
 /**
  * This is just an empty class used for generalizing the parseJSON method.
@@ -11,6 +16,10 @@ import scala.io.Source
  */
 class EmptyClass
 
+/**
+ * Object that parses a JSON into the schema defined by class T.
+ * @throws ParseException Can throw exception if JSON schema is not valid.
+ */
 object Parser {
   def parseJson[T <: EmptyClass: Manifest](filePath: String): T = {
     implicit val formats = DefaultFormats
