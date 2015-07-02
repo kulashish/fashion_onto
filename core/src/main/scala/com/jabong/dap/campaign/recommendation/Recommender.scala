@@ -2,6 +2,8 @@ package com.jabong.dap.campaign.recommendation
 
 import java.util.Locale.Category
 
+import org.apache.spark.sql.DataFrame
+
 import scala.collection.immutable.HashMap
 
 /**
@@ -57,6 +59,22 @@ trait Recommender  extends java.io.Serializable{
       return false
     }
     return stock>=stockMultiplier.asInstanceOf[Int]*weeklyAverage
+  }
+
+
+  def daysData(data:DataFrame,days:Int,Type:String,column:String): DataFrame ={
+    var expType:String=""
+    if(Type=="last"){
+      expType="<"
+    }
+    else
+      expType=">"
+
+    if (data == null || days < 0 || column == null) {
+      return null
+    }
+    val lastDaysData = data.filter("(unix_timestamp() -unix_timestamp("+column+",'yyyy-MM-dd HH:mm:ss.S'))/60/60/24<"+days)
+    return lastDaysData
   }
 
 

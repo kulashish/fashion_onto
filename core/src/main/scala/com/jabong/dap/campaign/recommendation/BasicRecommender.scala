@@ -9,7 +9,7 @@ import org.apache.spark.sql.types.TimestampType
 import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 
-import scala.collection.SortedSet
+import scala.collection.{mutable, SortedSet}
 
 
 /**
@@ -45,20 +45,7 @@ class BasicRecommender extends Recommender{
   }
 
 
-  def daysData(data:DataFrame,days:Int,Type:String,column:String): DataFrame ={
-    var expType:String=""
-    if(Type=="last"){
-        expType="<"
-    }
-    else
-      expType=">"
 
-    if (data == null || days < 0 || column == null) {
-      return null
-    }
-    val lastDaysData = data.filter("(unix_timestamp() -unix_timestamp("+column+",'yyyy-MM-dd HH:mm:ss.S'))/60/60/24<"+days)
-    return lastDaysData
-  }
 
 
 
@@ -91,21 +78,41 @@ class BasicRecommender extends Recommender{
 
 
     val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), "inner")
-      .select(ProductVariables.Sku,ProductVariables.Brick, ProductVariables.MVP,  ProductVariables.Brand,
-        ProductVariables.Gender,ProductVariables.SpecialPrice,ProductVariables.WeeklyAverageSale,"quantity","last_sold_date")
+      .select(ProductVariables.SKU,ProductVariables.BRICK, ProductVariables.MVP,  ProductVariables.BRAND,
+        ProductVariables.GENDER,ProductVariables.SPECIAL_PRICE,ProductVariables.WEEKLY_AVERAGE_SALE,"quantity","last_sold_date")
 
 
     return RecommendationInput
   }
 
-  def createRow(row: Row,array: Array[Int]):Row={
-    var sequence = new Seq[Int] = 
-    for(value <- array){
-      sequence+=(value)
+  def createKey(row: Row,array: Array[Int]):Row= {
+    var sequence: Seq[Any] = Seq()
+    var newSequence: Seq[Any] = Seq()
+    var test:Seq[String] = Seq("hello","hello1")
+    for (value <- array) {
+      println(value,row(value))
+      sequence =  sequence:+(row(value))
     }
-    row.get()
-    Row.apply()
+    val data =  Row.fromSeq(sequence)
+    println(data.getValuesMap(test))
     return data
+  }
+
+
+  def createKey1(row: Row,array: Array[Int]):String= {
+   var sequence:String= ""
+    var i :Int=0
+    for (value <- array) {
+      if(i==0){
+        sequence =  sequence+row(value)
+      }
+      sequence =  sequence+"^"+row(value)
+
+
+    }
+    //val data =  Row.fromSeq(sequence)
+    //println(data.getValuesMap(test))
+    return sequence
   }
   // Input: recommendationInput: contains sorted list of all skus sold in last x days
   //        schema: {sku, brick, mvp, brand, gender, sp, weeklyAverage of number sold}
@@ -116,20 +123,15 @@ class BasicRecommender extends Recommender{
       return null
     }
 
-
-
-
-
 //    val pivotArray = Array(1,2)
-//    for (pivot <- pivotArray){
-//      row => row(pivot)
-//    }
-    val test =  recommendationInput.rdd.keyBy(row =>createRow(row,pivotArray))
-
+//
+//    val mappedRecommendationInput =  recommendationInput.rdd.keyBy(row =>createKey1(row,pivotArray))
 
     // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),(row(0).toString,row(4).toString,row(3).toString,row(5).asInstanceOf[Int],row(6).asInstanceOf[Int])))
-   // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
     val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
+
+
+   // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
 
     //mappedRecommendationInput.collect().foreach(println)
 
@@ -138,7 +140,9 @@ class BasicRecommender extends Recommender{
 
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case(key,value)=>(key,genSku(value).toList)}
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
-    val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Int],value._1,value._2.sortBy(-_._1))))}
+     val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
+    //val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => createRow(key,value._1,value._2.sortBy(-_._1))))}
+
     val recommendDataFrame = hiveContext.createDataFrame(recommendations)
     recommendations.collect().foreach(println)
    // recommendationOutput.collect().foreach(println)
@@ -149,7 +153,7 @@ class BasicRecommender extends Recommender{
   }
 
 
-def testMap(x :(String,scala.collection.mutable.MutableList[(Long,String)])) = (x._2)
+
 
 
   def genSku(iterable: Iterable[Row]): Map[String,scala.collection.mutable.MutableList[(Long,String)]]={
@@ -266,14 +270,14 @@ def testMap(x :(String,scala.collection.mutable.MutableList[(Long,String)])) = (
     val filteredBeforeSevenDaysData = daysData(inputDataFrame,timeFrameDays,"before","last_sold_date")
 
 
-    val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.Stock+">2*"+ProductVariables.WeeklyAverageSale)
+    val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.STOCK+">2*"+ProductVariables.WEEKLY_AVERAGE_SALE)
 
-    val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock,filteredBeforeSevenDaysData(ProductVariables.Brand).equalTo(brickBrandStock("brands"))
-      && filteredBeforeSevenDaysData(ProductVariables.Brick).equalTo(brickBrandStock("bricks")) ,"inner")
-      .withColumn("stockAvailable",inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.Category)
-      ,filteredBeforeSevenDaysData(ProductVariables.Stock),brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
-    .select(ProductVariables.Sku,ProductVariables.Brick, ProductVariables.MVP,  ProductVariables.Brand,
-        ProductVariables.Gender,ProductVariables.SpecialPrice,ProductVariables.WeeklyAverageSale,"quantity","last_sold_date")
+    val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock,filteredBeforeSevenDaysData(ProductVariables.BRAND).equalTo(brickBrandStock("brands"))
+      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")) ,"inner")
+      .withColumn("stockAvailable",inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.CATEGORY)
+      ,filteredBeforeSevenDaysData(ProductVariables.STOCK),brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
+    .select(ProductVariables.SKU,ProductVariables.BRICK, ProductVariables.MVP,  ProductVariables.BRAND,
+        ProductVariables.GENDER,ProductVariables.SPECIAL_PRICE,ProductVariables.WEEKLY_AVERAGE_SALE,"quantity","last_sold_date")
 
     return filteredStock1.unionAll(filteredStock2)
 

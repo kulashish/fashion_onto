@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.recommendation
 
 import com.jabong.dap.campaign.common.ACartCampaign
-import com.jabong.dap.common.Constants.Variables.ProductVariables
+import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.{SharedSparkContext, Spark}
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest.FlatSpec
@@ -81,13 +81,13 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
 
   "top skus  input and itr" should "return sku complete data" in {
     val recInput =  basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
-    val recInputbrand = recInput.filter(ProductVariables.Sku+"='XW574WA35AZGINDFAS'").select(ProductVariables.Brand).collect()(0)(0).toString()
+    val recInputbrand = recInput.filter(ProductVariables.SKU +"='XW574WA35AZGINDFAS'").select(ProductVariables.BRAND).collect()(0)(0).toString()
     assert(recInputbrand=="adidas")
   }
 
   " skus BR828MA28TMPINDFAS input and itr" should "return WOMEN GENDER" in {
     val recInput =  basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
-    val recInputbrand = recInput.filter(ProductVariables.Sku+"='BR828MA28TMPINDFAS'").select(ProductVariables.Gender).collect()(0)(0).toString()
+    val recInputbrand = recInput.filter(ProductVariables.SKU+"='BR828MA28TMPINDFAS'").select(ProductVariables.GENDER).collect()(0)(0).toString()
     assert(recInputbrand=="WOMEN")
   }
 
