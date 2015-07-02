@@ -24,11 +24,6 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext{
     df1.collect.foreach(println)
   }
 
-  "The result Dataframe" should "have size 3" in {
-    var ordersCount = SalesOrder.ordersPlaced(df1)
-    ordersCount.collect.foreach(println)
-    assert(ordersCount.collect.size == 3)
-  }
 
   "The result" should "have size 3" in {
     var ordersCount = SalesOrder.couponScore(df2)
