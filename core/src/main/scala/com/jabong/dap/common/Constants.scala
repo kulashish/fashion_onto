@@ -1,6 +1,5 @@
 package com.jabong.dap.common
 
-
 object Constants {
   val CONVERT_MILLISECOND_TO_DAYS = 24 * 60 * 60 * 1000
   val DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
