@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, CustomerVariables }
 import com.jabong.dap.common.{ Constants, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.utils.Time
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
