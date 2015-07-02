@@ -13,8 +13,7 @@ import com.jabong.dap.common.json.EmptyClass
  */
 case class Config(
   var applicationName: String = null,
-  var master: String = null
-) extends EmptyClass
+  var master: String = null) extends EmptyClass
 
 /**
  * Object to access config variables application wide

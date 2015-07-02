@@ -4,51 +4,49 @@ import com.jabong.dap.common.Utils
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{TimestampType, IntegerType, StructField, StructType}
+import org.apache.spark.sql.types.{ TimestampType, IntegerType, StructField, StructType }
 
 /**
  * Created by raghu on 25/6/15.
  */
 object CustomerStorecreditsHistory {
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //customer_storecredits_history variable schemas
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //customer_storecredits_history variable schemas
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      val last_jr_covert_date = StructType(Array(StructField("fk_customer", IntegerType, true),
-        StructField("last_jr_covert_date", TimestampType, true)))
+  val last_jr_covert_date = StructType(Array(StructField("fk_customer", IntegerType, true),
+    StructField("last_jr_covert_date", TimestampType, true)))
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // DataFrame CUSTOMER_STORECREDITS_HISTORY operations
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // DataFrame CUSTOMER_STORECREDITS_HISTORY operations
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Name of variable: fk_customer, LAST_JR_COVERT_DATE
+  //customer_storecredits_history.operation_type = "nextbee_points_added", latest date for fk_customer
+  def getLastJrCovertDate(dfCSH: DataFrame): DataFrame = {
 
-      //Name of variable: fk_customer, LAST_JR_COVERT_DATE
-      //customer_storecredits_history.operation_type = "nextbee_points_added", latest date for fk_customer
-      def getLastJrCovertDate(dfCSH: DataFrame): DataFrame = {
+    if (dfCSH == null) {
 
-        if(dfCSH == null){
+      log("Data frame should not be null")
 
-          log("Data frame should not be null")
+      return null
 
-          return null
+    }
 
-        }
+    if (!Utils.isSchemaEqual(dfCSH.schema, Schema.csh)) {
 
-        if(!Utils.isSchemaEqual(dfCSH.schema, Schema.csh)){
+      log("schema attributes or data type mismatch")
 
-          log("schema attributes or data type mismatch")
+      return null
 
-          return null
+    }
 
-        }
+    val dfLastJrCovertDate = dfCSH.select("fk_customer", "created_at")
+      .groupBy("fk_customer")
+      .agg(max("created_at") as "last_jr_covert_date")
 
-        val dfLastJrCovertDate = dfCSH.select("fk_customer", "created_at")
-          .groupBy("fk_customer")
-          .agg(max("created_at") as "last_jr_covert_date")
-
-        dfLastJrCovertDate
-      }
-
+    dfLastJrCovertDate
+  }
 
 }

@@ -2,7 +2,7 @@ package com.jabong.dap.utils
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.common.Constants
 
@@ -66,9 +66,7 @@ object Time {
   def timeToSlot(dateString: String, dateFormat: String): Int = {
 
     var timeToSlotMap = new HashMap[Int, Int]
-    timeToSlotMap +=(7 -> 1, 8 -> 1, 9 -> 2, 10 -> 2, 11 -> 3, 12 -> 3, 13 -> 4, 14 -> 4
-      , 15 -> 5, 16 -> 5, 17 -> 6, 18 -> 6, 19 -> 7, 20 -> 7, 21 -> 8, 22 -> 8, 23 -> 9, 0 -> 9, 1 -> 10
-      , 2 -> 10, 3 -> 11, 4 -> 11, 5 -> 12, 6 -> 12)
+    timeToSlotMap += (7 -> 1, 8 -> 1, 9 -> 2, 10 -> 2, 11 -> 3, 12 -> 3, 13 -> 4, 14 -> 4, 15 -> 5, 16 -> 5, 17 -> 6, 18 -> 6, 19 -> 7, 20 -> 7, 21 -> 8, 22 -> 8, 23 -> 9, 0 -> 9, 1 -> 10, 2 -> 10, 3 -> 11, 4 -> 11, 5 -> 12, 6 -> 12)
 
     val formatter = new SimpleDateFormat(dateFormat)
     var date: java.util.Date = null
