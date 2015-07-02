@@ -18,15 +18,15 @@ object SalesOrderAddress {
    * @param prevDate
    */
   def create(currDate:String, prevDate: String){
-    val salesOrder = Spark.getSqlContext().read.parquet("")
-    val salesOrderFull = Spark.getSqlContext().read.parquet("")
-    val salesAddress = Spark.getSqlContext().read.parquet("")
+    val salesOrder = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH+DataSets.SALES_ORDER+"/"+currDate)
+    val salesAddress = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH+DataSets.SALES_ORDER_ADDRESS+"/"+currDate)
     val salesOrderAddress= salesAddress.join(salesOrder, salesAddress("id_sales_order_address") === salesOrder("fk_sales_order_address_shipping"))
     val curFav = salesOrderAddress.select("fk_customer","city", "phone")
     val prevFav = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH+DataSets.SALES_ORDER_ADDRESS+"/temp/"+prevDate)
     val jData = prevFav.unionAll(curFav)
     jData.write.parquet(DataSets.VARIABLE_PATH+DataSets.SALES_ORDER_ADDRESS+"/temp/"+currDate)
     val favCity = getFav(curFav)
+    favCity.write.parquet(DataSets.VARIABLE_PATH+DataSets.SALES_ORDER_ADDRESS+"/full/"+currDate)
   }
 
 
