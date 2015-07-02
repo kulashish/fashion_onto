@@ -1,8 +1,6 @@
 # Alchemy
  DAP (Data & Analytics Platform) repository
 
-<<<<<<< HEAD
-=======
 ### Compile, Test, and Coverage
 
 Compile and create assembly jar (i.e., jar with all dependencies):
@@ -43,6 +41,17 @@ Run application
 
            {
                "applicationName": "Name of the application",
-               "master": "local or local[4] or local[*] or spark://master:7077 to run on a Spark standalone cluster"
+               "master": "local or local[4] or local[*] or spark://master:7077 to run on a Spark standalone cluster",
+               "basePath": "Base path of the location where the data will be saved",
+               "credentials": [
+                    {
+                             "source": "source of the data",
+                             "driver": "driver to be used",
+                             "server": "IP where the database is hosted",
+                             "port": "The port number",
+                             "dbName": "Database name",
+                             "userName": "Username to connect to the database",
+                             "password": "Password for the above username"
+                    }
+               ]
            }
->>>>>>> master

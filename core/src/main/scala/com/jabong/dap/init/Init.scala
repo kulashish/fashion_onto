@@ -1,9 +1,10 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.common.{ Config, AppConfig }
+import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.common.json.Parser
-import com.jabong.dap.common.Spark
+import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.model.product.itr.Itr
+import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
 import scopt.OptionParser
 import java.nio.file.{ Paths, Files }
@@ -56,11 +57,24 @@ object Init {
 
     parser.parse(args, defaultParams).map { params =>
       // read application file
-      val config = Parser.parseJson[Config](params.config)
-      AppConfig.config = config
-      // initialize spark context
-      Spark.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
-      run(params)
+      try {
+        val config = Parser.parseJson[Config](params.config)
+        ConfigJsonValidator.validate(config)
+        AppConfig.config = config
+        // initialize spark context
+        Spark.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
+        run(params)
+      } catch {
+        case e: ParseException =>
+          println("Error while parsing JSON: " + e.getMessage)
+
+        case e: IllegalArgumentException =>
+          println("Error while validating JSON: " + e.getMessage)
+
+        case e: Exception =>
+          println("Some unknown error occurred: " + e.getMessage)
+          throw e
+      }
     }.getOrElse {
       sys.exit(1)
     }
@@ -73,7 +87,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
-      case "acquisition" => // do your stuff here
+      case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
     }
   }
 }

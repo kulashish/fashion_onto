@@ -1,6 +1,7 @@
 package com.jabong.dap.common
 
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{ SparkConf, SparkContext }
 import org.apache.spark.sql.hive.HiveContext
 
@@ -20,7 +21,6 @@ object Spark {
   def init(sConf: SparkConf) {
     sc = new SparkContext(sConf)
     sqlContext = new org.apache.spark.sql.SQLContext(sc)
-    hiveContext = new HiveContext(sc)
   }
 
   /**
@@ -44,6 +44,9 @@ object Spark {
    * @return HiveContext
    */
   def getHiveContext(): HiveContext = {
+    if (hiveContext == null) {
+      hiveContext = new HiveContext(sc)
+    }
     hiveContext
   }
 }

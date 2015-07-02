@@ -1,6 +1,6 @@
 package com.jabong.dap.model.product.itr
 
-import com.jabong.dap.common.{ Spark, AppConfig }
+import com.jabong.dap.common.{Constants, Spark, AppConfig}
 import com.jabong.dap.common.utils.Time
 import grizzled.slf4j.Logging
 
@@ -25,10 +25,10 @@ class Itr extends java.io.Serializable with Logging {
   def getPath(): String = {
     "%s/%s/".
       format(
-        AppConfig.config.hdfs +
-          AppConfig.PathSeparator + "itr",
+        AppConfig.config.basePath +
+          Constants.PATH_SEPARATOR + "itr",
         Time.getTodayDateWithHrs().
-          replaceAll("-", AppConfig.PathSeparator)
+          replaceAll("-", Constants.PATH_SEPARATOR)
       )
   }
 }
