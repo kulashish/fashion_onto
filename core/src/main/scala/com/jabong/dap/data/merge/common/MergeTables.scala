@@ -22,12 +22,14 @@ object MergeTables {
     val primaryKey = MergeJobConfig.mergeInfo.primaryKey
     val saveFormat = MergeJobConfig.mergeInfo.saveFormat
     val saveMode = MergeJobConfig.mergeInfo.saveMode
+    val mergeMode = MergeJobConfig.mergeInfo.mergeMode
 
     val basePath = AppConfig.config.basePath
+    
     val dateDayBeforeYesterday = Time.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
     val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
 
-    val pathFullMerged = "%s/%s/%s/full_merged/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
+    val pathFullMerged = "%s/%s/%s/%s_merged/%s/".format(basePath, source, tableName, mergeMode, dateDayBeforeYesterday)
     lazy val pathFull = "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
     lazy val pathYesterdayData = "%s/%s/%s/%s".format(basePath, source, tableName, dateYesterday)
 
@@ -52,7 +54,7 @@ object MergeTables {
     val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
 
 
-    val savePath = "%s/%s/%s/full_merged/%s/".format(basePath, source, tableName, dateYesterday)
+    val savePath = "%s/%s/%s/%s_merged/%s/".format(basePath, source, tableName,mergeMode, dateYesterday)
 
     mergedDF.write.format(saveFormat).mode(saveMode).save(savePath)
   }
