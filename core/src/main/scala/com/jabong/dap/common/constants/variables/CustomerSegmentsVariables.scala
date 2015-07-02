@@ -5,23 +5,23 @@ package com.jabong.dap.common.constants.variables
  */
 object CustomerSegmentsVariables {
 
-      //CustomerSegments schema variables
-      val IdCustomerSegments = "id_customer_segments"
-      val Segment = "segment"
-      val Frequency = "frequency"
-      val Recency = "recency"
-      val MvpScore = "mvp_score"
-      val DiscountScore = "discount_score"
-      val FkCustomer = "fk_customer"
-      val CreatedAt = "created_at"
-      val UpdatedAt = "updated_at"
+        //CustomerSegments schema variables
+        val ID_CUSTOMER_SEGMENTS = "id_customer_segments"
+        val SEGMENT = "segment"
+        val FREQUENCY = "frequency"
+        val RECENCY = "recency"
+        val MVP_SCORE = "mvp_score"
+        val DISCOUNT_SCORE = "discount_score"
+        val FK_CUSTOMER = "fk_customer"
+        val CREATED_AT = "created_at"
+        val UPDATED_AT = "updated_at"
 
-      //variables name
-      val Segment0 = "segment0"
-      val Segment1 = "segment1"
-      val Segment2 = "segment2"
-      val Segment3 = "segment3"
-      val Segment4 = "segment4"
-      val Segment5 = "segment5"
-      val Segment6 = "segment6"
+        //variables name
+        val SEGMENT0 = "segment0"
+        val SEGMENT1 = "segment1"
+        val SEGMENT2 = "segment2"
+        val SEGMENT3 = "segment3"
+        val SEGMENT4 = "segment4"
+        val SEGMENT5 = "segment5"
+        val SEGMENT6 = "segment6"
 }

@@ -6,29 +6,29 @@ package com.jabong.dap.common.constants.variables
 object NewsletterVariables {
 
         //Newsletter schema variables
-        val IdNewsletterSubscription = "id_newsletter_subscription"
-        val FkCustomer = "fk_customer"
-        val Email = "email"
-        val UnsubscribeKey = "unsubscribe_key"
-        val Ip = "ip"
-        val CreatedAt = "created_at"
-        val Status = "status"
-        val Gender = "gender"
-        val UpdatedAt = "updated_at"
-        val FkNewsletterCategory = "fk_newsletter_category"
-        val NewsletterPreferences = "newsletter_preferences"
-        val FkAffiliatePartner = "fk_affiliate_partner"
-        val SrcSub = "src_sub"
-        val SrcUnsub = "src_unsub"
-        val Frequency = "frequency"
+        val ID_NEWSLETTER_SUBSCRIPTION = "id_newsletter_subscription"
+        val FK_CUSTOMER = "fk_customer"
+        val EMAIL = "email"
+        val UNSUBSCRIBE_KEY = "unsubscribe_key"
+        val IP = "ip"
+        val CREATED_AT = "created_at"
+        val UPDATED_AT = "updated_at"
+        val STATUS = "status"
+        val GENDER = "gender"
+        val FK_NEWSLETTER_CATEGORY = "fk_newsletter_category"
+        val NEWSLETTER_PREFERENCES = "newsletter_preferences"
+        val FK_AFFILIATE_PARTNER = "fk_affiliate_partner"
+        val SRC_SUB = "src_sub"
+        val SRC_UNSUB = "src_unsub"
+        val FREQUENCY = "frequency"
 
 
         //variables name
 
 
         //as variables name
-        val NlsEmail = "nls_email"
-        val NlsCreatedAt = "nls_created_at"
-        val NlsUpdatedAt = "nls_updated_at"
+        val NLS_EMAIL = "nls_email"
+        val NLS_CREATED_AT = "nls_created_at"
+        val NLS_UPDATED_AT = "nls_updated_at"
 
 }

@@ -16,8 +16,8 @@ object CustomerStorecreditsHistory {
       //customer_storecredits_history variable schemas
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      val last_jr_covert_date = StructType(Array(StructField(CustomerStoreVariables.FkCustomer, IntegerType, true),
-                                                 StructField(CustomerStoreVariables.LastJrCovertDate, TimestampType, true)))
+      val last_jr_covert_date = StructType(Array(StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
+                                                 StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true)))
 
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,9 +44,9 @@ object CustomerStorecreditsHistory {
 
         }
 
-        val dfLastJrCovertDate = dfCSH.select(CustomerStoreVariables.FkCustomer, CustomerStoreVariables.CreatedAt)
-                                      .groupBy(CustomerStoreVariables.FkCustomer)
-                                      .agg(max(CustomerStoreVariables.CreatedAt) as CustomerStoreVariables.LastJrCovertDate)
+        val dfLastJrCovertDate = dfCSH.select(CustomerStoreVariables.FK_CUSTOMER, CustomerStoreVariables.CREATED_AT)
+                                      .groupBy(CustomerStoreVariables.FK_CUSTOMER)
+                                      .agg(max(CustomerStoreVariables.CREATED_AT) as CustomerStoreVariables.LAST_JR_COVERT_DATE)
 
         dfLastJrCovertDate
       }

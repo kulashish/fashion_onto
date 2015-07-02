@@ -5,14 +5,14 @@ package com.jabong.dap.common.constants.variables
  */
 object ProductVariables {
 
-  val Sku ="sku"
-  val Brand = "brand"
-  val Brick = "brick"
-  val Gender = "gender"
-  val MVP = "mvp"
-  val Stock = "stock"
-  val SpecialPrice ="specialPrice"
-  val WeeklyAverageSale = "weeklyAverageSale"
-  val Category = "category"
+        val SKU ="sku"
+        val BRAND = "brand"
+        val BRICK = "brick"
+        val GENDER = "gender"
+        val MVP = "mvp"
+        val STOCK = "stock"
+        val SPECIAL_PRICE ="special_price"
+        val WEEKLY_AVERAGE_SALE = "weekly_average_sale"
+        val CATEGORY = "category"
 
 }

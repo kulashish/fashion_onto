@@ -20,31 +20,31 @@ object Customer {
       //customer variable schemas
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      val emailOptInStatus = StructType(Array(StructField(CustomerVariables.IdCustomer, IntegerType, true),
-                                                 StructField(NewsletterVariables.Status, StringType, true)))
+      val emailOptInStatus = StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
+                                                 StructField(NewsletterVariables.STATUS, StringType, true)))
 
       val accRegDateAndUpdatedAt = StructType(Array(StructField(CustomerVariables.Email, StringType, true),
-                                                    StructField(CustomerVariables.AccRegDate, TimestampType, true),
-                                                    StructField(CustomerVariables.UpdatedAt, TimestampType, true)))
+                                                    StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
+                                                    StructField(CustomerVariables.UPDATED_AT, TimestampType, true)))
 
-      val customersPreferredOrderTimeslot = StructType(Array(StructField(CustomerVariables.FkCustomerCPOT, IntegerType, true),
-                                                                StructField(CustomerVariables.CustomerAllOrderTimeslot, StringType, true),
-                                                                StructField(CustomerVariables.CustomerPreferredOrderTimeslot, IntegerType, true)))
+      val customersPreferredOrderTimeslot = StructType(Array(StructField(CustomerVariables.FK_CUSTOMER_CPOT, IntegerType, true),
+                                                                StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
+                                                                StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true)))
 
-      val resultCustomer =  StructType(Array(StructField(CustomerVariables.IdCustomer, IntegerType, true),
-                                              StructField(CustomerVariables.GiftcardCreditsAvailable, DecimalType(10,2), true),
-                                              StructField(CustomerVariables.StoreCreditsAvailable, DecimalType(10,2), true),
-                                              StructField(CustomerVariables.Birthday, DateType, true),
-                                              StructField(CustomerVariables.Gender, StringType, true),
-                                              StructField(CustomerVariables.RewardType, StringType, true),
+      val resultCustomer =  StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
+                                              StructField(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE, DecimalType(10,2), true),
+                                              StructField(CustomerVariables.STORE_CREDITS_AVAILABLE, DecimalType(10,2), true),
+                                              StructField(CustomerVariables.BIRTHDAY, DateType, true),
+                                              StructField(CustomerVariables.GENDER, StringType, true),
+                                              StructField(CustomerVariables.REWARD_TYPE, StringType, true),
                                               StructField(CustomerVariables.Email, StringType, true),
-                                              StructField(CustomerVariables.CreatedAt, TimestampType, true),
-                                              StructField(CustomerVariables.UpdatedAt, TimestampType, true),
-                                              StructField(CustomerVariables.CustomerAllOrderTimeslot, StringType, true),
-                                              StructField(CustomerVariables.CustomerPreferredOrderTimeslot, IntegerType, true),
-                                              StructField(CustomerVariables.AccRegDate, TimestampType, true),
-                                              StructField(CustomerVariables.MaxUpdatedAt, TimestampType, true),
-                                              StructField(CustomerVariables.EmailOptInStatus, StringType, true)))
+                                              StructField(CustomerVariables.CREATED_AT, TimestampType, true),
+                                              StructField(CustomerVariables.UPDATED_AT, TimestampType, true),
+                                              StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
+                                              StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true),
+                                              StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
+                                              StructField(CustomerVariables.MAX_UPDATED_AT, TimestampType, true),
+                                              StructField(CustomerVariables.EMAIL_OPT_IN_STATUS, StringType, true)))
     
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DataFrame Customer,NLS, SalesOrder operations
@@ -83,32 +83,32 @@ object Customer {
           }
 
 
-          val NLS = dfNLS.select(col(NewsletterVariables.Email) as NewsletterVariables.NlsEmail,
-                                 col(NewsletterVariables.Status),
-                                 col(NewsletterVariables.CreatedAt) as NewsletterVariables.NlsCreatedAt,
-                                 col(NewsletterVariables.UpdatedAt) as NewsletterVariables.NlsUpdatedAt)
+          val NLS = dfNLS.select(col(NewsletterVariables.EMAIL) as NewsletterVariables.NLS_EMAIL,
+                                 col(NewsletterVariables.STATUS),
+                                 col(NewsletterVariables.CREATED_AT) as NewsletterVariables.NLS_CREATED_AT,
+                                 col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT)
 
           //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
           val udfCPOT = getCPOT(dfSalesOrder: DataFrame)
 
-          val dfJoin = dfCustomer.select(CustomerVariables.IdCustomer,
-                                         CustomerVariables.GiftcardCreditsAvailable,
-                                         CustomerVariables.StoreCreditsAvailable,
-                                         CustomerVariables.Birthday,
-                                         CustomerVariables.Gender,
-                                         CustomerVariables.RewardType,
+          val dfJoin = dfCustomer.select(CustomerVariables.ID_CUSTOMER,
+                                         CustomerVariables.GIFTCARD_CREDITS_AVAILABLE,
+                                         CustomerVariables.STORE_CREDITS_AVAILABLE,
+                                         CustomerVariables.BIRTHDAY,
+                                         CustomerVariables.GENDER,
+                                         CustomerVariables.REWARD_TYPE,
                                          CustomerVariables.Email,
-                                         CustomerVariables.CreatedAt,
-                                         CustomerVariables.UpdatedAt)
+                                         CustomerVariables.CREATED_AT,
+                                         CustomerVariables.UPDATED_AT)
 
-                                        .join(NLS, dfCustomer(CustomerVariables.Email) === NLS(NewsletterVariables.NlsEmail), "outer")
+                                        .join(NLS, dfCustomer(CustomerVariables.Email) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
 
-                                        .join(dfSalesOrder.select(col(SalesOrderVariables.FkCustomer),
-                                                                  col(SalesOrderVariables.CreatedAt) as SalesOrderVariables.SoCreatedAt,
-                                                                  col(SalesOrderVariables.UpdatedAt) as SalesOrderVariables.SoUpdatedAt),
-                                         dfCustomer(CustomerVariables.IdCustomer) === dfSalesOrder(SalesOrderVariables.FkCustomer), "outer")
+                                        .join(dfSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER),
+                                                                  col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
+                                                                  col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT),
+                                         dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer")
 
-                                        .join(udfCPOT, dfCustomer(CustomerVariables.IdCustomer) === udfCPOT(CustomerVariables.FkCustomerCPOT), "outer")
+                                        .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
 
 
           // Define User Defined Functions
@@ -143,27 +143,27 @@ object Customer {
                                      ACC_REG_DATE,
                                      MAX_UPDATED_AT,
                                      EMAIL_OPT_IN_STATUS,*/
-          val dfResult = dfJoin.select(col(CustomerVariables.IdCustomer),
-                                       col(CustomerVariables.GiftcardCreditsAvailable),
-                                       col(CustomerVariables.StoreCreditsAvailable),
-                                       col(CustomerVariables.Birthday),
-                                       col(CustomerVariables.Gender),
-                                       col(CustomerVariables.RewardType),
+          val dfResult = dfJoin.select(col(CustomerVariables.ID_CUSTOMER),
+                                       col(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE),
+                                       col(CustomerVariables.STORE_CREDITS_AVAILABLE),
+                                       col(CustomerVariables.BIRTHDAY),
+                                       col(CustomerVariables.GENDER),
+                                       col(CustomerVariables.REWARD_TYPE),
                                        col(CustomerVariables.Email),
-                                       col(CustomerVariables.CreatedAt),
-                                       col(CustomerVariables.UpdatedAt),
-                                       col(CustomerVariables.CustomerAllOrderTimeslot),
-                                       col(CustomerVariables.CustomerPreferredOrderTimeslot),
+                                       col(CustomerVariables.CREATED_AT),
+                                       col(CustomerVariables.UPDATED_AT),
+                                       col(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT),
+                                       col(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT),
 
-                                       udfAccRegDate(dfJoin(CustomerVariables.CreatedAt),
-                                                     dfJoin(NewsletterVariables.NlsCreatedAt)) as CustomerVariables.AccRegDate,
+                                       udfAccRegDate(dfJoin(CustomerVariables.CREATED_AT),
+                                                     dfJoin(NewsletterVariables.NLS_CREATED_AT)) as CustomerVariables.ACC_REG_DATE,
 
-                                       udfMaxUpdatedAt(dfJoin(CustomerVariables.UpdatedAt),
-                                                       dfJoin(NewsletterVariables.NlsCreatedAt),
-                                                       dfJoin(SalesOrderVariables.SoCreatedAt)) as CustomerVariables.MaxUpdatedAt,
+                                       udfMaxUpdatedAt(dfJoin(CustomerVariables.UPDATED_AT),
+                                                       dfJoin(NewsletterVariables.NLS_CREATED_AT),
+                                                       dfJoin(SalesOrderVariables.SO_CREATED_AT)) as CustomerVariables.MAX_UPDATED_AT,
 
-                                       udfEmailOptInStatus(dfJoin(NewsletterVariables.NlsEmail),
-                                                           dfJoin(NewsletterVariables.Status)) as CustomerVariables.EmailOptInStatus)
+                                       udfEmailOptInStatus(dfJoin(NewsletterVariables.NLS_EMAIL),
+                                                           dfJoin(NewsletterVariables.STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
 
 //
 //          if (isOldDate) {
@@ -231,8 +231,8 @@ object Customer {
        //CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
        def getCPOT(dfSalesOrder: DataFrame): DataFrame = {
 
-           val salesOrder = dfSalesOrder.select(SalesOrderVariables.FkCustomer, SalesOrderVariables.CreatedAt)
-                                        .sort(SalesOrderVariables.FkCustomer, SalesOrderVariables.CreatedAt)
+           val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
+                                        .sort(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
 
            val soMapReduce=salesOrder.map(r=> ((r(0), Time.timeToSlot(r(1).toString, Constants.DATETIME_FORMAT)),1)).reduceByKey(_+_)
 
