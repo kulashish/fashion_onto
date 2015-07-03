@@ -15,9 +15,7 @@ class MergeDelegator extends Serializable with Logging {
   def start(mergeJsonPath: String) = {
     val validated = try {
       MergeJobConfig.mergeJobInfo = Parser.parseJson[MergeJobInfo](mergeJsonPath)
-      //
-      // Build validator for the json for merge job
-      //
+      MergeJsonValidator.validate(MergeJobConfig.mergeJobInfo)
       true
     } catch {
       case e: ParseException =>
