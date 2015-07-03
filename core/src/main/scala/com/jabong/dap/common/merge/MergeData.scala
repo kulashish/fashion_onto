@@ -1,4 +1,4 @@
-package com.jabong.dap.common
+package com.jabong.dap.common.merge
 
 import org.apache.spark.sql.DataFrame
 

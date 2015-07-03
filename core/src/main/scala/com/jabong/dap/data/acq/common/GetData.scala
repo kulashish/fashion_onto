@@ -2,6 +2,7 @@ package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.Spark
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
 
 /**
  * Created by Abhay on 10/6/15.
@@ -30,24 +31,22 @@ object GetData extends Logging {
     val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver,condition)
     logger.info(dbTableQuery)
 
-    val jdbcDF = if (primaryKey == null) {
-      context.load("jdbc", Map(
-        "url" -> dbConn.getConnectionString,
-        "dbtable" -> dbTableQuery
-      ))
+    val jdbcDF: DataFrame = if (primaryKey == null) {
+      context.read.jdbc(dbConn.getConnectionString, dbTableQuery, dbConn.getConnectionProperties)
     } else {
       val minMax = GetMinMaxPK.getMinMax(dbConn, condition)
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0)
-        return
-      context.load("jdbc", Map(
-        "url" -> dbConn.getConnectionString,
-        "dbtable" -> dbTableQuery,
-        "partitionColumn" -> primaryKey,
-        "lowerBound" -> minMax.min.toString,
-        "upperBound" -> minMax.max.toString,
-        "numPartitions" -> "3"
-      ))
+        return null
+      context.read.jdbc(
+        dbConn.getConnectionString,
+        dbTableQuery,
+        primaryKey,
+        minMax.min,
+        minMax.max,
+        3,
+        dbConn.getConnectionProperties
+      )
     }
 
     jdbcDF.printSchema()
@@ -59,7 +58,5 @@ object GetData extends Logging {
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
   }
-
-
 
 }

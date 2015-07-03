@@ -1,17 +1,14 @@
-package com.jabong.dap.common.utils
+package com.jabong.dap.common.time
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
-
-import com.jabong.dap.common.Constants
-
 import scala.collection.immutable.HashMap
 
 /**
  * Created by Rachit on 28/5/15.
  */
-object Time {
+object TimeUtils {
 
   /**
    * Returns the total number of days between two given date inputs

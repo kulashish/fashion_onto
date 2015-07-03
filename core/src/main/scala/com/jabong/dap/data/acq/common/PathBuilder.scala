@@ -4,8 +4,8 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.{ AppConfig, Constants }
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.AppConfig
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
  * Created by Abhay on 16/6/15.
@@ -22,11 +22,11 @@ object PathBuilder {
 
     AcqImportInfo.tableInfo.mode match {
       case "full" =>
-        val dateNow = Time.getTodayDateWithHrs().replaceAll("-", File.separator)
+        val dateNow = TimeUtils.getTodayDateWithHrs().replaceAll("-", File.separator)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
-          val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
+          val dateYesterday = TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
           "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
         } else {
           val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)

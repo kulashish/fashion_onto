@@ -1,7 +1,7 @@
 package com.jabong.dap.data.acq
 
 import com.jabong.dap.data.acq.common.{ ImportInfo, TableInfo }
-import com.jabong.dap.common.utils.Time._
+import com.jabong.dap.common.time.TimeUtils._
 
 /**
  * Validator for the JSON file used for data acquisition.

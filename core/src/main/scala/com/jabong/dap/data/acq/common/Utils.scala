@@ -12,7 +12,7 @@ import grizzled.slf4j.Logging
  * @param foreignKey String The name of the foreign key for the table.
  */
 case class JoinTables(
-  name: String,
+  name:       String,
   foreignKey: String
 )
 
@@ -33,18 +33,18 @@ case class JoinTables(
  * @param joinTables List[JoinTables] List of tables to be joined.
  */
 case class TableInfo(
-  source: String,
-  tableName: String,
-  primaryKey: String,
-  mode: String,
-  saveFormat: String,
-  saveMode: String,
-  dateColumn: String,
-  rangeStart: String,
-  rangeEnd: String,
-  limit: String,
+  source:          String,
+  tableName:       String,
+  primaryKey:      String,
+  mode:            String,
+  saveFormat:      String,
+  saveMode:        String,
+  dateColumn:      String,
+  rangeStart:      String,
+  rangeEnd:        String,
+  limit:           String,
   filterCondition: String,
-  joinTables: List[JoinTables]
+  joinTables:      List[JoinTables]
 )
 
 /**
@@ -94,7 +94,7 @@ object DaoUtil extends Logging {
 
     // Get the connection
     try {
-      DriverManager.getConnection(dbc.getConnectionString)
+      DriverManager.getConnection(dbc.getConnectionString,dbc.getConnectionProperties)
     } catch {
       case e: Exception => {
         logger.error("No connection: " + e.getMessage)

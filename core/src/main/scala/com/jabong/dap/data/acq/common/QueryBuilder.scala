@@ -28,6 +28,7 @@ object QueryBuilder {
     (selectString, joinString)
   }
 
+
   def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String) = {
     val tableName = AcqImportInfo.tableInfo.tableName
     val limit = AcqImportInfo.tableInfo.limit
@@ -59,6 +60,7 @@ object QueryBuilder {
     val tableName = AcqImportInfo.tableInfo.tableName
 
     val joinStrings = getJoinTableStrings()
+
     mode match {
       case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2)
       case "daily" | "hourly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",

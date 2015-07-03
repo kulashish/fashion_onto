@@ -1,6 +1,6 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.time.TimeUtils
 import org.scalatest.{ Matchers, FlatSpec }
 
 /**
@@ -38,7 +38,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
       limit = "100", filterCondition = null,
       joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    val prevDayDate = Time.getYesterdayDate()
+    val prevDayDate = TimeUtils.getYesterdayDate()
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' ".format(prevDayDate, prevDayDate)
     ConditionBuilder.getCondition() should be (output)
   }
@@ -48,7 +48,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
       limit = "100", filterCondition = "tableColumn NOT LIKE 'R..'",
       joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    val prevDayDate = Time.getYesterdayDate()
+    val prevDayDate = TimeUtils.getYesterdayDate()
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' AND tableColumn NOT LIKE 'R..'".format(prevDayDate, prevDayDate)
     ConditionBuilder.getCondition() should be (output)
   }
