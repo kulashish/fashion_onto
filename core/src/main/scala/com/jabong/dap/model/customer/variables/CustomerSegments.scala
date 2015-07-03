@@ -1,11 +1,12 @@
 package com.jabong.dap.model.customer.variables
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
-import com.jabong.dap.common.{ Spark, Utils }
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ StringType, IntegerType, StructField, StructType }
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by raghu on 25/6/15.
@@ -28,7 +29,7 @@ object CustomerSegments {
 
     }
 
-    if (!Utils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
+    if (!SchemaUtils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
 
       log("schema attributes or data type mismatch")
 
