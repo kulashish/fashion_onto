@@ -1,14 +1,14 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{CustomerVariables, NewsletterVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{Constants, TimeUtils}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 27/5/15.

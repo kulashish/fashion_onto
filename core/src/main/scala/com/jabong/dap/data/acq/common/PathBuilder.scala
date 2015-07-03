@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import com.jabong.dap.common.AppConfig
-import com.jabong.dap.common.time.{Constants, TimeUtils}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
  * Created by Abhay on 16/6/15.
