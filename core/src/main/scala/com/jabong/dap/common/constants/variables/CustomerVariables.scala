@@ -1,6 +1,5 @@
 package com.jabong.dap.common.constants.variables
 
-
 object CustomerVariables {
 
   //customer schema variables
