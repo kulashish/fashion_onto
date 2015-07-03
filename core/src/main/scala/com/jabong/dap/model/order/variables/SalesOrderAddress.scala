@@ -3,7 +3,6 @@ package com.jabong.dap.model.order.variables
 import com.jabong.dap.common.Spark
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 /**

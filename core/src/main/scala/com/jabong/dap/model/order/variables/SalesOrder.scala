@@ -2,7 +2,7 @@ package com.jabong.dap.model.order.variables
 
 import java.text.SimpleDateFormat
 
-import com.jabong.dap.common.{Time, Spark, Constants}
+import com.jabong.dap.common.{Spark}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
