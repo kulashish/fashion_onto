@@ -1,15 +1,14 @@
 package com.jabong.dap.model.order
 
-import com.jabong.dap.common.{MergeUtils, Spark, SharedSparkContext}
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import com.jabong.dap.common.{ MergeUtils, Spark, SharedSparkContext }
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 import com.jabong.dap.model.order.variables.SalesOrder
-
 
 /**
  * Created by jabong on 29/6/15.
  */
-class SalesOrderTest extends FlatSpec with SharedSparkContext{
+class SalesOrderTest extends FlatSpec with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
   @transient var df1: DataFrame = _
@@ -24,13 +23,10 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext{
     df1.collect.foreach(println)
   }
 
-
   "The result" should "have size 3" in {
     var ordersCount = SalesOrder.couponScore(df2)
     ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 3)
   }
-
-
 
 }
