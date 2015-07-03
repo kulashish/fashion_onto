@@ -47,6 +47,18 @@ object Time {
   }
 
   /**
+   * Returns the date on the day before the input date as a string in the format yyyy-MM-dd
+   * WARNING: Will raise exception if input date is not null and not in the correct format ie yyyy-MM-dd
+   */
+  def getYesterdayDate(date: String) : String = {
+    val dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT)
+    val calendarDate = Calendar.getInstance()
+    calendarDate.setTime(dateFormat.parse(date))
+    calendarDate.add(Calendar.DAY_OF_MONTH, -1)
+    dateFormat.format(calendarDate.getTime)
+  }
+
+  /**
    * Returns day before yesterday's date as a string in the format yyyy-MM-dd
    */
   def  getDayBeforeYesterdayDate(): String = {

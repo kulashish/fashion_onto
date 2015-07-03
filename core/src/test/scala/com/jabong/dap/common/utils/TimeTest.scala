@@ -37,6 +37,12 @@ class TimeTest extends FlatSpec with Matchers {
     Time.getYesterdayDate() should be (sdf.format(cal.getTime))
   }
 
+  "getYesterdayDate" should "return correct value on an input date" in {
+    val inputDate = "2015-06-01"
+    val outputDate = "2015-05-31"
+    Time.getYesterdayDate(inputDate) should be (outputDate)
+  }
+
   "getTodayDateWithHrs" should "return correct value" in {
     val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
     Time.getTodayDateWithHrs() should be (sdf.format(today))

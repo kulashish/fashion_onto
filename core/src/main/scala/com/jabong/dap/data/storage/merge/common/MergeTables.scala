@@ -23,11 +23,21 @@ object MergeTables {
     val saveFormat = MergeJobConfig.mergeInfo.saveFormat
     val saveMode = MergeJobConfig.mergeInfo.saveMode
     val mergeMode = MergeJobConfig.mergeInfo.mergeMode
+    val mergeDate = MergeJobConfig.mergeInfo.mergeDate
 
     val basePath = AppConfig.config.basePath
 
-    val dateDayBeforeYesterday = Time.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
-    val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
+    val dateDayBeforeYesterday = if (mergeDate == null) {
+      Time.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
+    } else {
+      Time.getYesterdayDate(mergeDate).replaceAll("-", File.separator)
+    }
+
+    val dateYesterday = if (mergeDate == null){
+      Time.getYesterdayDate().replaceAll("-", File.separator)
+    }  else {
+      mergeDate.replaceAll("-", File.separator)
+    }
 
     val pathFullMerged = "%s/%s/%s/%s_merged/%s/".format(basePath, source, tableName, mergeMode, dateDayBeforeYesterday)
     lazy val pathFull = "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
