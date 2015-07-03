@@ -9,7 +9,8 @@ import org.apache.spark.sql.types._
  */
 object Schema {
 
-  val customer = StructType(Array(StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
+  val customer = StructType(Array(
+    StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
     StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CustomerVariables.INCREMENT_ID, StringType, true),
     StructField(CustomerVariables.PREFIX, StringType, true),
@@ -62,7 +63,8 @@ object Schema {
     StructField(CustomerVariables.FK_REFERRAL_CODE, IntegerType, true),
     StructField(CustomerVariables.SMS_OPT, BooleanType, true)))
 
-  val nls = StructType(Array(StructField(NewsletterVariables.ID_NEWSLETTER_SUBSCRIPTION, IntegerType, true),
+  val nls = StructType(Array(
+    StructField(NewsletterVariables.ID_NEWSLETTER_SUBSCRIPTION, IntegerType, true),
     StructField(NewsletterVariables.FK_CUSTOMER, IntegerType, true),
     StructField(NewsletterVariables.EMAIL, StringType, true),
     StructField(NewsletterVariables.UNSUBSCRIBE_KEY, StringType, true),
@@ -78,7 +80,8 @@ object Schema {
     StructField(NewsletterVariables.SRC_UNSUB, StringType, true),
     StructField(NewsletterVariables.FREQUENCY, StringType, true)))
 
-  val salesOrder = StructType(Array(StructField(SalesOrderVariables.ID_SALES_ORDER, IntegerType, true),
+  val salesOrder = StructType(Array(
+    StructField(SalesOrderVariables.ID_SALES_ORDER, IntegerType, true),
     StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_BILLING, IntegerType, true),
     StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING, IntegerType, true),
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
@@ -127,7 +130,8 @@ object Schema {
     StructField(SalesOrderVariables.CORPORATE_TRANSACTION_ID, StringType, true),
     StructField(SalesOrderVariables.DEVICE_ID, StringType, true)))
 
-  val csh = StructType(Array(StructField(CustomerStoreVariables.ID_CUSTOMER_STORECREDITS_HISTORY, IntegerType, true),
+  val csh = StructType(Array(
+    StructField(CustomerStoreVariables.ID_CUSTOMER_STORECREDITS_HISTORY, IntegerType, true),
     StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerStoreVariables.CREATED_AT, TimestampType, true),
     StructField(CustomerStoreVariables.OPERATION_TYPE, StringType, true),
@@ -142,7 +146,8 @@ object Schema {
     StructField(CustomerStoreVariables.BALANCE, DecimalType(10, 2), true),
     StructField(CustomerStoreVariables.EXPIRY_DATE, DateType, true)))
 
-  val customerSegments = StructType(Array(StructField(CustomerSegmentsVariables.ID_CUSTOMER_SEGMENTS, IntegerType, true),
+  val customerSegments = StructType(Array(
+    StructField(CustomerSegmentsVariables.ID_CUSTOMER_SEGMENTS, IntegerType, true),
     StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true),
     StructField(CustomerSegmentsVariables.FREQUENCY, IntegerType, true),
     StructField(CustomerSegmentsVariables.RECENCY, IntegerType, true),

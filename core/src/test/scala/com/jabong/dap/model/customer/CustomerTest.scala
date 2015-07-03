@@ -6,7 +6,7 @@ import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.variables.{CustomerStorecreditsHistory, CustomerSegments, Customer}
+import com.jabong.dap.model.customer.variables.{ CustomerStorecreditsHistory, CustomerSegments, Customer }
 import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
@@ -51,7 +51,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   "getCustomer: schema attributes and data type" should
     "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
 
-      val result = Customer.getCustomer(dfCustomer: DataFrame,
+      val result = Customer.getCustomer(
+        dfCustomer: DataFrame,
         dfNLS: DataFrame,
         dfSalesOrder: DataFrame)
       assert(result != null)
@@ -60,7 +61,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getCustomer: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = Customer.getCustomer(dfCustomer: DataFrame,
+    val result = Customer.getCustomer(
+      dfCustomer: DataFrame,
       dfNLS: DataFrame,
       dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
