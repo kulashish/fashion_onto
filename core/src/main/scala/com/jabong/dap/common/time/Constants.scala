@@ -1,5 +1,4 @@
-package com.jabong.dap.common
-
+package com.jabong.dap.common.time
 
 object Constants {
   val CONVERT_MILLISECOND_TO_DAYS = 24 * 60 * 60 * 1000

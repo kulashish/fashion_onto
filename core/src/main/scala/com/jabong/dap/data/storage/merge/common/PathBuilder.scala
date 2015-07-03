@@ -3,7 +3,7 @@ package com.jabong.dap.data.storage.merge.common
 import java.io.File
 
 import com.jabong.dap.common.AppConfig
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.MergeJobConfig
 
 /**
@@ -18,15 +18,15 @@ object PathBuilder {
 
   private def getDateDayBeforeYesterdayPath (): String = {
     if (mergeDate == null) {
-      Time.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
+      TimeUtils.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
     } else {
-      Time.getYesterdayDate(mergeDate).replaceAll("-", File.separator)
+      TimeUtils.getYesterdayDate(mergeDate).replaceAll("-", File.separator)
     }
   }
 
   private def getDateYesterdayDataPath (): String = {
     if (mergeDate == null){
-      Time.getYesterdayDate().replaceAll("-", File.separator)
+      TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
     }  else {
       mergeDate.replaceAll("-", File.separator)
     }

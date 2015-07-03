@@ -25,6 +25,7 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     config: String = null
+
   )
 
   def main(args: Array[String]) {

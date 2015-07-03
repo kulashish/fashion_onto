@@ -1,9 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
-import java.io.File
 
-import com.jabong.dap.common.{Spark, AppConfig}
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.Spark
 import com.jabong.dap.data.acq.common.MergeJobConfig
 
 /**

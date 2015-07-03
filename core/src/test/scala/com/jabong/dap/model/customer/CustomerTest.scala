@@ -2,10 +2,12 @@ package com.jabong.dap.model.customer
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.{ SharedSparkContext, Utils }
+import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
 import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.model.customer.variables.{ CustomerStorecreditsHistory, CustomerSegments, Customer }
+import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
 
@@ -26,11 +28,11 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
 
-    dfCustomer = Utils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
-    dfNLS = Utils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
-    dfSalesOrder = Utils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)
-    dfCSH = Utils.readFromJson(DataSets.CUSTOMER_STORECREDITS_HISTORY, DataSets.CUSTOMER_STORECREDITS_HISTORY, Schema.csh)
-    dfCustomerSegments = Utils.readFromJson(DataSets.CUSTOMER_SEGMENTS, DataSets.CUSTOMER_SEGMENTS, Schema.customerSegments)
+    dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
+    dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
+    dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)
+    dfCSH = JsonUtils.readFromJson(DataSets.CUSTOMER_STORECREDITS_HISTORY, DataSets.CUSTOMER_STORECREDITS_HISTORY, Schema.csh)
+    dfCustomerSegments = JsonUtils.readFromJson(DataSets.CUSTOMER_SEGMENTS, DataSets.CUSTOMER_SEGMENTS, Schema.customerSegments)
 
   }
 
@@ -69,8 +71,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
 
-    val dfResultCustomer = Utils.readFromJson(DataSets.CUSTOMER, "result_customer",
-      Customer.result_customer)
+    val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer",
+      SchemaVariables.resultCustomer)
       .collect().toSet
 
     assert(result.equals(dfResultCustomer) == true)
@@ -78,162 +80,34 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Name of variable: ACC_REG_DATE
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getMin(): timestamp t1 and t2 value " should "be null" in {
-
-    val t1 = null
-
-    val t2 = null
-
-    val result = Customer.getMin(t1, t2)
-
-    assert(result == null)
-
-  }
-
-  "getMin(): timestamp t1" should "be null" in {
-
-    val t1 = null
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val result = Customer.getMin(t1, t2)
-
-    assert(result.compareTo(t2) == 0)
-
-  }
-
-  "getMin(): timestamp t2" should "be null" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val t2 = null
-
-    val result = Customer.getMin(t1, t2)
-
-    assert(result.compareTo(t1) == 0)
-
-  }
-
-  "getMin(): return timestamp " should "t1" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0")
-
-    val result = Customer.getMin(t1, t2)
-
-    assert(result.compareTo(t1) >= 0)
-
-  }
-
-  "getMin(): return timestamp " should "t2" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:09.0")
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val result = Customer.getMin(t1, t2)
-
-    assert(result.compareTo(t2) >= 0)
-
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Name of variable: MAX_UPDATED_AT
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getMax(): timestamp t1 and t2 value " should "be null" in {
-
-    val t1 = null
-
-    val t2 = null
-
-    val result = Customer.getMax(t1, t2)
-
-    assert(result == null)
-
-  }
-
-  "getMax(): timestamp t1" should "be null" in {
-
-    val t1 = null
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val result = Customer.getMax(t1, t2)
-
-    assert(result.compareTo(t2) == 0)
-
-  }
-
-  "getMax(): timestamp t2" should "be null" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val t2 = null
-
-    val result = Customer.getMax(t1, t2)
-
-    assert(result.compareTo(t1) == 0)
-
-  }
-
-  "getMax(): return timestamp " should "t2" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0")
-
-    val result = Customer.getMax(t1, t2)
-
-    assert(result.compareTo(t2) == 0)
-
-  }
-
-  "getMax(): return timestamp " should "t1" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:09.0")
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val result = Customer.getMax(t1, t2)
-
-    assert(result.compareTo(t1) == 0)
-
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Name of variable: EMAIL_OPT_IN_STATUS
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  "getEmailOptInStatus: getStatusValue " should "o" in {
+  "getEmailOptInStatus: getStatusValue " should "O" in {
 
     val result = Customer.getEmailOptInStatus(null, null)
 
-    assert(result == "o")
+    assert(result == "O")
 
   }
 
-  "getEmailOptInStatus: getStatusValue " should "iou" in {
+  "getEmailOptInStatus: getStatusValue " should "I" in {
 
     val row = Row("", "subscribed")
 
     val result = Customer.getEmailOptInStatus("1", "subscribed")
 
-    assert(result == "iou")
+    assert(result == "I")
 
   }
 
-  "getEmailOptInStatus: getStatusValue " should "u" in {
+  "getEmailOptInStatus: getStatusValue " should "U" in {
 
     val row = Row("", "unsubscribed")
 
     val result = Customer.getEmailOptInStatus("1", "unsubscribed")
 
-    assert(result == "u")
+    assert(result == "U")
 
   }
 
@@ -248,8 +122,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
-    val dfCustomersPreferredOrderTimeslot = Utils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-      Customer.customers_preferred_order_timeslot)
+    val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
+      SchemaVariables.customersPreferredOrderTimeslot)
       .collect().toSet
 
     assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
@@ -284,8 +158,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
-    val dfLastJrCovertDate = Utils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
-      CustomerStorecreditsHistory.last_jr_covert_date)
+    val dfLastJrCovertDate = JsonUtils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
+      SchemaVariables.last_jr_covert_date)
       .collect().toSet
 
     assert(result.equals(dfLastJrCovertDate) == true)
@@ -320,7 +194,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     //                        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
 
-    val dfMvpSeg = Utils.readFromJson(DataSets.CUSTOMER, "mvp_seg", CustomerSegments.mvp_seg)
+    val dfMvpSeg = JsonUtils.readFromJson(DataSets.CUSTOMER, "mvp_seg", SchemaVariables.mvp_seg)
       .collect().toSet
 
     assert(result.equals(dfMvpSeg) == true)
