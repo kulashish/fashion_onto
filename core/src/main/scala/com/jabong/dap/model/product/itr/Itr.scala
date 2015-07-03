@@ -17,8 +17,7 @@ class Itr extends java.io.Serializable {
       "activated_at",
       "sku",
       "fk_catalog_supplier",
-      "fk_catalog_brand"
-    ).withColumnRenamed("", "").
+      "fk_catalog_brand").withColumnRenamed("", "").
       join(
         Model.simple.select(
           "id_catalog_simple",
@@ -27,18 +26,14 @@ class Itr extends java.io.Serializable {
           "special_from_date",
           "barcode_ean",
           "sku",
-          "fk_catalog_config"
-        ).withColumnRenamed("sku", "simpleSku"),
-        Model.config("id_catalog_config") === Model.simple("fk_catalog_config"), "leftouter"
-      ).
+          "fk_catalog_config").withColumnRenamed("sku", "simpleSku"),
+        Model.config("id_catalog_config") === Model.simple("fk_catalog_config"), "leftouter").
         join(
           Model.supplier.value.select("status", "id_catalog_supplier"),
-          Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier"), "leftouter"
-        ).
+          Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier"), "leftouter").
           join(
             Model.brand.value.select("name", "id_catalog_brand").withColumnRenamed("name", "brandName"),
-            Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand"), "leftouter"
-          ).limit(30)
+            Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand"), "leftouter").limit(30)
 
     val itr = out.select(
       "id_catalog_config",
@@ -54,8 +49,7 @@ class Itr extends java.io.Serializable {
       "barcode_ean",
       "simpleSku",
       "status",
-      "brandName"
-    ).map(addColumn)
+      "brandName").map(addColumn)
 
     Spark.getSqlContext().createDataFrame(itr, Schema.schema).show(2)
   }

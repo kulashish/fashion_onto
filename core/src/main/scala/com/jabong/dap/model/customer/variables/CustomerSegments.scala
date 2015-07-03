@@ -1,11 +1,12 @@
 package com.jabong.dap.model.customer.variables
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
-import com.jabong.dap.common.{ Spark, Utils }
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ StringType, IntegerType, StructField, StructType }
+import org.apache.spark.sql.types.{ IntegerType, StringType, StructField, StructType }
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 25/6/15.
@@ -28,7 +29,7 @@ object CustomerSegments {
 
     }
 
-    if (!Utils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
+    if (!SchemaUtils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
 
       log("schema attributes or data type mismatch")
 
@@ -40,17 +41,14 @@ object CustomerSegments {
       CustomerSegmentsVariables.FK_CUSTOMER,
       CustomerSegmentsVariables.UPDATED_AT,
       CustomerSegmentsVariables.MVP_SCORE,
-      CustomerSegmentsVariables.SEGMENT
-    )
+      CustomerSegmentsVariables.SEGMENT)
       .sort(
         col(CustomerSegmentsVariables.FK_CUSTOMER),
-        desc(CustomerSegmentsVariables.FK_CUSTOMER)
-      )
+        desc(CustomerSegmentsVariables.FK_CUSTOMER))
       .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
         first(CustomerSegmentsVariables.MVP_SCORE),
-        first(CustomerSegmentsVariables.SEGMENT)
-      )
+        first(CustomerSegmentsVariables.SEGMENT))
 
     //    val segments = getSeg(dfCustSegVars)
 
@@ -68,8 +66,7 @@ object CustomerSegments {
       StructField(CustomerSegmentsVariables.SEGMENT3, StringType, true),
       StructField(CustomerSegmentsVariables.SEGMENT4, StringType, true),
       StructField(CustomerSegmentsVariables.SEGMENT5, StringType, true),
-      StructField(CustomerSegmentsVariables.SEGMENT6, StringType, true)
-    ))
+      StructField(CustomerSegmentsVariables.SEGMENT6, StringType, true)))
 
     val segments = dfCustSegVars.map(r => r(0) + "," + r(1) + "," + getSegValue(r(2).toString))
 
@@ -84,8 +81,7 @@ object CustomerSegments {
         r(5).trim,
         r(6).trim,
         r(7).trim,
-        r(8).trim
-      ))
+        r(8).trim))
 
     // Apply the schema to the RDD.
     val dfs = Spark.getSqlContext().createDataFrame(rowRDD, schema)
