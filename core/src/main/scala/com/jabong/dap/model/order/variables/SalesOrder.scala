@@ -1,7 +1,5 @@
 package com.jabong.dap.model.order.variables
 
-import java.text.SimpleDateFormat
-
 import com.jabong.dap.common.{Spark}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -34,7 +32,7 @@ object SalesOrder {
     return couponScore
   }
 
-  def processData(prev : DataFrame, curr: DataFrame): DataFrame   = {
+  def processVariables(prev : DataFrame, curr: DataFrame): DataFrame   = {
     val gRDD = curr.groupBy("fk_customer").agg( max("created_at") as "last_order_date",
                                                 min("created_at") as "first_order_date",
                                                 count("created_at") as "orders_count",

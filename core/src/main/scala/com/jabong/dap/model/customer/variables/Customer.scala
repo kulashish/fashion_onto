@@ -3,10 +3,9 @@ package com.jabong.dap.model.customer.variables
 import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, CustomerVariables }
+import com.jabong.dap.common.utils.Time
 import com.jabong.dap.common.{ Constants, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.common.utils.Time
-
 import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -72,8 +71,8 @@ object Customer {
       .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
 
       .join(dfSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER),
-        col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
-        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT),
+      col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
+      col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT),
         dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer")
 
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
