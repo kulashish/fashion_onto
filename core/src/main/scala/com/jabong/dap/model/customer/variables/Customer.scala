@@ -1,10 +1,10 @@
 package com.jabong.dap.model.customer.variables
 
-import java.sql.Timestamp
-
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, CustomerVariables }
-import com.jabong.dap.common.utils.Time
-import com.jabong.dap.common.{ Constants, Spark, Utils }
+import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables, SalesOrderVariables }
+import com.jabong.dap.common.schema.SchemaUtils
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.functions._
@@ -40,9 +40,9 @@ object Customer {
 
     }
 
-    if (!Utils.isSchemaEqual(dfCustomer.schema, Schema.customer) ||
-      !Utils.isSchemaEqual(dfNLS.schema, Schema.nls) ||
-      !Utils.isSchemaEqual(dfSalesOrder.schema, Schema.salesOrder)) {
+    if (!SchemaUtils.isSchemaEqual(dfCustomer.schema, Schema.customer) ||
+      !SchemaUtils.isSchemaEqual(dfNLS.schema, Schema.nls) ||
+      !SchemaUtils.isSchemaEqual(dfSalesOrder.schema, Schema.salesOrder)) {
 
       log("schema attributes or data type mismatch")
 
@@ -76,23 +76,14 @@ object Customer {
 
       .join(
         dfSalesOrder.select(
-          col(SalesOrderVariables.FK_CUSTOMER),
-          col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
-          col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
-        ),
+        col(SalesOrderVariables.FK_CUSTOMER),
+        col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
+        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
+      ),
         dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer"
       )
 
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
-
-    // Define User Defined Functions
-    val sqlContext = Spark.getSqlContext()
-
-    //min(customer.created_at, sales_order.created_at)
-    val udfAccRegDate = udf((cust_created_at: Timestamp, nls_created_at: Timestamp) => getMin(cust_created_at: Timestamp, nls_created_at: Timestamp))
-
-    //max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
-    val udfMaxUpdatedAt = udf((cust_updated_at: Timestamp, nls_updated_at: Timestamp, so_updated_at: Timestamp) => getMax(getMax(cust_updated_at: Timestamp, nls_updated_at: Timestamp), so_updated_at: Timestamp))
 
     //Name of variable: EMAIL_OPT_IN_STATUS
     val udfEmailOptInStatus = udf((nls_email: String, status: String) => getEmailOptInStatus(nls_email: String, status: String))
@@ -125,16 +116,19 @@ object Customer {
       col(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT),
       col(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT),
 
-      udfAccRegDate(
+      Udf.udfMinTimestamp(
         dfJoin(CustomerVariables.CREATED_AT),
         dfJoin(NewsletterVariables.NLS_CREATED_AT)
       ) as CustomerVariables.ACC_REG_DATE,
 
-      udfMaxUpdatedAt(
+      Udf.udfMaxTimestamp(
         dfJoin(CustomerVariables.UPDATED_AT),
-        dfJoin(NewsletterVariables.NLS_CREATED_AT),
-        dfJoin(SalesOrderVariables.SO_CREATED_AT)
-      ) as CustomerVariables.MAX_UPDATED_AT,
+        Udf.udfMaxTimestamp(
+          dfJoin(NewsletterVariables.NLS_CREATED_AT),
+          dfJoin(SalesOrderVariables.SO_CREATED_AT)
+        )
+      )
+        as CustomerVariables.MAX_UPDATED_AT,
 
       udfEmailOptInStatus(
         dfJoin(NewsletterVariables.NLS_EMAIL),
@@ -153,42 +147,6 @@ object Customer {
     //          }
 
     dfResult
-  }
-
-  //min(customer.created_at, sales_order.created_at)
-  def getMin(t1: Timestamp, t2: Timestamp): Timestamp = {
-
-    if (t1 == null) {
-      return t2
-    }
-
-    if (t2 == null) {
-      return t1
-    }
-
-    if (t1.compareTo(t2) >= 0)
-      t1
-    else
-      t2
-
-  }
-
-  //max(customer.updated_at, newsletter_subscription.updated_at, sales_order.updated_at)
-  def getMax(t1: Timestamp, t2: Timestamp): Timestamp = {
-
-    if (t1 == null) {
-      return t2
-    }
-
-    if (t2 == null) {
-      return t1
-    }
-
-    if (t1.compareTo(t2) < 0)
-      t2
-    else
-      t1
-
   }
 
   //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
@@ -211,7 +169,7 @@ object Customer {
     val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
       .sort(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
 
-    val soMapReduce = salesOrder.map(r => ((r(0), Time.timeToSlot(r(1).toString, Constants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
+    val soMapReduce = salesOrder.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, Constants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
 
     val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 

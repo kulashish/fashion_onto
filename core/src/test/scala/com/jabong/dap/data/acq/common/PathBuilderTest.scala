@@ -3,7 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.io.File
 
 import com.jabong.dap.common.{ AppConfig, Config }
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.time.TimeUtils
 import org.scalatest.{ Matchers, FlatSpec }
 
 /**
@@ -36,14 +36,14 @@ class PathBuilderTest extends FlatSpec with Matchers {
 
   "getPath" should "return correct path if mode is full" in {
     val mode = "full"
-    val dateNow = Time.getTodayDateWithHrs().replaceAll("-", File.separator)
+    val dateNow = TimeUtils.getTodayDateWithHrs().replaceAll("-", File.separator)
     val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
     PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are null" in {
     val mode = "daily"
-    val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
+    val dateYesterday = TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
     val outputPath = "basePath/source/tableName/" + dateYesterday + "/"
     PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
   }
