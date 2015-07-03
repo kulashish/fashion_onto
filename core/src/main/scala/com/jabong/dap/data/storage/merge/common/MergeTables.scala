@@ -18,31 +18,13 @@ object MergeTables {
   }
 
   def mergeFull () = {
-    val source = MergeJobConfig.mergeInfo.source
-    val tableName = MergeJobConfig.mergeInfo.tableName
     val primaryKey = MergeJobConfig.mergeInfo.primaryKey
     val saveFormat = MergeJobConfig.mergeInfo.saveFormat
     val saveMode = MergeJobConfig.mergeInfo.saveMode
-    val mergeMode = MergeJobConfig.mergeInfo.mergeMode
-    val mergeDate = MergeJobConfig.mergeInfo.mergeDate
 
-    val basePath = AppConfig.config.basePath
-
-    val dateDayBeforeYesterday = if (mergeDate == null) {
-      Time.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
-    } else {
-      Time.getYesterdayDate(mergeDate).replaceAll("-", File.separator)
-    }
-
-    val dateYesterday = if (mergeDate == null){
-      Time.getYesterdayDate().replaceAll("-", File.separator)
-    }  else {
-      mergeDate.replaceAll("-", File.separator)
-    }
-
-    val pathFullMerged = "%s/%s/%s/%s_merged/%s/".format(basePath, source, tableName, mergeMode, dateDayBeforeYesterday)
-    lazy val pathFull = "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
-    lazy val pathYesterdayData = "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
+    val pathFullMerged = PathBuilder.getPathFullMerged()
+    lazy val pathFull = PathBuilder.getPathFull()
+    lazy val pathYesterdayData = PathBuilder.getPathYesterdayData()
 
     val mergeBaseDataPath = if (DataVerifier.hdfsDataExists(pathFullMerged)) {
       pathFullMerged
@@ -65,7 +47,7 @@ object MergeTables {
     val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
 
 
-    val savePath = "%s/%s/%s/%s_merged/%s/".format(basePath, source, tableName,mergeMode, dateYesterday)
+    val savePath = PathBuilder.getSavePathFullMerge()
 
     mergedDF.write.format(saveFormat).mode(saveMode).save(savePath)
   }
