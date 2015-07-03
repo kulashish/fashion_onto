@@ -50,18 +50,22 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   "getCustomer: schema attributes and data type" should
     "match into DataFrames(dfCustomer, dfNLS, dfSalesOrder)" in {
 
-      val result = Customer.getCustomer(dfCustomer: DataFrame,
+      val result = Customer.getCustomer(
+        dfCustomer: DataFrame,
         dfNLS: DataFrame,
-        dfSalesOrder: DataFrame)
+        dfSalesOrder: DataFrame
+      )
       assert(result != null)
 
     }
 
   "getCustomer: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = Customer.getCustomer(dfCustomer: DataFrame,
+    val result = Customer.getCustomer(
+      dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame)
+      dfSalesOrder: DataFrame
+    )
       .limit(30).collect().toSet
 
     //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
