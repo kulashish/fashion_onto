@@ -43,6 +43,14 @@ class TimeTest extends FlatSpec with Matchers {
     Time.getYesterdayDate(inputDate) should be (outputDate)
   }
 
+  "getDayBeforeYesterdayDate" should "return correct value" in {
+    val cal = Calendar.getInstance()
+    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
+    cal.setTime(today)
+    cal.add(Calendar.DAY_OF_MONTH, -2)
+    Time.getDayBeforeYesterdayDate() should be (sdf.format(cal.getTime))
+  }
+
   "getTodayDateWithHrs" should "return correct value" in {
     val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
     Time.getTodayDateWithHrs() should be (sdf.format(today))

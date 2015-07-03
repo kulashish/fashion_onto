@@ -5,11 +5,11 @@ import java.io.File
 import com.jabong.dap.common.{Spark, AppConfig}
 import com.jabong.dap.common.utils.Time
 import com.jabong.dap.data.acq.common.MergeJobConfig
-import MergeUtils
 
 /**
  * Created by Abhay on 2/7/15.
  */
+
 object MergeTables {
   def getContext(saveFormat: String) = saveFormat match {
     case "parquet" => Spark.getSqlContext()
