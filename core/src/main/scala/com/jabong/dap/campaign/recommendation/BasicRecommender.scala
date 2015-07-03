@@ -1,11 +1,12 @@
 package com.jabong.dap.campaign.recommendation
 
-import java.util
+import java.{lang, util}
 
-import com.jabong.dap.common.constants.variables.ProductVariables
+import com.jabong.dap.common.constants.variables.{NewsletterVariables, ProductVariables}
 import com.jabong.dap.common.Spark
+import org.apache.hadoop.hdfs.util.Diff.ListType
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.TimestampType
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 
@@ -27,10 +28,6 @@ class BasicRecommender extends Recommender{
 
 
   val skuSimpleToSku = udf((skuSimple: String) => simpleToSku(skuSimple: String))
-
-  //  val daysDiff = udf((date: Timestamp) => simpleToSku(skuSimple: String))
-
-
 
 
   //Converts Sku Simple to Sku
@@ -61,100 +58,112 @@ class BasicRecommender extends Recommender{
     if(lastDaysData.count()==0){
       return null
     }
-
-    //   orderItemData.select(skuSimpleToSku(orderItemData("slu")) as ("asdxas"),orderItemData("sku"))
-
     val groupedSku = lastDaysData.withColumn("actual_sku", skuSimpleToSku(lastDaysData("sku"))).groupBy("actual_sku")
       .agg($"actual_sku", count("created_at") as "quantity",max("created_at") as "last_sold_date")
 
     return groupedSku
   }
 
+
+
   def skuCompleteData(topSku: DataFrame, SkuCompleteData: DataFrame): DataFrame = {
     if (topSku == null || SkuCompleteData == null) {
       return null
     }
     import hiveContext.implicits._
-
-
     val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), "inner")
       .select(ProductVariables.SKU,ProductVariables.BRICK, ProductVariables.MVP,  ProductVariables.BRAND,
         ProductVariables.GENDER,ProductVariables.SPECIAL_PRICE,ProductVariables.WEEKLY_AVERAGE_SALE,"quantity","last_sold_date")
 
-
     return RecommendationInput
   }
 
-  def createKey(row: Row,array: Array[Int]):Row= {
+
+  /*
+  Given a row  and fields in that row it will return new row with only those keys
+  input:- row  and fields: field array
+  @returns row with only those fields
+   */
+  def createKey(row: Row,fields: Array[String]):Row=  {
+    if(row ==null || fields == null || fields.length==0 ){
+      return null
+    }
     var sequence: Seq[Any] = Seq()
-    var newSequence: Seq[Any] = Seq()
-    var test:Seq[String] = Seq("hello","hello1")
-    for (value <- array) {
-      println(value,row(value))
-      sequence =  sequence:+(row(value))
+    for (field <- fields) {
+      try{
+        sequence =  sequence:+(row(row.fieldIndex(field)))
+      } catch {
+        case ex :IllegalArgumentException =>{
+            ex.printStackTrace()
+            return null
+        }
+
+      }
     }
     val data =  Row.fromSeq(sequence)
-    println(data.getValuesMap(test))
     return data
   }
 
-
-  def createKey1(row: Row,array: Array[Int]):String= {
-   var sequence:String= ""
+  /*
+    Given a row  and fields in that row it will return new row with only those keys
+    input:- row  and fields: field array
+    @returns String
+     */
+  def createKeyString(row: Row,array: Array[Int]):String= {
+    var sequence:String= ""
     var i :Int=0
     for (value <- array) {
       if(i==0){
         sequence =  sequence+row(value)
       }
       sequence =  sequence+"^"+row(value)
-
-
     }
-    //val data =  Row.fromSeq(sequence)
-    //println(data.getValuesMap(test))
     return sequence
   }
   // Input: recommendationInput: contains sorted list of all skus sold in last x days
   //        schema: {sku, brick, mvp, brand, gender, sp, weeklyAverage of number sold}
   // Ouput: (mvp, brick, gender) and its sorted list of recommendations
 
-  def genRecommend(recommendationInput:DataFrame): DataFrame ={
+  def genRecommend(recommendationInput:DataFrame,pivotArray:Array[String],dataFrameSchema:StructType): DataFrame ={
     if(recommendationInput==null){
       return null
     }
-
-//    val pivotArray = Array(1,2)
-//
-//    val mappedRecommendationInput =  recommendationInput.rdd.keyBy(row =>createKey1(row,pivotArray))
-
-    // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),(row(0).toString,row(4).toString,row(3).toString,row(5).asInstanceOf[Int],row(6).asInstanceOf[Int])))
-    val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
-
-
-   // val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
-
+    val mappedRecommendationInput =  recommendationInput.rdd.keyBy(row =>createKey(row,pivotArray))
+    //val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
+    if(mappedRecommendationInput==null || mappedRecommendationInput.keys==null){
+      return null
+    }
     //mappedRecommendationInput.collect().foreach(println)
 
-
+    import hiveContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
-
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case(key,value)=>(key,genSku(value).toList)}
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
-     val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
-    //val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => createRow(key,value._1,value._2.sortBy(-_._1))))}
-
-    val recommendDataFrame = hiveContext.createDataFrame(recommendations)
-    recommendations.collect().foreach(println)
-   // recommendationOutput.collect().foreach(println)
-   // val testrec = recommendationOutput.map{case(key,value)=>(key,value.flatMap(t=>testMap(t)))}
-    //testrec.collect().foreach(println)
-
+    // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
+    val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => createRow(key,value._1,value._2.sortBy(-_._1))))}
+    val recommendDataFrame = hiveContext.createDataFrame(recommendations,dataFrameSchema)
     return recommendDataFrame
   }
 
 
 
+  /*
+   Input :- row and array of elements
+   Output:- Create a new merged row
+   */
+  def createRow(row:Row,any: Any*): Row ={
+    val seq =row.toSeq
+    val newSeq = seq++any
+    return Row.fromSeq(newSeq)
+  }
 
+
+
+/*
+  Generate the recommendaation based on gender and some group by keys
+  Input:- iterable Row od data
+  Output: - generate the List of sku for gender
+ */
 
   def genSku(iterable: Iterable[Row]): Map[String,scala.collection.mutable.MutableList[(Long,String)]]={
     var genderSkuMap : Map[String,scala.collection.mutable.MutableList[(Long,String)]] = Map()
@@ -168,8 +177,6 @@ class BasicRecommender extends Recommender{
         val recommendGenderArray = recommendedGenderList.split(",")
         for (recGender <- recommendGenderArray) {
           skuList = genderSkuMap.getOrElse(recGender,null)
-          println(gender+"\t"+recGender,skuList)
-
           if(skuList!=null){
             skuList.+=((quantity.asInstanceOf[Long],sku.toString))
             genderSkuMap += (recGender.toString -> skuList)
@@ -214,7 +221,6 @@ class BasicRecommender extends Recommender{
       val recommendGenderArray = recommendGenderX.split(",")
 
       val genderMatches = existsInArray(y(4).toString, recommendGenderArray)
-      println(y(4)+"\t"+recommendGenderX+"\t"+genderMatches)
       var skuList = genderSkuMap.getOrElse(x(4).toString,null)
       if(skuList==null){
         skuList = Set()
@@ -236,7 +242,6 @@ class BasicRecommender extends Recommender{
       val recommendGenderArray = recommendGenderY.split(",")
 
       val genderMatches = existsInArray(x(4).toString, recommendGenderArray)
-      println(x(4)+"\t"+recommendGenderY+"\t"+genderMatches)
       var skuList = genderSkuMap.getOrElse(y(4).toString,null)
       if(skuList==null){
         skuList = Set()
@@ -264,19 +269,15 @@ class BasicRecommender extends Recommender{
     if (inputDataFrame == null || timeFrameDays < 0) {
       return null
     }
-
     val filteredLastSevenDaysData = daysData(inputDataFrame,timeFrameDays,"last","last_sold_date")
-
     val filteredBeforeSevenDaysData = daysData(inputDataFrame,timeFrameDays,"before","last_sold_date")
-
-
     val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.STOCK+">2*"+ProductVariables.WEEKLY_AVERAGE_SALE)
 
     val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock,filteredBeforeSevenDaysData(ProductVariables.BRAND).equalTo(brickBrandStock("brands"))
       && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")) ,"inner")
       .withColumn("stockAvailable",inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.CATEGORY)
       ,filteredBeforeSevenDaysData(ProductVariables.STOCK),brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
-    .select(ProductVariables.SKU,ProductVariables.BRICK, ProductVariables.MVP,  ProductVariables.BRAND,
+      .select(ProductVariables.SKU,ProductVariables.BRICK, ProductVariables.MVP,  ProductVariables.BRAND,
         ProductVariables.GENDER,ProductVariables.SPECIAL_PRICE,ProductVariables.WEEKLY_AVERAGE_SALE,"quantity","last_sold_date")
 
     return filteredStock1.unionAll(filteredStock2)

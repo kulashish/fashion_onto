@@ -3,8 +3,11 @@ package com.jabong.dap.campaign.recommendation
 import com.jabong.dap.campaign.common.ACartCampaign
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.{SharedSparkContext, Spark}
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest.FlatSpec
+
+import scala.collection.mutable
 
 /**
  * Created by jabong1145 on 23/6/15.
@@ -100,16 +103,66 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
 
 
   "No Recommendation input skus" should "return No recommendation output" in {
-    val recOut = basicRecommender.genRecommend(null)
+    val recOut = basicRecommender.genRecommend(null,null,null)
     assert(recOut==null)
   }
 
 
-  "5 recommendation input skus" should "create recommendation based on brand mvp and gender" in {
-    val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame))
-    assert(recOut!=null)
+
+  "5 recommendation input skus and pivot keys is null" should " return null" in {
+    val dataFrameSchema = StructType(Array(StructField(ProductVariables.BRICK, StringType, false),
+      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.GENDER, StringType, false),
+      StructField(ProductVariables.RECOMMENDATIONS,ArrayType( StructType(Array(StructField(ProductVariables.QUANTITY, LongType)
+        ,StructField(ProductVariables.SKU_LIST, StringType))), true)
+      )))
+
+    val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
+      ,null,dataFrameSchema)
+    assert(recOut==null)
   }
 
+
+
+  "5 recommendation input skus" should "create recommendation based on brick mvp and gender" in {
+    val dataFrameSchema = StructType(Array(StructField(ProductVariables.BRICK, StringType, false),
+      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.GENDER, StringType, false),
+      StructField(ProductVariables.RECOMMENDATIONS,ArrayType( StructType(Array(StructField(ProductVariables.QUANTITY, LongType)
+        ,StructField(ProductVariables.SKU_LIST, StringType))), true)
+      )))
+    val pivotKeys = Array(ProductVariables.BRICK,ProductVariables.MVP)
+
+    val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
+      ,pivotKeys,dataFrameSchema)
+
+    val recommendations = recOut.filter(ProductVariables.BRICK+"= 'mens shoes' and "+ProductVariables.MVP+"='1' and "+ProductVariables.GENDER+"='MEN'")
+      .select(ProductVariables.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long,String)]]
+    assert(recommendations.length==1)
+  }
+
+
+
+  "5 recommendation input skus" should "create recommendation based on brick,brand mvp and gender" in {
+    val dataFrameSchema = StructType(Array(StructField(ProductVariables.BRICK, StringType, false),
+      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.BRAND, StringType, false),
+      StructField(ProductVariables.GENDER, StringType, false),
+      StructField(ProductVariables.RECOMMENDATIONS,ArrayType( StructType(Array(StructField(ProductVariables.QUANTITY, LongType)
+        ,StructField(ProductVariables.SKU_LIST, StringType))), true)
+      )))
+    val pivotKeys = Array(ProductVariables.BRICK,ProductVariables.MVP,ProductVariables.BRAND)
+
+    val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame)
+      ,pivotKeys,dataFrameSchema)
+//
+//     val recommendations = recOut.filter(ProductVariables.BRICK+"= 'test' and "+ProductVariables.MVP+"=1 and "+ProductVariables.GENDER+"='UNISEX'")
+//      .select(ProductVariables.RECOMMENDATIONS)
+    recOut.printSchema()
+    val recommendations = recOut.filter(ProductVariables.BRICK+"= 'test' and "+ProductVariables.MVP+"='1' and "+ProductVariables.GENDER+"='UNISEX'")
+        .select(ProductVariables.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long,String)]]
+    assert(recommendations.length==3)
+  }
 
   "No category for inventory last week not sold " should "return false means should get filtered" in {
     val inventorySoldStatus = basicRecommender.inventoryWeekNotSold(null,40,20)
@@ -130,5 +183,37 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
     val inventorySoldStatus = basicRecommender.inventoryWeekNotSold("SUNGLASSES",35,20)
     assert(inventorySoldStatus==false)
   }
+
+
+  "Given a row and array of keys" should  "create a dynamic row with those keys" in {
+    val keys = Array(ProductVariables.BRICK,ProductVariables.MVP)
+    val expectedRow:Seq[Any] = Seq("test",1)
+    val row = basicRecommender.createKey(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame).head(),keys)
+    assert((row.toSeq).equals(expectedRow))
+  }
+
+
+  "Given a null row and array of keys" should  "return null row" in {
+    val keys = Array(ProductVariables.BRICK,ProductVariables.MVP)
+    val row = basicRecommender.createKey(null,keys)
+    assert(row==null)
+  }
+
+
+  "Given a  row and  no keys" should  "return null row" in {
+    val keys :Array[String] = Array()
+    val row = basicRecommender.createKey(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame).head(),keys)
+    assert(row==null)
+  }
+
+
+
+  "Given a row and array of keys with one Bad key" should  "null row" in {
+    val keys = Array(ProductVariables.BRICK,"Bad")
+    val expectedRow:Seq[Any] = Seq("test",1)
+    val row = basicRecommender.createKey(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame,10),itrDataFrame).head(),keys)
+    assert(row==null)
+  }
+
 
 }

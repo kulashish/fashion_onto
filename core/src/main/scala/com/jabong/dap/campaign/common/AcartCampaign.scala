@@ -41,14 +41,15 @@ class ACartCampaign(sQLContext: SQLContext) extends LiveCampaign with java.io.Se
     }
     orderData.foreach(println )
     orderData.printSchema()
-    val customerData = orderData.filter(CustomerVariables.CUSTOMER_FOREIGN_KEY+" is not null and sku is not null").select(CustomerVariables.CUSTOMER_FOREIGN_KEY,"sku")
+    val customerData = orderData.filter(CustomerVariables.FK_CUSTOMER+" is not null and sku is not null")
+      .select(CustomerVariables.FK_CUSTOMER,"sku")
 
     val customerSkuMap = customerData.map(t=>(t(0),t(1).toString))
     println(customerSkuMap.count())
     val customerGroup = customerSkuMap.groupByKey().map{case (key,value) => (key.toString,value.toList)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val grouped =   customerGroup.toDF(CustomerVariables.CUSTOMER_FOREIGN_KEY,"sku_list")
+    val grouped =   customerGroup.toDF(CustomerVariables.FK_CUSTOMER,"sku_list")
 
     return grouped
   }
