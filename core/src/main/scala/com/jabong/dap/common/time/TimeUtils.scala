@@ -22,7 +22,7 @@ object TimeUtils {
    */
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
-    Math.abs(today.getTime - date.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
+    daysBetweenTwoDates(today, date)
   }
 
   /**
@@ -86,14 +86,25 @@ object TimeUtils {
   }
 
   /*
-  Returns the Date as a string in the given Date Format which is given no. of days after today's date.
-  If n is negative then returns the date as a string which is given no. of days before today's date.
+   Returns the Date as a string in the given Date Format which is given no. of days after given input date.
+   If input date is null then use today's date.
+   If n is negative then returns the date as a string which is given no. of days before today's date.
    */
-  def getDateAfterNDays(noOfDays: Int, dateFormat: String): String = {
+  def getDateAfterNDays(noOfDays: Int, dateFormat: String, date: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     val cal = Calendar.getInstance()
+    if (date != null)
+      cal.setTime(sdf.parse(date))
     cal.add(Calendar.DAY_OF_MONTH, noOfDays)
     sdf.format(cal.getTime())
+  }
+
+  /*
+   Returns the Date as a string in the given Date Format which is given no. of days after today's date.
+   If n is negative then returns the date as a string which is given no. of days before today's date.
+  */
+  def getDateAfterNDays(noOfDays: Int, dateFormat: String): String = {
+    getDateAfterNDays(noOfDays, dateFormat, getTodayDate(dateFormat))
   }
 
   def getTimeStamp(date: String, dateFormat: String): Timestamp = {
