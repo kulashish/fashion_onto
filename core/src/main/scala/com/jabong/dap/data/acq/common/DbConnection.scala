@@ -46,13 +46,9 @@ case class DbConnection(source: String) {
       case "sqlserver" =>
         "jdbc:sqlserver://%s:%s;database=%s".
           format(server, port, dbName)
-      //        "jdbc:sqlserver://%s:%s;database=%s;userName=%s;password=%s".
-      //          format(server, port, dbName, userName, password)
       case "mysql" =>
         "jdbc:mysql://%s:%s/%s"
           .format(server, port, dbName)
-      //        "jdbc:mysql://%s:%s/%s?zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&user=%s&password=%s"
-      //          .format(server, port, dbName, userName, password)
       case _ => ""
     }
   }

@@ -33,22 +33,20 @@ object GetData extends Logging {
 
     val jdbcDF: DataFrame = if (primaryKey == null) {
       context.read.jdbc(dbConn.getConnectionString, dbTableQuery, dbConn.getConnectionProperties)
-      //      context.load("jdbc", Map(
-      //        "url" -> dbConn.getConnectionString,
-      //        "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0)
         return null
-      context.read.jdbc(dbConn.getConnectionString, dbTableQuery, primaryKey, minMax.min, minMax.max, 3, dbConn.getConnectionProperties)
-      //      context.load("jdbc", Map(
-      //        "url" -> dbConn.getConnectionString,
-      //        "dbtable" -> dbTableQuery,
-      //        "partitionColumn" -> primaryKey,
-      //        "lowerBound" -> minMax.min.toString,
-      //        "upperBound" -> minMax.max.toString,
-      //        "numPartitions" -> "3"))
+      context.read.jdbc(
+        dbConn.getConnectionString,
+        dbTableQuery,
+        primaryKey,
+        minMax.min,
+        minMax.max,
+        3,
+        dbConn.getConnectionProperties
+      )
     }
 
     jdbcDF.printSchema()
