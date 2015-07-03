@@ -6,7 +6,7 @@ import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.variables.{ CustomerStorecreditsHistory, CustomerSegments, Customer }
+import com.jabong.dap.model.customer.variables.{CustomerStorecreditsHistory, CustomerSegments, Customer}
 import com.jabong.dap.model.schema.SchemaVariables
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
