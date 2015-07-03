@@ -26,32 +26,6 @@ object TimeUtils {
   }
 
   /**
-   * Returns today's date as a string in the format yyyy-MM-dd.
-   */
-  def getTodayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    sdf.format(new Date())
-  }
-
-  /**
-   * Returns yesterday's date as a string in the format yyyy-MM-dd
-   */
-  def getYesterdayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    val cal = Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, -1)
-    sdf.format(cal.getTime)
-  }
-
-  /**
-   * Returns today's date as a string in the format yyyy-MM-dd--HH.
-   */
-  def getTodayDateWithHrs(): String = {
-    val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
-    sdf.format(new Date())
-  }
-
-  /**
    * Boolean test to check whether a given date string is empty (returns true) or not (returns false).
    */
   def dateStringEmpty(dt: String): Boolean = {
@@ -111,10 +85,14 @@ object TimeUtils {
       false
   }
 
-  def dateBeforeDays(n: Int, dateFormat: String): String = {
+  /*
+  Returns the Date as a string in the given Date Format which is given no. of days after today's date.
+  If n is negative then returns the date as a string which is given no. of days before today's date.
+   */
+  def getDateAfterNDays(noOfDays: Int, dateFormat: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     val cal = Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, n)
+    cal.add(Calendar.DAY_OF_MONTH, noOfDays)
     sdf.format(cal.getTime())
   }
 
@@ -126,6 +104,9 @@ object TimeUtils {
     ts
   }
 
+  /*
+  Return today's date as a string in the given date format.
+   */
   def getTodayDate(dateFormat: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     sdf.format(new Date())
