@@ -2,6 +2,7 @@ package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.Spark
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
 
 /**
  * Created by Abhay on 10/6/15.
@@ -30,22 +31,24 @@ object GetData extends Logging {
       joinTables)
     logger.info(dbTableQuery)
 
-    val jdbcDF = if (primaryKey == null) {
-      context.load("jdbc", Map(
-        "url" -> dbConn.getConnectionString,
-        "dbtable" -> dbTableQuery))
+    val jdbcDF: DataFrame = if (primaryKey == null) {
+      context.read.jdbc(dbConn.getConnectionString, dbTableQuery, dbConn.getConnectionProperties)
+//      context.load("jdbc", Map(
+//        "url" -> dbConn.getConnectionString,
+//        "dbtable" -> dbTableQuery))
     } else {
       val minMax = GetMinMaxPK.getMinMax(mode, dbConn, tableName, condition, primaryKey, limit)
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0)
-        return
-      context.load("jdbc", Map(
-        "url" -> dbConn.getConnectionString,
-        "dbtable" -> dbTableQuery,
-        "partitionColumn" -> primaryKey,
-        "lowerBound" -> minMax.min.toString,
-        "upperBound" -> minMax.max.toString,
-        "numPartitions" -> "3"))
+        return null
+      context.read.jdbc(dbConn.getConnectionString, dbTableQuery, primaryKey, minMax.min, minMax.max, 3, dbConn.getConnectionProperties)
+//      context.load("jdbc", Map(
+//        "url" -> dbConn.getConnectionString,
+//        "dbtable" -> dbTableQuery,
+//        "partitionColumn" -> primaryKey,
+//        "lowerBound" -> minMax.min.toString,
+//        "upperBound" -> minMax.max.toString,
+//        "numPartitions" -> "3"))
     }
 
     jdbcDF.printSchema()
