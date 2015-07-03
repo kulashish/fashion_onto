@@ -50,15 +50,18 @@ object Customer {
 
     }
 
-    val NLS = dfNLS.select(col(NewsletterVariables.EMAIL) as NewsletterVariables.NLS_EMAIL,
+    val NLS = dfNLS.select(
+      col(NewsletterVariables.EMAIL) as NewsletterVariables.NLS_EMAIL,
       col(NewsletterVariables.STATUS),
       col(NewsletterVariables.CREATED_AT) as NewsletterVariables.NLS_CREATED_AT,
-      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT)
+      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT
+    )
 
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     val udfCPOT = getCPOT(dfSalesOrder: DataFrame)
 
-    val dfJoin = dfCustomer.select(CustomerVariables.ID_CUSTOMER,
+    val dfJoin = dfCustomer.select(
+      CustomerVariables.ID_CUSTOMER,
       CustomerVariables.GIFTCARD_CREDITS_AVAILABLE,
       CustomerVariables.STORE_CREDITS_AVAILABLE,
       CustomerVariables.BIRTHDAY,
@@ -66,14 +69,19 @@ object Customer {
       CustomerVariables.REWARD_TYPE,
       CustomerVariables.EMAIL,
       CustomerVariables.CREATED_AT,
-      CustomerVariables.UPDATED_AT)
+      CustomerVariables.UPDATED_AT
+    )
 
       .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
 
-      .join(dfSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER),
+      .join(
+        dfSalesOrder.select(
+        col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
-        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT),
-        dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer")
+        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
+      ),
+        dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer"
+      )
 
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
 
@@ -95,7 +103,8 @@ object Customer {
                                      ACC_REG_DATE,
                                      MAX_UPDATED_AT,
                                      EMAIL_OPT_IN_STATUS,*/
-    val dfResult = dfJoin.select(col(CustomerVariables.ID_CUSTOMER),
+    val dfResult = dfJoin.select(
+      col(CustomerVariables.ID_CUSTOMER),
       col(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE),
       col(CustomerVariables.STORE_CREDITS_AVAILABLE),
       col(CustomerVariables.BIRTHDAY),
@@ -107,16 +116,25 @@ object Customer {
       col(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT),
       col(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT),
 
-      Udf.udfMinTimestamp(dfJoin(CustomerVariables.CREATED_AT),
-        dfJoin(NewsletterVariables.NLS_CREATED_AT)) as CustomerVariables.ACC_REG_DATE,
+      Udf.udfMinTimestamp(
+        dfJoin(CustomerVariables.CREATED_AT),
+        dfJoin(NewsletterVariables.NLS_CREATED_AT)
+      ) as CustomerVariables.ACC_REG_DATE,
 
-      Udf.udfMaxTimestamp(dfJoin(CustomerVariables.UPDATED_AT),
-        Udf.udfMaxTimestamp(dfJoin(NewsletterVariables.NLS_CREATED_AT),
-          dfJoin(SalesOrderVariables.SO_CREATED_AT)))
+      Udf.udfMaxTimestamp(
+        dfJoin(CustomerVariables.UPDATED_AT),
+        Udf.udfMaxTimestamp(
+          dfJoin(NewsletterVariables.NLS_CREATED_AT),
+          dfJoin(SalesOrderVariables.SO_CREATED_AT)
+        )
+      )
         as CustomerVariables.MAX_UPDATED_AT,
 
-      udfEmailOptInStatus(dfJoin(NewsletterVariables.NLS_EMAIL),
-        dfJoin(NewsletterVariables.STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
+      udfEmailOptInStatus(
+        dfJoin(NewsletterVariables.NLS_EMAIL),
+        dfJoin(NewsletterVariables.STATUS)
+      ) as CustomerVariables.EMAIL_OPT_IN_STATUS
+    )
 
     //
     //          if (isOldDate) {
