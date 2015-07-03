@@ -1,4 +1,4 @@
-package com.jabong.dap.data.merge.common
+package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
 
@@ -25,13 +25,13 @@ object MergeTables {
     val mergeMode = MergeJobConfig.mergeInfo.mergeMode
 
     val basePath = AppConfig.config.basePath
-    
+
     val dateDayBeforeYesterday = Time.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
     val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
 
     val pathFullMerged = "%s/%s/%s/%s_merged/%s/".format(basePath, source, tableName, mergeMode, dateDayBeforeYesterday)
     lazy val pathFull = "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
-    lazy val pathYesterdayData = "%s/%s/%s/%s".format(basePath, source, tableName, dateYesterday)
+    lazy val pathYesterdayData = "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
 
     val mergeBaseDataPath = if (DataVerifier.hdfsDataExists(pathFullMerged)) {
       pathFullMerged

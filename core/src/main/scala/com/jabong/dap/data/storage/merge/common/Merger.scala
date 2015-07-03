@@ -1,6 +1,6 @@
-package com.jabong.dap.data.merge.common
+package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.data.acq.common.{MergeJobConfig, MergeInfo}
+import com.jabong.dap.data.acq.common.MergeJobConfig
 
 /**
  * Created by Abhay on 2/7/15.

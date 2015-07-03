@@ -3,7 +3,7 @@ package com.jabong.dap.init
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.Delegator
-import com.jabong.dap.data.merge.MergeDelegator
+import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.product.itr.Itr
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf

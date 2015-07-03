@@ -1,4 +1,4 @@
-package com.jabong.dap.data.merge.common
+package com.jabong.dap.data.storage.merge.common
 
 import java.nio.file.{Paths, Files}
 
@@ -10,7 +10,4 @@ object DataVerifier {
     val successFile = "%s_SUCCESS".format(directory)
     Files.exists(Paths.get(successFile))
   }
-
-
-
 }

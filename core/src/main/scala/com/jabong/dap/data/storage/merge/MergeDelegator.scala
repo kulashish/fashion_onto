@@ -1,8 +1,8 @@
-package com.jabong.dap.data.merge
+package com.jabong.dap.data.storage.merge
 
 import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.common.{MergeJobConfig, MergeJobInfo, ImportInfo}
-import com.jabong.dap.data.merge.common.Merger
+import com.jabong.dap.data.storage.merge.common.Merger
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 
