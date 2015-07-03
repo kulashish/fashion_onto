@@ -1,6 +1,7 @@
-package com.jabong.dap.common
+package com.jabong.dap.data.storage.merge.common
 
-import org.apache.spark.sql.{ DataFrame, _ }
+import com.jabong.dap.common.{ArrayUtils, Spark}
+import org.apache.spark.sql.{DataFrame, _}
 
 object MergeUtils extends MergeData {
 

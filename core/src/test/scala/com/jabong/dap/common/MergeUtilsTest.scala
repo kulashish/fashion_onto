@@ -1,5 +1,6 @@
 package com.jabong.dap.common
 
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
