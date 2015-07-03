@@ -111,10 +111,10 @@ object Customer {
       .join(NLS, dfCustomer("email") === NLS("nls_email"), "outer")
       .join(
         dfSalesOrder.select(
-        col("fk_customer"),
-        col("created_at") as "so_created_at",
-        col("updated_at") as "so_updated_at"
-      ),
+          col("fk_customer"),
+          col("created_at") as "so_created_at",
+          col("updated_at") as "so_updated_at"
+        ),
         dfCustomer("id_customer") === dfSalesOrder("fk_customer"), "outer"
       )
       .join(
