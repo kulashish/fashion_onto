@@ -14,13 +14,14 @@ import com.jabong.dap.common.json.EmptyClass
  * @param password String The password for the username
  */
 case class Credentials(
-  source: String,
-  driver: String,
-  server: String,
-  port: String,
-  dbName: String,
+  source:   String,
+  driver:   String,
+  server:   String,
+  port:     String,
+  dbName:   String,
   userName: String,
-  password: String)
+  password: String
+)
 
 /**
  * Case class for application configuration
@@ -34,10 +35,11 @@ case class Credentials(
  * @param credentials List[Credentials] List of credentials.
  */
 case class Config(
-  applicationName: String = null,
-  master: String = null,
-  basePath: String = null,
-  credentials: List[Credentials] = null) extends EmptyClass
+  applicationName: String            = null,
+  master:          String            = null,
+  basePath:        String            = null,
+  credentials:     List[Credentials] = null
+) extends EmptyClass
 
 /**
  * Object to access config variables application wide
