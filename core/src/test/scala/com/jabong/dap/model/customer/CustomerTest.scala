@@ -1,22 +1,18 @@
 package com.jabong.dap.model.customer
 
-import java.sql.Timestamp
-
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{Spark, SharedSparkContext}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.variables.{CustomerStorecreditsHistory, CustomerSegments, Customer}
+import com.jabong.dap.model.customer.variables.{ CustomerStorecreditsHistory, CustomerSegments, Customer }
 import com.jabong.dap.model.schema.SchemaVariables
-import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
+import org.apache.spark.sql.{SQLContext, DataFrame, Row}
 import org.scalatest.FlatSpec
 
 /**
  * Created by raghu on 16/6/15.
  */
 class CustomerTest extends FlatSpec with SharedSparkContext {
-
-  @transient var sqlContext: SQLContext = _
 
   @transient var dfCustomer: DataFrame = _
   @transient var dfNLS: DataFrame = _
@@ -27,7 +23,6 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
 
     super.beforeAll()
-
     dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
     dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
     dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)
@@ -42,7 +37,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getCustomer: Data Frame dfCustomer, dfNLS, dfSalesOrder" should "null" in {
 
-    val result = Customer.getCustomer(null, null, null)
+    val result = Customer.getCustomer(null, null, null, null)
 
     assert(result == null)
 
@@ -54,7 +49,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
       val result = Customer.getCustomer(
         dfCustomer: DataFrame,
         dfNLS: DataFrame,
-        dfSalesOrder: DataFrame)
+        dfSalesOrder: DataFrame, null)
       assert(result != null)
 
     }
@@ -64,10 +59,10 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame)
+      dfSalesOrder: DataFrame, null)
       .limit(30).collect().toSet
 
-    //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
+    //               result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer" + ".json")
 
     val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer",
       SchemaVariables.resultCustomer)
@@ -118,7 +113,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = Customer.getCPOT(dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
 
-    //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+//            result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
     val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
       SchemaVariables.customersPreferredOrderTimeslot)
@@ -154,7 +149,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
       .limit(30).collect().toSet
 
-    //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
+    //                result.limit(30).write.json(DataSets.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
     val dfLastJrCovertDate = JsonUtils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
       SchemaVariables.last_jr_covert_date)
@@ -190,7 +185,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
       .limit(30).collect().toSet
 
-    //                        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
+    //                        result.limit(30).write.json(DataSets.TEST_RESOURCES + "mvp_seg" + ".json")
 
     val dfMvpSeg = JsonUtils.readFromJson(DataSets.CUSTOMER, "mvp_seg", SchemaVariables.mvp_seg)
       .collect().toSet
