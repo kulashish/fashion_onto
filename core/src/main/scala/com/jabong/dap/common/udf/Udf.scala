@@ -11,6 +11,8 @@ object Udf {
 
 //  val hiveContext = Spark.getHiveContext()
 //  import hiveContext.implicits._
+// Define User Defined Functions
+//  val sqlContext = Spark.getSqlContext()
 
   //minTimestamp will return min of Timestamp t1 or t2
   val minTimestamp = udf((t1: Timestamp, t2: Timestamp) => UdfUtils.getMin(t1: Timestamp, t2: Timestamp))
