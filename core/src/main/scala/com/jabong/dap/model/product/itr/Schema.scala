@@ -39,22 +39,21 @@ object Schema {
         StructField("family", StringType, true) ::
         StructField("segment", StringType, true) ::
         StructField("businessUnit", StringType, true) ::
-        StructField("idCatalogConfig", IntegerType, true) ::
-        StructField("productName", StringType, true) ::
-        StructField("specialMargin", DecimalType.apply(6, 2), true) ::
-        StructField("margin", DecimalType.apply(6, 2), true) ::
-        StructField("activatedAt", TimestampType, true) ::
-        StructField("sku", StringType, true) ::
         StructField("idCatalogSimple", IntegerType, true) ::
-        StructField("specialPrice", DecimalType.apply(10, 2), true) ::
         StructField("specialToDate", DateType, true) ::
         StructField("specialFromDate", DateType, true) ::
         StructField("simpleSku", StringType, true) ::
-        StructField("supplierStatus", StringType, true) ::
-        StructField("brandUrlKey", StringType, true) ::
         StructField("visibility", BooleanType, true) ::
         StructField("quantity", LongType, true) ::
-        StructField("productUrl", StringType, true) :: Nil
+        StructField("idCatalogConfig", IntegerType, true) ::
+        StructField("productName", StringType, true) ::
+        StructField("activatedAt", TimestampType, true) ::
+        StructField("configSku", StringType, true) ::
+        StructField("supplierStatus", StringType, true) ::
+        StructField("productUrl", StringType, true) ::
+        StructField("specialMargin", DecimalType.apply(6, 2), true) ::
+        StructField("margin", DecimalType.apply(6, 2), true) ::
+        StructField("specialPrice", DecimalType.apply(10, 2), true) :: Nil
     )
 }
 

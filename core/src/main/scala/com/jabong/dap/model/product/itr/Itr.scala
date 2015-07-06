@@ -4,6 +4,7 @@ import com.jabong.dap.common.{ Constants, Spark, AppConfig }
 import com.jabong.dap.common.utils.Time
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
+import org.apache.spark.sql.functions._
 
 class Itr extends java.io.Serializable with Logging {
 
@@ -15,60 +16,16 @@ class Itr extends java.io.Serializable with Logging {
   def start(): Unit = {
     val erpDF = ERP.getERPColumns()
     val bobDF = Bob.getBobColumns()
-    val itrRDD = erpDF.join(bobDF, erpDF.col("jabongCode") === bobDF.col("simpleSku"), "left_outer")
-      .select(
-        "barcodeEan",
-        "vendorItemNo",
-        "heelHeight",
-        "sleeve",
-        "fit",
-        "neck",
-        "style",
-        "material",
-        "supplierColor",
-        "styleName",
-        "supplierStyleCode",
-        "dispatchLocation",
-        "packaging",
-        "shipping",
-        "reportingSubcategory",
-        "reportingCategory",
-        "brandType",
-        "itemType",
-        "season",
-        "mrpPrice",
-        "color",
-        "size",
-        "jabongCode",
-        "petStyleCode",
-        "gender",
-        "brick",
-        "class",
-        "family",
-        "segment",
-        "businessUnit",
-        "idCatalogConfig",
-        "productName",
-        "specialMargin",
-        "margin",
-        "activatedAt",
-        "sku",
-        "idCatalogSimple",
-        "specialPrice",
-        "specialToDate",
-        "specialFromDate",
-        "simpleSku",
-        "supplierStatus",
-        "brandUrlKey",
-        "visibility",
-        "quantity",
-        "productUrl"
-      )
+    val itr = erpDF.join(bobDF, erpDF.col("jabongCode") === bobDF.col("simpleSku"), "left_outer").na.fill(Map(
+      "specialMargin" -> 0.00,
+      "margin" -> 0.00,
+      "specialPrice" -> 0.00,
+      "quantity" -> 0
+    ))
 
-    Spark.getHiveContext().createDataFrame(itrRDD.toJavaRDD, Schema.schema).limit(5).write.mode(SaveMode.Overwrite).format("orc").save(getPath())
-//    itrRDD.show(5)
+    itr.limit(10).write.mode(SaveMode.Overwrite).format("orc").save(getPath())
 
-    itrRDD.limit(5).write.mode(SaveMode.Overwrite).format("json").save(getPath())
+    //    PriceBand.preparePriceBrand()
   }
 
   def getPath(): String = {

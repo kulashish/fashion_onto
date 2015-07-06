@@ -15,75 +15,88 @@ object Bob {
    * @return DataFrame
    */
   def getBobColumns(): DataFrame = {
-    val stockDataFrame = stockDF()
-    val visibilityDataFrame = visibilityDF()
-
-    val bob = Model.simple.select(
+    val simpleDF = Model.simple.select(
       "id_catalog_simple",
       "special_price",
       "special_to_date",
       "special_from_date",
       "sku",
       "fk_catalog_config"
-    ).withColumnRenamed("sku", "simpleSku").
-      join(Model.config.select(
-        "id_catalog_config",
-        "name",
-        "special_margin",
-        "margin",
-        "activated_at",
-        "sku",
-        "fk_catalog_supplier",
-        "fk_catalog_brand"
-      ), Model.config("id_catalog_config") === Model.simple("fk_catalog_config")).
-      join(
-        Model.supplier.value.select("status", "id_catalog_supplier").withColumnRenamed("status", "supplierStatus"),
-        Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier")
-      ).
-        join(
-          Model.brand.value.select("url_key", "id_catalog_brand").withColumnRenamed("url_key", "brandUrlKey"),
-          Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand")
-        ).join(
-            visibilityDataFrame,
-            visibilityDataFrame.col("idCatalogSimple") === Model.simple.col("id_catalog_simple"),
-            "left_outer"
-          ).join(
-              stockDataFrame,
-              stockDataFrame.col("idCatalogSimple") === Model.simple.col("id_catalog_simple"),
-              "left_outer"
-            ).
-              select(
-                "id_catalog_config",
-                "name",
-                "special_margin",
-                "margin",
-                "activated_at",
-                "sku",
-                "id_catalog_simple",
-                "special_price",
-                "special_to_date",
-                "special_from_date",
-                "simpleSku",
-                "supplierStatus",
-                "brandUrlKey",
-                "visibility",
-                "quantity"
-              ).
-                withColumnRenamed("id_catalog_config", "idCatalogConfig").
-                withColumnRenamed("name", "productName").
-                withColumnRenamed("special_margin", "specialMargin").
-                withColumnRenamed("activated_at", "activatedAt").
-                withColumnRenamed("id_catalog_simple", "idCatalogSimple").
-                withColumnRenamed("special_price", "specialPrice").
-                withColumnRenamed("special_to_date", "specialToDate").
-                withColumnRenamed("special_from_date", "specialFromDate")
+    ).withColumnRenamed("id_catalog_simple", "idCatalogSimple").
+      withColumnRenamed("special_price", "specialPrice").
+      withColumnRenamed("special_to_date", "specialToDate").
+      withColumnRenamed("special_from_date", "specialFromDate").
+      withColumnRenamed("sku", "simpleSku")
+
+    val visibilityDataFrame = visibilityDF()
+    val vDF = visibilityDataFrame.select("idCatalogSimple", "visibility").withColumnRenamed("idCatalogSimple", "vIdCatalogSimple")
+    val visibilityDaFr = simpleDF.join(
+      vDF,
+      vDF.col("vIdCatalogSimple") === simpleDF.col("idCatalogSimple"),
+      "left_outer"
+    )
+
+    val stockDataFrame = stockDF()
+    val sDF = stockDataFrame.select("idCatalogSimple", "quantity").withColumnRenamed("idCatalogSimple", "stockIdCatalogSimple")
+    val quantityDF = visibilityDaFr.join(
+      sDF,
+      sDF.col("stockIdCatalogSimple") === simpleDF.col("idCatalogSimple"),
+      "left_outer"
+    )
+
+    val config = Model.config.select(
+      "id_catalog_config",
+      "name",
+      "special_margin",
+      "margin",
+      "activated_at",
+      "sku",
+      "fk_catalog_supplier",
+      "fk_catalog_brand"
+    ).
+      withColumnRenamed("id_catalog_config", "idCatalogConfig").
+      withColumnRenamed("name", "productName").
+      withColumnRenamed("special_margin", "specialMargin").
+      withColumnRenamed("activated_at", "activatedAt").
+      withColumnRenamed("sku", "configSku")
+
+    val configDF = quantityDF.join(
+      config,
+      config("idCatalogConfig") === simpleDF("fk_catalog_config")
+    )
+
+    val supplierDF = configDF.join(
+      Model.supplier.value.select("status", "id_catalog_supplier").withColumnRenamed("status", "supplierStatus"),
+      Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier")
+    )
 
     val productUrl = udf(url)
 
-    bob.
-      withColumn(
+    val brandDF = supplierDF.join(
+      Model.brand.value.select("url_key", "id_catalog_brand").withColumnRenamed("url_key", "brandUrlKey"),
+      configDF("fk_catalog_brand") === Model.brand.value("id_catalog_brand")
+    ).withColumn(
         "productUrl",
         productUrl(col("idCatalogConfig"), col("brandUrlKey"), col("productName"))
+      )
+
+    brandDF.
+      select(
+        "idCatalogSimple",
+        "specialToDate",
+        "specialFromDate",
+        "simpleSku",
+        "visibility",
+        "quantity",
+        "idCatalogConfig",
+        "productName",
+        "activatedAt",
+        "configSku",
+        "supplierStatus",
+        "productUrl",
+        "specialMargin",
+        "margin",
+        "specialPrice"
       )
   }
 
@@ -108,7 +121,7 @@ object Bob {
           Model.simple.col("sku") === reservedDF.col("simpleSku")
         ).withColumn(
             "quantity",
-            stockUDF(col("quantity"), col("is_reserved"))
+            stockUDF(col("quantity"), col("reservedCount"))
           ).select(
               "id_catalog_simple",
               "quantity"
@@ -137,7 +150,7 @@ object Bob {
   }
 
   def simpleReservedDF(): DataFrame = {
-    Model.salesOrderItem.filter("is_reserved = 1").groupBy("sku").agg(count("is_reserved") as "is_reserved").withColumnRenamed("sku", "simpleSku")
+    Model.salesOrderItem.filter("is_reserved = 1").groupBy("sku").agg(count("is_reserved") as "reservedCount").withColumnRenamed("sku", "simpleSku")
   }
 
   /**
@@ -147,87 +160,100 @@ object Bob {
    * @return DataFrame
    */
   def visibilityDF(): DataFrame = {
-    val categoryMapping = Model.category.value.select("status", "id_catalog_category").
-      withColumnRenamed("status", "categoryStatus").
-      join(
-        Model.categoryMapping.select("fk_catalog_category", "fk_catalog_config"),
-        Model.categoryMapping.col("fk_catalog_category") === Model.category.value.col("id_catalog_category")
-      ).select("categoryStatus", "fk_catalog_config")
-
-    val image = Model.productImage.groupBy("fk_catalog_config").agg(count("image") as "image_count")
-
-    val reservedDF = simpleReservedDF()
-    val ss = Model.simple.select(
+    val simpleDF = Model.simple.select(
       "sku",
       "fk_catalog_config",
       "id_catalog_simple"
     ).withColumnRenamed("sku", "simpleSku").
-      join(Model.config.select(
-        "id_catalog_config",
-        "status",
-        "status_supplier_config",
-        "fk_catalog_supplier",
-        "pet_approved",
-        "fk_catalog_brand"
-      ), Model.simple.col("fk_catalog_config") === Model.config.col("id_catalog_config")).
+      withColumnRenamed("fk_catalog_config", "fkCatalogConfig").
+      withColumnRenamed("id_catalog_simple", "idCatalogSimple")
+
+    val image = Model.productImage.groupBy("fk_catalog_config").agg(count("image") as "imageCount")
+    val configDF = Model.config.select(
+      "id_catalog_config",
+      "status",
+      "status_supplier_config",
+      "fk_catalog_supplier",
+      "pet_approved",
+      "fk_catalog_brand"
+    ).withColumnRenamed("status", "configStatus").
+      withColumnRenamed("id_catalog_config", "idCatalogConfig").
+      withColumnRenamed("status_supplier_config", "statusSupplierConfig").
+      withColumnRenamed("pet_approved", "petApproved")
+
+    val supplierDF = configDF.
       join(
         Model.supplier.value.select("status", "id_catalog_supplier").
           withColumnRenamed("status", "supplierStatus"),
-        Model.config.col("fk_catalog_supplier") === Model.supplier.value.col("id_catalog_supplier")
+        configDF.col("fk_catalog_supplier") === Model.supplier.value.col("id_catalog_supplier")
       ).join(
           image,
-          image.col("fk_catalog_config") === Model.config.col("id_catalog_config")
+          image.col("fk_catalog_config") === configDF.col("idCatalogConfig")
         ).join(
             Model.brand.value.select("status", "id_catalog_brand")
               .withColumnRenamed("status", "brandStatus"),
-            Model.brand.value.col("id_catalog_brand") === Model.config.col("fk_catalog_brand"),
+            Model.brand.value.col("id_catalog_brand") === configDF.col("fk_catalog_brand"),
+            "left_outer"
+          ).select(
+              "idCatalogConfig",
+              "configStatus",
+              "statusSupplierConfig",
+              "supplierStatus",
+              "brandStatus",
+              "petApproved",
+              "imageCount"
+            )
+
+    val sConfigDF = simpleDF.join(supplierDF, simpleDF.col("fkCatalogConfig") === supplierDF.col("idCatalogConfig"))
+
+    val category = Model.category.value.select("status", "id_catalog_category").
+      withColumnRenamed("status", "categoryStatus").
+      withColumnRenamed("id_catalog_category", "idCatalogCategory")
+
+    val categoryStatus = category.
+      join(
+        Model.categoryMapping.select("fk_catalog_category", "fk_catalog_config"),
+        Model.categoryMapping.col("fk_catalog_category") === category.col("idCatalogCategory")
+      ).select("categoryStatus", "fk_catalog_config").
+        withColumnRenamed("fk_catalog_config", "fkCatalogConfig")
+
+    val reservedDF = simpleReservedDF()
+    val stockDataFrame = sConfigDF.
+      join(
+        categoryStatus,
+        categoryStatus.col("fkCatalogConfig") === sConfigDF.col("idCatalogConfig"),
+        "left_outer"
+      ).join(
+          reservedDF,
+          sConfigDF.col("simpleSku") === reservedDF.col("simpleSku"), "left_outer"
+        ).join(
+            Model.catalogStock.select("fk_catalog_simple", "quantity"),
+            Model.catalogStock.col("fk_catalog_simple") === sConfigDF.col("idCatalogSimple"),
             "left_outer"
           )
 
     val visibilityUDF = udf(simpleVisibility)
-    ss.join(
-      reservedDF,
-      ss.col("simpleSku") === reservedDF.col("simpleSku"), "left_outer"
-    ).join(
-        categoryMapping.select("categoryStatus", "fk_catalog_config"),
-        categoryMapping.col("fk_catalog_config") === ss.col("id_catalog_config"),
-        "left_outer"
-      ).join(
-          Model.catalogStock.select("fk_catalog_simple", "quantity"),
-          Model.catalogStock.col("fk_catalog_simple") === ss.col("id_catalog_simple"),
-          "left_outer"
-        ).select(
-            "id_catalog_simple",
-            "status",
-            "categoryStatus",
-            "supplierStatus",
-            "brandStatus",
-            "status_supplier_config",
-            "pet_approved",
-            "image_count",
-            "is_reserved",
-            "quantity"
-          ).withColumn(
-              "visibility",
-              visibilityUDF(
-                col("status"),
-                col("categoryStatus"),
-                col("supplierStatus"),
-                col("brandStatus"),
-                col("status_supplier_config"),
-                col("pet_approved"),
-                col("image_count"),
-                col("is_reserved"),
-                col("quantity")
-              )
-            ).select(
-                "id_catalog_simple",
-                "visibility"
-              ).
-                withColumnRenamed(
-                  "id_catalog_simple",
-                  "idCatalogSimple"
-                )
+    stockDataFrame.withColumn(
+      "visibility",
+      visibilityUDF(
+        col("configStatus"),
+        col("categoryStatus"),
+        col("supplierStatus"),
+        col("brandStatus"),
+        col("statusSupplierConfig"),
+        col("petApproved"),
+        col("imageCount"),
+        col("reservedCount"),
+        col("quantity")
+      )
+    ).select(
+        "idCatalogSimple",
+        "visibility"
+      ).
+        withColumnRenamed(
+          "id_catalog_simple",
+          "idCatalogSimple"
+        )
 
   }
 
