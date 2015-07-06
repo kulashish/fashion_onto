@@ -29,7 +29,6 @@ object QueryBuilder {
     (selectString, joinString)
   }
 
-
   def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String) = {
     val tableName = AcqImportInfo.tableInfo.tableName
     val limit = AcqImportInfo.tableInfo.limit
@@ -54,7 +53,7 @@ object QueryBuilder {
           limitString._2, limitString._1)
       case _ => ""
     }
-}
+  }
 
   def getDataQuery(driver: String, condition: String) = {
     val mode = AcqImportInfo.tableInfo.mode

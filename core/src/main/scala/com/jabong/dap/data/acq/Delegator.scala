@@ -5,15 +5,13 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.hadoop.fs.{ Path, FileSystem }
 
 /**
  * Reads and parses the JSON file to run various
  * data collection jobs.
  */
 class Delegator extends Serializable with Logging {
-
-
 
   def start(tableJsonPath: String) = {
     val validated = try {
