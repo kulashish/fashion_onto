@@ -3,6 +3,9 @@ package com.jabong.dap.data.storage.merge
 import com.jabong.dap.data.acq.common.MergeJobInfo
 import com.jabong.dap.data.acq.common.MergeInfo
 
+/**
+ * Validator for the JSON file used for data merge.
+ */
 object MergeJsonValidator {
 
   private def validateRequiredFields(mergeJob: MergeInfo) = {

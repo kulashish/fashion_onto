@@ -1,0 +1,13 @@
+{
+  "merge": [
+    {
+      "source": "bob",
+      "tableName": "sales_order",
+      "primaryKey": "id_sales_order",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveFormat": "parquet",
+      "saveMode": "overwrite"
+    }
+  ]
+}
