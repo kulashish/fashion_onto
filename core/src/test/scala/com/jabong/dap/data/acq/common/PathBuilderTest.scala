@@ -1,10 +1,8 @@
 package com.jabong.dap.data.acq.common
 
-import java.io.File
-
-import com.jabong.dap.common.{ AppConfig, Config }
 import com.jabong.dap.common.time.TimeUtils
-import org.scalatest.{ Matchers, FlatSpec }
+import com.jabong.dap.common.{ AppConfig, Config }
+import org.scalatest.{ FlatSpec, Matchers }
 
 /**
  * Created by Abhay on 22/6/15.
@@ -38,7 +36,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
       limit = "100", filterCondition = null,
       joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    val dateNow = TimeUtils.getTodayDateWithHrs().replaceAll("-", File.separator)
+    val dateNow = TimeUtils.getTodayDate("yyyy/MM/dd/HH")
     val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
     PathBuilder.getPath() should be (outputPath)
   }
@@ -48,7 +46,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
       limit = "100", filterCondition = null,
       joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    val dateYesterday = TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     val outputPath = "basePath/source/tableName/" + dateYesterday + "/"
     PathBuilder.getPath() should be (outputPath)
   }

@@ -1,6 +1,5 @@
 package com.jabong.dap.data.acq.common
 
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -22,11 +21,11 @@ object PathBuilder {
 
     AcqImportInfo.tableInfo.mode match {
       case "full" =>
-        val dateNow = TimeUtils.getTodayDateWithHrs().replaceAll("-", File.separator)
+        val dateNow = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
-          val dateYesterday = TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
+          val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
           "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
         } else {
           val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
