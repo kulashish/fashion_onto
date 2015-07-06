@@ -26,10 +26,10 @@ object PathBuilder {
     }
   }
 
-  private def getDateYesterdayDataPath (): String = {
-    if (mergeDate == null){
-      TimeUtils.getDateAfterNDays(-1,Constants.DATE_FORMAT).replaceAll("-", File.separator)
-    }  else {
+  private def getDateYesterdayDataPath(): String = {
+    if (mergeDate == null) {
+      TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT).replaceAll("-", File.separator)
+    } else {
       mergeDate.replaceAll("-", File.separator)
     }
   }
