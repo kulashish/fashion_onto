@@ -95,6 +95,15 @@ object MergeJobConfig {
   var mergeInfo: MergeInfo = null
 }
 
+/**
+ * Object to access ImportInfo variables application wide
+ */
+object AcqImportInfo {
+  var importInfo: ImportInfo = null
+  var tableInfo: TableInfo = null
+
+}
+
 object DaoUtil extends Logging {
 
   private val driverLoaded = scala.collection.mutable.Map("mysql" -> false, "sqlserver" -> false)

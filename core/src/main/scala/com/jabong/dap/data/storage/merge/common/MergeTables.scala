@@ -5,7 +5,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.data.acq.common.MergeJobConfig
 
 /**
- * Created by Abhay on 2/7/15.
+ * Used to merge the data on the basis of the merge type.
  */
 
 object MergeTables {

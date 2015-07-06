@@ -5,9 +5,11 @@ import java.io.File
 import com.jabong.dap.common.AppConfig
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.MergeJobConfig
+import com.jabong.dap.common.time.Constants
 
 /**
- * Created by Abhay on 3/7/15.
+ * Builds the path for the input data for creating the dataframes and
+ * the path at which the data is to be saved.
  */
 object PathBuilder {
 
@@ -18,15 +20,15 @@ object PathBuilder {
 
   private def getDateDayBeforeYesterdayPath (): String = {
     if (mergeDate == null) {
-      TimeUtils.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
+      TimeUtils.getDateAfterNDays(-2, Constants.DATE_FORMAT).replaceAll("-", File.separator)
     } else {
-      TimeUtils.getYesterdayDate(mergeDate).replaceAll("-", File.separator)
+      TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT, mergeDate).replaceAll("-", File.separator)
     }
   }
 
   private def getDateYesterdayDataPath (): String = {
     if (mergeDate == null){
-      TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
+      TimeUtils.getDateAfterNDays(-1,Constants.DATE_FORMAT).replaceAll("-", File.separator)
     }  else {
       mergeDate.replaceAll("-", File.separator)
     }

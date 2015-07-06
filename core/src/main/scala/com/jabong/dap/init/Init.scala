@@ -12,7 +12,6 @@ import org.apache.hadoop.fs._
 import net.liftweb.json._
 
 
-
 object Init {
 
   /**
@@ -74,6 +73,7 @@ object Init {
         val path = new Path(params.config)
         val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
         val config = json.extract[Config]
+
         ConfigJsonValidator.validate(config)
         AppConfig.config = config
         // initialize spark context

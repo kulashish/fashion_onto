@@ -3,7 +3,7 @@ package com.jabong.dap.data.storage.merge.common
 import java.nio.file.{Paths, Files}
 
 /**
- * Created by Abhay on 2/7/15.
+ * Verifies if the data exits at a given location.
  */
 object DataVerifier {
   def hdfsDataExists(directory: String) : Boolean = {

@@ -1,6 +1,7 @@
 package com.jabong.dap.data.storage.merge
 
 import com.jabong.dap.data.acq.common._
+import com.jabong.dap.data.storage.merge.common.Merger
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
