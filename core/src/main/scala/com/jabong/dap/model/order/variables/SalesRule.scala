@@ -1,5 +1,6 @@
 package com.jabong.dap.model.order.variables
 
+import com.jabong.dap.common.constants.variables.SalesRuleVariables
 import com.jabong.dap.common.{ Spark, MergeUtils}
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
@@ -12,8 +13,8 @@ import org.apache.spark.sql.functions._
 object SalesRule {
 
   def getCode(salesRule : DataFrame, c :Int):DataFrame={
-    val filData = salesRule.filter(salesRule("code").startsWith("WC"+c+"0"))
-    val wcCode = filData.select("fk_customer", "updated_at", "code", "created_at", "to_date")
+    val filData = salesRule.filter(salesRule(SalesRuleVariables.CODE).startsWith("WC"+c+"0"))
+    val wcCode = filData.select(SalesRuleVariables.FK_CUSTOMER, SalesRuleVariables.UPDATED_AT, SalesRuleVariables.CODE, SalesRuleVariables.CREATED_AT, SalesRuleVariables.TO_DATE)
     wcCode.printSchema()
     wcCode.show(1)
     println(wcCode.count())
@@ -25,14 +26,14 @@ object SalesRule {
     val salesRule = Spark.getSqlContext().read.parquet(salesRulePath)
     val wc10 = getCode(salesRule,1)
     val wc20 = getCode(salesRule,2)
-    wc10.write.parquet(DataSets.VARIABLE_PATH + "welcome1/"+ curr)
-    wc20.write.parquet(DataSets.VARIABLE_PATH + "welcome2/"+ curr)
-    val wc10Prev = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH  + "welcome1/full/"+ prev)
-    val wc20Prev = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH  + "welcome2/full/"+ prev)
-    val wc10Full = MergeUtils.InsertUpdateMerge(wc10Prev, wc10, "fk_customer")
-    val wc20Full = MergeUtils.InsertUpdateMerge(wc10Prev, wc20, "fk_customer")
-    wc10Full.write.parquet(DataSets.VARIABLE_PATH + "welcome1/full" + curr)
-    wc20Full.write.parquet(DataSets.VARIABLE_PATH + "welcome2/full" + curr)
+    wc10.write.parquet(DataSets.VARIABLE_PATH +SalesRuleVariables.WELCOME1+ curr)
+    wc20.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME2+ curr)
+    val wc10Prev = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH  + SalesRuleVariables.WELCOME1+"full/"+ prev)
+    val wc20Prev = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH  + SalesRuleVariables.WELCOME2+"full/"+ prev)
+    val wc10Full = MergeUtils.InsertUpdateMerge(wc10Prev, wc10, SalesRuleVariables.FK_CUSTOMER)
+    val wc20Full = MergeUtils.InsertUpdateMerge(wc10Prev, wc20, SalesRuleVariables.FK_CUSTOMER)
+    wc10Full.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME1+"full/" + curr)
+    wc20Full.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME2+"full/" + curr)
   }
 
 

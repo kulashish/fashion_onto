@@ -2,6 +2,8 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.{Spark}
 import org.apache.spark.sql.DataFrame
+import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
+
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
@@ -10,38 +12,27 @@ import org.apache.spark.sql.types._
  */
 object SalesOrder {
 
-
-  /**
-   *
-   * @param date
-   */
-  def create(date:String){
-    val salesOrder = Spark.getSqlContext().read.parquet("")
-
-
-  }
-
   /**
    *
    * @param salesOrders
    * @return
    */
   def couponScore(salesOrders: DataFrame): DataFrame = {
-    val salesOrderNew = salesOrders.select("fk_customer", "coupon_code").na.drop()
-    val couponScore = salesOrderNew.groupBy("fk_customer").agg(count("coupon_code") as "coupn_score")
+    val salesOrderNew = salesOrders.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.COUPON_CODE).na.drop()
+    val couponScore = salesOrderNew.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(count(SalesOrderVariables.COUPON_CODE) as SalesOrderVariables.COUPON_SCORE)
     return couponScore
   }
 
   def processVariables(prev : DataFrame, curr: DataFrame): DataFrame   = {
-    val gRDD = curr.groupBy("fk_customer").agg( max("created_at") as "last_order_date",
-                                                min("created_at") as "first_order_date",
-                                                count("created_at") as "orders_count",
-                                                count("created_at")-count("created_at") as "days_since_last_order")
+    val gRDD = curr.groupBy(SalesOrderVariables.FK_CUSTOMER).agg( max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.LAST_ORDER_DATE,
+                                                min(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.FIRST_ORDER_DATE,
+                                                count(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.ORDERS_COUNT,
+                                                count(SalesOrderVariables.CREATED_AT)-count(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.DAYS_SINCE_LAST_ORDER)
     val joinedRDD = prev.unionAll(gRDD)
-    val res =joinedRDD.groupBy("fk_customer").agg(max("created_at") as "last_order_date",
-                                                  min("created_at") as "first_order_date",
-                                                  sum("orders_count") as "orders_count",
-                                                  min("days_since_last_order")+1 as "days_since_last_order")
+    val res =joinedRDD.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.LAST_ORDER_DATE,
+                                                  min(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.FIRST_ORDER_DATE,
+                                                  sum(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.ORDERS_COUNT,
+                                                  min(SalesOrderVariables.DAYS_SINCE_LAST_ORDER)+1 as SalesOrderVariables.DAYS_SINCE_LAST_ORDER)
 
     return res
   }

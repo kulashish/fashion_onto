@@ -6,7 +6,7 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest.FlatSpec
 
 
-/**
+  /**
   * Created by jabong on 29/6/15.
   */
 class SalesRuleTest extends FlatSpec with SharedSparkContext{
@@ -34,7 +34,5 @@ class SalesRuleTest extends FlatSpec with SharedSparkContext{
      wcCodes.collect.foreach(println)
      assert(wcCodes.collect.size == 3)
    }
-
-
 
  }
