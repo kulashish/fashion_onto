@@ -1,10 +1,12 @@
 package com.jabong.dap.data.storage.merge
 
-import com.jabong.dap.common.json.Parser
-import com.jabong.dap.data.acq.common.{MergeJobConfig, MergeJobInfo, ImportInfo}
-import com.jabong.dap.data.storage.merge.common.Merger
+import com.jabong.dap.data.acq.common._
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
+import net.liftweb.json._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{Path, FileSystem}
+
 
 
 /**
@@ -14,7 +16,12 @@ import net.liftweb.json.JsonParser.ParseException
 class MergeDelegator extends Serializable with Logging {
   def start(mergeJsonPath: String) = {
     val validated = try {
-      MergeJobConfig.mergeJobInfo = Parser.parseJson[MergeJobInfo](mergeJsonPath)
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(mergeJsonPath)
+      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      MergeJobConfig.mergeJobInfo = json.extract[MergeJobInfo]
       MergeJsonValidator.validate(MergeJobConfig.mergeJobInfo)
       true
     } catch {
