@@ -1,12 +1,12 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{Spark, SharedSparkContext}
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.variables.{ CustomerStorecreditsHistory, CustomerSegments, Customer }
 import com.jabong.dap.model.schema.SchemaVariables
-import org.apache.spark.sql.{SQLContext, DataFrame, Row}
+import org.apache.spark.sql.{ SQLContext, DataFrame, Row }
 import org.scalatest.FlatSpec
 
 /**
@@ -55,6 +55,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     }
 
   "getCustomer: Data Frame" should "match to resultant Data Frame" in {
+
+    //"2015-07-05"
 
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
@@ -113,7 +115,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = Customer.getCPOT(dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
 
-//            result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+    //            result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
     val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
       SchemaVariables.customersPreferredOrderTimeslot)

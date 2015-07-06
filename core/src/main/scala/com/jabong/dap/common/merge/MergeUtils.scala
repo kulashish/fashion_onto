@@ -6,7 +6,7 @@ import com.jabong.dap.common.{ ArrayUtils, Spark }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.{ DataFrame, _ }
 
-object MergeUtils extends MergeData  {
+object MergeUtils extends MergeData {
 
   val NEW_ = "new_"
 

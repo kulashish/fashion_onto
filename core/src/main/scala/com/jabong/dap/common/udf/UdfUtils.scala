@@ -46,54 +46,103 @@ object UdfUtils {
   }
 
   //return latest value
-  def getLatestValue(a1: Any, a2: Any): Any = {
+  def getLatest[T](a1: T, a2: T): T = {
 
     if (a2 == null) a1 else a2
 
   }
 
   //this will merge two slots data
-  def getMergeSlots(oldSlot: Any, newSlot: Any): (String, Int) = {
+  def getMergeSlots(oldSlot: Any, newSlot: Any): (String) = {
+
     if (oldSlot == null && newSlot == null) {
+
       return null
     }
     if (oldSlot == null) {
-      return (newSlot.toString, getMaxSlot(newSlot))
+
+      return newSlot.toString
     }
     if (newSlot == null) {
-      return (oldSlot.toString, getMaxSlot(oldSlot))
-    }
-    var max = 0
 
-    var maxSlot = 0
+      return oldSlot.toString
+    }
+
     val oldSlotArray = oldSlot.toString.split("!")
+
     val newSlotArray = newSlot.toString.split("!")
+
     var finalSlotArray = new Array[Int](oldSlotArray.length)
 
     for (i <- 0 to oldSlotArray.length - 1) {
+
       finalSlotArray(i) = oldSlotArray(i).toInt + newSlotArray(i).toInt
-      if (finalSlotArray(i) > max) {
-        max = finalSlotArray(i)
-        maxSlot = i + 1
-      }
     }
 
-    return (ArrayUtils.arrayToString(finalSlotArray, 0), maxSlot)
+    return (ArrayUtils.arrayToString(finalSlotArray, 0))
   }
 
   //this method will return max value from slot data
-  def getMaxSlot(slots: Any): Int = {
-    var max = 0
+  def getMaxSlot(oldSlot: Any, newSlot: Any): Int = {
+
+    if (oldSlot == null && newSlot == null) {
+
+      return 0
+    }
+    if (oldSlot == null) {
+
+      return getMaxSlot(newSlot)
+    }
+    if (newSlot == null) {
+
+      return getMaxSlot(oldSlot)
+    }
+
     var maxSlot = 0
-    val slotArray = slots.toString.split("!")
-    for (i <- 0 to slotArray.length - 1) {
-      if (slotArray(i).toInt > max) {
-        max = slotArray(i).toInt
+
+    var maxOld = 0
+
+    var maxNew = 0
+
+    val oldSlotArray = oldSlot.toString.split("!")
+
+    val newSlotArray = newSlot.toString.split("!")
+
+    for (i <- 0 to oldSlotArray.length - 1) {
+
+      maxNew = oldSlotArray(i).toInt + newSlotArray(i).toInt
+
+      if (maxNew > maxOld) {
+
+        maxOld = maxNew
+
         maxSlot = i + 1
       }
     }
-    return maxSlot
 
+    return maxSlot
+  }
+
+  //this method will return max value from slots
+  def getMaxSlot(slots: Any): Int = {
+
+    var maxSlot = 0
+
+    var maxOld = 0
+
+    val slotArray = slots.toString.split("!")
+
+    for (i <- 0 to slotArray.length - 1) {
+
+      if (slotArray(i).toInt > maxOld) {
+
+        maxOld = slotArray(i).toInt
+
+        maxSlot = i + 1
+      }
+    }
+
+    return maxSlot
   }
 
   //this method will create a slot data
@@ -110,7 +159,7 @@ object UdfUtils {
         if (value > max) { maxSlot = slot; max = value };
         timeSlotArray(slot) = value
     }
-    new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
+    new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot + 1)
   }
 
 }

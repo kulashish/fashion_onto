@@ -23,6 +23,4 @@ object ArrayUtils {
     return arrayConverted
   }
 
-
-
 }

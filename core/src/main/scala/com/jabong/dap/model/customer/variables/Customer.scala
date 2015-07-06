@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.merge.MergeUtils
-import com.jabong.dap.common.{Spark }
+import com.jabong.dap.common.{ Spark }
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
@@ -126,21 +126,23 @@ object Customer {
       val joinDF = MergeUtils.joinOldAndNewDF(dfResult, CustomerVariables.ID_CUSTOMER, DataSets.CUSTOMER, date)
 
       //merge old and new data frame
-      dfResult = joinDF.select(Udf.latestValue(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)),
-        Udf.latestValue(joinDF(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE), joinDF(CustomerVariables.NEW_ + CustomerVariables.GIFTCARD_CREDITS_AVAILABLE)),
-        Udf.latestValue(joinDF(CustomerVariables.STORE_CREDITS_AVAILABLE), joinDF(CustomerVariables.NEW_ + CustomerVariables.STORE_CREDITS_AVAILABLE)),
-        Udf.latestValue(joinDF(CustomerVariables.BIRTHDAY), joinDF(CustomerVariables.NEW_ + CustomerVariables.BIRTHDAY)),
-        Udf.latestValue(joinDF(CustomerVariables.GENDER), joinDF(CustomerVariables.NEW_ + CustomerVariables.GENDER)),
-        Udf.latestValue(joinDF(CustomerVariables.REWARD_TYPE), joinDF(CustomerVariables.NEW_ + CustomerVariables.REWARD_TYPE)),
-        Udf.latestValue(joinDF(CustomerVariables.EMAIL), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL)),
-        Udf.latestValue(joinDF(CustomerVariables.CREATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.CREATED_AT)),
-        Udf.latestValue(joinDF(CustomerVariables.UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.UPDATED_AT)),
-        Udf.mergeSlots(joinDF(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT), joinDF(CustomerVariables.NEW_ + CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT)),
-        Udf.minTimestamp(joinDF(CustomerVariables.ACC_REG_DATE), joinDF(CustomerVariables.NEW_ + CustomerVariables.ACC_REG_DATE)),
-        Udf.maxTimestamp(joinDF(CustomerVariables.MAX_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.MAX_UPDATED_AT)),
-        Udf.latestValue(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)))
+      dfResult = joinDF.select(Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        Udf.latestDecimal(joinDF(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE), joinDF(CustomerVariables.NEW_ + CustomerVariables.GIFTCARD_CREDITS_AVAILABLE)) as CustomerVariables.GIFTCARD_CREDITS_AVAILABLE,
+        Udf.latestDecimal(joinDF(CustomerVariables.STORE_CREDITS_AVAILABLE), joinDF(CustomerVariables.NEW_ + CustomerVariables.STORE_CREDITS_AVAILABLE)) as CustomerVariables.STORE_CREDITS_AVAILABLE,
+        Udf.latestDate(joinDF(CustomerVariables.BIRTHDAY), joinDF(CustomerVariables.NEW_ + CustomerVariables.BIRTHDAY)) as CustomerVariables.BIRTHDAY,
+        Udf.latestString(joinDF(CustomerVariables.GENDER), joinDF(CustomerVariables.NEW_ + CustomerVariables.GENDER)) as CustomerVariables.GENDER,
+        Udf.latestString(joinDF(CustomerVariables.REWARD_TYPE), joinDF(CustomerVariables.NEW_ + CustomerVariables.REWARD_TYPE)) as CustomerVariables.REWARD_TYPE,
+        Udf.latestString(joinDF(CustomerVariables.EMAIL), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        Udf.latestTimestamp(joinDF(CustomerVariables.CREATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.CREATED_AT)) as CustomerVariables.CREATED_AT,
+        Udf.latestTimestamp(joinDF(CustomerVariables.UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT,
+        Udf.mergeSlots(joinDF(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT), joinDF(CustomerVariables.NEW_ + CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT)) as CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT,
+        Udf.maxSlot(joinDF(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT), joinDF(CustomerVariables.NEW_ + CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT)) as CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT,
+        Udf.minTimestamp(joinDF(CustomerVariables.ACC_REG_DATE), joinDF(CustomerVariables.NEW_ + CustomerVariables.ACC_REG_DATE)) as CustomerVariables.ACC_REG_DATE,
+        Udf.maxTimestamp(joinDF(CustomerVariables.MAX_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.MAX_UPDATED_AT)) as CustomerVariables.MAX_UPDATED_AT,
+        Udf.latestString(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
 
     }
+
     dfResult
   }
 
