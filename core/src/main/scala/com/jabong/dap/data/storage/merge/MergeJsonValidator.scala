@@ -3,9 +3,6 @@ package com.jabong.dap.data.storage.merge
 import com.jabong.dap.data.acq.common.MergeJobInfo
 import com.jabong.dap.data.acq.common.MergeInfo
 
-/**
- * Created by Abhay on 3/7/15.
- */
 object MergeJsonValidator {
 
   private def validateRequiredFields(mergeJob: MergeInfo) = {
