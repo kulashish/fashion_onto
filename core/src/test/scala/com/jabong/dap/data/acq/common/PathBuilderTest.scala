@@ -10,10 +10,6 @@ import org.scalatest.{ FlatSpec, Matchers }
 class PathBuilderTest extends FlatSpec with Matchers {
   val config = new Config(basePath = "basePath")
   AppConfig.config = config
-  val source = "source"
-  val tableName = "tableName"
-  var rangeStart: String = null
-  var rangeEnd: String = null
 
   "withLeadingZeros" should "add a zero if input is less than 10" in {
     val input = 7
@@ -28,38 +24,49 @@ class PathBuilderTest extends FlatSpec with Matchers {
   }
 
   "getPath" should "return empty string if mode is not full, hourly, or daily" in {
-    val mode = "otherMode"
-    PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be ("")
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "othermode",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+    PathBuilder.getPath() should be ("")
   }
 
   "getPath" should "return correct path if mode is full" in {
-    val mode = "full"
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "full",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val dateNow = TimeUtils.getTodayDate("yyyy/MM/dd/HH")
     val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
-    PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
+    PathBuilder.getPath() should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are null" in {
-    val mode = "daily"
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "daily",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     val outputPath = "basePath/source/tableName/" + dateYesterday + "/"
-    PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
+    PathBuilder.getPath() should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are provided" in {
-    val mode = "daily"
-    rangeStart = "2015-06-13 00:00:00"
-    rangeEnd = "2015-06-28 23:59:59"
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "daily",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "2015-06-13 00:00:00",
+      rangeEnd = "2015-06-28 23:59:59", limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val outputPath = "basePath/source/tableName/2015/06/13_28"
-    PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
+    PathBuilder.getPath() should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is hourly" in {
-    val mode = "hourly"
-    rangeStart = "2015-06-13 01:00:00"
-    rangeEnd = "2015-06-13 15:59:59"
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "hourly",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "2015-06-13 01:00:00",
+      rangeEnd = "2015-06-13 15:59:59", limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val outputPath = "basePath/source/tableName/2015/06/13/01_15"
-    PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
+    PathBuilder.getPath() should be (outputPath)
   }
 
 }
