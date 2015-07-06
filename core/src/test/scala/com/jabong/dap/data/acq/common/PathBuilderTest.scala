@@ -1,10 +1,8 @@
 package com.jabong.dap.data.acq.common
 
-import java.io.File
-
-import com.jabong.dap.common.{ AppConfig, Config }
 import com.jabong.dap.common.time.TimeUtils
-import org.scalatest.{ Matchers, FlatSpec }
+import com.jabong.dap.common.{ AppConfig, Config }
+import org.scalatest.{ FlatSpec, Matchers }
 
 /**
  * Created by Abhay on 22/6/15.
@@ -36,14 +34,14 @@ class PathBuilderTest extends FlatSpec with Matchers {
 
   "getPath" should "return correct path if mode is full" in {
     val mode = "full"
-    val dateNow = TimeUtils.getTodayDateWithHrs().replaceAll("-", File.separator)
+    val dateNow = TimeUtils.getTodayDate("yyyy/MM/dd/HH")
     val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
     PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are null" in {
     val mode = "daily"
-    val dateYesterday = TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     val outputPath = "basePath/source/tableName/" + dateYesterday + "/"
     PathBuilder.getPath(mode, source, tableName, rangeStart, rangeEnd) should be (outputPath)
   }
