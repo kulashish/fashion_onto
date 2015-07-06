@@ -1,17 +1,14 @@
-package com.jabong.dap.common.utils
+package com.jabong.dap.common.time
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
-
-import com.jabong.dap.common.Constants
-
 import scala.collection.immutable.HashMap
 
 /**
  * Created by Rachit on 28/5/15.
  */
-object Time {
+object TimeUtils {
 
   /**
    * Returns the total number of days between two given date inputs
@@ -25,33 +22,7 @@ object Time {
    */
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
-    Math.abs(today.getTime - date.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
-  }
-
-  /**
-   * Returns today's date as a string in the format yyyy-MM-dd.
-   */
-  def getTodayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    sdf.format(new Date())
-  }
-
-  /**
-   * Returns yesterday's date as a string in the format yyyy-MM-dd
-   */
-  def getYesterdayDate(): String = {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    val cal = Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, -1)
-    sdf.format(cal.getTime)
-  }
-
-  /**
-   * Returns today's date as a string in the format yyyy-MM-dd--HH.
-   */
-  def getTodayDateWithHrs(): String = {
-    val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
-    sdf.format(new Date())
+    daysBetweenTwoDates(today, date)
   }
 
   /**
@@ -114,11 +85,26 @@ object Time {
       false
   }
 
-  def dateBeforeDays(n: Int, dateFormat: String): String = {
+  /*
+   Returns the Date as a string in the given Date Format which is given no. of days after given input date.
+   If input date is null then use today's date.
+   If n is negative then returns the date as a string which is given no. of days before today's date.
+   */
+  def getDateAfterNDays(noOfDays: Int, dateFormat: String, date: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     val cal = Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_MONTH, n)
+    if (date != null)
+      cal.setTime(sdf.parse(date))
+    cal.add(Calendar.DAY_OF_MONTH, noOfDays)
     sdf.format(cal.getTime())
+  }
+
+  /*
+   Returns the Date as a string in the given Date Format which is given no. of days after today's date.
+   If n is negative then returns the date as a string which is given no. of days before today's date.
+  */
+  def getDateAfterNDays(noOfDays: Int, dateFormat: String): String = {
+    getDateAfterNDays(noOfDays, dateFormat, getTodayDate(dateFormat))
   }
 
   def getTimeStamp(date: String, dateFormat: String): Timestamp = {
@@ -129,6 +115,9 @@ object Time {
     ts
   }
 
+  /*
+  Return today's date as a string in the given date format.
+   */
   def getTodayDate(dateFormat: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     sdf.format(new Date())

@@ -1,6 +1,6 @@
 package com.jabong.dap.model.order
 
-import com.jabong.dap.common.{MergeUtils, Spark, SharedSparkContext}
+import com.jabong.dap.common.{Spark, SharedSparkContext}
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest.FlatSpec
 import com.jabong.dap.model.order.variables.SalesOrder

@@ -1,6 +1,6 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import org.scalatest.{ Matchers, FlatSpec }
 
 /**
@@ -34,7 +34,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd, and filterCondition are null" in {
     val mode = "daily"
     val filterCondition = null
-    val prevDayDate = Time.getYesterdayDate()
+    val prevDayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT)
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' ".format(prevDayDate, prevDayDate)
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }
@@ -42,7 +42,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd are null and filterCondition is not null" in {
     val mode = "daily"
     val filterCondition = "tableColumn NOT LIKE 'R..'"
-    val prevDayDate = Time.getYesterdayDate()
+    val prevDayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT)
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' AND tableColumn NOT LIKE 'R..'".format(prevDayDate, prevDayDate)
     ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
   }

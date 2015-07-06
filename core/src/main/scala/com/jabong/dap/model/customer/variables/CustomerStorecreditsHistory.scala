@@ -1,11 +1,10 @@
 package com.jabong.dap.model.customer.variables
 
-import com.jabong.dap.common.Utils
 import com.jabong.dap.common.constants.variables.CustomerStoreVariables
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ TimestampType, IntegerType, StructField, StructType }
 
 /**
  * Created by raghu on 25/6/15.
@@ -28,7 +27,7 @@ object CustomerStorecreditsHistory {
 
     }
 
-    if (!Utils.isSchemaEqual(dfCSH.schema, Schema.csh)) {
+    if (!SchemaUtils.isSchemaEqual(dfCSH.schema, Schema.csh)) {
 
       log("schema attributes or data type mismatch")
 
