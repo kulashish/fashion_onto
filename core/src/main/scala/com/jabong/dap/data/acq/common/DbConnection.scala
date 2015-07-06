@@ -5,7 +5,7 @@ import java.util.Properties
 import com.jabong.dap.common.AppConfig
 
 /**
- * Created by Abhay on 9/6/15.
+ * Class to get the Database connection properties and string for the respective server for the given source.
  */
 case class DbConnection(source: String) {
   require(source != null, "Source Type is null")

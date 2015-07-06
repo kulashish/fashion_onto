@@ -1,7 +1,7 @@
 package com.jabong.dap.data.acq.common
 
 /**
- * Created by Abhay on 8/6/15.
+ * Fetches data for each entry in the tableJson acquisition list.
  */
 class Fetcher() extends java.io.Serializable {
   def fetch(tableInfo: TableInfo): Unit = {

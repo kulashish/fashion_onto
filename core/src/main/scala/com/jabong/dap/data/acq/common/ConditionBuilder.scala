@@ -3,7 +3,7 @@ package com.jabong.dap.data.acq.common
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
- * Created by Abhay on 9/6/15.
+ * Builds the condition for the query to fetch the data and get the min and max values of primary key.
  */
 object ConditionBuilder {
   def getCondition(): String = {

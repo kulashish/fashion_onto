@@ -5,7 +5,7 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
 /**
- * Created by Abhay on 10/6/15.
+ * Gets the data for a given DbConnection
  */
 object GetData extends Logging {
 

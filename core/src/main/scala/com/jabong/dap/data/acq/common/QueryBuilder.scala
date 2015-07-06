@@ -1,7 +1,8 @@
 package com.jabong.dap.data.acq.common
 
 /**
- * Created by Abhay on 10/6/15.
+ * Builds the query which is used to fetch the requested data on the basis of the input parameters passed in the
+ * tableJson.
  */
 
 object QueryBuilder {

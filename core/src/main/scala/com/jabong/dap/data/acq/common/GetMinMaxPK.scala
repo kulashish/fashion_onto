@@ -5,7 +5,7 @@ import java.sql.{ ResultSet, Statement }
 import grizzled.slf4j.Logging
 
 /**
- * Created by Abhay on 9/6/15.
+ * Gets the minimum and maximum value of the Primary Key for effective partitioning for the requested data.
  */
 
 case class MinMax(min: Long, max: Long)
