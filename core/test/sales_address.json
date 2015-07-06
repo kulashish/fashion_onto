@@ -1,0 +1,15 @@
+{"fk_customer":"1", "city":"Hyderabad","phone":"3454"}
+{"fk_customer":"2", "city":"Delhi","phone":"9898"}
+{"fk_customer":"1", "city":"Bangalore","phone":"1237"}
+{"fk_customer":"3", "city":"Delhi","phone":"2220"}
+{"fk_customer":"1", "city":"Delhi","phone":"2345"}
+{"fk_customer":"3", "city":"Bangalore","phone":"0234"}
+{"fk_customer":"2", "city":"Hyderabad","phone":"9898  "}
+{"fk_customer":"1", "city":"Delhi","phone":"1230"}
+{"fk_customer":"3", "city":"Bangalore","phone":"0456"}
+{"fk_customer":"1", "city":"Delhi","phone":"2220"}
+{"fk_customer":"1", "city":"Bangalore","phone":"0333"}
+{"fk_customer":"2", "city":"Hyderabad","phone":"3454"}
+{"fk_customer":"1", "city":"Hyderabad","phone":"1230"}
+{"fk_customer":"3", "city":"Hyderabad","phone":"2220"}
+{"fk_customer":"1", "city":"Bangalore","phone":"1230"}
