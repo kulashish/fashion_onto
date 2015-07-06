@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{ArrayUtils, Spark}
-import org.apache.spark.sql.{DataFrame, _}
+import com.jabong.dap.common.{ ArrayUtils, Spark }
+import org.apache.spark.sql.{ DataFrame, _ }
 
 /**
  * Merges the dataFrames and returns the merged dataFrame.

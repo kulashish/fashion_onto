@@ -1,6 +1,5 @@
 package com.jabong.dap.data.storage.merge.common
 
-
 import com.jabong.dap.common.Spark
 import com.jabong.dap.data.acq.common.MergeJobConfig
 
@@ -15,7 +14,7 @@ object MergeTables {
     case _ => null
   }
 
-  def mergeFull () = {
+  def mergeFull() = {
     val primaryKey = MergeJobConfig.mergeInfo.primaryKey
     val saveFormat = MergeJobConfig.mergeInfo.saveFormat
     val saveMode = MergeJobConfig.mergeInfo.saveMode
@@ -32,8 +31,8 @@ object MergeTables {
       null
     }
 
-    val mergeIncrementalDataPath = if (mergeBaseDataPath!= null && DataVerifier.hdfsDataExists(pathYesterdayData)) {
-       pathYesterdayData
+    val mergeIncrementalDataPath = if (mergeBaseDataPath != null && DataVerifier.hdfsDataExists(pathYesterdayData)) {
+      pathYesterdayData
     } else {
       null
     }
@@ -43,7 +42,6 @@ object MergeTables {
     val baseDF = context.read.format(saveFormat).load(mergeBaseDataPath)
     val incrementalDF = context.read.format(saveFormat).load(mergeIncrementalDataPath)
     val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
-
 
     val savePath = PathBuilder.getSavePathFullMerge()
 
