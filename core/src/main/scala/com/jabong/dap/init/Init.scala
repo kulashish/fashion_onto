@@ -11,8 +11,6 @@ import org.apache.hadoop.conf._
 import org.apache.hadoop.fs._
 import net.liftweb.json._
 
-
-
 object Init {
 
   /**
@@ -27,7 +25,7 @@ object Init {
     component: String = null,
     tableJson: String = null,
     mergeJson: String = null,
-    config: String = null
+    config:    String = null
 
   )
 
@@ -52,8 +50,7 @@ object Init {
 
       opt[String]("mergeJson")
         .text("Path to merge job json config file.")
-        .action((x,c) => c.copy(mergeJson = x))
-
+        .action((x, c) => c.copy(mergeJson = x))
 
       opt[String]("tablesJson")
         .text("Path to data acquisition tables json config file.")

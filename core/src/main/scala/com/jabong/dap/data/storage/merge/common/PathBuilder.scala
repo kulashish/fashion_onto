@@ -16,7 +16,7 @@ object PathBuilder {
   val source = MergeJobConfig.mergeInfo.source
   val tableName = MergeJobConfig.mergeInfo.tableName
 
-  private def getDateDayBeforeYesterdayPath (): String = {
+  private def getDateDayBeforeYesterdayPath(): String = {
     if (mergeDate == null) {
       TimeUtils.getDayBeforeYesterdayDate().replaceAll("-", File.separator)
     } else {
@@ -24,21 +24,20 @@ object PathBuilder {
     }
   }
 
-  private def getDateYesterdayDataPath (): String = {
-    if (mergeDate == null){
+  private def getDateYesterdayDataPath(): String = {
+    if (mergeDate == null) {
       TimeUtils.getYesterdayDate().replaceAll("-", File.separator)
-    }  else {
+    } else {
       mergeDate.replaceAll("-", File.separator)
     }
   }
 
-
-  def getPathFullMerged (): String = {
+  def getPathFullMerged(): String = {
     val dateDayBeforeYesterday = getDateDayBeforeYesterdayPath()
     "%s/%s/%s/full_merged/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
   }
 
-  def getPathFull (): String = {
+  def getPathFull(): String = {
     val dateDayBeforeYesterday = getDateDayBeforeYesterdayPath()
     "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
   }
@@ -48,10 +47,9 @@ object PathBuilder {
     "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
   }
 
-  def getSavePathFullMerge() :String = {
+  def getSavePathFullMerge(): String = {
     val dateYesterday = getDateYesterdayDataPath()
     "%s/%s/%s/full_merged/%s/".format(basePath, source, tableName, dateYesterday)
   }
-
 
 }

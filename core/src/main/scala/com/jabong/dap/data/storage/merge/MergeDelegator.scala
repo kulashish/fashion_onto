@@ -5,9 +5,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{Path, FileSystem}
-
-
+import org.apache.hadoop.fs.{ Path, FileSystem }
 
 /**
  * Created by Abhay on 1/7/15.

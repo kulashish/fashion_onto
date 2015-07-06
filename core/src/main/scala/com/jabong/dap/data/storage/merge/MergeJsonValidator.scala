@@ -8,7 +8,7 @@ import com.jabong.dap.data.acq.common.MergeInfo
  */
 object MergeJsonValidator {
 
-  private def validateRequiredFields (mergeJob: MergeInfo) = {
+  private def validateRequiredFields(mergeJob: MergeInfo) = {
     require(mergeJob.source != null && mergeJob.source.length() != 0, "Source cannot be null or empty.")
     require(mergeJob.tableName != null && mergeJob.tableName.length() != 0, "Table Name cannot be null or empty.")
     require(mergeJob.primaryKey != null && mergeJob.primaryKey.length() != 0, "Primary Key cannot be null or empty.")
@@ -17,7 +17,7 @@ object MergeJsonValidator {
     require(mergeJob.saveFormat != null && mergeJob.saveFormat.length() != 0, "Save Format cannot be null or empty.")
   }
 
-  private def validatePossibleValues (mergeJob: MergeInfo) = {
+  private def validatePossibleValues(mergeJob: MergeInfo) = {
     val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
     val possibleMergeModes = Array("full")
     val possibleSaveFormats = Array("orc", "parquet")
@@ -34,15 +34,13 @@ object MergeJsonValidator {
 
   }
 
-
-  def validate (mergeInfo: MergeJobInfo) = {
-    for (mergeJob <- mergeInfo.merge){
+  def validate(mergeInfo: MergeJobInfo) = {
+    for (mergeJob <- mergeInfo.merge) {
       validateRequiredFields(mergeJob)
       validatePossibleValues(mergeJob)
     }
 
   }
-
 
 }
 

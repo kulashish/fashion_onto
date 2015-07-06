@@ -60,13 +60,13 @@ case class TableInfo(
  */
 
 case class MergeInfo(
-  source: String,
-  tableName: String,
+  source:     String,
+  tableName:  String,
   primaryKey: String,
-  mergeMode: String,
-  mergeDate: String,
+  mergeMode:  String,
+  mergeDate:  String,
   saveFormat: String,
-  saveMode: String
+  saveMode:   String
 )
 
 /**
