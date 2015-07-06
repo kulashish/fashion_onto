@@ -94,7 +94,7 @@ object DaoUtil extends Logging {
 
     // Get the connection
     try {
-      DriverManager.getConnection(dbc.getConnectionString,dbc.getConnectionProperties)
+      DriverManager.getConnection(dbc.getConnectionString, dbc.getConnectionProperties)
     } catch {
       case e: Exception => {
         logger.error("No connection: " + e.getMessage)

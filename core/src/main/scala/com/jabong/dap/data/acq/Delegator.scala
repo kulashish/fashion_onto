@@ -1,9 +1,11 @@
 package com.jabong.dap.data.acq
 
-import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.common._
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
+import net.liftweb.json._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{Path, FileSystem}
 
 /**
  * Reads and parses the JSON file to run various
@@ -15,7 +17,12 @@ class Delegator extends Serializable with Logging {
 
   def start(tableJsonPath: String) = {
     val validated = try {
-      AcqImportInfo.importInfo = Parser.parseJson[ImportInfo](tableJsonPath)
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val tablesPath = new Path(tableJsonPath)
+      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(tablesPath)).mkString)
+      AcqImportInfo.importInfo = json.extract[ImportInfo]
       TablesJsonValidator.validate(AcqImportInfo.importInfo)
       true
     } catch {
