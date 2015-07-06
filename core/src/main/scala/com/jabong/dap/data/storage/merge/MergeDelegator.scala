@@ -8,10 +8,6 @@ import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ Path, FileSystem }
 
-/**
- * Created by Abhay on 1/7/15.
- */
-
 class MergeDelegator extends Serializable with Logging {
   def start(mergeJsonPath: String) = {
     val validated = try {
