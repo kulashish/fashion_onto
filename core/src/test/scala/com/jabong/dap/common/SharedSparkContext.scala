@@ -14,12 +14,12 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
   }
 
   override def afterAll() {
-    val sc = Spark.getContext()
-    if (sc != null) {
-      sc.stop()
-    }
+//    val sc = Spark.getContext()
+//    if (sc != null) {
+//      sc.stop()
+//    }
     // To avoid Akka rebinding to the same port, since it doesn't unbind immediately on shutdown
-    System.clearProperty("spark.driver.port")
+//    System.clearProperty("spark.driver.port")
     super.afterAll()
   }
 }

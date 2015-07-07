@@ -1,7 +1,7 @@
 package com.jabong.dap.model.order
 
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{AppConfig, Config, SharedSparkContext}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.order.schema.OrderVarSchema
 import com.jabong.dap.model.order.variables.SalesOrderAddress
@@ -19,11 +19,11 @@ class SalesAddressTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-    val config = new Config(basePath = "basePath")
-    AppConfig.config = config
+//    val config = new Config(basePath = "basePath")
+//    AppConfig.config = config
 
     //    df1 = sqlContext.read.json("test/sales_address.json")
-    df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ADDRESS, "sales_address.json", OrderVarSchema.salesOrder)
+    df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ADDRESS, "sales_address", OrderVarSchema.salesOrder)
     //    df2 = sqlContext.read.json("test/sales_address2.json")
 
     df1.collect.foreach(println)

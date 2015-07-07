@@ -1,7 +1,7 @@
 package com.jabong.dap.model.order
 
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{AppConfig, Config, SharedSparkContext}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.order.schema.OrderVarSchema
 import com.jabong.dap.model.order.variables.SalesRule
@@ -19,8 +19,8 @@ class SalesRuleTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-    val config = new Config(basePath = "basePath")
-    AppConfig.config = config
+//    val config = new Config(basePath = "basePath")
+//    AppConfig.config = config
 
     //    df1 = sqlContext.read.json("sales_rule1.json")
     df1 = JsonUtils.readFromJson(DataSets.SALES_RULE, "sales_rule1", OrderVarSchema.salesRule)

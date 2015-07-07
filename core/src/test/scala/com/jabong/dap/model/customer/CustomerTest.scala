@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer
 
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{AppConfig, Config, SharedSparkContext}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.schema.CustVarSchema
@@ -24,8 +24,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
 
-    val config = new Config(basePath = "basePath")
-    AppConfig.config = config
+//    val config = new Config(basePath = "basePath")
+//    AppConfig.config = config
 
     dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
     dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)

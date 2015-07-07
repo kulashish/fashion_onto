@@ -8,8 +8,6 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("public")
 )
 
-parallelExecution in Test := false
-
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "1.2.1"  % "provided"
 
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
