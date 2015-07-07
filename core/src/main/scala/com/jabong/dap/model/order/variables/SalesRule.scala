@@ -2,8 +2,8 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.SalesRuleVariables
-import com.jabong.dap.common.merge.MergeUtils
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import org.apache.spark.sql.DataFrame
 
 /**

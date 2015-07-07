@@ -2,6 +2,7 @@ package com.jabong.dap.common.merge
 
 import com.jabong.dap.common.{SharedSparkContext, Spark}
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
