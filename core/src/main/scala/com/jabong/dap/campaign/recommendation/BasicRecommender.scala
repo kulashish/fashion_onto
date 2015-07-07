@@ -20,7 +20,7 @@ class BasicRecommender extends Recommender{
   val hiveContext = Spark.getHiveContext()
 
 
-  def generateRecommendation(orderData: DataFrame): DataFrame = {
+  override def generateRecommendation(orderData: DataFrame): DataFrame = {
 
     return null
 

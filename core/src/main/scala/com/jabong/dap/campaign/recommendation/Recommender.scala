@@ -43,6 +43,9 @@ trait Recommender  extends java.io.Serializable{
     "TOYS"              ->  2
     )
 
+  def generateRecommendation(orderData: DataFrame): DataFrame
+
+
   def getRecommendationGender(gender:Any): String ={
     if(gender==null){
       return null
