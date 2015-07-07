@@ -4,6 +4,7 @@ import java.io.File
 
 import com.jabong.dap.common.{ ArrayUtils, Spark }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeData
 import org.apache.spark.sql.{ DataFrame, _ }
 
 object MergeUtils extends MergeData {

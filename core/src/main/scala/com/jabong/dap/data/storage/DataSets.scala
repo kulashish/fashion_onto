@@ -1,12 +1,17 @@
 package com.jabong.dap.data.storage
 
+import com.jabong.dap.common.AppConfig
+
 /**
  * Created by jabong on 28/5/15.
  */
 object DataSets {
 
+//  val basePath = AppConfig.config.basePath
+
   val BOB_PATH = "hdfs://bigdata-master.jabong.com:8020/data/bob/"
   val VARIABLE_PATH = "hdfs://bigdata-master/data/variables/"
+
   val TEST_RESOURCES = "src/test/resources/"
 
   //read prequet file from these paths

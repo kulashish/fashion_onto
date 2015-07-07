@@ -13,5 +13,4 @@ object SalesRuleVariables {
   val WELCOME1 = "welcome1/"
   val WELCOME2 = "welcome2/"
 
-
 }

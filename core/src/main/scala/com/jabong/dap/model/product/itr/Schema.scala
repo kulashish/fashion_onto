@@ -24,7 +24,6 @@ object Schema {
         StructField("supplierStatus", BooleanType, false) ::
         StructField("brandName", StringType, false) ::
         StructField("productUrl", StringType, false) ::
-        StructField("quantity", IntegerType, false) :: Nil
-    )
+        StructField("quantity", IntegerType, false) :: Nil)
 }
 

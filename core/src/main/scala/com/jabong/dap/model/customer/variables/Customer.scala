@@ -8,7 +8,7 @@ import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.schema.SchemaVariables
+import com.jabong.dap.model.customer.schema.CustVarSchema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
 
@@ -177,8 +177,40 @@ object Customer {
     val rowRDD = finalData.map({ case (key, value) => Row(key.toInt, value._1, value._2) })
 
     // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, SchemaVariables.customersPreferredOrderTimeslot)
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslot)
 
     df
   }
+
+  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple2[String, Int] = {
+
+    var timeSlotArray = new Array[Int](13)
+
+    var maxSlot: Int = -1
+
+    var max: Int = -1
+
+    iterable.foreach {
+      case (slot, value) =>
+        if (value > max) { maxSlot = slot; max = value };
+        timeSlotArray(slot) = value
+    }
+    new Tuple2(arrayToString(timeSlotArray), maxSlot)
+  }
+
+  def arrayToString(array: Array[Int]): String = {
+
+    var arrayConverted: String = ""
+
+    for (i <- 1 to array.length - 1) {
+
+      if (i == 1) {
+        arrayConverted = array(i).toString
+      } else {
+        arrayConverted = arrayConverted + "!" + array(i).toString
+      }
+    }
+    arrayConverted
+  }
+
 }
