@@ -1,6 +1,7 @@
-package com.jabong.dap.common.merge
+package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.merge.MergeUtils
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
@@ -25,8 +26,8 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     assert(size == 3)
   }
 
-//  override def afterAll() {
-//    super.afterAll()
-//  }
+  //  override def afterAll() {
+  //    super.afterAll()
+  //  }
 
 }
