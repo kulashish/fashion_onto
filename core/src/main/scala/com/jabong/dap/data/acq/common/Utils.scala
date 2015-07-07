@@ -58,14 +58,13 @@ case class TableInfo(
  */
 
 case class MergeInfo(
-  source:     String,
-  tableName:  String,
+  source: String,
+  tableName: String,
   primaryKey: String,
-  mergeMode:  String,
-  mergeDate:  String,
+  mergeMode: String,
+  mergeDate: String,
   saveFormat: String,
-  saveMode:   String
-)
+  saveMode: String)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -81,8 +80,7 @@ case class ImportInfo(
  * @param merge List[MergeInfo] List of Tables to run the merge job on.
  */
 case class MergeJobInfo(
-  merge: List[MergeInfo]
-) extends EmptyClass
+  merge: List[MergeInfo]) extends EmptyClass
 
 /**
  * Object to access config variables application wide
