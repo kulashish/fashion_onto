@@ -5,8 +5,8 @@ import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.schema.CustVarSchema
-import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments, CustomerStorecreditsHistory}
-import org.apache.spark.sql.{DataFrame, Row}
+import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
+import org.apache.spark.sql.{ DataFrame, Row }
 import org.scalatest.FlatSpec
 
 /**
@@ -24,8 +24,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
 
-//    val config = new Config(basePath = "basePath")
-//    AppConfig.config = config
+    //    val config = new Config(basePath = "basePath")
+    //    AppConfig.config = config
 
     dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
     dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
@@ -198,8 +198,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   }
 
-//  override def afterAll() {
-//    super.afterAll()
-//  }
+  //  override def afterAll() {
+  //    super.afterAll()
+  //  }
 
 }

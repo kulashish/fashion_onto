@@ -19,8 +19,8 @@ class SalesAddressTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-//    val config = new Config(basePath = "basePath")
-//    AppConfig.config = config
+    //    val config = new Config(basePath = "basePath")
+    //    AppConfig.config = config
 
     //    df1 = sqlContext.read.json("test/sales_address.json")
     df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ADDRESS, "sales_address", OrderVarSchema.salesOrder)
@@ -35,7 +35,7 @@ class SalesAddressTest extends FlatSpec with SharedSparkContext {
     assert(maxCityPhon.collect.size == 3)
   }
 
-//  override def afterAll() {
-//    super.afterAll()
-//  }
+  //  override def afterAll() {
+  //    super.afterAll()
+  //  }
 }

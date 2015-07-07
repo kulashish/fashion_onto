@@ -19,8 +19,8 @@ class SalesRuleTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-//    val config = new Config(basePath = "basePath")
-//    AppConfig.config = config
+    //    val config = new Config(basePath = "basePath")
+    //    AppConfig.config = config
 
     //    df1 = sqlContext.read.json("sales_rule1.json")
     df1 = JsonUtils.readFromJson(DataSets.SALES_RULE, "sales_rule1", OrderVarSchema.salesRule)
@@ -39,8 +39,8 @@ class SalesRuleTest extends FlatSpec with SharedSparkContext {
     assert(wcCodes.collect.size == 3)
   }
 
-//  override def afterAll() {
-//    super.afterAll()
-//  }
+  //  override def afterAll() {
+  //    super.afterAll()
+  //  }
 
 }
