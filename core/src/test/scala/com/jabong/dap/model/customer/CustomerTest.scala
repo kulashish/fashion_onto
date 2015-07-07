@@ -24,9 +24,6 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
 
-    //    val config = new Config(basePath = "basePath")
-    //    AppConfig.config = config
-
     dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
     dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
     dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)

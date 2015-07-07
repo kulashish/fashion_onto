@@ -10,6 +10,10 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
 
   override def beforeAll() {
     Spark.init(conf)
+
+    val config = new Config(basePath = "basePath")
+    AppConfig.config = config
+
     super.beforeAll()
   }
 

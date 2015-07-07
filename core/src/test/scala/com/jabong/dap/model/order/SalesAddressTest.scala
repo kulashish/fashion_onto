@@ -19,11 +19,8 @@ class SalesAddressTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-    //    val config = new Config(basePath = "basePath")
-    //    AppConfig.config = config
-
     //    df1 = sqlContext.read.json("test/sales_address.json")
-    df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ADDRESS, "sales_address", OrderVarSchema.salesOrder)
+    df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ADDRESS, "sales_address", OrderVarSchema.salesOrderAddress)
     //    df2 = sqlContext.read.json("test/sales_address2.json")
 
     df1.collect.foreach(println)

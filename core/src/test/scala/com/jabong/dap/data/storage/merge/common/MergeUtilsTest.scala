@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{ AppConfig, Config, SharedSparkContext, Spark }
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
@@ -13,9 +13,6 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     val sqlContext = Spark.getSqlContext()
-
-    val config = new Config(basePath = "basePath")
-    AppConfig.config = config
 
     df1 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/1.json")
     df2 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/2.json")
