@@ -12,8 +12,9 @@ import grizzled.slf4j.Logging
  * @param foreignKey String The name of the foreign key for the table.
  */
 case class JoinTables(
-  name: String,
-  foreignKey: String)
+  name:       String,
+  foreignKey: String
+)
 
 /**
  * Case class for storing information about data acquisition from a table.
@@ -32,18 +33,19 @@ case class JoinTables(
  * @param joinTables List[JoinTables] List of tables to be joined.
  */
 case class TableInfo(
-  source: String,
-  tableName: String,
-  primaryKey: String,
-  mode: String,
-  saveFormat: String,
-  saveMode: String,
-  dateColumn: String,
-  rangeStart: String,
-  rangeEnd: String,
-  limit: String,
+  source:          String,
+  tableName:       String,
+  primaryKey:      String,
+  mode:            String,
+  saveFormat:      String,
+  saveMode:        String,
+  dateColumn:      String,
+  rangeStart:      String,
+  rangeEnd:        String,
+  limit:           String,
   filterCondition: String,
-  joinTables: List[JoinTables])
+  joinTables:      List[JoinTables]
+)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -51,7 +53,16 @@ case class TableInfo(
  * @param acquisition List[TableInfo] List of tables to acquire the data from.
  */
 case class ImportInfo(
-  acquisition: List[TableInfo]) extends EmptyClass
+  acquisition: List[TableInfo]
+) extends EmptyClass
+
+/**
+ * Object to access ImportInfo variables application wide
+ */
+object AcqImportInfo {
+  var importInfo: ImportInfo = null
+  var tableInfo: TableInfo = null
+}
 
 object DaoUtil extends Logging {
 
@@ -83,7 +94,7 @@ object DaoUtil extends Logging {
 
     // Get the connection
     try {
-      DriverManager.getConnection(dbc.getConnectionString)
+      DriverManager.getConnection(dbc.getConnectionString, dbc.getConnectionProperties)
     } catch {
       case e: Exception => {
         logger.error("No connection: " + e.getMessage)

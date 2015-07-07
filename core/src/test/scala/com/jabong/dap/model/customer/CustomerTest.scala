@@ -14,6 +14,8 @@ import org.scalatest.FlatSpec
  */
 class CustomerTest extends FlatSpec with SharedSparkContext {
 
+  @transient var sqlContext: SQLContext = _
+
   @transient var dfCustomer: DataFrame = _
   @transient var dfNLS: DataFrame = _
   @transient var dfSalesOrder: DataFrame = _
@@ -23,6 +25,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
 
     super.beforeAll()
+
     dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
     dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
     dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)

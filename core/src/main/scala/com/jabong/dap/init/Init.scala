@@ -1,13 +1,14 @@
 package com.jabong.dap.init
 
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
-import com.jabong.dap.common.json.Parser
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.model.product.itr.Itr
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
 import scopt.OptionParser
-import java.nio.file.{ Paths, Files }
+import org.apache.hadoop.conf._
+import org.apache.hadoop.fs._
+import net.liftweb.json._
 
 object Init {
 
@@ -21,7 +22,8 @@ object Init {
   case class Params(
     component: String = null,
     tableJson: String = null,
-    config: String = null)
+    config:    String = null
+  )
 
   def main(args: Array[String]) {
     options(args)
@@ -45,19 +47,23 @@ object Init {
       opt[String]("tablesJson")
         .text("Path to data acquisition tables json config file.")
         .action((x, c) => c.copy(tableJson = x))
-        .validate(x => if (Files.exists(Paths.get(x))) success else failure("Option --tablesJson path to data acquisition tables list json."))
 
       opt[String]("config")
         .text("Path to Alchemy config file.")
         .required()
         .action((x, c) => c.copy(config = x))
-        .validate(x => if (Files.exists(Paths.get(x))) success else failure("Option --config path to Alchemy config json."))
     }
 
     parser.parse(args, defaultParams).map { params =>
       // read application file
       try {
-        val config = Parser.parseJson[Config](params.config)
+        val conf = new Configuration()
+        val fileSystem = FileSystem.get(conf)
+        implicit val formats = net.liftweb.json.DefaultFormats
+        val configPath = new Path(params.config)
+        val json = parse(scala.io.Source.fromInputStream(fileSystem.open(configPath)).mkString)
+        val config = json.extract[Config]
+
         ConfigJsonValidator.validate(config)
         AppConfig.config = config
         // initialize spark context

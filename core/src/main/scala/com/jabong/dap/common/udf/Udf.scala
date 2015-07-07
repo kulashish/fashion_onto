@@ -2,7 +2,6 @@ package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
 
 /**
  * Created by raghu on 3/7/15.
