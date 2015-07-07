@@ -45,8 +45,7 @@ object GetData extends Logging {
         minMax.min,
         minMax.max,
         3,
-        dbConn.getConnectionProperties
-      )
+        dbConn.getConnectionProperties)
     }
 
     jdbcDF.printSchema()

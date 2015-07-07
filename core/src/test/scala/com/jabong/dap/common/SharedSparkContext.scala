@@ -6,7 +6,7 @@ import org.scalatest.{ BeforeAndAfterAll, Suite }
 /** Shares a local `SparkContext` between all tests in a suite and closes it at the end */
 trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
 
-  val conf = new SparkConf().setMaster("local[4]").setAppName("test")
+  val conf = new SparkConf().setMaster("local").setAppName("test").set("spark.driver.allowMultipleContexts" , "true")
 
   override def beforeAll() {
     Spark.init(conf)

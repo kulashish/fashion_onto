@@ -19,8 +19,6 @@ object Spark {
    */
   def init(sConf: SparkConf) {
     sc = new SparkContext(sConf)
-    sqlContext = new SQLContext(sc)
-
   }
 
   /**
@@ -36,6 +34,9 @@ object Spark {
    * @return SQLContext
    */
   def getSqlContext(): SQLContext = {
+    if (sqlContext == null) {
+      sqlContext = new SQLContext(sc)
+    }
     sqlContext
   }
 

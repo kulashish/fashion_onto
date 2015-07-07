@@ -1,7 +1,6 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import com.jabong.dap.common.udf.UdfUtils
 import org.scalatest.FlatSpec
 
 /**

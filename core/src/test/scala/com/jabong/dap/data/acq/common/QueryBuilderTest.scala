@@ -27,8 +27,7 @@ class QueryBuilderTest extends FlatSpec with Matchers {
       limit = null, filterCondition = null,
       joinTables = List(
         new JoinTables(name = "testTable1", foreignKey = "fk_testTable1"),
-        new JoinTables(name = "testTable2", foreignKey = "fk_testTable2")
-      ))
+        new JoinTables(name = "testTable2", foreignKey = "fk_testTable2")))
     val selectString = ", j1.*, j2.*"
     val joinString = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk LEFT JOIN testTable2 AS j2 ON j2.fk_testTable2 = t1.pk"
     QueryBuilder.getJoinTableStrings() should be (selectString, joinString)
