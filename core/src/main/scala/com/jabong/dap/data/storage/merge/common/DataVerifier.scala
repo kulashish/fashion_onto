@@ -1,13 +1,18 @@
 package com.jabong.dap.data.storage.merge.common
 
-import java.nio.file.{ Paths, Files }
+
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{Path, FileSystem}
 
 /**
  * Verifies if the data exits at a given location.
  */
 object DataVerifier {
   def hdfsDataExists(directory: String): Boolean = {
+    val conf = new Configuration()
+    val fileSystem = FileSystem.get(conf)
     val successFile = "%s_SUCCESS".format(directory)
-    Files.exists(Paths.get(successFile))
+    val successFilePath = new Path(successFile)
+    fileSystem.exists(successFilePath)
   }
 }
