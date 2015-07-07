@@ -2,6 +2,7 @@ package com.jabong.dap.init
 
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
+import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.product.itr.Itr
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
@@ -17,12 +18,16 @@ object Init {
    *
    * @param component String Name of the component
    * @param tableJson String Path of data acquisition config json file
+   * @param mergeJson String Path of merge job config json file
    * @param config String Path of application config json file
    */
   case class Params(
     component: String = null,
     tableJson: String = null,
-    config: String = null)
+    mergeJson: String = null,
+    config:    String = null
+
+  )
 
   def main(args: Array[String]) {
     options(args)
@@ -43,6 +48,10 @@ object Init {
         .required()
         .action((x, c) => c.copy(component = x))
 
+      opt[String]("mergeJson")
+        .text("Path to merge job json config file.")
+        .action((x, c) => c.copy(mergeJson = x))
+
       opt[String]("tablesJson")
         .text("Path to data acquisition tables json config file.")
         .action((x, c) => c.copy(tableJson = x))
@@ -59,8 +68,8 @@ object Init {
         val conf = new Configuration()
         val fileSystem = FileSystem.get(conf)
         implicit val formats = net.liftweb.json.DefaultFormats
-        val configPath = new Path(params.config)
-        val json = parse(scala.io.Source.fromInputStream(fileSystem.open(configPath)).mkString)
+        val path = new Path(params.config)
+        val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
         val config = json.extract[Config]
 
         ConfigJsonValidator.validate(config)
@@ -92,6 +101,7 @@ object Init {
     params.component match {
       case "itr" => new Itr().start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
+      case "merge" => new MergeDelegator().start(params.mergeJson)
     }
   }
 }
