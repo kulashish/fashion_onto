@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{AppConfig, Config, SharedSparkContext, Spark}
+import com.jabong.dap.common.{ AppConfig, Config, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
