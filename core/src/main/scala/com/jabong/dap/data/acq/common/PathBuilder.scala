@@ -26,14 +26,14 @@ object PathBuilder {
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
           val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
-          "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
+          "%s/%s/%s/daily/%s/".format(basePath, source, tableName, dateYesterday)
         } else {
           val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
           val start = Calendar.getInstance()
           val end = Calendar.getInstance()
           start.setTime(format.parse(rangeStart))
           end.setTime(format.parse(rangeEnd))
-          "%s/%s/%s/%s/%s/%s_%s"
+          "%s/%s/%s/daily/%s/%s/%s_%s"
             .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
               withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
         }
@@ -43,7 +43,7 @@ object PathBuilder {
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/%s/%s/%s/%s_%s"
+        "%s/%s/%s/hourly/%s/%s/%s/%s_%s"
           .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
             withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)),
             withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
