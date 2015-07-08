@@ -34,4 +34,3 @@ object MergeUtils extends MergeData {
     Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
   }
 }
-
