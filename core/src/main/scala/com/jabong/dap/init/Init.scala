@@ -54,7 +54,6 @@ object Init {
         .action((x, c) => c.copy(config = x))
     }
 
-
     parser.parse(args, defaultParams).map { params =>
       // read application file
       try {

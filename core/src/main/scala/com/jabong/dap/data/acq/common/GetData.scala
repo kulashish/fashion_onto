@@ -28,7 +28,7 @@ object GetData extends Logging {
 
     logger.info(condition)
 
-    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver,condition)
+    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition)
     logger.info(dbTableQuery)
 
     val jdbcDF: DataFrame = if (primaryKey == null) {
