@@ -23,22 +23,22 @@ class TimeTest extends FlatSpec with Matchers {
     TimeUtils.daysFromToday(date2) should be (numDaysFromToday)
   }
 
-  "getTodayDate" should "return correct value" in {
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
-    TimeUtils.getTodayDate() should be (sdf.format(today))
+  "getTodayDate1" should "return correct value" in {
+    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT_FOLDER)
+    TimeUtils.getTodayDate(Constants.DATE_FORMAT_FOLDER) should be (sdf.format(today))
   }
 
-  "getYesterdayDate" should "return correct value" in {
+  "getDateAfterNDays" should "return correct value" in {
     val cal = Calendar.getInstance()
-    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT)
+    val sdf = new SimpleDateFormat(Constants.DATE_FORMAT_FOLDER)
     cal.setTime(today)
     cal.add(Calendar.DAY_OF_MONTH, -1)
-    TimeUtils.getYesterdayDate() should be (sdf.format(cal.getTime))
+    TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER) should be (sdf.format(cal.getTime))
   }
 
-  "getTodayDateWithHrs" should "return correct value" in {
-    val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
-    TimeUtils.getTodayDateWithHrs() should be (sdf.format(today))
+  "getTodayDate2" should "return correct value" in {
+    val sdf = new SimpleDateFormat(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
+    TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER) should be (sdf.format(today))
   }
 
   "dateStringEmpty" should "return true" in {
