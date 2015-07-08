@@ -16,7 +16,7 @@ object CampaignProducer {
     if (factoryType.equalsIgnoreCase("CustomerSelection")) {
       return new CustomerSelectorFactory()
     }
-    else if (factoryType.equalsIgnoreCase("Action")) {
+    else if (factoryType.equalsIgnoreCase("SkuSelection")) {
       return new SkuSelectorFactory()
     }
 

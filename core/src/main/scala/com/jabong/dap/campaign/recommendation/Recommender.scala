@@ -10,6 +10,11 @@ import scala.collection.immutable.HashMap
  * Created by jabong1145 on 22/6/15.
  */
 trait Recommender  extends java.io.Serializable{
+  
+  // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
+  // 8 recommendations
+  def recommend(refSkus: DataFrame): DataFrame
+  
 
   var RecommendationGenderMap = new HashMap[String,String]
   RecommendationGenderMap+=(

@@ -5,8 +5,16 @@ import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderIt
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
+
 /**
- * Created by jabong1145 on 6/7/15.
+ * Returns a list of customers based on following conditions:
+ *      1. Has a corresponding order-item who status was updated to "required set of status" yesterday
+ *      2. No new order has been made by him/her after the corresponding order-item update
+ *      
+ *  Returns data in the following format: 
+ *    - list of [(id_customer, id_sales_order, sku_simple, item status, unit price (special price))]
+ *    - primary key is (id_customer, sku_simple), i.e., id_customer may bet repeated
+ *
  */
 class ReturnCancel extends LiveCustomerSelector{
 
@@ -48,6 +56,8 @@ class ReturnCancel extends LiveCustomerSelector{
     // 1. order_item (1 day): filter by required status
     // 2. inner join it with sales_order: short data
     // call it rdf
+    
+    
     
     // how to filter new orders after that
     // 1. sales_order subset: last day order created at, customers in the rdf
