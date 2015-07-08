@@ -1,4 +1,4 @@
-package com.jabong.dap.common.merge
+package com.jabong.dap.data.storage.merge.common
 
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import org.apache.spark.sql.{ DataFrame, SQLContext }
