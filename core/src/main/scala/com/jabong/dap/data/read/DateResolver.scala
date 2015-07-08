@@ -30,7 +30,7 @@ object DateResolver {
     while ( hour >= 0 && flag ==0) {
       dateHour = withLeadingZeros(hour)
       val tempPath = PathBuilder.buildPath(source, tableName, dataType, pathDate)+ dateHour + "/"
-      if (DataVerifier.hdfsDataExists(tempPath)) {
+      if (DataVerifier.hdfsDataExists(tempPath, null)) {
         flag = 1
       }
       hour = hour - 1
@@ -48,7 +48,6 @@ object DateResolver {
       "%s".format(input)
     }
   }
-
 }
 
 class DataNotFound extends Exception
