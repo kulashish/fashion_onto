@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.recommendation
 
-import com.jabong.dap.campaign.common.ACartCampaign
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.{SharedSparkContext, Spark}
 import org.apache.spark.sql.types._

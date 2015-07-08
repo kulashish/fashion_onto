@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.recommendation
 
-import com.jabong.dap.campaign.recommendation.Recommender
 import org.scalatest.FlatSpec
 
 /**

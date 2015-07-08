@@ -54,7 +54,7 @@ trait Recommender  extends java.io.Serializable{
   }
 
   def inventoryWeekNotSold(category: String,stock:Int,weeklyAverage:Int): Boolean ={
-    if(category==null || stock==null || weeklyAverage==null || stock< weeklyAverage){
+    if(category==null || stock==0 || weeklyAverage==0 || stock< weeklyAverage){
       return false
     }
     val stockMultiplier = DesiredInventoryLevel.getOrElse(category,null)

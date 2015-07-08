@@ -7,7 +7,7 @@ import org.apache.spark.sql.functions._
 /**
  * Created by jabong1145 on 15/6/15.
  */
-class CampaignUtils {
+object CampaignUtils {
 
   def generateReferenceSku(skuData:DataFrame,NumberSku:Int): DataFrame ={
     val customerRefSku = skuData.groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU))
