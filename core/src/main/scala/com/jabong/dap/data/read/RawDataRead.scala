@@ -4,11 +4,12 @@ import com.jabong.dap.common.Spark
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
-/**
- * Created by Abhay on 7/7/15.
- */
 object RawDataRead extends Logging {
 
+  /**
+   * Method to read raw HDFS data for a source and table and get a dataFrame for the same.
+   * WARNING: Throws DataNotFound exception if data is not found.
+   */
   def getDataFrame (source: String, tableName: String, dataType: String, date: String): DataFrame = {
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
