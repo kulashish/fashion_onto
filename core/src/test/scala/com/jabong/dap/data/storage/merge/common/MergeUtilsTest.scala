@@ -22,8 +22,8 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
 
   "A Merged DF" should "have size 3" in {
     var mergedDF = MergeUtils.InsertUpdateMerge(df1, df2, "name")
-    val size =  mergedDF.collect.size
-    assert(size == 3)
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 3)
   }
 
   //  override def afterAll() {

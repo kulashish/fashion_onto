@@ -8,8 +8,6 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
 
   val conf = new SparkConf().setMaster("local").setAppName("test").set("spark.driver.allowMultipleContexts", "true")
 
-  //  conf.set("spark.driver.allowMultipleContexts" , "true")
-
   override def beforeAll() {
     Spark.init(conf)
 

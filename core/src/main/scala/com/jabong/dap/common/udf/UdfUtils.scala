@@ -83,7 +83,7 @@ object UdfUtils {
   }
 
   //this method will return max value from slot data
-  def getMaxSlot(oldSlot: Any, newSlot: Any): Int = {
+  def getMaxSlot(oldSlot: Any, newSlot: Any, oldPreferredSlot: Any): Int = {
 
     if (oldSlot == null && newSlot == null) {
 
@@ -95,7 +95,7 @@ object UdfUtils {
     }
     if (newSlot == null) {
 
-      return getMaxSlot(oldSlot)
+      return oldPreferredSlot.asInstanceOf[Int]
     }
 
     var maxSlot = 0
