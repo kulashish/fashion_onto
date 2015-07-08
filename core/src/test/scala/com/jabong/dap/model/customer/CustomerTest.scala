@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
+import com.jabong.dap.common.{ Config, Spark, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -55,23 +55,51 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     }
 
-  "getCustomer: Data Frame" should "match to resultant Data Frame" in {
+  "getCustomer: Data Frame" should "match to resultant Data Frame, If dfFull is NULL" in {
 
-    //"2015-07-05"
+    var dfFull: DataFrame = null
 
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame, null)
-      .limit(30).collect().toSet
+      dfSalesOrder: DataFrame, dfFull)
+    //      .limit(30).collect().toSet
 
-    //               result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer" + ".json")
+    //               result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_new" + ".json")
 
-    val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer",
+    val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_new",
       CustVarSchema.resultCustomer)
       .collect().toSet
 
-    assert(result.equals(dfResultCustomer) == true)
+    assert(result._1.limit(30).collect().toSet.equals(dfResultCustomer) == true)
+
+    assert(result._2 == null)
+
+  }
+
+  "getCustomer: Data Frame" should "match to resultant Data Frame, If dfFull is Not NULL" in {
+
+    var dfFull: DataFrame = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.RESULT_CUSTOMER_OLD, CustVarSchema.resultCustomer)
+
+    val result = Customer.getCustomer(
+      dfCustomer: DataFrame,
+      dfNLS: DataFrame,
+      dfSalesOrder: DataFrame, dfFull: DataFrame)
+    //      .limit(30).collect().toSet
+
+    //    result._2.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_incremental" + ".json")
+
+    val dfResultNew = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_new",
+      CustVarSchema.resultCustomer)
+      .collect().toSet
+
+    val dfResultIncremental = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.RESULT_CUSTOMER_INCREMENTAL,
+      CustVarSchema.resultCustomer)
+      .collect().toSet
+
+    assert(result._1.limit(30).collect().toSet.equals(dfResultNew) == true)
+
+    assert(result._2.limit(30).collect().toSet.equals(dfResultIncremental) == true)
 
   }
 

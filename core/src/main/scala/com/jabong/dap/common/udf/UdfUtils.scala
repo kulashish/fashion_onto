@@ -83,7 +83,7 @@ object UdfUtils {
   }
 
   //this method will return max value from slot data
-  def getMaxSlot(oldSlot: Any, newSlot: Any, oldPreferredSlot: Any): Int = {
+  def getMaxSlot(oldSlot: Any, newSlot: Any, oldPreferredSlot: Int): Int = {
 
     if (oldSlot == null && newSlot == null) {
 
@@ -95,7 +95,7 @@ object UdfUtils {
     }
     if (newSlot == null) {
 
-      return oldPreferredSlot.asInstanceOf[Int]
+      return oldPreferredSlot
     }
 
     var maxSlot = 0
@@ -148,7 +148,7 @@ object UdfUtils {
   //this method will create a slot data
   def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple2[String, Int] = {
 
-    var timeSlotArray = new Array[Int](13)
+    var timeSlotArray = new Array[Int](12)
 
     var maxSlot: Int = -1
 
@@ -157,9 +157,9 @@ object UdfUtils {
     iterable.foreach {
       case (slot, value) =>
         if (value > max) { maxSlot = slot; max = value };
-        timeSlotArray(slot) = value
+        timeSlotArray(slot - 1) = value
     }
-    new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot + 1)
+    new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
   }
 
 }
