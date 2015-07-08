@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
@@ -10,7 +10,7 @@ import org.apache.spark.sql.functions._
 /**
  * Cancel Re-target class
  */
-class CancelReTarget extends Action{
+class CancelReTarget extends SkuSelector{
 
   /*
   Given list of ordered sku return those which are cancelled

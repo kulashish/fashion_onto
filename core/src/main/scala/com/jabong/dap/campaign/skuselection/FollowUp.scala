@@ -1,11 +1,11 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import org.apache.spark.sql.DataFrame
 
 /**
  * Created by jabong1145 on 6/7/15.
  */
-class FollowUp extends Action{
+class FollowUp extends SkuSelector{
 
 /*
 Place Holder for Followup Action

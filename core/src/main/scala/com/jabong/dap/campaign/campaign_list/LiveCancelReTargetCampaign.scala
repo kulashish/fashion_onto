@@ -11,7 +11,7 @@ class LiveCancelReTargetCampaign {
 
     val campaignFactory = CampaignProducer.getFactory("CustomerSelection")
 
-    val returnCancelCustomer = campaignFactory.getCustomer("ReturnCancel")
+    val returnCancelCustomer = campaignFactory.getCustomerSelector("ReturnCancel")
 
 //    returnCancelCustomer.customerSelection()
 

@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.customerselect
+package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.variables.{ACartVariables, CustomerVariables}
 import org.apache.spark.sql.DataFrame
@@ -7,7 +7,7 @@ import org.apache.spark.sql.functions._
 /**
  * Live Campaign Class
  */
-abstract class LiveCustomerSelection extends CustomerSelection {
+abstract class LiveCustomerSelector extends CustomerSelector {
 
 
   /*

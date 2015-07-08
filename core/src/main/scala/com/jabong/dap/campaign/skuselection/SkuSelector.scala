@@ -1,11 +1,11 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import org.apache.spark.sql.DataFrame
 
 /**
 Action Interface to perform certain actions like re-target,item on discount
   */
-trait Action {
+trait SkuSelector {
 
  // val hiveContext = Spark.getHiveContext()
   def execute(inDataFrame: DataFrame):DataFrame

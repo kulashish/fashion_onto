@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.customerselect
+package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.{SharedSparkContext, Spark}
 import org.apache.spark.sql.{DataFrame, SQLContext}

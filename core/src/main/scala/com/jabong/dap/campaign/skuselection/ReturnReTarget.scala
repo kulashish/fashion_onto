@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.status.OrderStatus
@@ -8,7 +8,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Target customers who have returned the items
  */
-class ReturnReTarget extends Action {
+class ReturnReTarget extends SkuSelector {
   // val hiveContext = Spark.getHiveContext()
   override def execute(orderItemDataFrame: DataFrame): DataFrame = {
 

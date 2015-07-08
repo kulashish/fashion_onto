@@ -1,19 +1,25 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.actions.Action
+import com.jabong.dap.campaign.skuselection.SkuSelector
 import com.jabong.dap.campaign.recommendation.Recommender
-import com.jabong.dap.campaign.customerselect.CustomerSelection
+import com.jabong.dap.campaign.customerselection.CustomerSelector
 
 /**
- * Created by jabong1145 on 7/7/15.
+ *  A campaign consists of three main stages:
+ *  1. Customer selection --- e.g., all users who have abandoned cart during last 30 days
+ *  2. Reference SKU selection -- e.g., out of abandoned skus, find skus having stock of less than 10
+ *  3. Recommended SKU selection -- i.e., given the customer and reference skus, find the list of recommended skus
+ *  
+ *  This abstract factory interface defines methods for all these steps, which will be
+ *  be implemented by Factory instances of each stage separately.
  */
 
  abstract class CampaignFactory {
 
-  def getCustomer(customerType:String): CustomerSelection
+  def getCustomerSelector(customerType:String): CustomerSelector
 
-  def getAction(action:String):Action
+  def getSkuSelector(action:String):SkuSelector
 
-  def getRecommendation(recType:String): Recommender
+  def getRecommender(recType:String): Recommender
 
 }

@@ -1,11 +1,11 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import org.apache.spark.sql.DataFrame
 
 /**
   Low Stock Action Execution Class
  */
-class LowStock extends Action{
+class LowStock extends SkuSelector{
 
   /*
 Place Holder for Low Stock Action

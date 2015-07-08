@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.actions.ActionFactory
-import com.jabong.dap.campaign.customerselect.{CustomerSelectionFactory, CustomerSelection}
+import com.jabong.dap.campaign.skuselection.SkuSelectorFactory
+import com.jabong.dap.campaign.customerselection.{CustomerSelectorFactory, CustomerSelector}
 import com.jabong.dap.campaign.recommendation.RecommenderFactory
 
 /**
@@ -14,10 +14,10 @@ object CampaignProducer {
       return null
     }
     if (factoryType.equalsIgnoreCase("CustomerSelection")) {
-      return new CustomerSelectionFactory()
+      return new CustomerSelectorFactory()
     }
     else if (factoryType.equalsIgnoreCase("Action")) {
-      return new ActionFactory()
+      return new SkuSelectorFactory()
     }
 
     else if(factoryType.equalsIgnoreCase("Recommendation")) {

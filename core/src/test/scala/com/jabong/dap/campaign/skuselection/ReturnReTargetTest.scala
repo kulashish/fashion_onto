@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.common.{SharedSparkContext, Spark}
 import org.apache.spark.sql.DataFrame
@@ -6,32 +6,33 @@ import org.apache.spark.sql.hive.HiveContext
 import org.scalatest.FlatSpec
 
 /**
-  Cancel ReTarget Test Class
+ * Created by jabong1145 on 7/7/15.
  */
-class CancelReTargetTest extends FlatSpec with SharedSparkContext {
+class ReturnReTargetTest extends FlatSpec with SharedSparkContext{
+
   @transient var hiveContext: HiveContext = _
   @transient var testDataFrame : DataFrame = _
   @transient var orderItemDataFrame : DataFrame = _
-  var cancelRetarget :CancelReTarget = _
+  var returnReTarget :ReturnReTarget = _
 
   override def beforeAll() {
     super.beforeAll()
     hiveContext = Spark.getHiveContext()
-    cancelRetarget = new CancelReTarget()
+    returnReTarget = new ReturnReTarget()
     orderItemDataFrame = hiveContext.read.json("src/test/resources/sales_order/sales_order_with_item.json")
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }
 
 
-  "empty order data " should "return empty data from execute function" in {
-    val skuData = cancelRetarget.execute(null)
+  "empty order data " should "return empty data from execute function of return re-target " in {
+    val skuData = returnReTarget.execute(null)
     assert(skuData==null)
   }
 
 
-  "Last day order items data " should "return empty data from execute function" in {
-    val skuData = cancelRetarget.execute(orderItemDataFrame)
-    assert(skuData.count()==2)
+  "Last day order items data " should "return two records from execute function" in {
+    val skuData = returnReTarget.execute(orderItemDataFrame)
+    assert(skuData.count()==1)
   }
 
 

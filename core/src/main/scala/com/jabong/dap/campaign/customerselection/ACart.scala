@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.customerselect
+package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.variables.{ACartVariables, CustomerVariables}
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 /**
  * Created by jabong1145 on 16/6/15.
  */
-class ACart (sQLContext: SQLContext) extends LiveCustomerSelection with java.io.Serializable {
+class ACart (sQLContext: SQLContext) extends LiveCustomerSelector with java.io.Serializable {
 
   //Logic to select the cutomer
   // In this case cutomers with abundant cart in last 30days

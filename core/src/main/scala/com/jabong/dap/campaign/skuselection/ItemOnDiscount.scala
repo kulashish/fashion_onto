@@ -1,11 +1,11 @@
-package com.jabong.dap.campaign.actions
+package com.jabong.dap.campaign.skuselection
 
 import org.apache.spark.sql.DataFrame
 
 /**
   Item On Discount Execution Class
  */
-class ItemOnDiscount extends Action{
+class ItemOnDiscount extends SkuSelector{
   /*
 Place Holder for Item on Discount Action
  */
