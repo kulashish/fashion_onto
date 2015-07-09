@@ -21,7 +21,7 @@ class ReturnCancelTest extends FlatSpec with SharedSparkContext {
     hiveContext = Spark.getHiveContext()
     returnCancel = new ReturnCancel()
     orderItemDataFrame = hiveContext.read.json("src/test/resources/sales_order/sales_order_item.json")
-    orderData = hiveContext.read.json("src/test/resources/sales_order/sales_order.json")
+    orderData = hiveContext.read.json("src/test/resources/sales_order/sales_order_campaign.json")
   }
 
   "No order data" should "return no data" in {
