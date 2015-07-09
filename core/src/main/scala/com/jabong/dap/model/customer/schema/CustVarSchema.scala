@@ -1,12 +1,12 @@
-package com.jabong.dap.model.schema
+package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.{ NewsletterVariables, CustomerVariables, CustomerStoreVariables, CustomerSegmentsVariables }
+import com.jabong.dap.common.constants.variables.{ CustomerSegmentsVariables, CustomerStoreVariables, CustomerVariables, NewsletterVariables }
 import org.apache.spark.sql.types._
 
 /**
  * Created by raghu on 2/7/15.
  */
-object SchemaVariables {
+object CustVarSchema {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //customer variable schemas
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,5 +63,4 @@ object SchemaVariables {
     StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true)
   ))
-
 }

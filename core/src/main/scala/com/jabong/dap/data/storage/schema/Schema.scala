@@ -1,6 +1,5 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants._
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
