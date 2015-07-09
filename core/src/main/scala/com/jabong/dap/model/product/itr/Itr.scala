@@ -34,11 +34,11 @@ class Itr extends java.io.Serializable {
         join(
           Model.supplier.value.select("status", "id_catalog_supplier"),
           Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier"), "leftouter"
-      ).
+        ).
           join(
             Model.brand.value.select("name", "id_catalog_brand").withColumnRenamed("name", "brandName"),
             Model.config("fk_catalog_brand") === Model.brand.value("id_catalog_brand"), "leftouter"
-      ).limit(30)
+          ).limit(30)
 
     val itr = out.select(
       "id_catalog_config",

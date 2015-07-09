@@ -35,9 +35,9 @@ case class Credentials(
  * @param credentials List[Credentials] List of credentials.
  */
 case class Config(
-  applicationName: String = null,
-  master:          String = null,
-  basePath:        String = null,
+  applicationName: String            = null,
+  master:          String            = null,
+  basePath:        String            = null,
   credentials:     List[Credentials] = null
 ) extends EmptyClass
 
