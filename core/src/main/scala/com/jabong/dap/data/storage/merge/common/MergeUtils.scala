@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{ ArrayUtils, Spark }
-import org.apache.spark.sql.{ DataFrame, _ }
+import com.jabong.dap.common.Spark
+import org.apache.spark.sql.DataFrame
 
 /**
  * Merges the dataFrames and returns the merged dataFrame.
@@ -9,29 +9,57 @@ import org.apache.spark.sql.{ DataFrame, _ }
 
 object MergeUtils extends MergeData {
 
+  val NEW_ = "new_"
+
   def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
-    // rename dfIncr column names with new_ as prefix
-    var dfIncrVar = dfIncr;
+    val newpk = NEW_ + primaryKey
+
+    // join on primary key
+    val joinedDF = joinOldAndNewDF(dfIncr, dfBase, primaryKey)
+
+    //    //Commenting this code as this has functionality issue
+    //    //when we have a data set with base as big and incr as very small.
+    //    val dfSchema = dfIncr.schema
+    //
+    //    val numOfColumns = dfSchema.length
+    //
+    //    val incrPKColumn = ArrayUtils.findIndexInArray(dfIncr.columns, primaryKey)
+    //    
+    //    def reduceFunc(x: Row): Row = {
+    //      val splitSeq = x.toSeq.splitAt(numOfColumns)
+    //      if (x(incrPrimayKeyColumn + numOfColumns) == null)
+    //        Row.fromSeq(splitSeq._1)
+    //      else
+    //        Row.fromSeq(splitSeq._2)
+    //    }
+    //
+    //    val mergedDF = joinedDF.map(x => reduceFunc(x))
+    //
+    //    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
+
+    var numPart = dfBase.rdd.partitions.length
+
+    val df1 = joinedDF.filter(newpk + " IS NULL").select(dfBase("*"))
+
+    df1.unionAll(dfIncr).coalesce(numPart)
+  }
+
+  // join old and new data frame
+  def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
+
+    var dfIncrVar = dfIncr
+
+    dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
 
     val dfSchema = dfIncr.schema
-    val numOfColumns = dfSchema.length
-    val incrPrimayKeyColumn = ArrayUtils.findIndexInArray(dfIncr.columns, primaryKey)
 
-    dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, "new_" + x.name))
-    // join on primary key
-    val joinedDF = dfBase.join(dfIncrVar, dfBase(primaryKey) === dfIncrVar("new_" + primaryKey), "outer")
+    // rename dfIncr column names with new_ as prefix
+    dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
 
-    def reduceFunc(x: Row): Row = {
-      val splitSeq = x.toSeq.splitAt(numOfColumns)
-      if (x(incrPrimayKeyColumn + numOfColumns) == null)
-        Row.fromSeq(splitSeq._1)
-      else
-        Row.fromSeq(splitSeq._2)
-    }
+    // join old and new data frame on primary key
+    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), "outer")
 
-    val mergedDF = joinedDF.map(x => reduceFunc(x))
-
-    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
+    joinedDF
   }
-}
 
+}

@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.customerselection
 import com.jabong.dap.campaign.skuselection.SkuSelector
 import com.jabong.dap.campaign.manager.CampaignFactory
 import com.jabong.dap.campaign.recommendation.Recommender
+import com.jabong.dap.common.constants.campaign.CustomerSelection
 
 /**
  * Created by jabong1145 on 6/7/15.
@@ -14,7 +15,7 @@ class CustomerSelectorFactory extends CampaignFactory{
       return null
     }
 
-    if(customerSelectionType.equalsIgnoreCase("ReturnCancel")){
+    if(customerSelectionType.equalsIgnoreCase(CustomerSelection.RETURN_CANCEL)){
       return new ReturnCancel()
     }
 

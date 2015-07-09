@@ -14,7 +14,7 @@ import scala.collection.{mutable, SortedSet}
 
 
 /**
- * Created by jabong1145 on 23/6/15.
+ * Created by rahul (first version of basic recommender) on 23/6/15.
  */
 class BasicRecommender extends Recommender{
   val hiveContext = Spark.getHiveContext()
@@ -298,6 +298,8 @@ class BasicRecommender extends Recommender{
     return false
   }
 
+  // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
+  override def recommend(refSkus: DataFrame): DataFrame = ???
 }
 
 

@@ -65,4 +65,7 @@ object CustomerVariables {
   val FK_CUSTOMER_CPOT = "fk_customer_cpot"
   val NLS_UPDATED_AT = "nls_updated_at"
 
+  //for renaming column name
+  val NEW_ = "new_"
+
 }

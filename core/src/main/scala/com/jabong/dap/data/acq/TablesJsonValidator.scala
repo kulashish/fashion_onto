@@ -62,7 +62,7 @@ object TablesJsonValidator {
         )
       case "hourly" =>
         require(
-          table.mode == "hourly" && isSameDay(table.rangeStart, table.rangeEnd),
+          isSameDay(table.rangeStart, table.rangeEnd),
           "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
             "want data spanning multiple days."
         )
