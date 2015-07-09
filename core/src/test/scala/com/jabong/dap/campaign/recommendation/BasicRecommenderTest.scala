@@ -26,8 +26,8 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext{
     hiveContext = Spark.getHiveContext()
 
     basicRecommender=new BasicRecommender()
-    orderItemDataFrame = hiveContext.read.json("src/test/resources/SalesCart/OrderItemHistory.json")
-    itrDataFrame = hiveContext.read.json("src/test/resources/SalesCart/itrData.json")
+    orderItemDataFrame = hiveContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
+    itrDataFrame = hiveContext.read.json("src/test/resources/salescart/itrData.json")
 
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }

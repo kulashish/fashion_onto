@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.traceability
 
 /**
- * Created by jabong1145 on 8/7/15.
+  To check whether we send the campaign to the user earlier
  */
 class PastCampaignCheck {
 
