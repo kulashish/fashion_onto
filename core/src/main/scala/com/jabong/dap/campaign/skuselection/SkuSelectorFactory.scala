@@ -5,15 +5,14 @@ import com.jabong.dap.campaign.manager.CampaignFactory
 import com.jabong.dap.campaign.recommendation.Recommender
 import com.jabong.dap.common.constants.campaign.SkuSelection
 
-
 class SkuSelectorFactory extends CampaignFactory {
   override def getCustomerSelector(customerType: String): CustomerSelector = ???
 
   override def getSkuSelector(actionType: String): SkuSelector = {
-    if(actionType==null){
+    if (actionType == null) {
       return null
     }
-    if(actionType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)){
+    if (actionType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)) {
       return new CancelReTarget()
     }
     return null

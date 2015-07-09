@@ -5,7 +5,7 @@ import org.scalatest.FlatSpec
 /**
  * Created by jabong1145 on 23/6/15.
  */
-class RecommenderTest  extends FlatSpec {
+class RecommenderTest extends FlatSpec {
   /*var recommender :Recommender = _
 
 

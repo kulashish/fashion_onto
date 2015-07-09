@@ -16,6 +16,5 @@ class WishlistIODCampaign {
 
     // null recommendation
 
-
   }
 }

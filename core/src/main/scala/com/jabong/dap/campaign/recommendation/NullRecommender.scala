@@ -12,5 +12,4 @@ class NullRecommender extends Recommender {
     return null
   }
 
-
 }

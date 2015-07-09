@@ -9,7 +9,7 @@ import org.apache.spark.sql.DataFrame
  * 4. This campaign should not have gone to the customer in the past 30 days for the same Ref SKU
  */
 class LowStock extends SkuSelector {
-  
+
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
   // input will be [(id_customer, sku, sku simple)]
@@ -19,5 +19,5 @@ class LowStock extends SkuSelector {
   override def skuFilter(inDataFrame: DataFrame, itrDataFrame: DataFrame, campaignName: String): DataFrame = {
     null
   }
-  
+
 }

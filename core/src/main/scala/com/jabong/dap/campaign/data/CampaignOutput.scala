@@ -2,7 +2,6 @@ package com.jabong.dap.campaign.data
 
 import org.apache.spark.sql.DataFrame
 
-
 object CampaignOutput {
 
   /**

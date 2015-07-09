@@ -3,10 +3,10 @@ package com.jabong.dap.campaign.skuselection
 import org.apache.spark.sql.DataFrame
 
 /**
-  Item On Discount Execution Class
+ * Item On Discount Execution Class
  */
-class ItemOnDiscount extends SkuSelector{
-  
+class ItemOnDiscount extends SkuSelector {
+
   // sku filter
   // 1. order should not have been placed for the ref sku yet
   // 2. Today's Special Price of SKU (SIMPLE – include size) is less than
@@ -18,7 +18,7 @@ class ItemOnDiscount extends SkuSelector{
   // itr30dayData = [(skusimple, date, special price)]
   override def skuFilter(inDataFrame: DataFrame, itr30dayData: DataFrame, campaignName: String): DataFrame = {
     null
-    
+
   }
 
   // not needed

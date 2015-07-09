@@ -8,14 +8,14 @@ import com.jabong.dap.common.constants.campaign.CustomerSelection
 /**
  * Created by jabong1145 on 6/7/15.
  */
-class CustomerSelectorFactory extends CampaignFactory{
+class CustomerSelectorFactory extends CampaignFactory {
 
   override def getCustomerSelector(customerSelectionType: String): CustomerSelector = {
-    if(customerSelectionType==null){
+    if (customerSelectionType == null) {
       return null
     }
 
-    if(customerSelectionType.equalsIgnoreCase(CustomerSelection.RETURN_CANCEL)){
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.RETURN_CANCEL)) {
       return new ReturnCancel()
     }
 
