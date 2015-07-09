@@ -1,0 +1,10 @@
+{"fk_customer":1, "fk_sales_order":2, "fk_sales_order_item_status":4}
+{"fk_customer":2, "fk_sales_order":3, "fk_sales_order_item_status":3}
+{"fk_customer":1, "fk_sales_order":2, "fk_sales_order_item_status":5}
+{"fk_customer":3, "fk_sales_order":6, "fk_sales_order_item_status":6}
+{"fk_customer":1, "fk_sales_order":12, "fk_sales_order_item_status":7}
+{"fk_customer":1, "fk_sales_order":2, "fk_sales_order_item_status":12}
+{"fk_customer":2, "fk_sales_order":3, "fk_sales_order_item_status":18}
+{"fk_customer":1, "fk_sales_order":5, "fk_sales_order_item_status":15}
+{"fk_customer":3, "fk_sales_order":16, "fk_sales_order_item_status":16}
+{"fk_customer":1, "fk_sales_order":14, "fk_sales_order_item_status":17}
