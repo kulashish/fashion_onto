@@ -15,7 +15,7 @@ object MergeUtils extends MergeData {
     val newpk = NEW_ + primaryKey
 
     // join on primary key
-    val joinedDF = dfBase.join(dfIncr, dfBase(primaryKey) === dfIncr(newpk), "outer")
+    val joinedDF = joinOldAndNewDF(dfIncr, dfBase, primaryKey)
 
     //    //Commenting this code as this has functionality issue
     //    //when we have a data set with base as big and incr as very small.
