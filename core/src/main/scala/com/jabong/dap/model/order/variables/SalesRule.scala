@@ -9,10 +9,17 @@ import org.apache.spark.sql.functions._
 
 
 /**
- * Created by jabong on 26/6/15.
+ * Created by mubarak on 26/6/15.
+ *  Generate Welcome vouchers codes
  */
 object SalesRule {
 
+  /**
+   *
+   * @param salesRule DataFrame with the sales_rule data
+   * @param c int to filter the welcome code
+   * @return DataFrame with the welcome codes
+   */
   def getCode(salesRule : DataFrame, c :Int):DataFrame={
     val filData = salesRule.filter(salesRule(SalesRuleVariables.CODE).startsWith("WC"+c+"0"))
     val wcCode = filData.select(SalesRuleVariables.FK_CUSTOMER, SalesRuleVariables.UPDATED_AT, SalesRuleVariables.CODE, SalesRuleVariables.CREATED_AT, SalesRuleVariables.TO_DATE)
@@ -22,6 +29,11 @@ object SalesRule {
     return wcCode
   }
 
+  /**
+   *
+   * @param curr todays Date in format(YYYY/MM/DD)
+   * @param prev previous Date in format (YYYY/MM/DD)
+   */
   def createWcCodes(curr: String, prev:String) {
     val salesRulePath = DataSets.BOB_PATH + DataSets.SALES_RULE +"/"+ curr
     val salesRule = Spark.getSqlContext().read.parquet(salesRulePath)
