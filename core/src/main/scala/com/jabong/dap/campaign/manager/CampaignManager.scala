@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.campaign_list.LiveRetargetCampaign
+import com.jabong.dap.campaign.campaignlist.LiveRetargetCampaign
 
 /**
  *  Campaign Manager will run multiple campaign based On Priority

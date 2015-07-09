@@ -1,4 +1,4 @@
-package com.jabong.dap.campaign.campaign_list
+package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.manager.CampaignProducer
 import org.apache.spark.sql.DataFrame

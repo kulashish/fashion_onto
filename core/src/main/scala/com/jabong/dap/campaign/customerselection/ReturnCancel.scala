@@ -57,7 +57,7 @@ class ReturnCancel extends LiveCustomerSelector{
     // 2. inner join it with sales_order: short data
     // call it rdf
     
-    
+
     
     // how to filter new orders after that
     // 1. sales_order subset: last day order created at, customers in the rdf
@@ -70,5 +70,5 @@ class ReturnCancel extends LiveCustomerSelector{
 
   }
 
-
+  override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
 }

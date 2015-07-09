@@ -2,17 +2,16 @@ package com.jabong.dap.campaign.skuselection
 
 import org.apache.spark.sql.DataFrame
 
-/**
- * Created by jabong1145 on 6/7/15.
- */
 class FollowUp extends SkuSelector{
 
-/*
-Place Holder for Followup Action
- */
-  override def execute(inputDataFrame: DataFrame): DataFrame = {
-    return null
+  // 1. order should not have been placed for the ref sku yet
+  // 2. pick based on special price (descending)
+  // 1 day data
+  // inDataFrame =  [(id_customer, sku, sku simple)]
+  // itr30dayData = [(skusimple, date, special price)]
+  override def skuFilter(inDataFrame: DataFrame, itrData: DataFrame, campaignName: String): DataFrame = {
+    null
   }
-
+  
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 }

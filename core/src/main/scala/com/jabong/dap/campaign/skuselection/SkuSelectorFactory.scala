@@ -4,9 +4,7 @@ import com.jabong.dap.campaign.customerselection.CustomerSelector
 import com.jabong.dap.campaign.manager.CampaignFactory
 import com.jabong.dap.campaign.recommendation.Recommender
 
-/**
- * Created by jabong1145 on 4/7/15.
- */
+
 class SkuSelectorFactory extends CampaignFactory {
   override def getCustomerSelector(customerType: String): CustomerSelector = ???
 

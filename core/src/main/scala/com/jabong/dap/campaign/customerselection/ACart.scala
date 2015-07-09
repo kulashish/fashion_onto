@@ -49,4 +49,6 @@ class ACart (sQLContext: SQLContext) extends LiveCustomerSelector with java.io.S
   }
 
   override def customerSelection(customerData: DataFrame, orderItemData: DataFrame): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
 }

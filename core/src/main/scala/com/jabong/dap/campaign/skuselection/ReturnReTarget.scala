@@ -9,8 +9,10 @@ import org.apache.spark.sql.DataFrame
  * Target customers who have returned the items
  */
 class ReturnReTarget extends SkuSelector {
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
+
   // val hiveContext = Spark.getHiveContext()
-  override def execute(orderItemDataFrame: DataFrame): DataFrame = {
+  def execute(orderItemDataFrame: DataFrame): DataFrame = {
 
     if(orderItemDataFrame==null){
       return null
