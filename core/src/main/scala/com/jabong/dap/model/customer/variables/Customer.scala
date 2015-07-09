@@ -6,6 +6,7 @@ import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import com.jabong.dap.model.utils.Utils
@@ -32,7 +33,7 @@ object Customer {
                                   UPDATED_AT,
                                   EMAIL_OPT_IN_STATUS,
                                   CUSTOMERS PREFERRED ORDER TIMESLOT*/
-  def getCustomer(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame, date: String): DataFrame = {
+  def getCustomer(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame, dfPrevVarFull: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomer == null || dfNLS == null || dfSalesOrder == null) {
 
@@ -97,7 +98,7 @@ object Customer {
                                      ACC_REG_DATE,
                                      MAX_UPDATED_AT,
                                      EMAIL_OPT_IN_STATUS,*/
-    var dfResult = dfJoin.select(col(CustomerVariables.ID_CUSTOMER),
+    val dfResult = dfJoin.select(col(CustomerVariables.ID_CUSTOMER),
       col(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE),
       col(CustomerVariables.STORE_CREDITS_AVAILABLE),
       col(CustomerVariables.BIRTHDAY),
@@ -120,13 +121,15 @@ object Customer {
       udfEmailOptInStatus(dfJoin(NewsletterVariables.NLS_EMAIL),
         dfJoin(NewsletterVariables.STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
 
-    if (null != date && 0 < date.length) {
+    var dfFull: DataFrame = null
+
+    if (null != dfPrevVarFull) {
 
       //join old and new data frame
-      val joinDF = Utils.joinOldAndNewDF(dfResult, CustomerVariables.ID_CUSTOMER, DataSets.CUSTOMER, date)
+      val joinDF = MergeUtils.joinOldAndNewDF(dfResult, dfPrevVarFull, CustomerVariables.ID_CUSTOMER)
 
       //merge old and new data frame
-      dfResult = joinDF.select(Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+      dfFull = joinDF.select(Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         Udf.latestDecimal(joinDF(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE), joinDF(CustomerVariables.NEW_ + CustomerVariables.GIFTCARD_CREDITS_AVAILABLE)) as CustomerVariables.GIFTCARD_CREDITS_AVAILABLE,
         Udf.latestDecimal(joinDF(CustomerVariables.STORE_CREDITS_AVAILABLE), joinDF(CustomerVariables.NEW_ + CustomerVariables.STORE_CREDITS_AVAILABLE)) as CustomerVariables.STORE_CREDITS_AVAILABLE,
         Udf.latestDate(joinDF(CustomerVariables.BIRTHDAY), joinDF(CustomerVariables.NEW_ + CustomerVariables.BIRTHDAY)) as CustomerVariables.BIRTHDAY,
@@ -143,7 +146,7 @@ object Customer {
 
     }
 
-    dfResult
+    (dfResult, dfFull)
   }
 
   //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed

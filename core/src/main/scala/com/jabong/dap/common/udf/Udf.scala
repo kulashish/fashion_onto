@@ -38,6 +38,6 @@ object Udf {
   val mergeSlots = udf((oldSlot: Any, newSlot: Any) => UdfUtils.getMergeSlots(oldSlot: Any, newSlot: Any))
 
   //this udf will return Max Slot from two slots
-  val maxSlot = udf((oldSlot: Any, newSlot: Any, oldPreferredSlot: Any) => UdfUtils.getMaxSlot(oldSlot: Any, newSlot: Any, oldPreferredSlot: Any))
+  val maxSlot = udf((oldSlot: Any, newSlot: Any, oldPreferredSlot: Int) => UdfUtils.getMaxSlot(oldSlot: Any, newSlot: Any, oldPreferredSlot: Int))
 
 }

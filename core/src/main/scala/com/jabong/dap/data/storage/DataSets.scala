@@ -22,6 +22,9 @@ object DataSets {
   val SALES_RULE = "sales_rule"
 
   //customer
+  val RESULT_CUSTOMER_INCREMENTAL = "result_customer_incremental"
+  val RESULT_CUSTOMER_OLD = "result_customer_old"
+
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
   val CUSTOMER_SEGMENTS = "customer_segments"
