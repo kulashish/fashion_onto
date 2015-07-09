@@ -13,17 +13,20 @@ object CustVarSchema {
 
   val emailOptInStatus = StructType(Array(
     StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
-    StructField(NewsletterVariables.STATUS, StringType, true)))
+    StructField(NewsletterVariables.STATUS, StringType, true))
+  )
 
   val accRegDateAndUpdatedAt = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
-    StructField(CustomerVariables.UPDATED_AT, TimestampType, true)))
+    StructField(CustomerVariables.UPDATED_AT, TimestampType, true))
+  )
 
   val customersPreferredOrderTimeslot = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER_CPOT, IntegerType, true),
     StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
-    StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true)))
+    StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true))
+  )
 
   val resultCustomer = StructType(Array(
     StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
@@ -39,7 +42,8 @@ object CustVarSchema {
     StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true),
     StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
     StructField(CustomerVariables.MAX_UPDATED_AT, TimestampType, true),
-    StructField(CustomerVariables.EMAIL_OPT_IN_STATUS, StringType, true)))
+    StructField(CustomerVariables.EMAIL_OPT_IN_STATUS, StringType, true))
+  )
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //customer_segments variable schemas
@@ -48,7 +52,8 @@ object CustVarSchema {
   val mvp_seg = StructType(Array(
     StructField(CustomerSegmentsVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerSegmentsVariables.MVP_SCORE, IntegerType, true),
-    StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true)))
+    StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true))
+  )
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //customer_storecredits_history variable schemas
@@ -56,6 +61,6 @@ object CustVarSchema {
 
   val last_jr_covert_date = StructType(Array(
     StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
-    StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true)))
-
+    StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true))
+  )
 }
