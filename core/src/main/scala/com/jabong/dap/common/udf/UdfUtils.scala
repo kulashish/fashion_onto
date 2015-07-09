@@ -1,8 +1,10 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
+import java.util.{ Date }
 
 import com.jabong.dap.common.ArrayUtils
+import com.jabong.dap.common.time.TimeUtils
 
 /**
  * Created by raghu on 3/7/15.
@@ -160,6 +162,12 @@ object UdfUtils {
         timeSlotArray(slot - 1) = value
     }
     new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
+  }
+
+  def getAge(birthday: Date): Int = {
+
+    return TimeUtils.getYearFromToday(birthday)
+
   }
 
 }

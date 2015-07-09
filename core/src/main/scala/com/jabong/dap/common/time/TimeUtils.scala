@@ -160,5 +160,20 @@ object TimeUtils {
     timeSlot
   }
 
+  //calculate total year from today date and given date
+  def getYearFromToday(date: Date): Int = {
+
+    if (date == null)
+      return 0
+
+    val cal = Calendar.getInstance()
+    cal.setTime(date)
+
+    val todayCal = Calendar.getInstance()
+
+    return todayCal.get(Calendar.YEAR) - cal.get(Calendar.YEAR)
+
+  }
+
   case class MonthYear(val month: Int, val year: Int, val day: Int)
 }
