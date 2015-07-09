@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
 import com.jabong.dap.common.Spark
-import org.apache.spark.sql.{ DataFrame, _ }
+import org.apache.spark.sql.DataFrame
 
 /**
  * Merges the dataFrames and returns the merged dataFrame.
@@ -13,29 +13,29 @@ object MergeUtils extends MergeData {
 
   def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
     val newpk = NEW_ + primaryKey
-    
+
     // join on primary key
     val joinedDF = dfBase.join(dfIncr, dfBase(primaryKey) === dfIncr(newpk), "outer")
 
-//    //Commenting this code as this has functionality issue
-//    //when we have a data set with base as big and incr as very small.
-//    val dfSchema = dfIncr.schema
-//
-//    val numOfColumns = dfSchema.length
-//
-//    val incrPKColumn = ArrayUtils.findIndexInArray(dfIncr.columns, primaryKey)
-//    
-//    def reduceFunc(x: Row): Row = {
-//      val splitSeq = x.toSeq.splitAt(numOfColumns)
-//      if (x(incrPrimayKeyColumn + numOfColumns) == null)
-//        Row.fromSeq(splitSeq._1)
-//      else
-//        Row.fromSeq(splitSeq._2)
-//    }
-//
-//    val mergedDF = joinedDF.map(x => reduceFunc(x))
-//
-//    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
+    //    //Commenting this code as this has functionality issue
+    //    //when we have a data set with base as big and incr as very small.
+    //    val dfSchema = dfIncr.schema
+    //
+    //    val numOfColumns = dfSchema.length
+    //
+    //    val incrPKColumn = ArrayUtils.findIndexInArray(dfIncr.columns, primaryKey)
+    //    
+    //    def reduceFunc(x: Row): Row = {
+    //      val splitSeq = x.toSeq.splitAt(numOfColumns)
+    //      if (x(incrPrimayKeyColumn + numOfColumns) == null)
+    //        Row.fromSeq(splitSeq._1)
+    //      else
+    //        Row.fromSeq(splitSeq._2)
+    //    }
+    //
+    //    val mergedDF = joinedDF.map(x => reduceFunc(x))
+    //
+    //    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
 
     var numPart = dfBase.rdd.partitions.length
 
