@@ -7,7 +7,7 @@ import org.apache.spark.sql.DataFrame
 import scala.collection.immutable.HashMap
 
 /**
- * Created by jabong1145 on 22/6/15.
+ * Created by rahul (base recommender interface) on 22/6/15.
  */
 trait Recommender extends java.io.Serializable {
 

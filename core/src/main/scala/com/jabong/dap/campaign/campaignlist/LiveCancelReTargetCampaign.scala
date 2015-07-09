@@ -6,7 +6,7 @@ import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import org.apache.spark.sql.DataFrame
 
 /**
- * Created by jabong1145 on 7/7/15.
+ * Created by rahul for live cancel reTarget campaign on 7/7/15.
  */
 class LiveCancelReTargetCampaign {
 

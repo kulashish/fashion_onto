@@ -6,7 +6,7 @@ import com.jabong.dap.campaign.recommendation.Recommender
 import com.jabong.dap.common.constants.campaign.CustomerSelection
 
 /**
- * Created by jabong1145 on 6/7/15.
+ * Created by rahul for customer selection factory on 6/7/15.
  */
 class CustomerSelectorFactory extends CampaignFactory {
 

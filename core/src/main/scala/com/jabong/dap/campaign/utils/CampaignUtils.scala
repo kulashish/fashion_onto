@@ -5,7 +5,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
- * Created by jabong1145 on 15/6/15.
+ * Utility Class
  */
 object CampaignUtils {
 

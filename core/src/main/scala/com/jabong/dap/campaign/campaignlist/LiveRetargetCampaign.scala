@@ -5,7 +5,7 @@ import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelect
 import org.apache.spark.sql.DataFrame
 
 /**
- * Created by jabong1142 on 8/7/15.
+ *  Live Retarget Campaign  Class
  */
 class LiveRetargetCampaign {
 

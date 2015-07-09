@@ -6,7 +6,7 @@ import com.jabong.dap.campaign.recommendation.RecommenderFactory
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 
 /**
- * Created by jabong1145 on 7/7/15.
+ * Created by rahul for campaign production on 7/7/15.
  */
 object CampaignProducer {
 

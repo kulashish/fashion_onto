@@ -9,7 +9,7 @@ import org.scalatest.FlatSpec
 import scala.collection.mutable
 
 /**
- * Created by jabong1145 on 23/6/15.
+ *  basic recommender test cases
  */
 class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
 

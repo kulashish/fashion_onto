@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.data
 import org.apache.spark.sql.DataFrame
 
 /**
- * Created by jabong1145 on 15/6/15.
+ * Created by rahul for providing camapaign input on 15/6/15.
  */
 class CampaignInput {
 

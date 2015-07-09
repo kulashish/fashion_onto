@@ -7,7 +7,7 @@ import org.apache.spark.sql.hive.HiveContext
 import org.scalatest.FlatSpec
 
 /**
- * Created by jabong1145 on 6/7/15.
+ * Return cancel customer selector test cases
  */
 class ReturnCancelTest extends FlatSpec with SharedSparkContext {
 

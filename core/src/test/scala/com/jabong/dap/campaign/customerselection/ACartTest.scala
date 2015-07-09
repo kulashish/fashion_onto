@@ -5,7 +5,7 @@ import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
- * Created by jabong1145 on 17/6/15.
+ * Acart test cases
  */
 class ACartTest extends FlatSpec with SharedSparkContext {
 

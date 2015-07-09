@@ -6,7 +6,7 @@ import org.apache.spark.sql.hive.HiveContext
 import org.scalatest.FlatSpec
 
 /**
- * Created by jabong1145 on 7/7/15.
+ * return reTarget sku selection test cases
  */
 class ReturnReTargetTest extends FlatSpec with SharedSparkContext {
 

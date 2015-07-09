@@ -4,7 +4,7 @@ import com.jabong.dap.common.constants.variables.{ ACartVariables, CustomerVaria
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 
 /**
- * Created by jabong1145 on 16/6/15.
+ * Created by rahul for Acart customer selection on 16/6/15.
  */
 class ACart(sQLContext: SQLContext) extends LiveCustomerSelector with java.io.Serializable {
 

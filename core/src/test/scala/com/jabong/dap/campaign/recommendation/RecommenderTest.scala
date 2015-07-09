@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.recommendation
 import org.scalatest.FlatSpec
 
 /**
- * Created by jabong1145 on 23/6/15.
+ * 
  */
 class RecommenderTest extends FlatSpec {
   /*var recommender :Recommender = _
