@@ -26,7 +26,6 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     config:    String = null
-
   )
 
   def main(args: Array[String]) {
@@ -44,7 +43,7 @@ object Init {
 
     val parser = new OptionParser[Params]("Alchemy") {
       opt[String]("component")
-        .text("Component name like 'itr/acquisition' etc.")
+        .text("Component name like 'itr/acquisition/erp/campaign' etc.")
         .required()
         .action((x, c) => c.copy(component = x))
 
