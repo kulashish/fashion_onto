@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{ ArrayUtils, Spark }
-import org.apache.spark.sql.{ DataFrame, _ }
+import com.jabong.dap.common.Spark
+import org.apache.spark.sql.DataFrame
 
 /**
  * Merges the dataFrames and returns the merged dataFrame.
@@ -12,27 +12,36 @@ object MergeUtils extends MergeData {
   val NEW_ = "new_"
 
   def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
+    val newpk = NEW_ + primaryKey
 
     // join on primary key
-    val joinedDF = joinOldAndNewDF(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String)
+    val joinedDF = joinOldAndNewDF(dfIncr, dfBase, primaryKey)
 
-    val dfSchema = dfIncr.schema
+    //    //Commenting this code as this has functionality issue
+    //    //when we have a data set with base as big and incr as very small.
+    //    val dfSchema = dfIncr.schema
+    //
+    //    val numOfColumns = dfSchema.length
+    //
+    //    val incrPKColumn = ArrayUtils.findIndexInArray(dfIncr.columns, primaryKey)
+    //    
+    //    def reduceFunc(x: Row): Row = {
+    //      val splitSeq = x.toSeq.splitAt(numOfColumns)
+    //      if (x(incrPrimayKeyColumn + numOfColumns) == null)
+    //        Row.fromSeq(splitSeq._1)
+    //      else
+    //        Row.fromSeq(splitSeq._2)
+    //    }
+    //
+    //    val mergedDF = joinedDF.map(x => reduceFunc(x))
+    //
+    //    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
 
-    val numOfColumns = dfSchema.length
+    var numPart = dfBase.rdd.partitions.length
 
-    val incrPKColumn = ArrayUtils.findIndexInArray(dfIncr.columns, primaryKey)
+    val df1 = joinedDF.filter(newpk + " IS NULL").select(dfBase("*"))
 
-    def reduceFunc(x: Row): Row = {
-      val splitSeq = x.toSeq.splitAt(numOfColumns)
-      if (x(incrPKColumn + numOfColumns) == null)
-        Row.fromSeq(splitSeq._1)
-      else
-        Row.fromSeq(splitSeq._2)
-    }
-
-    val mergedDF = joinedDF.map(x => reduceFunc(x))
-
-    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
+    df1.unionAll(dfIncr).coalesce(numPart)
   }
 
   // join old and new data frame

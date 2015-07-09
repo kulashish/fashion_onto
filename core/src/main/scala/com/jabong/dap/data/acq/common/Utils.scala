@@ -12,8 +12,9 @@ import grizzled.slf4j.Logging
  * @param foreignKey String The name of the foreign key for the table.
  */
 case class JoinTables(
-  name: String,
-  foreignKey: String)
+  name:       String,
+  foreignKey: String
+)
 
 /**
  * Case class for storing information about data acquisition from a table.
@@ -32,18 +33,19 @@ case class JoinTables(
  * @param joinTables List[JoinTables] List of tables to be joined.
  */
 case class TableInfo(
-  source: String,
-  tableName: String,
-  primaryKey: String,
-  mode: String,
-  saveFormat: String,
-  saveMode: String,
-  dateColumn: String,
-  rangeStart: String,
-  rangeEnd: String,
-  limit: String,
+  source:          String,
+  tableName:       String,
+  primaryKey:      String,
+  mode:            String,
+  saveFormat:      String,
+  saveMode:        String,
+  dateColumn:      String,
+  rangeStart:      String,
+  rangeEnd:        String,
+  limit:           String,
   filterCondition: String,
-  joinTables: List[JoinTables])
+  joinTables:      List[JoinTables]
+)
 
 /**
  * Case class for storing information for merging the data of a table.
@@ -58,13 +60,14 @@ case class TableInfo(
  */
 
 case class MergeInfo(
-  source: String,
-  tableName: String,
+  source:     String,
+  tableName:  String,
   primaryKey: String,
-  mergeMode: String,
-  mergeDate: String,
+  mergeMode:  String,
+  mergeDate:  String,
   saveFormat: String,
-  saveMode: String)
+  saveMode:   String
+)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -72,7 +75,8 @@ case class MergeInfo(
  * @param acquisition List[TableInfo] List of tables to acquire the data from.
  */
 case class ImportInfo(
-  acquisition: List[TableInfo]) extends EmptyClass
+  acquisition: List[TableInfo]
+) extends EmptyClass
 
 /**
  * Case class for storing the information for the merge job.
@@ -80,7 +84,8 @@ case class ImportInfo(
  * @param merge List[MergeInfo] List of Tables to run the merge job on.
  */
 case class MergeJobInfo(
-  merge: List[MergeInfo]) extends EmptyClass
+  merge: List[MergeInfo]
+) extends EmptyClass
 
 /**
  * Object to access config variables application wide

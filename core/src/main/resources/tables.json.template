@@ -1,12 +1,12 @@
 {
   "acquisition": [
     {
-      "source": "bob"/"erp"/"unicommerce"/"nextbee",
+      "source": "bob",
       "tableName": "catalog_product_image",
       "primaryKey": "id_catalog_product_image",
-      "mode": "full"/"daily"/"hourly",
-      "saveFormat": "parquet"/"orc",
-      "saveMode": "overwrite"/"append"/"ignore"/"error",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "overwrite",
       "dateColumn": "[Last Modification Date Time]",
       "rangeStart": "2014-06-12",
       "rangeEnd": "2014-06-12",

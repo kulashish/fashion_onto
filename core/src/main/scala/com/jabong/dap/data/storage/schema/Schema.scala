@@ -60,7 +60,8 @@ object Schema {
     StructField(CustomerVariables.APP_VERSION, StringType, true),
     StructField(CustomerVariables.FK_CORPORATE_CUSTOMER, IntegerType, true),
     StructField(CustomerVariables.FK_REFERRAL_CODE, IntegerType, true),
-    StructField(CustomerVariables.SMS_OPT, BooleanType, true)))
+    StructField(CustomerVariables.SMS_OPT, BooleanType, true)
+  ))
 
   val nls = StructType(Array(
     StructField(NewsletterVariables.ID_NEWSLETTER_SUBSCRIPTION, IntegerType, true),
@@ -77,7 +78,8 @@ object Schema {
     StructField(NewsletterVariables.FK_AFFILIATE_PARTNER, IntegerType, true),
     StructField(NewsletterVariables.SRC_SUB, StringType, true),
     StructField(NewsletterVariables.SRC_UNSUB, StringType, true),
-    StructField(NewsletterVariables.FREQUENCY, StringType, true)))
+    StructField(NewsletterVariables.FREQUENCY, StringType, true)
+  ))
 
   val salesOrder = StructType(Array(
     StructField(SalesOrderVariables.ID_SALES_ORDER, IntegerType, true),
@@ -127,7 +129,8 @@ object Schema {
     StructField(SalesOrderVariables.FK_CORPORATE_CUSTOMER, IntegerType, true),
     StructField(SalesOrderVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true),
     StructField(SalesOrderVariables.CORPORATE_TRANSACTION_ID, StringType, true),
-    StructField(SalesOrderVariables.DEVICE_ID, StringType, true)))
+    StructField(SalesOrderVariables.DEVICE_ID, StringType, true)
+  ))
 
   val csh = StructType(Array(
     StructField(CustomerStoreVariables.ID_CUSTOMER_STORECREDITS_HISTORY, IntegerType, true),
@@ -143,7 +146,8 @@ object Schema {
     StructField(CustomerStoreVariables.FK_ACL_USER, IntegerType, true),
     StructField(CustomerStoreVariables.UPDATED_AT, TimestampType, true),
     StructField(CustomerStoreVariables.BALANCE, DecimalType(10, 2), true),
-    StructField(CustomerStoreVariables.EXPIRY_DATE, DateType, true)))
+    StructField(CustomerStoreVariables.EXPIRY_DATE, DateType, true)
+  ))
 
   val customerSegments = StructType(Array(
     StructField(CustomerSegmentsVariables.ID_CUSTOMER_SEGMENTS, IntegerType, true),
@@ -154,6 +158,11 @@ object Schema {
     StructField(CustomerSegmentsVariables.DISCOUNT_SCORE, IntegerType, true),
     StructField(CustomerSegmentsVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerSegmentsVariables.CREATED_AT, TimestampType, true),
-    StructField(CustomerSegmentsVariables.UPDATED_AT, TimestampType, true)))
+    StructField(CustomerSegmentsVariables.UPDATED_AT, TimestampType, true)
+  ))
 
+  val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
+  val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true)))
+  val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
 }

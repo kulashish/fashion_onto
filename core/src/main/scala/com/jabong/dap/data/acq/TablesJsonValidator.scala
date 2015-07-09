@@ -35,32 +35,37 @@ object TablesJsonValidator {
   def validateDateTimes(table: TableInfo) = {
     require(
       !(dateStringEmpty(table.rangeStart) ^ dateStringEmpty(table.rangeEnd)),
-      "rangeStart and rangeEnd both should have values, or none of them should have a value")
+      "rangeStart and rangeEnd both should have values, or none of them should have a value"
+    )
 
     // Check if rangeStart doesn't have a value for hourly mode.
     // rangeEnd doesn't need to be checked as it will have a value if rangeStart has a value.
     if (table.mode == "hourly") {
       require(
         !dateStringEmpty(table.rangeStart),
-        "Range should be provided for hourly mode")
+        "Range should be provided for hourly mode"
+      )
     }
   }
 
   def validateRanges(table: TableInfo) = {
     require(
       isStrictlyLessThan(table.rangeStart, table.rangeEnd),
-      "Start date time should be strictly less than End date time")
+      "Start date time should be strictly less than End date time"
+    )
     table.mode match {
       case "daily" =>
         require(
           isSameMonth(table.rangeStart, table.rangeEnd),
           "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
-            "want data spanning multiple months.")
+            "want data spanning multiple months."
+        )
       case "hourly" =>
         require(
           isSameDay(table.rangeStart, table.rangeEnd),
           "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
-            "want data spanning multiple days.")
+            "want data spanning multiple days."
+        )
       case "full" =>
     }
   }
