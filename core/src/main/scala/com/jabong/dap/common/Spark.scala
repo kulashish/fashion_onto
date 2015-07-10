@@ -13,6 +13,7 @@ object Spark {
   private var sqlContext: SQLContext = null
   private var hiveContext: HiveContext = null
 
+
   /**
    * Initialize spark context as well as sqlContext instances
    * @param sConf SparkConf

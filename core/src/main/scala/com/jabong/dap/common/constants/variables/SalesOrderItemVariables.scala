@@ -1,7 +1,7 @@
 package com.jabong.dap.common.constants.variables
 
 /**
- * Created by jabong on 6/7/15.
+ * Sales order item variables
  */
 object SalesOrderItemVariables {
   val ID_SALES_ORDER_ITEM = "id_sales_order_item"
@@ -14,6 +14,7 @@ object SalesOrderItemVariables {
   val GIFTCARD_CREDITS_VALUE = "giftcard_credits_value"
   val STORE_CREDITS_VALUE = "store_credits_value"
   val PAYBACK_CREDITS_VALUE = "payback_credits_value"
-
+  val UNIT_PRICE = "unit_price"
+  val SALES_ORDER_ITEM_STATUS = "fk_sales_order_item_status"
   val REVENUE = "revenue"
 }
