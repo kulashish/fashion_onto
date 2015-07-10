@@ -3,7 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.AppConfig
+import com.jabong.dap.common.{OptionUtils, AppConfig}
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
@@ -16,8 +16,8 @@ object PathBuilder {
     val basePath = AppConfig.config.basePath
     val source = AcqImportInfo.tableInfo.source
     val tableName = AcqImportInfo.tableInfo.tableName
-    val rangeStart = AcqImportInfo.tableInfo.rangeStart
-    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
+    val rangeStart = OptionUtils.getOptValue(AcqImportInfo.tableInfo.rangeStart)
+    val rangeEnd = OptionUtils.getOptValue(AcqImportInfo.tableInfo.rangeEnd)
 
     AcqImportInfo.tableInfo.mode match {
       case "full" =>

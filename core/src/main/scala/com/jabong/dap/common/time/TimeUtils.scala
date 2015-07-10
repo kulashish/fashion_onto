@@ -26,16 +26,6 @@ object TimeUtils {
   }
 
   /**
-   * Boolean test to check whether a given date string is empty (returns true) or not (returns false).
-   */
-  def dateStringEmpty(dt: String): Boolean = {
-    if (dt == null || dt.length() == 0)
-      true
-    else
-      false
-  }
-
-  /**
    * Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
    * date or not.
    * WARNING: can raise ParseException if input dates not in the correct format.

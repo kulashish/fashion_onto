@@ -41,15 +41,7 @@ class TimeTest extends FlatSpec with Matchers {
     TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER) should be (sdf.format(today))
   }
 
-  "dateStringEmpty" should "return true" in {
-    TimeUtils.dateStringEmpty("") should be (true)
-  }
-
-  "dateStringEmpty" should "return false" in {
-    TimeUtils.dateStringEmpty("2015-06-19") should be (false)
-  }
-
-  "isStrictlyLessThan" should "return true" in {
+   "isStrictlyLessThan" should "return true" in {
     TimeUtils.isStrictlyLessThan("2015-05-19 00:00:00", "2015-06-19 00:00:00") should be (true)
   }
 
