@@ -10,7 +10,7 @@ import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 26/6/15.
- *  Generate Welcome vouchers codes
+ * 
  */
 object SalesRule {
 
@@ -31,22 +31,14 @@ object SalesRule {
 
   /**
    *
-   * @param curr todays Date in format(YYYY/MM/DD)
-   * @param prev previous Date in format (YYYY/MM/DD)
+   * @param salesRule sales_rule table data
+   * @param wcPrev previous full dataframe
+   * @param i (1 for wc10, 2 for wc20 )
    */
-  def createWcCodes(curr: String, prev:String) {
-    val salesRulePath = DataSets.BOB_PATH + DataSets.SALES_RULE +"/"+ curr
-    val salesRule = Spark.getSqlContext().read.parquet(salesRulePath)
-    val wc10 = getCode(salesRule,1)
-    val wc20 = getCode(salesRule,2)
-    wc10.write.parquet(DataSets.VARIABLE_PATH +SalesRuleVariables.WELCOME1+ curr)
-    wc20.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME2+ curr)
-    val wc10Prev = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH  + SalesRuleVariables.WELCOME1+"full/"+ prev)
-    val wc20Prev = Spark.getSqlContext().read.parquet(DataSets.VARIABLE_PATH  + SalesRuleVariables.WELCOME2+"full/"+ prev)
-    val wc10Full = MergeUtils.InsertUpdateMerge(wc10Prev, wc10, SalesRuleVariables.FK_CUSTOMER)
-    val wc20Full = MergeUtils.InsertUpdateMerge(wc10Prev, wc20, SalesRuleVariables.FK_CUSTOMER)
-    wc10Full.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME1+"full/" + curr)
-    wc20Full.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME2+"full/" + curr)
+  def createWcCodes(salesRule: DataFrame, wcPrev:DataFrame, i:Int ):DataFrame= {
+    val wc = getCode(salesRule,i)
+    val wcFull = MergeUtils.InsertUpdateMerge(wcPrev, wc, SalesRuleVariables.FK_CUSTOMER)
+    wcFull
   }
 
 }

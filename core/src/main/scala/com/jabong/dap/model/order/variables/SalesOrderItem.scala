@@ -38,7 +38,6 @@ object SalesOrderItem {
       SalesOrderItemVariables.STORE_CREDITS_VALUE,
       SalesOrderVariables.DOMAIN)
     salesJoinedDF.printSchema()
-
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
@@ -47,6 +46,7 @@ object SalesOrderItem {
     val mWeb = getRevenueOrders(mWebOrders,"_mweb")
     val joinedData = joinDataFrames(app, web, mWeb)
     joinedData.printSchema()
+    joinedData.show(5)
     joinedData
   }
 
@@ -87,13 +87,12 @@ object SalesOrderItem {
       SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
       SalesOrderItemVariables.REVENUE_WEB -> 0.0
     ))
-    joinedData.printSchema()
-    joinedData.show(5)
     val res = joinedData.withColumn(SalesOrderItemVariables.REVENUE,
       joinedData(SalesOrderItemVariables.REVENUE_APP) + joinedData(SalesOrderItemVariables.REVENUE_WEB) + joinedData(SalesOrderItemVariables.REVENUE_MWEB) ).withColumn(
       SalesOrderItemVariables.ORDERS_COUNT,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB))
     res.printSchema()
+    res.show(5)
     return res
   }
 
@@ -135,16 +134,13 @@ object SalesOrderItem {
   }
 
   /**
-   *
+   * Calculates revenue, orders_count per customer for the input dataframe
    * @param salesOrderItem
    * @param domain
-   * @return
+   * @return dataframe with the revnue and orders count
    */
   def getRevenueOrders(salesOrderItem: DataFrame, domain: String): DataFrame ={
     val resultDF = salesOrderItem.groupBy(SalesOrderVariables.FK_CUSTOMER).agg((first(SalesOrderVariables.SHIPPING_AMOUNT) + first(SalesOrderVariables.COD_CHARGE) + first(SalesOrderVariables.GW_AMOUNT) + sum(SalesOrderItemVariables.PAID_PRICE) + sum(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE) +  sum(SalesOrderItemVariables.STORE_CREDITS_VALUE) + sum(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE)) as SalesOrderItemVariables.REVENUE, countDistinct(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ORDERS_COUNT)
-    println("After merging for " + domain)
-    resultDF.printSchema()
-    resultDF.show(5)
     val newRdd = resultDF.rdd
     val schema = StructType(Array(StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true), StructField(SalesOrderItemVariables.REVENUE+domain, DecimalType.apply(16,2), true), StructField(SalesOrderVariables.ORDERS_COUNT+domain, LongType , true)))
     val res = Spark.getSqlContext().createDataFrame(newRdd, schema)
@@ -152,23 +148,4 @@ object SalesOrderItem {
     res.show(5)
     res
   }
-
-
-  /**
-   * for testing only
-   * @param args
-   */
-  def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("SparkExamples")
-    Spark.init(conf)
-
-    val soDf = Spark.getSqlContext().read.parquet("")
-    val soiDf = Spark.getSqlContext().read.parquet("")
-
-    val merged = processVariables(soDf,soiDf)
-    merged.show(5)
-
-  }
-
-
 }
