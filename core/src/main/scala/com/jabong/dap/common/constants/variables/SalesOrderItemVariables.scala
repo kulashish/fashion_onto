@@ -2,6 +2,7 @@ package com.jabong.dap.common.constants.variables
 
 /**
  * Created by mubarak on 6/7/15.
+ * Sales order item variables
  */
 object SalesOrderItemVariables {
   val ID_SALES_ORDER_ITEM = "id_sales_order_item"
@@ -20,7 +21,8 @@ object SalesOrderItemVariables {
   val APP = "/app/"
   val WEB = "/web/"
   val MOBILE_WEB = "/mobile_web/"
-
+  val UNIT_PRICE = "unit_price"
+  val SALES_ORDER_ITEM_STATUS = "fk_sales_order_item_status"
   val REVENUE = "revenue"
   val REVENUE_APP = "revenue_app"
   val REVENUE_WEB = "revenue_web"
