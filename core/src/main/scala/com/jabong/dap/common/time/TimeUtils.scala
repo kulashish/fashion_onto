@@ -11,22 +11,31 @@ import scala.collection.immutable.HashMap
 object TimeUtils {
 
   /**
-   * Returns the total number of days between two given date inputs
+   * @note Returns the total number of days between two given date inputs
+   * @param date1
+   * @param date2
+   * @return
    */
   def daysBetweenTwoDates(date1: Date, date2: Date): BigInt = {
     Math.abs(date1.getTime - date2.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
   }
 
+
   /**
-   * Given a date input, returns the number of days between that date and today's date
+   * @note Given a date input, returns the number of days between that date and today's date
+   * @param date
+   * @return
    */
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
     daysBetweenTwoDates(today, date)
   }
 
+
   /**
-   * Boolean test to check whether a given date string is empty (returns true) or not (returns false).
+   * @note Boolean test to check whether a given date string is empty (returns true) or not (returns false).
+   * @param dt
+   * @return
    */
   def dateStringEmpty(dt: String): Boolean = {
     if (dt == null || dt.length() == 0)
@@ -35,10 +44,14 @@ object TimeUtils {
       false
   }
 
+
   /**
-   * Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
+   * @note Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
    * date or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
+   * @param dt1
+   * @param dt2
+   * @return
    */
   def isStrictlyLessThan(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
@@ -51,9 +64,12 @@ object TimeUtils {
   }
 
   /**
-   * Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same month of the same
+   * @note Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same month of the same
    * year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
+   * @param dt1
+   * @param dt2
+   * @return
    */
   def isSameMonth(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
@@ -67,10 +83,14 @@ object TimeUtils {
       false
   }
 
+
   /**
-   * Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same day of the same
+   * @note Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same day of the same
    * month of the same year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
+   * @param dt1
+   * @param dt2
+   * @return
    */
   def isSameDay(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
@@ -85,10 +105,15 @@ object TimeUtils {
       false
   }
 
-  /*
-   Returns the Date as a string in the given Date Format which is given no. of days after given input date.
-   If input date is null then use today's date.
-   If n is negative then returns the date as a string which is given no. of days before today's date.
+
+  /**
+   *@note  Returns the Date as a string in the given Date Format which is given no. of days after given input date.
+   * If input date is null then use today's date.
+   * If n is negative then returns the date as a string which is given no. of days before today's date.
+   * @param noOfDays
+   * @param dateFormat
+   * @param date
+   * @return
    */
   def getDateAfterNDays(noOfDays: Int, dateFormat: String, date: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
@@ -99,14 +124,24 @@ object TimeUtils {
     sdf.format(cal.getTime())
   }
 
-  /*
-   Returns the Date as a string in the given Date Format which is given no. of days after today's date.
-   If n is negative then returns the date as a string which is given no. of days before today's date.
-  */
+
+  /**
+   * @note  Returns the Date as a string in the given Date Format which is given no. of days after today's date.
+   *   If n is negative then returns the date as a string which is given no. of days before today's date.
+   * @param noOfDays
+   * @param dateFormat
+   * @return
+   */
   def getDateAfterNDays(noOfDays: Int, dateFormat: String): String = {
     getDateAfterNDays(noOfDays, dateFormat, getTodayDate(dateFormat))
   }
 
+  /**
+   * @note
+   * @param date
+   * @param dateFormat
+   * @return
+   */
   def getTimeStamp(date: String, dateFormat: String): Timestamp = {
     val sdf = new SimpleDateFormat(dateFormat)
     val dt = sdf.parse(date)
@@ -115,14 +150,23 @@ object TimeUtils {
     ts
   }
 
-  /*
-  Return today's date as a string in the given date format.
+
+  /**
+   * @note Return today's date as a string in the given date format.
+   * @param dateFormat
+   * @return
    */
   def getTodayDate(dateFormat: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     sdf.format(new Date())
   }
 
+  /**
+   *
+   * @param dt
+   * @param dateFormat
+   * @return
+   */
   def getMonthAndYear(dt: String, dateFormat: String): MonthYear = {
     val cal = Calendar.getInstance()
     if (null != dt) {
@@ -134,6 +178,12 @@ object TimeUtils {
     my
   }
 
+  /**
+   *
+   * @param dt
+   * @param dateFormat
+   * @return
+   */
   def getMaxDaysOfMonth(dt: String, dateFormat: String): Int = {
     val cal = Calendar.getInstance()
     if (null != dt) {
@@ -144,6 +194,12 @@ object TimeUtils {
     cal.getActualMaximum(Calendar.DAY_OF_MONTH)
   }
 
+  /**
+   *
+   * @param dateString
+   * @param dateFormat
+   * @return Int
+   */
   def timeToSlot(dateString: String, dateFormat: String): Int = {
 
     var timeToSlotMap = new HashMap[Int, Int]
@@ -159,11 +215,14 @@ object TimeUtils {
     val timeSlot = timeToSlotMap.getOrElse(hours, 0)
     timeSlot
   }
-  
+
   /**
-  calculate total number of years from given date till today.
-  Input Parameter should Date DataType and it will return Int DataType
- */
+   * @author raghu
+   * @note calculate total number of years from given date till today.
+   * @param date
+   * @return Int
+   */
+
   def getYearFromToday(date: Date): Int = {
 
     if (date == null)

@@ -20,7 +20,15 @@ object Customer {
   // DataFrame Customer,NLS, SalesOrder operations
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  //this method will calculate customer related variable
+  /**
+   * @note this method will calculate customer related variable
+   * @author raghu
+   * @param dfCustomer
+   * @param dfNLS
+   * @param dfSalesOrder
+   * @param dfPrevVarFull
+   * @return (DataFrame, DataFrame)
+   */
   def getCustomer(dfCustomer: DataFrame, dfNLS: DataFrame, dfSalesOrder: DataFrame, dfPrevVarFull: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomer == null || dfNLS == null || dfSalesOrder == null) {
@@ -184,7 +192,13 @@ object Customer {
     (dfResult, dfFull)
   }
 
-  //iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
+  /**
+   * @note iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
+   * @author raghu
+    * @param nls_email
+    * @param status
+    * @return String
+    */
   def getEmailOptInStatus(nls_email: String, status: String): String = {
 
     if (nls_email == null) {
@@ -198,7 +212,13 @@ object Customer {
 
   }
 
-  //CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
+
+  /**
+   * @note CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
+   * @author raghu
+   * @param dfSalesOrder
+   * @return DataFrame
+   */
   def getCPOT(dfSalesOrder: DataFrame): DataFrame = {
 
     val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
@@ -220,35 +240,5 @@ object Customer {
     df
   }
 
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple2[String, Int] = {
-
-    var timeSlotArray = new Array[Int](13)
-
-    var maxSlot: Int = -1
-
-    var max: Int = -1
-
-    iterable.foreach {
-      case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value };
-        timeSlotArray(slot) = value
-    }
-    new Tuple2(arrayToString(timeSlotArray), maxSlot)
-  }
-
-  def arrayToString(array: Array[Int]): String = {
-
-    var arrayConverted: String = ""
-
-    for (i <- 1 to array.length - 1) {
-
-      if (i == 1) {
-        arrayConverted = array(i).toString
-      } else {
-        arrayConverted = arrayConverted + "!" + array(i).toString
-      }
-    }
-    arrayConverted
-  }
 
 }
