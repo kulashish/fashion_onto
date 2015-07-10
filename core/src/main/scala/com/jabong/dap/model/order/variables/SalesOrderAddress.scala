@@ -11,9 +11,6 @@ import org.apache.spark.sql.DataFrame
  * Created by mubarak on 24/6/15.
  */
 object SalesOrderAddress {
-  val TEMP = "/temp/"
-  val FULL = "/full/"
-
 
   /**
    *
@@ -22,11 +19,11 @@ object SalesOrderAddress {
    * @param prevFav Dataframe with the previous joined data from sales_order, sales_order_address
    * @return
    */
-  def joinPrevData(salesOrder: DataFrame, salesAddress: DataFrame, prevFav: DataFrame):DataFrame= {
+  def processVariable(salesOrder: DataFrame, salesAddress: DataFrame, prevFav: DataFrame):(DataFrame, DataFrame)= {
     val salesOrderAddress = salesAddress.join(salesOrder, salesAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
     val curFav = salesOrderAddress.select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE)
     val jData = prevFav.unionAll(curFav)
-    jData
+    (jData, getFav(jData))
   }
 
   /**

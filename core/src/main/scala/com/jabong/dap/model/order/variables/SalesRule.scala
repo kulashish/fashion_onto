@@ -10,7 +10,7 @@ import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 26/6/15.
- * 
+ *
  */
 object SalesRule {
 
@@ -35,10 +35,10 @@ object SalesRule {
    * @param wcPrev previous full dataframe
    * @param i (1 for wc10, 2 for wc20 )
    */
-  def createWcCodes(salesRule: DataFrame, wcPrev:DataFrame, i:Int ):DataFrame= {
+  def createWcCodes(salesRule: DataFrame, wcPrev:DataFrame, i:Int ):(DataFrame,DataFrame)= {
     val wc = getCode(salesRule,i)
     val wcFull = MergeUtils.InsertUpdateMerge(wcPrev, wc, SalesRuleVariables.FK_CUSTOMER)
-    wcFull
+    (wc, wcFull)
   }
 
 }

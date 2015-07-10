@@ -22,7 +22,7 @@ object SalesOrderItem {
    * @return Dataframe with the latest values for orders_count and ravenue for each customer
    */
 
-  def processVariables(salesOrder: DataFrame, salesItem:DataFrame):DataFrame ={
+  def processVariables(salesOrder: DataFrame, salesItem:DataFrame, prevFull: DataFrame):(DataFrame,DataFrame) ={
     val salesOrderNew = salesOrder.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
@@ -45,9 +45,10 @@ object SalesOrderItem {
     val web = getRevenueOrders(webOrders,"_web")
     val mWeb = getRevenueOrders(mWebOrders,"_mweb")
     val joinedData = joinDataFrames(app, web, mWeb)
+    val mergedData =merge(joinedData, prevFull)
     joinedData.printSchema()
     joinedData.show(5)
-    joinedData
+    (joinedData, mergedData)
   }
 
   /**
@@ -93,7 +94,7 @@ object SalesOrderItem {
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB))
     res.printSchema()
     res.show(5)
-    return res
+    res
   }
 
   /**
@@ -116,7 +117,9 @@ object SalesOrderItem {
       joinedData(SalesOrderItemVariables.REVENUE_WEB_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_LIFE,
       joinedData(SalesOrderItemVariables.REVENUE_MWEB_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_LIFE
     )
-    return res
+    res.printSchema()
+    res.show(5)
+    res
   }
 
   /**
@@ -130,7 +133,7 @@ object SalesOrderItem {
     val currCount = sucessOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT)
     val currFull = currCount.unionAll(prevCount)
     val res = currFull.groupBy(SalesOrderVariables.FK_SALES_ORDER).agg(sum(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT)
-    return res
+    res
   }
 
   /**
