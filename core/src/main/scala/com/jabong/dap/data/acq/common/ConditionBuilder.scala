@@ -3,12 +3,16 @@ package com.jabong.dap.data.acq.common
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
- * Created by Abhay on 9/6/15.
+ * Builds the condition for the query to fetch the data and get the min and max values of primary key.
  */
 object ConditionBuilder {
-  def getCondition(mode: String, dateColumn: String, rangeStart: String, rangeEnd: String,
-                   filterCondition: String): String = {
+  def getCondition(): String = {
 
+    val mode = AcqImportInfo.tableInfo.mode
+    val dateColumn = AcqImportInfo.tableInfo.dateColumn
+    val rangeStart = AcqImportInfo.tableInfo.rangeStart
+    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
+    val filterCondition = AcqImportInfo.tableInfo.filterCondition
     val tempFilterCondition = if (filterCondition == null) {
       ""
     } else {

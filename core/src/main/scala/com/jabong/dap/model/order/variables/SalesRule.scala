@@ -2,8 +2,8 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.constants.variables.SalesRuleVariables
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.merge.MergeUtils
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -26,7 +26,7 @@ object SalesRule {
     wcCode.printSchema()
     wcCode.show(1)
     println(wcCode.count())
-    return wcCode
+    wcCode
   }
 
   /**
@@ -48,6 +48,5 @@ object SalesRule {
     wc10Full.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME1+"full/" + curr)
     wc20Full.write.parquet(DataSets.VARIABLE_PATH + SalesRuleVariables.WELCOME2+"full/" + curr)
   }
-
 
 }

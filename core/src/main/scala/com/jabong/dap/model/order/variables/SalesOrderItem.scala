@@ -2,7 +2,6 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.time.Constants
 import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
-import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.common.{Spark}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
@@ -16,13 +15,30 @@ import org.apache.spark.sql.types._
  */
 object SalesOrderItem {
 
-  def processVariables(curr: String, prev:String ) {
-    val salesOrder = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH + DataSets.SALES_ORDER + "/" + curr)
-    val salesItem = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH + DataSets.SALES_ORDER_ITEM + "/" + curr)
+  /**
+   * Creates order_count(app,web,mweb) and Revenue(app,web,mweb)
+   * @param salesOrder sales_order table data
+   * @param salesItem sales_order_table data
+   * @return Dataframe with the latest values for orders_count and ravenue for each customer
+   */
+
+  def processVariables(salesOrder: DataFrame, salesItem:DataFrame):DataFrame ={
     val salesOrderNew = salesOrder.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
-    val salesJoinedDF = salesOrderNew.join(salesItem, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesItem(SalesOrderVariables.FK_SALES_ORDER))
+    val salesJoinedDF = salesOrderNew.join(salesItem, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesItem(SalesOrderVariables.FK_SALES_ORDER)).select(
+      SalesOrderVariables.FK_CUSTOMER,
+      SalesOrderVariables.COD_CHARGE,
+      SalesOrderVariables.GW_AMOUNT,
+      SalesOrderVariables.SHIPPING_AMOUNT,
+      SalesOrderVariables.ID_SALES_ORDER,
+      SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE,
+      SalesOrderItemVariables.PAYBACK_CREDITS_VALUE,
+      SalesOrderItemVariables.PAID_PRICE,
+      SalesOrderItemVariables.STORE_CREDITS_VALUE,
+      SalesOrderVariables.DOMAIN)
+    salesJoinedDF.printSchema()
+
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
@@ -30,26 +46,33 @@ object SalesOrderItem {
     val web = getRevenueOrders(webOrders,"_web")
     val mWeb = getRevenueOrders(mWebOrders,"_mweb")
     val joinedData = joinDataFrames(app, web, mWeb)
-    val prevFull = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH + DataSets.SALES_ORDER + "/full/" + prev)
-    val mergedData = merge(joinedData, prevFull)
-    mergedData.write.parquet(DataSets.BOB_PATH + DataSets.SALES_ORDER + "/full/" + curr)
+    joinedData.printSchema()
+    joinedData
   }
 
+  /**
+   *
+   * @param app DataFrame for app data
+   * @param web DataFrame for web data
+   * @param mWeb DataFrame for mobile_web data
+   * @return Combined dataframe for all the above dataframes
+   */
   def joinDataFrames(app: DataFrame, web: DataFrame, mWeb: DataFrame): DataFrame ={
     val bcapp = Spark.getContext().broadcast(app).value
     val bcweb = Spark.getContext().broadcast(web).value
     val bcmweb = Spark.getContext().broadcast(mWeb).value
 
-    /*val appJoined = bcweb.join(bcapp, bcapp.value(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), "outer").
-      select(coalesce(bcapp.value(SalesOrderVariables.FK_CUSTOMER),
+    val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), "outer").
+      select(coalesce(bcapp(SalesOrderVariables.FK_CUSTOMER),
         bcweb(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         bcweb(SalesOrderItemVariables.ORDERS_COUNT_WEB),
         bcweb(SalesOrderItemVariables.REVENUE_WEB),
         bcapp(SalesOrderItemVariables.ORDERS_COUNT_APP),
         bcapp(SalesOrderItemVariables.REVENUE_APP))
+    appJoined.printSchema()
     appJoined.show(5)
     val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), "outer").
-      select(coalesce(bcmweb.value(SalesOrderVariables.FK_CUSTOMER),
+      select(coalesce(bcmweb(SalesOrderVariables.FK_CUSTOMER),
       appJoined(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
       appJoined(SalesOrderItemVariables.ORDERS_COUNT_WEB),
       appJoined(SalesOrderItemVariables.REVENUE_WEB),
@@ -64,18 +87,27 @@ object SalesOrderItem {
       SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
       SalesOrderItemVariables.REVENUE_WEB -> 0.0
     ))
+    joinedData.printSchema()
     joinedData.show(5)
     val res = joinedData.withColumn(SalesOrderItemVariables.REVENUE,
       joinedData(SalesOrderItemVariables.REVENUE_APP) + joinedData(SalesOrderItemVariables.REVENUE_WEB) + joinedData(SalesOrderItemVariables.REVENUE_MWEB) ).withColumn(
       SalesOrderItemVariables.ORDERS_COUNT,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB))
-    */return web
+    res.printSchema()
+    return res
   }
 
+  /**
+   * Merges the incremental dataframe with the previous full dataframe
+   * @param inc
+   * @param full
+   * @return merged full dataframe
+   */
   def merge(inc :DataFrame, full :DataFrame): DataFrame ={
     val bcInc = Spark.getContext().broadcast(inc)
     val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), "outer" )
-    val res = joinedData.select(
+    val res = joinedData.select(coalesce(full(SalesOrderVariables.FK_CUSTOMER),
+      bcInc.value(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_LIFE)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
@@ -89,7 +121,7 @@ object SalesOrderItem {
   }
 
   /**
-   *  Difficult because, should link items to sales_order
+   *
    * @param salesOrderItem
    * @param prevCount
    * @return
@@ -102,10 +134,19 @@ object SalesOrderItem {
     return res
   }
 
+  /**
+   *
+   * @param salesOrderItem
+   * @param domain
+   * @return
+   */
   def getRevenueOrders(salesOrderItem: DataFrame, domain: String): DataFrame ={
-    val resultRDD = salesOrderItem.groupBy(SalesOrderVariables.FK_CUSTOMER).agg((first(SalesOrderVariables.SHIPPING_AMOUNT) + first(SalesOrderVariables.COD_CHARGE) + first(SalesOrderVariables.GW_AMOUNT) + sum(SalesOrderItemVariables.PAID_PRICE) + sum(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE) +  sum(SalesOrderItemVariables.STORE_CREDITS_VALUE) + sum(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE)) as SalesOrderItemVariables.REVENUE, countDistinct(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ORDERS_COUNT)
-    val newRdd = resultRDD.rdd
-    val schema = StructType(Array(StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true), StructField(SalesOrderItemVariables.REVENUE+domain, DecimalType.apply(16,2), true), StructField(SalesOrderVariables.ORDERS_COUNT+domain, IntegerType , true)))
+    val resultDF = salesOrderItem.groupBy(SalesOrderVariables.FK_CUSTOMER).agg((first(SalesOrderVariables.SHIPPING_AMOUNT) + first(SalesOrderVariables.COD_CHARGE) + first(SalesOrderVariables.GW_AMOUNT) + sum(SalesOrderItemVariables.PAID_PRICE) + sum(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE) +  sum(SalesOrderItemVariables.STORE_CREDITS_VALUE) + sum(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE)) as SalesOrderItemVariables.REVENUE, countDistinct(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ORDERS_COUNT)
+    println("After merging for " + domain)
+    resultDF.printSchema()
+    resultDF.show(5)
+    val newRdd = resultDF.rdd
+    val schema = StructType(Array(StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true), StructField(SalesOrderItemVariables.REVENUE+domain, DecimalType.apply(16,2), true), StructField(SalesOrderVariables.ORDERS_COUNT+domain, LongType , true)))
     val res = Spark.getSqlContext().createDataFrame(newRdd, schema)
     res.printSchema()
     res.show(5)
@@ -121,28 +162,12 @@ object SalesOrderItem {
     val conf = new SparkConf().setAppName("SparkExamples")
     Spark.init(conf)
 
-    val soi = StructType(Array(
-      StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
-      StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, IntegerType, true),
-      StructField(SalesOrderVariables.COD_CHARGE,  DecimalType(10, 2), true),
-      StructField(SalesOrderVariables.GW_AMOUNT,  DecimalType(10, 2), true),
-      StructField(SalesOrderVariables.SHIPPING_AMOUNT,  DecimalType(10, 2), true),
-      StructField(SalesOrderItemVariables.FK_SALES_ORDER, IntegerType, true),
-      StructField(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE, DecimalType(10, 2), true),
-      StructField(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE, DecimalType(10, 2), true),
-      StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2), true),
-      StructField(SalesOrderItemVariables.STORE_CREDITS_VALUE, DecimalType(10, 2), true)
-    ))
-//    val df1 = Spark.getSqlContext().read.json("test/sales_order_item1.json").select(SalesOrderVariables.FK_CUSTOMER,SalesOrderItemVariables.FK_SALES_ORDER, SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)
-    val df2 = Spark.getSqlContext().read.schema(soi).format("json").load("test/sales_order_item_web.json")
-    val web = getRevenueOrders(df2,"_web")
-    val df3 = Spark.getSqlContext().read.schema(soi).format("json").load("test/sales_order_item_app.json")
-    val app = getRevenueOrders(df3,"_app")
-    val df4 = Spark.getSqlContext().read.schema(soi).format("json").load("test/sales_order_item_mweb.json")
-    val mweb = getRevenueOrders(df4,"_mweb")
-    val res = web.join(app, web("fk_customer") === app("fk_customer"),"outer")
-    //val res5 = joinDataFrames(app,web,mweb)
-    res.collect().foreach(println)
+    val soDf = Spark.getSqlContext().read.parquet("")
+    val soiDf = Spark.getSqlContext().read.parquet("")
+
+    val merged = processVariables(soDf,soiDf)
+    merged.show(5)
+
   }
 
 

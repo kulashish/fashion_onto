@@ -7,15 +7,19 @@ import com.jabong.dap.common.AppConfig
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
- * Created by Abhay on 16/6/15.
+ * Builds the path at which the requested data is to be saved.
  */
 
 object PathBuilder {
 
-  def getPath(mode: String, source: String, tableName: String, rangeStart: String, rangeEnd: String) = {
+  def getPath() = {
     val basePath = AppConfig.config.basePath
+    val source = AcqImportInfo.tableInfo.source
+    val tableName = AcqImportInfo.tableInfo.tableName
+    val rangeStart = AcqImportInfo.tableInfo.rangeStart
+    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
 
-    mode match {
+    AcqImportInfo.tableInfo.mode match {
       case "full" =>
         val dateNow = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
