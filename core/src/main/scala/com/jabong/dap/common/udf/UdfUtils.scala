@@ -12,7 +12,6 @@ import com.jabong.dap.common.time.TimeUtils
 object UdfUtils {
 
   /**
-   * @author raghu
    * @note min of Timestamp t1 or t2
    * @param t1
    * @param t2
@@ -36,7 +35,6 @@ object UdfUtils {
   }
 
   /**
-   * @author raghu
    * @note max of Timestamp t1 or t2
    * @param t1
    * @param t2
@@ -60,8 +58,7 @@ object UdfUtils {
   }
 
   /**
-   * @author raghu
-   * @note it will return latest value
+   * @note It will return latest value
    * @param a1
    * @param a2
    * @tparam T
@@ -74,8 +71,7 @@ object UdfUtils {
   }
 
   /**
-   * @author raghu
-   * @note this will merge two slots data
+   * @note This will merge two slots data
    * @param oldSlot
    * @param newSlot
    * @return String
@@ -110,8 +106,7 @@ object UdfUtils {
   }
 
   /**
-   * @author raghu
-   * @note this method will return max value from slot data
+   * @note This method will return max value from slot data
    * @param oldSlot
    * @param newSlot
    * @param oldPreferredSlot
@@ -158,7 +153,6 @@ object UdfUtils {
   }
 
   /**
-   * @author raghu
    * @note this method will return max value from slots
    * @param slots
    * @return Int
@@ -184,9 +178,7 @@ object UdfUtils {
     return maxSlot
   }
 
-
   /**
-   * @author raghu
    * @note this method will create a slot data
    * @param iterable
    * @return Tuple2[String, Int]

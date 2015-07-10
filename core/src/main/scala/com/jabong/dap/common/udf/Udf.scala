@@ -13,70 +13,57 @@ object Udf {
   // Define User Defined Functions
   //  val sqlContext = Spark.getSqlContext()
 
-
   /**
-   * @author raghu
    * @note minTimestamp will return min of Timestamp t1 or t2
    */
   val minTimestamp = udf((t1: Timestamp, t2: Timestamp) => UdfUtils.getMin(t1: Timestamp, t2: Timestamp))
 
-
   /**
-   * @author raghu
    * @note maxTimestamp will return max of Timestamp t1 or t2
    */
   val maxTimestamp = udf((t1: Timestamp, t2: Timestamp) => UdfUtils.getMax(t1: Timestamp, t2: Timestamp))
 
   /**
-   * @author raghu
    * @note latestTimestamp will return latest Timestamp value
    */
   val latestTimestamp = udf((a1: Timestamp, a2: Timestamp) => UdfUtils.getLatest(a1: Timestamp, a2: Timestamp))
 
   /**
-   * @author raghu
    * @note latestInt will return latest Integer value
    */
   val latestInt = udf((a1: Integer, a2: Integer) => UdfUtils.getLatest(a1: Integer, a2: Integer))
 
   /**
-   * @author raghu
    * @note latestBool will return latest Boolean value
    */
   val latestBool = udf((a1: Boolean, a2: Boolean) => UdfUtils.getLatest(a1: Boolean, a2: Boolean))
 
   /**
-   * @author raghu
    * @note latestDecimal will return latest Decimal value
    */
   val latestDecimal = udf((a1: java.math.BigDecimal, a2: java.math.BigDecimal) => UdfUtils.getLatest(a1: java.math.BigDecimal, a2: java.math.BigDecimal))
 
   /**
-   * @author raghu
    * @note latestDate will return latest Date value
    */
   val latestDate = udf((a1: Date, a2: Date) => UdfUtils.getLatest(a1: Date, a2: Date))
 
   /**
-   * @author raghu
    * @note latestString will return latest String value
    */
   val latestString = udf((a1: String, a2: String) => UdfUtils.getLatest(a1: String, a2: String))
 
   /**
-   * @author raghu
    * @note mergeSlots will return merge two slots data
    */
   val mergeSlots = udf((oldSlot: Any, newSlot: Any) => UdfUtils.getMergeSlots(oldSlot: Any, newSlot: Any))
 
   /**
-   * @author raghu
    * @note maxSlot will return Max Slot from two slots
    */
   val maxSlot = udf((oldSlot: Any, newSlot: Any, oldPreferredSlot: Int) => UdfUtils.getMaxSlot(oldSlot: Any, newSlot: Any, oldPreferredSlot: Int))
 
   /**
-   * @author raghu
    * @note age will convert birthday to age
    */
   val age = udf((birthday: Date) => UdfUtils.getAge(birthday: Date))

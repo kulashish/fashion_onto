@@ -1,15 +1,15 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{CustomerVariables, NewsletterVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{Constants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 27/5/15.
@@ -22,7 +22,6 @@ object Customer {
 
   /**
    * @note this method will calculate customer related variable
-   * @author raghu
    * @param dfCustomer
    * @param dfNLS
    * @param dfSalesOrder
@@ -194,11 +193,10 @@ object Customer {
 
   /**
    * @note iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
-   * @author raghu
-    * @param nls_email
-    * @param status
-    * @return String
-    */
+   * @param nls_email
+   * @param status
+   * @return String
+   */
   def getEmailOptInStatus(nls_email: String, status: String): String = {
 
     if (nls_email == null) {
@@ -212,10 +210,8 @@ object Customer {
 
   }
 
-
   /**
    * @note CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
-   * @author raghu
    * @param dfSalesOrder
    * @return DataFrame
    */
@@ -239,6 +235,5 @@ object Customer {
 
     df
   }
-
 
 }

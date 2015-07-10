@@ -44,9 +44,7 @@ object MergeUtils extends MergeData {
     df1.unionAll(dfIncr).coalesce(numPart)
   }
 
-
   /**
-   * @author raghu
    * @note join old and new data frame
    * @param dfIncr
    * @param dfPrevVarFull

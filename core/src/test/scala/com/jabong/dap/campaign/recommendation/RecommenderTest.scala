@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.recommendation
 import org.scalatest.FlatSpec
 
 /**
- * 
+ *
  */
 class RecommenderTest extends FlatSpec {
   /*var recommender :Recommender = _

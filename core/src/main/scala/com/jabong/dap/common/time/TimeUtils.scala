@@ -20,7 +20,6 @@ object TimeUtils {
     Math.abs(date1.getTime - date2.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
   }
 
-
   /**
    * @note Given a date input, returns the number of days between that date and today's date
    * @param date
@@ -30,7 +29,6 @@ object TimeUtils {
     val today = new Date
     daysBetweenTwoDates(today, date)
   }
-
 
   /**
    * @note Boolean test to check whether a given date string is empty (returns true) or not (returns false).
@@ -43,7 +41,6 @@ object TimeUtils {
     else
       false
   }
-
 
   /**
    * @note Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
@@ -83,7 +80,6 @@ object TimeUtils {
       false
   }
 
-
   /**
    * @note Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same day of the same
    * month of the same year or not.
@@ -105,9 +101,8 @@ object TimeUtils {
       false
   }
 
-
   /**
-   *@note  Returns the Date as a string in the given Date Format which is given no. of days after given input date.
+   * @note  Returns the Date as a string in the given Date Format which is given no. of days after given input date.
    * If input date is null then use today's date.
    * If n is negative then returns the date as a string which is given no. of days before today's date.
    * @param noOfDays
@@ -123,7 +118,6 @@ object TimeUtils {
     cal.add(Calendar.DAY_OF_MONTH, noOfDays)
     sdf.format(cal.getTime())
   }
-
 
   /**
    * @note  Returns the Date as a string in the given Date Format which is given no. of days after today's date.
@@ -149,7 +143,6 @@ object TimeUtils {
     val ts = new Timestamp(time)
     ts
   }
-
 
   /**
    * @note Return today's date as a string in the given date format.
@@ -217,7 +210,6 @@ object TimeUtils {
   }
 
   /**
-   * @author raghu
    * @note calculate total number of years from given date till today.
    * @param date
    * @return Int
