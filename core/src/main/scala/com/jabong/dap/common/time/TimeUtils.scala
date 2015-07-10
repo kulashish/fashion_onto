@@ -159,8 +159,11 @@ object TimeUtils {
     val timeSlot = timeToSlotMap.getOrElse(hours, 0)
     timeSlot
   }
-
-  //calculate total year from today date and given date
+  
+  /**
+  calculate total number of years from given date till today.
+  Input Parameter should Date DataType and it will return Int DataType
+ */
   def getYearFromToday(date: Date): Int = {
 
     if (date == null)
