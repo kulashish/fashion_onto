@@ -19,7 +19,7 @@ object TablesJsonValidator {
 
   def validatePossibleValues(table: TableInfo) = {
     val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
-    val possibleModes = Array("full", "daily", "hourly")
+    val possibleModes = Array("full", "monthly", "daily", "hourly")
     val possibleSaveFormats = Array("orc", "parquet")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 
@@ -55,6 +55,12 @@ object TablesJsonValidator {
       "Start date time should be strictly less than End date time"
     )
     mode match {
+      case "monthly" =>
+        require(
+          isSameYear(rngStart, rngEnd),
+          "rangeFrom and rangeEnd must span only a single year for mode 'monthly'. Please run multiple jobs if you " +
+            "want data spanning multiple years."
+        )
       case "daily" =>
         require(
           isSameMonth(rngStart, rngEnd),

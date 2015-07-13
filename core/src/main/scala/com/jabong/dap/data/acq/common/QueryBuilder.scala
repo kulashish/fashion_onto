@@ -65,7 +65,7 @@ object QueryBuilder {
 
     mode match {
       case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2)
-      case "daily" | "hourly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
+      case "daily" | "hourly" | "monthly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
         joinStrings._2, condition)
       case _ => ""
     }

@@ -45,6 +45,23 @@ object TimeUtils {
    * year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
    */
+  def isSameYear(dt1: String, dt2: String): Boolean = {
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val start = Calendar.getInstance()
+    val end = Calendar.getInstance()
+    start.setTime(format.parse(dt1))
+    end.setTime(format.parse(dt2))
+    if (start.get(Calendar.YEAR) == end.get(Calendar.YEAR))
+      true
+    else
+      false
+  }
+
+  /**
+   * Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same month of the same
+   * year or not.
+   * WARNING: can raise ParseException if input dates not in the correct format.
+   */
   def isSameMonth(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val start = Calendar.getInstance()
