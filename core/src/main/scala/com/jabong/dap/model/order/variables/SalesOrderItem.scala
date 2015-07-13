@@ -154,6 +154,23 @@ object SalesOrderItem {
     res
   }
 
+  def getRevenueDays(curr: DataFrame, prev: DataFrame, days: String):DataFrame={
+    val bcCurr = Spark.getContext().broadcast(prev)
+    val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), "outer" )
+    val res = joinedData.select(coalesce(prev(SalesOrderVariables.FK_CUSTOMER),
+      bcCurr.value(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_LIFE)- joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT+days,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP+days,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB+days,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB+days,
+      joinedData(SalesOrderItemVariables.REVENUE_LIFE)- joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE+days,
+      joinedData(SalesOrderItemVariables.REVENUE_APP_LIFE)- joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP+days,
+      joinedData(SalesOrderItemVariables.REVENUE_WEB_LIFE)- joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB+days,
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB_LIFE)- joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB+days
+    )
+    res
+  }
+
 
 /**
   def main(args: Array[String]) {

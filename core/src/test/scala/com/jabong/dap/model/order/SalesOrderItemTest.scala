@@ -30,7 +30,7 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
     df2 = Spark.getSqlContext().read.parquet(DataSets.SALES_ORDER_ITEM+"/"+DataSets.SALES_ORDER_ITEM+"_web")
 
     df3 = Spark.getSqlContext().read.parquet(DataSets.SALES_ORDER_ITEM+"/"+DataSets.SALES_ORDER_ITEM+"_mweb")
-    
+
     df4 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item1", OrderVarSchema.salesOrderItem)
 
   }
