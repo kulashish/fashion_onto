@@ -21,7 +21,7 @@ object Customer {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @note this method will calculate customer related variable
+   * This method will calculate customer related variable
    * @param dfCustomer
    * @param dfNLS
    * @param dfSalesOrder
@@ -78,7 +78,6 @@ object Customer {
         col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
         col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT),
         dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer")
-
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
 
     //Name of variable: EMAIL_OPT_IN_STATUS
@@ -184,6 +183,7 @@ object Customer {
         Udf.minTimestamp(joinDF(CustomerVariables.ACC_REG_DATE), joinDF(CustomerVariables.NEW_ + CustomerVariables.ACC_REG_DATE)) as CustomerVariables.ACC_REG_DATE,
 
         Udf.maxTimestamp(joinDF(CustomerVariables.MAX_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.MAX_UPDATED_AT)) as CustomerVariables.MAX_UPDATED_AT,
+        Udf.latestString(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
 
         Udf.latestString(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
     }
@@ -192,7 +192,7 @@ object Customer {
   }
 
   /**
-   * @note iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
+   * iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
    * @param nls_email
    * @param status
    * @return String
@@ -211,7 +211,7 @@ object Customer {
   }
 
   /**
-   * @note CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
+   * CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
    * @param dfSalesOrder
    * @return DataFrame
    */

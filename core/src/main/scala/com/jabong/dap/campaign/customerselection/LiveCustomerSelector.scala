@@ -57,8 +57,10 @@ abstract class LiveCustomerSelector extends CustomerSelector {
       return null
     }
 
-    val filteredData = customerData.withColumn(ACartVariables.ACART_SKU1, skuFilter(customerData(ACartVariables.ACART_PRICE_SKU1), customerData(ACartVariables.ACART_PRICE_SKU1_PRICE), customerData(ACartVariables.ACART_PRICE_SKU1_TODAY_PRICE))).withColumn(ACartVariables.ACART_SKU2,
-      skuFilter(customerData(ACartVariables.ACART_PRICE_SKU2), customerData(ACartVariables.ACART_PRICE_SKU2_PRICE), customerData(ACartVariables.ACART_PRICE_SKU1_TODAY_PRICE))).select(ACartVariables.UID, ACartVariables.ACART_SKU1, ACartVariables.ACART_PRICE_SKU1_BRAND, ACartVariables.ACART_PRICE_SKU1_BRICK, ACartVariables.ACART_PRICE_SKU1_CATEGORY, ACartVariables.ACART_PRICE_SKU1_COLOR,
+    val filteredData = customerData.withColumn(ACartVariables.ACART_SKU1, skuFilter(customerData(ACartVariables.ACART_PRICE_SKU1), customerData(ACartVariables.ACART_PRICE_SKU1_PRICE), customerData(ACartVariables.ACART_PRICE_SKU1_TODAY_PRICE))).withColumn(
+      ACartVariables.ACART_SKU2,
+      skuFilter(customerData(ACartVariables.ACART_PRICE_SKU2), customerData(ACartVariables.ACART_PRICE_SKU2_PRICE), customerData(ACartVariables.ACART_PRICE_SKU1_TODAY_PRICE))
+    ).select(ACartVariables.UID, ACartVariables.ACART_SKU1, ACartVariables.ACART_PRICE_SKU1_BRAND, ACartVariables.ACART_PRICE_SKU1_BRICK, ACartVariables.ACART_PRICE_SKU1_CATEGORY, ACartVariables.ACART_PRICE_SKU1_COLOR,
         ACartVariables.ACART_PRICE_SKU1_GENDER, ACartVariables.ACART_SKU2, ACartVariables.ACART_PRICE_SKU2_BRAND, ACartVariables.ACART_PRICE_SKU2_BRICK, ACartVariables.ACART_PRICE_SKU2_CATEGORY,
         ACartVariables.ACART_PRICE_SKU2_COLOR, ACartVariables.ACART_PRICE_SKU2_GENDER)
       .filter(ACartVariables.ACART_SKU1 + " is not null or " + ACartVariables.ACART_SKU2 + " is not null")

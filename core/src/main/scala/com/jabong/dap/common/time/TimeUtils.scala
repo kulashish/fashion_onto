@@ -11,7 +11,7 @@ import scala.collection.immutable.HashMap
 object TimeUtils {
 
   /**
-   * @note Returns the total number of days between two given date inputs
+   * Returns the total number of days between two given date inputs
    * @param date1
    * @param date2
    * @return
@@ -21,7 +21,7 @@ object TimeUtils {
   }
 
   /**
-   * @note Given a date input, returns the number of days between that date and today's date
+   * Given a date input, returns the number of days between that date and today's date
    * @param date
    * @return
    */
@@ -31,7 +31,7 @@ object TimeUtils {
   }
 
   /**
-   * @note Boolean test to check whether a given date string is empty (returns true) or not (returns false).
+   * Boolean test to check whether a given date string is empty (returns true) or not (returns false).
    * @param dt
    * @return
    */
@@ -43,7 +43,7 @@ object TimeUtils {
   }
 
   /**
-   * @note Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
+   * Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
    * date or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
    * @param dt1
@@ -61,7 +61,26 @@ object TimeUtils {
   }
 
   /**
-   * @note Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same month of the same
+   * Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same year or not.
+   * WARNING: can raise ParseException if input dates not in the correct format.
+   * @param dt1
+   * @param dt2
+   * @return 
+   */
+  def isSameYear(dt1: String, dt2: String): Boolean = {
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val start = Calendar.getInstance()
+    val end = Calendar.getInstance()
+    start.setTime(format.parse(dt1))
+    end.setTime(format.parse(dt2))
+    if (start.get(Calendar.YEAR) == end.get(Calendar.YEAR))
+      true
+    else
+      false
+  }
+
+  /**
+   * Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same month of the same
    * year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
    * @param dt1
@@ -81,7 +100,7 @@ object TimeUtils {
   }
 
   /**
-   * @note Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same day of the same
+   * Given two input date strings in the format yyyy-MM-dd, tells whether both lie in the same day of the same
    * month of the same year or not.
    * WARNING: can raise ParseException if input dates not in the correct format.
    * @param dt1
@@ -102,7 +121,7 @@ object TimeUtils {
   }
 
   /**
-   * @note  Returns the Date as a string in the given Date Format which is given no. of days after given input date.
+   * Returns the Date as a string in the given Date Format which is given no. of days after given input date.
    * If input date is null then use today's date.
    * If n is negative then returns the date as a string which is given no. of days before today's date.
    * @param noOfDays
@@ -120,7 +139,7 @@ object TimeUtils {
   }
 
   /**
-   * @note  Returns the Date as a string in the given Date Format which is given no. of days after today's date.
+   * Returns the Date as a string in the given Date Format which is given no. of days after today's date.
    *   If n is negative then returns the date as a string which is given no. of days before today's date.
    * @param noOfDays
    * @param dateFormat
@@ -131,7 +150,7 @@ object TimeUtils {
   }
 
   /**
-   * @note
+   * 
    * @param date
    * @param dateFormat
    * @return
@@ -145,7 +164,7 @@ object TimeUtils {
   }
 
   /**
-   * @note Return today's date as a string in the given date format.
+   * Return today's date as a string in the given date format.
    * @param dateFormat
    * @return
    */
@@ -210,7 +229,7 @@ object TimeUtils {
   }
 
   /**
-   * @note calculate total number of years from given date till today.
+   * calculate total number of years from given date till today.
    * @param date
    * @return Int
    */

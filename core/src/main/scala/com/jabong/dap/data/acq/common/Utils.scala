@@ -39,12 +39,12 @@ case class TableInfo(
   mode:            String,
   saveFormat:      String,
   saveMode:        String,
-  dateColumn:      String,
-  rangeStart:      String,
-  rangeEnd:        String,
-  limit:           String,
-  filterCondition: String,
-  joinTables:      List[JoinTables]
+  dateColumn:      Option[String],
+  rangeStart:      Option[String],
+  rangeEnd:        Option[String],
+  limit:           Option[String],
+  filterCondition: Option[String],
+  joinTables:      Option[List[JoinTables]]
 )
 
 /**
