@@ -18,7 +18,8 @@ object SalesOrderItem {
     val salesOrder = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH + DataSets.SALES_ORDER + "/" + curr)
     val salesItem = Spark.getSqlContext().read.parquet(DataSets.BOB_PATH + DataSets.SALES_ORDER_ITEM + "/" + curr)
     val salesOrderNew = salesOrder.na.fill(Map(
-      SalesOrderVariables.GW_AMOUNT -> 0.0))
+      SalesOrderVariables.GW_AMOUNT -> 0.0
+    ))
     val salesOrderItem = salesOrderNew.join(salesItem, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === salesItem(SalesOrderVariables.FK_SALES_ORDER))
 
   }
