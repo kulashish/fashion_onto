@@ -2,6 +2,7 @@ package com.jabong.dap.data.acq
 
 import com.jabong.dap.data.acq.common.{ ImportInfo, TableInfo }
 import com.jabong.dap.common.time.TimeUtils._
+import com.jabong.dap.common.OptionUtils
 
 /**
  * Validator for the JSON file used for data acquisition.
@@ -18,7 +19,7 @@ object TablesJsonValidator {
 
   def validatePossibleValues(table: TableInfo) = {
     val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
-    val possibleModes = Array("full", "daily", "hourly")
+    val possibleModes = Array("full", "monthly", "daily", "hourly")
     val possibleSaveFormats = Array("orc", "parquet")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 
@@ -34,7 +35,7 @@ object TablesJsonValidator {
 
   def validateDateTimes(table: TableInfo) = {
     require(
-      !(dateStringEmpty(table.rangeStart) ^ dateStringEmpty(table.rangeEnd)),
+      !(OptionUtils.optStringEmpty(table.rangeStart) ^ OptionUtils.optStringEmpty(table.rangeEnd)),
       "rangeStart and rangeEnd both should have values, or none of them should have a value"
     )
 
@@ -42,27 +43,33 @@ object TablesJsonValidator {
     // rangeEnd doesn't need to be checked as it will have a value if rangeStart has a value.
     if (table.mode == "hourly") {
       require(
-        !dateStringEmpty(table.rangeStart),
+        !OptionUtils.optStringEmpty(table.rangeStart),
         "Range should be provided for hourly mode"
       )
     }
   }
 
-  def validateRanges(table: TableInfo) = {
+  def validateRanges(rngStart: String, rngEnd: String, mode: String) = {
     require(
-      isStrictlyLessThan(table.rangeStart, table.rangeEnd),
+      isStrictlyLessThan(rngStart, rngEnd),
       "Start date time should be strictly less than End date time"
     )
-    table.mode match {
+    mode match {
+      case "monthly" =>
+        require(
+          isSameYear(rngStart, rngEnd),
+          "rangeFrom and rangeEnd must span only a single year for mode 'monthly'. Please run multiple jobs if you " +
+            "want data spanning multiple years."
+        )
       case "daily" =>
         require(
-          isSameMonth(table.rangeStart, table.rangeEnd),
+          isSameMonth(rngStart, rngEnd),
           "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
             "want data spanning multiple months."
         )
       case "hourly" =>
         require(
-          isSameDay(table.rangeStart, table.rangeEnd),
+          isSameDay(rngStart, rngEnd),
           "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
             "want data spanning multiple days."
         )
@@ -75,8 +82,8 @@ object TablesJsonValidator {
       validateRequiredValues(table)
       validatePossibleValues(table)
       validateDateTimes(table)
-      if (!(dateStringEmpty(table.rangeStart) && dateStringEmpty(table.rangeEnd))) {
-        validateRanges(table)
+      if (!(OptionUtils.optStringEmpty(table.rangeStart) && OptionUtils.optStringEmpty(table.rangeEnd))) {
+        validateRanges(table.rangeStart.orNull, table.rangeEnd.orNull, table.mode)
       }
     }
   }

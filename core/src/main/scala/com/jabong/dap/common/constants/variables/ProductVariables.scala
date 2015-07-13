@@ -11,7 +11,7 @@ object ProductVariables {
   val SPECIAL_PRICE = "specialPrice"
   val WEEKLY_AVERAGE_SALE = "weeklyAverageSale"
   val CATEGORY = "category"
-  val SKU_LIST ="skuList"
+  val SKU_LIST = "skuList"
   val QUANTITY = "quantity"
   val RECOMMENDATIONS = "recommendations"
 }

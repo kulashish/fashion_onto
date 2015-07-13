@@ -50,7 +50,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
       val result = Customer.getCustomer(
         dfCustomer: DataFrame,
         dfNLS: DataFrame,
-        dfSalesOrder: DataFrame, null)
+        dfSalesOrder: DataFrame, null
+      )
       assert(result != null)
 
     }
@@ -62,7 +63,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame, dfFull)
+      dfSalesOrder: DataFrame, dfFull
+    )
     //      .limit(30).collect().toSet
 
     //               result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_new" + ".json")
@@ -84,7 +86,8 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame, dfFull: DataFrame)
+      dfSalesOrder: DataFrame, dfFull: DataFrame
+    )
     //      .limit(30).collect().toSet
 
     //    result._2.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_incremental" + ".json")

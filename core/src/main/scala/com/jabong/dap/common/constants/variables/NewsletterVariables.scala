@@ -23,6 +23,8 @@ object NewsletterVariables {
   val FREQUENCY = "frequency"
 
   //variables name
+  val UNSUB_KEY = "unsub_key"
+  val NL_SUB_DATE = "nl_sub_date"
 
   //as variables name
   val NLS_EMAIL = "nls_email"

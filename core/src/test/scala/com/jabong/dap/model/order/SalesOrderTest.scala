@@ -9,7 +9,7 @@ import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
 /**
- * Created by jabong on 29/6/15.
+ * Created by mubarak on 29/6/15.
  */
 class SalesOrderTest extends FlatSpec with SharedSparkContext {
 
@@ -22,9 +22,9 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
     val config = new Config(basePath = "basePath")
     AppConfig.config = config
 
-    //    df1 = sqlContext.read.json("test/sales_order1.json")
+
     df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order1", OrderVarSchema.salesOrder)
-    //    df2 = sqlContext.read.json("test/sales_order2.json")
+
     df2 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order2", OrderVarSchema.salesOrderCoupon)
     df1.collect.foreach(println)
   }
@@ -35,7 +35,5 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
     assert(ordersCount.collect.size == 3)
   }
 
-  //  override def afterAll() {
-  //    super.afterAll()
-  //  }
+
 }
