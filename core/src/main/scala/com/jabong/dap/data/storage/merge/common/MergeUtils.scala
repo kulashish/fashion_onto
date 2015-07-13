@@ -44,7 +44,13 @@ object MergeUtils extends MergeData {
     df1.unionAll(dfIncr).coalesce(numPart)
   }
 
-  // join old and new data frame
+  /**
+   * join old and new data frame
+   * @param dfIncr
+   * @param dfPrevVarFull
+   * @param primaryKey
+   * @return DataFrame
+   */
   def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
 
     var dfIncrVar = dfIncr
