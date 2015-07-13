@@ -8,4 +8,14 @@ object CampaignCommon {
   val CUSTOMER_SELECTOR = "CustomerSelector"
   val RECOMMENDER = "Recommender"
 
+  val REF_SKUS = "refSkus"
+  val PUSH_REF_SKUS = 1
+  val NUMBER_REF_SKUS = 2
+
+  val BASE_PATH = "misc/campaignTestRun"
+
+  val CANCEL_RETARGET_CAMPAIGN = "cancelReTargetCampaign"
+  val RETURN_RETARGET_CAMPAIGN = "returnReTargetCampaign"
+  val DATE_FORMAT = "yyyy/mm/dd"
+
 }
