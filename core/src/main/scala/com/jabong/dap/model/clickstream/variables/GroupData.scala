@@ -23,7 +23,7 @@ class GroupData (hiveContext: HiveContext, pagevisit: DataFrame) extends java.io
   def groupDataByUser(): RDD[(String, Row)] = {
     pagevisit.as('pagevisit)
 
-    val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null").map(x => (x(uid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+    val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is not null").map(x => (x(uid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
     return ug
   }
 
@@ -33,7 +33,7 @@ class GroupData (hiveContext: HiveContext, pagevisit: DataFrame) extends java.io
     val br:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is null").map(x => (x(bid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
     return br
   }
-  
+
 
   def calculateColumns(): Unit =
   {
@@ -53,7 +53,7 @@ class GroupData (hiveContext: HiveContext, pagevisit: DataFrame) extends java.io
         visitts=i
       else if(res(i) == "userid")
         uid=i
-      else if(res(i) == "bid")
+      else if(res(i) == "browserid")
         bid=i
 
     }
