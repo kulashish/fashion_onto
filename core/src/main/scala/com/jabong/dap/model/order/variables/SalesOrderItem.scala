@@ -25,7 +25,7 @@ object SalesOrderItem {
    * @return Dataframe with the latest values for orders_count and ravenue for each customer
    */
 
-  def processVariables(salesOrder: DataFrame, salesItem:DataFrame, prevFull: DataFrame):(DataFrame,DataFrame) ={
+  def processVariables(salesOrder: DataFrame, salesItem:DataFrame, prevFull: DataFrame, before7: DataFrame, before30: DataFrame, before90: DataFrame):(DataFrame,DataFrame) ={
     val salesOrderNew = salesOrder.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
@@ -49,9 +49,10 @@ object SalesOrderItem {
     val mWeb = getRevenueOrders(mWebOrders,"_mweb")
     val joinedData = joinDataFrames(app, web, mWeb)
     val mergedData =merge(joinedData, prevFull)
-    joinedData.printSchema()
-    joinedData.show(5)
-    (joinedData, mergedData)
+    val res7 = getRevenueDays(before7,mergedData,7)
+    val res30 = getRevenueDays(before30,res7,30)
+    val res = getRevenueDays(before30,res30,90)
+    (joinedData, res)
   }
 
   /**
@@ -117,7 +118,31 @@ object SalesOrderItem {
       joinedData(SalesOrderItemVariables.REVENUE_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_LIFE,
       joinedData(SalesOrderItemVariables.REVENUE_APP_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_LIFE,
       joinedData(SalesOrderItemVariables.REVENUE_WEB_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_LIFE,
-      joinedData(SalesOrderItemVariables.REVENUE_MWEB_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_LIFE
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB_LIFE)+ joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_LIFE,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_7)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_7,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_7)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_7,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_7)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_7,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_7,
+      joinedData(SalesOrderItemVariables.REVENUE_7)+ joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_7,
+      joinedData(SalesOrderItemVariables.REVENUE_APP_7)+ joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_7,
+      joinedData(SalesOrderItemVariables.REVENUE_WEB_7)+ joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_7,
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB_7)+ joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_7,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_30)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_30,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_30)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_30,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_30)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_30,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB_30)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_30,
+      joinedData(SalesOrderItemVariables.REVENUE_30)+ joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_30,
+      joinedData(SalesOrderItemVariables.REVENUE_APP_30)+ joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_30,
+      joinedData(SalesOrderItemVariables.REVENUE_WEB_30)+ joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_30,
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB_30)+ joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_30,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_90)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_90,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_90)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_90,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_90)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_90,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB_90)+ joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_90,
+      joinedData(SalesOrderItemVariables.REVENUE_90)+ joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_90,
+      joinedData(SalesOrderItemVariables.REVENUE_APP_90)+ joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_90,
+      joinedData(SalesOrderItemVariables.REVENUE_WEB_90)+ joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_90,
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB_90)+ joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_90
     )
     res.printSchema()
     res.show(5)
@@ -153,20 +178,22 @@ object SalesOrderItem {
     res
   }
 
-  def getRevenueDays(curr: DataFrame, prev: DataFrame, days: String):DataFrame={
+  def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int):DataFrame={
     val bcCurr = Spark.getContext().broadcast(prev)
     val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), "outer" )
     val res = joinedData.select(coalesce(prev(SalesOrderVariables.FK_CUSTOMER),
       bcCurr.value(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-      joinedData(SalesOrderItemVariables.ORDERS_COUNT+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT+days,
-      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP+days,
-      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB+days,
-      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB+days,
-      joinedData(SalesOrderItemVariables.REVENUE+days)- joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE+days,
-      joinedData(SalesOrderItemVariables.REVENUE_APP+days)- joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP+days,
-      joinedData(SalesOrderItemVariables.REVENUE_WEB+days)- joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB+days,
-      joinedData(SalesOrderItemVariables.REVENUE_MWEB+days)- joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB+days
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT+"_"+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT+"_"+days,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP+"_"+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP+"_"+days,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB+"_"+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB+"_"+days,
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB+"_"+days)- joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB+"_"+days,
+      joinedData(SalesOrderItemVariables.REVENUE+"_"+days)- joinedData(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE+"_"+days,
+      joinedData(SalesOrderItemVariables.REVENUE_APP+"_"+days)- joinedData(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP+"_"+days,
+      joinedData(SalesOrderItemVariables.REVENUE_WEB+"_"+days)- joinedData(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB+"_"+days,
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB+"_"+days)- joinedData(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB+"_"+days
     )
+    res.printSchema()
+    res.show(5)
     res
   }
 
