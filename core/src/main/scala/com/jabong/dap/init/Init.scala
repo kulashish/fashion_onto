@@ -25,8 +25,7 @@ object Init {
     component: String = null,
     tableJson: String = null,
     mergeJson: String = null,
-    config:    String = null
-  )
+    config: String = null)
 
   def main(args: Array[String]) {
     options(args)

@@ -28,6 +28,7 @@ object DataSets {
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
   val CUSTOMER_SEGMENTS = "customer_segments"
+  val CUSTOMER_WISHLIST = "customer_wishlist"
 
   //newsletter
   val NEWSLETTER_SUBSCRIPTION = "newsletter_subscription"

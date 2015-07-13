@@ -161,4 +161,14 @@ object Schema {
     StructField(CustomerSegmentsVariables.UPDATED_AT, TimestampType, true)
   ))
 
+  val customerWishlist = StructType(Array(
+    StructField(CustomerWishlistVariables.ID_CUSTOMER_WISHLIST, IntegerType, true),
+    StructField(CustomerWishlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerWishlistVariables.COMMENT, StringType, true),
+    StructField(CustomerWishlistVariables.CREATED_AT, TimestampType, true),
+    StructField(CustomerWishlistVariables.UPDATED_AT, TimestampType, true),
+    StructField(CustomerWishlistVariables.CONFIGURABLE_SKU, StringType, true),
+    StructField(CustomerWishlistVariables.SIMPLE_SKU, StringType, true)
+  ))
+
 }
