@@ -206,7 +206,15 @@ object SalesOrderItem {
       joinedData(SalesOrderItemVariables.REVENUE+"_"+day2),
       joinedData(SalesOrderItemVariables.REVENUE_APP+"_"+day2),
       joinedData(SalesOrderItemVariables.REVENUE_WEB+"_"+day2),
-      joinedData(SalesOrderItemVariables.REVENUE_MWEB+"_"+day2)
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB+"_"+day2),
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE),
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE),
+      joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE),
+      joinedData(SalesOrderItemVariables.REVENUE_LIFE),
+      joinedData(SalesOrderItemVariables.REVENUE_APP_LIFE),
+      joinedData(SalesOrderItemVariables.REVENUE_WEB_LIFE),
+      joinedData(SalesOrderItemVariables.REVENUE_MWEB_LIFE)
     )
     res.printSchema()
     res.show(5)
