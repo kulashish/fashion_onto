@@ -29,22 +29,22 @@ object PathBuilder {
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/monthly/%s/%s/%s"
+        "%s/%s/%s/monthly/%s/%s/%s/"
           .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
             withLeadingZeros(end.get(Calendar.DATE)))
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
           val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
-          "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
+          "%s/%s/%s/daily/%s/".format(basePath, source, tableName, dateYesterday)
         } else {
           val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
           val start = Calendar.getInstance()
           val end = Calendar.getInstance()
           start.setTime(format.parse(rangeStart))
           end.setTime(format.parse(rangeEnd))
-          "%s/%s/%s/daily/%s/%s/%s"
-            .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-              withLeadingZeros(end.get(Calendar.DATE)))
+          "%s/%s/%s/daily/%s/%s/%s_%s"
+            .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
+              withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
         }
       case "hourly" =>
         val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
@@ -52,9 +52,9 @@ object PathBuilder {
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/hourly/%s/%s/%s/%s"
-          .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-            withLeadingZeros(end.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+        "%s/%s/%s/hourly/%s/%s/%s/%s_%s"
+          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
+            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
       case _ => ""
     }
   }

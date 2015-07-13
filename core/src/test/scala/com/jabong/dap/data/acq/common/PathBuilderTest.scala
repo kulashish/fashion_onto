@@ -51,7 +51,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    val outputPath = "basePath/source/tableName/" + dateYesterday + "/"
+    val outputPath = "basePath/source/tableName/daily/" + dateYesterday + "/"
     PathBuilder.getPath() should be (outputPath)
   }
 
@@ -60,7 +60,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-13 00:00:00"),
       rangeEnd = Option.apply("2015-06-28 23:59:59"), limit = lmt, filterCondition = null,
       joinTables = jnTbls)
-    val outputPath = "basePath/source/tableName/2015/06/13_28"
+    val outputPath = "basePath/source/tableName/daily/2015/06/13_28"
     PathBuilder.getPath() should be (outputPath)
   }
 
@@ -69,7 +69,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-13 01:00:00"),
       rangeEnd = Option.apply("2015-06-13 15:59:59"), limit = lmt, filterCondition = null,
       joinTables = jnTbls)
-    val outputPath = "basePath/source/tableName/2015/06/13/01_15"
+    val outputPath = "basePath/source/tableName/hourly/2015/06/13/01_15"
     PathBuilder.getPath() should be (outputPath)
   }
 
