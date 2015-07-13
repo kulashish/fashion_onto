@@ -1,6 +1,6 @@
 package com.jabong.dap.common
 
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by pooja on 10/7/15.
