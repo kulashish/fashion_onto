@@ -14,8 +14,6 @@ import scala.collection.mutable
 class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
-  @transient var hiveContext: SQLContext = _
-
   @transient var itrDataFrame: DataFrame = _
   @transient var orderItemDataFrame: DataFrame = _
   var basicRecommender: BasicRecommender = _
@@ -23,11 +21,10 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    hiveContext = Spark.getHiveContext()
 
     basicRecommender = new BasicRecommender()
-    orderItemDataFrame = hiveContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
-    itrDataFrame = hiveContext.read.json("src/test/resources/salescart/itrData.json")
+    orderItemDataFrame = sqlContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
+    itrDataFrame = sqlContext.read.json("src/test/resources/salescart/itrData.json")
 
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }
