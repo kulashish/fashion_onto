@@ -14,8 +14,6 @@ import scala.collection.mutable
 class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
-  @transient var hiveContext: SQLContext = _
-
   @transient var itrDataFrame: DataFrame = _
   @transient var orderItemDataFrame: DataFrame = _
   var basicRecommender: BasicRecommender = _
@@ -23,11 +21,10 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    hiveContext = Spark.getHiveContext()
 
     basicRecommender = new BasicRecommender()
-    orderItemDataFrame = hiveContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
-    itrDataFrame = hiveContext.read.json("src/test/resources/salescart/itrData.json")
+    orderItemDataFrame = sqlContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
+    itrDataFrame = sqlContext.read.json("src/test/resources/salescart/itrData.json")
 
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }
@@ -95,22 +92,24 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
   }
 
   "5 recommendation input skus and pivot keys is null" should " return null" in {
-    val dataFrameSchema = StructType(Array(StructField(ProductVariables.BRICK, StringType, false),
+    val dataFrameSchema = StructType(Array(
+      StructField(ProductVariables.BRICK, StringType, false),
       StructField(ProductVariables.MVP, LongType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true)
-      )))
+      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
+    ))
 
     val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame, 10), itrDataFrame), null, dataFrameSchema)
     assert(recOut == null)
   }
 
   "5 recommendation input skus" should "create recommendation based on brick mvp and gender" in {
-    val dataFrameSchema = StructType(Array(StructField(ProductVariables.BRICK, StringType, false),
+    val dataFrameSchema = StructType(Array(
+      StructField(ProductVariables.BRICK, StringType, false),
       StructField(ProductVariables.MVP, LongType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true)
-      )))
+      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
+    ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
 
     val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame, 10), itrDataFrame), pivotKeys, dataFrameSchema)
@@ -121,12 +120,13 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
   }
 
   "5 recommendation input skus" should "create recommendation based on brick,brand mvp and gender" in {
-    val dataFrameSchema = StructType(Array(StructField(ProductVariables.BRICK, StringType, false),
+    val dataFrameSchema = StructType(Array(
+      StructField(ProductVariables.BRICK, StringType, false),
       StructField(ProductVariables.MVP, LongType, false),
       StructField(ProductVariables.BRAND, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true)
-      )))
+      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
+    ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND)
 
     val recOut = basicRecommender.genRecommend(basicRecommender.skuCompleteData(basicRecommender.topProductsSold(orderItemDataFrame, 10), itrDataFrame), pivotKeys, dataFrameSchema)

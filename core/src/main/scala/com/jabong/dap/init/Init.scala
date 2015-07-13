@@ -3,6 +3,7 @@ package com.jabong.dap.init
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
+import com.jabong.dap.model.custorder.CustOrderVarMerger
 import com.jabong.dap.model.product.itr.Itr
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
@@ -25,7 +26,8 @@ object Init {
     component: String = null,
     tableJson: String = null,
     mergeJson: String = null,
-    config: String = null)
+    coVarJson: String = null,
+    config:    String = null)
 
   def main(args: Array[String]) {
     options(args)
@@ -58,6 +60,11 @@ object Init {
         .text("Path to Alchemy config file.")
         .required()
         .action((x, c) => c.copy(config = x))
+
+      opt[String]("varJson")
+        .text("Path to customer and Order variables merge job json config file.")
+        .action((x, c) => c.copy(coVarJson = x))
+
     }
 
     parser.parse(args, defaultParams).map { params =>
@@ -100,6 +107,7 @@ object Init {
       case "itr" => new Itr().start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
+      case "covariables" => new CustOrderVarMerger().start(params.coVarJson)
     }
   }
 }

@@ -161,7 +161,12 @@ object Schema {
     StructField(CustomerSegmentsVariables.UPDATED_AT, TimestampType, true)
   ))
 
-  val customerWishlist = StructType(Array(
+  val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
+  val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true)))
+  val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
+
+val customerWishlist = StructType(Array(
     StructField(CustomerWishlistVariables.ID_CUSTOMER_WISHLIST, IntegerType, true),
     StructField(CustomerWishlistVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerWishlistVariables.COMMENT, StringType, true),
@@ -170,5 +175,6 @@ object Schema {
     StructField(CustomerWishlistVariables.CONFIGURABLE_SKU, StringType, true),
     StructField(CustomerWishlistVariables.SIMPLE_SKU, StringType, true)
   ))
+
 
 }
