@@ -3,7 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.{OptionUtils, AppConfig}
+import com.jabong.dap.common.{ OptionUtils, AppConfig }
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
