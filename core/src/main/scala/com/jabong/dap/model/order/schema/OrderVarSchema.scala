@@ -13,28 +13,29 @@ object OrderVarSchema {
     StructField(SalesRuleVariables.UPDATED_AT, TimestampType, true),
     StructField(SalesRuleVariables.CODE, StringType, true),
     StructField(SalesRuleVariables.CREATED_AT, TimestampType, true),
-    StructField(SalesRuleVariables.TO_DATE, TimestampType, true))
-  )
+    StructField(SalesRuleVariables.TO_DATE, TimestampType, true)
+  ))
 
   val salesOrder = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
-    StructField(SalesOrderVariables.CREATED_AT, TimestampType, true))
-  )
+    StructField(SalesOrderVariables.CREATED_AT, TimestampType, true)
+  ))
 
   val salesOrderAddress = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
     StructField(SalesAddressVariables.CITY, StringType, true),
-    StructField(SalesAddressVariables.PHONE, StringType, true))
-  )
+    StructField(SalesAddressVariables.PHONE, StringType, true)
+  ))
 
   val salesOrderCoupon = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
-    StructField(SalesOrderVariables.COUPON_CODE, StringType, true))
-  )
+    StructField(SalesOrderVariables.COUPON_CODE, StringType, true)
+  ))
+
 
   val salesOrderItem = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
     StructField(SalesOrderItemVariables.FK_SALES_ORDER, IntegerType, true),
-    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true))
-  )
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true)
+  ))
 }

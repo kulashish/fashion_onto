@@ -64,6 +64,8 @@ object CustomerVariables {
   val EMAIL_OPT_IN_STATUS = "email_opt_in_status"
   val FK_CUSTOMER_CPOT = "fk_customer_cpot"
   val NLS_UPDATED_AT = "nls_updated_at"
+  val VERIFICATION_STATUS = "verification_status"
+  val AGE = "age"
 
   //for renaming column name
   val NEW_ = "new_"

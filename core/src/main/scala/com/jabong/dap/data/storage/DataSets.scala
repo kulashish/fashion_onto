@@ -41,4 +41,7 @@ object DataSets {
   val SALES_ORDER_PAYBACK_EARN = "sales_order_payback_earn"
   val SALES_ORDER_PAYBACK_REDEEM = "sales_order_payback_redeem"
 
+  //Newsletter Preferences
+  val NEWSLETTER_PREFERENCES = "newsletter_preferences"
+
 }

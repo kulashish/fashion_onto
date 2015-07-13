@@ -1,5 +1,7 @@
 package com.jabong.dap.data.acq.common
 
+import com.jabong.dap.common.OptionUtils
+
 /**
  * Builds the query which is used to fetch the requested data on the basis of the input parameters passed in the
  * tableJson.
@@ -8,9 +10,9 @@ package com.jabong.dap.data.acq.common
 object QueryBuilder {
 
   def getJoinTableStrings(): (String, String) = {
-    val joinTables = AcqImportInfo.tableInfo.joinTables
+    val joinTables = if (null != AcqImportInfo.tableInfo.joinTables) AcqImportInfo.tableInfo.joinTables.orNull else null
     val primaryKey = AcqImportInfo.tableInfo.primaryKey
-    if (joinTables.isEmpty) {
+    if (null == joinTables || joinTables.isEmpty) {
       return ("", "")
     }
 
@@ -31,7 +33,7 @@ object QueryBuilder {
 
   def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String) = {
     val tableName = AcqImportInfo.tableInfo.tableName
-    val limit = AcqImportInfo.tableInfo.limit
+    val limit = OptionUtils.getOptValue(AcqImportInfo.tableInfo.limit)
     val primaryKey = AcqImportInfo.tableInfo.primaryKey
 
     driver match {
@@ -63,7 +65,7 @@ object QueryBuilder {
 
     mode match {
       case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2)
-      case "daily" | "hourly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
+      case "daily" | "hourly" | "monthly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
         joinStrings._2, condition)
       case _ => ""
     }

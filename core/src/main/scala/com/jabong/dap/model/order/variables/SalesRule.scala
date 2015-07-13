@@ -24,7 +24,7 @@ object SalesRule {
     val filData = salesRule.filter(salesRule(SalesRuleVariables.CODE).startsWith("WC"+c+"0"))
     val wcCode = filData.select(SalesRuleVariables.FK_CUSTOMER, SalesRuleVariables.UPDATED_AT, SalesRuleVariables.CODE, SalesRuleVariables.CREATED_AT, SalesRuleVariables.TO_DATE)
     wcCode.printSchema()
-    wcCode.show(1)
+    wcCode.show(5)
     println(wcCode.count())
     wcCode
   }
