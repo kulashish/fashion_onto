@@ -1,8 +1,11 @@
 package com.jabong.dap.model.order.variables
 
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.Constants
 import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
-import com.jabong.dap.common.{Spark}
+import com.jabong.dap.common.{AppConfig, Config, Spark}
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.order.schema.OrderVarSchema
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -125,14 +128,13 @@ object SalesOrderItem {
   /**
    *
    * @param salesOrderItem
-   * @param prevCount
    * @return
    */
-  def getSucessfulOrders(salesOrderItem: DataFrame, prevCount: DataFrame): DataFrame={
-    val sucessOrders = salesOrderItem.filter(salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS).contains(Constants.ITEM_SUCCESS_STATUS))
-    val currCount = sucessOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT)
-    val currFull = currCount.unionAll(prevCount)
-    val res = currFull.groupBy(SalesOrderVariables.FK_SALES_ORDER).agg(sum(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT)
+  def getSucessfulOrders(salesOrderItem: DataFrame): DataFrame={
+    val sucessOrders = salesOrderItem.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+    val res = sucessOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+    res.printSchema()
+    res.show(5)
     res
   }
 
@@ -151,4 +153,19 @@ object SalesOrderItem {
     res.show(5)
     res
   }
+
+
+/**
+  def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("SparkExamples")
+    Spark.init(conf)
+    val df1 =Spark.getSqlContext().read.schema(OrderVarSchema.salesOrderItem).format("json")
+      .load("src/test/resources/sales_order_item/sales_order_item1.json")
+    df1.collect.foreach(println)
+    val  x = getSucessfulOrders(df1)
+    df1.collect().foreach(println)
+
+    }
+  */
+
 }

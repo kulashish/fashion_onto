@@ -30,7 +30,8 @@ object SalesOrderItemVariables {
   val ORDERS_COUNT_APP = "orders_count_app"
   val ORDERS_COUNT_WEB = "orders_count_web"
   val ORDERS_COUNT_MWEB = "orders_count_mweb"
-
+  val FILTER_SUCCESSFUL_ORDERS = "fk_sales_order_item_status = 3 or fk_sales_order_item_status = 4 or fk_sales_order_item_status = 5 or fk_sales_order_item_status = 6 or fk_sales_order_item_status = 7 or fk_sales_order_item_status = 11 or fk_sales_order_item_status = 17 or fk_sales_order_item_status = 24 or fk_sales_order_item_status = 33 or fk_sales_order_item_status = 34"
+  val ORDERS_COUNT_SUCCESSFUL = "orders_count_successful"
 
   val REVENUE_APP_LIFE = "revenue_app_life"
   val REVENUE_WEB_LIFE = "revenue_web_life"
