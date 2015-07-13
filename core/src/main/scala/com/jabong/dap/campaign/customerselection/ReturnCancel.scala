@@ -44,8 +44,10 @@ class ReturnCancel extends LiveCustomerSelector {
       .agg($"${SalesOrderVariables.FK_CUSTOMER}", first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER, first(SalesOrderVariables.UPDATED_AT) as "customer_updated_at")
 
     // join sales_order and sales_order_item on 'id_sales_order' and select (id_customer, id_sales_order, sku (simple), item status, unit price)
-    val customerLatestItemsData = latestCustomerOrders.join(salesOrderItemData,
-      latestCustomerOrders(SalesOrderVariables.ID_SALES_ORDER).equalTo(salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER)), "inner")
+    val customerLatestItemsData = latestCustomerOrders.join(
+      salesOrderItemData,
+      latestCustomerOrders(SalesOrderVariables.ID_SALES_ORDER).equalTo(salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER)), "inner"
+    )
       .select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, ProductVariables.SKU, SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS, SalesOrderItemVariables.UNIT_PRICE)
 
     // 1. order_item (1 day): filter by required status
