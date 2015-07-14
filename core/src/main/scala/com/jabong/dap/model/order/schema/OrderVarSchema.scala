@@ -1,6 +1,6 @@
 package com.jabong.dap.model.order.schema
 
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesAddressVariables, SalesOrderVariables, SalesRuleVariables }
+import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesAddressVariables, SalesOrderVariables, SalesRuleVariables}
 import org.apache.spark.sql.types._
 
 /**
@@ -31,6 +31,7 @@ object OrderVarSchema {
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
     StructField(SalesOrderVariables.COUPON_CODE, StringType, true)
   ))
+
 
   val salesOrderItem = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
