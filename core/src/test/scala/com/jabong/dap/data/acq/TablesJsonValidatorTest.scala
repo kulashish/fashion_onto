@@ -143,8 +143,9 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
   // Unit tests for date time validations.
 
   "Tables Json Validator" should "throw IllegalArgumentException if only one of rangeStart and rangeEnd has value" in {
+    val rngStrt = Option.apply("2015-06-22 15:00:00")
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = null, limit = null,
+      saveMode = null, dateColumn = null, rangeStart = rngStrt, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateDateTimes(tableInfo)
@@ -161,8 +162,9 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if range end is not provided for hourly mode" in {
+    val rngStrt = Option.apply("2015-06-22 15:00:00")
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = null, limit = null,
+      saveMode = null, dateColumn = null, rangeStart = rngStrt, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateDateTimes(tableInfo)
@@ -170,62 +172,72 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
   }
 
   "Tables Json Validator" should "throw ParseException if format of rangeStart is not proper" in {
-    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-06", rangeEnd = null,
-      limit = null, filterCondition = null, joinTables = null)
     a[ParseException] should be thrownBy {
-      TablesJsonValidator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges("2015-06", "2015-07", "")
     }
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if rangeStart is greater than rangeEnd" in {
-    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-06-22 15:00:00", rangeEnd = "2015-05-21 15:00:00",
-      limit = null, filterCondition = null, joinTables = null)
+    //    val rngStrt = Option.apply("2015-06-22 15:00:00")
+    //    val dt2 = Option.apply("2015-05-21 15:00:00")
+    //    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
+    //      saveMode = null, dateColumn = null, rangeStart = rngStrt, rangeEnd = dt2,
+    //      limit = null, filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
-      TablesJsonValidator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges("2015-06-22 15:00:00", "2015-05-21 15:00:00", null)
     }
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a month in daily mode" in {
-    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily", saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-06-21 15:00:00",
-      limit = null, filterCondition = null, joinTables = null)
+    //    val dt3 = Option.apply("2015-04-22 15:00:00")
+    //    val dt4 = Option.apply("2015-06-21 15:00:00")
+    //    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily", saveFormat = null,
+    //      saveMode = null, dateColumn = null, rangeStart = dt3, rangeEnd = dt4,
+    //      limit = null, filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
-      TablesJsonValidator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges("2015-04-22 15:00:00", "2015-06-21 15:00:00", "daily")
     }
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a day in hourly mode" in {
-    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-04-23 15:00:00",
-      limit = null, filterCondition = null, joinTables = null)
+    //    val dt1 = Option.apply("2015-04-22 15:00:00")
+    //    val dt2 = Option.apply("2015-04-23 15:00:00")
+    //    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
+    //      saveMode = null, dateColumn = null, rangeStart = dt1, rangeEnd = dt2,
+    //      limit = null, filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
-      TablesJsonValidator.validateRanges(tableInfo)
+      TablesJsonValidator.validateRanges("2015-04-22 15:00:00", "2015-04-23 15:00:00", "hourly")
     }
   }
 
   "Tables Json Validator" should "not throw any exception if the ranges are provided with full mode" in {
+    val dt1 = Option.apply("2015-04-22 15:00:00")
+    val dt2 = Option.apply("2015-04-23 15:00:00")
     val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "full", saveFormat = null,
-      saveMode = null, dateColumn = null, rangeStart = "2015-04-22 15:00:00", rangeEnd = "2015-04-23 15:00:00",
+      saveMode = null, dateColumn = null, rangeStart = dt1, rangeEnd = dt2,
       limit = null, filterCondition = null, joinTables = null)
-    TablesJsonValidator.validateRanges(tableInfo)
+    TablesJsonValidator.validateRanges("2015-04-22 15:00:00", "2015-04-23 15:00:00", "full")
   }
 
   // Integration test.
   "Tables Json Validator" should "not throw any exception if everything is correct (daily mode)" in {
+    val dt2 = Option.apply("2015-06-30 15:00:00")
+    val dt1 = Option.apply("2015-06-20 15:00:00")
+    val dtCol = Option.apply("created_at")
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
-      mode = "daily", saveFormat = "orc", saveMode = "overwrite", dateColumn = "created_at",
-      rangeStart = "2015-06-20 15:00:00", rangeEnd = "2015-06-30 15:00:00", limit = null, filterCondition = null,
+      mode = "daily", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol,
+      rangeStart = dt1, rangeEnd = dt2, limit = null, filterCondition = null,
       joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo))
     TablesJsonValidator.validate(importInfo)
   }
 
   "Tables Json Validator" should "not throw any exception if everything is correct (full mode)" in {
+    val lmt1 = Option.apply("3000")
+    val dtCol = Option.apply("created_at")
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
-      mode = "full", saveFormat = "orc", saveMode = "overwrite", dateColumn = "created_at", rangeStart = null,
-      rangeEnd = null, limit = "3000", filterCondition = null, joinTables = null)
+      mode = "full", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol, rangeStart = null,
+      rangeEnd = null, limit = lmt1, filterCondition = null, joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo))
     TablesJsonValidator.validate(importInfo)
   }

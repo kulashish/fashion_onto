@@ -2,6 +2,7 @@ package com.jabong.dap.data.acq.common
 
 import java.sql.{ ResultSet, Statement }
 
+import com.jabong.dap.common.OptionUtils
 import grizzled.slf4j.Logging
 
 /**
@@ -15,7 +16,7 @@ object GetMinMaxPK extends Logging {
     val mode = AcqImportInfo.tableInfo.mode
     val tableName = AcqImportInfo.tableInfo.tableName
     val tablePrimaryKey = AcqImportInfo.tableInfo.primaryKey
-    val limit = AcqImportInfo.tableInfo.limit
+    val limit = OptionUtils.getOptValue(AcqImportInfo.tableInfo.limit)
 
     var minMax = new MinMax(0, 0)
 

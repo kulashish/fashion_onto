@@ -3,7 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.AppConfig
+import com.jabong.dap.common.{ OptionUtils, AppConfig }
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
@@ -16,13 +16,22 @@ object PathBuilder {
     val basePath = AppConfig.config.basePath
     val source = AcqImportInfo.tableInfo.source
     val tableName = AcqImportInfo.tableInfo.tableName
-    val rangeStart = AcqImportInfo.tableInfo.rangeStart
-    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
+    val rangeStart = OptionUtils.getOptValue(AcqImportInfo.tableInfo.rangeStart)
+    val rangeEnd = OptionUtils.getOptValue(AcqImportInfo.tableInfo.rangeEnd)
 
     AcqImportInfo.tableInfo.mode match {
       case "full" =>
         val dateNow = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
+      case "monthly" =>
+        val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+        val start = Calendar.getInstance()
+        val end = Calendar.getInstance()
+        start.setTime(format.parse(rangeStart))
+        end.setTime(format.parse(rangeEnd))
+        "%s/%s/%s/monthly/%s/%s/%s/"
+          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
+            withLeadingZeros(end.get(Calendar.DATE)))
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
           val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
@@ -45,8 +54,7 @@ object PathBuilder {
         end.setTime(format.parse(rangeEnd))
         "%s/%s/%s/hourly/%s/%s/%s/%s_%s"
           .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
-            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)),
-            withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
       case _ => ""
     }
   }

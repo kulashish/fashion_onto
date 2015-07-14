@@ -9,7 +9,7 @@ import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
 /**
- * Created by jabong on 2/7/15.
+ * Created by mubarak on 2/7/15.
  */
 class SalesAddressTest extends FlatSpec with SharedSparkContext {
 
@@ -19,9 +19,7 @@ class SalesAddressTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-    //    df1 = sqlContext.read.json("test/sales_address.json")
     df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ADDRESS, "sales_address", OrderVarSchema.salesOrderAddress)
-    //    df2 = sqlContext.read.json("test/sales_address2.json")
 
     df1.collect.foreach(println)
   }
