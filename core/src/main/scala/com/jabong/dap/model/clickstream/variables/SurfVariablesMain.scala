@@ -18,13 +18,13 @@ object SurfVariablesMain extends java.io.Serializable {
     Spark.init(conf)
     val hiveContext = Spark.getHiveContext()
     val tablename = args(0)
-    val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, args(0))
+    val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename)
     var UserObj = new GroupData(hiveContext, pagevisit)
     UserObj.calculateColumns()
     val userWiseData: RDD[(String, Row)] = UserObj.groupDataByUser()
     val browserWiseData: RDD[(String, Row)] = UserObj.groupDataByBrowser()
-    var surf3 = VariableMethods.Surf3(userWiseData, pagevisit, UserObj, hiveContext)
-    surf3.take(8) foreach (println)
+    var surf3IncrementVariables = VariableMethods.Surf3(userWiseData, UserObj, hiveContext)
+    surf3IncrementVariables.take(8) foreach (println)
   }
 
   def coalesce(id1: Any, id2: Any): String = {

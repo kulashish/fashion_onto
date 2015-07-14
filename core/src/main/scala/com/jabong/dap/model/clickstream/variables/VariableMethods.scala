@@ -18,10 +18,12 @@ import scala.util.control._
 
 object VariableMethods extends java.io.Serializable {
 
-  def Surf3(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, UserObj: GroupData, hiveContext: HiveContext): RDD[(String, (Any, Any, Any))] = {
-    val a1 = GroupedData.filter(v => v._2(UserObj.pagetype) == "CPD" || v._2(UserObj.pagetype) == "DPD" || v._2(UserObj.pagetype) == "QPD")
+  def Surf3(GroupedData: RDD[(String, Row)], UserObj: GroupData, hiveContext: HiveContext): RDD[(String, (Any, Any, Any))] = {
+    val dailyIncremental = GroupedData.filter(v => v._2(UserObj.pagetype) == "CPD" || v._2(UserObj.pagetype) == "DPD" || v._2(UserObj.pagetype) == "QPD")
       .mapValues(x => (x(UserObj.productsku), x(UserObj.browserid), x(UserObj.domain)))
-    return a1
+    val prepareForMerge1 = dailyIncremental.mapValues(x => x._1)
+    val prepareForMerge2 = prepareForMerge1.reduceByKey((x, y) => (x + "," + y))
+    return dailyIncremental
   }
 
   def appCheck(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, UserObj: GroupData, hiveContext: HiveContext): Unit = {
