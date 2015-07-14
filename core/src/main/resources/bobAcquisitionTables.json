@@ -85,10 +85,9 @@
       "source": "bob",
       "tableName": "customer_product_shortlist",
       "primaryKey": "id_customer_product_shortlist",
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": "created_at"
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -100,6 +99,13 @@
       "dateColumn": "updated_at"
     },
     {
+      "source": "bob",
+      "tableName": "customer_storecredits_history",
+      "primaryKey": "id_customer_storecredits_history",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "error"
+    },{
       "source": "bob",
       "tableName": "newsletter_subscription",
       "primaryKey": "id_newsletter_subscription",
