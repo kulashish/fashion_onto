@@ -55,8 +55,10 @@ class ReturnCancel extends LiveCustomerSelector {
 
     // 2. inner join it with sales_order: short data
     // call it customerLatestItemsData
-    val customerLatestItemsData = customerOrderData.join(returnCancelSku,
-      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner")
+    val customerLatestItemsData = customerOrderData.join(
+      returnCancelSku,
+      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner"
+    )
       .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER), customerOrderData(SalesOrderVariables.ID_SALES_ORDER), returnCancelSku(ProductVariables.SKU), returnCancelSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), returnCancelSku(SalesOrderItemVariables.UNIT_PRICE), returnCancelSku(SalesOrderItemVariables.UPDATED_AT), returnCancelSku(ProductVariables.SKU))
 
     // how to filter new orders after that
