@@ -7,13 +7,13 @@ import com.jabong.dap.common.time.{ Constants, TimeUtils }
  * Builds the condition for the query to fetch the data and get the min and max values of primary key.
  */
 object ConditionBuilder {
-  def getCondition(): String = {
+  def getCondition(tableInfo: TableInfo): String = {
 
-    val mode = AcqImportInfo.tableInfo.mode
-    val dateColumn = OptionUtils.getOptValue(AcqImportInfo.tableInfo.dateColumn)
-    val rangeStart = OptionUtils.getOptValue(AcqImportInfo.tableInfo.rangeStart)
-    val rangeEnd = OptionUtils.getOptValue(AcqImportInfo.tableInfo.rangeEnd)
-    val filterCondition = OptionUtils.getOptValue(AcqImportInfo.tableInfo.filterCondition)
+    val mode = tableInfo.mode
+    val dateColumn = OptionUtils.getOptValue(tableInfo.dateColumn)
+    val rangeStart = OptionUtils.getOptValue(tableInfo.rangeStart)
+    val rangeEnd = OptionUtils.getOptValue(tableInfo.rangeEnd)
+    val filterCondition = OptionUtils.getOptValue(tableInfo.filterCondition)
     val tempFilterCondition = if (filterCondition == null) {
       ""
     } else {

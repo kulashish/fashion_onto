@@ -40,15 +40,16 @@ object GetData extends Logging {
       println("File Already exists and save Mode is error: " + savePath)
       return
     }
+
+    val condition = ConditionBuilder.getCondition(tableInfo)
+    logger.info(condition)
+
+    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition, tableInfo)
+    logger.info(dbTableQuery)
+
     val primaryKey = tableInfo.primaryKey
     val saveFormat = tableInfo.saveFormat
     val context = getContext(saveFormat)
-    val condition = ConditionBuilder.getCondition()
-
-    logger.info(condition)
-
-    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition)
-    logger.info(dbTableQuery)
 
     val jdbcDF: DataFrame = if (primaryKey == null) {
       context.read.jdbc(dbConn.getConnectionString, dbTableQuery, dbConn.getConnectionProperties)
