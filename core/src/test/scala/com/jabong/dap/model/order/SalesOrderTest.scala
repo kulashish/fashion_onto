@@ -22,7 +22,6 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
     val config = new Config(basePath = "basePath")
     AppConfig.config = config
 
-
     df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order1", OrderVarSchema.salesOrder)
 
     df2 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order2", OrderVarSchema.salesOrderCoupon)
@@ -34,6 +33,5 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
     ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 3)
   }
-
 
 }

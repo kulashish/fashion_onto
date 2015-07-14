@@ -3,7 +3,6 @@ package com.jabong.dap.campaign.customerselection
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, CustomerVariables }
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import org.apache.spark.sql.{ SQLContext, DataFrame }
-import org.apache.spark.sql.hive.HiveContext
 import org.scalatest.FlatSpec
 
 /**

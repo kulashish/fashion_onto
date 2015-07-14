@@ -19,7 +19,7 @@ object SalesOrderAddress {
    * @param prevFav Dataframe with the previous joined data from sales_order, sales_order_address
    * @return
    */
-  def processVariable(salesOrder: DataFrame, salesAddress: DataFrame, prevFav: DataFrame):(DataFrame, DataFrame)= {
+  def processVariable(salesOrder: DataFrame, salesAddress: DataFrame, prevFav: DataFrame): (DataFrame, DataFrame) = {
     val salesOrderAddress = salesAddress.join(salesOrder, salesAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
     val curFav = salesOrderAddress.select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE)
     val jData = prevFav.unionAll(curFav)
@@ -62,16 +62,17 @@ object SalesOrderAddress {
     return (fCity, fMobile)
   }
 
-  /** for testing only
-
-  def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("SparkExamples")
-    Spark.init(conf)
-    val df1 = Spark.getSqlContext().read.json("test/sales_address.json").select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE)
-    df1.collect().foreach(println)
-    val res = getFav(df1)
-    res.collect().foreach(println)
-  }
+  /**
+   * for testing only
+   *
+   * def main(args: Array[String]) {
+   * val conf = new SparkConf().setAppName("SparkExamples")
+   * Spark.init(conf)
+   * val df1 = Spark.getSqlContext().read.json("test/sales_address.json").select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE)
+   * df1.collect().foreach(println)
+   * val res = getFav(df1)
+   * res.collect().foreach(println)
+   * }
    */
 
 }

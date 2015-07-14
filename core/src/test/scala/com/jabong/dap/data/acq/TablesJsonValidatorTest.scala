@@ -148,7 +148,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = rngStrt, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
-      TablesJsonValidator.validateDateTimes(tableInfo)
+      TablesJsonValidator.validateDateTimes(tableInfo, false)
     }
   }
 
@@ -157,7 +157,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = null, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
-      TablesJsonValidator.validateDateTimes(tableInfo)
+      TablesJsonValidator.validateDateTimes(tableInfo, false)
     }
   }
 
@@ -167,7 +167,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
       saveMode = null, dateColumn = null, rangeStart = rngStrt, rangeEnd = null, limit = null,
       filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
-      TablesJsonValidator.validateDateTimes(tableInfo)
+      TablesJsonValidator.validateDateTimes(tableInfo, false)
     }
   }
 
@@ -228,7 +228,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
       mode = "daily", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol,
       rangeStart = dt1, rangeEnd = dt2, limit = null, filterCondition = null,
       joinTables = null)
-    val importInfo = new ImportInfo(acquisition = List(tableInfo))
+    val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(false))
     TablesJsonValidator.validate(importInfo)
   }
 
@@ -238,7 +238,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
       mode = "full", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol, rangeStart = null,
       rangeEnd = null, limit = lmt1, filterCondition = null, joinTables = null)
-    val importInfo = new ImportInfo(acquisition = List(tableInfo))
+    val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(false))
     TablesJsonValidator.validate(importInfo)
   }
 }

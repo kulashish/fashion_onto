@@ -2,8 +2,7 @@ package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.customerselection.ReturnCancel
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
-import org.apache.spark.sql.{ SQLContext, DataFrame }
-import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -18,7 +17,7 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    sqlContext = Spark.getHiveContext()
+    sqlContext = Spark.getSqlContext()
     cancelRetarget = new CancelReTarget()
 
     orderItemDataFrame = sqlContext.read.json("src/test/resources/sales_order/sales_order_with_item.json")
