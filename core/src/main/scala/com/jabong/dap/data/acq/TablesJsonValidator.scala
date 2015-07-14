@@ -90,7 +90,7 @@ object TablesJsonValidator {
       validateRequiredValues(table)
       validatePossibleValues(table)
       validateDateTimes(table, isHistory)
-      if (!(OptionUtils.optStringEmpty(table.rangeStart) && OptionUtils.optStringEmpty(table.rangeEnd))) {
+      if (!OptionUtils.optStringEmpty(table.rangeStart) && !OptionUtils.optStringEmpty(table.rangeEnd)) {
         validateRanges(table.rangeStart.orNull, table.rangeEnd.orNull, table.mode)
       }
     }
