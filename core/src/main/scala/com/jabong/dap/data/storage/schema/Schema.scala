@@ -166,7 +166,7 @@ object Schema {
   val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true),
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
 
-val customerWishlist = StructType(Array(
+  val customerWishlist = StructType(Array(
     StructField(CustomerWishlistVariables.ID_CUSTOMER_WISHLIST, IntegerType, true),
     StructField(CustomerWishlistVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerWishlistVariables.COMMENT, StringType, true),
@@ -176,5 +176,28 @@ val customerWishlist = StructType(Array(
     StructField(CustomerWishlistVariables.SIMPLE_SKU, StringType, true)
   ))
 
+  val customerProductShortlist = StructType(Array(
+    StructField(CustomerProductShortlist.ID_CUSTOMER_PRODUCT_SHORTLIST, IntegerType, true),
+    StructField(CustomerProductShortlist.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlist.USER_SHORTLIST_KEY, StringType, true),
+    StructField(CustomerProductShortlist.EMAIL, StringType, true),
+    StructField(CustomerProductShortlist.SKU, StringType, true),
+    StructField(CustomerProductShortlist.EXTRA_DATA, StringType, true),
+    StructField(CustomerProductShortlist.STOCK_WHEN_REMOVED, IntegerType, true),
+    StructField(CustomerProductShortlist.CUSTOMER_SOURCE, StringType, true),
+    StructField(CustomerProductShortlist.CREATED_AT, TimestampType, true),
+    StructField(CustomerProductShortlist.REMOVED_AT, TimestampType, true),
+    StructField(CustomerProductShortlist.DOMAIN, StringType, true),
+    StructField(CustomerProductShortlist.USER_DEVICE_TYPE, StringType, true)
+  ))
+
+  val resultCustomerWishlist = StructType(Array(
+    StructField(CustomerProductShortlist.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlist.EMAIL, StringType, true),
+    StructField(CustomerProductShortlist.SKU, StringType, true),
+    StructField(CustomerProductShortlist.DOMAIN, StringType, true),
+    StructField(CustomerProductShortlist.USER_DEVICE_TYPE, StringType, true),
+    StructField(CustomerProductShortlist.CREATED_AT, TimestampType, true)
+  ))
 
 }
