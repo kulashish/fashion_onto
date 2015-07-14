@@ -5,7 +5,7 @@ import java.util.Calendar
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ProductVariables, CustomerVariables }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -28,18 +28,18 @@ object CampaignUtils {
 
     import sqlContext.implicits._
 
-    if (refSkuData == null) {
+    if (refSkuData == null || NumberSku <= 0) {
       return null
     }
-    refSkuData.foreach(println)
-    refSkuData.printSchema()
+
     val customerData = refSkuData.filter(ProductVariables.SKU + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU)
+      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), t(1).toString))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.take(NumberSku).toList) }
+    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[Double], t(1).toString)))
+    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+    //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
     val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_LIST)
