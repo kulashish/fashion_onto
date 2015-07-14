@@ -1,6 +1,6 @@
 package com.jabong.dap.data.acq.common
 
-import java.sql.{Connection, DriverManager}
+import java.sql.{ Connection, DriverManager }
 
 import grizzled.slf4j.Logging
 

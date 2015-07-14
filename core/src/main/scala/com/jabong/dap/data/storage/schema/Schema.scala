@@ -163,6 +163,8 @@ object Schema {
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
   val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true)))
-  val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true),
-    StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
+  val paybackCustomer = StructType(Array(
+    StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)
+  ))
 }

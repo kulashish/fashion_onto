@@ -77,9 +77,10 @@ case class MergeInfo(
 
 case class COVarInfo(
   prevFullDate: String,
-  mergeDate: String,
-  saveFormat: String,
-  saveMode: String)
+  mergeDate:    String,
+  saveFormat:   String,
+  saveMode:     String
+)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -87,7 +88,7 @@ case class COVarInfo(
  * @param acquisition List[TableInfo] List of tables to acquire the data from.
  */
 case class ImportInfo(
-  isHistory: Option[Boolean],
+  isHistory:   Option[Boolean],
   acquisition: List[TableInfo]
 ) extends EmptyClass
 
@@ -106,7 +107,8 @@ case class MergeJobInfo(
  * @param coVar List[COVarInfo] List of variables to run the customer and order variables job on.
  */
 case class COVarJobInfo(
-  coVar: List[COVarInfo]) extends EmptyClass
+  coVar: List[COVarInfo]
+) extends EmptyClass
 
 /**
  * Object to access config variables application wide

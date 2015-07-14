@@ -37,7 +37,8 @@ object SalesOrderItem {
       SalesOrderItemVariables.PAYBACK_CREDITS_VALUE,
       SalesOrderItemVariables.PAID_PRICE,
       SalesOrderItemVariables.STORE_CREDITS_VALUE,
-      SalesOrderVariables.DOMAIN)
+      SalesOrderVariables.DOMAIN
+    )
     salesJoinedDF.printSchema()
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
@@ -65,23 +66,31 @@ object SalesOrderItem {
     val bcweb = Spark.getContext().broadcast(web).value
     val bcmweb = Spark.getContext().broadcast(mWeb).value
     val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), "outer").
-      select(coalesce(bcapp(SalesOrderVariables.FK_CUSTOMER),
-        bcweb(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+      select(
+        coalesce(
+        bcapp(SalesOrderVariables.FK_CUSTOMER),
+        bcweb(SalesOrderVariables.FK_CUSTOMER)
+      ) as SalesOrderVariables.FK_CUSTOMER,
         bcweb(SalesOrderItemVariables.ORDERS_COUNT_WEB),
         bcweb(SalesOrderItemVariables.REVENUE_WEB),
         bcapp(SalesOrderItemVariables.ORDERS_COUNT_APP),
-        bcapp(SalesOrderItemVariables.REVENUE_APP))
+        bcapp(SalesOrderItemVariables.REVENUE_APP)
+      )
     appJoined.printSchema()
     appJoined.show(5)
     val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), "outer").
-      select(coalesce(bcmweb(SalesOrderVariables.FK_CUSTOMER),
-        appJoined(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+      select(
+        coalesce(
+        bcmweb(SalesOrderVariables.FK_CUSTOMER),
+        appJoined(SalesOrderVariables.FK_CUSTOMER)
+      ) as SalesOrderVariables.FK_CUSTOMER,
         appJoined(SalesOrderItemVariables.ORDERS_COUNT_WEB),
         appJoined(SalesOrderItemVariables.REVENUE_WEB),
         appJoined(SalesOrderItemVariables.ORDERS_COUNT_APP),
         appJoined(SalesOrderItemVariables.REVENUE_APP),
         bcmweb(SalesOrderItemVariables.ORDERS_COUNT_MWEB),
-        bcmweb(SalesOrderItemVariables.REVENUE_MWEB)).na.fill(Map(
+        bcmweb(SalesOrderItemVariables.REVENUE_MWEB)
+      ).na.fill(Map(
           SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
           SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
           SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
@@ -89,10 +98,13 @@ object SalesOrderItem {
           SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
           SalesOrderItemVariables.REVENUE_WEB -> 0.0
         ))
-    val res = joinedData.withColumn(SalesOrderItemVariables.REVENUE,
-      joinedData(SalesOrderItemVariables.REVENUE_APP) + joinedData(SalesOrderItemVariables.REVENUE_WEB) + joinedData(SalesOrderItemVariables.REVENUE_MWEB)).withColumn(
+    val res = joinedData.withColumn(
+      SalesOrderItemVariables.REVENUE,
+      joinedData(SalesOrderItemVariables.REVENUE_APP) + joinedData(SalesOrderItemVariables.REVENUE_WEB) + joinedData(SalesOrderItemVariables.REVENUE_MWEB)
+    ).withColumn(
         SalesOrderItemVariables.ORDERS_COUNT,
-        joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB))
+        joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB)
+      )
     res.printSchema()
     res.show(5)
     res
@@ -107,8 +119,11 @@ object SalesOrderItem {
   def merge(inc: DataFrame, full: DataFrame): DataFrame = {
     val bcInc = Spark.getContext().broadcast(inc)
     val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), "outer")
-    val res = joinedData.select(coalesce(full(SalesOrderVariables.FK_CUSTOMER),
-      bcInc.value(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+    val res = joinedData.select(
+      coalesce(
+      full(SalesOrderVariables.FK_CUSTOMER),
+      bcInc.value(SalesOrderVariables.FK_CUSTOMER)
+    ) as SalesOrderVariables.FK_CUSTOMER,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_LIFE) + joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
@@ -179,8 +194,11 @@ object SalesOrderItem {
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
     val bcCurr = Spark.getContext().broadcast(prev)
     val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), "outer")
-    val res = joinedData.select(coalesce(prev(SalesOrderVariables.FK_CUSTOMER),
-      bcCurr.value(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+    val res = joinedData.select(
+      coalesce(
+      prev(SalesOrderVariables.FK_CUSTOMER),
+      bcCurr.value(SalesOrderVariables.FK_CUSTOMER)
+    ) as SalesOrderVariables.FK_CUSTOMER,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB + "_" + days,
