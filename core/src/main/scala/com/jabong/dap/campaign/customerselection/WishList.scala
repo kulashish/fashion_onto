@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.constants.variables.{ CustomerProductShortlist, CustomerWishlistVariables }
+import com.jabong.dap.common.constants.variables.CustomerProductShortlist
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.data.storage.schema.Schema
@@ -59,7 +59,7 @@ class WishList extends LiveCustomerSelector {
     val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlist.FK_CUSTOMER + " is not null and " +
       //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
       CustomerProductShortlist.REMOVED_AT + " is null and " +
-      CustomerWishlistVariables.CREATED_AT + " > " + "'" + dateBeforeNdays + "'")
+      CustomerProductShortlist.CREATED_AT + " >= " + "'" + dateBeforeNdays + "'")
       .select(
         col(CustomerProductShortlist.FK_CUSTOMER),
         col(CustomerProductShortlist.EMAIL),
