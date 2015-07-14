@@ -1,7 +1,7 @@
 package com.jabong.dap.model.order
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.order.schema.OrderVarSchema
 import com.jabong.dap.model.order.variables.SalesOrderItem
@@ -32,7 +32,7 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
   }
 
   "Testing JoinDataframe" should "have size 148" in {
-    var ordersCount = SalesOrderItem.joinDataFrames(df1,df2,df3)
+    var ordersCount = SalesOrderItem.joinDataFrames(df1, df2, df3)
     ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 148)
   }
@@ -42,6 +42,5 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
     ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 3)
   }
-
 
 }

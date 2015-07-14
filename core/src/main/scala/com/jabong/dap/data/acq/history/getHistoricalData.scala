@@ -1,8 +1,8 @@
 package com.jabong.dap.data.acq.history
 
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.time.{Constants, TimeUtils}
-import com.jabong.dap.data.acq.common.{PathBuilder, DbConnection, GetData, TableInfo}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ PathBuilder, DbConnection, GetData, TableInfo }
 
 /**
  * Created by pooja on 13/7/15.
@@ -42,7 +42,6 @@ class getHistoricalData extends java.io.Serializable {
           mode = "monthly", saveFormat = tableInfo.saveFormat, saveMode = "ignore", dateColumn = tableInfo.dateColumn,
           rangeStart = Option.apply(start), rangeEnd = Option.apply(end), limit = tableInfo.limit, filterCondition = tableInfo.filterCondition,
           joinTables = tableInfo.joinTables)
-
 
         GetData.getData(dbConn, tblInfo)
       }

@@ -1,8 +1,8 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.customerselection.ReturnCancel
-import com.jabong.dap.common.{SharedSparkContext, Spark}
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
