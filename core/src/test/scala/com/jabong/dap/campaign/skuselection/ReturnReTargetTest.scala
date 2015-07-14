@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{ SQLContext, DataFrame }
 import org.apache.spark.sql.hive.HiveContext
 import org.scalatest.FlatSpec
 
@@ -10,26 +10,26 @@ import org.scalatest.FlatSpec
  */
 class ReturnReTargetTest extends FlatSpec with SharedSparkContext {
 
-  @transient var hiveContext: HiveContext = _
+  @transient var sqlContext: SQLContext = _
   @transient var testDataFrame: DataFrame = _
   @transient var orderItemDataFrame: DataFrame = _
   var returnReTarget: ReturnReTarget = _
 
   override def beforeAll() {
     super.beforeAll()
-    hiveContext = Spark.getHiveContext()
+    sqlContext = Spark.getSqlContext()
     returnReTarget = new ReturnReTarget()
-    orderItemDataFrame = hiveContext.read.json("src/test/resources/sales_order/sales_order_with_item.json")
+    orderItemDataFrame = sqlContext.read.json("src/test/resources/sales_order/sales_order_with_item.json")
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }
 
   "empty order data " should "return empty data from execute function of return re-target " in {
-    val skuData = returnReTarget.execute(null)
+    val skuData = returnReTarget.skuFilter(null)
     assert(skuData == null)
   }
 
   "Last day order items data " should "return two records from execute function" in {
-    val skuData = returnReTarget.execute(orderItemDataFrame)
+    val skuData = returnReTarget.skuFilter(orderItemDataFrame)
     assert(skuData.count() == 1)
   }
 

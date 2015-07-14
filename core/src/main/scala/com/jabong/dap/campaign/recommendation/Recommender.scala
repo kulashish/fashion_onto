@@ -1,7 +1,5 @@
 package com.jabong.dap.campaign.recommendation
 
-import java.util.Locale.Category
-
 import org.apache.spark.sql.DataFrame
 
 import scala.collection.immutable.HashMap
