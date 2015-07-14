@@ -28,6 +28,9 @@ object DataSets {
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
   val CUSTOMER_SEGMENTS = "customer_segments"
+  val CUSTOMER_WISHLIST = "customer_wishlist"
+  val CUSTOMER_PRODUCT_SHORTLIST = "customer_product_shortlist"
+  val RESULT_CUSTOMER_WISHLIST = "result_customer_wishlist"
 
   //newsletter
   val NEWSLETTER_SUBSCRIPTION = "newsletter_subscription"
@@ -43,5 +46,7 @@ object DataSets {
 
   //Newsletter Preferences
   val NEWSLETTER_PREFERENCES = "newsletter_preferences"
+
+  val CAMPAIGN = "campaign"
 
 }
