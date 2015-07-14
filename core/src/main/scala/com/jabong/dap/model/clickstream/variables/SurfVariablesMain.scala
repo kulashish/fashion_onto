@@ -1,24 +1,22 @@
 package com.jabong.dap.model.clickstream.variables
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.model.clickstream.utils.{GroupData, GetMergedClickstreamData}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SaveMode, Row}
 import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.{DataFrame, SaveMode, Row}
 import org.apache.spark.{SparkContext, SparkConf}
 import scala.collection.immutable.HashMap
 
 /**
  * Created by Divya on 13/7/15.
  */
-class SurfVariablesMain extends java.io.Serializable {
+object SurfVariablesMain extends java.io.Serializable {
 
   def main(args: Array[String]) {
-    //val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true"
     val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
-    val sc = new SparkContext(conf)
-   // val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-    val hiveContext = new HiveContext(sc)
-    import hiveContext.implicits._
+    Spark.init(conf)
+    val hiveContext = Spark.getHiveContext()
     val tablename = args(0)
     val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, args(0))
     var UserObj = new GroupData(hiveContext, pagevisit)
