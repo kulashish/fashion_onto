@@ -53,7 +53,8 @@ object Customer {
       col(NewsletterVariables.STATUS),
       col(NewsletterVariables.UNSUBSCRIBE_KEY),
       col(NewsletterVariables.CREATED_AT) as NewsletterVariables.NLS_CREATED_AT,
-      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT)
+      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT
+    )
 
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     val udfCPOT = getCPOT(dfSalesOrder: DataFrame)
@@ -70,14 +71,18 @@ object Customer {
       CustomerVariables.UPDATED_AT,
       CustomerVariables.FIRST_NAME,
       CustomerVariables.LAST_NAME,
-      CustomerVariables.IS_CONFIRMED)
+      CustomerVariables.IS_CONFIRMED
+    )
       .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
 
-      .join(dfSalesOrder.select(
+      .join(
+        dfSalesOrder.select(
         col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
-        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT),
-        dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer")
+        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
+      ),
+        dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer"
+      )
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
 
     //Name of variable: EMAIL_OPT_IN_STATUS
@@ -126,16 +131,25 @@ object Customer {
 
       Udf.age(dfJoin(CustomerVariables.BIRTHDAY)) as CustomerVariables.AGE,
 
-      Udf.minTimestamp(dfJoin(CustomerVariables.CREATED_AT),
-        dfJoin(NewsletterVariables.NLS_CREATED_AT)) as CustomerVariables.ACC_REG_DATE,
+      Udf.minTimestamp(
+        dfJoin(CustomerVariables.CREATED_AT),
+        dfJoin(NewsletterVariables.NLS_CREATED_AT)
+      ) as CustomerVariables.ACC_REG_DATE,
 
-      Udf.maxTimestamp(dfJoin(CustomerVariables.UPDATED_AT),
-        Udf.maxTimestamp(dfJoin(NewsletterVariables.NLS_UPDATED_AT),
-          dfJoin(SalesOrderVariables.SO_UPDATED_AT)))
+      Udf.maxTimestamp(
+        dfJoin(CustomerVariables.UPDATED_AT),
+        Udf.maxTimestamp(
+          dfJoin(NewsletterVariables.NLS_UPDATED_AT),
+          dfJoin(SalesOrderVariables.SO_UPDATED_AT)
+        )
+      )
         as CustomerVariables.MAX_UPDATED_AT,
 
-      udfEmailOptInStatus(dfJoin(NewsletterVariables.NLS_EMAIL),
-        dfJoin(NewsletterVariables.STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
+      udfEmailOptInStatus(
+        dfJoin(NewsletterVariables.NLS_EMAIL),
+        dfJoin(NewsletterVariables.STATUS)
+      ) as CustomerVariables.EMAIL_OPT_IN_STATUS
+    )
 
     var dfFull: DataFrame = null
 
@@ -184,7 +198,8 @@ object Customer {
 
         Udf.maxTimestamp(joinDF(CustomerVariables.MAX_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.MAX_UPDATED_AT)) as CustomerVariables.MAX_UPDATED_AT,
 
-        Udf.latestString(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS)
+        Udf.latestString(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS
+      )
     }
 
     (dfResult, dfFull)

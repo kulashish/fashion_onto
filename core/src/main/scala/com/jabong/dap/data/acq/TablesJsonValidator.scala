@@ -33,11 +33,18 @@ object TablesJsonValidator {
       format(table.saveMode, possibleSaveModes.mkString(",")))
   }
 
-  def validateDateTimes(table: TableInfo) = {
-    require(
-      !(OptionUtils.optStringEmpty(table.rangeStart) ^ OptionUtils.optStringEmpty(table.rangeEnd)),
-      "rangeStart and rangeEnd both should have values, or none of them should have a value"
-    )
+  def validateDateTimes(table: TableInfo, isHistory: Boolean) = {
+    if (!isHistory) {
+      require(
+        !(OptionUtils.optStringEmpty(table.rangeStart) ^ OptionUtils.optStringEmpty(table.rangeEnd)),
+        "rangeStart and rangeEnd both should have values, or none of them should have a value"
+      )
+    } else {
+      require(
+        !(OptionUtils.optStringEmpty(table.rangeStart)),
+        "rangeStart should have value if we are trying to get historical data"
+      )
+    }
 
     // Check if rangeStart doesn't have a value for hourly mode.
     // rangeEnd doesn't need to be checked as it will have a value if rangeStart has a value.
@@ -78,10 +85,11 @@ object TablesJsonValidator {
   }
 
   def validate(info: ImportInfo) = {
+    val isHistory = OptionUtils.getOptBoolVal(info.isHistory)
     for (table <- info.acquisition) {
       validateRequiredValues(table)
       validatePossibleValues(table)
-      validateDateTimes(table)
+      validateDateTimes(table, isHistory)
       if (!(OptionUtils.optStringEmpty(table.rangeStart) && OptionUtils.optStringEmpty(table.rangeEnd))) {
         validateRanges(table.rangeStart.orNull, table.rangeEnd.orNull, table.mode)
       }

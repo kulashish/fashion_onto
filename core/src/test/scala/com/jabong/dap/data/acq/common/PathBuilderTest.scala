@@ -32,7 +32,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
       limit = lmt, filterCondition = null,
       joinTables = jnTbls)
-    PathBuilder.getPath() should be ("")
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be ("")
   }
 
   "getPath" should "return correct path if mode is full" in {
@@ -42,7 +42,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       joinTables = jnTbls)
     val dateNow = TimeUtils.getTodayDate("yyyy/MM/dd/HH")
     val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
-    PathBuilder.getPath() should be (outputPath)
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are null" in {
@@ -52,7 +52,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       joinTables = jnTbls)
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     val outputPath = "basePath/source/tableName/daily/" + dateYesterday + "/"
-    PathBuilder.getPath() should be (outputPath)
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are provided" in {
@@ -61,7 +61,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       rangeEnd = Option.apply("2015-06-28 23:59:59"), limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val outputPath = "basePath/source/tableName/daily/2015/06/13_28"
-    PathBuilder.getPath() should be (outputPath)
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is hourly" in {
@@ -70,7 +70,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       rangeEnd = Option.apply("2015-06-13 15:59:59"), limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val outputPath = "basePath/source/tableName/hourly/2015/06/13/01_15"
-    PathBuilder.getPath() should be (outputPath)
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
 }
