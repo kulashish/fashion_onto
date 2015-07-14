@@ -18,7 +18,7 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    sqlContext = Spark.getHiveContext()
+    sqlContext = Spark.getSqlContext()
     cancelRetarget = new CancelReTarget()
 
     orderItemDataFrame = sqlContext.read.json("src/test/resources/sales_order/sales_order_with_item.json")
