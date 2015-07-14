@@ -77,10 +77,10 @@ object Customer {
 
       .join(
         dfSalesOrder.select(
-        col(SalesOrderVariables.FK_CUSTOMER),
-        col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
-        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
-      ),
+          col(SalesOrderVariables.FK_CUSTOMER),
+          col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
+          col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
+        ),
         dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer"
       )
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
