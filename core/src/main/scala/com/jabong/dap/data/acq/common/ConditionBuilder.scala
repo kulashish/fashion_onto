@@ -22,8 +22,8 @@ object ConditionBuilder {
 
     if (rangeStart == null && rangeEnd == null && mode == "daily") {
       val prevDayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT)
-      "WHERE t1.%s >= '%s 00:00:00' AND t1.%s <= '%s 23:59:59' %s".format(dateColumn, prevDayDate, dateColumn,
-        prevDayDate, tempFilterCondition)
+      "WHERE t1.%s >= '%s %s' AND t1.%s <= '%s %s' %s".format(dateColumn, prevDayDate, Constants.START_TIME, dateColumn,
+        prevDayDate, Constants.END_TIME, tempFilterCondition)
     } else if (mode == "full" && filterCondition == null) {
       ""
     } else if (mode == "full" && filterCondition != null) {
