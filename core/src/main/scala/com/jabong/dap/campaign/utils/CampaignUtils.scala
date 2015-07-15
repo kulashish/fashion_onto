@@ -1,7 +1,8 @@
 package com.jabong.dap.campaign.utils
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.util.{Date, Calendar}
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
@@ -55,7 +56,7 @@ object CampaignUtils {
    * @param diffType
    * @return
    */
-  def currentTimeDiff(date: String, diffType: String): Long = {
+  def currentTimeDiff(date: String, diffType: String): Double = {
     val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
     val prodDate = dateFormat.parse(date)
 
@@ -63,7 +64,7 @@ object CampaignUtils {
 
     val diff = cal.getTime().getTime - prodDate.getTime()
 
-    var diffTime: Long = 0
+    var diffTime: Double = 0
 
     diffType match {
       case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
@@ -73,6 +74,46 @@ object CampaignUtils {
     }
 
     return diffTime
+  }
+
+  /**
+   * To calculate difference between start time of previous day and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: String, diffType: String): Double = {
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance();
+    cal.add(Calendar.DATE,-1)
+    val diff = startOfDay(cal.getTime) - prodDate.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    return diffTime
+  }
+
+  /**
+   * get start time of the day
+   * @param time
+   * @return
+   */
+  def  startOfDay(time:Date):Long= {
+    val cal = Calendar.getInstance();
+    cal.setTimeInMillis(time.getTime());
+    cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to zero
+    cal.set(Calendar.MINUTE, 0); // set minutes to zero
+    cal.set(Calendar.SECOND, 0); //set seconds to zero
+    return cal.getTime.getTime
   }
 
   /**
