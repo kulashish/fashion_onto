@@ -1,15 +1,15 @@
-{"fk_customer":1, "city":"Hyderabad","phone":"3454"}
-{"fk_customer":2, "city":"Delhi","phone":"9898"}
-{"fk_customer":1, "city":"Bangalore","phone":"1237"}
-{"fk_customer":3, "city":"Delhi","phone":"2220"}
-{"fk_customer":1, "city":"Delhi","phone":"2345"}
-{"fk_customer":3, "city":"Bangalore","phone":"0234"}
-{"fk_customer":2, "city":"Hyderabad","phone":"9898  "}
-{"fk_customer":1, "city":"Delhi","phone":"1230"}
-{"fk_customer":3, "city":"Bangalore","phone":"0456"}
-{"fk_customer":1, "city":"Delhi","phone":"2220"}
-{"fk_customer":1, "city":"Bangalore","phone":"0333"}
-{"fk_customer":2, "city":"Hyderabad","phone":"3454"}
-{"fk_customer":1, "city":"Hyderabad","phone":"1230"}
-{"fk_customer":3, "city":"Hyderabad","phone":"2220"}
-{"fk_customer":1, "city":"Bangalore","phone":"1230"}
+{"fk_customer":1, "city":"Hyderabad","phone":"3454", "first_name":"a", "last_name": "A"}
+{"fk_customer":2, "city":"Delhi","phone":"9898", "first_name":"b", "last_name": "B"}
+{"fk_customer":1, "city":"Bangalore","phone":"1237", "first_name":"a", "last_name": "A"}
+{"fk_customer":3, "city":"Delhi","phone":"2220", "first_name":"c", "last_name": "C"}
+{"fk_customer":1, "city":"Delhi","phone":"2345", "first_name":"a1", "last_name": "A1"}
+{"fk_customer":3, "city":"Bangalore","phone":"0234", "first_name":"c", "last_name": "C"}
+{"fk_customer":2, "city":"Hyderabad","phone":"9898  ", "first_name":"b1", "last_name": "B1"}
+{"fk_customer":1, "city":"Delhi","phone":"1230", "first_name":"a", "last_name": "A"}
+{"fk_customer":3, "city":"Bangalore","phone":"0456", "first_name":"c1", "last_name": "C1"}
+{"fk_customer":1, "city":"Delhi","phone":"2220", "first_name":"a1", "last_name": "A1"}
+{"fk_customer":1, "city":"Bangalore","phone":"0333", "first_name":"a", "last_name": "a"}
+{"fk_customer":2, "city":"Hyderabad","phone":"3454", "first_name":"b1", "last_name": "B1"}
+{"fk_customer":1, "city":"Hyderabad","phone":"1230", "first_name":"a", "last_name": "A"}
+{"fk_customer":3, "city":"Hyderabad","phone":"2220", "first_name":"c", "last_name": "C"}
+{"fk_customer":1, "city":"Bangalore","phone":"1230", "first_name":"a", "last_name": "a"}

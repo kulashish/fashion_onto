@@ -188,6 +188,12 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     }
   }
 
+  "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a year in monthly mode" in {
+    a[IllegalArgumentException] should be thrownBy {
+      TablesJsonValidator.validateRanges("2014-04-22 15:00:00", "2015-06-21 15:00:00", "monthly")
+    }
+  }
+
   "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a month in daily mode" in {
     //    val dt3 = Option.apply("2015-04-22 15:00:00")
     //    val dt4 = Option.apply("2015-06-21 15:00:00")
@@ -239,6 +245,27 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
       mode = "full", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol, rangeStart = null,
       rangeEnd = null, limit = lmt1, filterCondition = null, joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(false))
+    TablesJsonValidator.validate(importInfo)
+  }
+
+  "Tables Json Validator" should "not throw an IllegalArgumentException if isHistory true and range start not given" in {
+    val dtCol = Option.apply("updated_at")
+    val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
+      mode = "monthly", saveFormat = "parquet", saveMode = "ignore", dateColumn = dtCol, rangeStart = null,
+      rangeEnd = null, limit = null, filterCondition = null, joinTables = null)
+    val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(true))
+    a[IllegalArgumentException] should be thrownBy {
+      TablesJsonValidator.validate(importInfo)
+    }
+  }
+
+  "Tables Json Validator" should "not throw any exception if everything is correct with isHistory true" in {
+    val dtCol = Option.apply("updated_at")
+    val dt1 = Option.apply("2015-06-20 15:00:00")
+    val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
+      mode = "monthly", saveFormat = "parquet", saveMode = "ignore", dateColumn = dtCol, rangeStart = dt1,
+      rangeEnd = null, limit = null, filterCondition = null, joinTables = null)
+    val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(true))
     TablesJsonValidator.validate(importInfo)
   }
 }

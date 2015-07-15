@@ -24,29 +24,32 @@ object GetData extends Logging {
     val savePath = PathBuilder.getPath(tableInfo)
     val saveMode = tableInfo.saveMode
 
-    if (saveMode.equals("ignore") && DataVerifier.hdfsDataExists(savePath)) {
-      logger.info("File Already exists: " + savePath)
-      println("File Already exists so not doing anything: " + savePath)
-      return
-    } else {
-      DataVerifier.hdfsDirDelete(savePath)
-      logger.info("Directory with no success file was removed: " + savePath)
-      println("Directory with no success file was removed: " + savePath)
-    }
-    if (saveMode.equals("error") && DataVerifier.hdfsDirExists(savePath)) {
+    if (saveMode.equals("ignore")) {
+      if (DataVerifier.hdfsDataExists(savePath)) {
+        logger.info("File Already exists: " + savePath)
+        println("File Already exists so not doing anything: " + savePath)
+        return
+      }
+      if (DataVerifier.hdfsDirExists(savePath)) {
+        DataVerifier.hdfsDirDelete(savePath)
+        logger.info("Directory with no success file was removed: " + savePath)
+        println("Directory with no success file was removed: " + savePath)
+      }
+    } else if (saveMode.equals("error") && DataVerifier.hdfsDirExists(savePath)) {
       logger.info("File Already exists and save Mode is error: " + savePath)
       println("File Already exists and save Mode is error: " + savePath)
       return
     }
+
+    val condition = ConditionBuilder.getCondition(tableInfo)
+    logger.info(condition)
+
+    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition, tableInfo)
+    logger.info(dbTableQuery)
+
     val primaryKey = tableInfo.primaryKey
     val saveFormat = tableInfo.saveFormat
     val context = getContext(saveFormat)
-    val condition = ConditionBuilder.getCondition()
-
-    logger.info(condition)
-
-    val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition)
-    logger.info(dbTableQuery)
 
     val jdbcDF: DataFrame = if (primaryKey == null) {
       context.read.jdbc(dbConn.getConnectionString, dbTableQuery, dbConn.getConnectionProperties)

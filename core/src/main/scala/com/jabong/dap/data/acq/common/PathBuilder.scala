@@ -22,20 +22,20 @@ object PathBuilder {
     tableInfo.mode match {
       case "full" =>
         val dateNow = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
-        "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
+        "%s/%s/%s/full/%s".format(basePath, source, tableName, dateNow)
       case "monthly" =>
         val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
         val start = Calendar.getInstance()
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/monthly/%s/%s/%s/"
+        "%s/%s/%s/monthly/%s/%s/%s"
           .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
             withLeadingZeros(end.get(Calendar.DATE)))
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
           val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
-          "%s/%s/%s/daily/%s/".format(basePath, source, tableName, dateYesterday)
+          "%s/%s/%s/daily/%s".format(basePath, source, tableName, dateYesterday)
         } else {
           val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
           val start = Calendar.getInstance()

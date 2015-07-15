@@ -7,4 +7,7 @@ object Constants {
   val DATE_FORMAT_FOLDER = "yyyy/MM/dd"
   val DATE_TIME_FORMAT_MS = "yyyy-MM-dd HH:mm:ss.SSS"
   val DATE_TIME_FORMAT_HRS_FOLDER = "yyyy/MM/dd/HH"
+
+  val START_TIME = "00:00:00"
+  val END_TIME = "23:59:59"
 }

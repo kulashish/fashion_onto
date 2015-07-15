@@ -41,7 +41,7 @@ class PathBuilderTest extends FlatSpec with Matchers {
       limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val dateNow = TimeUtils.getTodayDate("yyyy/MM/dd/HH")
-    val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
+    val outputPath = "basePath/source/tableName/full/" + dateNow
     PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
@@ -51,7 +51,16 @@ class PathBuilderTest extends FlatSpec with Matchers {
       limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    val outputPath = "basePath/source/tableName/daily/" + dateYesterday + "/"
+    val outputPath = "basePath/source/tableName/daily/" + dateYesterday
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
+  }
+
+  "getPath" should "return correct path if mode is monthly and both ranges are provided" in {
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "monthly",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-01 00:00:00"),
+      rangeEnd = Option.apply("2015-06-30 23:59:59"), limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    val outputPath = "basePath/source/tableName/monthly/2015/06/30"
     PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 

@@ -9,9 +9,9 @@ import com.jabong.dap.common.OptionUtils
 
 object QueryBuilder {
 
-  def getJoinTableStrings(): (String, String) = {
-    val joinTables = if (null != AcqImportInfo.tableInfo.joinTables) AcqImportInfo.tableInfo.joinTables.orNull else null
-    val primaryKey = AcqImportInfo.tableInfo.primaryKey
+  def getJoinTableStrings(tableInfo: TableInfo): (String, String) = {
+    val joinTables = if (null != tableInfo.joinTables) tableInfo.joinTables.orNull else null
+    val primaryKey = tableInfo.primaryKey
     if (null == joinTables || joinTables.isEmpty) {
       return ("", "")
     }
@@ -36,10 +36,10 @@ object QueryBuilder {
     (selectString, joinString)
   }
 
-  def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String) = {
-    val tableName = AcqImportInfo.tableInfo.tableName
-    val limit = OptionUtils.getOptValue(AcqImportInfo.tableInfo.limit)
-    val primaryKey = AcqImportInfo.tableInfo.primaryKey
+  def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String, tableInfo: TableInfo) = {
+    val tableName = tableInfo.tableName
+    val limit = OptionUtils.getOptValue(tableInfo.limit)
+    val primaryKey = tableInfo.primaryKey
 
     driver match {
       case "sqlserver" =>
@@ -62,14 +62,14 @@ object QueryBuilder {
     }
   }
 
-  def getDataQuery(driver: String, condition: String) = {
-    val mode = AcqImportInfo.tableInfo.mode
-    val tableName = AcqImportInfo.tableInfo.tableName
+  def getDataQuery(driver: String, condition: String, tableInfo: TableInfo) = {
+    val mode = tableInfo.mode
+    val tableName = tableInfo.tableName
 
-    val joinStrings = getJoinTableStrings()
+    val joinStrings = getJoinTableStrings(tableInfo)
 
     mode match {
-      case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2)
+      case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2, tableInfo)
       case "daily" | "hourly" | "monthly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
         joinStrings._2, condition)
       case _ => ""
