@@ -15,7 +15,7 @@ class QueryBuilderTest extends FlatSpec with Matchers {
     val tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = "pk", mode = "mode",
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
       limit = null, filterCondition = null,
-      joinTables = Option.empty[List[JoinTables]])
+      joinTables = null)
     QueryBuilder.getJoinTableStrings(tableInfo) should be ("", "")
   }
 
