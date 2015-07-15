@@ -41,7 +41,6 @@ object SalesOrderItemVariables {
   val ORDERS_COUNT_MWEB_LIFE = "orders_count_mweb_life"
   val ORDERS_COUNT_LIFE = "oredrs_count_life"
 
-
   val REVENUE_7 = "revenue_7"
   val REVENUE_30 = "revenue_30"
   val REVENUE_90 = "revenue_90"
@@ -68,6 +67,5 @@ object SalesOrderItemVariables {
   val ORDERS_COUNT_MWEB_7 = "orders_count_mweb_7"
   val ORDERS_COUNT_MWEB_30 = "orders_count_mweb_30"
   val ORDERS_COUNT_MWEB_90 = "orders_count_mweb_90"
-
 
 }

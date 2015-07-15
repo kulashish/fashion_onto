@@ -65,7 +65,7 @@ object TimeUtils {
    * WARNING: can raise ParseException if input dates not in the correct format.
    * @param dt1
    * @param dt2
-   * @return 
+   * @return
    */
   def isSameYear(dt1: String, dt2: String): Boolean = {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
@@ -150,7 +150,7 @@ object TimeUtils {
   }
 
   /**
-   * 
+   *
    * @param date
    * @param dateFormat
    * @return

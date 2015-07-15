@@ -2,7 +2,8 @@ package com.jabong.dap.campaign.recommendation
 
 import java.{ lang, util }
 
-import com.jabong.dap.common.constants.variables.{ NewsletterVariables, ProductVariables }
+import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, ProductVariables }
 import com.jabong.dap.common.Spark
 import org.apache.hadoop.hdfs.util.Diff.ListType
 import org.apache.spark.rdd.RDD
@@ -16,7 +17,7 @@ import scala.collection.{ mutable, SortedSet }
  * Created by rahul (first version of basic recommender) on 23/6/15.
  */
 class BasicRecommender extends Recommender {
-  val hiveContext = Spark.getHiveContext()
+  val sqlContext = Spark.getSqlContext()
 
   override def generateRecommendation(orderData: DataFrame): DataFrame = {
 
@@ -38,12 +39,13 @@ class BasicRecommender extends Recommender {
   }
 
   def topProductsSold(orderItemData: DataFrame, days: Int): DataFrame = {
-    if (orderItemData == null || days < 0) {
+    if (orderItemData == null || days <= 0) {
       return null
     }
-    import hiveContext.implicits._
+    import sqlContext.implicits._
 
-    val lastDaysData = orderItemData.filter("(unix_timestamp() -unix_timestamp(created_at,'yyyy-MM-dd HH:mm:ss.S'))/60/60/24<" + days)
+    val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.currentDaysDifference(orderItemData(SalesOrderVariables.CREATED_AT)))
+      .filter("daysPresent<=" + days)
 
     if (lastDaysData.count() == 0) {
       return null
@@ -58,7 +60,7 @@ class BasicRecommender extends Recommender {
     if (topSku == null || SkuCompleteData == null) {
       return null
     }
-    import hiveContext.implicits._
+    import sqlContext.implicits._
     val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), "inner")
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
@@ -112,7 +114,7 @@ class BasicRecommender extends Recommender {
   // Ouput: (mvp, brick, gender) and its sorted list of recommendations
 
   def genRecommend(recommendationInput: DataFrame, pivotArray: Array[String], dataFrameSchema: StructType): DataFrame = {
-    if (recommendationInput == null) {
+    if (recommendationInput == null || pivotArray == null || dataFrameSchema == null) {
       return null
     }
     val mappedRecommendationInput = recommendationInput.rdd.keyBy(row => createKey(row, pivotArray))
@@ -122,13 +124,13 @@ class BasicRecommender extends Recommender {
     }
     //mappedRecommendationInput.collect().foreach(println)
 
-    import hiveContext.implicits._
+    import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
     val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1)))) }
-    val recommendDataFrame = hiveContext.createDataFrame(recommendations, dataFrameSchema)
+    val recommendDataFrame = sqlContext.createDataFrame(recommendations, dataFrameSchema)
     return recommendDataFrame
   }
 

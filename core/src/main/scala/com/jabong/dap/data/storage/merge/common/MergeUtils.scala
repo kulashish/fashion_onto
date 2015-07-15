@@ -45,7 +45,7 @@ object MergeUtils extends MergeData {
   }
 
   /**
-   * @note join old and new data frame
+   * join old and new data frame
    * @param dfIncr
    * @param dfPrevVarFull
    * @param primaryKey

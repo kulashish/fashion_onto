@@ -5,7 +5,7 @@ package com.jabong.dap.data.acq.common
  */
 class Fetcher() extends java.io.Serializable {
   def fetch(tableInfo: TableInfo): Unit = {
-    val dbConn = new DbConnection(AcqImportInfo.tableInfo.source)
-    GetData.getData(dbConn)
+    val dbConn = new DbConnection(tableInfo.source)
+    GetData.getData(dbConn, tableInfo)
   }
 }

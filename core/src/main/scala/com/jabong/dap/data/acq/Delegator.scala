@@ -1,6 +1,8 @@
 package com.jabong.dap.data.acq
 
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
+import com.jabong.dap.data.acq.history.getHistoricalData
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -40,11 +42,21 @@ class Delegator extends Serializable with Logging {
 
     // Fetch the data if validation succeeded.
     if (validated) {
-      for (table <- AcqImportInfo.importInfo.acquisition) {
-        AcqImportInfo.tableInfo = table
-        table.source match {
-          case "erp" | "bob" | "unicommerce" => new Fetcher().fetch(table)
-          case _ => logger.error("Unknown table source.")
+      if (OptionUtils.getOptBoolVal(AcqImportInfo.importInfo.isHistory)) {
+        for (table <- AcqImportInfo.importInfo.acquisition) {
+          AcqImportInfo.tableInfo = table
+          table.source match {
+            case "erp" | "bob" | "unicommerce" => new getHistoricalData().fetchData(table)
+            case _ => logger.error("Unknown table source.")
+          }
+        }
+      } else {
+        for (table <- AcqImportInfo.importInfo.acquisition) {
+          AcqImportInfo.tableInfo = table
+          table.source match {
+            case "erp" | "bob" | "unicommerce" => new Fetcher().fetch(table)
+            case _ => logger.error("Unknown table source.")
+          }
         }
       }
     }

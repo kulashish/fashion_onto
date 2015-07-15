@@ -15,6 +15,11 @@ class SkuSelectorFactory extends CampaignFactory {
     if (actionType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)) {
       return new CancelReTarget()
     }
+
+    if (actionType.equalsIgnoreCase(SkuSelection.RETURN_RETARGET)) {
+      return new ReturnReTarget()
+    }
+
     return null
   }
 

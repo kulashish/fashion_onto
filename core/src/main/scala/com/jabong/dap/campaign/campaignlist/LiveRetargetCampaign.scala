@@ -9,21 +9,25 @@ import org.apache.spark.sql.DataFrame
  */
 class LiveRetargetCampaign {
 
-  def runCampaign(inData: DataFrame): Unit = {
+  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame): Unit = {
 
     // x = run retargeting campaign common customer selection
-    val returnCancelCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.RETURN_CANCEL)
+    val returnCancelCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
+      .getCustomerSelector(CustomerSelection.RETURN_CANCEL)
 
     // find customers with required order-item status during last day
-    val targetCustomersWithOrderItems = returnCancelCustomerSelector.customerSelection(null, null)
+    // FIXME: we will have to filter for last 30 days later for customerOrderData and last day for orderItemData
+    val targetCustomersWithOrderItems = returnCancelCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
-    // run cancel retargeting
+    // FIXME: past campaign sent or not filter
+
+    //run cancel retargeting campaign
     val cancelCampaign = new LiveCancelReTargetCampaign()
     cancelCampaign.runCampaign(targetCustomersWithOrderItems)
 
-    // run return retargeting
-
-    // (x)
+    // run return retargeting campaign
+    val returnCampaign = new LiveReturnReTargetCampaign()
+    returnCampaign.runCampaign(targetCustomersWithOrderItems)
 
   }
 }
