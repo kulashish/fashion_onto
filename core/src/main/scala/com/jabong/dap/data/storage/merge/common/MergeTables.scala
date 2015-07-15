@@ -20,12 +20,11 @@ object MergeTables extends Logging {
     val saveFormat = MergeJobConfig.mergeInfo.saveFormat
     val saveMode = MergeJobConfig.mergeInfo.saveMode
 
-    val pathFullMerged = PathBuilder.getPathFullMerged()
     lazy val pathFull = PathBuilder.getPathFull()
     lazy val pathYesterdayData = PathBuilder.getPathYesterdayData()
 
     try {
-      val mergeBaseDataPath = MergePathResolver.basePathResolver(pathFullMerged, pathFull)
+      val mergeBaseDataPath = MergePathResolver.basePathResolver(pathFull)
       val mergeIncrementalDataPath = MergePathResolver.incrementalPathResolver(pathYesterdayData)
       val context = getContext(saveFormat)
       val baseDF = context.read.format(saveFormat).load(mergeBaseDataPath)

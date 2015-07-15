@@ -5,10 +5,8 @@ package com.jabong.dap.data.storage.merge.common
  */
 object MergePathResolver {
 
-  def basePathResolver (pathFullMerged: String, pathFull: String ): String ={
-    if (DataVerifier.hdfsDataExists(pathFullMerged)) {
-      pathFullMerged
-    } else if (DataVerifier.hdfsDataExists(pathFull)) {
+  def basePathResolver (pathFull: String ): String ={
+    if (DataVerifier.hdfsDataExists(pathFull)) {
       pathFull
     } else {
       throw new DataNotFound("Base Data not found for specified inputs")

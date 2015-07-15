@@ -34,24 +34,19 @@ object PathBuilder {
     }
   }
 
-  def getPathFullMerged(): String = {
-    val dateDayBeforeYesterday = getDateDayBeforeYesterdayPath()
-    "%s/%s/%s/full_merged/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
-  }
-
   def getPathFull(): String = {
     val dateDayBeforeYesterday = getDateDayBeforeYesterdayPath()
-    "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateDayBeforeYesterday)
+    "%s/%s/%s/full/%s".format(basePath, source, tableName, dateDayBeforeYesterday)
   }
 
   def getPathYesterdayData(): String = {
     val dateYesterday = getDateYesterdayDataPath()
-    "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
+    "%s/%s/%s/%s".format(basePath, source, tableName, dateYesterday)
   }
 
   def getSavePathFullMerge(): String = {
     val dateYesterday = getDateYesterdayDataPath()
-    "%s/%s/%s/full_merged/%s/".format(basePath, source, tableName, dateYesterday)
+    "%s/%s/%s/full/%s".format(basePath, source, tableName, dateYesterday)
   }
 
 }
