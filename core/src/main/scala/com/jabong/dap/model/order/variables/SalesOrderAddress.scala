@@ -14,13 +14,13 @@ object SalesOrderAddress {
 
   /**
    *
-   * @param salesOrder
-   * @param salesAddress
+   * @param salesOrderInc
+   * @param salesAddressfull
    * @param prevFav Dataframe with the previous joined data from sales_order, sales_order_address
    * @return
    */
-  def processVariable(salesOrder: DataFrame, salesAddress: DataFrame, prevFav: DataFrame): (DataFrame, DataFrame) = {
-    val salesOrderAddress = salesAddress.join(salesOrder, salesAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
+  def processVariable(salesOrderInc: DataFrame, salesAddressfull: DataFrame, prevFav: DataFrame): (DataFrame, DataFrame) = {
+    val salesOrderAddress = salesAddressfull.join(salesOrderInc, salesAddressfull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrderInc(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
     val curFav = salesOrderAddress.select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE,SalesAddressVariables.FIRST_NAME,SalesAddressVariables.LAST_NAME)
     val jData = prevFav.unionAll(curFav)
     (jData, getFav(jData))
