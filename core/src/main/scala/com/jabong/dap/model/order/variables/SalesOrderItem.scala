@@ -1,12 +1,7 @@
 package com.jabong.dap.model.order.variables
 
-import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.Constants
 import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
-import com.jabong.dap.common.{AppConfig, Config, Spark}
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.order.schema.OrderVarSchema
-import org.apache.spark.SparkConf
+import com.jabong.dap.common.{Spark}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
