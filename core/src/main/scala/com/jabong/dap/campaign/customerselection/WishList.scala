@@ -19,4 +19,6 @@ class WishList extends LiveCustomerSelector {
   override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = {
     null
   }
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 }

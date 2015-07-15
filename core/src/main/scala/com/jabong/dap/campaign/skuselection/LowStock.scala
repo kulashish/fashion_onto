@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
+import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -12,12 +14,25 @@ class LowStock extends SkuSelector {
 
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
-  // input will be [(id_customer, sku, sku simple)]
-  // case 1: only sku simple: price not available (need to query itr)
-  // case 2: only sku simple + special price available
-  // case 3: sku simple and skus both: price not available
-  override def skuFilter(inDataFrame: DataFrame, itrDataFrame: DataFrame, campaignName: String): DataFrame = {
-    null
+  // input will be [(id_customer, sku simple)] or [(id_customer, sku)]
+  // case 1: only sku simple
+  // case 2: only sku
+  override def skuFilter(customerSkuData: DataFrame, itrDataFrame: DataFrame, campaignName: String): DataFrame = {
+    if(customerSkuData == null || itrDataFrame==null || campaignName==null){
+      return null
+    }
+    var filteredSku:DataFrame = null
+    if(campaignName==CampaignCommon.INVALID_CAMPAIGN){
+     filteredSku=  customerSkuData.join(itrDataFrame,customerSkuData(ProductVariables.SKU)===itrDataFrame(ProductVariables.SKU),"inner")
+        .filter(itrDataFrame(ProductVariables.STOCK+" <= "+CampaignCommon.LOW_STOCK_VALUE))
+        .select(customerSkuData(CustomerVariables.FK_CUSTOMER),customerSkuData(ProductVariables.SKU),customerSkuData(ProductVariables.SPECIAL_PRICE))
+    } else if(campaignName==CampaignCommon.WISHLIST_CAMPAIGN) {
+        // separate sku and sku simples
+
+
+    }
+
+      return filteredSku
   }
 
 }
