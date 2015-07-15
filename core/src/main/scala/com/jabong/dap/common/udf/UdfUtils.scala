@@ -205,4 +205,19 @@ object UdfUtils {
 
   }
 
+  /**
+   * getAppUserId  creates new userid for users not having any userid
+   * by using the browserid prepended with a constant
+   *
+   * @param userid
+   * @param browserid
+   * @return either transformed userid
+   */
+  def getAppUserId(userid: String, browserid: String): String = {
+    var app_user_id = userid
+    if(app_user_id == null) {
+      app_user_id = "_app_" + browserid
+    }
+    return app_user_id
+  }
 }

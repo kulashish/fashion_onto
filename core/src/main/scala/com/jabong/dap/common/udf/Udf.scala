@@ -67,4 +67,9 @@ object Udf {
    * age will convert birthday to age
    */
   val age = udf((birthday: Date) => UdfUtils.getAge(birthday: Date))
+  /**
+   * appUsers will convert null userid  to  _app_+browserid
+   */
+  val appUserId = udf((userid: String, browserid: String) => UdfUtils.getAppUserId(userid: String, browserid: String))
+
 }
