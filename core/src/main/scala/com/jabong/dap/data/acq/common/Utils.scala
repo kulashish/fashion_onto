@@ -10,7 +10,8 @@ import com.jabong.dap.common.json.EmptyClass
  */
 case class JoinTables(
   name:       String,
-  foreignKey: String
+  foreignKey: String,
+  selectString: Option[String]
 )
 
 /**

@@ -16,13 +16,18 @@ object QueryBuilder {
       return ("", "")
     }
 
+
     var selectString = ""
     var joinString = ""
     var count = 1
 
     for (info <- joinTables) {
       val tableAlias = "j" + count
-      selectString = selectString + ", " + tableAlias + ".*"
+      if (OptionUtils.getOptValue(info.selectString) != null) {
+        selectString = selectString + ", " + info.selectString
+      } else {
+        selectString = selectString + ", " + tableAlias + ".*"
+      }
       joinString = joinString + " LEFT JOIN " + info.name + " AS " + tableAlias + " ON " + tableAlias + "." +
         info.foreignKey + " = t1." + primaryKey
       count = count + 1
