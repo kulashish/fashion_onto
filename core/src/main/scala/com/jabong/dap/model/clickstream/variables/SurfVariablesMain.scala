@@ -23,17 +23,15 @@ object SurfVariablesMain extends java.io.Serializable {
     UserObj.calculateColumns()
     val userWiseData: RDD[(String, Row)] = UserObj.groupDataByUser()
     val browserWiseData: RDD[(String, Row)] = UserObj.groupDataByBrowser()
-    var surf3IncrementVariables = VariableMethods.Surf3(userWiseData, UserObj, hiveContext)
+    var surf3IncrementVariables = GetSurfVariables.Surf3(userWiseData, UserObj, hiveContext)
     surf3IncrementVariables.take(8) foreach (println)
   }
-
   def coalesce(id1: Any, id2: Any): String = {
     if (id1 == null)
       return id2.toString
     else
       return id1.toString
   }
-
   //def fullName: String = ClickstreamConstants.database + "." + ClickstreamConstants.tablename
 
 }
