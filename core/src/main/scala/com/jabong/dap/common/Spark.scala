@@ -20,7 +20,7 @@ object Spark {
    */
   def init(sConf: SparkConf) {
     sc = new SparkContext(sConf)
-    sqlContext = new org.apache.spark.sql.SQLContext(sc)
+    sqlContext = new SQLContext(sc)
   }
 
   /**

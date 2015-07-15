@@ -1,18 +1,19 @@
 package com.jabong.dap.data.acq.common
 
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
  * Builds the condition for the query to fetch the data and get the min and max values of primary key.
  */
 object ConditionBuilder {
-  def getCondition(): String = {
+  def getCondition(tableInfo: TableInfo): String = {
 
-    val mode = AcqImportInfo.tableInfo.mode
-    val dateColumn = AcqImportInfo.tableInfo.dateColumn
-    val rangeStart = AcqImportInfo.tableInfo.rangeStart
-    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
-    val filterCondition = AcqImportInfo.tableInfo.filterCondition
+    val mode = tableInfo.mode
+    val dateColumn = OptionUtils.getOptValue(tableInfo.dateColumn)
+    val rangeStart = OptionUtils.getOptValue(tableInfo.rangeStart)
+    val rangeEnd = OptionUtils.getOptValue(tableInfo.rangeEnd)
+    val filterCondition = OptionUtils.getOptValue(tableInfo.filterCondition)
     val tempFilterCondition = if (filterCondition == null) {
       ""
     } else {
@@ -27,7 +28,7 @@ object ConditionBuilder {
       ""
     } else if (mode == "full" && filterCondition != null) {
       "WHERE %s".format(filterCondition)
-    } else if (mode == "hourly" || (mode == "daily" && rangeStart != null && rangeEnd != null)) {
+    } else if (mode == "hourly" || (mode == "daily" && rangeStart != null && rangeEnd != null) || (mode == "monthly" && rangeStart != null && rangeEnd != null)) {
       "WHERE t1.%s >= '%s' AND t1.%s <= '%s' %s".format(dateColumn, rangeStart, dateColumn, rangeEnd,
         tempFilterCondition)
     } else {

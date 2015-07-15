@@ -11,6 +11,10 @@ class PathBuilderTest extends FlatSpec with Matchers {
   val config = new Config(basePath = "basePath")
   AppConfig.config = config
 
+  val dateCol = Option.apply("dateColumn")
+  val jnTbls = Option.apply(List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+  val lmt = Option.apply("100")
+
   "withLeadingZeros" should "add a zero if input is less than 10" in {
     val input = 7
     val output = "07"
@@ -25,48 +29,48 @@ class PathBuilderTest extends FlatSpec with Matchers {
 
   "getPath" should "return empty string if mode is not full, hourly, or daily" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "othermode",
-      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
-      limit = "100", filterCondition = null,
-      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    PathBuilder.getPath() should be ("")
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
+      limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be ("")
   }
 
   "getPath" should "return correct path if mode is full" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "full",
-      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
-      limit = "100", filterCondition = null,
-      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
+      limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
     val dateNow = TimeUtils.getTodayDate("yyyy/MM/dd/HH")
     val outputPath = "basePath/source/tableName/full/" + dateNow + "/"
-    PathBuilder.getPath() should be (outputPath)
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are null" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "daily",
-      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
-      limit = "100", filterCondition = null,
-      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
+      limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    val outputPath = "basePath/source/tableName/" + dateYesterday + "/"
-    PathBuilder.getPath() should be (outputPath)
+    val outputPath = "basePath/source/tableName/daily/" + dateYesterday + "/"
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is daily and both ranges are provided" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "daily",
-      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "2015-06-13 00:00:00",
-      rangeEnd = "2015-06-28 23:59:59", limit = "100", filterCondition = null,
-      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    val outputPath = "basePath/source/tableName/2015/06/13_28"
-    PathBuilder.getPath() should be (outputPath)
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-13 00:00:00"),
+      rangeEnd = Option.apply("2015-06-28 23:59:59"), limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    val outputPath = "basePath/source/tableName/daily/2015/06/13_28"
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
   "getPath" should "return correct path if mode is hourly" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "hourly",
-      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "2015-06-13 01:00:00",
-      rangeEnd = "2015-06-13 15:59:59", limit = "100", filterCondition = null,
-      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
-    val outputPath = "basePath/source/tableName/2015/06/13/01_15"
-    PathBuilder.getPath() should be (outputPath)
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-13 01:00:00"),
+      rangeEnd = Option.apply("2015-06-13 15:59:59"), limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    val outputPath = "basePath/source/tableName/hourly/2015/06/13/01_15"
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
 }

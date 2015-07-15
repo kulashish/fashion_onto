@@ -54,9 +54,15 @@ object SalesOrderVariables {
   val CORPORATE_CURRENCY_VALUE = "corporate_currency_value"
   val CORPORATE_TRANSACTION_ID = "corporate_transaction_id"
   val DEVICE_ID = "device_id"
+  val GW_AMOUNT = "gw_amount"
 
   //variables name
   val SO_CREATED_AT = "so_created_at"
   val SO_UPDATED_AT = "so_updated_at"
+  val COUPON_SCORE = "coupon_score"
+  val DAYS_SINCE_LAST_ORDER = "days_since_last_order"
+  val FIRST_ORDER_DATE = "first_order_date"
+  val LAST_ORDER_DATE = "last_order_date"
+  val ORDERS_COUNT = "orders_count"
 
 }

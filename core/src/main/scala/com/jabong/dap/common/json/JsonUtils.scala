@@ -12,7 +12,7 @@ import org.apache.spark.sql.types._
 object JsonUtils {
 
   //Reads Parquet file, convert to dataframe, writes it in Json format file for test cases
-  def writeToJson(fileName: String, parquetFilePath: String): Any = {
+  def writeToJson(parquetFilePath: String, fileName: String): Any = {
 
     val df = Spark.getSqlContext().read.parquet(parquetFilePath + fileName + "/")
 
