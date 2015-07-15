@@ -96,4 +96,13 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
     ConditionBuilder.getCondition(tableInfo) should be (output)
   }
 
+  "getCondition" should "return correct condition when mode is monthly with ranges not null and filterCondition null" in {
+    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "monthly",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = rngStrt,
+      rangeEnd = rngEnd, limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
+    ConditionBuilder.getCondition(tableInfo) should be (output)
+  }
+
 }

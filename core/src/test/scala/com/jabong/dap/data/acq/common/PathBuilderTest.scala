@@ -55,6 +55,15 @@ class PathBuilderTest extends FlatSpec with Matchers {
     PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
   }
 
+  "getPath" should "return correct path if mode is monthly and both ranges are provided" in {
+    AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "monthly",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-01 00:00:00"),
+      rangeEnd = Option.apply("2015-06-30 23:59:59"), limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    val outputPath = "basePath/source/tableName/monthly/2015/06/30/"
+    PathBuilder.getPath(AcqImportInfo.tableInfo) should be (outputPath)
+  }
+
   "getPath" should "return correct path if mode is daily and both ranges are provided" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "daily",
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = Option.apply("2015-06-13 00:00:00"),
