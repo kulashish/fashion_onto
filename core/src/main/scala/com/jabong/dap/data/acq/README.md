@@ -21,7 +21,7 @@ For data acquisition, we are reading and parsing a JSON configuration file. The 
       "joinTables": [
         {
             "name": "",
-            "foreignKey": ""
+            "foreignKey": "",
             "selectString": ""
         },
         {
