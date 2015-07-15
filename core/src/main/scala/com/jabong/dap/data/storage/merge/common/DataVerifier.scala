@@ -20,12 +20,17 @@ object DataVerifier {
    * @param directory directory to be checked.
    * @return true or false
    */
-  def hdfsDataExists(directory: String): Boolean = {
+
+  def hdfsDataExists(directory: String, fileName: String): Boolean = {
     val conf = new Configuration()
     val fileSystem = FileSystem.get(conf)
-    val successFile = "%s%s_SUCCESS".format(directory, File.separator)
+    val successFile = "%s%s%s".format(directory, File.separator, fileName)
     val successFilePath = new Path(successFile)
     fileSystem.exists(successFilePath)
+  }
+
+  def hdfsDataExists(directory: String): Boolean = {
+    hdfsDataExists(directory, "_SUCCESS")
   }
 
   /**

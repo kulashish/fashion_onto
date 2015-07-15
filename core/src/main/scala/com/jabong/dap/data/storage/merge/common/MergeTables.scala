@@ -17,11 +17,13 @@ object MergeTables extends Logging {
 
   def mergeFull() = {
     val primaryKey = MergeJobConfig.mergeInfo.primaryKey
-    val saveFormat = MergeJobConfig.mergeInfo.saveFormat
     val saveMode = MergeJobConfig.mergeInfo.saveMode
 
-    lazy val pathFull = PathBuilder.getPathFull()
+    val pathFull = PathBuilder.getPathFull()
     lazy val pathYesterdayData = PathBuilder.getPathYesterdayData()
+
+    val saveFormat = FormatResolver.resolveFormat(pathFull)
+
 
     try {
       val mergeBaseDataPath = MergePathResolver.basePathResolver(pathFull)
@@ -36,8 +38,6 @@ object MergeTables extends Logging {
     } catch {
       case e : DataNotFound =>
         logger.error("Data not at location: " + e.getMessage )
-
-
     }
   }
 
