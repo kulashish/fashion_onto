@@ -19,7 +19,7 @@
     {
       "source": "bob",
       "tableName": "catalog_config",
-      "primaryKey": "id_catalog_stock",
+      "primaryKey": "id_catalog_config",
       "mergeMode": "full",
       "mergeDate": null,
       "saveMode": "overwrite"
