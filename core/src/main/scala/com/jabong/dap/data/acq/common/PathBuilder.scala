@@ -1,28 +1,31 @@
 package com.jabong.dap.data.acq.common
 
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.{ AppConfig, Constants }
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.AppConfig
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 
 /**
- * Created by Abhay on 16/6/15.
+ * Builds the path at which the requested data is to be saved.
  */
 
 object PathBuilder {
 
-  def getPath(mode: String, source: String, tableName: String, rangeStart: String, rangeEnd: String) = {
+  def getPath() = {
     val basePath = AppConfig.config.basePath
+    val source = AcqImportInfo.tableInfo.source
+    val tableName = AcqImportInfo.tableInfo.tableName
+    val rangeStart = AcqImportInfo.tableInfo.rangeStart
+    val rangeEnd = AcqImportInfo.tableInfo.rangeEnd
 
-    mode match {
+    AcqImportInfo.tableInfo.mode match {
       case "full" =>
-        val dateNow = Time.getTodayDateWithHrs().replaceAll("-", File.separator)
+        val dateNow = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
         "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
-          val dateYesterday = Time.getYesterdayDate().replaceAll("-", File.separator)
+          val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
           "%s/%s/%s/%s/".format(basePath, source, tableName, dateYesterday)
         } else {
           val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)

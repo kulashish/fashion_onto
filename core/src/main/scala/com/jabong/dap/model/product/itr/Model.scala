@@ -8,7 +8,7 @@ import com.jabong.dap.common.Spark
 object Model {
   val config = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_config/full/2015/06/19/14")
 
-  val simple = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_simple/full/2015/06/19/14")
+  val simple = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_simple/full/2015/07/07/17")
 
   val supplier = Spark.getContext().broadcast(Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_supplier/full/2015/06/19/15"))
 
@@ -24,5 +24,5 @@ object Model {
 
   val categoryMapping = Spark.getSqlContext().read.parquet("hdfs://localhost/user/geek/bob/catalog_config_has_catalog_category")
 
-  val itemMaster = Spark.getHiveContext().read.format("orc").load("hdfs://localhost/home/test/sparkData/erp/item_master/full/2015/06/18/14")
+  val itemMaster = Spark.getHiveContext().read.format("orc").load("hdfs://localhost/user/geek/erp/item_master/full/2015/07/07/15")
 }

@@ -1,25 +1,17 @@
 package com.jabong.dap.model.customer.variables
 
-import com.jabong.dap.common.{ Spark, Utils }
+import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ StringType, IntegerType, StructField, StructType }
+import org.apache.spark.sql.types.{ IntegerType, StringType, StructField, StructType }
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 25/6/15.
  */
 object CustomerSegments {
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer_segments variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  val mvp_seg = StructType(Array(
-    StructField("fk_customer", IntegerType, true),
-    StructField("mvp_score", IntegerType, true),
-    StructField("segment", IntegerType, true)
-  ))
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // DataFrame CustomerSegments operations
@@ -37,7 +29,7 @@ object CustomerSegments {
 
     }
 
-    if (!Utils.isSchemaEquals(dfCustomerSegments.schema, Schema.customerSegments)) {
+    if (!SchemaUtils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
 
       log("schema attributes or data type mismatch")
 
@@ -45,12 +37,20 @@ object CustomerSegments {
 
     }
 
-    val dfCustSegVars = dfCustomerSegments.select("fk_customer", "updated_at", "mvp_score", "segment")
-      .sort(col("fk_customer"), desc("updated_at"))
-      .groupBy("fk_customer")
+    val dfCustSegVars = dfCustomerSegments.select(
+      CustomerSegmentsVariables.FK_CUSTOMER,
+      CustomerSegmentsVariables.UPDATED_AT,
+      CustomerSegmentsVariables.MVP_SCORE,
+      CustomerSegmentsVariables.SEGMENT
+    )
+      .sort(
+        col(CustomerSegmentsVariables.FK_CUSTOMER),
+        desc(CustomerSegmentsVariables.FK_CUSTOMER)
+      )
+      .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
-        first("mvp_score") as "mvp_score",
-        first("segment") as "segment"
+        first(CustomerSegmentsVariables.MVP_SCORE),
+        first(CustomerSegmentsVariables.SEGMENT)
       )
 
     //    val segments = getSeg(dfCustSegVars)
@@ -61,15 +61,15 @@ object CustomerSegments {
   def getSeg(dfCustSegVars: DataFrame): DataFrame = {
 
     val schema = StructType(Array(
-      StructField("fk_customer", IntegerType, true),
-      StructField("mvp_score", IntegerType, true),
-      StructField("segment0", StringType, true),
-      StructField("segment1", StringType, true),
-      StructField("segment2", StringType, true),
-      StructField("segment3", StringType, true),
-      StructField("segment4", StringType, true),
-      StructField("segment5", StringType, true),
-      StructField("segment6", StringType, true)
+      StructField(CustomerSegmentsVariables.FK_CUSTOMER, IntegerType, true),
+      StructField(CustomerSegmentsVariables.MVP_SCORE, IntegerType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT0, StringType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT1, StringType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT2, StringType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT3, StringType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT4, StringType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT5, StringType, true),
+      StructField(CustomerSegmentsVariables.SEGMENT6, StringType, true)
     ))
 
     val segments = dfCustSegVars.map(r => r(0) + "," + r(1) + "," + getSegValue(r(2).toString))
@@ -93,6 +93,7 @@ object CustomerSegments {
 
     dfs
   }
+
   def getSegValue(i: String): String = {
     val x = Integer.parseInt(i)
     x match {

@@ -1,86 +1,92 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.utils.Time
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by Abhay on 22/6/15.
  */
 class ConditionBuilderTest extends FlatSpec with Matchers {
-  val dateColumn = "dateColumn"
-  var rangeStart: String = null
-  var rangeEnd: String = null
-
   "getCondition" should "return empty string when mode is not full, daily or hourly" in {
-    val filterCondition = null
-    val mode = "otherMode"
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be ("")
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "othermode",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+    ConditionBuilder.getCondition() should be ("")
   }
 
   "getCondition" should "return correct condition when filterCondition is not null and mode is full" in {
-    val filterCondition = "tableColumn NOT LIKE 'R%'"
-    val mode = "full"
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "full",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = "tableColumn NOT LIKE 'R%'",
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val output = "WHERE tableColumn NOT LIKE 'R%'"
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when filterCondition is null and mode is full" in {
-    val mode = "full"
-    val filterCondition = null
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "full",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val output = ""
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd, and filterCondition are null" in {
-    val mode = "daily"
-    val filterCondition = null
-    val prevDayDate = Time.getYesterdayDate()
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+    val prevDayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT)
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' ".format(prevDayDate, prevDayDate)
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd are null and filterCondition is not null" in {
-    val mode = "daily"
-    val filterCondition = "tableColumn NOT LIKE 'R..'"
-    val prevDayDate = Time.getYesterdayDate()
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = null, rangeEnd = null,
+      limit = "100", filterCondition = "tableColumn NOT LIKE 'R..'",
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+    val prevDayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT)
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' AND tableColumn NOT LIKE 'R..'".format(prevDayDate, prevDayDate)
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when mode is hourly and filterCondition is null" in {
-    val mode = "hourly"
-    rangeStart = "rangeStart"
-    rangeEnd = "rangeEnd"
-    val filterCondition = null
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "rangeStart",
+      rangeEnd = "rangeEnd", limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when mode is hourly and filterCondition is not null" in {
-    val mode = "hourly"
-    val filterCondition = "tableColumn NOT LIKE 'R%'"
-    rangeStart = "rangeStart"
-    rangeEnd = "rangeEnd"
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "rangeStart",
+      rangeEnd = "rangeEnd", limit = "100", filterCondition = "tableColumn NOT LIKE 'R%'",
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' AND tableColumn NOT LIKE 'R%'"
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition null" in {
-    val mode = "daily"
-    rangeStart = "rangeStart"
-    rangeEnd = "rangeEnd"
-    val filterCondition = null
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "rangeStart",
+      rangeEnd = "rangeEnd", limit = "100", filterCondition = null,
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition is not null" in {
-    val mode = "daily"
-    val filterCondition = "tableColumn NOT LIKE 'R%'"
-    rangeStart = "rangeStart"
-    rangeEnd = "rangeEnd"
+    AcqImportInfo.tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = "dateColumn", rangeStart = "rangeStart",
+      rangeEnd = "rangeEnd", limit = "100", filterCondition = "tableColumn NOT LIKE 'R%'",
+      joinTables = List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' AND tableColumn NOT LIKE 'R%'"
-    ConditionBuilder.getCondition(mode, dateColumn, rangeStart, rangeEnd, filterCondition) should be (output)
+    ConditionBuilder.getCondition() should be (output)
   }
 
 }

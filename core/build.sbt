@@ -10,6 +10,8 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("public")
 )
 
+libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "1.2.1"  % "provided"
+
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "1.4.0" % "provided"
