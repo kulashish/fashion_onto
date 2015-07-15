@@ -2,6 +2,7 @@ package com.jabong.dap.data.storage.merge.common
 
 import com.jabong.dap.common.Spark
 import org.apache.hadoop.fs.{ FileSystem, Path }
+import java.io.File
 
 /**
  * Verifies if the data exits at a given location.
@@ -17,7 +18,7 @@ object DataVerifier {
    * @return true or false
    */
   def hdfsDataExists(directory: String): Boolean = {
-    val successFile = "%s_SUCCESS".format(directory)
+    val successFile = "%s%s_SUCCESS".format(directory, File.separator)
     hdfs.exists(new Path(successFile))
   }
 
