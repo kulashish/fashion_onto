@@ -8,5 +8,71 @@
       "mergeDate": "2015-06-26",
       "saveMode": "overwrite"
     }
+    {
+      "source": "bob",
+      "tableName": "sales_order_item",
+      "primaryKey": "id_sales_order_item",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "bob",
+      "tableName": "catalog_stock",
+      "primaryKey": "id_catalog_stock",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "bob",
+      "tableName": "catalog_config",
+      "primaryKey": "id_catalog_stock",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "bob",
+      "tableName": "catalog_config_simple",
+      "primaryKey": "id_catalog_config_simple",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "bob",
+      "tableName": "catalog_config_brand",
+      "primaryKey": "id_catalog_config_brand",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "bob",
+      "tableName": "catalog_config_category",
+      "primaryKey": "id_catalog_config_category",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "bob",
+      "tableName": "catalog_config_supplier",
+      "primaryKey": "id_catalog_config_supplier",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+    {
+      "source": "erp",
+      "tableName": "item_master",
+      "primaryKey": "No",
+      "mergeMode": "full",
+      "mergeDate": "2015-06-26",
+      "saveMode": "overwrite"
+    }
+
+
   ]
 }
