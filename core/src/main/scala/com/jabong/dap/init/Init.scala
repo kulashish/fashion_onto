@@ -27,7 +27,8 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     coVarJson: String = null,
-    config:    String = null)
+    config:    String = null
+  )
 
   def main(args: Array[String]) {
     options(args)

@@ -6,13 +6,7 @@
       "primaryKey": "id_catalog_brand",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -20,13 +14,7 @@
       "primaryKey": "id_catalog_category",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -35,12 +23,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -48,27 +31,15 @@
       "primaryKey": "id_catalog_config_has_catalog_category",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
       "tableName": "catalog_product_image",
       "primaryKey": "id_catalog_product_image",
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -77,12 +48,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -90,13 +56,7 @@
       "primaryKey": "id_catalog_stock",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -104,13 +64,7 @@
       "primaryKey": "id_catalog_supplier",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -120,10 +74,6 @@
       "saveFormat": "parquet",
       "saveMode": "error",
       "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
       "joinTables": [
         {
           "name": "customer_additional_info",
@@ -133,59 +83,36 @@
     },
     {
       "source": "bob",
+      "tableName": "customer_product_shortlist",
+      "primaryKey": "id_customer_product_shortlist",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "error"
+    },
+    {
+      "source": "bob",
       "tableName": "customer_segments",
       "primaryKey": "id_customer_segments",
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
-      "tableName": "customer_wishlist",
-      "primaryKey": "id_customer_wishlist",
-      "mode": "daily",
-      "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
-    },
-    {
-      "source": "bob",
-      "tableName": "mail_reminder_wishlist",
-      "primaryKey": "id_mail_reminder_wishlist",
-      "mode": "daily",
+      "tableName": "customer_storecredits_history",
+      "primaryKey": "id_customer_storecredits_history",
+      "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "error"
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
-    },
-    {
+    },{
       "source": "bob",
       "tableName": "newsletter_subscription",
       "primaryKey": "id_newsletter_subscription",
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -194,12 +121,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -207,13 +129,7 @@
       "primaryKey": "id_sales_cart_custom_text",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -222,12 +138,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -236,12 +147,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -251,10 +157,6 @@
       "saveFormat": "parquet",
       "saveMode": "error",
       "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
       "joinTables": [
         {
           "name": "sales_order_item_additional_info",
@@ -268,13 +170,7 @@
       "primaryKey": "id_sales_order_item_status",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": null,
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -283,12 +179,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -297,12 +188,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -311,12 +197,7 @@
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "error",
-      "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
-      "joinTables": []
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -326,10 +207,6 @@
       "saveFormat": "parquet",
       "saveMode": "error",
       "dateColumn": "updated_at",
-      "rangeStart": null,
-      "rangeEnd": null,
-      "limit": null,
-      "filterCondition": null,
       "joinTables": [
         {
           "name": "sales_order_additional_info",
