@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
 /**
- * Created by Abhay on 8/7/15.
+ * Gets the Path for the base and incremental dataFrames
  */
 object MergePathResolver {
 
