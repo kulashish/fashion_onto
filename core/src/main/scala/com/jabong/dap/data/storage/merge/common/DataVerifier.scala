@@ -27,7 +27,6 @@ object DataVerifier {
    * @return true or false
    */
   def hdfsDirExists(directory: String): Boolean = {
-//    val dir = directory.substring(0, directory.length()-1)
     hdfs.exists(new Path(directory))
   }
 
@@ -37,6 +36,6 @@ object DataVerifier {
    * @return true or false
    */
   def hdfsDirDelete(directory: String): Boolean = {
-    hdfs.delete(new Path(directory),true)
+    hdfs.delete(new Path(directory), true)
   }
 }
