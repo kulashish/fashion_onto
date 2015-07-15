@@ -1,12 +1,8 @@
 package com.jabong.dap.model.order.variables
 
-import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.Constants
+
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
-import com.jabong.dap.common.{ AppConfig, Config, Spark }
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.order.schema.OrderVarSchema
-import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -68,9 +64,9 @@ object SalesOrderItem {
     val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), "outer").
       select(
         coalesce(
-        bcapp(SalesOrderVariables.FK_CUSTOMER),
-        bcweb(SalesOrderVariables.FK_CUSTOMER)
-      ) as SalesOrderVariables.FK_CUSTOMER,
+          bcapp(SalesOrderVariables.FK_CUSTOMER),
+          bcweb(SalesOrderVariables.FK_CUSTOMER)
+        ) as SalesOrderVariables.FK_CUSTOMER,
         bcweb(SalesOrderItemVariables.ORDERS_COUNT_WEB),
         bcweb(SalesOrderItemVariables.REVENUE_WEB),
         bcapp(SalesOrderItemVariables.ORDERS_COUNT_APP),
@@ -81,9 +77,9 @@ object SalesOrderItem {
     val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), "outer").
       select(
         coalesce(
-        bcmweb(SalesOrderVariables.FK_CUSTOMER),
-        appJoined(SalesOrderVariables.FK_CUSTOMER)
-      ) as SalesOrderVariables.FK_CUSTOMER,
+          bcmweb(SalesOrderVariables.FK_CUSTOMER),
+          appJoined(SalesOrderVariables.FK_CUSTOMER)
+        ) as SalesOrderVariables.FK_CUSTOMER,
         appJoined(SalesOrderItemVariables.ORDERS_COUNT_WEB),
         appJoined(SalesOrderItemVariables.REVENUE_WEB),
         appJoined(SalesOrderItemVariables.ORDERS_COUNT_APP),
@@ -121,9 +117,9 @@ object SalesOrderItem {
     val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), "outer")
     val res = joinedData.select(
       coalesce(
-      full(SalesOrderVariables.FK_CUSTOMER),
-      bcInc.value(SalesOrderVariables.FK_CUSTOMER)
-    ) as SalesOrderVariables.FK_CUSTOMER,
+        full(SalesOrderVariables.FK_CUSTOMER),
+        bcInc.value(SalesOrderVariables.FK_CUSTOMER)
+      ) as SalesOrderVariables.FK_CUSTOMER,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_LIFE) + joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
@@ -196,9 +192,9 @@ object SalesOrderItem {
     val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), "outer")
     val res = joinedData.select(
       coalesce(
-      prev(SalesOrderVariables.FK_CUSTOMER),
-      bcCurr.value(SalesOrderVariables.FK_CUSTOMER)
-    ) as SalesOrderVariables.FK_CUSTOMER,
+        prev(SalesOrderVariables.FK_CUSTOMER),
+        bcCurr.value(SalesOrderVariables.FK_CUSTOMER)
+      ) as SalesOrderVariables.FK_CUSTOMER,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB + "_" + days,

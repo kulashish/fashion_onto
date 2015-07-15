@@ -71,16 +71,18 @@ object Customer {
       CustomerVariables.UPDATED_AT,
       CustomerVariables.FIRST_NAME,
       CustomerVariables.LAST_NAME,
+      CustomerVariables.PHONE,
+      CustomerVariables.CITY,
       CustomerVariables.IS_CONFIRMED
     )
       .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), "outer")
 
       .join(
         dfSalesOrder.select(
-        col(SalesOrderVariables.FK_CUSTOMER),
-        col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
-        col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
-      ),
+          col(SalesOrderVariables.FK_CUSTOMER),
+          col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
+          col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
+        ),
         dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), "outer"
       )
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), "outer")
@@ -103,6 +105,8 @@ object Customer {
                                CUSTOMERS PREFERRED ORDER TIMESLOT,
                                FIRST_NAME,
                                LAST_NAME,
+                               PHONE,
+                               CITY,
                                VERIFICATION_STATUS,
                                NL_SUB_DATE,
                                UNSUB_KEY,
@@ -125,6 +129,8 @@ object Customer {
       col(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT),
       col(CustomerVariables.FIRST_NAME),
       col(CustomerVariables.LAST_NAME),
+      col(CustomerVariables.PHONE),
+      col(CustomerVariables.CITY),
       col(CustomerVariables.IS_CONFIRMED) as CustomerVariables.VERIFICATION_STATUS,
       col(NewsletterVariables.NLS_CREATED_AT) as NewsletterVariables.NL_SUB_DATE,
       col(NewsletterVariables.UNSUBSCRIBE_KEY) as NewsletterVariables.UNSUB_KEY,
@@ -185,6 +191,10 @@ object Customer {
         Udf.latestString(joinDF(CustomerVariables.FIRST_NAME), joinDF(CustomerVariables.NEW_ + CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
 
         Udf.latestString(joinDF(CustomerVariables.LAST_NAME), joinDF(CustomerVariables.NEW_ + CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+
+        Udf.latestString(joinDF(CustomerVariables.PHONE), joinDF(CustomerVariables.NEW_ + CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+
+        Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
         Udf.latestBool(joinDF(CustomerVariables.VERIFICATION_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.VERIFICATION_STATUS)) as CustomerVariables.VERIFICATION_STATUS,
 

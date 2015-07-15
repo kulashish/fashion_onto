@@ -1,13 +1,20 @@
 package com.jabong.dap.data.storage.merge.common
 
-
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{Path, FileSystem}
+import com.jabong.dap.common.Spark
+import java.io.File
+
+
 
 /**
  * Verifies if the data exits at a given location.
  */
 object DataVerifier {
+
+  val hconf = Spark.getContext().hadoopConfiguration
+  val hdfs = FileSystem.get(hconf)
+
   /**
    * Returns true if the _success file exists in the directory given.
    * @param directory directory to be checked.
@@ -16,7 +23,7 @@ object DataVerifier {
   def hdfsDataExists(directory: String): Boolean = {
     val conf = new Configuration()
     val fileSystem = FileSystem.get(conf)
-    val successFile = "%s_SUCCESS".format(directory)
+    val successFile = "%s%s_SUCCESS".format(directory, File.separator)
     val successFilePath = new Path(successFile)
     fileSystem.exists(successFilePath)
   }
@@ -27,7 +34,7 @@ object DataVerifier {
    * @return true or false
    */
   def hdfsDirExists(directory: String): Boolean = {
-    Files.exists(Paths.get(directory))
+    hdfs.exists(new Path(directory))
   }
 
   /**
@@ -36,6 +43,6 @@ object DataVerifier {
    * @return true or false
    */
   def hdfsDirDelete(directory: String): Boolean = {
-    Files.deleteIfExists(Paths.get(directory))
+    hdfs.delete(new Path(directory), true)
   }
 }
