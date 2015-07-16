@@ -1,22 +1,18 @@
 package com.jabong.dap.model.customer
 
-import java.sql.Timestamp
-
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{ Config, Spark, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.variables.{ CustomerStorecreditsHistory, CustomerSegments, Customer }
-import com.jabong.dap.model.schema.SchemaVariables
-import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
+import com.jabong.dap.model.customer.schema.CustVarSchema
+import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
+import org.apache.spark.sql.{ DataFrame, Row }
 import org.scalatest.FlatSpec
 
 /**
  * Created by raghu on 16/6/15.
  */
 class CustomerTest extends FlatSpec with SharedSparkContext {
-
-  @transient var sqlContext: SQLContext = _
 
   @transient var dfCustomer: DataFrame = _
   @transient var dfNLS: DataFrame = _
@@ -42,7 +38,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getCustomer: Data Frame dfCustomer, dfNLS, dfSalesOrder" should "null" in {
 
-    val result = Customer.getCustomer(null, null, null)
+    val result = Customer.getCustomer(null, null, null, null)
 
     assert(result == null)
 
@@ -54,28 +50,59 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
       val result = Customer.getCustomer(
         dfCustomer: DataFrame,
         dfNLS: DataFrame,
-        dfSalesOrder: DataFrame
+        dfSalesOrder: DataFrame, null
       )
       assert(result != null)
 
     }
 
-  "getCustomer: Data Frame" should "match to resultant Data Frame" in {
+  "getCustomer: Data Frame" should "match to resultant Data Frame, If dfFull is NULL" in {
+
+    var dfFull: DataFrame = null
 
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
       dfNLS: DataFrame,
-      dfSalesOrder: DataFrame
+      dfSalesOrder: DataFrame, dfFull
     )
-      .limit(30).collect().toSet
+    //      .limit(30).collect().toSet
 
-    //               result.limit(30).write.json(DataFiles.TEST_RESOURCES + "result_customer" + ".json")
+    //               result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_new" + ".json")
 
-    val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer",
-      SchemaVariables.resultCustomer)
+    val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_new",
+      CustVarSchema.resultCustomer)
       .collect().toSet
 
-    assert(result.equals(dfResultCustomer) == true)
+    assert(result._1.limit(30).collect().toSet.equals(dfResultCustomer) == true)
+
+    assert(result._2 == null)
+
+  }
+
+  "getCustomer: Data Frame" should "match to resultant Data Frame, If dfFull is Not NULL" in {
+
+    var dfFull: DataFrame = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.RESULT_CUSTOMER_OLD, CustVarSchema.resultCustomer)
+
+    val result = Customer.getCustomer(
+      dfCustomer: DataFrame,
+      dfNLS: DataFrame,
+      dfSalesOrder: DataFrame, dfFull: DataFrame
+    )
+    //      .limit(30).collect().toSet
+
+    //    result._2.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_incremental" + ".json")
+
+    val dfResultNew = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_new",
+      CustVarSchema.resultCustomer)
+      .collect().toSet
+
+    val dfResultIncremental = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.RESULT_CUSTOMER_INCREMENTAL,
+      CustVarSchema.resultCustomer)
+      .collect().toSet
+
+    assert(result._1.limit(30).collect().toSet.equals(dfResultNew) == true)
+
+    assert(result._2.limit(30).collect().toSet.equals(dfResultIncremental) == true)
 
   }
 
@@ -120,10 +147,10 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = Customer.getCPOT(dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
 
-    //        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+    //            result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
     val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-      SchemaVariables.customersPreferredOrderTimeslot)
+      CustVarSchema.customersPreferredOrderTimeslot)
       .collect().toSet
 
     assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
@@ -156,10 +183,10 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
       .limit(30).collect().toSet
 
-    //                result.limit(30).write.json(DataFiles.TEST_RESOURCES + "last_jr_covert_date" + ".json")
+    //                result.limit(30).write.json(DataSets.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
     val dfLastJrCovertDate = JsonUtils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
-      SchemaVariables.last_jr_covert_date)
+      CustVarSchema.last_jr_covert_date)
       .collect().toSet
 
     assert(result.equals(dfLastJrCovertDate) == true)
@@ -192,13 +219,17 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
       .limit(30).collect().toSet
 
-    //                        result.limit(30).write.json(DataFiles.TEST_RESOURCES + "mvp_seg" + ".json")
+    //                        result.limit(30).write.json(DataSets.TEST_RESOURCES + "mvp_seg" + ".json")
 
-    val dfMvpSeg = JsonUtils.readFromJson(DataSets.CUSTOMER, "mvp_seg", SchemaVariables.mvp_seg)
+    val dfMvpSeg = JsonUtils.readFromJson(DataSets.CUSTOMER, "mvp_seg", CustVarSchema.mvp_seg)
       .collect().toSet
 
     assert(result.equals(dfMvpSeg) == true)
 
   }
+
+  //  override def afterAll() {
+  //    super.afterAll()
+  //  }
 
 }
