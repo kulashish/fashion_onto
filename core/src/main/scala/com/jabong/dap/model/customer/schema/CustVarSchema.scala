@@ -42,6 +42,8 @@ object CustVarSchema {
     StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true),
     StructField(CustomerVariables.FIRST_NAME, StringType, true),
     StructField(CustomerVariables.LAST_NAME, StringType, true),
+    StructField(CustomerVariables.PHONE, StringType, true),
+    StructField(CustomerVariables.CITY, StringType, true),
     StructField(CustomerVariables.VERIFICATION_STATUS, BooleanType, true),
     StructField(NewsletterVariables.NL_SUB_DATE, TimestampType, true),
     StructField(NewsletterVariables.UNSUB_KEY, StringType, true),

@@ -71,4 +71,7 @@ class WishList extends LiveCustomerSelector with Logging {
 
     dfResult
   }
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
+
 }

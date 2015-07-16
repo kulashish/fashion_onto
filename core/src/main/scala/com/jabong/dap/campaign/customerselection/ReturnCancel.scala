@@ -55,8 +55,10 @@ class ReturnCancel extends LiveCustomerSelector {
 
     // 2. inner join it with sales_order: short data
     // call it customerLatestItemsData
-    val customerLatestItemsData = customerOrderData.join(returnCancelSku,
-      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner")
+    val customerLatestItemsData = customerOrderData.join(
+      returnCancelSku,
+      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner"
+    )
       .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER), customerOrderData(SalesOrderVariables.ID_SALES_ORDER), returnCancelSku(ProductVariables.SKU), returnCancelSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), returnCancelSku(SalesOrderItemVariables.UNIT_PRICE), returnCancelSku(SalesOrderItemVariables.UPDATED_AT), returnCancelSku(ProductVariables.SKU))
 
     // how to filter new orders after that
@@ -64,7 +66,7 @@ class ReturnCancel extends LiveCustomerSelector {
     // 2. on that, group on fk_customer, order by created_by and create (customer, last_sales_order_id, last_order_time)
 
     val latestCustomerOrders = customerOrderData.withColumn("DaysPresent", CampaignUtils.currentDaysDifference(customerOrderData(SalesOrderVariables.CREATED_AT)))
-      .filter("DaysPresent < 1")
+      .filter("DaysPresent <= 1")
       .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg($"${SalesOrderVariables.FK_CUSTOMER}", first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.FK_SALES_ORDER, first(SalesOrderVariables.CREATED_AT) as "last_order_time")
 
@@ -89,4 +91,6 @@ class ReturnCancel extends LiveCustomerSelector {
    * @return
    */
   override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 }

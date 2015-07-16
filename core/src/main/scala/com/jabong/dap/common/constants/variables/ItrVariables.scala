@@ -17,4 +17,7 @@ object ItrVariables {
   val STOCK = "stock"
   val CREATED_AT = "created_at"
 
+  val AVERAGE_STOCK = "average_stock"
+
+  val ITR_ = "itr_"
 }

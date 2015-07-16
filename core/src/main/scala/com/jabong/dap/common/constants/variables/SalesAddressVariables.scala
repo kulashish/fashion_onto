@@ -9,5 +9,7 @@ object SalesAddressVariables {
   val FK_SALES_ORDER = "fk_sales_order"
   val CITY = "city"
   val PHONE = "phone"
+  val FIRST_NAME = "first_name"
+  val LAST_NAME = "last_name"
 
 }
