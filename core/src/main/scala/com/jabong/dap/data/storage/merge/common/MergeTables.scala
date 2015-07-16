@@ -18,11 +18,12 @@ object MergeTables extends Logging {
   def mergeFull() = {
     val primaryKey = MergeJobConfig.mergeInfo.primaryKey
     val saveMode = MergeJobConfig.mergeInfo.saveMode
+    val saveFormat = MergeJobConfig.mergeInfo.saveFormat
 
     val pathFull = PathBuilder.getPathFull()
     lazy val pathYesterdayData = PathBuilder.getPathYesterdayData()
 
-    val saveFormat = FormatResolver.resolveFormat(pathFull)
+
 
 
     try {

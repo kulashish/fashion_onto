@@ -6,6 +6,7 @@
       "primaryKey": "id_sales_order",
       "mergeMode": "full",
       "mergeDate": null,
+      "saveFormat":"parquet",
       "saveMode": "overwrite"
     },
     {
@@ -14,6 +15,7 @@
       "primaryKey": "id_sales_order_item",
       "mergeMode": "full",
       "mergeDate": null,
+      "saveFormat":"parquet",
       "saveMode": "overwrite"
     },
     {
@@ -22,6 +24,7 @@
       "primaryKey": "id_catalog_config",
       "mergeMode": "full",
       "mergeDate": null,
+      "saveFormat":"parquet",
       "saveMode": "overwrite"
     },
     {
@@ -30,14 +33,16 @@
       "primaryKey": "id_catalog_simple",
       "mergeMode": "full",
       "mergeDate": null,
+      "saveFormat":"parquet",
       "saveMode": "overwrite"
     },
     {
       "source": "erp",
       "tableName": "item_master",
-      "primaryKey": "No",
+      "primaryKey": "No_",
       "mergeMode": "full",
       "mergeDate": null,
+      "saveFormat":"orc",
       "saveMode": "overwrite"
     }
   ]
