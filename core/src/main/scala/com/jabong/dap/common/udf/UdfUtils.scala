@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.{ Date }
 
 import com.jabong.dap.common.ArrayUtils
-import com.jabong.dap.common.time.{Constants, TimeUtils}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import net.liftweb.json._
 import org.codehaus.jettison.json.JSONArray
 
@@ -232,12 +232,12 @@ object UdfUtils {
    */
   def getSimpleSkuFromExtraData(extraData: String): String = {
 
-//    var extraData = "{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+    //    var extraData = "{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
 
-    if(extraData == null)
-    return null
+    if (extraData == null)
+      return null
 
-    if(extraData.length() < 10)
+    if (extraData.length() < 10)
       return null
 
     val jsonExtraData = parse(extraData)
@@ -254,10 +254,10 @@ object UdfUtils {
    */
   def getPriceFromExtraData(extraData: String): Double = {
 
-    if(extraData == null)
+    if (extraData == null)
       return 0
 
-    if(extraData.length() < 10)
+    if (extraData.length() < 10)
       return 0
 
     val jsonExtraData = parse(extraData)
@@ -275,7 +275,7 @@ object UdfUtils {
    */
   def getskuFromSimpleSku(simpleSku: String): String = {
 
-    if(simpleSku == null){
+    if (simpleSku == null) {
       return null
     }
 

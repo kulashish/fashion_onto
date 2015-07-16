@@ -15,7 +15,7 @@ import org.apache.spark.sql.functions._
  *  Returns data in the following format:
  *    - list of [(id_customer, sku_simple, sku, created_at(timestamp))]*
  */
-class WishList extends LiveCustomerSelector with Logging{
+class WishList extends LiveCustomerSelector with Logging {
   // not used
   override def customerSelection(wishlistData: DataFrame): DataFrame = ???
 

@@ -16,5 +16,5 @@ object ItrVariables {
   val WEEKLY_AVERAGE_SALE = "weekly_average_sale"
   val STOCK = "stock"
   val CREATED_AT = "created_at"
-  
+
 }

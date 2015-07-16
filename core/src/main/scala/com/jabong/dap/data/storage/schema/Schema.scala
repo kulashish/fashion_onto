@@ -189,7 +189,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true),
     StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true)
   ))
-  
+
   val itr = StructType(Array(
     StructField(ItrVariables.SKU, StringType, true),
     StructField(ItrVariables.BRAND, StringType, true),
