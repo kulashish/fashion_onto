@@ -10,10 +10,11 @@ object RawDataRead extends Logging {
    * Method to read raw HDFS data for a source and table and get a dataFrame for the same.
    * WARNING: Throws DataNotFound exception if data is not found.
    */
-  def getDataFrame (source: String, tableName: String, dataType: String, date: String): DataFrame = {
+  def getDataFrame (source: String, tableName: String, dataType: String, date: String, saveFormat: String): DataFrame = {
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
     require(dataType != null, "Data Type is null")
+    require(saveFormat != null, "Save Format is null")
 
 
     val pathDate = DateResolver.resolveDate(date, dataType)
@@ -22,9 +23,8 @@ object RawDataRead extends Logging {
       val pathDateWithHour = "%s-%s".format(pathDate, dateHour)
 
       val fetchPath = PathBuilder.buildPath(source, tableName, dataType, pathDateWithHour)
-      val fileFormat = FormatResolver.resolveFormat(fetchPath)
-      val context = getContext(fileFormat)
-      context.read.format(fileFormat).load(fetchPath)
+      val context = getContext(saveFormat)
+      context.read.format(saveFormat).load(fetchPath)
     } catch {
       case e : DataNotFound =>
         logger.error("Data not found for the date")
