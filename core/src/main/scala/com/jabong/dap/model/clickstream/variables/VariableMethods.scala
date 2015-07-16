@@ -24,6 +24,21 @@ object VariableMethods extends java.io.Serializable {
     return a1
   }
 
+  def variableSurf1(GroupedData: RDD[(Any, Row)], UserObj: GroupData): RDD[((String),String)] = {
+    //def variableSurf1(GroupedData: RDD[(String, Row)], UserObj: GroupData): RDD[(String, Row)] = {
+    val actualvisitid = UserObj.actualvisitid
+    val productsku = UserObj.productsku
+    val domain = UserObj.domain
+    val browserid = UserObj.browserid
+    val userid = UserObj.uid
+    val a = GroupedData.filter((x => x._2(UserObj.productsku) != null))
+    val b = a.map(x => ((if((x._2(userid)==null) && (x._2(domain).toString=="android"||x._2(domain).toString=="ios"||x._2(domain).toString=="windows"))"_app_"+x._2(browserid) else x._2(userid), x._2(actualvisitid), x._2(browserid), x._2(domain)).toString, x._2(productsku).toString))
+    //map(x => ((if((x(uid)==null) && (x(domain).toString=="android" ||x(domain).toString=="ios" ||x(domain).toString=="windows" )) "_app_"+x(browserid).toString else x(uid)).toString,x))
+    //val b=a.map(x=>((if ((x._2(UserObj.domain))=="w" || ((x._2(UserObj.domain))=="m")) x._2(UserObj.uid) else "_app_"+x._2(UserObj.browserid),x._2(UserObj.actualvisitid),x._2(UserObj.browserid),x._2(UserObj.domain)),x._2(UserObj.productsku)))
+    val c = b.reduceByKey((x, y) => (x + "," + y))
+    return c
+  }
+
   def appCheck(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, UserObj: GroupData, hiveContext: HiveContext): Unit = {
     val domain = UserObj.domain
     val userDomain = GroupedData.mapValues(x => scala.collection.mutable.Set(x(domain).toString))
