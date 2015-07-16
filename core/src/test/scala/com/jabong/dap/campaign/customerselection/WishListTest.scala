@@ -54,9 +54,9 @@ class WishListTest extends FlatSpec with SharedSparkContext {
     val result = wishlist.customerSelection(dfCustomerProductShortlist, 5)
       .limit(30).collect().toSet
 
-    //                              result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_wishlist" + ".json")
+    //                              result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_customer_product_shortlist" + ".json")
 
-    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.RESULT_CUSTOMER_WISHLIST, Schema.resultCustomerWishlist)
+    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
       .collect().toSet
 
     assert(result.equals(dfCustomerProductShortlistResult))

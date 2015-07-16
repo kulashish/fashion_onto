@@ -1,9 +1,10 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.constants.variables.CustomerProductShortlist
+import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.data.storage.schema.Schema
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -14,7 +15,7 @@ import org.apache.spark.sql.functions._
  *  Returns data in the following format:
  *    - list of [(id_customer, sku_simple, sku, created_at(timestamp))]*
  */
-class WishList extends LiveCustomerSelector {
+class WishList extends LiveCustomerSelector with Logging{
   // not used
   override def customerSelection(wishlistData: DataFrame): DataFrame = ???
 
@@ -31,7 +32,7 @@ class WishList extends LiveCustomerSelector {
 
     if (dfCustomerProductShortlist == null) {
 
-      log("Data frame should not be null")
+      logger.error("Data frame should not be null")
 
       return null
 
@@ -39,7 +40,7 @@ class WishList extends LiveCustomerSelector {
 
     if (ndays <= 0) {
 
-      log("ndays should not be negative value")
+      logger.error("ndays should not be negative value")
 
       return null
 
@@ -47,7 +48,7 @@ class WishList extends LiveCustomerSelector {
 
     if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
 
-      log("schema attributes or data type mismatch")
+      logger.error("schema attributes or data type mismatch")
 
       return null
 
@@ -56,17 +57,17 @@ class WishList extends LiveCustomerSelector {
     val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, Constants.DATE_TIME_FORMAT_MS)
 
     //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
-    val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlist.FK_CUSTOMER + " is not null and " +
+    val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
       //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
-      CustomerProductShortlist.REMOVED_AT + " is null and " +
-      CustomerProductShortlist.CREATED_AT + " >= " + "'" + dateBeforeNdays + "'")
+      CustomerProductShortlistVariables.REMOVED_AT + " is null and " +
+      CustomerProductShortlistVariables.CREATED_AT + " >= " + "'" + dateBeforeNdays + "'")
       .select(
-        col(CustomerProductShortlist.FK_CUSTOMER),
-        col(CustomerProductShortlist.EMAIL),
-        col(CustomerProductShortlist.SKU),
-        col(CustomerProductShortlist.DOMAIN),
-        col(CustomerProductShortlist.USER_DEVICE_TYPE),
-        col(CustomerProductShortlist.CREATED_AT))
+        col(CustomerProductShortlistVariables.FK_CUSTOMER),
+        col(CustomerProductShortlistVariables.EMAIL),
+        col(CustomerProductShortlistVariables.SKU),
+        col(CustomerProductShortlistVariables.DOMAIN),
+        col(CustomerProductShortlistVariables.USER_DEVICE_TYPE),
+        col(CustomerProductShortlistVariables.CREATED_AT))
 
     dfResult
   }

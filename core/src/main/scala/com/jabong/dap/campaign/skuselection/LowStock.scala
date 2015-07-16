@@ -20,4 +20,11 @@ class LowStock extends SkuSelector {
     null
   }
 
+
+  //one day itr data
+  //if average stock <= 10
+  def shortListSkuFilter(inDataFrame: DataFrame, itrDataFrame: DataFrame): DataFrame = {
+    null
+  }
+
 }

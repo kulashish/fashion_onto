@@ -1,10 +1,13 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import java.util.{ Date }
 
 import com.jabong.dap.common.ArrayUtils
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.time.{Constants, TimeUtils}
+import net.liftweb.json._
+import org.codehaus.jettison.json.JSONArray
 
 /**
  * Created by raghu on 3/7/15.
@@ -199,10 +202,84 @@ object UdfUtils {
     new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
   }
 
+  /**
+   * This will return age of person
+   * @param birthday
+   * @return
+   */
   def getAge(birthday: Date): Int = {
 
     return TimeUtils.getYearFromToday(birthday)
 
+  }
+
+  /**
+   * This will return Timestamp into YYYYMMDD format
+   * @param t1
+   * @return
+   */
+  def getYYYYmmDD(t1: Timestamp): String = {
+
+    val format = new SimpleDateFormat(Constants.DATE_FORMAT)
+
+    format.parse(t1.toString).toString()
+  }
+
+  /**
+   *  getSimpleSkuFromExtraData will extract data from extraData
+   * @param extraData
+   * @return
+   */
+  def getSimpleSkuFromExtraData(extraData: String): String = {
+
+//    var extraData = "{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+
+    if(extraData == null)
+    return null
+
+    if(extraData.length() < 10)
+      return null
+
+    val jsonExtraData = parse(extraData)
+
+    val simple_sku = compact(render(jsonExtraData \ "simple_sku")).replaceAll("^\"|\"$", "")
+
+    return simple_sku
+  }
+
+  /**
+   * getPriceFromExtraData will extract data from extraData
+   * @param extraData
+   * @return
+   */
+  def getPriceFromExtraData(extraData: String): Double = {
+
+    if(extraData == null)
+      return 0
+
+    if(extraData.length() < 10)
+      return 0
+
+    val jsonExtraData = parse(extraData)
+
+    val price = compact(render(jsonExtraData \ "price")).replaceAll("^\"|\"$", "")
+
+    return price.toDouble
+
+  }
+
+  /**
+   * getskuFromSimpleSku will convert simple_sku to sku
+   * @param simpleSku
+   * @return
+   */
+  def getskuFromSimpleSku(simpleSku: String): String = {
+
+    if(simpleSku == null){
+      return null
+    }
+
+    return simpleSku.substring(0, simpleSku.lastIndexOf('-'))
   }
 
 }

@@ -136,4 +136,52 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
+  "getSimpleSkuFromExtraData: simple_sku" should "LA625BG58FVTINDFAS-3949337" in {
+
+    val result = UdfUtils.getSimpleSkuFromExtraData("{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}")
+
+    assert(result == "LA625BG58FVTINDFAS-3949337")
+
+  }
+
+  "getPriceFromExtraData: price" should "1599" in {
+
+    val result = UdfUtils.getPriceFromExtraData("{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}")
+
+    assert(result == 1599)
+
+  }
+
+  "getSimpleSkuFromExtraData: extraData value" should "null" in {
+
+    val result = UdfUtils.getSimpleSkuFromExtraData(null)
+
+    assert(result == null)
+
+  }
+
+  "getPriceFromExtraData: extraData value" should "null" in {
+
+    val result = UdfUtils.getPriceFromExtraData(null)
+
+    assert(result == 0)
+
+  }
+
+  "getSimpleSkuFromExtraData: extraData value" should "Array" in {
+
+    val result = UdfUtils.getSimpleSkuFromExtraData("Array")
+
+    assert(result == null)
+
+  }
+
+  "getPriceFromExtraData: extraData value" should "Array" in {
+
+    val result = UdfUtils.getPriceFromExtraData("Array")
+
+    assert(result == 0)
+
+  }
+
 }
