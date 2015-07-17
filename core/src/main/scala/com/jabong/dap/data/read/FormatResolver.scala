@@ -35,7 +35,6 @@ object FormatResolver {
     }
   }
 
-
   def getFileExtension(file: File): String = {
     val fileName = file.getName
     if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
