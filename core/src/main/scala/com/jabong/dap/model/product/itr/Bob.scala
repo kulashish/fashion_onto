@@ -1,9 +1,8 @@
 package com.jabong.dap.model.product.itr
 
-import com.jabong.dap.common.Spark
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import scala.runtime.RichLong
+import com.jabong.dap.model.product.itr.variables.ITR
 
 object Bob {
 
@@ -22,25 +21,41 @@ object Bob {
       "special_from_date",
       "sku",
       "fk_catalog_config"
-    ).withColumnRenamed("id_catalog_simple", "idCatalogSimple").
-      withColumnRenamed("special_price", "specialPrice").
-      withColumnRenamed("special_to_date", "specialToDate").
-      withColumnRenamed("special_from_date", "specialFromDate").
-      withColumnRenamed("sku", "simpleSku")
+    ).withColumnRenamed("id_catalog_simple", ITR.ID_CATALOG_SIMPLE).
+      withColumnRenamed("special_price", ITR.SPECIAL_PRICE).
+      withColumnRenamed("special_to_date", ITR.SPECIAL_TO_DATE).
+      withColumnRenamed("special_from_date", ITR.SPECIAL_FROM_DATE).
+      withColumnRenamed("sku", ITR.SIMPLE_SKU)
 
     val visibilityDataFrame = visibilityDF()
-    val vDF = visibilityDataFrame.select("idCatalogSimple", "visibility").withColumnRenamed("idCatalogSimple", "vIdCatalogSimple")
+    val vDF = visibilityDataFrame.select(
+      ITR.ID_CATALOG_SIMPLE,
+      ITR.VISIBILITY
+    ).
+      withColumnRenamed(
+        ITR.ID_CATALOG_SIMPLE,
+        "vIdCatalogSimple"
+      )
+
     val visibilityDaFr = simpleDF.join(
       vDF,
-      vDF.col("vIdCatalogSimple") === simpleDF.col("idCatalogSimple"),
+      vDF.col("vIdCatalogSimple") === simpleDF.col(ITR.ID_CATALOG_SIMPLE),
       "left_outer"
     )
 
     val stockDataFrame = stockDF()
-    val sDF = stockDataFrame.select("idCatalogSimple", "quantity").withColumnRenamed("idCatalogSimple", "stockIdCatalogSimple")
+    val sDF = stockDataFrame.select(
+      ITR.ID_CATALOG_SIMPLE,
+      ITR.QUANTITY
+    ).
+      withColumnRenamed(
+        ITR.ID_CATALOG_SIMPLE,
+        "stockIdCatalogSimple"
+      )
+
     val quantityDF = visibilityDaFr.join(
       sDF,
-      sDF.col("stockIdCatalogSimple") === simpleDF.col("idCatalogSimple"),
+      sDF.col("stockIdCatalogSimple") === simpleDF.col(ITR.ID_CATALOG_SIMPLE),
       "left_outer"
     )
 
@@ -54,15 +69,15 @@ object Bob {
       "fk_catalog_supplier",
       "fk_catalog_brand"
     ).
-      withColumnRenamed("id_catalog_config", "idCatalogConfig").
-      withColumnRenamed("name", "productName").
-      withColumnRenamed("special_margin", "specialMargin").
-      withColumnRenamed("activated_at", "activatedAt").
-      withColumnRenamed("sku", "configSku")
+      withColumnRenamed("id_catalog_config", ITR.ID_CATALOG_CONFIG).
+      withColumnRenamed("name", ITR.PRODUCT_NAME).
+      withColumnRenamed("special_margin", ITR.SPECIAL_MARGIN).
+      withColumnRenamed("activated_at", ITR.ACTIVATED_AT).
+      withColumnRenamed("sku", ITR.CONFIG_SKU)
 
     val configDF = quantityDF.join(
       config,
-      config("idCatalogConfig") === simpleDF("fk_catalog_config")
+      config(ITR.ID_CATALOG_CONFIG) === simpleDF("fk_catalog_config")
     )
 
     val supplierDF = configDF.join(
@@ -76,13 +91,14 @@ object Bob {
       Model.brand.value.select("url_key", "id_catalog_brand").withColumnRenamed("url_key", "brandUrlKey"),
       configDF("fk_catalog_brand") === Model.brand.value("id_catalog_brand")
     ).withColumn(
-        "productUrl",
-        productUrl(col("idCatalogConfig"), col("brandUrlKey"), col("productName"))
+        ITR.PRODUCT_URL,
+        productUrl(col(ITR.ID_CATALOG_CONFIG), col("brandUrlKey"), col(ITR.PRODUCT_NAME))
       )
 
     brandDF.
       select(
         "idCatalogSimple",
+        "specialPrice",
         "specialToDate",
         "specialFromDate",
         "simpleSku",
@@ -95,8 +111,7 @@ object Bob {
         "supplierStatus",
         "productUrl",
         "specialMargin",
-        "margin",
-        "specialPrice"
+        "margin"
       )
   }
 
@@ -134,9 +149,9 @@ object Bob {
   /**
    * Calculate stock against simple sku
    *
-   * @return Int
+   * @return Long
    */
-  val stock = (quantity: Int, reservedCount: Int) => {
+  val stock = (quantity: Long, reservedCount: Long) => {
     quantity - reservedCount
   }
 

@@ -11,16 +11,16 @@ import org.apache.spark.SparkConf
  */
 object CampaignManager {
 
-  def main(args: Array[String]) {
-    val liveRetargetCampaign = new LiveRetargetCampaign()
-    val conf = new SparkConf().setAppName("CampaignTest").set("spark.driver.allowMultipleContexts", "true")
-
-    Spark.init(conf)
-    val hiveContext = Spark.getHiveContext()
-    val orderData = hiveContext.read.parquet(args(0))
-    val orderItemData = hiveContext.read.parquet(args(1))
-    liveRetargetCampaign.runCampaign(orderData, orderItemData)
-  }
+  //  def main(args: Array[String]) {
+  //    val liveRetargetCampaign = new LiveRetargetCampaign()
+  //    val conf = new SparkConf().setAppName("CampaignTest").set("spark.driver.allowMultipleContexts", "true")
+  //
+  //    Spark.init(conf)
+  //    val hiveContext = Spark.getHiveContext()
+  //    val orderData = hiveContext.read.parquet(args(0))
+  //    val orderItemData = hiveContext.read.parquet(args(1))
+  //    liveRetargetCampaign.runCampaign(orderData, orderItemData)
+  //  }
   //
   //  def execute() = {
   //
