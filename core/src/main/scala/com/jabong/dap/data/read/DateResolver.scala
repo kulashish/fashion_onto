@@ -5,18 +5,18 @@ import java.io.File
 object DateResolver {
 
   /**
-   * Used to get most recent value of hour in hh format for which the data
+   * Appends the  most recent value of hour in hh format to the inputted date for which the data
    * exists for given input pathDate.
    * WARNING: throws DataNotFound exception if data is not found in any
    * value of hour for the given date.
    */
-  def getDateWithHour(source: String, tableName: String, mode: String, pathDate: String): String = {
+  def getDateWithHour(source: String, tableName: String, mode: String, date: String): String = {
     var hour: Int = 23
     var flag = 0
     var dateHour: String = null
     while (hour >= 0 && flag == 0) {
       dateHour = withLeadingZeros(hour)
-      val path = PathBuilder.buildPath(source, tableName, mode, pathDate) + File.separator + dateHour
+      val path = PathBuilder.buildPath(source, tableName, mode, date) + File.separator + dateHour
       if (DataVerifier.dataExists(path)) {
         flag = 1
       }
@@ -25,7 +25,7 @@ object DateResolver {
     if (flag == 0) {
       throw new DataNotFound
     }
-    "%s-%s".format(pathDate, dateHour)
+    "%s-%s".format(date, dateHour)
   }
 
   def withLeadingZeros(input: Int): String = {
