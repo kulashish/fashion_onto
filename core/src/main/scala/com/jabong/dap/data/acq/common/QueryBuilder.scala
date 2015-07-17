@@ -16,7 +16,6 @@ object QueryBuilder {
       return ("", "")
     }
 
-
     var selectString = ""
     var joinString = ""
     var count = 1
