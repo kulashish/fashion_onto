@@ -188,6 +188,12 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     }
   }
 
+  "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a year in monthly mode" in {
+    a[IllegalArgumentException] should be thrownBy {
+      TablesJsonValidator.validateRanges("2014-04-22 15:00:00", "2015-06-21 15:00:00", "monthly")
+    }
+  }
+
   "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a month in daily mode" in {
     //    val dt3 = Option.apply("2015-04-22 15:00:00")
     //    val dt4 = Option.apply("2015-06-21 15:00:00")

@@ -10,4 +10,6 @@ object Constants {
   val ITEM_SUCCESS_STATUS = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
   val PATH_SEPARATOR = "/"
   val ONE_DAY_MILLISECONDS = 24 * 60 * 60 * 1000
+  val START_TIME = "00:00:00"
+  val END_TIME = "23:59:59"
 }
