@@ -20,7 +20,7 @@ object DataReader extends Logging {
     require(date != null, "Date is null")
 
     try {
-      val dateWithHour = "%s-%s".format(date, DateResolver.getDateHour(source, tableName, dataType, date))
+      val dateWithHour = DateResolver.getDateWithHour(source, tableName, dataType, date))
       val fetchPath = PathBuilder.buildPath(source, tableName, dataType, dateWithHour)
       val saveFormat = FormatResolver.getFormat(fetchPath)
       val context = getContext(saveFormat)

@@ -10,7 +10,7 @@ object DateResolver {
    * WARNING: throws DataNotFound exception if data is not found in any
    * value of hour for the given date.
    */
-  def getDateHour(source: String, tableName: String, dataType: String, pathDate: String): String = {
+  def getDateWithHour(source: String, tableName: String, dataType: String, pathDate: String): String = {
     var hour: Int = 23
     var flag = 0
     var dateHour: String = null
@@ -25,7 +25,7 @@ object DateResolver {
     if (flag == 0) {
       throw new DataNotFound
     }
-    dateHour
+    "%s-%s".format(pathDate, dateHour)
   }
 
   def withLeadingZeros(input: Int): String = {
