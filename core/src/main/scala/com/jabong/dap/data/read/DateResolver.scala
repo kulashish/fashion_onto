@@ -1,5 +1,7 @@
 package com.jabong.dap.data.read
 
+import java.io.File
+
 object DateResolver {
 
   /**
@@ -14,7 +16,7 @@ object DateResolver {
     var dateHour: String = null
     while (hour >= 0 && flag == 0) {
       dateHour = withLeadingZeros(hour)
-      val path = PathBuilder.buildPath(source, tableName, dataType, pathDate) + dateHour
+      val path = PathBuilder.buildPath(source, tableName, dataType, pathDate) + File.separator + dateHour
       if (DataVerifier.dataExists(path)) {
         flag = 1
       }
