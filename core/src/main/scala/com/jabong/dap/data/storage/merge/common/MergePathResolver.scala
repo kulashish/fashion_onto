@@ -5,8 +5,8 @@ package com.jabong.dap.data.storage.merge.common
  */
 object MergePathResolver {
 
-  def basePathResolver (pathFull: String ): String ={
-    if (DataVerifier.hdfsDataExists(pathFull)) {
+  def basePathResolver(pathFull: String): String = {
+    if (DataVerifier.dataExists(pathFull)) {
       pathFull
     } else {
       throw new DataNotFound("Base Data not found for specified inputs")
@@ -14,13 +14,12 @@ object MergePathResolver {
   }
 
   def incrementalPathResolver(pathYesterdayData: String): String = {
-    if (DataVerifier.hdfsDataExists(pathYesterdayData)) {
+    if (DataVerifier.dataExists(pathYesterdayData)) {
       pathYesterdayData
     } else {
       throw new DataNotFound("Incremental Data not found for specified inputs")
     }
   }
-
 }
 
 case class DataNotFound(message: String) extends Exception

@@ -1,11 +1,9 @@
 package com.jabong.dap.data.storage.merge.common
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.hadoop.fs.{ Path, FileSystem }
 import com.jabong.dap.common.Spark
 import java.io.File
-
-
 
 /**
  * Verifies if the data exits at a given location.
@@ -16,12 +14,12 @@ object DataVerifier {
   val hdfs = FileSystem.get(hconf)
 
   /**
-   * Returns true if the _success file exists in the directory given.
+   * Returns true if the file exists in the directory
    * @param directory directory to be checked.
+   * @param fileName name of file to be checked.
    * @return true or false
    */
-
-  def hdfsDataExists(directory: String, fileName: String): Boolean = {
+  def dataExists(directory: String, fileName: String): Boolean = {
     val conf = new Configuration()
     val fileSystem = FileSystem.get(conf)
     val successFile = "%s%s%s".format(directory, File.separator, fileName)
@@ -29,8 +27,13 @@ object DataVerifier {
     fileSystem.exists(successFilePath)
   }
 
-  def hdfsDataExists(directory: String): Boolean = {
-    hdfsDataExists(directory, "_SUCCESS")
+  /**
+   * Returns true if the _success file exists in the directory.
+   * @param directory directory to be checked.
+   * @return true or false
+   */
+  def dataExists(directory: String): Boolean = {
+    dataExists(directory, "_SUCCESS")
   }
 
   /**

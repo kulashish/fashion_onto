@@ -12,7 +12,5 @@ class Merger extends java.io.Serializable {
     mergeMode match {
       case "full" => MergeTables.mergeFull()
     }
-
   }
-
 }
