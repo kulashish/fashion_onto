@@ -187,7 +187,9 @@ object Schema {
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true),
-    StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true)
+    StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true),
+    StructField(CustomerProductShortlistVariables.SIMPLE_SKU, StringType, true),
+    StructField(CustomerProductShortlistVariables.PRICE, DecimalType(10, 2), true)
   ))
 
   val itr = StructType(Array(

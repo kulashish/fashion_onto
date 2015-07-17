@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.customerselection
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -67,7 +68,10 @@ class WishList extends LiveCustomerSelector with Logging {
         col(CustomerProductShortlistVariables.SKU),
         col(CustomerProductShortlistVariables.DOMAIN),
         col(CustomerProductShortlistVariables.USER_DEVICE_TYPE),
-        col(CustomerProductShortlistVariables.CREATED_AT))
+        Udf.yyyymmdd(dfCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
+        Udf.simpleSkuFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.SIMPLE_SKU,
+        Udf.priceFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.PRICE
+      )
 
     dfResult
   }

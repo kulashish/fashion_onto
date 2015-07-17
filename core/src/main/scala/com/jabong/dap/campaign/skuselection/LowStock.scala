@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.skuselection
 
-import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ ItrVariables, CustomerProductShortlistVariables, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
@@ -72,10 +71,10 @@ class LowStock extends SkuSelector with Logging {
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       itrData,
       skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
-      SQL.INNER
+      "inner"
     )
 
-    val dfFilter = dfJoin.filter(ItrVariables.AVERAGE_STOCK + SQL.LTE + "10")
+    val dfFilter = dfJoin.filter(ItrVariables.AVERAGE_STOCK + " <= " + "10")
 
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),

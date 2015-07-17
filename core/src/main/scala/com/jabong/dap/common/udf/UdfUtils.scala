@@ -162,6 +162,10 @@ object UdfUtils {
    */
   def getMaxSlot(slots: Any): Int = {
 
+    if (slots == null) {
+      return 0
+    }
+
     var maxSlot = 0
 
     var maxOld = 0
@@ -209,6 +213,10 @@ object UdfUtils {
    */
   def getAge(birthday: Date): Int = {
 
+    if (birthday == null) {
+      return 0
+    }
+
     return TimeUtils.getYearFromToday(birthday)
 
   }
@@ -218,11 +226,15 @@ object UdfUtils {
    * @param t1
    * @return
    */
-  def getYYYYmmDD(t1: Timestamp): String = {
+  def getYYYYmmDD(t1: Timestamp): Timestamp = {
 
-    val format = new SimpleDateFormat(Constants.DATE_FORMAT)
+    if (t1 == null) {
+      return null
+    }
 
-    format.parse(t1.toString).toString()
+    val time = t1.toString()
+
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ")) + " 00:00:00.0")
   }
 
   /**
@@ -244,6 +256,9 @@ object UdfUtils {
 
     val simple_sku = compact(render(jsonExtraData \ "simple_sku")).replaceAll("^\"|\"$", "")
 
+    if (extraData.length() < 10)
+      return null
+
     return simple_sku
   }
 
@@ -252,7 +267,7 @@ object UdfUtils {
    * @param extraData
    * @return
    */
-  def getPriceFromExtraData(extraData: String): Double = {
+  def getPriceFromExtraData(extraData: String): BigDecimal = {
 
     if (extraData == null)
       return 0
