@@ -29,7 +29,7 @@ object DataReader extends Logging {
         throw new ValidFormatNotFound
     }
   }
-  
+
   /**
    * Method to read raw HDFS data for a source and table and get a dataFrame for the same. Checks
    * for the data for today's date. In case data is not found, checks for the data for yesterday's
@@ -41,7 +41,7 @@ object DataReader extends Logging {
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
     require(mode != null, "Mode is null")
-    
+
     try {
       fetchDataFrame(source, tableName, mode, TimeUtils.getTodayDate(Constants.DATE_FORMAT))
     } catch {
@@ -65,7 +65,7 @@ object DataReader extends Logging {
    * WARNING: Throws DataNotFound exception if data is not found.
    * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
    */
-  private def fetchDataFrame(source: String, tableName: String, mode: String, date: String):  DataFrame = {
+  private def fetchDataFrame(source: String, tableName: String, mode: String, date: String): DataFrame = {
     val dateWithHour = DateResolver.getDateWithHour(source, tableName, mode, date)
     val fetchPath = PathBuilder.buildPath(source, tableName, mode, dateWithHour)
     val saveFormat = FormatResolver.getFormat(fetchPath)

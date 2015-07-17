@@ -5,6 +5,10 @@ import org.apache.spark.sql.functions._
 import com.jabong.dap.model.product.itr.variables.ITR
 
 object PriceBand {
+  /**
+   * Prepare data frame for price band
+   * @return DataFrame
+   */
   def preparePriceBrand(): DataFrame = {
     val erp = ERP.getERPColumns().
       select(
@@ -63,6 +67,9 @@ object PriceBand {
                 withColumnRenamed(ITR.BRICK, "bandBrick")
   }
 
+  /**
+   * Calculate difference of min & max special price
+   */
   val spDifference = (minSpecialPrice: Any, maxSpecialPrice: Any) => {
     if (minSpecialPrice == null && maxSpecialPrice == null) {
       0

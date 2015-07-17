@@ -35,7 +35,6 @@ object FormatResolver {
     }
   }
 
-
   /**
    * Returns the extension of a file.
    */

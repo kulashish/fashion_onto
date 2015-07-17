@@ -2,7 +2,7 @@ package com.jabong.dap.model.product.itr
 
 import java.math
 
-import com.jabong.dap.common.time.{ Constants }
+import com.jabong.dap.common.time.{ TimeUtils, Constants }
 import com.jabong.dap.common.{ AppConfig }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
@@ -11,11 +11,20 @@ import com.jabong.dap.model.product.itr.variables.ITR
 
 class Itr extends java.io.Serializable with Logging {
 
+  /**
+   * Convert string to tuple2
+   * @param priceBand
+   * @return Tuple2
+   */
   def getRage(priceBand: String): (math.BigDecimal, math.BigDecimal) = {
     val range = priceBand.split("-")
     new Tuple2(new math.BigDecimal(range(0)), new math.BigDecimal(range(0)))
   }
 
+  /**
+   * Calculate mvp
+   * @return String
+   */
   val mvp = (priceBandA: String,
     priceBandB: String,
     priceBandC: String,
@@ -26,11 +35,8 @@ class Itr extends java.io.Serializable with Logging {
     val bRange = getRage(priceBandB)
     val cRange = getRage(priceBandC)
     val dRange = getRage(priceBandD)
-    val eRange = getRage(priceBandE)
 
-    if (specialPrice == 0.0) {
-      "mass"
-    } else if ((specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0) ||
+    if ((specialPrice == 0.0) || (specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0) ||
       (specialPrice.compareTo(bRange._1) >= 0 && specialPrice.compareTo(bRange._2) <= 0)) {
       "mass"
     } else if ((specialPrice.compareTo(cRange._1) >= 0 && specialPrice.compareTo(cRange._2) <= 0) ||
@@ -38,6 +44,36 @@ class Itr extends java.io.Serializable with Logging {
       "value"
     } else {
       "premium"
+    }
+  }
+
+  /**
+   * Calculate price band
+   * @return String
+   */
+  val priceBandFunc = (priceBandA: String,
+    priceBandB: String,
+    priceBandC: String,
+    priceBandD: String,
+    priceBandE: String,
+    specialPrice: math.BigDecimal) => {
+
+    val aRange = getRage(priceBandA)
+    val bRange = getRage(priceBandB)
+    val cRange = getRage(priceBandC)
+    val dRange = getRage(priceBandD)
+    val eRange = getRage(priceBandE)
+
+    if (specialPrice == 0.0 || (specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0)) {
+      "A"
+    } else if (specialPrice.compareTo(bRange._1) >= 0 && specialPrice.compareTo(bRange._2) <= 0) {
+      "B"
+    } else if (specialPrice.compareTo(cRange._1) >= 0 && specialPrice.compareTo(cRange._2) <= 0) {
+      "C"
+    } else if (specialPrice.compareTo(dRange._1) >= 0 && specialPrice.compareTo(dRange._2) <= 0) {
+      "D"
+    } else {
+      "E"
     }
   }
 
@@ -137,37 +173,15 @@ class Itr extends java.io.Serializable with Logging {
     ).write.mode(SaveMode.Overwrite).format("orc").save(getPath())
   }
 
-  val priceBandFunc = (priceBandA: String,
-    priceBandB: String,
-    priceBandC: String,
-    priceBandD: String,
-    priceBandE: String,
-    specialPrice: math.BigDecimal) => {
-
-    val aRange = getRage(priceBandA)
-    val bRange = getRage(priceBandB)
-    val cRange = getRage(priceBandC)
-    val dRange = getRage(priceBandD)
-    val eRange = getRage(priceBandE)
-
-    if (specialPrice == 0.0 || (specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0)) {
-      "A"
-    } else if (specialPrice.compareTo(bRange._1) >= 0 && specialPrice.compareTo(bRange._2) <= 0) {
-      "B"
-    } else if (specialPrice.compareTo(cRange._1) >= 0 && specialPrice.compareTo(cRange._2) <= 0) {
-      "C"
-    } else if (specialPrice.compareTo(dRange._1) >= 0 && specialPrice.compareTo(dRange._2) <= 0) {
-      "D"
-    } else {
-      "E"
-    }
-  }
-
+  /**
+   *  Return save path for ITR
+   * @return String
+   */
   def getPath(): String = {
     "%s/".
       format(
         AppConfig.config.basePath +
-          Constants.PATH_SEPARATOR + "itr"
+          Constants.PATH_SEPARATOR + "itr" + Constants.PATH_SEPARATOR +  TimeUtils.getTodayDate("yyyy/MM/dd/HH")
       )
   }
 }
