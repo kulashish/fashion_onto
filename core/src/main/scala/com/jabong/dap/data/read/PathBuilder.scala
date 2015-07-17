@@ -8,9 +8,9 @@ object PathBuilder {
   /**
    * Builds the path for given inputs.
    */
-  def buildPath(source: String, tableName: String, dataType: String, date: String): String = {
+  def buildPath(source: String, tableName: String, mode: String, date: String): String = {
     val basePath = AppConfig.config.basePath
     val datePath = date.replaceAll("-", File.separator)
-    "%s/%s/%s/%s/%s".format(basePath, source, tableName, dataType, datePath)
+    "%s/%s/%s/%s/%s".format(basePath, source, tableName, mode, datePath)
   }
 }
