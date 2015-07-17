@@ -181,7 +181,7 @@ class Itr extends java.io.Serializable with Logging {
     "%s/".
       format(
         AppConfig.config.basePath +
-          Constants.PATH_SEPARATOR + "itr" + Constants.PATH_SEPARATOR +  TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+          Constants.PATH_SEPARATOR + "itr" + Constants.PATH_SEPARATOR + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
       )
   }
 }
