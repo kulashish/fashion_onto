@@ -15,7 +15,7 @@ object DataReader extends Logging {
   def getDataFrame(source: String, tableName: String, mode: String, date: String): DataFrame = {
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
-    require(mode != null, "Data Type is null")
+    require(mode != null, "Mode is null")
     require(date != null, "Date is null")
 
     try {
@@ -40,7 +40,7 @@ object DataReader extends Logging {
   def getDataFrame(source: String, tableName: String, mode: String): DataFrame = {
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
-    require(mode != null, "Data Type is null")
+    require(mode != null, "Mode is null")
     
     try {
       fetchDataFrame(source, tableName, mode, TimeUtils.getTodayDate(Constants.DATE_FORMAT))
