@@ -159,6 +159,16 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
+  "getSimpleSkuFromExtraData: simple_sku" should "true" in {
+
+    val extraData = "{\"simple_sku\":\"true\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+
+    val result = UdfUtils.getSimpleSkuFromExtraData(extraData)
+
+    assert(result == null)
+
+  }
+
   //===============================getPriceFromExtraData()==============================================================
   "getPriceFromExtraData: price" should "1599" in {
 

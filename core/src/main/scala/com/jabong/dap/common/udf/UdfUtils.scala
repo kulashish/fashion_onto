@@ -256,7 +256,7 @@ object UdfUtils {
 
     val simple_sku = compact(render(jsonExtraData \ "simple_sku")).replaceAll("^\"|\"$", "")
 
-    if (extraData.length() < 10)
+    if (simple_sku.length() < 10)
       return null
 
     return simple_sku

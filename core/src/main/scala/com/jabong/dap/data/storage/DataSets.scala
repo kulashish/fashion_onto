@@ -48,4 +48,14 @@ object DataSets {
 
   val CAMPAIGN = "campaign"
 
+  val ITEM_ON_DISCOUNT = "item_on_discount"
+
+  val LOW_STOCK = "low_stock"
+
+  val SKU_SELECTION = "sku_selection"
+
+  val ITR_30_DAY_DATA = "itr_30_day_data"
+
+  val YESTERDAY_ITR_DATA = "yesterday_itr_data"
+
 }
