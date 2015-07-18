@@ -20,6 +20,10 @@ class SkuSelectorFactory extends CampaignFactory {
       return new ReturnReTarget()
     }
 
+    if (actionType.equalsIgnoreCase(SkuSelection.FOLLOW_UP)) {
+      return new FollowUp()
+    }
+
     return null
   }
 
