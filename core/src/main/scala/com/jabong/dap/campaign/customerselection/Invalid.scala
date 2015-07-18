@@ -15,7 +15,7 @@ class Invalid extends LiveCustomerSelector with Logging {
 
   override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
 
-  override def customerSelection(inData: DataFrame, inData2: DataFrame): DataFrame = ???
+  override def customerSelection(inData: DataFrame, inData2: DataFrame,nDays:Int): DataFrame = ???
 
   /**
    * return customers who have placed invalid order and haven't placed successful order for the same sku yet
@@ -23,12 +23,11 @@ class Invalid extends LiveCustomerSelector with Logging {
    *
    * @param customerOrderData - full
    * @param salesOrderItemData - filtered beforehand for n days
-   * @param ndays
    * @return
    */
-  override def customerSelection(customerOrderData: DataFrame, salesOrderItemData: DataFrame, ndays: Int): DataFrame = {
-    if (customerOrderData == null || salesOrderItemData == null || ndays < 0) {
-      logger.error("either of provided data is null or number of days is negative")
+  override def customerSelection(customerOrderData: DataFrame, salesOrderItemData: DataFrame): DataFrame = {
+    if (customerOrderData == null || salesOrderItemData == null) {
+      logger.error("either of provided data is null")
       return null
     }
     // FIXME: need to for last day 0 to 24
@@ -36,13 +35,13 @@ class Invalid extends LiveCustomerSelector with Logging {
    // val daysAfter = TimeUtils.getDateAfterNDays(-ndays,"yyyy-MM-dd HH:mm:ss.S")
     //val lastDaysSalesItemData = salesOrderItemData.filter(SalesOrderItemVariables.UPDATED_AT + " >= '" + daysAfter+"'")
 
-    val lastDaysSalesItemData = salesOrderItemData
+    //val lastDaysSalesItemData = salesOrderItemData
 
     // get Invalid Orders of last days sales item
-    val inValidSku = getInvalidOrders(lastDaysSalesItemData)
+    val inValidSku = getInvalidOrders(salesOrderItemData)
 
     // get successful Orders of last days sales item
-    val successfulSku = getSuccessfulOrders(lastDaysSalesItemData)
+    val successfulSku = getSuccessfulOrders(salesOrderItemData)
 
     // 2. inner join it with sales_order: short data
     // Now we have customers with invalid orders in last n days
@@ -86,10 +85,10 @@ class Invalid extends LiveCustomerSelector with Logging {
       ,customerInValidItemsData("invalid_"+SalesOrderVariables.FK_CUSTOMER) === customerSuccessfulItemsData("success_"+SalesOrderVariables.FK_CUSTOMER)
         && customerInValidItemsData("invalid_"+ProductVariables.SKU) === customerSuccessfulItemsData("success_"+ProductVariables.SKU), "left_outer")
       .filter("success_"+SalesOrderItemVariables.FK_SALES_ORDER + " is null or invalid_"+SalesOrderItemVariables.UPDATED_AT + " > " + "success_"+SalesOrderItemVariables.UPDATED_AT)
-      .select("invalid_"+SalesOrderVariables.FK_SALES_ORDER
-        ,"invalid_"+CustomerVariables.FK_CUSTOMER
-        ,"invalid_"+ProductVariables.SKU
-        ,"invalid_"+SalesOrderItemVariables.UNIT_PRICE)
+      .select(customerInValidItemsData("invalid_"+SalesOrderVariables.FK_SALES_ORDER) as (SalesOrderVariables.FK_SALES_ORDER)
+        ,customerInValidItemsData("invalid_"+CustomerVariables.FK_CUSTOMER) as (CustomerVariables.FK_CUSTOMER)
+        ,customerInValidItemsData("invalid_"+ProductVariables.SKU) as (ProductVariables.SKU)
+        ,customerInValidItemsData("invalid_"+SalesOrderItemVariables.UNIT_PRICE) as (SalesOrderItemVariables.UNIT_PRICE))
 
     return customerSelected
   }
