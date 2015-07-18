@@ -24,6 +24,10 @@ class SkuSelectorFactory extends CampaignFactory {
       return new FollowUp()
     }
 
+    if (actionType.equalsIgnoreCase(SkuSelection.LOW_STOCK)) {
+      return new LowStock()
+    }
+
     return null
   }
 
