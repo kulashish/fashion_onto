@@ -6,5 +6,7 @@ package com.jabong.dap.common.constants.campaign
 object SkuSelection {
   val CANCEL_RETARGET = "CancelReTarget"
   val RETURN_RETARGET = "ReturnReTarget"
-
+  val FOLLOW_UP = "FollowUp"
+  val LOW_STOCK = "LowStock"
+  
 }
