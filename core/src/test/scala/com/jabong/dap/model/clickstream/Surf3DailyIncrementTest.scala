@@ -1,5 +1,7 @@
 package com.jabong.dap.model.clickstream
 
+import java.util.Calendar
+
 import com.jabong.dap.common.{Spark, SharedSparkContext}
 import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, VariableMethods}
 import org.apache.spark.sql.{DataFrame, SQLContext,Row}
@@ -17,21 +19,34 @@ class Surf3DailyIncrementTest extends FlatSpec with SharedSparkContext {
   @transient var userObj: GroupData = _
   @transient var userWiseData: RDD[(String, Row)] = _
   @transient var hiveContext: HiveContext = _
+  @transient var YesterMergedData: DataFrame = _
+  @transient var dailyIncrementalSKUs: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
-    val hiveContext = Spark.getHiveContext()
+    hiveContext = Spark.getHiveContext()
     sqlContext = Spark.getSqlContext()
     pagevisitDataFrame = sqlContext.read.json("src/test/resources/clickstream/pagevisitSingleUser.json")
+    YesterMergedData = sqlContext.read.json("src/test/resources/clickstream/Surf3MergedData")
     userObj = new GroupData(hiveContext, pagevisitDataFrame)
     userWiseData = userObj.groupDataByUser()
     userObj.calculateColumns()
   }
 
-  "DailyIncremetal for surf3" should "have 27 PDP records " in {
-    var dailyIncrementalSKUs = GetSurfVariables.Surf3(userWiseData, userObj, hiveContext)
-    dailyIncrementalSKUs.collect.foreach(println)
-    assert(dailyIncrementalSKUs.collect.size == 27)
+  "DailyIncremetal for surf3" should "have 12 unique PDP records " in {
+    var today = "_daily"
+    dailyIncrementalSKUs = GetSurfVariables.Surf3Incremental(userWiseData, userObj, hiveContext)
+    assert(dailyIncrementalSKUs.count() == 12)
+  }
+
+  "merged data " should "have onlu 2 skus matching in 2-30 days" in {
+    var surf3Variable = GetSurfVariables.ProcessSurf3Variable(YesterMergedData,dailyIncrementalSKUs)
+    assert(surf3Variable.count() == 2)
+  }
+
+  "Today's merge" should "have 5 rows" in {
+    var mergeForTom = GetSurfVariables.mergeSurf3Variable(hiveContext,YesterMergedData,dailyIncrementalSKUs,"18/07/2015")
+    assert(mergeForTom.count() == 5)
   }
 
 }

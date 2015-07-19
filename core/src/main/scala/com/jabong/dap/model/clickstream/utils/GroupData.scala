@@ -21,14 +21,11 @@ class GroupData (hiveContext: HiveContext, pagevisit: DataFrame) extends java.io
 
   def groupDataByUser(): RDD[(String, Row)] = {
     pagevisit.as('pagevisit)
-    val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is not null").map(x => (x(uid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+  //  val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is not null")
+    //  .map(x => (x(uid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+    val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is not null")
+      .map(x => (x(uid).toString,x))
     return ug
-  }
-
-  def groupDataByBrowser(): RDD[(String, Row)] = {
-    pagevisit.as('pagevisit)
-    val br:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is null").map(x => (x(browserid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
-    return br
   }
 
   def calculateColumns(): Unit =

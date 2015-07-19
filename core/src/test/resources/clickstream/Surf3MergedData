@@ -1,0 +1,5 @@
+{"userid":"user1","dt":"14/07/2015","skuList":["sku1","sku2"]}
+{"userid":"user1","dt":"16/07/2015","skuList":["sku2","sku3"]}
+{"userid":"user1","dt":"20/06/2015","skuList":["sku4","sku5"]}
+{"userid":"user2","dt":"19/06/2015","skuList":["sku1","sku3"]}
+{"userid":"user2","dt":"17/07/2015","skuList":["sku2","sku4"]}
