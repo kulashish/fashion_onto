@@ -19,6 +19,10 @@ class CustomerSelectorFactory extends CampaignFactory {
       return new ReturnCancel()
     }
 
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.INVALID)) {
+      return new Invalid()
+    }
+
     return null
   }
 
