@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.hive.HiveContext
 
 /**
- * Created by jabong on 15/7/15.
+ * Created by Divya on 15/7/15.
  */
 object GetSurfVariables extends java.io.Serializable {
 
@@ -59,5 +59,4 @@ object GetSurfVariables extends java.io.Serializable {
       .toDF("userid", "dt", "skuList")
     return yesterMerge.unionAll(IncrementalMerge)
   }
-
 }

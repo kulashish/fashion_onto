@@ -42,8 +42,11 @@ object SurfVariablesMain extends java.io.Serializable {
     var UserObj = new GroupData(hiveContext, pagevisit)
     UserObj.calculateColumns()
     val userWiseData: RDD[(String, Row)] = UserObj.groupDataByUser()
+
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
+
     var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData,incremental)
+
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext,oldMergedData,incremental,dt)
     mergedData.saveAsParquetFile(currentMergedDataPath)
 
