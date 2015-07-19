@@ -6,7 +6,7 @@ import java.util.{Date, Calendar}
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -125,6 +125,52 @@ object CampaignUtils {
     val cal = Calendar.getInstance();
     val sdf = new SimpleDateFormat(dateFormat);
     return sdf.format(cal.getTime());
+  }
+
+  /**
+   * get all Orders which are successful
+   * @param salesOrderItemData
+   * @return
+   */
+  def getSuccessfulOrders(salesOrderItemData: DataFrame): DataFrame = {
+    if (salesOrderItemData == null) {
+      return null
+    }
+    // Sales order skus with successful order status
+    val successfulSku = salesOrderItemData.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+      .select(salesOrderItemData(ProductVariables.SKU), salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE), salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
+        salesOrderItemData(SalesOrderItemVariables.UPDATED_AT))
+
+    return successfulSku
+  }
+
+
+  /**
+   *
+   * @param inputData
+   * @param salesOrder
+   * @param salesOrderItem
+   * @return
+   */
+  def skuNotBought(inputData:DataFrame,salesOrder:DataFrame,salesOrderItem:DataFrame): DataFrame ={
+    var successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+    val customerSuccessfulItemsSchema = successFulOrderItems.schema
+
+    //rename customerSuccessfulItemsData column names with success_ as prefix
+    customerSuccessfulItemsSchema.foreach(x => successFulOrderItems = successFulOrderItems.withColumnRenamed(x.name, "success_"+ x.name))
+
+
+    val salesData = salesOrder.join(successFulOrderItems,salesOrder(SalesOrderVariables.ID_SALES_ORDER) ===successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER)
+      ,"inner")
+    val skuNotBoughtTillNow = inputData.join(successFulOrderItems
+      ,inputData(SalesOrderVariables.FK_CUSTOMER) === successFulOrderItems("success_"+SalesOrderVariables.FK_CUSTOMER)
+        && inputData(ProductVariables.SKU) === successFulOrderItems("success_"+ProductVariables.SKU), "left_outer")
+      .filter("success_"+SalesOrderItemVariables.FK_SALES_ORDER + " is null or "+SalesOrderItemVariables.UPDATED_AT + " > " + "success_"+SalesOrderItemVariables.UPDATED_AT)
+      .select(,inputData(CustomerVariables.FK_CUSTOMER)
+        ,inputData(ProductVariables.SKU))
+
+    return skuNotBoughtTillNow
   }
 }
 
