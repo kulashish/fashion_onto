@@ -88,7 +88,9 @@ object Bob {
     val productUrl = udf(url)
 
     val brandDF = supplierDF.join(
-      Model.brand.value.select("url_key", "id_catalog_brand").withColumnRenamed("url_key", "brandUrlKey"),
+      Model.brand.value.select("url_key", "id_catalog_brand", "name").
+        withColumnRenamed("url_key", "brandUrlKey").
+        withColumnRenamed("name", ITR.BRAND_NAME),
       configDF("fk_catalog_brand") === Model.brand.value("id_catalog_brand")
     ).withColumn(
         ITR.PRODUCT_URL,
@@ -97,21 +99,22 @@ object Bob {
 
     brandDF.
       select(
-        "idCatalogSimple",
-        "specialPrice",
-        "specialToDate",
-        "specialFromDate",
-        "simpleSku",
-        "visibility",
-        "quantity",
-        "idCatalogConfig",
-        "productName",
-        "activatedAt",
-        "configSku",
-        "supplierStatus",
-        "productUrl",
-        "specialMargin",
-        "margin"
+        ITR.ID_CATALOG_SIMPLE,
+        ITR.SPECIAL_PRICE,
+        ITR.SPECIAL_TO_DATE,
+        ITR.SPECIAL_FROM_DATE,
+        ITR.SIMPLE_SKU,
+        ITR.VISIBILITY,
+        ITR.QUANTITY,
+        ITR.ID_CATALOG_CONFIG,
+        ITR.PRODUCT_NAME,
+        ITR.ACTIVATED_AT,
+        ITR.CONFIG_SKU,
+        ITR.SUPPLIER_STATUS,
+        ITR.PRODUCT_URL,
+        ITR.SPECIAL_MARGIN,
+        ITR.MARGIN,
+        ITR.BRAND_NAME
       )
   }
 

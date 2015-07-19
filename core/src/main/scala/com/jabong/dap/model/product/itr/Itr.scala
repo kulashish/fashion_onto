@@ -3,7 +3,7 @@ package com.jabong.dap.model.product.itr
 import java.math
 
 import com.jabong.dap.common.time.{ TimeUtils, Constants }
-import com.jabong.dap.common.{ AppConfig }
+import com.jabong.dap.common.{ Spark, AppConfig }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions._
@@ -124,7 +124,7 @@ class Itr extends java.io.Serializable with Logging {
         col(ITR.SPECIAL_PRICE)
       ))
 
-    priceBandMVPDF.select(
+    val itrDF = priceBandMVPDF.select(
       ITR.BARCODE_EAN,
       ITR.VENDOR_ITEM_NO,
       ITR.HEEL_HEIGHT,
@@ -169,19 +169,42 @@ class Itr extends java.io.Serializable with Logging {
       ITR.SPECIAL_MARGIN,
       ITR.MARGIN,
       ITR.MVP,
-      ITR.PRICE_BAND
-    ).write.mode(SaveMode.Overwrite).format("orc").save(getPath())
+      ITR.PRICE_BAND,
+      ITR.SUPPLIER_STATUS,
+      ITR.BRAND_NAME
+    ).persist()
+
+    itrDF.write.mode(SaveMode.Overwrite).format("orc").save(getPath(false))
+
+    priceBandMVPDF.
+      groupBy(ITR.CONFIG_SKU).
+      agg(
+        first(ITR.BRAND_NAME) as ITR.BRAND_NAME,
+        first(ITR.PRICE_BAND) as ITR.PRICE_BAND,
+        first(ITR.GENDER) as ITR.GENDER,
+        first(ITR.MVP) as ITR.MVP,
+        first(ITR.BRICK) as ITR.BRICK,
+        first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
+        sum(ITR.QUANTITY) as ITR.QUANTITY
+      ).write.mode(SaveMode.Overwrite).format("orc").save(getPath(true))
   }
 
   /**
    *  Return save path for ITR
    * @return String
    */
-  def getPath(): String = {
-    "%s/".
+  def getPath(skuLevel: Boolean): String = {
+    if (skuLevel) {
+      return "%s/".
+        format(
+          AppConfig.config.basePath +
+            Constants.PATH_SEPARATOR + "itr" + Constants.PATH_SEPARATOR + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+        )
+    }
+    return "%s/".
       format(
         AppConfig.config.basePath +
-          Constants.PATH_SEPARATOR + "itr" + Constants.PATH_SEPARATOR + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+          Constants.PATH_SEPARATOR + "itr/sku-level" + Constants.PATH_SEPARATOR + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
       )
   }
 }

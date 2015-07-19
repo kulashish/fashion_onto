@@ -50,4 +50,6 @@ object ITR {
   val MARGIN = "margin"
   val MVP = "mvp"
   val PRICE_BAND = "priceBand"
+  val BRAND_NAME = "brandName"
+  val SUPPLIER_STATUS = "supplierStatus"
 }
