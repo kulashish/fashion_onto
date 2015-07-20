@@ -42,9 +42,12 @@ object QueryBuilder {
 
     driver match {
       case "sqlserver" =>
-        val limitString = if (limit != null) {
+        val limitString = if (limit != null && primaryKey != null) {
           ("TOP %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
-        } else {
+        } else if (limit != null && primaryKey == null) {
+          ("TOP %s".format(limit), "")
+        }
+        else {
           ("", "")
         }
         "(SELECT %s t1.* %s FROM %s AS t1 %s %s %s) AS t".format(limitString._1, joinSelect, tableName, joinFrom,
