@@ -8,5 +8,4 @@ object SkuSelection {
   val RETURN_RETARGET = "ReturnReTarget"
   val FOLLOW_UP = "FollowUp"
   val LOW_STOCK = "LowStock"
-  
 }

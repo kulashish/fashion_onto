@@ -11,5 +11,4 @@ trait SkuSelector {
   def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame
   def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame
 
-
 }

@@ -27,7 +27,6 @@ class CustomerSelectorFactory extends CampaignFactory {
       return new ACart()
     }
 
-
     return null
   }
 

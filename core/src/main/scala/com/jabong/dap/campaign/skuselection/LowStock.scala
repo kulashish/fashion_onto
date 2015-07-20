@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -18,21 +18,20 @@ class LowStock extends SkuSelector {
   // case 1: only sku simple
   // case 2: only sku
   override def skuFilter(customerSkuData: DataFrame, itrDataFrame: DataFrame, campaignName: String): DataFrame = {
-    if(customerSkuData == null || itrDataFrame==null || campaignName==null){
+    if (customerSkuData == null || itrDataFrame == null || campaignName == null) {
       return null
     }
-    var filteredSku:DataFrame = null
-    if(campaignName==CampaignCommon.INVALID_CAMPAIGN){
-     filteredSku=  customerSkuData.join(itrDataFrame,customerSkuData(ProductVariables.SKU)===itrDataFrame(ProductVariables.SKU),"inner")
-        .filter(itrDataFrame(ProductVariables.STOCK+" <= "+CampaignCommon.LOW_STOCK_VALUE))
-        .select(customerSkuData(CustomerVariables.FK_CUSTOMER),customerSkuData(ProductVariables.SKU),customerSkuData(ProductVariables.SPECIAL_PRICE))
-    } else if(campaignName==CampaignCommon.WISHLIST_CAMPAIGN) {
-        // separate sku and sku simples
-
+    var filteredSku: DataFrame = null
+    if (campaignName == CampaignCommon.INVALID_CAMPAIGN) {
+      filteredSku = customerSkuData.join(itrDataFrame, customerSkuData(ProductVariables.SKU) === itrDataFrame(ProductVariables.SKU), "inner")
+        .filter(itrDataFrame(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE))
+        .select(customerSkuData(CustomerVariables.FK_CUSTOMER), customerSkuData(ProductVariables.SKU), customerSkuData(ProductVariables.SPECIAL_PRICE))
+    } else if (campaignName == CampaignCommon.WISHLIST_CAMPAIGN) {
+      // separate sku and sku simples
 
     }
 
-      return filteredSku
+    return filteredSku
   }
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
