@@ -19,6 +19,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var customerSelected: DataFrame = _
   @transient var salesOrder: DataFrame = _
   @transient var salesOrderItem: DataFrame = _
+  @transient var customerSelectedTime: DataFrame = _
 
   val calendar = Calendar.getInstance()
   calendar.add(Calendar.DATE, -1)
@@ -32,6 +33,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     customerSelected = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected.json")
     salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
     salesOrderItem = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_item_bought.json")
+    customerSelectedTime = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_filtered_time.json")
 
   }
 
@@ -94,6 +96,54 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     assert(skuNotBought.count() == 1)
   }
 
+
+  "No order data from 2015-07-02 22:36:58.0 to 2015-07-12 22:36:58.0 " should "return no filtered frame" in {
+    val after = "2015-07-02 22:36:58.0"
+    val before = "2015-07-12 22:36:58.0"
+    val field = "updated_at"
+    val filteredData = CampaignUtils.getTimeBasedDataFrame(null,field,after,before)
+    assert(filteredData == null)
+  }
+
+  "Different before and after format" should "return no filtered frame" in {
+    val after = "2015-07-02 22:36:58"
+    val before = "2015-07-12 22:36:58.0"
+    val field = "updated_at"
+    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime,field,after,before)
+    assert(filteredData == null)
+  }
+
+  "null Field " should "return no filtered frame" in {
+    val after = "2015-07-02 22:36:58"
+    val before = "2015-07-12 22:36:58.0"
+    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime,null,after,before)
+    assert(filteredData == null)
+  }
+
+
+  "Field doesn't exist in data frame schema" should "return no filtered frame" in {
+    val after = "2015-07-02 22:36:58"
+    val before = "2015-07-12 22:36:58.0"
+    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime,null,after,before)
+    assert(filteredData == null)
+  }
+
+
+  "order data from 2015-07-02 22:36:58.0 to 2015-07-12 22:36:58.0 " should "return two records based on before and after" in {
+    val after = "2015-07-02 22:36:58.0"
+    val before = "2015-07-12 22:36:58.0"
+    val field = "updated_at"
+    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime,field,after,before)
+    assert(filteredData.count == 2)
+  }
+
+  "order data from 2015-07-02 22:36:59.0 to 2015-07-12 22:36:58.0 " should "return one record based on before and after" in {
+    val after = "2015-07-02 22:36:59.0"
+    val before = "2015-07-12 22:36:58.0"
+    val field = "updated_at"
+    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime,field,after,before)
+    assert(filteredData.count == 1)
+  }
   //
   //  "Given data format " should "return current time in that format" in {
   //    val currentTime = CampaignUtils.now("yyyy/mm/dd")

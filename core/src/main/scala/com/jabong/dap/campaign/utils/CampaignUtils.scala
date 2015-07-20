@@ -111,9 +111,9 @@ object CampaignUtils extends Logging {
   def startOfDay(time: Date): Long = {
     val cal = Calendar.getInstance();
     cal.setTimeInMillis(time.getTime());
-    cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to zero
-    cal.set(Calendar.MINUTE, 0); // set minutes to zero
-    cal.set(Calendar.SECOND, 0); //set seconds to zero
+    cal.set(Calendar.HOUR_OF_DAY,0); //set hours to 0
+    cal.set(Calendar.MINUTE,0); // set minutes to 0
+    cal.set(Calendar.SECOND,0); //set seconds to 0
     return cal.getTime.getTime
   }
 
@@ -178,5 +178,36 @@ object CampaignUtils extends Logging {
 
     return skuNotBoughtTillNow
   }
+
+  /**
+   * Filtered Data based on before time to after Time yyyy-mm-dd HH:MM:SS.s
+   * @param inData
+   * @param timeField
+   * @param after
+   * @param before
+   * @return
+   */
+  def getTimeBasedDataFrame(inData: DataFrame,timeField:String , after: String, before: String): DataFrame = {
+    if(inData == null || timeField == null || before == null || after ==null) {
+      logger.error("Any of the value in getTimeBasedDataFrame is null")
+      return null
+    }
+
+    if(after.length != before.length) {
+      logger.error("before and after time formats are different ")
+      return null
+    }
+
+    val Columns = inData.columns
+     if(!(Columns contains(timeField))){
+       logger.error(timeField+"doesn't exist in the inData Frame Schema")
+       return null
+     }
+
+    val filteredData = inData.filter(timeField+" >= '"+after+"' and "+ timeField +" <= '"+before+"'")
+    logger.info("Input Data Frame has been filtered before"+before + "after '"+after)
+    return filteredData
+  }
+
 }
 
