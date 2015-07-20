@@ -8,11 +8,11 @@ import org.apache.spark.sql.DataFrame
 
 class FollowUp extends SkuSelector with Logging {
 
-  // 1. order should not have been placed for the ref sku yet
+  // 1. stock should be >= 10
   // 2. pick based on special price (descending)
   // 1 day data
-  // inDataFrame =  [(id_customer, sku, sku simple)]
-  // itrData = [(skusimple, date, special price)]
+  // inDataFrame =  [(id_customer, sku simple)]
+  // itrData = [(skusimple, date, stock, special price)]
   override def skuFilter(customerSkuData: DataFrame, itrData: DataFrame): DataFrame = {
     if (customerSkuData == null || itrData == null) {
       logger.error("either customer selected skus are null or itrData is null")

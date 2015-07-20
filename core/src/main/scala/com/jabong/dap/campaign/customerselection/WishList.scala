@@ -62,6 +62,8 @@ class WishList extends LiveCustomerSelector with Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
 
     //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
+    // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
+    // FIXME -- filter for created_at <= endTimeStamp
     val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
       //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
       CustomerProductShortlistVariables.REMOVED_AT + " is null and " +

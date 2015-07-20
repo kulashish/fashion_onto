@@ -17,7 +17,6 @@ import org.apache.spark.sql.functions._
 class ItemOnDiscount extends SkuSelector with Logging {
 
   // sku filter
-  // 1. order should not have been placed for the ref sku yet
   // 2. Today's Special Price of SKU (SIMPLE – include size) is less than
   //      previous Special Price of SKU (when it was added to wishlist)
   // 3. This campaign shouldn’t have gone to the customer in the past 30 days for the same Ref SKU
@@ -35,6 +34,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     }
 
+    // FIXME: either sku or sku simple: both can't be there
     val itr30dayData = df30DaysItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
       col(ItrVariables.AVERAGE_PRICE) as ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE,
@@ -50,7 +50,8 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
-
+    
+    // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
 
     val join30DaysDf = getJoinDF(customerSelected, irt30Day)
@@ -63,6 +64,11 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerVariables.EMAIL),
         col(ProductVariables.SKU_SIMPLE))
+    
+    // FIXME: include special price
+    
+    // FIXME: generate ref skus
+    
 
     return dfResult
   }
@@ -110,10 +116,13 @@ class ItemOnDiscount extends SkuSelector with Logging {
    */
   def getJoinDF(cpsl: DataFrame, itr30dayData: DataFrame): DataFrame = {
 
+    // FIXME: sku to sku simple
     val joinDf = cpsl.join(itr30dayData, cpsl(CustomerProductShortlistVariables.SKU) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU)
       &&
       cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
 
+    
+    // FIXME: special price
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
       CustomerProductShortlistVariables.EMAIL,

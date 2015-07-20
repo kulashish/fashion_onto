@@ -15,8 +15,8 @@ class ACart extends LiveCustomerSelector with Logging {
   // In this case cutomers with abundant cart in last 30days
   override def customerSelection(salesCartData: DataFrame, salesOrder: DataFrame, salesOrderItemData: DataFrame): DataFrame = {
     if (salesCartData == null) {
-      return null
       logger.error("sales cart data is null ")
+      return null
     }
     val acartCustomers = salesCartData.filter(ACartVariables.ACART_STATUS + " = 'active'")
       .select(salesCartData(ACartVariables.FK_CUSTOMER), salesCartData(ACartVariables.SKU_SIMPLE) as (ProductVariables.SKU_SIMPLE), salesCartData(ACartVariables.CREATED_AT), salesCartData(ACartVariables.UPDATED_AT))
