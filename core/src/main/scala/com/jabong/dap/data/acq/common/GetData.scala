@@ -71,7 +71,7 @@ object GetData extends Logging {
       )
     }
 
-//    jdbcDF.printSchema()
+    //    jdbcDF.printSchema()
     val columnList = jdbcDF.columns
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
