@@ -1,0 +1,18 @@
+{
+  "acquisition": [
+    {
+      "source": "erp",
+      "tableName": "item_master_complete_dump",
+      "primaryKey": "[No_]",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "overwrite",
+      "dateColumn": "[Last Modification Date Time]",
+      "rangeStart": null,
+      "rangeEnd": null,
+      "limit": null,
+      "filterCondition" : "[No_] NOT LIKE 'R%'"
+    }
+  ]
+}
+
