@@ -5,5 +5,6 @@ package com.jabong.dap.common.constants.campaign
  */
 object CustomerSelection {
   val RETURN_CANCEL = "ReturnCancel"
+  val WISH_LIST = "WishList"
 
 }
