@@ -19,9 +19,6 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-    val config = new Config(basePath = "basePath")
-    AppConfig.config = config
-
     df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order1", OrderVarSchema.salesOrder)
 
     df2 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order2", OrderVarSchema.salesOrderCoupon)
