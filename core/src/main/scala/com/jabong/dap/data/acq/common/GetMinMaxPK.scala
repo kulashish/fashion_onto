@@ -20,7 +20,7 @@ object GetMinMaxPK extends Logging {
 
     var minMax = new MinMax(0, 0)
 
-    val minMaxSql = if ((mode == "full" && limit == null)  || mode == "monthly" || mode == "daily" || mode == "hourly") {
+    val minMaxSql = if ((mode == "full" && limit == null) || mode == "monthly" || mode == "daily" || mode == "hourly") {
       "SELECT MIN(%s), MAX(%s) FROM %s AS t1 %s".format(tablePrimaryKey, tablePrimaryKey, tableName, condition)
     } else {
       dbc.driver match {
