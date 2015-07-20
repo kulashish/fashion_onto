@@ -177,5 +177,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
   // not needed
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 }
 

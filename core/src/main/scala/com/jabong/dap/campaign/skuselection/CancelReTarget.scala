@@ -72,4 +72,6 @@ class CancelReTarget extends SkuSelector {
 
     return refSku
   }
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 }

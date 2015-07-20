@@ -11,14 +11,18 @@ class InvalidTest extends FlatSpec with SharedSparkContext {
   @transient var sqlContext: SQLContext = _
   @transient var salesOrderItemDataFrame: DataFrame = _
   @transient var orderDataFrame: DataFrame = _
+  @transient var salesOrderItemDataFrame1: DataFrame = _
+  @transient var orderDataFrame1: DataFrame = _
   var invalidCustomerSelection: Invalid = _
 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     invalidCustomerSelection = new Invalid()
-    salesOrderItemDataFrame = sqlContext.read.json("src/test/resources/campaign/sales_item_invalid.json")
-    orderDataFrame = sqlContext.read.json("src/test/resources/campaign/sales_order_invalid.json")
+    salesOrderItemDataFrame = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_item_invalid.json")
+    orderDataFrame = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_order_invalid.json")
+    salesOrderItemDataFrame1 = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_item_invalid1.json")
+    orderDataFrame1 = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_order_invalid1.json")
   }
 
   "No orders data" should "return null successful orders" in {
@@ -42,23 +46,28 @@ class InvalidTest extends FlatSpec with SharedSparkContext {
   }
 
   "No Orders data" should "return null customer selection" in {
-    val expectedOrders = invalidCustomerSelection.customerSelection(null, salesOrderItemDataFrame, 30)
+    val expectedOrders = invalidCustomerSelection.customerSelection(null, salesOrderItemDataFrame)
     assert(expectedOrders == null)
   }
 
   "No Orders Items data" should "return null customer selection" in {
-    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, null, 30)
+    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, null)
     assert(expectedOrders == null)
   }
+//
+//  "Negative days as parameter" should "return null customer selection" in {
+//    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame, -30)
+//    assert(expectedOrders == null)
+//  }
 
-  "Negative days as parameter" should "return null customer selection" in {
-    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame, -30)
-    assert(expectedOrders == null)
-  }
-
-  "30 days salesOrder data with orders data" should "return null customer selection" in {
-    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame, 30)
+  "30 days salesOrder data with orders data" should "return one customer with invalid order" in {
+    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame)
     assert(expectedOrders.count() == 1)
+  }
+
+  "salesOrder data with with updated at of invalid order is less than successful order" should "return null customer selection  " in {
+    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame1, salesOrderItemDataFrame1)
+    assert(expectedOrders.count() == 0)
   }
 
 }

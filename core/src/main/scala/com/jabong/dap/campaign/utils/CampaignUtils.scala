@@ -2,18 +2,19 @@ package com.jabong.dap.campaign.utils
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Date, Calendar}
+import java.util.{ Date, Calendar }
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
  * Utility Class
  */
-object CampaignUtils {
+object CampaignUtils extends Logging {
 
   val sqlContext = Spark.getSqlContext()
 
@@ -87,7 +88,7 @@ object CampaignUtils {
     val prodDate = dateFormat.parse(date)
 
     val cal = Calendar.getInstance();
-    cal.add(Calendar.DATE,-1)
+    cal.add(Calendar.DATE, -1)
     val diff = startOfDay(cal.getTime) - prodDate.getTime()
 
     var diffTime: Double = 0
@@ -107,7 +108,7 @@ object CampaignUtils {
    * @param time
    * @return
    */
-  def  startOfDay(time:Date):Long= {
+  def startOfDay(time: Date): Long = {
     val cal = Calendar.getInstance();
     cal.setTimeInMillis(time.getTime());
     cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to zero
@@ -125,6 +126,57 @@ object CampaignUtils {
     val cal = Calendar.getInstance();
     val sdf = new SimpleDateFormat(dateFormat);
     return sdf.format(cal.getTime());
+  }
+
+  /**
+   * get all Orders which are successful
+   * @param salesOrderItemData
+   * @return
+   */
+  def getSuccessfulOrders(salesOrderItemData: DataFrame): DataFrame = {
+    if (salesOrderItemData == null) {
+      return null
+    }
+    // Sales order skus with successful order status
+    val successfulSku = salesOrderItemData.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+      .select(salesOrderItemData(ProductVariables.SKU), salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE), salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
+        salesOrderItemData(SalesOrderItemVariables.UPDATED_AT))
+
+    return successfulSku
+  }
+
+  /**
+   * returns the skus which are not bought inputData till Now
+   * @param inputData
+   * @param salesOrder
+   * @param salesOrderItem
+   * @return
+   */
+  def skuNotBought(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    var successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(salesOrder(SalesOrderVariables.FK_CUSTOMER), successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), successFulOrderItems(ProductVariables.SKU), successFulOrderItems(SalesOrderItemVariables.UPDATED_AT))
+
+    val customerSuccessfulItemsSchema = successfulSalesData.schema
+
+    //rename customerSuccessfulItemsData column names with success_ as prefix
+    customerSuccessfulItemsSchema.foreach(x => successfulSalesData = successfulSalesData.withColumnRenamed(x.name, "success_" + x.name))
+
+    val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData("success_" + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData("success_" + ProductVariables.SKU), "left_outer")
+      .filter("success_" + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + "success_" + SalesOrderItemVariables.UPDATED_AT)
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+
+    logger.info("Filtered all the sku which has been bought")
+
+    return skuNotBoughtTillNow
   }
 }
 

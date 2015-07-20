@@ -16,6 +16,9 @@ import org.scalatest.FlatSpec
 class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var sqlContext: SQLContext = _
   @transient var refSkuInput: DataFrame = _
+  @transient var customerSelected: DataFrame = _
+  @transient var salesOrder: DataFrame = _
+  @transient var salesOrderItem: DataFrame = _
 
   val calendar = Calendar.getInstance()
   calendar.add(Calendar.DATE, -1)
@@ -26,6 +29,10 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     refSkuInput = sqlContext.read.json("src/test/resources/campaign/ref_sku_input.json")
+    customerSelected = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected.json")
+    salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
+    salesOrderItem = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_item_bought.json")
+
   }
 
   "Yesterdays date " should "return 1 in day diff" in {
@@ -76,6 +83,17 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     assert(refSkuFirst.head === expectedData)
     assert(refSkuFirst.size == 1)
   }
+
+  "No input Data for sku Not Bought" should "return null" in {
+    val skuNotBought = CampaignUtils.skuNotBought(null,salesOrder,salesOrderItem)
+    assert(skuNotBought == null)
+  }
+
+  "input Data  with order data " should "return sku not bought till now" in {
+    val skuNotBought = CampaignUtils.skuNotBought(customerSelected,salesOrder,salesOrderItem)
+    assert(skuNotBought.count() == 1)
+  }
+
   //
   //  "Given data format " should "return current time in that format" in {
   //    val currentTime = CampaignUtils.now("yyyy/mm/dd")

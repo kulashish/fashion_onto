@@ -7,16 +7,16 @@ import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelectio
 import org.apache.spark.sql.DataFrame
 
 /**
- * Created by rahul for invalid follow up campaign campaignlist on 16/7/15.
+ * Created by rahul for com.jabong.dap.campaign.campaignlist on 20/7/15.
  */
-class InvalidFollowUpCampaign {
+class AcartFollowUpCampaign {
 
-  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(salesCartData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
 
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
-      .getCustomerSelector(CustomerSelection.INVALID)
+      .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for 30 days
-    val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
+    val selectedCustomers = invalidCustomerSelector.customerSelection(salesCartData, orderItemData)
 
     //sku selection
     val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
@@ -24,8 +24,7 @@ class InvalidFollowUpCampaign {
 
     //save campaign Output
     CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      + CampaignCommon.ACART_FOLLOWUP_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
 
   }
-
 }
