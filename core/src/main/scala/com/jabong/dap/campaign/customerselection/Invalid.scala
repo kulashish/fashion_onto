@@ -128,4 +128,6 @@ class Invalid extends LiveCustomerSelector with Logging {
 
     return inValidSku
   }
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, inData3: DataFrame): DataFrame = ???
 }
