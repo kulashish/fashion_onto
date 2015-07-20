@@ -1,6 +1,6 @@
 package com.jabong.dap.common.json
 
-import com.jabong.dap.common.{AppConfig, Config}
+import com.jabong.dap.common.{ AppConfig, Config }
 import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json.JsonParser.ParseException
 import org.scalatest.{ Matchers, FlatSpec }
