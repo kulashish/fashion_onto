@@ -7,6 +7,7 @@ import com.jabong.dap.common.json.EmptyClass
  *
  * @param name String The name of the table.
  * @param foreignKey String The name of the foreign key for the table.
+ * @param selectString String The select string for selecting columns from the join table.
  */
 case class JoinTables(
   name: String,
