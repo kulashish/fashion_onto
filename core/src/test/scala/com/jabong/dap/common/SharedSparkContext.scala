@@ -9,7 +9,8 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
   val conf = new SparkConf().setMaster("local").setAppName("test").set("spark.driver.allowMultipleContexts", "true")
 
   override def beforeAll() {
-    Spark.init(conf)
+    if (Spark.getContext() == null)
+      Spark.init(conf)
 
     val config = new Config(basePath = "basePath")
     AppConfig.config = config
@@ -23,7 +24,7 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
     //      sc.stop()
     //    }
     // To avoid Akka rebinding to the same port, since it doesn't unbind immediately on shutdown
-    System.clearProperty("spark.driver.port")
+    //System.clearProperty("spark.driver.port")
     super.afterAll()
   }
 }
