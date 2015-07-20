@@ -44,4 +44,6 @@ object DataSets {
   //Newsletter Preferences
   val NEWSLETTER_PREFERENCES = "newsletter_preferences"
 
+  //Clickstream
+  val CLICKSTREAM = "clickstream"
 }

@@ -70,6 +70,6 @@ object Udf {
   /**
    * appUsers will convert null userid  to  _app_+browserid
    */
-  val appUserId = udf((userid: String, browserid: String) => UdfUtils.getAppUserId(userid: String, browserid: String))
+  val appUserId = udf((userid: String, domain: String, browserid: String) => UdfUtils.getAppUserId(userid: String, domain: String, browserid: String))
 
 }

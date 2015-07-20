@@ -213,9 +213,9 @@ object UdfUtils {
    * @param browserid
    * @return either transformed userid
    */
-  def getAppUserId(userid: String, browserid: String): String = {
+  def getAppUserId(userid: String, domain: String, browserid: String): String = {
     var app_user_id = userid
-    if(app_user_id == null) {
+    if(app_user_id == null && (domain == "ios" || domain == "android" || domain == "windows")) {
       app_user_id = "_app_" + browserid
     }
     return app_user_id

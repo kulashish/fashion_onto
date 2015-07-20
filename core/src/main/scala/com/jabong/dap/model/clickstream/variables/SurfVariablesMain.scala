@@ -50,17 +50,25 @@ object SurfVariablesMain extends java.io.Serializable {
 
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext,oldMergedData,incremental,dt)
     mergedData.saveAsParquetFile(currentMergedDataPath)
-   //val userWiseData: RDD[(String, Row)] = UserObj.groupDataByUser()
+
+
+
+
     //val browserWiseData: RDD[(String, Row)] = UserObj.groupDataByBrowser()
     val surfVariableData: RDD[(Any, Row)] = UserObj.surfVariableData()
     //var surf3 = VariableMethods.Surf3(userWiseData, pagevisit, UserObj, hiveContext)
     //var variableSurfUserwise=VariableMethods.variableSurf1(surfVariableData,UserObj)
     var variableSurfFinal=GetSurfVariables.variableSurf1(surfVariableData,UserObj)
+
     val finalUidDeviceid = GetSurfVariables.uidToDeviceid(hiveContext).write.save(args(1))
     //val finalSurf1Data=variableSurfUserwise.union(variableSurfBrowserwise)
     //variableSurfFinal.saveAsTextFile(args(1))
   }
 
+
+
+    //val finalSurf1Data=variableSurfUserwise.union(variableSurfBrowserwise)
+    variableSurfFinal.saveAsTextFile(args(1))
 
   /*def relpaceNullUserid(GroupedData: RDD[(String, Row)]): RDD[((Any,Any,Any,Any),Any)] = {
     val a = GroupedData.filter((x => x._2(UserObj.productsku) != null))

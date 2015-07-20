@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 /*package com.jabong.dap.model.customer.variables
+=======
+package com.jabong.dap.model.clickstream.variables
+>>>>>>> 0cd2667
 
 import com.jabong.dap.common.Spark
 import org.apache.spark.sql.functions._
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import org.apache.spark.sql.{ DataFrame, Row }
 import com.jabong.dap.common.constants.variables.{ PageVisitVariables }
 
@@ -12,7 +17,7 @@ object UserDeviceMapping {
    * @param dfUser
    * @return (DataFrame)
    */
-  def getAppUserDeviceMap (dfUser: DataFrame): DataFrame = {
+  def getUserDeviceMap (dfUser: DataFrame): DataFrame = {
     if (dfUser == null) {
 
       log("Data frame should not be null")
@@ -21,25 +26,52 @@ object UserDeviceMapping {
 
     }
 
-    //Todo schema attributes or data type mismatch
+    //Todo: schema attributes or data type mismatch
 
+    // Fetch required columns only and change null userid for apps to _app_{browser_id}
+    val dfAppUser = dfUser.select(
 
-    //val pagevisit = sqlContext.sql("SELECT * from clickstream_apps.apps  WHERE date1=26  AND userid IS NOT NULL AND pagets IS NOT NULL LIMIT 2000")
+      Udf.appUserId(
+        col(PageVisitVariables.USER_ID),
+        col(PageVisitVariables.DOMAIN),
+        col(PageVisitVariables.BROWSER_ID)
+      ) as PageVisitVariables.USER_ID,
 
+<<<<<<< HEAD
     val dfAppUser = dfUser.select(
 
       dfUser.appUserId(col(PageVisitVariables.USER_ID), col(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.USER_ID,
 
       col(PageVisitVariables.PAGE_TIMESTAMP),
+=======
+>>>>>>> 0cd2667
       col(PageVisitVariables.BROWSER_ID),
-      col(PageVisitVariables.DOMAIN)
+      col(PageVisitVariables.DOMAIN),
+      col(PageVisitVariables.PAGE_TIMESTAMP)
     )
+<<<<<<< HEAD
 *
     dfAppUser.orderBy(PageVisitVariables.PAGE_TIMESTAMP)
       .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
       .agg(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN, max(PageVisitVariables.PAGE_TIMESTAMP))
       .take(10)
+=======
+      .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
+      .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
+      .filter(PageVisitVariables.PAGE_TIMESTAMP + " IS NOT NULL")
+>>>>>>> 0cd2667
 
-    return dfAppUser
+    // Get user device mapping sorted by time
+    val dfuserDeviceMap = dfAppUser.filter(PageVisitVariables.USER_ID + " IS NOT NULL")
+      .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
+      .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
+      .agg(
+        col(PageVisitVariables.USER_ID),
+        col(PageVisitVariables.BROWSER_ID),
+        col(PageVisitVariables.DOMAIN),
+        max(PageVisitVariables.PAGE_TIMESTAMP)
+      )
+
+    return dfuserDeviceMap
   }
 }

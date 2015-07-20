@@ -32,7 +32,9 @@ class Surf1Test extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
+
     surfDataFrame = sqlContext.read.json("core/src/test/resources/clickstream/surfvariables/surf1-2-6.json")
+
     surfDataFrame.foreach(println)
     userObj = new GroupData(hiveContext, surfDataFrame)
     userObj.calculateColumns()
