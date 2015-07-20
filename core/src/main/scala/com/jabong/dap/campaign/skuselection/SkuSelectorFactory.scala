@@ -8,23 +8,23 @@ import com.jabong.dap.common.constants.campaign.SkuSelection
 class SkuSelectorFactory extends CampaignFactory {
   override def getCustomerSelector(customerType: String): CustomerSelector = ???
 
-  override def getSkuSelector(actionType: String): SkuSelector = {
-    if (actionType == null) {
+  override def getSkuSelector(skuSelectorType: String): SkuSelector = {
+    if (skuSelectorType == null) {
       return null
     }
-    if (actionType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)) {
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)) {
       return new CancelReTarget()
     }
 
-    if (actionType.equalsIgnoreCase(SkuSelection.RETURN_RETARGET)) {
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.RETURN_RETARGET)) {
       return new ReturnReTarget()
     }
 
-    if (actionType.equalsIgnoreCase(SkuSelection.FOLLOW_UP)) {
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.FOLLOW_UP)) {
       return new FollowUp()
     }
 
-    if (actionType.equalsIgnoreCase(SkuSelection.LOW_STOCK)) {
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.LOW_STOCK)) {
       return new LowStock()
     }
 
