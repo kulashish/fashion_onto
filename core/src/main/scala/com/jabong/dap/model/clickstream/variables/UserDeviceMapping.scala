@@ -24,20 +24,33 @@ object UserDeviceMapping {
 
     //Todo: schema attributes or data type mismatch
 
+    // Fetch required columns only and change null userid for apps to _app_{browser_id}
     val dfAppUser = dfUser.select(
 
-      Udf.appUserId(col(PageVisitVariables.USER_ID),  col(PageVisitVariables.DOMAIN), col(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.USER_ID,
+      Udf.appUserId(
+        col(PageVisitVariables.USER_ID),
+        col(PageVisitVariables.DOMAIN),
+        col(PageVisitVariables.BROWSER_ID)
+      ) as PageVisitVariables.USER_ID,
 
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.PAGE_TIMESTAMP)
     )
+      .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
+      .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
+      .filter(PageVisitVariables.PAGE_TIMESTAMP + " IS NOT NULL")
 
-    //Todo: filter null values
-    val dfuserDeviceMap = dfAppUser //.filter("col(PageVisitVariables.USER_ID) != null")
+    // Get user device mapping sorted by time
+    val dfuserDeviceMap = dfAppUser.filter(PageVisitVariables.USER_ID + " IS NOT NULL")
       .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
       .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
-      .agg(col(PageVisitVariables.USER_ID), col(PageVisitVariables.BROWSER_ID), col(PageVisitVariables.DOMAIN), max(PageVisitVariables.PAGE_TIMESTAMP))
+      .agg(
+        col(PageVisitVariables.USER_ID),
+        col(PageVisitVariables.BROWSER_ID),
+        col(PageVisitVariables.DOMAIN),
+        max(PageVisitVariables.PAGE_TIMESTAMP)
+      )
 
     return dfuserDeviceMap
   }
