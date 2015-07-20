@@ -45,13 +45,13 @@ class WishList extends LiveCustomerSelector {
 
     }
 
-    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
-
-      log("schema attributes or data type mismatch")
-
-      return null
-
-    }
+//    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
+//
+//      log("schema attributes or data type mismatch")
+//
+//      return null
+//
+//    }
 
     val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, Constants.DATE_TIME_FORMAT_MS)
 
@@ -73,4 +73,5 @@ class WishList extends LiveCustomerSelector {
 
   override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, inData3: DataFrame): DataFrame = ???
 }

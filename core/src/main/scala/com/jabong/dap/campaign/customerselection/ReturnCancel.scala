@@ -93,4 +93,6 @@ class ReturnCancel extends LiveCustomerSelector {
   override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
 
   override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, inData3: DataFrame): DataFrame = ???
 }

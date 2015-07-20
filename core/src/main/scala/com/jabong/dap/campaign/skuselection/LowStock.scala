@@ -35,4 +35,5 @@ class LowStock extends SkuSelector {
       return filteredSku
   }
 
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 }

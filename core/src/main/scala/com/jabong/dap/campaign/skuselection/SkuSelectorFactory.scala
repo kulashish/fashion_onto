@@ -6,6 +6,7 @@ import com.jabong.dap.campaign.recommendation.Recommender
 import com.jabong.dap.common.constants.campaign.SkuSelection
 
 class SkuSelectorFactory extends CampaignFactory {
+
   override def getCustomerSelector(customerType: String): CustomerSelector = ???
 
   override def getSkuSelector(skuSelectorType: String): SkuSelector = {
@@ -32,4 +33,5 @@ class SkuSelectorFactory extends CampaignFactory {
   }
 
   override def getRecommender(recType: String): Recommender = ???
+
 }

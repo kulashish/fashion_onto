@@ -18,11 +18,11 @@ class ACart extends LiveCustomerSelector with Logging {
       return null
       logger.error("sales cart data is null ")
     }
-    val acartCustomers = salesCartData.filter(ACartVariables.ACART_STATUS + "= active")
-      .select(ACartVariables.FK_CUSTOMER
-        ,ACartVariables.SKU_SIMPLE
-        ,ACartVariables.CREATED_AT
-        ,ACartVariables.UPDATED_AT)
+    val acartCustomers = salesCartData.filter(ACartVariables.ACART_STATUS + " = 'active'")
+      .select(salesCartData(ACartVariables.FK_CUSTOMER)
+        ,salesCartData(ACartVariables.SKU_SIMPLE) as (ProductVariables.SKU_SIMPLE)
+        ,salesCartData(ACartVariables.CREATED_AT)
+        ,salesCartData(ACartVariables.UPDATED_AT))
 
 
     val acartCustomerNotBought = CampaignUtils.skuNotBought(acartCustomers,salesOrder,salesOrderItemData)

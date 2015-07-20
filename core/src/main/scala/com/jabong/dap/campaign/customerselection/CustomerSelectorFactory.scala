@@ -23,6 +23,11 @@ class CustomerSelectorFactory extends CampaignFactory {
       return new Invalid()
     }
 
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.ACART)) {
+      return new ACart()
+    }
+
+
     return null
   }
 

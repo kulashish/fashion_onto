@@ -23,5 +23,7 @@ class ItemOnDiscount extends SkuSelector {
 
   // not needed
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 }
 
