@@ -48,7 +48,7 @@ class getHistoricalData extends java.io.Serializable {
     }
 
     for (day <- 1 to currMonthYear.day - 1) {
-      println("till date: " + (currMonthYear.day - 1))
+      //      println("till date: " + (currMonthYear.day - 1))
       val mnthStr = PathBuilder.withLeadingZeros(currMonthYear.month + 1)
       val yr = currMonthYear.year.toString
       val start = yr + "-" + mnthStr + "-" + PathBuilder.withLeadingZeros(day) + " " + Constants.START_TIME

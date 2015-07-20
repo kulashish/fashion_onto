@@ -1,10 +1,7 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesAddressVariables }
-
-import org.apache.spark.SparkConf
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderVariables }
 import org.apache.spark.sql.DataFrame
 
 /**
