@@ -18,14 +18,25 @@ class GroupData (hiveContext: HiveContext, pagevisit: DataFrame) extends java.io
   var brand = 0
   var domain = 0
   var actualvisitid, visitts, uid, browserid, productsku = 0
+  var useridDeviceidFrame:DataFrame
 
+  def mergeAppsDeviceIdUserId():DataFrame ={
+    useridDeviceidFrame = pagevisit.sqlContext.sql("select coalesce(userid,concat('_app_',bid))as appuserid, userid, bid from merge.app where ")
+  }
   def groupDataByUser(): RDD[(String, Row)] = {
     pagevisit.as('pagevisit)
   //  val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is not null")
     //  .map(x => (x(uid).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
-    val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null and userid is not null")
+    val ug:RDD[(String, Row)] = pagevisit.filter("pagets is not null")
       .map(x => (x(uid).toString,x))
     return ug
+  }
+
+  def surfVariableData(): RDD[(Any, Row)] = {
+    pagevisit.as('pagevisit)
+    val br:RDD[(Any, Row)] = pagevisit.filter("pagets is not null").map(x => (x(uid),x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+      //map(x => ((if((x(uid)==null) && (x(domain).toString=="android" ||x(domain).toString=="ios" ||x(domain).toString=="windows" )) "_app_"+x(browserid).toString else x(uid)).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+    return br
   }
 
   def calculateColumns(): Unit =
