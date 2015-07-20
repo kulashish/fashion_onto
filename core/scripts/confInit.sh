@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 
 # copy config in a hdfs
