@@ -4,10 +4,9 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.data.read.DataReader
 
 /**
- * Created by geek on 12/06/15.
+ * Data sources for ITR
  */
 object Model {
-
   val config = DataReader.getDataFrame("bob", "catalog_config", "full")
 
   val simple = DataReader.getDataFrame("bob", "catalog_simple", "full")
@@ -24,7 +23,7 @@ object Model {
 
   val category = Spark.getContext().broadcast(DataReader.getDataFrame("bob", "catalog_category", "full"))
 
-  val categoryMapping = Spark.getSqlContext().read.parquet("bob", "catalog_config_has_catalog_category", "full")
+  val categoryMapping = DataReader.getDataFrame("bob", "catalog_config_has_catalog_category", "full")
 
-  val itemMaster = DataReader.getDataFrame("erp", "item_master", "full")
+  val itemMaster = DataReader.getDataFrame("erp", "item_master_complete_dump", "full")
 }
