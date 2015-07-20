@@ -234,7 +234,7 @@ object UdfUtils {
 
     val time = t1.toString()
 
-    return Timestamp.valueOf(time.substring(0, time.indexOf(" ")) + " 00:00:00.0")
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.START_TIME_MS)
   }
 
   /**

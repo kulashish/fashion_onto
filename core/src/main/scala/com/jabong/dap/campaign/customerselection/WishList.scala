@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
+import java.sql.Timestamp
+
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
@@ -57,11 +59,13 @@ class WishList extends LiveCustomerSelector with Logging {
 
     val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, Constants.DATE_TIME_FORMAT_MS)
 
+    val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
+
     //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
     val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
       //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
       CustomerProductShortlistVariables.REMOVED_AT + " is null and " +
-      CustomerProductShortlistVariables.CREATED_AT + " >= " + "'" + dateBeforeNdays + "'")
+      CustomerProductShortlistVariables.CREATED_AT + " >= " + "'" + startTimestamp + "'")
       .select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),

@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -76,6 +77,36 @@ class WishListTest extends FlatSpec with SharedSparkContext {
       .limit(30).collect().toSet
 
     assert(result.equals(dfCustomerProductShortlistResult))
+  }
+
+  "customerSelection: Timestamp" should "Today" in {
+
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+
+    val date = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT)
+
+    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date)).toInt
+
+    val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
+
+    assert(result == null)
+
+  }
+
+  "customerSelection:result length" should "8" in {
+
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+
+    val date = format.parse("2015-07-10 16:20:20.2")
+
+    val ndays = TimeUtils.daysFromToday(date).toInt
+
+    val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
+    //      .limit(30).collect().toSet
+
+    //                                  result.limit(30).write.json(DataSets.TEST_RESOURCES + DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST + ".json")
+
+    assert(result.count() == 8)
   }
 
 }
