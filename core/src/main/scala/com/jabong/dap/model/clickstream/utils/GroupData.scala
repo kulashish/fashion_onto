@@ -28,6 +28,13 @@ class GroupData (hiveContext: HiveContext, pagevisit: DataFrame) extends java.io
     return ug
   }
 
+  def surfVariableData(): RDD[(Any, Row)] = {
+    pagevisit.as('pagevisit)
+    val br:RDD[(Any, Row)] = pagevisit.filter("pagets is not null").map(x => (x(uid),x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+      //map(x => ((if((x(uid)==null) && (x(domain).toString=="android" ||x(domain).toString=="ios" ||x(domain).toString=="windows" )) "_app_"+x(browserid).toString else x(uid)).toString,x)).partitionBy(new org.apache.spark.HashPartitioner(32)).persist()
+    return br
+  }
+
   def calculateColumns(): Unit =
   {
     val res = pagevisit.columns

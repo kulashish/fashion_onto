@@ -34,7 +34,7 @@ object GetSurfVariables extends java.io.Serializable {
     return joinResult
   }
 
-  def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, yesterDate:String): DataFrame ={
+  def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, yesterDate:String): DataFrame = {
     import hiveContext.implicits._
     val format = new java.text.SimpleDateFormat("dd/MM/yyyy")
     val ft = new java.text.SimpleDateFormat("dd-MM-YYYY")
@@ -44,14 +44,14 @@ object GetSurfVariables extends java.io.Serializable {
     var dt = 0
     for (i <- 1 to (col.length - 1)) {
       if (col(i) == "userid")
-      userid = i
+        userid = i
       else if (col(i) == "skuList")
-      skuList = i
+        skuList = i
       else if (col(i) == "dt")
-      dt = i
+        dt = i
     }
-    val yesterMerge = mergedData.map(x=> (x(userid),x(dt),x(skuList),TimeUtils.daysBetweenTwoDates(format.parse(yesterDate),format.parse(x(dt).toString)).toInt))
-      .filter(x=>x._4<29).map(x=>(x._1.toString,x._2.toString,x._3.toString)).toDF("userid", "dt", "skuList")
+    val yesterMerge = mergedData.map(x => (x(userid), x(dt), x(skuList), TimeUtils.daysBetweenTwoDates(format.parse(yesterDate), format.parse(x(dt).toString)).toInt))
+      .filter(x => x._4 < 29).map(x => (x._1.toString, x._2.toString, x._3.toString)).toDF("userid", "dt", "skuList")
 
     val IncrementalMerge = incremental.map(t => (t(0).toString, t(1).toString))
       .reduceByKey((x, y) => (x + "," + y))
@@ -59,4 +59,19 @@ object GetSurfVariables extends java.io.Serializable {
       .toDF("userid", "dt", "skuList")
     return yesterMerge.unionAll(IncrementalMerge)
   }
+    def variableSurf1(GroupedData: RDD[(Any, Row)], UserObj: GroupData): RDD[((String),String)] = {
+      //def variableSurf1(GroupedData: RDD[(String, Row)], UserObj: GroupData): RDD[(String, Row)] = {
+      val actualvisitid = UserObj.actualvisitid
+      val productsku = UserObj.productsku
+      val domain = UserObj.domain
+      val browserid = UserObj.browserid
+      val userid = UserObj.uid
+      val a = GroupedData.filter((x => x._2(UserObj.productsku) != null))
+      val b = a.map(x => ((if((x._2(userid)==null) && (x._2(domain).toString=="android"||x._2(domain).toString=="ios"||x._2(domain).toString=="windows"))"_app_"+x._2(browserid) else x._2(userid), x._2(actualvisitid), x._2(browserid), x._2(domain)).toString, x._2(productsku).toString))
+      //map(x => ((if((x(uid)==null) && (x(domain).toString=="android" ||x(domain).toString=="ios" ||x(domain).toString=="windows" )) "_app_"+x(browserid).toString else x(uid)).toString,x))
+      //val b=a.map(x=>((if ((x._2(UserObj.domain))=="w" || ((x._2(UserObj.domain))=="m")) x._2(UserObj.uid) else "_app_"+x._2(UserObj.browserid),x._2(UserObj.actualvisitid),x._2(UserObj.browserid),x._2(UserObj.domain)),x._2(UserObj.productsku)))
+      val c = b.reduceByKey((x, y) => (x + "," + y))
+      return c
+    }
+
 }
