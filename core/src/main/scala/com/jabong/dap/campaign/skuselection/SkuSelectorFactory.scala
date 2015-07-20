@@ -29,6 +29,10 @@ class SkuSelectorFactory extends CampaignFactory {
       return new LowStock()
     }
 
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.ITEM_ON_DISCOUNT)) {
+      return new ItemOnDiscount()
+    }
+
     return null
   }
 

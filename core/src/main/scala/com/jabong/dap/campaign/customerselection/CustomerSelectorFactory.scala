@@ -27,6 +27,10 @@ class CustomerSelectorFactory extends CampaignFactory {
       return new ACart()
     }
 
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.WISH_LIST)) {
+      return new WishList()
+    }
+
     return null
   }
 
