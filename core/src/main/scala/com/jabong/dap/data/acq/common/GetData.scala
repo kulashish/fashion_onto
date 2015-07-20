@@ -56,8 +56,10 @@ object GetData extends Logging {
     } else {
       val minMax = GetMinMaxPK.getMinMax(dbConn, condition)
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
-      if (minMax.min == 0 && minMax.max == 0)
+      if (minMax.min == 0 && minMax.max == 0) {
+        println("Data for the given date and table is null: " + dbTableQuery)
         return null
+      }
       context.read.jdbc(
         dbConn.getConnectionString,
         dbTableQuery,
@@ -69,11 +71,12 @@ object GetData extends Logging {
       )
     }
 
-    jdbcDF.printSchema()
+//    jdbcDF.printSchema()
     val columnList = jdbcDF.columns
     val newColumnList = columnList.map(cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
+    println("Data written successfully using query: " + dbTableQuery)
   }
 }
