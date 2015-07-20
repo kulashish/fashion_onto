@@ -59,4 +59,5 @@ object GetSurfVariables extends java.io.Serializable {
       .toDF("userid", "dt", "skuList")
     return yesterMerge.unionAll(IncrementalMerge)
   }
+
 }
