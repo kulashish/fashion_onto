@@ -30,7 +30,7 @@ object PathBuilder {
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
         "%s/%s/%s/monthly/%s/%s/%s"
-          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
+          .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
             withLeadingZeros(end.get(Calendar.DATE)))
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
@@ -43,7 +43,7 @@ object PathBuilder {
           start.setTime(format.parse(rangeStart))
           end.setTime(format.parse(rangeEnd))
           "%s/%s/%s/daily/%s/%s/%s"
-            .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
+            .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
               withLeadingZeros(end.get(Calendar.DATE)))
         }
       case "hourly" =>
@@ -53,8 +53,8 @@ object PathBuilder {
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
         "%s/%s/%s/hourly/%s/%s/%s/%s"
-          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
-            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+          .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
+            withLeadingZeros(end.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
       case _ => ""
     }
   }
