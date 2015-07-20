@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.skuselection
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.constants.variables.{ ItrVariables, CustomerProductShortlistVariables }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
@@ -25,33 +25,15 @@ class ItemOnDiscount extends SkuSelector with Logging {
   //
   // dfCustomerProductShortlist =  [(id_customer, sku, sku simple)]
   // itr30dayData = [(skusimple, date, special price)]
-  override def skuFilter(dfCustomerProductShortlist: DataFrame, df30DaysItrData: DataFrame, campaignName: String): DataFrame = {
+  override def skuFilter(customerSelected: DataFrame, df30DaysItrData: DataFrame, campaignName: String): DataFrame = {
 
-    if (dfCustomerProductShortlist == null || df30DaysItrData == null) {
+    if (customerSelected == null || df30DaysItrData == null) {
 
       logger.error("Data frame should not be null")
 
       return null
 
     }
-
-    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.resultCustomerProductShortlist) ||
-      !SchemaUtils.isSchemaEqual(df30DaysItrData.schema, Schema.itr)) {
-
-      logger.error("schema attributes or data type mismatch")
-
-      return null
-
-    }
-
-    val customerProductShortlist = dfCustomerProductShortlist.select(
-      col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU),
-      col(CustomerProductShortlistVariables.CREATED_AT),
-      col(CustomerProductShortlistVariables.SIMPLE_SKU),
-      col(CustomerProductShortlistVariables.PRICE)
-    )
 
     val itr30dayData = df30DaysItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
@@ -69,13 +51,20 @@ class ItemOnDiscount extends SkuSelector with Logging {
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
 
-    val dfSku = shortListSkuFilter(customerProductShortlist, dfYesterdayItrData, itr30dayData)
+    val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
 
-    val dfSkuSimple = shortListSkuSimpleFilter(customerProductShortlist, dfYesterdayItrData)
+    val join30DaysDf = getJoinDF(customerSelected, irt30Day)
 
-    val dfUnion = dfSku.unionAll(dfSkuSimple)
+    //join yesterdayItrData and joinDf on the basis of SKU
+    //filter on the basis of SPECIAL_PRICE
+    val dfResult = join30DaysDf.join(dfYesterdayItrData, join30DaysDf(ProductVariables.SKU_SIMPLE) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SIMPLE_SKU))
+      .filter(join30DaysDf(ItrVariables.SPECIAL_PRICE) + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
+      .select(
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerVariables.EMAIL),
+        col(ProductVariables.SKU_SIMPLE))
 
-    dfUnion
+    return dfResult
   }
 
   /**

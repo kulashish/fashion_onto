@@ -6,6 +6,7 @@ import java.util.{ Date }
 
 import com.jabong.dap.common.ArrayUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.codehaus.jettison.json.JSONArray
 
@@ -252,11 +253,19 @@ object UdfUtils {
     if (extraData.length() < 10)
       return null
 
-    val jsonExtraData = parse(extraData)
+    var simple_sku: String = null
 
-    val simple_sku = compact(render(jsonExtraData \ "simple_sku")).replaceAll("^\"|\"$", "")
+    try {
+      val jsonExtraData = parse(extraData)
 
-    if (simple_sku.length() < 10)
+      simple_sku = compact(render(jsonExtraData \ "simple_sku")).replaceAll("^\"|\"$", "")
+    } catch {
+      case ex: ParseException => {
+        ex.printStackTrace()
+        return null
+      }
+    }
+    if (simple_sku == null || simple_sku.length() < 10)
       return null
 
     return simple_sku
@@ -275,11 +284,21 @@ object UdfUtils {
     if (extraData.length() < 10)
       return 0
 
-    val jsonExtraData = parse(extraData)
+    var priceString: String = null
+    try {
+      val jsonExtraData = parse(extraData)
 
-    val price = compact(render(jsonExtraData \ "price")).replaceAll("^\"|\"$", "")
+      priceString = compact(render(jsonExtraData \ "price")).replaceAll("^\"|\"$", "")
+    } catch {
+      case ex: ParseException => {
+        ex.printStackTrace()
+        return 0
+      }
+    }
+    if (priceString == null || priceString.length() < 1)
+      return 0
 
-    return price.toDouble
+    return priceString.toDouble
 
   }
 

@@ -108,34 +108,34 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   }
 
   //=====================================skuFilter()=====================================================
-  "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
+  //  "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
+  //
+  //    val result = itemOnDiscount.skuFilter(null, null, null)
+  //
+  //    assert(result == null)
+  //
+  //  }
+  //
+  //  "skuFilter: schema attributes and data type" should
+  //    "match into dfCustomerProductShortlist and dfItr30DayData" in {
+  //
+  //      val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
+  //      assert(result != null)
+  //
+  //    }
 
-    val result = itemOnDiscount.skuFilter(null, null, null)
-
-    assert(result == null)
-
-  }
-
-  "skuFilter: schema attributes and data type" should
-    "match into dfCustomerProductShortlist and dfItr30DayData" in {
-
-      val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
-      assert(result != null)
-
-    }
-
-  "skuFilter: Data Frame" should "match to resultant Data Frame" in {
-
-    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
-      .limit(30).collect().toSet
-
-    //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")
-
-    //    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" +  DataSets.ITEM_ON_DISCOUNT, "result_sku_filter", Schema.resultSkuSimpleFilter)
-    //      .collect().toSet
-
-    assert(result != null)
-
-  }
+  //  "skuFilter: Data Frame" should "match to resultant Data Frame" in {
+  //
+  //    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
+  //      .limit(30).collect().toSet
+  //
+  //    //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")
+  //
+  //    //    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" +  DataSets.ITEM_ON_DISCOUNT, "result_sku_filter", Schema.resultSkuSimpleFilter)
+  //    //      .collect().toSet
+  //
+  //    assert(result != null)
+  //
+  //  }
 
 }

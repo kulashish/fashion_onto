@@ -74,7 +74,7 @@ class LowStock extends SkuSelector with Logging {
       "inner"
     )
 
-    val dfFilter = dfJoin.filter(ItrVariables.AVERAGE_STOCK + " <= " + "10")
+    val dfFilter = dfJoin.filter(ItrVariables.AVERAGE_STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
 
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
@@ -84,6 +84,52 @@ class LowStock extends SkuSelector with Logging {
 
     return dfResult
   }
+
+  def shortListSkuSimpleFilter(dfCustomerProductShortlist: DataFrame, dfItrData: DataFrame): DataFrame = {
+
+    if (dfCustomerProductShortlist == null || dfItrData == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
+
+    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.resultCustomerProductShortlist) ||
+      !SchemaUtils.isSchemaEqual(dfItrData.schema, Schema.itr)) {
+
+      logger.error("schema attributes or data type mismatch")
+
+      return null
+    }
+    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.select(
+      CustomerProductShortlistVariables.FK_CUSTOMER,
+      CustomerProductShortlistVariables.EMAIL,
+      CustomerProductShortlistVariables.SIMPLE_SKU
+    )
+
+    val itrData = dfItrData.select(
+      col(ItrVariables.SIMPLE_SKU) as ItrVariables.ITR_ + ItrVariables.SIMPLE_SKU,
+      col(ItrVariables.STOCK)
+    )
+
+    val dfJoin = skuSimpleCustomerProductShortlist.join(
+      itrData,
+      skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SIMPLE_SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SIMPLE_SKU),
+      "inner"
+    )
+
+    val dfFilter = dfJoin.filter(ItrVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
+
+    val dfResult = dfFilter.select(
+      col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.EMAIL),
+      col(CustomerProductShortlistVariables.SIMPLE_SKU)
+    )
+
+    return dfResult
+  }
+
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 
 }
