@@ -1,10 +1,7 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesAddressVariables }
-
-import org.apache.spark.SparkConf
+import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderVariables}
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -32,7 +29,7 @@ object SalesOrderAddress {
    * @return
    */
   def getFav(favData: DataFrame): DataFrame = {
-    val mapCity = favData.map(s => (s(0) -> (s(1).toString, s(2).toString,s(3).toString+", "+s(4).toString)))
+    val mapCity = favData.map(s => (s(0) -> (s(1).toString, s(2).toString, s(3).toString + ", " + s(4).toString)))
     val grouped = mapCity.groupByKey()
     val x = grouped.map(s => (s._1.toString, findMax(s._2.toList)))
     return Spark.getSqlContext().createDataFrame(x)

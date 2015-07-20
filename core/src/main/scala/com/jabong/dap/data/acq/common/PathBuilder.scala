@@ -44,7 +44,7 @@ object PathBuilder {
           end.setTime(format.parse(rangeEnd))
           "%s/%s/%s/daily/%s/%s/%s_%s"
             .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-              withLeadingZeros(end.get(Calendar.DATE)))
+              withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
         }
       case "hourly" =>
         val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
