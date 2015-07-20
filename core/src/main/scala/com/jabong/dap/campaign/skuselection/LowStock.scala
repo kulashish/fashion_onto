@@ -84,6 +84,6 @@ class LowStock extends SkuSelector with Logging {
 
     return dfResult
   }
- override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 
 }
