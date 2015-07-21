@@ -28,62 +28,28 @@ object SurfVariablesMain extends java.io.Serializable {
     val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     var dt = dateFormat.format(cal.getTime())
     val tablename = args(0)
-    val currentMergedDataPath = args(2)+"/"+year+"/"+month+"/"+day+"/Surf3mergedData"
+    val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
+    val currentMergedDataPath = args(1)+"/"+year+"/"+month+"/"+day+"/Surf3mergedData"
+    var processedVariablePath = args(2)+"/"+year+"/"+month+"/"+day+"/Surf3ProcessedVariable"
     cal.add(Calendar.DATE, -1);
     year = cal.get(Calendar.YEAR);
     day = cal.get(Calendar.DAY_OF_MONTH);
     month = mFormat.format(cal.getTime());
     var oldMergedDataPath = args(1)+"/"+year+"/"+month+"/"+day+"/Surf3mergedData"
-    val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
-
     var sqlContext = Spark.getSqlContext()
     var oldMergedData = hiveContext.parquetFile(oldMergedDataPath)
     val today = "_daily"
     var UserObj = new GroupData(hiveContext, pagevisit)
-    UserObj.calculateColumns()
-
-    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByUser()
-
+    var useridDeviceidFrame = UserObj.appuseridCreation()
+    UserObj.calculateColumns(useridDeviceidFrame)
+    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(useridDeviceidFrame)
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
-
     var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData,incremental)
-
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext,oldMergedData,incremental,dt)
     mergedData.saveAsParquetFile(currentMergedDataPath)
+    incremental.save(processedVariablePath)
 
-
-
-
-    //val browserWiseData: RDD[(String, Row)] = UserObj.groupDataByBrowser()
-    val surfVariableData: RDD[(Any, Row)] = UserObj.surfVariableData()
-    //var surf3 = VariableMethods.Surf3(userWiseData, pagevisit, UserObj, hiveContext)
-    //var variableSurfUserwise=VariableMethods.variableSurf1(surfVariableData,UserObj)
-    var variableSurfFinal=GetSurfVariables.variableSurf1(surfVariableData,UserObj)
-
-    val finalUidDeviceid = GetSurfVariables.uidToDeviceid(hiveContext).write.save(args(1))
-    //val finalSurf1Data=variableSurfUserwise.union(variableSurfBrowserwise)
-    //variableSurfFinal.saveAsTextFile(args(1))
-  }
-
-
-
-    //val finalSurf1Data=variableSurfUserwise.union(variableSurfBrowserwise)
-    variableSurfFinal.saveAsTextFile(args(1))
-
-  /*def relpaceNullUserid(GroupedData: RDD[(String, Row)]): RDD[((Any,Any,Any,Any),Any)] = {
-    val a = GroupedData.filter((x => x._2(UserObj.productsku) != null))
-    val b = a.map(x => ((x._2(userid), x._2(actualvisitid), x._2(browserid), x._2(domain)), x._2(productsku)))
-    val c = b.reduceByKey((x, y) => (x + "," + y))
-    return c
-  }
-  */
-  def coalesce(id1: Any, id2: Any): String = {
-    if (id1 == null)
-      return id2.toString
-    else
-      return id1.toString
-  }
-  //def fullName: String = ClickstreamConstants.database + "." + ClickstreamConstants.tablename
+    }
 
 }
 

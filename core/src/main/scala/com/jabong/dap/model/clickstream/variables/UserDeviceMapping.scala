@@ -37,7 +37,7 @@ object UserDeviceMapping {
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.PAGE_TIMESTAMP)
     )
-      .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
+     .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
       .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
       .filter(PageVisitVariables.PAGE_TIMESTAMP + " IS NOT NULL")
 

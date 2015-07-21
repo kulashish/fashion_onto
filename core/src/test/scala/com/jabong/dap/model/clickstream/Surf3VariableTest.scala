@@ -13,7 +13,7 @@ import org.apache.spark.sql.hive.HiveContext
 /**
  * Created by Divya on 14/7/15.
  */
-class Surf3DailyIncrementTest extends FlatSpec with SharedSparkContext {
+class Surf3VariableTest extends FlatSpec with SharedSparkContext {
   @transient var sqlContext: SQLContext = _
   @transient var pagevisitDataFrame: DataFrame = _
   @transient var userObj: GroupData = _
@@ -28,22 +28,27 @@ class Surf3DailyIncrementTest extends FlatSpec with SharedSparkContext {
     sqlContext = Spark.getSqlContext()
     pagevisitDataFrame = sqlContext.read.json("src/test/resources/clickstream/pagevisitSingleUser.json")
     YesterMergedData = sqlContext.read.json("src/test/resources/clickstream/Surf3MergedData")
-    userObj = new GroupData(hiveContext, pagevisitDataFrame)
-    userWiseData = userObj.groupDataByUser()
-    userObj.calculateColumns()
   }
 
   "DailyIncremetal for surf3" should "have 12 unique PDP records " in {
     var today = "_daily"
+    userObj = new GroupData(hiveContext, pagevisitDataFrame)
+    userObj.calculateColumns(pagevisitDataFrame)
+    userWiseData = userObj.groupDataByAppUser(pagevisitDataFrame)
+
     dailyIncrementalSKUs = GetSurfVariables.Surf3Incremental(userWiseData, userObj, hiveContext)
     assert(dailyIncrementalSKUs.count() == 12)
   }
+
 
   "merged data " should "have onlu 2 skus matching in 2-30 days" in {
     var surf3Variable = GetSurfVariables.ProcessSurf3Variable(YesterMergedData,dailyIncrementalSKUs)
     assert(surf3Variable.count() == 2)
   }
 
+  /**
+   * Today's merge should only have the data for last 29 days and should filyet out the data before that
+    */
   "Today's merge" should "have 5 rows" in {
     var mergeForTom = GetSurfVariables.mergeSurf3Variable(hiveContext,YesterMergedData,dailyIncrementalSKUs,"18/07/2015")
     assert(mergeForTom.count() == 5)
