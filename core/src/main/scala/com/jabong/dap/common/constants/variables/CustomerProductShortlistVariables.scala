@@ -20,5 +20,7 @@ object CustomerProductShortlistVariables {
   val USER_DEVICE_TYPE = "user_device_type"
   val PRICE = "price"
   val AVERAGE_PRICE = "average_price"
+  val SKU_SIMPLE = "sku_simple"
+  val SPECIAL_PRICE = "special_price"
 
 }

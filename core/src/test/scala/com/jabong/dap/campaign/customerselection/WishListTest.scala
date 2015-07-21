@@ -71,7 +71,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
       .limit(30).collect().toSet
 
-    //                                  result.limit(30).write.json(DataSets.TEST_RESOURCES + DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST + ".json")
+    //                                      result.limit(30).write.json(DataSets.TEST_RESOURCES + DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST + ".json")
 
     val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
       .limit(30).collect().toSet
@@ -97,7 +97,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
 
-    val date = format.parse("2015-07-10 16:20:20.2")
+    val date = format.parse("2015-07-10 00:00:00.0")
 
     val ndays = TimeUtils.daysFromToday(date).toInt
 

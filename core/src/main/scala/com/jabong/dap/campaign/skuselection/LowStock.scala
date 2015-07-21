@@ -104,17 +104,17 @@ class LowStock extends SkuSelector with Logging {
     val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
       CustomerProductShortlistVariables.EMAIL,
-      CustomerProductShortlistVariables.SIMPLE_SKU
+      CustomerProductShortlistVariables.SKU_SIMPLE
     )
 
     val itrData = dfItrData.select(
-      col(ItrVariables.SIMPLE_SKU) as ItrVariables.ITR_ + ItrVariables.SIMPLE_SKU,
+      col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
       col(ItrVariables.STOCK)
     )
 
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       itrData,
-      skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SIMPLE_SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SIMPLE_SKU),
+      skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
       "inner"
     )
 
@@ -123,7 +123,7 @@ class LowStock extends SkuSelector with Logging {
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SIMPLE_SKU)
+      col(CustomerProductShortlistVariables.SKU_SIMPLE)
     )
 
     return dfResult

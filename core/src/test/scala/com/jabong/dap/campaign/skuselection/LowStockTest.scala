@@ -4,13 +4,11 @@ package com.jabong.dap.campaign.skuselection
  * Created by raghu on 18/7/15.
  */
 import com.jabong.dap.common.SharedSparkContext
-import com.jabong.dap.common.constants.variables.ItrVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
-import org.apache.spark.sql.functions._
 
 /**
  * Created by raghu on 17/7/15.
