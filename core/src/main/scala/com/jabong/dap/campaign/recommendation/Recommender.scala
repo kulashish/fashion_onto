@@ -75,6 +75,7 @@ trait Recommender extends java.io.Serializable {
     if (data == null || days < 0 || column == null) {
       return null
     }
+    //FIXME:change unix time stamp to last day function in campaign utils
     val lastDaysData = data.filter("(unix_timestamp() -unix_timestamp(" + column + ",'yyyy-MM-dd HH:mm:ss.S'))/60/60/24<" + days)
     return lastDaysData
   }
