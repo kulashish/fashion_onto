@@ -137,3 +137,31 @@ object AcqImportInfo {
 
 }
 
+
+//FIXME:need to check which one to use
+//case class for campaign List
+case class CampaignDetail (
+                            campaignName: String,
+                            priority: Int,
+                            mailType: Int)
+
+//case class CampaignList (
+//                                pushCampaignList: List[CampaignDetail]) extends EmptyClass
+
+/**
+ *
+ * @param pushBasePath
+ * @param pushCampaignList
+ */
+//case class for campaignConfig expects path and campaign List
+case class CampaignConfig(
+                           var pushBasePath: String,
+                           var pushCampaignList: List[CampaignDetail])
+
+
+object CampaignInfo {
+  var campaignJobInfo: String = null
+  var campaigns: CampaignConfig = null
+}
+
+
