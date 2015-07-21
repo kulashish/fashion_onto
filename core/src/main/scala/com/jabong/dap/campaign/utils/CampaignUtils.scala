@@ -51,6 +51,8 @@ object CampaignUtils extends Logging {
 
   val currentDaysDifference = udf((date: String) => currentTimeDiff(date: String, "days"))
 
+  val lastDayTimeDifference = udf((date: String) => lastDayTimeDiff(date: String, "days"))
+
   /**
    * To calculate difference between current time and date provided as argument either in days, minutes hours
    * @param date
@@ -165,7 +167,7 @@ object CampaignUtils extends Logging {
     val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
 
     var successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
-      .select(salesOrder(SalesOrderVariables.FK_CUSTOMER), successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), successFulOrderItems(ProductVariables.SKU), successFulOrderItems(SalesOrderItemVariables.UPDATED_AT))
+      .select(salesOrder(SalesOrderVariables.FK_CUSTOMER), successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), successFulOrderItems(ProductVariables.SKU), successFulOrderItems(SalesOrderItemVariables.CREATED_AT))
 
     val customerSuccessfulItemsSchema = successfulSalesData.schema
 
