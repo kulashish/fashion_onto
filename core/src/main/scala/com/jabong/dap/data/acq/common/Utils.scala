@@ -54,7 +54,6 @@ case class TableInfo(
  * @param primaryKey String The primary key of the table.
  * @param mergeMode String The mode of the data merge.
  * @param mergeDate String The date for the merge data is to be run.
- * @param saveFormat String The Format in which the data will be found and saved after the merge.
  * @param saveMode String The mode in which the data is to be saved. (Can be overwrite, append, error or ignore)
  */
 
@@ -64,7 +63,6 @@ case class MergeInfo(
   primaryKey: String,
   mergeMode:  String,
   mergeDate:  String,
-  saveFormat: String,
   saveMode:   String
 )
 
