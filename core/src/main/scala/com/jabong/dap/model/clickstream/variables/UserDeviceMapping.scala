@@ -46,10 +46,7 @@ object UserDeviceMapping {
       .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
       .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
       .agg(
-        col(PageVisitVariables.USER_ID),
-        col(PageVisitVariables.BROWSER_ID),
-        col(PageVisitVariables.DOMAIN),
-        max(PageVisitVariables.PAGE_TIMESTAMP)
+        max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
       )
 
     return dfuserDeviceMap

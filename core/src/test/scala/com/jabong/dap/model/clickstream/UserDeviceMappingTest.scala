@@ -10,12 +10,14 @@ import org.scalatest.FlatSpec
 class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
-  @transient var userDeviceDf: DataFrame = _
+  @transient var dfInputUserDeviceMap: DataFrame = _
+  @transient var dfOutputUserDeviceMap: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    userDeviceDf = sqlContext.read.json(DataSets.TEST_RESOURCES + DataSets.CLICKSTREAM + "/userDeviceMapping.json")
+    dfInputUserDeviceMap = sqlContext.read.json(DataSets.TEST_RESOURCES + DataSets.CLICKSTREAM + "/userDeviceMappingInput.json")
+    dfOutputUserDeviceMap = sqlContext.read.json(DataSets.TEST_RESOURCES + DataSets.CLICKSTREAM + "/userDeviceMappingOutput.json")
   }
 
   "getUserDeviceMap: (null)" should " be null " in {
@@ -24,8 +26,13 @@ class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
   }
 
   "getUserDeviceMap: (DF)" should "have 16 records only " in {
-    var udMap = UserDeviceMapping.getUserDeviceMap(userDeviceDf)
+    var udMap = UserDeviceMapping.getUserDeviceMap(dfInputUserDeviceMap)
     assert(udMap.collect.size == 16)
+  }
+
+  "getUserDeviceMap: (DF)" should " match the output DF" in {
+    var udMap = UserDeviceMapping.getUserDeviceMap(dfInputUserDeviceMap).collect().toSet()
+    assert(udMap.equals(dfOutputUserDeviceMap.collect().toSet()) == true)
   }
 
 }
