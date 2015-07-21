@@ -25,7 +25,7 @@ object GetData extends Logging {
     val saveMode = tableInfo.saveMode
 
     if (saveMode.equals("ignore")) {
-      if (DataVerifier.hdfsDataExists(savePath)) {
+      if (DataVerifier.dataExists(savePath)) {
         logger.info("File Already exists: " + savePath)
         println("File Already exists so not doing anything: " + savePath)
         return
