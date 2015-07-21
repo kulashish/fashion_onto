@@ -43,12 +43,12 @@ object DataReader extends Logging {
     require(mode != null, "Mode is null")
 
     try {
-      fetchDataFrame(source, tableName, mode, TimeUtils.getTodayDate(Constants.DATE_FORMAT_FOLDER))
+      fetchDataFrame(source, tableName, mode, TimeUtils.getTodayDate(Constants.DATE_FORMAT))
     } catch {
       case e: DataNotFound =>
         logger.info("Data not found for the given table and source for today's date. Trying to fetch for yesterday's data.")
         try {
-          fetchDataFrame(source, tableName, mode, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER))
+          fetchDataFrame(source, tableName, mode, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT))
         } catch {
           case e: DataNotFound =>
             logger.error("Data not found for the given table and source for yesterday's date")
