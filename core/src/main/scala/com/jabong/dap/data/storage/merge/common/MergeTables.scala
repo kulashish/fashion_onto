@@ -2,10 +2,10 @@ package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
 
-import com.jabong.dap.common.time.{Constants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common._
-import com.jabong.dap.data.read.{FormatResolver, ValidFormatNotFound}
+import com.jabong.dap.data.read.{ FormatResolver, ValidFormatNotFound }
 import grizzled.slf4j.Logging
 
 /**
@@ -25,16 +25,15 @@ object MergeTables extends Logging {
     val source = mergeInfo.source
     val tableName = mergeInfo.tableName
     // If the incremental date is null than it is assumed that it will be yesterday's date.
-    val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1,Constants.DATE_FORMAT_FOLDER))
-                              .replaceAll("-",File.separator)
+    val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER))
+      .replaceAll("-", File.separator)
 
     // If incremental Data Mode is null then we assume that it will be "daily"
     val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, "daily")
 
     // If full Data date is null then we assume that it will be day before the Incremental Data's date.
-    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, TimeUtils.getDateAfterNDays(-1,Constants.DATE_FORMAT_FOLDER, incrDate))
-                                  .replaceAll("-",File.separator)
-
+    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, incrDate))
+      .replaceAll("-", File.separator)
 
     val pathFull = PathBuilder.getFullDataPath(fullDataDate, source, tableName)
     lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)

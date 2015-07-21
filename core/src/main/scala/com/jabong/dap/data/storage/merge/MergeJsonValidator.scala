@@ -18,7 +18,7 @@ object MergeJsonValidator {
 
   private def validatePossibleValues(mergeJob: MergeInfo) = {
     val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
-    val possibleMergeModes = Array("full","historical")
+    val possibleMergeModes = Array("full", "historical")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 
     require(possibleSources.contains(mergeJob.source), "Source '%s' not recognized. Possible values: %s".

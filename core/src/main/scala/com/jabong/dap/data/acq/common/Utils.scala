@@ -52,7 +52,7 @@ case class TableInfo(
  * @param primaryKey String The primary key of the table.
  * @param mergeMode String The mode of the data merge.
  * @param incrDate String The date for the merge data is to be run.
- * @param fullDate String The full data date. Incase of merging incr data with full data from a specific. 
+ * @param fullDate String The full data date. Incase of merging incr data with full data from a specific.
  * @param incrMode String The incremental data is in monthly or daily mode
  * @param saveMode String The mode in which the data is to be saved. (Can be overwrite, append, error or ignore)
  */

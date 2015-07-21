@@ -1,8 +1,8 @@
 package com.jabong.dap.data.acq.history
 
-import com.jabong.dap.common.time.{Constants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils}
-import com.jabong.dap.data.acq.common.{DbConnection, GetData, TableInfo}
+import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils }
+import com.jabong.dap.data.acq.common.{ DbConnection, GetData, TableInfo }
 
 /**
  * Created by pooja on 13/7/15.
