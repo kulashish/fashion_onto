@@ -68,6 +68,8 @@ object DataReader extends Logging {
   private def fetchDataFrame(source: String, tableName: String, mode: String, date: String): DataFrame = {
     val dateWithHour = DateResolver.getDateWithHour(source, tableName, mode, date)
     val fetchPath = PathBuilder.buildPath(source, tableName, mode, dateWithHour)
+    println(fetchPath)
+    logger.info(fetchPath)
     val saveFormat = FormatResolver.getFormat(fetchPath)
     val context = getContext(saveFormat)
     context.read.format(saveFormat).load(fetchPath)

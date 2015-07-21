@@ -20,12 +20,14 @@ object Bob {
       "special_to_date",
       "special_from_date",
       "sku",
-      "fk_catalog_config"
+      "fk_catalog_config",
+      "barcode_ean"
     ).withColumnRenamed("id_catalog_simple", ITR.ID_CATALOG_SIMPLE).
       withColumnRenamed("special_price", ITR.SPECIAL_PRICE).
       withColumnRenamed("special_to_date", ITR.SPECIAL_TO_DATE).
       withColumnRenamed("special_from_date", ITR.SPECIAL_FROM_DATE).
-      withColumnRenamed("sku", ITR.SIMPLE_SKU)
+      withColumnRenamed("sku", ITR.SIMPLE_SKU).
+      withColumnRenamed("barcode_ean", ITR.BARCODE_EAN)
 
     val visibilityDataFrame = visibilityDF()
     val vDF = visibilityDataFrame.select(
@@ -104,6 +106,7 @@ object Bob {
         ITR.SPECIAL_TO_DATE,
         ITR.SPECIAL_FROM_DATE,
         ITR.SIMPLE_SKU,
+        ITR.BARCODE_EAN,
         ITR.VISIBILITY,
         ITR.QUANTITY,
         ITR.ID_CATALOG_CONFIG,

@@ -87,7 +87,7 @@ class Itr extends java.io.Serializable with Logging {
     val bobDF = Bob.getBobColumns()
     val itr = erpDF.join(
       bobDF,
-      erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.SIMPLE_SKU),
+      erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
       "left_outer"
     ).
       na.fill(Map(
@@ -125,7 +125,7 @@ class Itr extends java.io.Serializable with Logging {
       ))
 
     val itrDF = priceBandMVPDF.select(
-      ITR.BARCODE_EAN,
+      ITR.JABONG_CODE,
       ITR.VENDOR_ITEM_NO,
       ITR.HEEL_HEIGHT,
       ITR.SLEEVE,
@@ -146,7 +146,6 @@ class Itr extends java.io.Serializable with Logging {
       ITR.MRP_PRICE,
       ITR.COLOR,
       ITR.SIZE,
-      ITR.JABONG_CODE,
       ITR.PET_STYLE_CODE,
       ITR.GENDER,
       ITR.BRICK,
@@ -172,11 +171,11 @@ class Itr extends java.io.Serializable with Logging {
       ITR.PRICE_BAND,
       ITR.SUPPLIER_STATUS,
       ITR.BRAND_NAME
-    ).persist()
+    )
 
     itrDF.write.mode(SaveMode.Overwrite).format("orc").save(getPath(false))
 
-    priceBandMVPDF.
+    itrDF.
       groupBy(ITR.CONFIG_SKU).
       agg(
         first(ITR.BRAND_NAME) as ITR.BRAND_NAME,

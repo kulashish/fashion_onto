@@ -4,7 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import com.jabong.dap.model.product.itr.variables.ITR
 
-object PriceBand {
+object PriceBand extends java.io.Serializable {
   /**
    * Prepare data frame for price band
    * @return DataFrame
@@ -13,7 +13,6 @@ object PriceBand {
     val erp = ERP.getERPColumns().
       select(
         ITR.JABONG_CODE,
-        ITR.BARCODE_EAN,
         ITR.REPORTING_CATEGORY,
         ITR.BRICK
       )
@@ -21,8 +20,8 @@ object PriceBand {
     val simple = Model.simple
 
     val minMax = erp.join(
-      simple.select("sku", "special_price"),
-      erp.col(ITR.JABONG_CODE) === simple.col("sku")
+      simple.select("barcode_ean", "special_price"),
+      erp.col(ITR.JABONG_CODE) === simple.col("barcode_ean")
     ).groupBy(ITR.REPORTING_CATEGORY, ITR.BRICK).
       agg(min("special_price") as "minSpecialPrice", max("special_price") as "maxSpecialPrice")
 
