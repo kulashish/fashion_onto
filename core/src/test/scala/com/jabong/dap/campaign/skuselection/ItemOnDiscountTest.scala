@@ -36,14 +36,14 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
     var itr = dfItr30DayData
 
     itr = itr.select(
-      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
+      col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
       col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT,
-      col(ItrVariables.AVERAGE_PRICE))
+      col(ItrVariables.SPECIAL_PRICE))
 
     val result = itemOnDiscount.getJoinDF(dfCustomerProductShortlist, itr)
       .limit(30).collect().toSet
 
-    //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_get_join_df" + ".json")
+    //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_get_join_df" + ".json")
 
     val dfJoin = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_get_join_df", Schema.resultGetJoin)
       .collect().toSet
@@ -59,7 +59,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
     var yesterdayItrData = dfYesterdayItrData
 
     yesterdayItrData = yesterdayItrData.select(
-      col(ItrVariables.SIMPLE_SKU) as ItrVariables.ITR_ + ItrVariables.SIMPLE_SKU,
+      col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
       col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE
     )
 
@@ -98,7 +98,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
     val result = itemOnDiscount.shortListSkuFilter(dfCustomerProductShortlist, yesterdayItrData, itr30Day)
       .limit(30).collect().toSet
 
-    //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_filter" + ".json")
+    //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_filter" + ".json")
 
     val dfShortListSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_filter", Schema.resultSkuSimpleFilter)
       .collect().toSet
@@ -108,13 +108,13 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   }
 
   //=====================================skuFilter()=====================================================
-  //  "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
-  //
-  //    val result = itemOnDiscount.skuFilter(null, null, null)
-  //
-  //    assert(result == null)
-  //
-  //  }
+  "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
+
+    val result = itemOnDiscount.skuFilter(null, null, null)
+
+    assert(result == null)
+
+  }
   //
   //  "skuFilter: schema attributes and data type" should
   //    "match into dfCustomerProductShortlist and dfItr30DayData" in {
@@ -124,18 +124,18 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   //
   //    }
 
-  //  "skuFilter: Data Frame" should "match to resultant Data Frame" in {
-  //
-  //    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
-  //      .limit(30).collect().toSet
-  //
-  //    //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")
-  //
-  //    //    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" +  DataSets.ITEM_ON_DISCOUNT, "result_sku_filter", Schema.resultSkuSimpleFilter)
-  //    //      .collect().toSet
-  //
-  //    assert(result != null)
-  //
-  //  }
+  "skuFilter: Data Frame" should "match to resultant Data Frame" in {
+
+    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
+    //        .limit(30).colle//ct().toSet
+
+    //    result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")
+
+    //    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" +  DataSets.ITEM_ON_DISCOUNT, "result_sku_filter", Schema.resultSkuSimpleFilter)
+    //      .collect().toSet
+
+    assert(result != null)
+
+  }
 
 }
