@@ -10,10 +10,9 @@ import com.jabong.dap.common.json.EmptyClass
  * @param selectString String The select string for selecting columns from the join table.
  */
 case class JoinTables(
-  name:         String,
-  foreignKey:   String,
-  selectString: Option[String]
-)
+  name: String,
+  foreignKey: String,
+  selectString: Option[String])
 
 /**
  * Case class for storing information about data acquisition from a table.
@@ -32,19 +31,18 @@ case class JoinTables(
  * @param joinTables List[JoinTables] List of tables to be joined.
  */
 case class TableInfo(
-  source:          String,
-  tableName:       String,
-  primaryKey:      String,
-  mode:            String,
-  saveFormat:      String,
-  saveMode:        String,
-  dateColumn:      Option[String],
-  rangeStart:      Option[String],
-  rangeEnd:        Option[String],
-  limit:           Option[String],
+  source: String,
+  tableName: String,
+  primaryKey: String,
+  mode: String,
+  saveFormat: String,
+  saveMode: String,
+  dateColumn: Option[String],
+  rangeStart: Option[String],
+  rangeEnd: Option[String],
+  limit: Option[String],
   filterCondition: Option[String],
-  joinTables:      Option[List[JoinTables]]
-)
+  joinTables: Option[List[JoinTables]])
 
 /**
  * Case class for storing information for merging the data of a table.
@@ -54,19 +52,17 @@ case class TableInfo(
  * @param primaryKey String The primary key of the table.
  * @param mergeMode String The mode of the data merge.
  * @param mergeDate String The date for the merge data is to be run.
- * @param saveFormat String The Format in which the data will be found and saved after the merge.
  * @param saveMode String The mode in which the data is to be saved. (Can be overwrite, append, error or ignore)
  */
 
 case class MergeInfo(
-  source:     String,
-  tableName:  String,
+  source: String,
+  tableName: String,
   primaryKey: String,
-  mergeMode:  String,
-  mergeDate:  String,
+  mergeMode: String,
+  mergeDate: String,
   saveFormat: String,
-  saveMode:   String
-)
+  saveMode: String)
 
 /**
  * Case class for storing information for variable merging the data of customer and order.
@@ -79,10 +75,9 @@ case class MergeInfo(
 
 case class COVarInfo(
   prevFullDate: String,
-  mergeDate:    String,
-  saveFormat:   String,
-  saveMode:     String
-)
+  mergeDate: String,
+  saveFormat: String,
+  saveMode: String)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -90,9 +85,8 @@ case class COVarInfo(
  * @param acquisition List[TableInfo] List of tables to acquire the data from.
  */
 case class ImportInfo(
-  isHistory:   Option[Boolean],
-  acquisition: List[TableInfo]
-) extends EmptyClass
+  isHistory: Option[Boolean],
+  acquisition: List[TableInfo]) extends EmptyClass
 
 /**
  * Case class for storing the information for the merge job.
@@ -100,8 +94,7 @@ case class ImportInfo(
  * @param merge List[MergeInfo] List of Tables to run the merge job on.
  */
 case class MergeJobInfo(
-  merge: List[MergeInfo]
-) extends EmptyClass
+  merge: List[MergeInfo]) extends EmptyClass
 
 /**
  * Case class for storing the information for the customer and order variables job.
@@ -109,8 +102,7 @@ case class MergeJobInfo(
  * @param coVar List[COVarInfo] List of variables to run the customer and order variables job on.
  */
 case class COVarJobInfo(
-  coVar: List[COVarInfo]
-) extends EmptyClass
+  coVar: List[COVarInfo]) extends EmptyClass
 
 /**
  * Object to access config variables application wide
@@ -135,5 +127,30 @@ object AcqImportInfo {
   var importInfo: ImportInfo = null
   var tableInfo: TableInfo = null
 
+}
+
+//FIXME:need to check which one to use
+//case class for campaign List
+case class CampaignDetail(
+  campaignName: String,
+  priority: Int,
+  mailType: Int)
+
+//case class CampaignList (
+//                                pushCampaignList: List[CampaignDetail]) extends EmptyClass
+
+/**
+ *
+ * @param pushBasePath
+ * @param pushCampaignList
+ */
+//case class for campaignConfig expects path and campaign List
+case class CampaignConfig(
+  var pushBasePath: String,
+  var pushCampaignList: List[CampaignDetail])
+
+object CampaignInfo {
+  var campaignJobInfo: String = null
+  var campaigns: CampaignConfig = null
 }
 
