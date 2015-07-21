@@ -10,10 +10,9 @@ import com.jabong.dap.common.json.EmptyClass
  * @param selectString String The select string for selecting columns from the join table.
  */
 case class JoinTables(
-  name:         String,
-  foreignKey:   String,
-  selectString: Option[String]
-)
+  name: String,
+  foreignKey: String,
+  selectString: Option[String])
 
 /**
  * Case class for storing information about data acquisition from a table.
@@ -32,19 +31,18 @@ case class JoinTables(
  * @param joinTables List[JoinTables] List of tables to be joined.
  */
 case class TableInfo(
-  source:          String,
-  tableName:       String,
-  primaryKey:      String,
-  mode:            String,
-  saveFormat:      String,
-  saveMode:        String,
-  dateColumn:      Option[String],
-  rangeStart:      Option[String],
-  rangeEnd:        Option[String],
-  limit:           Option[String],
+  source: String,
+  tableName: String,
+  primaryKey: String,
+  mode: String,
+  saveFormat: String,
+  saveMode: String,
+  dateColumn: Option[String],
+  rangeStart: Option[String],
+  rangeEnd: Option[String],
+  limit: Option[String],
   filterCondition: Option[String],
-  joinTables:      Option[List[JoinTables]]
-)
+  joinTables: Option[List[JoinTables]])
 
 /**
  * Case class for storing information for merging the data of a table.
@@ -58,13 +56,12 @@ case class TableInfo(
  */
 
 case class MergeInfo(
-  source:     String,
-  tableName:  String,
+  source: String,
+  tableName: String,
   primaryKey: String,
-  mergeMode:  String,
-  mergeDate:  String,
-  saveMode:   String
-)
+  mergeMode: String,
+  mergeDate: Option[String],
+  saveMode: String)
 
 /**
  * Case class for storing information for variable merging the data of customer and order.
@@ -77,10 +74,9 @@ case class MergeInfo(
 
 case class COVarInfo(
   prevFullDate: String,
-  mergeDate:    String,
-  saveFormat:   String,
-  saveMode:     String
-)
+  mergeDate: String,
+  saveFormat: String,
+  saveMode: String)
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -88,9 +84,8 @@ case class COVarInfo(
  * @param acquisition List[TableInfo] List of tables to acquire the data from.
  */
 case class ImportInfo(
-  isHistory:   Option[Boolean],
-  acquisition: List[TableInfo]
-) extends EmptyClass
+  isHistory: Option[Boolean],
+  acquisition: List[TableInfo]) extends EmptyClass
 
 /**
  * Case class for storing the information for the merge job.
@@ -98,8 +93,7 @@ case class ImportInfo(
  * @param merge List[MergeInfo] List of Tables to run the merge job on.
  */
 case class MergeJobInfo(
-  merge: List[MergeInfo]
-) extends EmptyClass
+  merge: List[MergeInfo]) extends EmptyClass
 
 /**
  * Case class for storing the information for the customer and order variables job.
@@ -107,8 +101,7 @@ case class MergeJobInfo(
  * @param coVar List[COVarInfo] List of variables to run the customer and order variables job on.
  */
 case class COVarJobInfo(
-  coVar: List[COVarInfo]
-) extends EmptyClass
+  coVar: List[COVarInfo]) extends EmptyClass
 
 /**
  * Object to access config variables application wide

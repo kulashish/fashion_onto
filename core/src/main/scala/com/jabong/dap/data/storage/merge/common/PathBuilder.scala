@@ -2,7 +2,7 @@ package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
 
-import com.jabong.dap.common.AppConfig
+import com.jabong.dap.common.{ OptionUtils, AppConfig }
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.MergeJobConfig
 import com.jabong.dap.common.time.Constants
@@ -14,21 +14,21 @@ import com.jabong.dap.common.time.Constants
 object PathBuilder {
 
   val basePath = AppConfig.config.basePath
-  val mergeDate = MergeJobConfig.mergeInfo.mergeDate
+  val mergeDate = OptionUtils.getOptValue(MergeJobConfig.mergeInfo.mergeDate)
   val source = MergeJobConfig.mergeInfo.source
   val tableName = MergeJobConfig.mergeInfo.tableName
 
   private def getDateDayBeforeYesterdayPath: String = {
-    if (mergeDate == null) {
-      TimeUtils.getDateAfterNDays(-2, Constants.DATE_FORMAT).replaceAll("-", File.separator)
+    if (null == mergeDate) {
+      TimeUtils.getDateAfterNDays(-2, Constants.DATE_FORMAT_FOLDER)
     } else {
-      TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT, mergeDate).replaceAll("-", File.separator)
+      TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, mergeDate)
     }
   }
 
   private def getDateYesterdayDataPath: String = {
-    if (mergeDate == null) {
-      TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT).replaceAll("-", File.separator)
+    if (null == mergeDate) {
+      TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
     } else {
       mergeDate.replaceAll("-", File.separator)
     }
