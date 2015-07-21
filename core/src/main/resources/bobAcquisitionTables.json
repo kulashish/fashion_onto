@@ -6,7 +6,7 @@
       "primaryKey": "id_catalog_brand",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error"
+      "saveMode": "ignore"
     },
     {
       "source": "bob",
@@ -14,16 +14,7 @@
       "primaryKey": "id_catalog_category",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error"
-    },
-    {
-      "source": "bob",
-      "tableName": "catalog_config",
-      "primaryKey": "id_catalog_config",
-      "mode": "daily",
-      "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": "updated_at"
+      "saveMode": "ignore"
     },
     {
       "source": "bob",
@@ -31,7 +22,7 @@
       "primaryKey": "id_catalog_config_has_catalog_category",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error"
+      "saveMode": "ignore"
     },
     {
       "source": "bob",
@@ -39,16 +30,7 @@
       "primaryKey": "id_catalog_product_image",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error"
-    },
-    {
-      "source": "bob",
-      "tableName": "catalog_simple",
-      "primaryKey": "id_catalog_simple",
-      "mode": "daily",
-      "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": "updated_at"
+      "saveMode": "ignore"
     },
     {
       "source": "bob",
@@ -56,7 +38,7 @@
       "primaryKey": "id_catalog_stock",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error"
+      "saveMode": "ignore"
     },
     {
       "source": "bob",
@@ -64,7 +46,57 @@
       "primaryKey": "id_catalog_supplier",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "error"
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "customer_product_shortlist",
+      "primaryKey": "id_customer_product_shortlist",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "customer_storecredits_history",
+      "primaryKey": "id_customer_storecredits_history",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_cart_custom_text",
+      "primaryKey": "id_sales_cart_custom_text",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_status",
+      "primaryKey": "id_sales_order_item_status",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config",
+      "primaryKey": "id_catalog_config",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "ignore",
+      "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple",
+      "primaryKey": "id_catalog_simple",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "ignore",
+      "dateColumn": "updated_at"
     },
     {
       "source": "bob",
@@ -72,7 +104,7 @@
       "primaryKey": "id_customer",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at",
       "joinTables": [
         {
@@ -83,35 +115,20 @@
     },
     {
       "source": "bob",
-      "tableName": "customer_product_shortlist",
-      "primaryKey": "id_customer_product_shortlist",
-      "mode": "full",
-      "saveFormat": "parquet",
-      "saveMode": "error"
-    },
-    {
-      "source": "bob",
       "tableName": "customer_segments",
       "primaryKey": "id_customer_segments",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
     },
     {
-      "source": "bob",
-      "tableName": "customer_storecredits_history",
-      "primaryKey": "id_customer_storecredits_history",
-      "mode": "full",
-      "saveFormat": "parquet",
-      "saveMode": "error"
-    },{
       "source": "bob",
       "tableName": "newsletter_subscription",
       "primaryKey": "id_newsletter_subscription",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -120,16 +137,8 @@
       "primaryKey": "id_sales_cart",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
-    },
-    {
-      "source": "bob",
-      "tableName": "sales_cart_custom_text",
-      "primaryKey": "id_sales_cart_custom_text",
-      "mode": "full",
-      "saveFormat": "parquet",
-      "saveMode": "error"
     },
     {
       "source": "bob",
@@ -137,8 +146,28 @@
       "primaryKey": "id_sales_cart_guest_info",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order",
+      "primaryKey": "id_sales_order",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "ignore",
+      "dateColumn": "updated_at",
+      "joinTables": [
+        {
+          "name": "sales_order_additional_info",
+          "foreignKey": "fk_sales_order"
+        },
+        {
+          "name": "sales_order_gift_wrap",
+          "foreignKey": "fk_sales_order",
+          "selectString": "j2.id_sales_order_gift_wrap, j2.gw_recipient_email, j2.gw_recipient_name, j2.gw_message, j2.gw_sender_name, j2.gw_amount, j2.gw_giftcard_credit, j2.gw_store_credit, j2.gw_paid_price, j2.gw_payback_credit, j2.occasion"
+        }
+      ]
     },
     {
       "source": "bob",
@@ -146,7 +175,7 @@
       "primaryKey": "id_sales_order_address",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -155,7 +184,7 @@
       "primaryKey": "id_sales_order_item",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at",
       "joinTables": [
         {
@@ -166,19 +195,11 @@
     },
     {
       "source": "bob",
-      "tableName": "sales_order_item_status",
-      "primaryKey": "id_sales_order_item_status",
-      "mode": "full",
-      "saveFormat": "parquet",
-      "saveMode": "error"
-    },
-    {
-      "source": "bob",
       "tableName": "sales_order_payback_earn",
       "primaryKey": "id_sales_order_payback_earn",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -187,7 +208,7 @@
       "primaryKey": "id_sales_order_payback_redeem",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -196,27 +217,8 @@
       "primaryKey": "id_sales_rule",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "error",
+      "saveMode": "ignore",
       "dateColumn": "updated_at"
-    },
-    {
-      "source": "bob",
-      "tableName": "sales_order",
-      "primaryKey": "id_sales_order",
-      "mode": "daily",
-      "saveFormat": "parquet",
-      "saveMode": "error",
-      "dateColumn": "updated_at",
-      "joinTables": [
-        {
-          "name": "sales_order_additional_info",
-          "foreignKey": "fk_sales_order"
-        },
-        {
-          "name": "sales_order_gift_wrap",
-          "foreignKey": "fk_sales_order"
-        }
-      ]
     }
   ]
 }
