@@ -1,7 +1,7 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderVariables }
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -18,7 +18,7 @@ object SalesOrderAddress {
    */
   def processVariable(salesOrderInc: DataFrame, salesAddressfull: DataFrame, prevFav: DataFrame): (DataFrame, DataFrame) = {
     val salesOrderAddress = salesAddressfull.join(salesOrderInc, salesAddressfull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrderInc(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
-    val curFav = salesOrderAddress.select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE,SalesAddressVariables.FIRST_NAME,SalesAddressVariables.LAST_NAME)
+    val curFav = salesOrderAddress.select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE, SalesAddressVariables.FIRST_NAME, SalesAddressVariables.LAST_NAME)
     val jData = prevFav.unionAll(curFav)
     (jData, getFav(jData))
   }
@@ -59,21 +59,21 @@ object SalesOrderAddress {
     val fMobile = y.find(_._2 == bmax).getOrElse(default)._1.toString
     val z = c.groupBy(identity).mapValues(_.length)
     val cmax = z.valuesIterator.max
-    val fName= z.find(_._2 == cmax).getOrElse(default)._1.toString
+    val fName = z.find(_._2 == cmax).getOrElse(default)._1.toString
     return (fCity, fMobile, fName)
   }
 
-/**
-
-  def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("SparkExamples")
-    Spark.init(conf)
-    val df1 = Spark.getSqlContext().read.json("src/test/resources/sales_order_address/sales_address.json").select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE,SalesAddressVariables.FIRST_NAME,SalesAddressVariables.LAST_NAME)
-    df1.collect().foreach(println)
-    val res = getFav(df1)
-    res.collect().foreach(println)
-  }
-
-*/
+  /**
+   *
+   * def main(args: Array[String]) {
+   * val conf = new SparkConf().setAppName("SparkExamples")
+   * Spark.init(conf)
+   * val df1 = Spark.getSqlContext().read.json("src/test/resources/sales_order_address/sales_address.json").select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE,SalesAddressVariables.FIRST_NAME,SalesAddressVariables.LAST_NAME)
+   * df1.collect().foreach(println)
+   * val res = getFav(df1)
+   * res.collect().foreach(println)
+   * }
+   *
+   */
 
 }

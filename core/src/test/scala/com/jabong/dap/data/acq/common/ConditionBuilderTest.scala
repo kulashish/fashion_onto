@@ -9,7 +9,7 @@ import org.scalatest.{ Matchers, FlatSpec }
 class ConditionBuilderTest extends FlatSpec with Matchers {
   val dateCol = Option.apply("dateColumn")
   val lmt = Option.apply("100")
-  val jnTbls = Option.apply(List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+  val jnTbls = Option.apply(List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1", selectString = null)))
   val fltrCond = Option.apply("tableColumn NOT LIKE 'R%'")
   val rngStrt = Option.apply("rangeStart")
   val rngEnd = Option.apply("rangeEnd")

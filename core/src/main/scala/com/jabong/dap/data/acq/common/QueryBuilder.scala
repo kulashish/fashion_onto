@@ -22,7 +22,12 @@ object QueryBuilder {
 
     for (info <- joinTables) {
       val tableAlias = "j" + count
-      selectString = selectString + ", " + tableAlias + ".*"
+      val selectStr = OptionUtils.getOptValue(info.selectString)
+      if (null != selectStr) {
+        selectString = selectString + ", " + selectStr
+      } else {
+        selectString = selectString + ", " + tableAlias + ".*"
+      }
       joinString = joinString + " LEFT JOIN " + info.name + " AS " + tableAlias + " ON " + tableAlias + "." +
         info.foreignKey + " = t1." + primaryKey
       count = count + 1
@@ -38,8 +43,10 @@ object QueryBuilder {
 
     driver match {
       case "sqlserver" =>
-        val limitString = if (limit != null) {
+        val limitString = if (limit != null && primaryKey != null) {
           ("TOP %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
+        } else if (limit != null && primaryKey == null) {
+          ("TOP %s".format(limit), "")
         } else {
           ("", "")
         }
