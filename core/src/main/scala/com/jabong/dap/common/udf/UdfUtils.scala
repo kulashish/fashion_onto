@@ -210,6 +210,7 @@ object UdfUtils {
    * by using the browserid prepended with a constant
    *
    * @param userid
+   * @param domain
    * @param browserid
    * @return either transformed userid
    */
