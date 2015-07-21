@@ -38,13 +38,8 @@ class ItemOnDiscount extends SkuSelector with Logging {
       Udf.yyyymmdd(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
     )
 
-    //get data yesterday date
-    val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT))
-
-    val yesterdayDateYYYYmmDD = UdfUtils.getYYYYmmDD(yesterdayDate)
-
     //filter yesterday itrData from itr30dayData
-    val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
+    val dfYesterdayItrData = getYesterdayItrData(itr30dayData)
 
     // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = itr30dayData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
@@ -64,6 +59,18 @@ class ItemOnDiscount extends SkuSelector with Logging {
     // FIXME: generate ref skus
 
     return dfResult
+  }
+
+  def getYesterdayItrData(itr30dayData: DataFrame): DataFrame = {
+    //get data yesterday date
+    val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT))
+
+    val yesterdayDateYYYYmmDD = UdfUtils.getYYYYmmDD(yesterdayDate)
+
+    //filter yesterday itrData from itr30dayData
+    val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
+
+    return dfYesterdayItrData
   }
 
   /**
@@ -87,6 +94,49 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     return dfResult
 
+  }
+
+  /**
+   *
+   * @param dfCustomerProductShortlist
+   * @param df30DaysSkuItrData
+   * @param dfYesterdaySkuSimpleItrData
+   * @return
+   */
+  def shortListFullSkuFilter(dfCustomerProductShortlist: DataFrame, df30DaysSkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
+
+    //=====================================calculate SKU data frame=====================================================
+    val itr30dayData = df30DaysSkuItrData.select(
+      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
+      col(ItrVariables.AVERAGE_PRICE) as ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE,
+      Udf.yyyymmdd(df30DaysSkuItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
+    )
+
+    //========df30DaysSkuItrData filter for yesterday===================================================================
+    val dfYesterdayItrData = getYesterdayItrData(itr30dayData)
+
+    val dfSkuLevel = shortListSkuFilter(dfCustomerProductShortlist, dfYesterdayItrData, itr30dayData)
+      .withColumnRenamed(CustomerProductShortlistVariables.SKU, CustomerProductShortlistVariables.SKU_SIMPLE)
+      .withColumnRenamed(CustomerProductShortlistVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.SPECIAL_PRICE)
+
+    //=========calculate SKU_SIMPLE data frame==========================================================================
+    val yesterdaySkuSimpleItrData = dfYesterdaySkuSimpleItrData.select(
+      col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
+      col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE
+    )
+    val dfSkuSimpleLevel = shortListSkuSimpleFilter(dfCustomerProductShortlist, yesterdaySkuSimpleItrData)
+
+    //=======union both sku and sku simple==============================================================================
+    val dfUnion = dfSkuLevel.unionAll(dfSkuSimpleLevel)
+
+    //=======select FK_CUSTOMER, EMAIL, SKU_SIMPLE, SPECIAL_PRICE=======================================================
+    val dfResult = dfUnion.select(col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.EMAIL),
+      col(CustomerProductShortlistVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
+    )
+
+    return dfResult
   }
 
   /**
@@ -119,15 +169,16 @@ class ItemOnDiscount extends SkuSelector with Logging {
         CustomerProductShortlistVariables.AVERAGE_PRICE
       )
 
-    //FIXME: add AVERAGE_PRICE
     //join yesterdayItrData and joinDf on the basis of SKU
     //filter on the basis of AVERAGE_PRICE
     val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerProductShortlistVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
       .filter(CustomerProductShortlistVariables.AVERAGE_PRICE + " > " + ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE)
       .select(
-        col(CustomerProductShortlistVariables.FK_CUSTOMER),
-        col(CustomerProductShortlistVariables.EMAIL),
-        col(CustomerProductShortlistVariables.SKU))
+        CustomerProductShortlistVariables.FK_CUSTOMER,
+        CustomerProductShortlistVariables.EMAIL,
+        CustomerProductShortlistVariables.SKU,
+        CustomerProductShortlistVariables.AVERAGE_PRICE
+      )
 
     return dfResult
 
@@ -162,11 +213,11 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val dfFilter = dfJoin.filter(CustomerProductShortlistVariables.PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
 
-    //FIXME: add SPECIAL_PRICE
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),
-      Udf.skuFromSimpleSku(dfJoin(CustomerProductShortlistVariables.SKU_SIMPLE)) as CustomerProductShortlistVariables.SKU
+      col(CustomerProductShortlistVariables.SKU_SIMPLE),
+      col(CustomerProductShortlistVariables.PRICE) as CustomerProductShortlistVariables.SPECIAL_PRICE
     )
 
     return dfResult

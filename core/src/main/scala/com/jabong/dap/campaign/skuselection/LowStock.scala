@@ -37,6 +37,27 @@ class LowStock extends SkuSelector with Logging {
     return filteredSku
   }
 
+  def shortListFullSkuFilter(dfCustomerProductShortlist: DataFrame, dfYesterdaySkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
+
+    val dfSkuLevel = shortListSkuFilter(dfCustomerProductShortlist, dfYesterdaySkuItrData)
+      .withColumnRenamed(CustomerProductShortlistVariables.SKU, CustomerProductShortlistVariables.SKU_SIMPLE)
+      .withColumnRenamed(CustomerProductShortlistVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.SPECIAL_PRICE)
+
+    val dfSkuSimpleLevel = shortListSkuSimpleFilter(dfCustomerProductShortlist, dfYesterdaySkuSimpleItrData)
+
+    //union both sku and sku simple
+    val dfUnion = dfSkuLevel.unionAll(dfSkuSimpleLevel)
+
+    val dfResult = dfUnion.select(
+      col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.EMAIL),
+      col(CustomerProductShortlistVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
+    )
+
+    return dfResult
+  }
+
   //one day itr data
   //if average stock <= 10
   def shortListSkuFilter(dfCustomerProductShortlist: DataFrame, dfItrData: DataFrame): DataFrame = {
@@ -49,13 +70,6 @@ class LowStock extends SkuSelector with Logging {
 
     }
 
-    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.resultCustomerProductShortlist) ||
-      !SchemaUtils.isSchemaEqual(dfItrData.schema, Schema.itr)) {
-
-      logger.error("schema attributes or data type mismatch")
-
-      return null
-    }
     val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
       CustomerProductShortlistVariables.EMAIL,
@@ -64,7 +78,8 @@ class LowStock extends SkuSelector with Logging {
 
     val itrData = dfItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ItrVariables.AVERAGE_STOCK)
+      col(ItrVariables.AVERAGE_STOCK),
+      col(ItrVariables.AVERAGE_PRICE)
     )
 
     val dfJoin = skuSimpleCustomerProductShortlist.join(
@@ -78,7 +93,8 @@ class LowStock extends SkuSelector with Logging {
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU)
+      col(CustomerProductShortlistVariables.SKU),
+      col(CustomerProductShortlistVariables.AVERAGE_PRICE)
     )
 
     return dfResult
@@ -94,13 +110,6 @@ class LowStock extends SkuSelector with Logging {
 
     }
 
-    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.resultCustomerProductShortlist) ||
-      !SchemaUtils.isSchemaEqual(dfItrData.schema, Schema.itr)) {
-
-      logger.error("schema attributes or data type mismatch")
-
-      return null
-    }
     val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
       CustomerProductShortlistVariables.EMAIL,
@@ -109,7 +118,8 @@ class LowStock extends SkuSelector with Logging {
 
     val itrData = dfItrData.select(
       col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
-      col(ItrVariables.STOCK)
+      col(ItrVariables.STOCK),
+      col(ItrVariables.SPECIAL_PRICE)
     )
 
     val dfJoin = skuSimpleCustomerProductShortlist.join(
@@ -123,7 +133,8 @@ class LowStock extends SkuSelector with Logging {
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU_SIMPLE)
+      col(CustomerProductShortlistVariables.SKU_SIMPLE),
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
     )
 
     return dfResult
