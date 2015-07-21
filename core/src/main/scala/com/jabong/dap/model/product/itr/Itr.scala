@@ -62,7 +62,6 @@ class Itr extends java.io.Serializable with Logging {
     val bRange = getRage(priceBandB)
     val cRange = getRage(priceBandC)
     val dRange = getRage(priceBandD)
-    val eRange = getRage(priceBandE)
 
     if (specialPrice == 0.0 || (specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0)) {
       "A"
@@ -82,7 +81,7 @@ class Itr extends java.io.Serializable with Logging {
    *
    * @return Unit
    */
-  def start(): Unit = {
+  def start() = {
     val erpDF = ERP.getERPColumns()
     val bobDF = Bob.getBobColumns()
     val itr = erpDF.join(
@@ -171,7 +170,7 @@ class Itr extends java.io.Serializable with Logging {
       ITR.PRICE_BAND,
       ITR.SUPPLIER_STATUS,
       ITR.BRAND_NAME
-    )
+    ).cache()
 
     itrDF.write.mode(SaveMode.Overwrite).format("orc").save(getPath(false))
 
