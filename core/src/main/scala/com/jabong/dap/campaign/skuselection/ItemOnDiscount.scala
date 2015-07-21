@@ -50,7 +50,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
-    
+
     // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
 
@@ -64,11 +64,10 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerVariables.EMAIL),
         col(ProductVariables.SKU_SIMPLE))
-    
+
     // FIXME: include special price
-    
+
     // FIXME: generate ref skus
-    
 
     return dfResult
   }
@@ -121,7 +120,6 @@ class ItemOnDiscount extends SkuSelector with Logging {
       &&
       cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
 
-    
     // FIXME: special price
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,

@@ -150,9 +150,9 @@ object CampaignUtils extends Logging {
 
   /**
    * returns the skus which are not bought till Now (in reference to skus and updated_at time in inputData)
-   * 
+   *
    * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
-   *  
+   *
    * @param inputData - fk_customer, sku_simple, updated_at
    * @param salesOrder -
    * @param salesOrderItem
