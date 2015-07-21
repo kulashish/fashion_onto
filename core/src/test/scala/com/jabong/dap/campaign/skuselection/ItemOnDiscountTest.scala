@@ -138,4 +138,6 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
   }
 
+  //FIXME: add test cases for when price is null
+
 }

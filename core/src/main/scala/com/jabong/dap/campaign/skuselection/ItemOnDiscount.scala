@@ -99,7 +99,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
   def shortListSkuFilter(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
 
-    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is null ")
+    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is null or " + CustomerProductShortlistVariables.PRICE + " is null ")
       .select(
         CustomerProductShortlistVariables.FK_CUSTOMER,
         CustomerProductShortlistVariables.EMAIL,
@@ -119,6 +119,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
         CustomerProductShortlistVariables.AVERAGE_PRICE
       )
 
+    //FIXME: add AVERAGE_PRICE
     //join yesterdayItrData and joinDf on the basis of SKU
     //filter on the basis of AVERAGE_PRICE
     val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerProductShortlistVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
@@ -140,7 +141,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
    */
   def shortListSkuSimpleFilter(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
 
-    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is not null ")
+    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is not null and " + CustomerProductShortlistVariables.PRICE + " is not null ")
       .select(
         CustomerProductShortlistVariables.FK_CUSTOMER,
         CustomerProductShortlistVariables.EMAIL,
@@ -161,6 +162,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val dfFilter = dfJoin.filter(CustomerProductShortlistVariables.PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
 
+    //FIXME: add SPECIAL_PRICE
     val dfResult = dfFilter.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),
