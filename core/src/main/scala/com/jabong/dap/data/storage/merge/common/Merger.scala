@@ -10,7 +10,8 @@ class Merger extends java.io.Serializable {
     val mergeMode = MergeJobConfig.mergeInfo.mergeMode
 
     mergeMode match {
-      case "full" => MergeTables.mergeFull()
+      case "full" => MergeTables.mergeFull(MergeJobConfig.mergeInfo)
+      case "historical" => MergeTables.mergeHistory(MergeJobConfig.mergeInfo)
     }
   }
 }
