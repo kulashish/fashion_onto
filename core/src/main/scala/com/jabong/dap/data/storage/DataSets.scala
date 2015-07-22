@@ -8,8 +8,8 @@ import com.jabong.dap.common.AppConfig
 object DataSets {
   val basePath = AppConfig.config.basePath
 
-  val BOB_PATH = basePath + "bob/"
-  val VARIABLE_PATH = basePath + "variables/"
+//  val BOB_PATH = basePath + "bob/"
+//  val VARIABLE_PATH = basePath + "variables/"
 
   val TEST_RESOURCES = "src/test/resources/"
 

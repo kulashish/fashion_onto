@@ -29,6 +29,8 @@ libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
   "org.clapper" %% "grizzled-slf4j" % "1.0.1",
   "org.pegdown" % "pegdown" % "1.0.2")
 
+unmanagedJars in Compile += file("lib/sqljdbc4.jar")
+
 test in assembly := {}
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")

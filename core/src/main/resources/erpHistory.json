@@ -1,0 +1,12 @@
+{
+  "acquisition": [
+    {
+      "source": "erp",
+      "tableName": "item_master_complete_dump",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "error"
+    }
+  ]
+}
