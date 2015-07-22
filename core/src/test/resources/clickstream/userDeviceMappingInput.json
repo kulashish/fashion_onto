@@ -1,20 +1,20 @@
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"ios",         "userid":null}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"ios",         "userid":null}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"android",     "userid":null}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"android",     "userid":null}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"windows",     "userid":null}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"windows",     "userid":null}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"w",           "userid":null}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"w",           "userid":null}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"m",           "userid":null}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"m",           "userid":null}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"ios",         "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"ios",         "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"android",     "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"android",     "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"windows",     "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"windows",     "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"w",           "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"w",           "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"m",           "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
-{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"m",           "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"ios",     "appuserid":"_app_55712be5050a5b2aa48b458a",                   "userid":null}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"ios",     "appuserid":"_app_55712be5050a5b2aa48b458b",                   "userid":null}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"android", "appuserid":"_app_55712be5050a5b2aa48b458a",                   "userid":null}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"android", "appuserid":"_app_55712be5050a5b2aa48b458b",                   "userid":null}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"windows", "appuserid":"_app_55712be5050a5b2aa48b458a",                   "userid":null}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"windows", "appuserid":"_app_55712be5050a5b2aa48b458b",                   "userid":null}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"w",       "appuserid":null,                                              "userid":null}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"w",       "appuserid":null,                                              "userid":null}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"m",       "appuserid":null,                                              "userid":null}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"m",       "appuserid":null,                                              "userid":null}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"ios",     "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"ios",     "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"android", "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"android", "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"windows", "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"windows", "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"w",       "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"w",       "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.417",  "browserid":"55712be5050a5b2aa48b458a",   "domain":"m",       "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}
+{"pagets":"2015-07-10 16:34:30.418",  "browserid":"55712be5050a5b2aa48b458b",   "domain":"m",       "appuserid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg=",    "userid":"rVpXm92tbGo7Co+A/ZZhFCznegQkAqFSOneMkhvX/gg="}

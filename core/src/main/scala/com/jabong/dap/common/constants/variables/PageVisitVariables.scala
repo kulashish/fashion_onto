@@ -3,6 +3,7 @@ package com.jabong.dap.common.constants.variables
 object PageVisitVariables {
   val BROWSER_ID = "browserid"
   val USER_ID = "userid"
+  val APP_USER_ID = "appuserid"
   val VISIT_ID = "visitid"
   val VISIT_TIMESTAMP = "visitts"
   val ACTUAL_VISIT_ID = "actualvisitid"

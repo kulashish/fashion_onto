@@ -31,6 +31,8 @@ object SurfVariablesMain extends java.io.Serializable {
     val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
     val currentMergedDataPath = args(1)+"/"+year+"/"+month+"/"+day+"/Surf3mergedData"
     var processedVariablePath = args(2)+"/"+year+"/"+month+"/"+day+"/Surf3ProcessedVariable"
+    val userDeviceMapPath = args(1)+"/"+year+"/"+month+"/"+day+"/userDeviceMapAppJson"
+
     cal.add(Calendar.DATE, -1);
     year = cal.get(Calendar.YEAR);
     day = cal.get(Calendar.DAY_OF_MONTH);
@@ -49,7 +51,12 @@ object SurfVariablesMain extends java.io.Serializable {
     mergedData.saveAsParquetFile(currentMergedDataPath)
     incremental.save(processedVariablePath)
 
-    }
+    // user device mapping
+    var userDeviceMapping = UserDeviceMapping
+      .getUserDeviceMapApp(useridDeviceidFrame)
+      .write.mode("error")
+      .save(userDeviceMapPath)
+  }
 
 }
 

@@ -51,4 +51,43 @@ object UserDeviceMapping {
 
     return dfuserDeviceMap
   }
+
+  def getUserDeviceMapApp (dfUser: DataFrame): DataFrame = {
+    if (dfUser == null) {
+
+      log("Data frame should not be null")
+
+      return null
+
+    }
+
+    //Todo: schema attributes or data type mismatch
+
+    // Fetch required columns only
+    val dfAppUser = dfUser.select(
+      col(PageVisitVariables.APP_USER_ID), // Taken care in input DF
+      col(PageVisitVariables.BROWSER_ID),
+      col(PageVisitVariables.DOMAIN),
+      col(PageVisitVariables.PAGE_TIMESTAMP)
+    )
+      //.filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL") Taken care in input DF
+      .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
+      .filter(PageVisitVariables.PAGE_TIMESTAMP + " IS NOT NULL")
+
+    // Get user device mapping sorted by time
+    val dfuserDeviceMap = dfAppUser
+      .filter(PageVisitVariables.APP_USER_ID + " IS NOT NULL")
+      .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
+      .groupBy(PageVisitVariables.APP_USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
+      .agg(
+        max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
+      )
+
+    return dfuserDeviceMap.select(
+      col(PageVisitVariables.APP_USER_ID) as PageVisitVariables.USER_ID,
+      col(PageVisitVariables.BROWSER_ID),
+      col(PageVisitVariables.DOMAIN),
+      col(PageVisitVariables.PAGE_TIMESTAMP)
+    )
+  }
 }
