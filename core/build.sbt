@@ -26,7 +26,10 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4"
 
 libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
   "org.slf4j" % "slf4j-simple" % "1.7.5",
-  "org.clapper" %% "grizzled-slf4j" % "1.0.1")
+  "org.clapper" %% "grizzled-slf4j" % "1.0.1",
+  "org.pegdown" % "pegdown" % "1.0.2")
 
 test in assembly := {}
 
+(testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
+(testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")

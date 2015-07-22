@@ -15,18 +15,6 @@ class PathBuilderTest extends FlatSpec with Matchers {
   val jnTbls = Option.apply(List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1", selectString = null)))
   val lmt = Option.apply("100")
 
-  "withLeadingZeros" should "add a zero if input is less than 10" in {
-    val input = 7
-    val output = "07"
-    PathBuilder.withLeadingZeros(input) should be (output)
-  }
-
-  "withLeadingZeros" should "not add a zero if input is greater than 9" in {
-    val input = 23
-    val output = "23"
-    PathBuilder.withLeadingZeros(input) should be (output)
-  }
-
   "getPath" should "return empty string if mode is not full, hourly, or daily" in {
     AcqImportInfo.tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "othermode",
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,

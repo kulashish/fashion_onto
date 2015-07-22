@@ -30,8 +30,8 @@ object PathBuilder {
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
         "%s/%s/%s/monthly/%s/%s/%s"
-          .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-            withLeadingZeros(end.get(Calendar.DATE)))
+          .format(basePath, source, tableName, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+            TimeUtils.withLeadingZeros(end.get(Calendar.DATE)))
       case "daily" =>
         if (rangeStart == null && rangeEnd == null) {
           val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
@@ -43,8 +43,8 @@ object PathBuilder {
           start.setTime(format.parse(rangeStart))
           end.setTime(format.parse(rangeEnd))
           "%s/%s/%s/daily/%s/%s/%s"
-            .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-              withLeadingZeros(end.get(Calendar.DATE)))
+            .format(basePath, source, tableName, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+              TimeUtils.withLeadingZeros(end.get(Calendar.DATE)))
         }
       case "hourly" =>
         val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
@@ -53,20 +53,9 @@ object PathBuilder {
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
         "%s/%s/%s/hourly/%s/%s/%s/%s"
-          .format(basePath, source, tableName, end.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-            withLeadingZeros(end.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+          .format(basePath, source, tableName, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+            TimeUtils.withLeadingZeros(end.get(Calendar.DATE)), TimeUtils.withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
       case _ => ""
-    }
-  }
-
-  /**
-   * Converts integer containing day or month of date to a string with the format MM or dd, respectively.
-   */
-  def withLeadingZeros(input: Int): String = {
-    if (input < 10) {
-      "0%s".format(input)
-    } else {
-      "%s".format(input)
     }
   }
 

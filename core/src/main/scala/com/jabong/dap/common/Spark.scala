@@ -22,6 +22,17 @@ object Spark {
     sqlContext = new SQLContext(sc)
   }
 
+  //  /**
+  //   * Initialize spark context as well as sqlContext instances
+  //   * @param sConf SparkConf
+  //   * @param logLevel Log level for Spark
+  //   */
+  //  def init(sConf: SparkConf, logLevel: String) {
+  //    sc = new SparkContext(sConf)
+  //    sc.setLogLevel(logLevel)
+  //    sqlContext = new SQLContext(sc)
+  //  }
+
   /**
    * Return application specific spark context instance
    * @return SparkContext

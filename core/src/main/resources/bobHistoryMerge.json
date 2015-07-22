@@ -1,0 +1,22 @@
+{
+  "merge": [
+    {
+      "source": "bob",
+      "tableName": "sales_order",
+      "primaryKey": "id_sales_order",
+      "mergeMode": "historical",
+      "incrDate": "2012-06-30",
+      "fullDate": "2012/05/31/24",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item",
+      "primaryKey": "id_sales_order_item",
+      "mergeMode": "historical",
+      "incrDate": "2012-06-30",
+      "fullDate": "2012/05/31/24",
+      "saveMode": "ignore"
+    }
+  ]
+}
