@@ -313,6 +313,10 @@ object UdfUtils {
       return null
     }
 
+    if (!(simpleSku.contains('-'))) {
+      return simpleSku
+    }
+
     return simpleSku.substring(0, simpleSku.lastIndexOf('-'))
   }
 

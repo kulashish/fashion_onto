@@ -1,12 +1,12 @@
 package com.jabong.dap.campaign.utils
 
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Date, Calendar }
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
+import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -15,6 +15,8 @@ import org.apache.spark.sql.functions._
  * Utility Class
  */
 object CampaignUtils extends Logging {
+
+  val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
 
@@ -140,12 +142,54 @@ object CampaignUtils extends Logging {
       return null
     }
     // Sales order skus with successful order status
-    val successfulSku = salesOrderItemData.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
-      .select(salesOrderItemData(ProductVariables.SKU), salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
-        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE), salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
-        salesOrderItemData(SalesOrderItemVariables.CREATED_AT), salesOrderItemData(SalesOrderItemVariables.UPDATED_AT))
+    val successfulSku = salesOrderItemData
+      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+      .select(
+        salesOrderItemData(ProductVariables.SKU),
+        salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE),
+        salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
+        salesOrderItemData(SalesOrderItemVariables.CREATED_AT),
+        salesOrderItemData(SalesOrderItemVariables.UPDATED_AT)
+      )
 
     return successfulSku
+  }
+
+  /**
+   * returns the skuSimple which are not bought till Now (in reference to skus and updated_at time in inputData)
+   *
+   * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
+   *
+   * @param inputData - fk_customer, sku_simple, updated_at
+   * @param salesOrder -
+   * @param salesOrderItem
+   * @return
+   */
+  def skuSimpleNOTBought(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        successFulOrderItems(ProductVariables.SKU) as SUCCESS_ + ProductVariables.SKU,
+        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+      )
+
+    val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+
+    logger.info("Filtered all the sku simple which has been bought")
+
+    return skuSimpleNotBoughtTillNow
   }
 
   /**
@@ -153,8 +197,8 @@ object CampaignUtils extends Logging {
    *
    * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
    *
-   * @param inputData - fk_customer, sku_simple, updated_at
-   * @param salesOrder -
+   * @param inputData
+   * @param salesOrder
    * @param salesOrderItem
    * @return
    */
@@ -164,20 +208,24 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+    val successFullOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    var successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
-      .select(salesOrder(SalesOrderVariables.FK_CUSTOMER), successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), successFulOrderItems(ProductVariables.SKU), successFulOrderItems(SalesOrderItemVariables.CREATED_AT))
+    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        Udf.skuFromSimpleSku(successFullOrderItems(ProductVariables.SKU)) as SUCCESS_ + ProductVariables.SKU,
+        successFullOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+      )
 
-    val customerSuccessfulItemsSchema = successfulSalesData.schema
-
-    //rename customerSuccessfulItemsData column names with success_ as prefix
-    customerSuccessfulItemsSchema.foreach(x => successfulSalesData = successfulSalesData.withColumnRenamed(x.name, "success_" + x.name))
-
-    val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData("success_" + SalesOrderVariables.FK_CUSTOMER)
-      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData("success_" + ProductVariables.SKU), "left_outer")
-      .filter("success_" + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + "success_" + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+    val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
+      .select(
+        inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(ProductVariables.SKU),
+        inputData(ProductVariables.SPECIAL_PRICE)
+      )
 
     logger.info("Filtered all the sku which has been bought")
 
