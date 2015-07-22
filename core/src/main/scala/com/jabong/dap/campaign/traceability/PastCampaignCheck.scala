@@ -35,7 +35,7 @@ class PastCampaignCheck extends Logging {
   }
 
   /**
-   * \
+   *  To check whether the campaign has been sent to customer in last nDays
    * @param pastCampaignData
    * @param customerSelected
    * @param campaignMailType
