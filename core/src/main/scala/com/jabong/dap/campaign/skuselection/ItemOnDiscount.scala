@@ -61,6 +61,11 @@ class ItemOnDiscount extends SkuSelector with Logging {
     return dfResult
   }
 
+  /**
+   *
+   * @param itr30dayData
+   * @return
+   */
   def getYesterdayItrData(itr30dayData: DataFrame): DataFrame = {
     //get data yesterday date
     val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT))
@@ -129,6 +134,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     //=======union both sku and sku simple==============================================================================
     val dfUnion = dfSkuLevel.unionAll(dfSkuSimpleLevel)
 
+    //=========SKU_SIMPLE is mix of sku and sku-simple in case of shortlist======================================
     //=======select FK_CUSTOMER, EMAIL, SKU_SIMPLE, SPECIAL_PRICE=======================================================
     val dfResult = dfUnion.select(col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),

@@ -37,17 +37,28 @@ class LowStock extends SkuSelector with Logging {
     return filteredSku
   }
 
+  /**
+   *
+   * @param dfCustomerProductShortlist
+   * @param dfYesterdaySkuItrData
+   * @param dfYesterdaySkuSimpleItrData
+   * @return
+   */
   def shortListFullSkuFilter(dfCustomerProductShortlist: DataFrame, dfYesterdaySkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
 
+    //=====================================calculate SKU data frame=====================================================
     val dfSkuLevel = shortListSkuFilter(dfCustomerProductShortlist, dfYesterdaySkuItrData)
       .withColumnRenamed(CustomerProductShortlistVariables.SKU, CustomerProductShortlistVariables.SKU_SIMPLE)
       .withColumnRenamed(CustomerProductShortlistVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.SPECIAL_PRICE)
 
+    //=========calculate SKU_SIMPLE data frame==========================================================================
     val dfSkuSimpleLevel = shortListSkuSimpleFilter(dfCustomerProductShortlist, dfYesterdaySkuSimpleItrData)
 
-    //union both sku and sku simple
+    //=======union both sku and sku simple==============================================================================
     val dfUnion = dfSkuLevel.unionAll(dfSkuSimpleLevel)
 
+    //=========SKU_SIMPLE is mix of sku and sku-simple in case of shortlist======================================
+    //=======select FK_CUSTOMER, EMAIL, SKU_SIMPLE, SPECIAL_PRICE=======================================================
     val dfResult = dfUnion.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.EMAIL),
@@ -60,6 +71,12 @@ class LowStock extends SkuSelector with Logging {
 
   //one day itr data
   //if average stock <= 10
+  /**
+   *
+   * @param dfCustomerProductShortlist
+   * @param dfItrData
+   * @return
+   */
   def shortListSkuFilter(dfCustomerProductShortlist: DataFrame, dfItrData: DataFrame): DataFrame = {
 
     if (dfCustomerProductShortlist == null || dfItrData == null) {
@@ -100,6 +117,12 @@ class LowStock extends SkuSelector with Logging {
     return dfResult
   }
 
+  /**
+   *
+   * @param dfCustomerProductShortlist
+   * @param dfItrData
+   * @return
+   */
   def shortListSkuSimpleFilter(dfCustomerProductShortlist: DataFrame, dfItrData: DataFrame): DataFrame = {
 
     if (dfCustomerProductShortlist == null || dfItrData == null) {
