@@ -18,6 +18,11 @@ object MergeJsonValidator {
 
   private def validatePossibleValues(mergeJob: MergeInfo) = {
     val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
+    // Here the full mode will merge given date's incr and full file. And in case the incr date and full date is not
+    // given then it will merge the yesterday's incr data with day before yesterday's full data.
+    // Historical mode will merge starting from the incr date's till yesterday's data with the data of prevFullDate.
+    // Here it will assume monthly data from the incr start date till last month and daily data for this month from 1st
+    // to yesterda'y date.
     val possibleMergeModes = Array("full", "historical")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 

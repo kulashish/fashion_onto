@@ -64,6 +64,24 @@ object MergeTables extends Logging {
     }
   }
 
+  /**
+   * This function gets called when we want to merge the historical data and get the latest full. This historical data
+   * is assumed to be acquired using isHistory = true of Data acq. Here we get monthly till the last month and then
+   * daily for the current month. After merging it will give us the final full till yesterday's date.
+   * e.g., {
+   *    "source": "bob",
+   *    "tableName": "sales_order",
+   *    "primaryKey": "id_sales_order",
+   *    "mergeMode": "historical",
+   *    "incrDate": "2012-06-30",
+   *    "fullDate": "2012/05/31/24",
+   *    "saveMode": "ignore"
+   *  }
+   * This will try to merge all the incremental data of each month starting from 2012-06 to 2015-06 (whichever is last
+   * month) with the full data of date 2012/05/31. After this it will merge the daily data of the current month from 1st
+   * of the month to yesterday's date.
+   * @param mergeInfo - Merge Info object formed from the input mergeJson file.
+   */
   def mergeHistory(mergeInfo: MergeInfo) = {
     var prevFullDate = OptionUtils.getOptValue(mergeInfo.fullDate)
 
@@ -96,7 +114,7 @@ object MergeTables extends Logging {
 
         mergeFull(mrgInfo)
 
-        prevFullDate = end + File.separator + "00"
+        prevFullDate = end + File.separator + "24"
       }
     }
 
@@ -110,7 +128,7 @@ object MergeTables extends Logging {
 
       mergeFull(mrgInfo)
 
-      prevFullDate = end + File.separator + "00"
+      prevFullDate = end + File.separator + "24"
 
     }
   }

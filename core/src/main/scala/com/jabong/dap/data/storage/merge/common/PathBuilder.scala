@@ -19,7 +19,7 @@ object PathBuilder {
   }
 
   def getSavePathFullMerge(incrDate: String, source: String, tableName: String): String = {
-    "%s/%s/%s/full/%s/00".format(basePath, source, tableName, incrDate)
+    "%s/%s/%s/full/%s/24".format(basePath, source, tableName, incrDate)
   }
 
 }
