@@ -15,6 +15,18 @@ class TimeTest extends FlatSpec with Matchers {
   val today = new Date
   val numDaysFromToday = Math.abs(today.getTime - date2.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
 
+  "withLeadingZeros" should "add a zero if input is less than 10" in {
+    val input = 7
+    val output = "07"
+    TimeUtils.withLeadingZeros(input) should be (output)
+  }
+
+  "withLeadingZeros" should "not add a zero if input is greater than 9" in {
+    val input = 23
+    val output = "23"
+    TimeUtils.withLeadingZeros(input) should be (output)
+  }
+
   "daysBetweenTwoDates" should "return 31" in {
     TimeUtils.daysBetweenTwoDates(date1, date2) should be (31)
   }

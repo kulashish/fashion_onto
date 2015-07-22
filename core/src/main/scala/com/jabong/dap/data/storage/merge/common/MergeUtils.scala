@@ -13,6 +13,10 @@ object MergeUtils extends MergeData {
 
   def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
     val newpk = NEW_ + primaryKey
+    if (null == dfBase)
+      return dfIncr
+    else if (null == dfIncr)
+      return dfBase
 
     // join on primary key
     val joinedDF = joinOldAndNewDF(dfIncr, dfBase, primaryKey)

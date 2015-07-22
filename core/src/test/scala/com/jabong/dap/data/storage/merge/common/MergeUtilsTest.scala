@@ -25,6 +25,18 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     assert(mergedDF.collect.size == 4)
   }
 
+  "A Merged DF" should "have size 2" in {
+    var mergedDF = MergeUtils.InsertUpdateMerge(null, df2, "name")
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 2)
+  }
+
+  "A Merged DF" should "have size 3" in {
+    var mergedDF = MergeUtils.InsertUpdateMerge(df1, null, "name")
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 3)
+  }
+
   //  override def afterAll() {
   //    super.afterAll()
   //  }

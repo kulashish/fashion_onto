@@ -279,6 +279,16 @@ object TimeUtils {
 
     return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.START_TIME_MS)
   }
+  /**
+   * Converts integer containing day or month of date to a string with the format MM or dd, respectively.
+   */
+  def withLeadingZeros(input: Int): String = {
+    if (input < 10) {
+      "0%s".format(input)
+    } else {
+      "%s".format(input)
+    }
+  }
 
   case class MonthYear(val month: Int, val year: Int, val day: Int)
 }

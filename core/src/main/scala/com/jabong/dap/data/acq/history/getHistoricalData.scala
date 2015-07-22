@@ -1,8 +1,8 @@
 package com.jabong.dap.data.acq.history
 
-import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ PathBuilder, DbConnection, GetData, TableInfo }
+import com.jabong.dap.common.{ OptionUtils }
+import com.jabong.dap.data.acq.common.{ DbConnection, GetData, TableInfo }
 
 /**
  * Created by pooja on 13/7/15.
@@ -31,7 +31,7 @@ class getHistoricalData extends java.io.Serializable {
       }
 
       for (mnth <- startMonth to endMonth) {
-        val mnthStr = PathBuilder.withLeadingZeros(mnth)
+        val mnthStr = TimeUtils.withLeadingZeros(mnth)
 
         val start = yr.toString + "-" + mnthStr + "-01 " + Constants.START_TIME
 
@@ -49,11 +49,11 @@ class getHistoricalData extends java.io.Serializable {
 
     for (day <- 1 to currMonthYear.day - 1) {
       //      println("till date: " + (currMonthYear.day - 1))
-      val mnthStr = PathBuilder.withLeadingZeros(currMonthYear.month + 1)
-      val yr = currMonthYear.year.toString
-      val start = yr + "-" + mnthStr + "-" + PathBuilder.withLeadingZeros(day) + " " + Constants.START_TIME
+      val mnthStr = TimeUtils.withLeadingZeros(currMonthYear.month + 1)
+      val yrStr = currMonthYear.year.toString
+      val start = yrStr + "-" + mnthStr + "-" + TimeUtils.withLeadingZeros(day) + " " + Constants.START_TIME
 
-      val end = yr.toString + "-" + mnthStr + "-" + PathBuilder.withLeadingZeros(day) + " " + Constants.END_TIME
+      val end = yrStr + "-" + mnthStr + "-" + TimeUtils.withLeadingZeros(day) + " " + Constants.END_TIME
 
       val tblInfo = new TableInfo(source = tableInfo.source, tableName = tableInfo.tableName, primaryKey = tableInfo.primaryKey,
         mode = "daily", saveFormat = tableInfo.saveFormat, saveMode = "ignore", dateColumn = tableInfo.dateColumn,
