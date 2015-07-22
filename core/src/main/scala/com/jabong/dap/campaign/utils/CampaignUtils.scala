@@ -221,7 +221,11 @@ object CampaignUtils extends Logging {
     val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU))
+      .select(
+        inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(ProductVariables.SKU),
+        inputData(ProductVariables.SPECIAL_PRICE)
+      )
 
     logger.info("Filtered all the sku which has been bought")
 

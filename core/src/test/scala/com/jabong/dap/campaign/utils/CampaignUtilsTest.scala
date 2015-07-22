@@ -20,6 +20,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var salesOrder: DataFrame = _
   @transient var salesOrderItem: DataFrame = _
   @transient var customerSelectedTime: DataFrame = _
+  @transient var customerSelectedShortlist: DataFrame = _
 
   val calendar = Calendar.getInstance()
   calendar.add(Calendar.DATE, -1)
@@ -31,6 +32,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     sqlContext = Spark.getSqlContext()
     refSkuInput = sqlContext.read.json("src/test/resources/campaign/ref_sku_input.json")
     customerSelected = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected.json")
+    customerSelectedShortlist = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected_shortlist.json")
     salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
     salesOrderItem = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_item_bought.json")
     customerSelectedTime = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_filtered_time.json")
@@ -102,7 +104,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   }
 
   "input Data  with order data " should "return sku not bought till now" in {
-    val skuNotBought = CampaignUtils.skuNotBought(customerSelected, salesOrder, salesOrderItem)
+    val skuNotBought = CampaignUtils.skuNotBought(customerSelectedShortlist, salesOrder, salesOrderItem)
     assert(skuNotBought.count() == 2)
   }
 
