@@ -2,13 +2,13 @@ package com.jabong.dap.campaign.manager
 
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.scalatest.FlatSpec
 
 /**
  * Created by rahul for com.jabong.dap.campaign.manager on 21/7/15.
  */
-class CampaignManagerTest  extends FlatSpec with Serializable {
+class CampaignManagerTest extends FlatSpec with Serializable {
   val jsonPath: String = "src/test/resources/campaign/campaign_config/push_campaign_conf.json"
   val conf = new Configuration()
   val fileSystem = FileSystem.get(conf)

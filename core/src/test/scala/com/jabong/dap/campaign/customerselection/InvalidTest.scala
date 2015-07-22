@@ -54,11 +54,11 @@ class InvalidTest extends FlatSpec with SharedSparkContext {
     val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, null)
     assert(expectedOrders == null)
   }
-//
-//  "Negative days as parameter" should "return null customer selection" in {
-//    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame, -30)
-//    assert(expectedOrders == null)
-//  }
+  //
+  //  "Negative days as parameter" should "return null customer selection" in {
+  //    val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame, -30)
+  //    assert(expectedOrders == null)
+  //  }
 
   "30 days salesOrder data with orders data" should "return one customer with invalid order" in {
     val expectedOrders = invalidCustomerSelection.customerSelection(orderDataFrame, salesOrderItemDataFrame)
