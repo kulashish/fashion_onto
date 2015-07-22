@@ -83,22 +83,22 @@ my $AMMUNITION1 = "--num-executors 3 --executor-memory 27G";
 
 # bobAcq
 if ($component eq "bobAcq") {
-    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
-    run_component($component, $command);
-    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION1 $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
-    run_component($component, $command);
-    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
-    run_component($component, $command);
+    my $command1 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
+    run_component($component, $command1);
+    my $command2 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION1 $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
+    run_component($component, $command2);
+    my $command3 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
+    run_component($component, $command3);
 # bobMerge
-} else if ($component eq "bobMerge") {
+} elsif ($component eq "bobMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component($component, $command);
 # erpAcq
-} else if ($component eq "erpAcq") {
+} elsif ($component eq "erpAcq") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
     run_component($component, $command);
 # erpMerge
-} else if ($component eq "erpMerge") {
+} elsif ($component eq "erpMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command);
 } else {

@@ -71,14 +71,6 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "ignore"
-    },
-    {
-      "source": "bob",
-      "tableName": "customer_product_shortlist",
-      "primaryKey": "id_customer_product_shortlist",
-      "mode": "full",
-      "saveFormat": "parquet",
-      "saveMode": "ignore"
     }
   ]
 }
