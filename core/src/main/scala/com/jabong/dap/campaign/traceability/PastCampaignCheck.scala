@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.traceability
 
 import com.jabong.dap.common.constants.campaign.CampaignMerge
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables, ProductVariables, CustomerVariables}
 import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -32,5 +32,32 @@ class PastCampaignCheck extends Logging {
     logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
 
     return mailTypeCustomers
+  }
+
+  /**
+   * \
+   * @param pastCampaignData
+   * @param customerSelected
+   * @param campaignMailType
+   * @param nDays
+   * @return
+   */
+  def campaignCheck(pastCampaignData: DataFrame,customerSelected: DataFrame, campaignMailType: Int, nDays: Int): DataFrame ={
+    if (pastCampaignData == null || customerSelected == null || campaignMailType == 0 || nDays < 0) {
+      logger.error("Any of the argument is null")
+      return null
+    }
+
+    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData,campaignMailType,nDays).withColumnRenamed(CampaignMerge.FK_CUSTOMER,  "pastCampaign_" + CampaignMerge.FK_CUSTOMER)
+    val pastCampaignNotSendCustomers = customerSelected.join(pastCampaignSendCustomers, customerSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers( "pastCampaign_" + CampaignMerge.FK_CUSTOMER),"left_outer")
+      .filter(
+        "pastCampaign_" + CampaignMerge.FK_CUSTOMER + " is null"
+      )
+      .select(
+        customerSelected(CustomerVariables.FK_CUSTOMER),
+        customerSelected(ProductVariables.SKU_SIMPLE)
+      )
+
+    return pastCampaignNotSendCustomers
   }
 }
