@@ -1,0 +1,84 @@
+{
+  "acquisition": [
+    {
+      "source": "bob",
+      "tableName": "catalog_brand",
+      "primaryKey": "id_catalog_brand",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_category",
+      "primaryKey": "id_catalog_category",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config_has_catalog_category",
+      "primaryKey": "id_catalog_config_has_catalog_category",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_product_image",
+      "primaryKey": "id_catalog_product_image",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_stock",
+      "primaryKey": "id_catalog_stock",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_supplier",
+      "primaryKey": "id_catalog_supplier",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "customer_storecredits_history",
+      "primaryKey": "id_customer_storecredits_history",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_cart_custom_text",
+      "primaryKey": "id_sales_cart_custom_text",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_status",
+      "primaryKey": "id_sales_order_item_status",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "customer_product_shortlist",
+      "primaryKey": "id_customer_product_shortlist",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "ignore"
+    }
+  ]
+}

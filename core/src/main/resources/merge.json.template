@@ -1,0 +1,39 @@
+{
+  "merge": [
+    {
+      "source": "bob",
+      "tableName": "sales_order",
+      "primaryKey": "id_sales_order",
+      "mergeMode": "full",
+      "saveMode": "overwrite"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item",
+      "primaryKey": "id_sales_order_item",
+      "mergeMode": "full",
+      "saveMode": "overwrite"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config",
+      "primaryKey": "id_catalog_config",
+      "mergeMode": "full",
+      "saveMode": "overwrite"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple",
+      "primaryKey": "id_catalog_simple",
+      "mergeMode": "full",
+      "saveMode": "overwrite"
+    },
+    {
+      "source": "erp",
+      "tableName": "item_master",
+      "primaryKey": "No_",
+      "mergeMode": "full",
+      "saveMode": "overwrite"
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 package com.jabong.dap.data.read
 
 import java.io.File
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{ LocatedFileStatus, RemoteIterator, Path, FileSystem }
+
 import scala.util.control.Breaks._
 
 object FormatResolver {
@@ -12,12 +15,15 @@ object FormatResolver {
    * is not found in the given directory.
    */
   def getFormat(directory: String): String = {
-    val dir = new File(directory)
-    val directoryListing = dir.listFiles()
+    val fileSystem = FileSystem.get(new Configuration())
+    val directoryListingIterator: RemoteIterator[LocatedFileStatus] = fileSystem.listFiles(new Path(directory), false)
     var flag: String = null
-    if (directoryListing != null) {
+    if (directoryListingIterator.hasNext) {
       breakable {
-        for (file <- directoryListing) {
+        while (directoryListingIterator.hasNext) {
+          val fileStatus: LocatedFileStatus = directoryListingIterator.next()
+          val filename: String = fileStatus.getPath.getName
+          val file = new File(filename)
           val extension = getFileExtension(file)
           if (extension == "orc" || extension == "parquet") {
             flag = extension

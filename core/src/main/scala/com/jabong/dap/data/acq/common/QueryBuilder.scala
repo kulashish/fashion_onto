@@ -22,8 +22,9 @@ object QueryBuilder {
 
     for (info <- joinTables) {
       val tableAlias = "j" + count
-      if (OptionUtils.getOptValue(info.selectString) != null) {
-        selectString = selectString + ", " + info.selectString
+      val selectStr = OptionUtils.getOptValue(info.selectString)
+      if (null != selectStr) {
+        selectString = selectString + ", " + selectStr
       } else {
         selectString = selectString + ", " + tableAlias + ".*"
       }
