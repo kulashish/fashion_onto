@@ -13,7 +13,7 @@ object UserDeviceMapping {
    * @param dfUser
    * @return (DataFrame)
    */
-  def getUserDeviceMap (dfUser: DataFrame): DataFrame = {
+  def getUserDeviceMap(dfUser: DataFrame): DataFrame = {
     if (dfUser == null) {
 
       log("Data frame should not be null")
@@ -37,7 +37,7 @@ object UserDeviceMapping {
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.PAGE_TIMESTAMP)
     )
-     .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
+      .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
       .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
       .filter(PageVisitVariables.PAGE_TIMESTAMP + " IS NOT NULL")
 
@@ -52,7 +52,12 @@ object UserDeviceMapping {
     return dfuserDeviceMap
   }
 
-  def getUserDeviceMapApp (dfUser: DataFrame): DataFrame = {
+  /**
+   * Mapping user to device/browser_id for apps with preprocessed dataframe
+   * @param dfUser
+   * @return (DataFrame)
+   */
+  def getUserDeviceMapApp(dfUser: DataFrame): DataFrame = {
     if (dfUser == null) {
 
       log("Data frame should not be null")

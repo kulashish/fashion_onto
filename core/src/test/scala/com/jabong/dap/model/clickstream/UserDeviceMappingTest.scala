@@ -1,10 +1,10 @@
 package com.jabong.dap.model.clickstream
 
-import com.jabong.dap.common.{SharedSparkContext, Spark}
-import com.jabong.dap.model.clickstream.variables.{UserDeviceMapping}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.model.clickstream.variables.{ UserDeviceMapping }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
 
 class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
