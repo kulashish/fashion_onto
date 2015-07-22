@@ -3,22 +3,22 @@ package com.jabong.dap.model.product.itr
 import java.math
 
 import com.jabong.dap.common.time.{ TimeUtils, Constants }
-import com.jabong.dap.common.{ Spark, AppConfig }
+import com.jabong.dap.common.AppConfig
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions._
 import com.jabong.dap.model.product.itr.variables.ITR
 
-class Itr extends java.io.Serializable with Logging {
+class Itr extends Serializable with Logging {
 
   /**
    * Convert string to tuple2
    * @param priceBand
    * @return Tuple2
    */
-  def getRage(priceBand: String): (math.BigDecimal, math.BigDecimal) = {
+  def getRange(priceBand: String): (math.BigDecimal, math.BigDecimal) = {
     val range = priceBand.split("-")
-    new Tuple2(new math.BigDecimal(range(0)), new math.BigDecimal(range(0)))
+    new Tuple2(new math.BigDecimal(range(0)), new math.BigDecimal(range(1)))
   }
 
   /**
@@ -31,10 +31,10 @@ class Itr extends java.io.Serializable with Logging {
     priceBandD: String,
     priceBandE: String,
     specialPrice: java.math.BigDecimal) => {
-    val aRange = getRage(priceBandA)
-    val bRange = getRage(priceBandB)
-    val cRange = getRage(priceBandC)
-    val dRange = getRage(priceBandD)
+    val aRange = getRange(priceBandA)
+    val bRange = getRange(priceBandB)
+    val cRange = getRange(priceBandC)
+    val dRange = getRange(priceBandD)
 
     if ((specialPrice == 0.0) || (specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0) ||
       (specialPrice.compareTo(bRange._1) >= 0 && specialPrice.compareTo(bRange._2) <= 0)) {
@@ -58,10 +58,10 @@ class Itr extends java.io.Serializable with Logging {
     priceBandE: String,
     specialPrice: math.BigDecimal) => {
 
-    val aRange = getRage(priceBandA)
-    val bRange = getRage(priceBandB)
-    val cRange = getRage(priceBandC)
-    val dRange = getRage(priceBandD)
+    val aRange = getRange(priceBandA)
+    val bRange = getRange(priceBandB)
+    val cRange = getRange(priceBandC)
+    val dRange = getRange(priceBandD)
 
     if (specialPrice == 0.0 || (specialPrice.compareTo(aRange._1) >= 0 && specialPrice.compareTo(aRange._2) <= 0)) {
       "A"

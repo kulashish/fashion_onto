@@ -4,7 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import com.jabong.dap.model.product.itr.variables.ITR
 
-object PriceBand extends java.io.Serializable {
+object PriceBand {
   /**
    * Prepare data frame for price band
    * @return DataFrame
@@ -73,7 +73,7 @@ object PriceBand extends java.io.Serializable {
     if (minSpecialPrice == null && maxSpecialPrice == null) {
       0
     } else {
-      ((maxSpecialPrice.asInstanceOf[java.math.BigDecimal].doubleValue() - minSpecialPrice.asInstanceOf[java.math.BigDecimal].doubleValue()) / 5)
+      (maxSpecialPrice.asInstanceOf[java.math.BigDecimal].doubleValue() - minSpecialPrice.asInstanceOf[java.math.BigDecimal].doubleValue()) / 5
     }
   }
 
