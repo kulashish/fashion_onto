@@ -7,6 +7,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.model.clickstream.utils.{ GroupData, GetMergedClickstreamData }
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ DataFrame, SaveMode, Row }
+import org.apache.spark.sql.{ SQLContext, DataFrame, SaveMode, Row }
 import org.apache.spark.{ SparkContext, SparkConf }
 
 /**
@@ -32,7 +33,7 @@ object SurfVariablesMain extends java.io.Serializable {
     val currentMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
     var processedVariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf3ProcessedVariable"
     val userDeviceMapPath = args(2) + "/" + year + "/" + month + "/" + day + "/userDeviceMap"
-
+    var surf1VariablePath = args(3) + "/" + year + "/" + month + "/" + day + "/Surf1ProcessedVariable"
     cal.add(Calendar.DATE, -1);
     year = cal.get(Calendar.YEAR);
     day = cal.get(Calendar.DAY_OF_MONTH);
@@ -56,7 +57,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .getUserDeviceMapApp(useridDeviceidFrame)
       .write.mode("error")
       .save(userDeviceMapPath)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, args(0))
+    variableSurf1.write.save(surf1VariablePath)
   }
-
 }
-

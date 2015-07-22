@@ -6,7 +6,7 @@ import java.util.Calendar
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ SQLContext, DataFrame, Row }
 import org.apache.spark.sql.hive.HiveContext
 
 /**
@@ -39,7 +39,7 @@ object GetSurfVariables extends java.io.Serializable {
    * @param incremental
    * @return (DataFrame)
    */
-  def ProcessSurf3Variable(mergedData: DataFrame, incremental: DataFrame): DataFrame ={
+  def ProcessSurf3Variable(mergedData: DataFrame, incremental: DataFrame): DataFrame = {
     var today = "_daily"
     var explodedMergedData = mergedData.explode("skuList", "sku") { str: List[String] => str.toList }
     var joinResult = incremental.join(explodedMergedData, incremental("userid" + today) === explodedMergedData("userid"))
@@ -58,7 +58,7 @@ object GetSurfVariables extends java.io.Serializable {
    * @param yesterDate
    * @return (DataFrame)
    */
-  def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, yesterDate:String): DataFrame = {
+  def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, yesterDate: String): DataFrame = {
     import hiveContext.implicits._
 
     val dateFormat = new SimpleDateFormat("dd/MM/yyyy")
@@ -66,7 +66,7 @@ object GetSurfVariables extends java.io.Serializable {
     cal.setTime(dateFormat.parse(yesterDate))
     cal.add(Calendar.DATE, -29)
     var filterDate = dateFormat.format(cal.getTime())
-    val yesterMerge = mergedData.filter("dt != '"+filterDate.toString+"'")
+    val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
     val IncrementalMerge = incremental.map(t => (t(0).toString, t(1).toString))
       .reduceByKey((x, y) => (x + "," + y))
       .map(v => (v._1, yesterDate.toString, (v._2.split(",").toSet.toList)))
@@ -74,11 +74,21 @@ object GetSurfVariables extends java.io.Serializable {
     return yesterMerge.unionAll(IncrementalMerge)
   }
 
-
-  def uidToDeviceid(hiveContext: HiveContext):DataFrame = {
+  def uidToDeviceid(hiveContext: HiveContext): DataFrame = {
     val uiddeviceiddf = hiveContext.sql("select distinct case when userid is null then concat('_app_',bid) else userid end as userid,bid as deviceid,domain,max(pagets) as pagets from merge.app where bid is not null and pagets is not null group by userid,bid,domain order by userid,pagets desc")
     return uiddeviceiddf
   }
 
+  /**
+   * Converts null app userid to _app_browserid and filter null desktop userid
+   * Returns list of [userid, browserid,actualvisitid,domain, List[Sku]]
+   * @param hiveContext
+   * @return (DataFrame)
+   */
+  def listOfProductsViewedInSession(hiveContext: HiveContext, tablename: String): DataFrame = {
+    val query = "select case when (domain in('android','ios','windows') and userid is null) then concat('_app_',browserid) else userid end as userid,browserid,actualvisitid,domain,collect_set(productsku) from " + tablename + " where browserid is not null and productsku is not null and pagetype in ('CPD','DPD','QPD') and (userid is not null and domain in ('w','m') or domain in ('android','ios','windows'))group by userid,browserid,actualvisitid,domain"
+    val surf1Variables = hiveContext.sql(query)
+    return surf1Variables
+  }
 
 }

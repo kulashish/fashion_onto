@@ -4,9 +4,9 @@ import java.text.SimpleDateFormat
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
-import scala.collection.mutable.{Map, Set}
+import scala.collection.mutable.{ Map, Set }
 import scala.util.control._
 
 /**
@@ -23,7 +23,7 @@ object VariableMethods extends java.io.Serializable {
     val userDomain = GroupedData.mapValues(x => scala.collection.mutable.Set(x(domain).toString))
     val appcheck = userDomain.reduceByKey((x, y) => appCheckReducer(x, y))
     val result = appcheck.mapValues(x => x("w"))
-  //  result.saveAsTextFile(ClickstreamConstants.appcheckOutputPath)
+    //  result.saveAsTextFile(ClickstreamConstants.appcheckOutputPath)
     println(result.count());
   }
 
@@ -31,7 +31,7 @@ object VariableMethods extends java.io.Serializable {
     return x ++ y
   }
 
-  def lastBrowsedDevice(GroupedData: RDD[(String, Row)], pagevisit: DataFrame): RDD[(String,Any)] = {
+  def lastBrowsedDevice(GroupedData: RDD[(String, Row)], pagevisit: DataFrame): RDD[(String, Any)] = {
     val col = pagevisit.columns
     var pagets: Int = 0
     for (i <- 1 to (col.length - 1)) {
@@ -44,7 +44,7 @@ object VariableMethods extends java.io.Serializable {
         device = i
     }
     val userPagets = GroupedData.mapValues(x => (x(pagets).toString, x(device)))
-    val lastDevice = userPagets.reduceByKey((x, y) => lastDeviceReducer(x, y)).map(x=> (x._1, x._2._2))
+    val lastDevice = userPagets.reduceByKey((x, y) => lastDeviceReducer(x, y)).map(x => (x._1, x._2._2))
     return lastDevice
   }
 
@@ -55,22 +55,21 @@ object VariableMethods extends java.io.Serializable {
     val date2 = format.parse(y._1)
     if (date1 after date2) {
       return x
-    }
-    else
+    } else
       return y
   }
 
-  def getBrands(brands :Tuple2[Any,List[(Any, Array[Any])]] ): Array[String] =
-  {
-    var cnt = 0
-    var arr = new Array[String](4)
-    arr(cnt) = brands._1.toString
-    for (br <- brands._2) {
-      cnt += 1
-      arr(cnt) = br._2(1).toString
+  def getBrands(brands: Tuple2[Any, List[(Any, Array[Any])]]): Array[String] =
+    {
+      var cnt = 0
+      var arr = new Array[String](4)
+      arr(cnt) = brands._1.toString
+      for (br <- brands._2) {
+        cnt += 1
+        arr(cnt) = br._2(1).toString
+      }
+      return arr
     }
-    return arr
-  }
 
   def comparePagets(a: Brand, b: Brand): Boolean = {
     val a1: String = a.pagets.toString
@@ -80,15 +79,14 @@ object VariableMethods extends java.io.Serializable {
     val date2 = format.parse(b1)
     if (date1 after date2) {
       return true
-    }
-    else
+    } else
       return false
   }
 
   def returnLast3Reducer(x: List[(Any, Array[Any])], y: List[(Any, Array[Any])]): List[(Any, Array[Any])] = {
     val merge = x ::: y
     val brand =
-      for (m <- 0 to merge.length-1) yield new Brand(merge(m)._1, merge(m)._2)
+      for (m <- 0 to merge.length - 1) yield new Brand(merge(m)._1, merge(m)._2)
     var lastBrands = brand sortWith comparePagets
     // Get last three brands
     var cnt = 0
@@ -98,16 +96,14 @@ object VariableMethods extends java.io.Serializable {
     var previousBrand2 = ""
     loop.breakable {
       for (b <- lastBrands) {
-        if(cnt == 0) {
+        if (cnt == 0) {
           list.++=(List(b.pagets -> b.info))
           previousBrand1 = b.info(1).toString
           cnt += 1
-        }
-        else if((previousBrand1 != b.info(1).toString) && (previousBrand2 != b.info(1).toString))
-        {
+        } else if ((previousBrand1 != b.info(1).toString) && (previousBrand2 != b.info(1).toString)) {
           list.++=(List(b.pagets -> b.info))
           previousBrand2 != b.info(1).toString
-          cnt +=1
+          cnt += 1
         }
 
         if (cnt == 3) loop.break()
@@ -146,7 +142,7 @@ object VariableMethods extends java.io.Serializable {
       .map(x => (x._1, Map(x._2(domain).toString -> x._2(visitts).toString)))
       .reduceByKey((x, y) => maxByDate(x, y))
       .map(x => (x._1, getDomain(x._2.keys.take(1).head)))
-     // .saveAsTextFile(ClickstreamConstants.lastDomainOutputPath)
+    // .saveAsTextFile(ClickstreamConstants.lastDomainOutputPath)
   }
 
   def maxByDate(x: Map[String, String], y: Map[String, String]): Map[String, String] = {
@@ -165,10 +161,9 @@ object VariableMethods extends java.io.Serializable {
     return domain
   }
 
-  class Brand (
-                val pagets: Any,
-               val info: Array[Any]
-               ) {
+  class Brand(
+      val pagets: Any,
+      val info: Array[Any]) {
     override def toString() =
       "(" + pagets + ") " + info
   }
