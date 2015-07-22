@@ -19,7 +19,7 @@ object MergeTables extends Logging {
     case _ => null
   }
 
-  def mergeFull(mergeInfo: MergeInfo) = {
+  def mergeFull(mergeInfo: MergeInfo): Unit = {
     val primaryKey = mergeInfo.primaryKey
     val saveMode = mergeInfo.saveMode
     val source = mergeInfo.source
@@ -27,6 +27,24 @@ object MergeTables extends Logging {
     // If the incremental date is null than it is assumed that it will be yesterday's date.
     val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER))
       .replaceAll("-", File.separator)
+
+    val savePath = PathBuilder.getSavePathFullMerge(incrDate, source, tableName)
+    if (saveMode.equals("ignore")) {
+      if (DataVerifier.dataExists(savePath)) {
+        logger.info("File Already exists: " + savePath)
+        println("File Already exists so not doing anything: " + savePath)
+        return
+      }
+      if (DataVerifier.hdfsDirExists(savePath)) {
+        DataVerifier.hdfsDirDelete(savePath)
+        logger.info("Directory with no success file was removed: " + savePath)
+        println("Directory with no success file was removed: " + savePath)
+      }
+    } else if (saveMode.equals("error") && DataVerifier.hdfsDirExists(savePath)) {
+      logger.info("File Already exists and save Mode is error: " + savePath)
+      println("File Already exists and save Mode is error: " + savePath)
+      return
+    }
 
     // If incremental Data Mode is null then we assume that it will be "daily"
     val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, "daily")
@@ -54,7 +72,7 @@ object MergeTables extends Logging {
           .load(MergePathResolver.incrementalPathResolver(pathIncr))
       val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
 
-      mergedDF.write.format(saveFormat).mode(saveMode).save(PathBuilder.getSavePathFullMerge(incrDate, source, tableName))
+      mergedDF.write.format(saveFormat).mode(saveMode).save(savePath)
       println("merged " + pathIncr + " with " + pathFull)
     } catch {
       case e: DataNotFound =>
