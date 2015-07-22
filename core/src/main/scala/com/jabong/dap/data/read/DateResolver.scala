@@ -11,10 +11,10 @@ object DateResolver {
    * value of hour for the given date.
    */
   def getDateWithHour(source: String, tableName: String, mode: String, date: String): String = {
-    var hour: Int = 23
+    var hour: Int = 24
     var flag = 0
     var dateHour: String = null
-    while (hour >= 0 && flag == 0) {
+    while (hour >= 1 && flag == 0) {
       dateHour = withLeadingZeros(hour)
       val path = PathBuilder.buildPath(source, tableName, mode, date) + File.separator + dateHour
       if (DataVerifier.dataExists(path)) {

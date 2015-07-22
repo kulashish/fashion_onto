@@ -57,5 +57,10 @@ object DataSets {
   val ITR_30_DAY_DATA = "itr_30_day_data"
 
   val YESTERDAY_ITR_DATA = "yesterday_itr_data"
+  
+  // Data sources
+  val BOB_SOURCE = "bob"
+  val ERP_SOURCE = "erp"
+  
 
 }

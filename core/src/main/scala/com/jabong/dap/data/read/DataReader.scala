@@ -70,6 +70,7 @@ object DataReader extends Logging {
     val fetchPath = PathBuilder.buildPath(source, tableName, mode, dateWithHour)
     val saveFormat = FormatResolver.getFormat(fetchPath)
     val context = getContext(saveFormat)
+    logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)
     context.read.format(saveFormat).load(fetchPath)
   }
 

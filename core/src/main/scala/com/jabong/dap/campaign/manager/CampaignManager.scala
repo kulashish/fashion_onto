@@ -1,8 +1,12 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist.LiveRetargetCampaign
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.Spark
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.{ CampaignDetail, CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -93,6 +97,23 @@ object CampaignManager extends Serializable with Logging {
 
     return true
   }
+  
+  
+  def startPushRetargetCampaign() = {
+    val liveRetargetCampaign = new LiveRetargetCampaign()
+
+    val orderItemData = CampaignInput.loadYesterdayOrderItemData()
+    val orderData = CampaignInput.loadLast30daysOrderData()
+    
+    liveRetargetCampaign.runCampaign(orderData, orderItemData)
+  }
+  
+  
+  def startPushCampaignMerge(json: String) = {
+    
+    
+  }
+  
   //
   //  def execute() = {
   //
