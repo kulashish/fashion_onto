@@ -40,48 +40,56 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
     assert(mailTypeCustomers == null)
   }
 
-  "Past campaign Data with 47 mail type" should "return one customer whom we have sent the campaign" in {
+  "Past campaign Data with 47 mail type" should "return no customer whom we have sent the campaign" in {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val mailTypeCustomers = pastCampaignCheck.getCampaignCustomers(pastCampaignData, 47, ndays)
-    assert(mailTypeCustomers.count == 1)
+    assert(mailTypeCustomers.count == 0)
   }
 
-  "Past campaign Data with 46 mail type" should "return two customer whom we have sent the campaign" in {
+  "Past campaign Data with 46 mail type" should "return one customer whom we have sent the campaign" in {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val mailTypeCustomers = pastCampaignCheck.getCampaignCustomers(pastCampaignData, 46, ndays)
-    assert(mailTypeCustomers.count == 2)
+    assert(mailTypeCustomers.count == 1)
   }
 
-  "No past campaign Data to past campaign check" should "return no customer whom we have sent the campaign" in {
+  "No past campaign Data to past campaign check" should "return null customer whom we have sent the campaign" in {
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(null, customerSelected, 46, 20)
     assert(campaignNotSendCustomers == null)
   }
 
-  "No customer selected Data to past campaign check" should "return no customer whom we have sent the campaign" in {
+  "No customer selected Data to past campaign check" should "return null customer whom we have not sent the campaign" in {
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, null, 46, 20)
     assert(campaignNotSendCustomers == null)
   }
 
-  "No mail Type to past campaign check" should "return no customer whom we have sent the campaign" in {
+  "No mail Type to past campaign check" should "return null customer whom we have sent not the campaign" in {
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, customerSelected, 0, 20)
     assert(campaignNotSendCustomers == null)
   }
 
-  "Negative days to past campaign check" should "return no customer whom we have sent the campaign" in {
+  "Negative days to past campaign check" should "return null customer whom we have sent not the campaign" in {
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, customerSelected, 47, -20)
     assert(campaignNotSendCustomers == null)
   }
 
-  "Past campaign Data with 46 mail type to past campaign check" should "return two customer whom we have sent the campaign" in {
+  "Past campaign Data with 46 mail type to past campaign check" should "return one customer whom we have not sent the campaign" in {
     val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, customerSelected, 46, ndays)
     assert(campaignNotSendCustomers.count == 1)
+  }
+
+  "Past campaign Data with 47 mail type to past campaign check" should "return two customer whom we have  not sent the campaign" in {
+    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val date = format.parse("2015-07-09 00:00:08.0")
+    val ndays = TimeUtils.daysFromToday(date).toInt
+    val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, customerSelected, 47, ndays)
+    assert(campaignNotSendCustomers.count == 2)
   }
 
 }
