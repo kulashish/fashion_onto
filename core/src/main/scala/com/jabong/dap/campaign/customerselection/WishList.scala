@@ -61,13 +61,16 @@ class WishList extends LiveCustomerSelector with Logging {
 
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
 
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT_MS)
+
+    val endTimeStamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
+
     //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
     // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
-    // FIXME -- filter for created_at <= endTimeStamp
     val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
       //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
       CustomerProductShortlistVariables.REMOVED_AT + " is null and " +
-      CustomerProductShortlistVariables.CREATED_AT + " >= " + "'" + startTimestamp + "'")
+      "'" + startTimestamp + "'" + " <= " + CustomerProductShortlistVariables.CREATED_AT + " and " + CustomerProductShortlistVariables.CREATED_AT + " <= " + "'" + endTimeStamp + "'")
       .select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
@@ -75,7 +78,7 @@ class WishList extends LiveCustomerSelector with Logging {
         col(CustomerProductShortlistVariables.DOMAIN),
         col(CustomerProductShortlistVariables.USER_DEVICE_TYPE),
         Udf.yyyymmdd(dfCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
-        Udf.simpleSkuFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.SIMPLE_SKU,
+        Udf.simpleSkuFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.SKU_SIMPLE,
         Udf.priceFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.PRICE
       )
 

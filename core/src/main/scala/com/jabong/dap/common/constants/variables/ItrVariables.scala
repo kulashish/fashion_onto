@@ -6,7 +6,7 @@ package com.jabong.dap.common.constants.variables
 object ItrVariables {
 
   val SKU = "sku"
-  val SIMPLE_SKU = "simple_sku"
+  val SKU_SIMPLE = "sku_simple"
   val SPECIAL_PRICE = "special_price"
   val BRAND = "brand"
   val BRICK = "brick"

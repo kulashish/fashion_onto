@@ -188,13 +188,13 @@ object Schema {
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true),
     StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true),
-    StructField(CustomerProductShortlistVariables.SIMPLE_SKU, StringType, true),
+    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
     StructField(CustomerProductShortlistVariables.PRICE, DecimalType(10, 2), true)
   ))
 
   val itr = StructType(Array(
     StructField(ItrVariables.SKU, StringType, true),
-    StructField(ItrVariables.SIMPLE_SKU, StringType, true),
+    StructField(ItrVariables.SKU_SIMPLE, StringType, true),
     StructField(ItrVariables.BRAND, StringType, true),
     StructField(ItrVariables.BRICK, StringType, true),
     StructField(ItrVariables.MVP, IntegerType, true),
@@ -203,20 +203,36 @@ object Schema {
     StructField(ItrVariables.AVERAGE_PRICE, DecimalType(10, 2), true),
     StructField(ItrVariables.WEEKLY_AVERAGE_SALE, DecimalType(10, 2), true),
     StructField(ItrVariables.AVERAGE_STOCK, IntegerType, true),
+    StructField(ItrVariables.STOCK, IntegerType, true),
     StructField(ItrVariables.CREATED_AT, TimestampType, true)
   ))
 
   val resultGetJoin = StructType(Array(
     StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
-    StructField(ItrVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
+    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
+    StructField(ItrVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuSimpleFilter = StructType(Array(
     StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true)
+    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerProductShortlistVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
+  ))
+
+  val resultSkuFilter = StructType(Array(
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
+    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
+    StructField(CustomerProductShortlistVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
+  ))
+
+  val resultFullSkuFilter = StructType(Array(
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
 }
