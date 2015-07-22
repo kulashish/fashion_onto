@@ -66,8 +66,12 @@ object DataReader extends Logging {
    * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
    */
   private def fetchDataFrame(source: String, tableName: String, mode: String, date: String): DataFrame = {
-    val dateWithHour = DateResolver.getDateWithHour(source, tableName, mode, date)
-    val fetchPath = PathBuilder.buildPath(source, tableName, mode, dateWithHour)
+    var reqDate = date
+    if (!mode.equals("daily")) {
+      // append hour after it
+      reqDate = DateResolver.getDateWithHour(source, tableName, mode, date)
+    }
+    val fetchPath = PathBuilder.buildPath(source, tableName, mode, reqDate)
     val saveFormat = FormatResolver.getFormat(fetchPath)
     val context = getContext(saveFormat)
     logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)

@@ -22,7 +22,7 @@ object CampaignInput extends Logging{
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "incr", dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "daily", dateYesterday)
     orderItemData
   }
 

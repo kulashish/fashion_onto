@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.utils
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Date, Calendar }
 
@@ -10,6 +11,9 @@ import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import java.math.BigDecimal
+
+import org.apache.spark.sql.types.{Decimal, DecimalType}
 
 /**
  * Utility Class
@@ -41,7 +45,7 @@ object CampaignUtils extends Logging {
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[Double], t(1).toString)))
+    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal], t(1).toString)))
     val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
@@ -51,9 +55,9 @@ object CampaignUtils extends Logging {
     return grouped
   }
 
-  val currentDaysDifference = udf((date: String) => currentTimeDiff(date: String, "days"))
+  val currentDaysDifference = udf((date: Timestamp) => currentTimeDiff(date: Timestamp, "days"))
 
-  val lastDayTimeDifference = udf((date: String) => lastDayTimeDiff(date: String, "days"))
+  val lastDayTimeDifference = udf((date: Timestamp) => lastDayTimeDiff(date: Timestamp, "days"))
 
   /**
    * To calculate difference between current time and date provided as argument either in days, minutes hours
@@ -61,13 +65,13 @@ object CampaignUtils extends Logging {
    * @param diffType
    * @return
    */
-  def currentTimeDiff(date: String, diffType: String): Double = {
-    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    val prodDate = dateFormat.parse(date)
+  def currentTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
 
     val cal = Calendar.getInstance();
 
-    val diff = cal.getTime().getTime - prodDate.getTime()
+    val diff = cal.getTime().getTime - date.getTime
 
     var diffTime: Double = 0
 
@@ -87,13 +91,13 @@ object CampaignUtils extends Logging {
    * @param diffType
    * @return
    */
-  def lastDayTimeDiff(date: String, diffType: String): Double = {
-    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    val prodDate = dateFormat.parse(date)
+  def lastDayTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
 
     val cal = Calendar.getInstance();
     cal.add(Calendar.DATE, -1)
-    val diff = startOfDay(cal.getTime) - prodDate.getTime()
+    val diff = startOfDay(cal.getTime) - date.getTime()
 
     var diffTime: Double = 0
 

@@ -83,6 +83,9 @@ my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 if ($component eq "bobAcq") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcquisitionTables.json";
     run_component($component, $command);
+} if ($component eq "retargetPushCampaign") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+    run_component($component, $command);
 } else {
    print "not a valid component\n";
 }   
