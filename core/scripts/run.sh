@@ -78,10 +78,17 @@ my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.i
 my $CORE_JAR = "/opt/alchemy-core/current/jar/Alchemy-assembly-0.1.jar";
 my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
 my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+my $AMMUNITION1 = "--num-executors 3 --executor-memory 27G";
 
 # bobAcq
 if ($component eq "bobAcq") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcquisitionTables.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
+    run_component($component, $command);
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION1 $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
+    run_component($component, $command);
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
+    run_component($component, $command);
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component($component, $command);
 } else {
    print "not a valid component\n";
