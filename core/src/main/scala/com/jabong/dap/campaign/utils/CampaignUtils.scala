@@ -223,6 +223,7 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
         inputData(ProductVariables.SPECIAL_PRICE)
       )

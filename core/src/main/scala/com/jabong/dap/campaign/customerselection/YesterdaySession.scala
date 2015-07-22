@@ -10,6 +10,7 @@ import org.apache.spark.sql.DataFrame
  * Input - (user, session, deviceid, devicetype, [list of skus])
  */
 class YesterdaySession extends CustomerSelector {
+
   override def customerSelection(inData: DataFrame): DataFrame = ???
 
   override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
