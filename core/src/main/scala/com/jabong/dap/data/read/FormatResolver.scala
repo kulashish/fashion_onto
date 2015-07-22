@@ -2,7 +2,7 @@ package com.jabong.dap.data.read
 
 import java.io.File
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{LocatedFileStatus, RemoteIterator, Path, FileSystem}
+import org.apache.hadoop.fs.{ LocatedFileStatus, RemoteIterator, Path, FileSystem }
 
 import scala.util.control.Breaks._
 
