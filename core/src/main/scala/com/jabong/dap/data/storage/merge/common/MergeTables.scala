@@ -6,6 +6,7 @@ import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.read.{ FormatResolver, ValidFormatNotFound }
+import com.jabong.dap.data.storage.merge.common.PathBuilder.DataNotExist
 import grizzled.slf4j.Logging
 
 /**
@@ -50,13 +51,14 @@ object MergeTables extends Logging {
     val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, "daily")
 
     // If full Data date is null then we assume that it will be day before the Incremental Data's date.
-    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, incrDate))
+    val prevFullDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, incrDate) + File.separator + "24"
+    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, prevFullDate)
       .replaceAll("-", File.separator)
 
-    val pathFull = PathBuilder.getFullDataPath(fullDataDate, source, tableName)
-    lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)
-
     try {
+      val pathFull = PathBuilder.getFullDataPath(fullDataDate, source, tableName)
+      lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)
+
       val saveFormat = FormatResolver.getFormat(pathFull)
       val context = getContext(saveFormat)
 
@@ -79,6 +81,8 @@ object MergeTables extends Logging {
         logger.error("Data not at location: " + e.getMessage)
       case e: ValidFormatNotFound =>
         logger.error("Could not resolve format in which the data is saved")
+      case e: DataNotExist =>
+        logger.error("Data in the given Path doesn't exist")
     }
   }
 
