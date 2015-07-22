@@ -21,7 +21,7 @@ class InvalidLowStockCampaign {
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
 
-    //FIXME:Filter the order items data for last 3 days
+    //FIXME:Filter the order items data for last 30 days
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     //sku selection

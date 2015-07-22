@@ -15,7 +15,7 @@ class InvalidFollowUpCampaign {
 
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
-    //FIXME:Filter the order items data for 30 days
+    //FIXME:Filter the order items data for 3 days
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     //sku selection
