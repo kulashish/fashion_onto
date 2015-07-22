@@ -11,7 +11,8 @@ package:
 	mkdir -p $(BASE)/jar
 	mkdir -p $(BASE)/conf
 	cp target/scala-2.10/Alchemy-assembly-$(VERSION).jar $(BASE)/jar/
-	cp src/main/resources/bobAcquisitionTables.json $(BASE)/conf/
+	cp src/main/resources/bobAcqFull.json $(BASE)/conf/
+	cp src/main/resources/bobAcqIncr.json $(BASE)/conf/
 	cp src/main/resources/bobHistory.json $(BASE)/conf/
 	cp src/main/resources/bobMerge.json $(BASE)/conf/
 	cp src/main/resources/erpAcquisitionTables.json $(BASE)/conf/
