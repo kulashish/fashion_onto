@@ -55,6 +55,7 @@ object MergeTables extends Logging {
       val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
 
       mergedDF.write.format(saveFormat).mode(saveMode).save(PathBuilder.getSavePathFullMerge(incrDate, source, tableName))
+      println("merged " + pathIncr + " with " + pathFull)
     } catch {
       case e: DataNotFound =>
         logger.error("Data not at location: " + e.getMessage)
@@ -88,28 +89,28 @@ object MergeTables extends Logging {
       for (mnth <- startMonth to endMonth) {
         val mnthStr = TimeUtils.withLeadingZeros(mnth)
         val days = TimeUtils.getMaxDaysOfMonth(yr.toString + "-" + mnthStr + "-01", Constants.DATE_FORMAT)
-        val end = yr.toString + File.separator + mnthStr + File.separator + days + File.separator + "00"
+        val end = yr.toString + File.separator + mnthStr + File.separator + days
 
         val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = "full",
           incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply("monthly"), saveMode = "ignore")
 
         mergeFull(mrgInfo)
 
-        prevFullDate = end
+        prevFullDate = end + File.separator + "00"
       }
     }
 
     for (day <- 1 to currMonthYear.day - 1) {
       val mnthStr = TimeUtils.withLeadingZeros(currMonthYear.month + 1)
       val yrStr = currMonthYear.year.toString
-      val end = yrStr + File.separator + mnthStr + File.separator + TimeUtils.withLeadingZeros(day) + File.separator + "00"
+      val end = yrStr + File.separator + mnthStr + File.separator + TimeUtils.withLeadingZeros(day)
 
       val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = "full",
         incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply("daily"), saveMode = "ignore")
 
       mergeFull(mrgInfo)
 
-      prevFullDate = end
+      prevFullDate = end + File.separator + "00"
 
     }
   }
