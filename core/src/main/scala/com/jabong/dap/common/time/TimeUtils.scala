@@ -1,14 +1,16 @@
 package com.jabong.dap.common.time
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
+import java.text.{DateFormatSymbols, SimpleDateFormat}
+import java.util
 import java.util.{ Calendar, Date }
+import grizzled.slf4j.Logging
 import scala.collection.immutable.HashMap
 
 /**
  * Created by Rachit on 28/5/15.
  */
-object TimeUtils {
+object TimeUtils extends Logging{
 
   /**
    * Returns the total number of days between two given date inputs
@@ -246,6 +248,55 @@ object TimeUtils {
 
     return todayCal.get(Calendar.YEAR) - cal.get(Calendar.YEAR)
 
+  }
+
+  /**
+   *
+   * @param dateString
+   * @param initialFormat
+   * @param expectedFormat
+   * @return
+   */
+  def changeDateFormat(dateString: String, initialFormat:String, expectedFormat:String): String = {
+    val format = new java.text.SimpleDateFormat(initialFormat)
+    format.setLenient(false)
+    val date = format.parse(dateString)
+    val readableDf = new SimpleDateFormat(expectedFormat);
+    //we want to parse date strictly
+    return readableDf.format(date)
+  }
+
+  /**
+   * @param ipDate
+   * @param DateFormat
+   * @return Weekday Name
+   */
+  def dayName(ipDate: String, DateFormat: String): String ={
+    //dayformat: yyyyMMdd
+    val format = new java.text.SimpleDateFormat(DateFormat)
+    format.setLenient(false)
+    //we want to parse date strictly
+    val date = format.parse(ipDate)
+
+    return (new SimpleDateFormat(Constants.EEEE)).format(date)
+  }
+
+  /**
+   * @param dayName
+   * @param n
+   * @return the nth weekday name from dayName
+   */
+  def nextNDay(dayName: String, n: Int): String = {
+    val dfs  = new DateFormatSymbols()
+    val dayNameCaps = dayName.capitalize
+    val weekDays = util.Arrays.copyOfRange(dfs.getWeekdays(),1,8)
+
+    val index = weekDays.indexOf(dayNameCaps)
+    if(index == -1) {
+      logger.error("I don\'t understand: " + dayName)
+    }
+    val forwardedIndex = index + n
+    return weekDays.apply(forwardedIndex%7)
   }
 
   /**

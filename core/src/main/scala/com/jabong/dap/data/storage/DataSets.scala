@@ -44,4 +44,22 @@ object DataSets {
   //Newsletter Preferences
   val NEWSLETTER_PREFERENCES = "newsletter_preferences"
 
+  //ad4push
+  val DEVICE_REACTION_CSV_DIRECTORY = TEST_RESOURCES+ "ad4push/csv"
+  val DEVICE_REACTION_DF_DIRECTORY = TEST_RESOURCES+"ad4push/df"
+  val DEVICE_REACTION_JSON_DIRECTORY = TEST_RESOURCES+"ad4push/json"
+  //non schema constants for ad4push
+  val IPHONE_CSV_PREFIX = "exportMessagesReactions_517_"
+  val ANDROID_CSV_PREFIX = "exportMessagesReactions_515_"
+
+  val IPHONE_DF_PREFIX = "iphone_"
+  val ANDROID_DF_PREFIX = "android_"
+
+
+  val BEFORE_7_DAYS_DF_NAME = "Before7days"
+  val BEFORE_15_DAYS_DF_NAME = "Before15days"
+  val BEFORE_30_DAYS_DF_NAME = "Before30days"
+  val FULL_DF_NAME = "Full"
+  val CSV_EXTENSION = ".csv"
+  val PARQUET_EXTENSION = ".parquet"
 }

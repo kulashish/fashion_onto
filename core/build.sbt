@@ -24,6 +24,8 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.35"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4"
 
+libraryDependencies += "com.databricks" % "spark-csv_2.11" % "1.0.3"
+
 libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
   "org.slf4j" % "slf4j-simple" % "1.7.5",
   "org.clapper" %% "grizzled-slf4j" % "1.0.1",

@@ -12,4 +12,8 @@ object Constants {
 
   val START_TIME = "00:00:00"
   val END_TIME = "23:59:59"
+
+  val YYYYMMDD = "yyyyMMdd"
+  //used for day name
+  val EEEE = "EEEE"
 }
