@@ -213,6 +213,14 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
+  "getskuFromSimpleSku: simpleSku value" should "LA625BG58FVTINDFAS" in {
+
+    val result = UdfUtils.getskuFromSimpleSku("LA625BG58FVTINDFAS")
+
+    assert(result == "LA625BG58FVTINDFAS")
+
+  }
+
   //===============================getYYYYmmDD()========================================================================
   "getYYYYmmDD: Timestamp value" should "null" in {
 
