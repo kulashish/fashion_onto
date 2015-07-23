@@ -7,6 +7,12 @@ import org.apache.spark.sql.DataFrame
  */
 class CampaignInput {
 
+  def readCustomerData(path: String, date: String): DataFrame = {
+
+    return null
+
+  }
+
   def loadCustomerData(): DataFrame = {
     return null
   }
