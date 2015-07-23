@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.utils
 
+import java.sql.Timestamp
 import java.text.{ DateFormat, SimpleDateFormat }
 import java.util.Calendar
 
@@ -25,7 +26,8 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   val calendar = Calendar.getInstance()
   calendar.add(Calendar.DATE, -1)
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-  val testDate = dateFormat.format(calendar.getTime)
+  val testDate = Timestamp.valueOf(dateFormat.format(calendar.getTime))
+
 
   override def beforeAll() {
     super.beforeAll()
