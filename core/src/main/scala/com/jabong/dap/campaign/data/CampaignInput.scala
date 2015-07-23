@@ -26,6 +26,26 @@ object CampaignInput extends Logging{
     orderItemData
   }
 
+  def loadFullOrderItemData(): DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading full order item data from hdfs")
+    val orderItemData = DataReader.getDataFrame(DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "full", dateYesterday)
+    orderItemData
+  }
+  
+  // based on updated_at
+  def loadLastNdaysOrderItemData(n: Int, fullOrderItemData: DataFrame): DataFrame = {
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, Constants.DATE_TIME_FORMAT_MS))
+    val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
+
+    val yesterdayTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT_MS))
+    val yesterdayEndTime = TimeUtils.getEndTimestampMS(yesterdayTime)
+
+    val lastNdaysOrderItemData = CampaignUtils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, yesterdayEndTime.toString)
+
+    lastNdaysOrderItemData
+  }
+
   def loadFullOrderData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order data from hdfs")
@@ -33,19 +53,15 @@ object CampaignInput extends Logging{
     orderData
   }
 
-  def loadLast30daysOrderData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    logger.info("Reading full order data from hdfs")
-    val orderData = DataReader.getDataFrame(DataSets.BOB_SOURCE, DataSets.SALES_ORDER, "full", dateYesterday)
-
-    val thirtyDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-30, Constants.DATE_TIME_FORMAT_MS))
-    val thirtyDayOldStartTime = TimeUtils.getStartTimestampMS(thirtyDayOldTime)
+  def loadLastNdaysOrderData(n: Int, fullOrderData: DataFrame): DataFrame = {
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, Constants.DATE_TIME_FORMAT_MS))
+    val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
 
     val yesterdayTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT_MS))
     val yesterdayEndTime = TimeUtils.getEndTimestampMS(yesterdayTime)
 
-    val last30daysOrderData = CampaignUtils.getTimeBasedDataFrame(orderData, SalesOrderVariables.CREATED_AT, thirtyDayOldStartTime.toString, yesterdayEndTime.toString)
-    last30daysOrderData
+    val lastNdaysOrderData = CampaignUtils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, yesterdayEndTime.toString)
+    lastNdaysOrderData
   }
 
 
