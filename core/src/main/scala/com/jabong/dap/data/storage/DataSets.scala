@@ -20,6 +20,7 @@ object DataSets {
   val SALES_ORDER_ITEM = "sales_order_item"
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
+  val SALES_CART = "sales_cart"
 
   //customer
   val RESULT_CUSTOMER_INCREMENTAL = "result_customer_incremental"

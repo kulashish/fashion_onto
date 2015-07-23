@@ -64,6 +64,25 @@ object CampaignInput extends Logging {
     lastNdaysOrderData
   }
 
+  def loadLast30daysAcartData(): DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last 30 days acart item data from hdfs")
+
+    val acartData = DataReader.getDataFrame(DataSets.BOB_SOURCE, DataSets.SALES_CART, "monthly", dateYesterday)
+    acartData
+  }
+  
+  // 1 day data only
+  def loadNthdayAcartData(n:Int, last30daysAcartData: DataFrame) : DataFrame = {
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, Constants.DATE_TIME_FORMAT_MS))
+    val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
+    val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
+
+    val nthDayOrderData = CampaignUtils.getTimeBasedDataFrame(last30daysAcartData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
+    nthDayOrderData
+  }
+  
+  
   def loadProductData(): DataFrame = {
     return null
   }

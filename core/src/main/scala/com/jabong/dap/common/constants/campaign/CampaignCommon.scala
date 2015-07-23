@@ -19,7 +19,11 @@ object CampaignCommon {
   val INVALID_FOLLOWUP_CAMPAIGN = "invalidFollowup"
   val INVALID_LOWSTOCK_CAMPAIGN = "invalidLowStock"
   val ACART_FOLLOWUP_CAMPAIGN = "acartFollowUp"
+  val ACART_DAILY_CAMPAIGN = "acartDailys"
+  val ACART_LOWSTOCK_CAMPAIGN = "acartLowStock"
+  val ACART_IOD_CAMPAIGN = "acartIOD"
 
+  
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
   val DATE_FORMAT = "yyyy/MM/dd"

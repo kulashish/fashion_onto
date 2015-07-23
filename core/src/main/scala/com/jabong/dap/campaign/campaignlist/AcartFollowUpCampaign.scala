@@ -11,12 +11,12 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartFollowUpCampaign {
 
-  def runCampaign(salesCartData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(prev3rdDayAcartData: DataFrame,  last3DaySalesOrderData:DataFrame, last3DaySalesOrderItemData: DataFrame, itrData: DataFrame): Unit = {
 
-    val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
+    val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for last 3 days
-    val selectedCustomers = invalidCustomerSelector.customerSelection(salesCartData, orderItemData)
+    val selectedCustomers = acartCustomerSelector.customerSelection(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData)
 
     //sku selection
     val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)

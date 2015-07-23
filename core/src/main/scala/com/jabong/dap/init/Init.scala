@@ -116,6 +116,7 @@ object Init {
       case "covariables" => new CustOrderVarMerger().start(params.coVarJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
+      case "pushAbandonedCartCampaign" =>  CampaignManager.startPushAbandonedCartCampaign()
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCamapignsJson)
     }
   }
