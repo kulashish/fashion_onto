@@ -1,6 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
+import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.functions._
 
 /**
@@ -67,4 +68,26 @@ object Udf {
    * age will convert birthday to age
    */
   val age = udf((birthday: Date) => UdfUtils.getAge(birthday: Date))
+
+  val maxClickDayName = udf((count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int) => UdfUtils.getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int))
+
+  /**
+   * yyyymmdd will convert yyyymmdd formate
+   */
+  val yyyymmdd = udf((t1: Timestamp) => UdfUtils.getYYYYmmDD(t1: Timestamp))
+
+  /**
+   * simpleSkuFromExtraData will extract data from extraData
+   */
+  val simpleSkuFromExtraData = udf((extraData: String) => UdfUtils.getSimpleSkuFromExtraData(extraData: String))
+
+  /**
+   * priceFromExtraData will extract data from extraData
+   */
+  val priceFromExtraData = udf((extraData: String) => UdfUtils.getPriceFromExtraData(extraData: String))
+
+  /**
+   * skuFromSimpleSku will convert simple_sku to sku
+   */
+  val skuFromSimpleSku = udf((simpleSku: String) => UdfUtils.getskuFromSimpleSku(simpleSku: String))
 }

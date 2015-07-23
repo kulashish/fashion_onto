@@ -13,4 +13,5 @@ object OrderStatus {
   val CANCEL_PAYMENT_ERROR = 29
   val RETURN = 8
   val RETURN_PAYMENT_PENDING = 18
+  val INVALID = 10
 }

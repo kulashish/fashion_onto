@@ -1,8 +1,9 @@
 package com.jabong.dap.model.product.itr
 
+import java.io.File
 import java.math
 
-import com.jabong.dap.common.time.{ TimeUtils, Constants }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils, Constants}
 import com.jabong.dap.common.AppConfig
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
@@ -196,13 +197,13 @@ class Itr extends Serializable with Logging {
       return "%s/".
         format(
           AppConfig.config.basePath +
-            Constants.PATH_SEPARATOR + "itr" + Constants.PATH_SEPARATOR + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+            File.separator + "itr" +  File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
         )
     }
     return "%s/".
       format(
         AppConfig.config.basePath +
-          Constants.PATH_SEPARATOR + "itr-sku-level" + Constants.PATH_SEPARATOR + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+          File.separator + "itr-sku-level" +  File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
       )
   }
 }

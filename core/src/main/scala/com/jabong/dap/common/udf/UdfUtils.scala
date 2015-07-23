@@ -1,10 +1,12 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.util.{ Date }
+import java.util.Date
 
 import com.jabong.dap.common.ArrayUtils
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import net.liftweb.json.JsonParser.ParseException
+import net.liftweb.json._
 
 /**
  * Created by raghu on 3/7/15.
@@ -159,6 +161,10 @@ object UdfUtils {
    */
   def getMaxSlot(slots: Any): Int = {
 
+    if (slots == null) {
+      return 0
+    }
+
     var maxSlot = 0
 
     var maxOld = 0
@@ -199,10 +205,158 @@ object UdfUtils {
     new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
   }
 
+  /**
+   * This will return age of person
+   * @param birthday
+   * @return
+   */
   def getAge(birthday: Date): Int = {
+
+    if (birthday == null) {
+      return 0
+    }
 
     return TimeUtils.getYearFromToday(birthday)
 
   }
 
+  /**
+   * This will return Timestamp into YYYYMMDD format
+   * @param t1
+   * @return
+   */
+  def getYYYYmmDD(t1: Timestamp): Timestamp = {
+
+    if (t1 == null) {
+      return null
+    }
+
+    val time = t1.toString()
+
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
+  }
+
+  /**
+   *  getSimpleSkuFromExtraData will extract data from extraData
+   * @param extraData
+   * @return
+   */
+  def getSimpleSkuFromExtraData(extraData: String): String = {
+
+    //    var extraData = "{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+
+    if (extraData == null)
+      return null
+
+    if (extraData.length() < 10)
+      return null
+
+    var simple_sku: String = null
+
+    try {
+      val jsonExtraData = parse(extraData)
+
+      simple_sku = compact(render(jsonExtraData \ "simple_sku")).replaceAll("^\"|\"$", "")
+    } catch {
+      case ex: ParseException => {
+        ex.printStackTrace()
+        return null
+      }
+    }
+    if (simple_sku == null || simple_sku.length() < 10)
+      return null
+
+    return simple_sku
+  }
+
+  /**
+   * getPriceFromExtraData will extract data from extraData
+   * @param extraData
+   * @return
+   */
+  def getPriceFromExtraData(extraData: String): BigDecimal = {
+
+    if (extraData == null)
+      return 0
+
+    if (extraData.length() < 10)
+      return 0
+
+    var priceString: String = null
+    try {
+      val jsonExtraData = parse(extraData)
+
+      priceString = compact(render(jsonExtraData \ "price")).replaceAll("^\"|\"$", "")
+    } catch {
+      case ex: ParseException => {
+        ex.printStackTrace()
+        return 0
+      }
+    }
+    if (priceString == null || priceString.length() < 1)
+      return 0
+
+    return priceString.toDouble
+
+  }
+
+  /**
+   * getskuFromSimpleSku will convert simple_sku to sku
+   * @param simpleSku
+   * @return
+   */
+  def getskuFromSimpleSku(simpleSku: String): String = {
+
+    if (simpleSku == null) {
+      return null
+    }
+
+    if (!(simpleSku.contains('-'))) {
+      return simpleSku
+    }
+
+    return simpleSku.substring(0, simpleSku.lastIndexOf('-'))
+  }
+
+  /**
+   * returns dayName with max click given counts for 7 days
+   * @param count1
+   * @param count2
+   * @param count3
+   * @param count4
+   * @param count5
+   * @param count6
+   * @param count7
+   * @return day with maximum click
+   */
+  def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
+    var max = count1;
+    var index = 0;
+
+    if (max < count2) {
+      max = count2
+      index = 1
+    }
+    if (max < count3) {
+      max = count3
+      index = 2
+    }
+    if (max < count4) {
+      max = count4
+      index = 3
+    }
+    if (max < count5) {
+      max = count5
+      index = 4
+    }
+    if (max < count6) {
+      max = count6
+      index = 5
+    }
+    if (max < count7) {
+      max = count7
+      index = 6
+    }
+    return TimeUtils.nextNDay("Monday", index)
+  }
 }

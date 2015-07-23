@@ -178,11 +178,6 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if rangeStart is greater than rangeEnd" in {
-    //    val rngStrt = Option.apply("2015-06-22 15:00:00")
-    //    val dt2 = Option.apply("2015-05-21 15:00:00")
-    //    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = null, saveFormat = null,
-    //      saveMode = null, dateColumn = null, rangeStart = rngStrt, rangeEnd = dt2,
-    //      limit = null, filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges("2015-06-22 15:00:00", "2015-05-21 15:00:00", null)
     }
@@ -195,22 +190,12 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a month in daily mode" in {
-    //    val dt3 = Option.apply("2015-04-22 15:00:00")
-    //    val dt4 = Option.apply("2015-06-21 15:00:00")
-    //    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "daily", saveFormat = null,
-    //      saveMode = null, dateColumn = null, rangeStart = dt3, rangeEnd = dt4,
-    //      limit = null, filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges("2015-04-22 15:00:00", "2015-06-21 15:00:00", "daily")
     }
   }
 
   "Tables Json Validator" should "throw IllegalArgumentException if the range spans more than a day in hourly mode" in {
-    //    val dt1 = Option.apply("2015-04-22 15:00:00")
-    //    val dt2 = Option.apply("2015-04-23 15:00:00")
-    //    val tableInfo = new TableInfo(source = null, tableName = null, primaryKey = null, mode = "hourly", saveFormat = null,
-    //      saveMode = null, dateColumn = null, rangeStart = dt1, rangeEnd = dt2,
-    //      limit = null, filterCondition = null, joinTables = null)
     a[IllegalArgumentException] should be thrownBy {
       TablesJsonValidator.validateRanges("2015-04-22 15:00:00", "2015-04-23 15:00:00", "hourly")
     }

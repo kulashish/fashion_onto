@@ -2,6 +2,8 @@ package com.jabong.dap.data.read
 
 import java.io.File
 
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+
 object DateResolver {
 
   /**
@@ -10,22 +12,23 @@ object DateResolver {
    * WARNING: throws DataNotFound exception if data is not found in any
    * value of hour for the given date.
    */
-  def getDateWithHour(source: String, tableName: String, mode: String, date: String): String = {
-    var hour: Int = 23
+  def getDateWithHour(basePath: String, source: String, tableName: String, mode: String, date: String): String = {
+    var hour: Int = 0
     var flag = 0
     var dateHour: String = null
-    while (hour >= 0 && flag == 0) {
+    val nextDay = TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT, date)
+    while (hour <= 23 && flag == 0) {
       dateHour = withLeadingZeros(hour)
-      val path = PathBuilder.buildPath(source, tableName, mode, date) + File.separator + dateHour
+      val path = PathBuilder.buildPath(basePath, source, tableName, mode, date) + File.separator + dateHour
       if (DataVerifier.dataExists(path)) {
         flag = 1
       }
-      hour = hour - 1
+      hour = hour + 1
     }
     if (flag == 0) {
       throw new DataNotFound
     }
-    "%s-%s".format(date, dateHour)
+    "%s-%s".format(nextDay, dateHour)
   }
 
   def withLeadingZeros(input: Int): String = {

@@ -2,7 +2,8 @@ package com.jabong.dap.data.storage.merge.common
 
 import com.jabong.dap.common.Spark
 import org.apache.spark.sql.DataFrame
-
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.Row
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */
@@ -13,6 +14,10 @@ object MergeUtils extends MergeData {
 
   def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
     val newpk = NEW_ + primaryKey
+    if (null == dfBase)
+      return dfIncr
+    else if (null == dfIncr)
+      return dfBase
 
     // join on primary key
     val joinedDF = joinOldAndNewDF(dfIncr, dfBase, primaryKey)
@@ -42,6 +47,25 @@ object MergeUtils extends MergeData {
     val df1 = joinedDF.filter(newpk + " IS NULL").select(dfBase("*"))
 
     df1.unionAll(dfIncr).coalesce(numPart)
+  }
+
+  /**
+   * joinOldAndNewDF with null parameters allowed
+   * @param dfIncr can be null
+   * @param incrSchema schema
+   * @param dfPrevVarFull can be null
+   * @param prevVarFullSchema schema
+   * @param primaryKey join key
+   * @return Dataframe
+   */
+  def joinOldAndNewDF(dfIncr: DataFrame, incrSchema: StructType, dfPrevVarFull: DataFrame, prevVarFullSchema: StructType, primaryKey: String): DataFrame = {
+    var dfIncrVar: DataFrame = dfIncr
+    if (null == dfIncr) dfIncrVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], incrSchema)
+
+    var dfPrevVarFullVar: DataFrame = dfPrevVarFull
+    if (null == dfPrevVarFull) dfPrevVarFullVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], prevVarFullSchema)
+
+    joinOldAndNewDF(dfIncrVar, dfPrevVarFullVar, primaryKey)
   }
 
   /**

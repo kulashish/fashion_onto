@@ -1,8 +1,9 @@
 package com.jabong.dap.data.read
 
 import java.io.File
+import com.jabong.dap.data.storage.DataSets
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{LocatedFileStatus, RemoteIterator, Path, FileSystem}
+import org.apache.hadoop.fs.{ LocatedFileStatus, RemoteIterator, Path, FileSystem }
 
 import scala.util.control.Breaks._
 
@@ -25,7 +26,7 @@ object FormatResolver {
           val filename: String = fileStatus.getPath.getName
           val file = new File(filename)
           val extension = getFileExtension(file)
-          if (extension == "orc" || extension == "parquet") {
+          if (extension == DataSets.ORC || extension == DataSets.PARQUET || extension == DataSets.CSV) {
             flag = extension
             break()
           }

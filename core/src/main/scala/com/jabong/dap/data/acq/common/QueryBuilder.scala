@@ -1,6 +1,7 @@
 package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Builds the query which is used to fetch the requested data on the basis of the input parameters passed in the
@@ -71,9 +72,9 @@ object QueryBuilder {
     val joinStrings = getJoinTableStrings(tableInfo)
 
     mode match {
-      case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2, tableInfo)
-      case "daily" | "hourly" | "monthly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
-        joinStrings._2, condition)
+      case DataSets.FULL => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2, tableInfo)
+      case DataSets.HOURLY_MODE | DataSets.DAILY_MODE | DataSets.MONTHLY_MODE =>
+        "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1", joinStrings._2, condition)
       case _ => ""
     }
   }

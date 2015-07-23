@@ -22,6 +22,13 @@ object OptionUtils {
       null
   }
 
+  def getOptValue(strOpt: Option[String], value: String): String = {
+    if (null != strOpt)
+      strOpt.getOrElse(value)
+    else
+      value
+  }
+
   def getOptBoolVal(boolOpt: Option[Boolean]): Boolean = {
     if (null != boolOpt)
       boolOpt.getOrElse(false)

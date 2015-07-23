@@ -23,8 +23,7 @@ object DataVerifier {
     val conf = new Configuration()
     val fileSystem = FileSystem.get(conf)
     val successFile = "%s%s%s".format(directory, File.separator, fileName)
-    val successFilePath = new Path(successFile)
-    fileSystem.exists(successFilePath)
+    fileSystem.exists(new Path(successFile))
   }
 
   /**
