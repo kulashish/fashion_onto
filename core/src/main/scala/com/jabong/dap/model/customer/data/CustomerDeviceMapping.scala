@@ -67,13 +67,12 @@ object CustomerDeviceMapping {
 //      withColumnRenamed("_3",CustomerVariables.EMAIL).
 //      withColumnRenamed("_4",CustomerVariables.BROWSER_ID).
 //      withColumnRenamed("_5",CustomerVariables.DOMAIN)
-     val df2 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, date)
-     val df3 = df2.filter(!df2(CustomerVariables.RESPONSYS_ID).startsWith(CustomerVariables.RESPONSYS_ID))
-      df3.printSchema()
-      df3.show(10)
+     val df2 = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, date, "true",";")
+     df2.printSchema()
+     df2.show(10)
 //     val df4 =Spark.getSqlContext().read.parquet("/home/jabong/bobdata/customer/07/01")
      val df4 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, date)
-     val res = getLatestDevice(df1,df3, df4)
+     val res = getLatestDevice(df1,df2, df4)
      res.printSchema()
      res.show(20)
    }
