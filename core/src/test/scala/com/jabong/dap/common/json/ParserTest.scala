@@ -15,12 +15,12 @@ class ParserTest extends FlatSpec with Matchers {
   AppConfig.config = config
 
   "Parser" should "successfully parse a valid JSON file" in {
-    Parser.parseJson[TestSchema](DataSets.TEST_RESOURCES + "common/json/parserTest1.json")
+    Parser.parseJson[TestSchema](DataSets.TEST_RESOURCES + "/common/json/parserTest1.json")
   }
 
   "Parser" should "throw ParserException for an invalid JSON file" in {
     a[ParseException] should be thrownBy {
-      Parser.parseJson[TestSchema](DataSets.TEST_RESOURCES + "common/json/parserTest2.json")
+      Parser.parseJson[TestSchema](DataSets.TEST_RESOURCES + "/common/json/parserTest2.json")
     }
   }
 }

@@ -17,13 +17,14 @@ object DataSets {
   val CLICKSTREAM = basePath + File.separator+ "clickstream"
 
 
-  val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources" + File.separator
+  val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources"
 
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
+  val SALES_CART = "sales_cart"
 
   //customer
   val RESULT_CUSTOMER_INCREMENTAL = "result_customer_incremental"
@@ -32,6 +33,8 @@ object DataSets {
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
   val CUSTOMER_SEGMENTS = "customer_segments"
+  val CUSTOMER_PRODUCT_SHORTLIST = "customer_product_shortlist"
+  val RESULT_CUSTOMER_PRODUCT_SHORTLIST = "result_customer_product_shortlist"
 
   //newsletter
   val NEWSLETTER_SUBSCRIPTION = "newsletter_subscription"
@@ -85,5 +88,21 @@ object DataSets {
   val NEXTBEE = "nextbee"
   val DEVICE_MAPPING = "device_mapping"
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"
+
+  val CAMPAIGN = "campaign"
+
+  val ITEM_ON_DISCOUNT = "item_on_discount"
+
+  val LOW_STOCK = "low_stock"
+
+  val SKU_SELECTION = "sku_selection"
+
+  val ITR_30_DAY_DATA = "itr_30_day_data"
+
+  val YESTERDAY_ITR_DATA = "yesterday_itr_data"
+
+  // Data sources
+  val BOB_SOURCE = "bob"
+  val ERP_SOURCE = "erp"
 
 }

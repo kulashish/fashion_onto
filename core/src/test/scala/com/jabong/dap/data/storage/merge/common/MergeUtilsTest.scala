@@ -14,8 +14,8 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     val sqlContext = Spark.getSqlContext()
 
-    df1 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/1.json")
-    df2 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/2.json")
+    df1 = sqlContext.read.json(DataSets.TEST_RESOURCES + "/common/merge/1.json")
+    df2 = sqlContext.read.json(DataSets.TEST_RESOURCES + "/common/merge/2.json")
     df1.collect.foreach(println)
   }
 

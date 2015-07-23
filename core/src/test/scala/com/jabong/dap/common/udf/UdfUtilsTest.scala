@@ -1,6 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
+
 import org.scalatest.FlatSpec
 
 /**
@@ -8,10 +9,7 @@ import org.scalatest.FlatSpec
  */
 class UdfUtilsTest extends FlatSpec {
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Name of variable: ACC_REG_DATE
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  //===============================getMin()=============================================================================
   "getMin(): timestamp t1 and t2 value " should "be null" in {
 
     val t1 = null
@@ -72,10 +70,7 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Name of variable: MAX_UPDATED_AT
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  //===============================getMax()=============================================================================
   "getMax(): timestamp t1 and t2 value " should "be null" in {
 
     val t1 = null
@@ -133,6 +128,309 @@ class UdfUtilsTest extends FlatSpec {
     val result = UdfUtils.getMax(t1, t2)
 
     assert(result.compareTo(t1) == 0)
+
+  }
+
+  //===============================getSimpleSkuFromExtraData()==========================================================
+  "getSimpleSkuFromExtraData: simple_sku" should "LA625BG58FVTINDFAS-3949337" in {
+
+    val extraData = "{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+
+    val result = UdfUtils.getSimpleSkuFromExtraData(extraData)
+
+    assert(result == "LA625BG58FVTINDFAS-3949337")
+
+  }
+
+  "getSimpleSkuFromExtraData: extraData value" should "null" in {
+
+    val result = UdfUtils.getSimpleSkuFromExtraData(null)
+
+    assert(result == null)
+
+  }
+
+  "getSimpleSkuFromExtraData: extraData value" should "Array" in {
+
+    val result = UdfUtils.getSimpleSkuFromExtraData("Array")
+
+    assert(result == null)
+
+  }
+
+  "getSimpleSkuFromExtraData: simple_sku" should "true" in {
+
+    val extraData = "{\"simple_sku\":\"true\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+
+    val result = UdfUtils.getSimpleSkuFromExtraData(extraData)
+
+    assert(result == null)
+
+  }
+
+  //===============================getPriceFromExtraData()==============================================================
+  "getPriceFromExtraData: price" should "1599" in {
+
+    val extraData = "{\"simple_sku\":\"LA625BG58FVTINDFAS-3949337\",\"price\":1599,\"all_colors\":\"LA625BG58FVTINDFAS\",\"sel_size_qty\":\"1\",\"id_catalog_config\":\"1251841\",\"all_simples\":{\"LA625BG58FVTINDFAS-3949337\":\"1\"}}"
+
+    val result = UdfUtils.getPriceFromExtraData(extraData)
+
+    assert(result == 1599)
+
+  }
+
+  "getPriceFromExtraData: extraData value" should "null" in {
+
+    val result = UdfUtils.getPriceFromExtraData(null)
+
+    assert(result == 0)
+
+  }
+
+  "getPriceFromExtraData: extraData value" should "Array" in {
+
+    val result = UdfUtils.getPriceFromExtraData("Array")
+
+    assert(result == 0)
+
+  }
+
+  //===============================getskuFromSimpleSku()================================================================
+  "getskuFromSimpleSku: simpleSku value" should "null" in {
+
+    val result = UdfUtils.getskuFromSimpleSku(null)
+
+    assert(result == null)
+
+  }
+
+  "getskuFromSimpleSku: simpleSku value" should "LA625BG58FVTINDFAS-3949337" in {
+
+    val result = UdfUtils.getskuFromSimpleSku("LA625BG58FVTINDFAS-3949337")
+
+    assert(result == "LA625BG58FVTINDFAS")
+
+  }
+
+  "getskuFromSimpleSku: simpleSku value" should "LA625BG58FVTINDFAS" in {
+
+    val result = UdfUtils.getskuFromSimpleSku("LA625BG58FVTINDFAS")
+
+    assert(result == "LA625BG58FVTINDFAS")
+
+  }
+
+  //===============================getYYYYmmDD()========================================================================
+  "getYYYYmmDD: Timestamp value" should "null" in {
+
+    val result = UdfUtils.getYYYYmmDD(null)
+
+    assert(result == null)
+
+  }
+
+  "getYYYYmmDD: Timestamp value" should "2015-07-13 00:02:22.0" in {
+
+    val ts = Timestamp.valueOf("2015-07-13 00:02:22.0")
+
+    val result = UdfUtils.getYYYYmmDD(ts)
+
+    assert(result == Timestamp.valueOf("2015-07-13 00:00:00.0"))
+
+  }
+
+  //===============================getAge()=============================================================================
+  "getAge: age value" should "null" in {
+
+    val result = UdfUtils.getAge(null)
+
+    assert(result == 0)
+
+  }
+
+  "getAge: age value" should "2010-07-13 00:02:22.0" in {
+
+    val ts = Timestamp.valueOf("2010-07-13 00:02:22.0")
+
+    val result = UdfUtils.getAge(ts)
+
+    assert(result == 5)
+
+  }
+  //
+  //  //===============================getLatest()============================================================================
+  //  "getLatest(): timestamp t1 and t2 value " should "be null" in {
+  //
+  //    val t1 = null
+  //
+  //    val t2 = null
+  //
+  //    val result = UdfUtils.getLatest(t1, t2)
+  //
+  //    assert(result == t1)
+  //
+  //  }
+
+  "getLatest(): timestamp t1" should "be null" in {
+
+    val t1 = null
+
+    val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
+    val result = UdfUtils.getLatest(t1, t2)
+
+    assert(result == t2)
+
+  }
+
+  "getLatest(): timestamp t2" should "be null" in {
+
+    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
+    val t2 = null
+
+    val result = UdfUtils.getLatest(t1, t2)
+
+    assert(result == t1)
+
+  }
+
+  "getLatest(): return timestamp " should "t2" in {
+
+    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
+
+    val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0")
+
+    val result = UdfUtils.getLatest(t1, t2)
+
+    assert(result == t2)
+
+  }
+
+  //===============================getMergeSlots()======================================================================
+  "getMergeSlots(): oldSlot and newSlot value " should "be null" in {
+
+    val oldSlot = null
+
+    val newSlot = null
+
+    val result = UdfUtils.getMergeSlots(oldSlot, newSlot)
+
+    assert(result == null)
+
+  }
+
+  "getMergeSlots(): oldSlot value" should "be null" in {
+
+    val oldSlot = null
+
+    val newSlot = "0!0!0!0!0!1!0!0!0!0!0!0"
+
+    val result = UdfUtils.getMergeSlots(oldSlot, newSlot)
+
+    assert(result == newSlot)
+
+  }
+
+  "getMergeSlots(): newSlot value" should "be null" in {
+
+    val oldSlot = "0!0!0!0!0!1!0!0!0!0!0!0"
+
+    val newSlot = null
+
+    val result = UdfUtils.getMergeSlots(oldSlot, newSlot)
+
+    assert(result == oldSlot)
+
+  }
+
+  "getMergeSlots(): return slot value " should "0!0!0!0!0!2!0!5!0!4!0!0" in {
+
+    val oldSlot = "0!0!0!0!0!1!0!0!0!4!0!0"
+
+    val newSlot = "0!0!0!0!0!1!0!5!0!0!0!0"
+
+    val result = UdfUtils.getMergeSlots(oldSlot, newSlot)
+
+    assert(result == "0!0!0!0!0!2!0!5!0!4!0!0")
+
+  }
+
+  //===============================getMaxSlot(oldSlot, newSlot, oldPreferredSlot)=======================================
+  "getMaxSlot(oldSlot, newSlot, oldPreferredSlot): oldSlot and newSlot value " should "be null" in {
+
+    val oldSlot = null
+
+    val newSlot = null
+
+    val oldPreferredSlot = 0
+
+    val result = UdfUtils.getMaxSlot(oldSlot, newSlot, oldPreferredSlot)
+
+    assert(result == 0)
+
+  }
+
+  "getMaxSlot(oldSlot, newSlot, oldPreferredSlot): oldSlot value" should "be null" in {
+
+    val oldSlot = null
+
+    val newSlot = "0!0!0!0!0!1!0!0!0!0!0!0"
+
+    val oldPreferredSlot = 0
+
+    val result = UdfUtils.getMaxSlot(oldSlot, newSlot, oldPreferredSlot)
+
+    assert(result == 6)
+
+  }
+
+  "getMaxSlot(oldSlot, newSlot, oldPreferredSlot): newSlot value" should "be null" in {
+
+    val oldSlot = "0!0!0!0!0!1!0!0!0!0!0!0"
+
+    val newSlot = null
+
+    val oldPreferredSlot = 7
+
+    val result = UdfUtils.getMaxSlot(oldSlot, newSlot, oldPreferredSlot)
+
+    assert(result == 7)
+
+  }
+
+  "getMaxSlot(oldSlot, newSlot, oldPreferredSlot): return slot value " should "0!0!0!0!0!2!0!5!0!4!0!0" in {
+
+    val oldSlot = "0!0!0!0!0!1!0!0!0!4!0!0"
+
+    val newSlot = "0!0!0!0!0!1!0!5!0!0!0!0"
+
+    val oldPreferredSlot = 0
+
+    val result = UdfUtils.getMaxSlot(oldSlot, newSlot, oldPreferredSlot)
+
+    assert(result == 8)
+
+  }
+
+  //===============================getMaxSlot(slots: Any)=========================================================
+  "getMaxSlot(slot): slot value " should "be null" in {
+
+    val slot = null
+
+    val result = UdfUtils.getMaxSlot(slot)
+
+    assert(result == 0)
+
+  }
+
+  "getMaxSlot(slot): slot value " should "0!0!0!0!0!1!0!5!0!0!0!0" in {
+
+    val slot = "0!0!0!0!0!1!0!5!0!0!0!0"
+
+    val result = UdfUtils.getMaxSlot(slot)
+
+    assert(result == 8)
 
   }
 
