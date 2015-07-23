@@ -16,7 +16,7 @@ class AcartLowStockCampaign {
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for last day
-    val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData,last30DaySalesOrderData, last30DaySalesOrderItemData)
+    val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
     //sku selection
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)

@@ -11,7 +11,7 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartFollowUpCampaign {
 
-  def runCampaign(prev3rdDayAcartData: DataFrame,  last3DaySalesOrderData:DataFrame, last3DaySalesOrderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(prev3rdDayAcartData: DataFrame, last3DaySalesOrderData: DataFrame, last3DaySalesOrderItemData: DataFrame, itrData: DataFrame): Unit = {
 
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)

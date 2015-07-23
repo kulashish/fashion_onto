@@ -80,13 +80,12 @@ class PastCampaignCheck extends Logging {
       .withColumnRenamed(CampaignMerge.FK_CUSTOMER, "pastCampaign_" + CampaignMerge.FK_CUSTOMER)
 
     val customerSkuSelected = customerSkuSimpleSelected.
-      withColumn(ProductVariables.SKU,Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
+      withColumn(ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CampaignMerge.FK_CUSTOMER)
-    &&
-      customerSkuSelected(ProductVariables.SKU_SIMPLE) === pastCampaignSendCustomers(CampaignMerge.REF_SKU1)
-        , "left_outer")
+        &&
+        customerSkuSelected(ProductVariables.SKU_SIMPLE) === pastCampaignSendCustomers(CampaignMerge.REF_SKU1), "left_outer")
       .filter(
         "pastCampaign_" + CampaignMerge.FK_CUSTOMER + " is null"
       )

@@ -71,9 +71,9 @@ object CampaignInput extends Logging {
     val acartData = DataReader.getDataFrame(DataSets.BOB_SOURCE, DataSets.SALES_CART, "monthly", dateYesterday)
     acartData
   }
-  
+
   // 1 day data only
-  def loadNthdayAcartData(n:Int, last30daysAcartData: DataFrame) : DataFrame = {
+  def loadNthdayAcartData(n: Int, last30daysAcartData: DataFrame): DataFrame = {
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, Constants.DATE_TIME_FORMAT_MS))
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
     val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
@@ -81,8 +81,7 @@ object CampaignInput extends Logging {
     val nthDayOrderData = CampaignUtils.getTimeBasedDataFrame(last30daysAcartData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
     nthDayOrderData
   }
-  
-  
+
   def loadProductData(): DataFrame = {
     return null
   }

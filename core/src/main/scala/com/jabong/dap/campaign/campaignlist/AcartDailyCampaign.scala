@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{SkuSelection, CustomerSelection, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -11,7 +11,7 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartDailyCampaign {
 
-  def runCampaign(yesterdayAcartData: DataFrame,  yesterdaySalesOrderData:DataFrame, yesterdaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame): Unit = {
+  def runCampaign(yesterdayAcartData: DataFrame, yesterdaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame): Unit = {
 
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
