@@ -59,6 +59,8 @@ object CampaignUtils extends Logging {
   val currentDaysDifference = udf((date: Timestamp) => currentTimeDiff(date: Timestamp, "days"))
 
   val lastDayTimeDifference = udf((date: Timestamp) => lastDayTimeDiff(date: Timestamp, "days"))
+//FIXME:Remove this function
+  val lastDayTimeDifferenceString = udf((date: String) => lastDayTimeDiff(date: String, "days"))
 
   /**
    * To calculate difference between current time and date provided as argument either in days, minutes hours
@@ -99,6 +101,32 @@ object CampaignUtils extends Logging {
     val cal = Calendar.getInstance();
     cal.add(Calendar.DATE, -1)
     val diff = startOfDay(cal.getTime) - date.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    return diffTime
+  }
+
+  /**
+   * Input date is string
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: String, diffType: String): Double = {
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance();
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - prodDate.getTime()
 
     var diffTime: Double = 0
 

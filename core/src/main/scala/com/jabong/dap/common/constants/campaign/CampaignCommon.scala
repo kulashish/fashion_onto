@@ -12,7 +12,7 @@ object CampaignCommon {
   val PUSH_REF_SKUS = 1
   val NUMBER_REF_SKUS = 2
 
-  val BASE_PATH = "/user/rahulaneja/misc/campaignTestRun"
+  val BASE_PATH = "/data/output/campaign/"
 
   val CANCEL_RETARGET_CAMPAIGN = "cancelReTarget"
   val RETURN_RETARGET_CAMPAIGN = "returnReTarget"

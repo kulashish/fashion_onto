@@ -71,13 +71,12 @@ object CampaignManager extends Serializable with Logging {
     liveRetargetCampaign.runCampaign(orderData, orderItemData)
   }
 
-  def createCampaignMaps(json: String): Boolean = {
-    if (json == null) {
+  def createCampaignMaps(parsedJson: JValue): Boolean = {
+    if (parsedJson == null) {
       return false
     }
     implicit val formats = net.liftweb.json.DefaultFormats
     try {
-      val parsedJson = parse(json)
       CampaignInfo.campaigns = parsedJson.extract[CampaignConfig]
       //  var campaignDetails:CampaignDetail = null
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
@@ -185,8 +184,14 @@ object CampaignManager extends Serializable with Logging {
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-  def startPushCampaignMerge(json: String) = {
+  def startPushCampaignMerge(campaignJsonPath: String) = {
 
+//    val conf = new Configuration()
+//          val fileSystem = FileSystem.get(conf)
+//          implicit val formats = net.liftweb.json.DefaultFormats
+//          val path = new Path(campaignJsonPath)
+//          val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+//          campaignInfo.campaigns = json.extract[campaignConfig]
   }
 
   //
