@@ -8,14 +8,14 @@ import org.scalatest.{ Matchers, FlatSpec }
 class QueryBuilderTest extends FlatSpec with Matchers {
   val condition = "condition"
   val dateCol = Option.apply("dateColumn")
-  val jnTbls = Option.apply(List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1")))
+  val jnTbls = Option.apply(List(new JoinTables(name = "testTable1", foreignKey = "fk_testTable1", selectString = null)))
   val lmt1k = Option.apply("1000")
 
   "getJoinTableStrings" should "return empty strings when joinTables is an empty list" in {
     val tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = "pk", mode = "mode",
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
       limit = null, filterCondition = null,
-      joinTables = Option.empty[List[JoinTables]])
+      joinTables = null)
     QueryBuilder.getJoinTableStrings(tableInfo) should be ("", "")
   }
 
@@ -24,8 +24,8 @@ class QueryBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
       limit = null, filterCondition = null,
       joinTables = Option.apply(List(
-        new JoinTables(name = "testTable1", foreignKey = "fk_testTable1"),
-        new JoinTables(name = "testTable2", foreignKey = "fk_testTable2")
+        new JoinTables(name = "testTable1", foreignKey = "fk_testTable1", selectString = null),
+        new JoinTables(name = "testTable2", foreignKey = "fk_testTable2", selectString = null)
       )))
     val selectString = ", j1.*, j2.*"
     val joinString = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk LEFT JOIN testTable2 AS j2 ON j2.fk_testTable2 = t1.pk"

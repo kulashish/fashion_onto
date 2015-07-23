@@ -1,0 +1,13 @@
+{
+  "acquisition": [
+    {
+      "source": "erp",
+      "tableName": "item_master_complete_dump",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "error",
+      "dateColumn": "[Last Modification Date Time]"
+    }
+  ]
+}

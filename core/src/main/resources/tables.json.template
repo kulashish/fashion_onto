@@ -8,18 +8,20 @@
       "saveFormat": "parquet",
       "saveMode": "overwrite",
       "dateColumn": "[Last Modification Date Time]",
-      "rangeStart": "2014-06-12",
-      "rangeEnd": "2014-06-12",
+      "rangeStart": "2014-06-12 00:00:00",
+      "rangeEnd": "2014-06-12 23:59:59",
       "limit": "3000",
       "filterCondition": "id_catalog_product_image NOT LIKE 'R%'"
       "joinTables": [
         {
             "name": "abc",
-            "foreignKey": "fk_erp" 
+            "foreignKey": "fk_erp",
+            "selectString": "j1.column1, j1.column2"
         },
         {
             "name": "abd",
-            "foreignKey": "fk_erp" 
+            "foreignKey": "fk_erp",
+            "selectString": "j2.column1, j2.column2"
         }
     ]
     }

@@ -3,6 +3,9 @@ package com.jabong.dap.data.storage.merge
 import com.jabong.dap.data.acq.common.MergeJobInfo
 import com.jabong.dap.data.acq.common.MergeInfo
 
+/**
+ * Validator for the JSON file used for data merge.
+ */
 object MergeJsonValidator {
 
   private def validateRequiredFields(mergeJob: MergeInfo) = {
@@ -11,21 +14,22 @@ object MergeJsonValidator {
     require(mergeJob.primaryKey != null && mergeJob.primaryKey.length() != 0, "Primary Key cannot be null or empty.")
     require(mergeJob.mergeMode != null && mergeJob.mergeMode.length() != 0, "Merge Mode cannot be null or empty.")
     require(mergeJob.saveMode != null && mergeJob.saveMode.length() != 0, "Save Mode cannot be null or empty.")
-    require(mergeJob.saveFormat != null && mergeJob.saveFormat.length() != 0, "Save Format cannot be null or empty.")
   }
 
   private def validatePossibleValues(mergeJob: MergeInfo) = {
     val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
-    val possibleMergeModes = Array("full")
-    val possibleSaveFormats = Array("orc", "parquet")
+    // Here the full mode will merge given date's incr and full file. And in case the incr date and full date is not
+    // given then it will merge the yesterday's incr data with day before yesterday's full data.
+    // Historical mode will merge starting from the incr date's till yesterday's data with the data of prevFullDate.
+    // Here it will assume monthly data from the incr start date till last month and daily data for this month from 1st
+    // to yesterda'y date.
+    val possibleMergeModes = Array("full", "historical")
     val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
 
     require(possibleSources.contains(mergeJob.source), "Source '%s' not recognized. Possible values: %s".
       format(mergeJob.source, possibleSources.mkString(",")))
     require(possibleMergeModes.contains(mergeJob.mergeMode), "Mode '%s' not recognized. Possible values: %s".
       format(mergeJob.mergeMode, possibleMergeModes.mkString(",")))
-    require(possibleSaveFormats.contains(mergeJob.saveFormat), "Save format '%s' not recognized. Possible values: %s".
-      format(mergeJob.saveFormat, possibleSaveFormats.mkString(",")))
     require(possibleSaveModes.contains(mergeJob.saveMode), "Save mode '%s' not recognized. Possible values: %s".
       format(mergeJob.saveMode, possibleSaveModes.mkString(",")))
 

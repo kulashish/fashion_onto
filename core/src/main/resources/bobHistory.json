@@ -89,6 +89,27 @@
     },
     {
       "source": "bob",
+      "tableName": "sales_order",
+      "primaryKey": "id_sales_order",
+      "mode": "monthly",
+      "saveFormat": "parquet",
+      "saveMode": "ignore",
+      "dateColumn": "updated_at",
+      "rangeStart": "2012-05-01 00:00:00",
+      "joinTables": [
+        {
+          "name": "sales_order_additional_info",
+          "foreignKey": "fk_sales_order"
+        },
+        {
+          "name": "sales_order_gift_wrap",
+          "foreignKey": "fk_sales_order",
+          "selectString": "j2.id_sales_order_gift_wrap, j2.gw_recipient_email, j2.gw_recipient_name, j2.gw_message, j2.gw_sender_name, j2.gw_amount, j2.gw_giftcard_credit, j2.gw_store_credit, j2.gw_paid_price, j2.gw_payback_credit, j2.occasion"
+        }
+      ]
+    },
+    {
+      "source": "bob",
       "tableName": "sales_order_item",
       "primaryKey": "id_sales_order_item",
       "mode": "monthly",

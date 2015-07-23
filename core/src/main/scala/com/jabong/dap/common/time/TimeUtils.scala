@@ -1,14 +1,16 @@
 package com.jabong.dap.common.time
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
+import java.text.{ DateFormatSymbols, SimpleDateFormat }
+import java.util
 import java.util.{ Calendar, Date }
+import grizzled.slf4j.Logging
 import scala.collection.immutable.HashMap
 
 /**
  * Created by Rachit on 28/5/15.
  */
-object TimeUtils {
+object TimeUtils extends Logging {
 
   /**
    * Returns the total number of days between two given date inputs
@@ -17,7 +19,7 @@ object TimeUtils {
    * @return
    */
   def daysBetweenTwoDates(date1: Date, date2: Date): BigInt = {
-    Math.abs(date1.getTime - date2.getTime) / Constants.CONVERT_MILLISECOND_TO_DAYS
+    Math.abs(date1.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS
   }
 
   /**
@@ -51,7 +53,7 @@ object TimeUtils {
    * @return
    */
   def isStrictlyLessThan(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val start = format.parse(dt1)
     val end = format.parse(dt2)
     if (start.getTime < end.getTime)
@@ -68,7 +70,7 @@ object TimeUtils {
    * @return
    */
   def isSameYear(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
     start.setTime(format.parse(dt1))
@@ -88,7 +90,7 @@ object TimeUtils {
    * @return
    */
   def isSameMonth(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
     start.setTime(format.parse(dt1))
@@ -108,7 +110,7 @@ object TimeUtils {
    * @return
    */
   def isSameDay(dt1: String, dt2: String): Boolean = {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val start = Calendar.getInstance()
     val end = Calendar.getInstance()
     start.setTime(format.parse(dt1))
@@ -246,6 +248,66 @@ object TimeUtils {
 
     return todayCal.get(Calendar.YEAR) - cal.get(Calendar.YEAR)
 
+  }
+
+  /**
+   *
+   * @param dateString
+   * @param initialFormat
+   * @param expectedFormat
+   * @return
+   */
+  def changeDateFormat(dateString: String, initialFormat: String, expectedFormat: String): String = {
+    val format = new java.text.SimpleDateFormat(initialFormat)
+    format.setLenient(false)
+    val date = format.parse(dateString)
+    val readableDf = new SimpleDateFormat(expectedFormat);
+    //we want to parse date strictly
+    return readableDf.format(date)
+  }
+
+  /**
+   * @param ipDate
+   * @param DateFormat
+   * @return Weekday Name
+   */
+  def dayName(ipDate: String, DateFormat: String): String = {
+    //dayformat: yyyyMMdd
+    val format = new java.text.SimpleDateFormat(DateFormat)
+    format.setLenient(false)
+    //we want to parse date strictly
+    val date = format.parse(ipDate)
+
+    return (new SimpleDateFormat(TimeConstants.EEEE)).format(date)
+  }
+
+  /**
+   * @param dayName
+   * @param n
+   * @return the nth weekday name from dayName
+   */
+  def nextNDay(dayName: String, n: Int): String = {
+    val dfs = new DateFormatSymbols()
+    val dayNameCaps = dayName.capitalize
+    val weekDays = util.Arrays.copyOfRange(dfs.getWeekdays(), 1, 8)
+
+    val index = weekDays.indexOf(dayNameCaps)
+    if (index == -1) {
+      logger.error("I don\'t understand: " + dayName)
+    }
+    val forwardedIndex = index + n
+    return weekDays.apply(forwardedIndex % 7)
+  }
+
+  /**
+   * Converts integer containing day or month of date to a string with the format MM or dd, respectively.
+   */
+  def withLeadingZeros(input: Int): String = {
+    if (input < 10) {
+      "0%s".format(input)
+    } else {
+      "%s".format(input)
+    }
   }
 
   case class MonthYear(val month: Int, val year: Int, val day: Int)
