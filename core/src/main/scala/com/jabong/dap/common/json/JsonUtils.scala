@@ -19,6 +19,12 @@ object JsonUtils {
     df.limit(5).select("*").write.format("json").json(DataSets.TEST_RESOURCES + fileName + ".json")
 
   }
+  //read Json file
+  def readFromJsonAbsPath(directoryName: String, fileName: String, schema: StructType): DataFrame = {
+    val df = Spark.getSqlContext().read.schema(schema).format("json")
+      .load(directoryName + "/" + fileName + ".json")
+    df
+  }
 
   //read Json file
   def readFromJson(directoryName: String, fileName: String, schema: StructType): DataFrame = {
