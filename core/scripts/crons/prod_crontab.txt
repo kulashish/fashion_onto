@@ -1,0 +1,5 @@
+18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c bob  >>/opt/alchemy-core/logs/bob_logs.txt
+
+18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c bobFull  >>/opt/alchemy-core/logs/bobFull_logs.txt
+
+18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c erp  >>/opt/alchemy-core/logs/erp_logs.txt

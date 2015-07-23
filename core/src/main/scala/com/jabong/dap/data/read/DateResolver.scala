@@ -2,7 +2,7 @@ package com.jabong.dap.data.read
 
 import java.io.File
 
-import com.jabong.dap.common.time.{Constants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 
 object DateResolver {
 
@@ -12,14 +12,14 @@ object DateResolver {
    * WARNING: throws DataNotFound exception if data is not found in any
    * value of hour for the given date.
    */
-  def getDateWithHour(source: String, tableName: String, mode: String, date: String): String = {
+  def getDateWithHour(basePath: String, source: String, tableName: String, mode: String, date: String): String = {
     var hour: Int = 0
     var flag = 0
     var dateHour: String = null
-    val nextDay = TimeUtils.getDateAfterNDays(1, Constants.DATE_FORMAT, date)
+    val nextDay = TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT, date)
     while (hour <= 23 && flag == 0) {
       dateHour = withLeadingZeros(hour)
-      val path = PathBuilder.buildPath(source, tableName, mode, nextDay) + File.separator + dateHour
+      val path = PathBuilder.buildPath(basePath, source, tableName, mode, date) + File.separator + dateHour
       if (DataVerifier.dataExists(path)) {
         flag = 1
       }

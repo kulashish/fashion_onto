@@ -2,7 +2,7 @@ package com.jabong.dap.common.time
 
 import java.io.File
 
-object Constants {
+object TimeConstants {
   val CONVERT_MILLISECOND_TO_DAYS = 24 * 60 * 60 * 1000
   val DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
   val DATE_FORMAT = "yyyy-MM-dd"
@@ -12,6 +12,10 @@ object Constants {
 
   val START_TIME = "00:00:00"
   val END_TIME = "23:59:59"
+
+  val YYYYMMDD = "yyyyMMdd"
+  //used for day name
+  val EEEE = "EEEE"
 
   val START_TIME_MS = "00:00:00.0"
   val END_TIME_MS = "23:59:59.9"

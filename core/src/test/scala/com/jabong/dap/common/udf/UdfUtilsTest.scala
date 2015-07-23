@@ -1,8 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
-import org.apache.commons.net.ntp.TimeStamp
+
 import org.scalatest.FlatSpec
 
 /**

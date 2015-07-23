@@ -69,6 +69,8 @@ object Udf {
    */
   val age = udf((birthday: Date) => UdfUtils.getAge(birthday: Date))
 
+  val maxClickDayName = udf((count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int) => UdfUtils.getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int))
+
   /**
    * yyyymmdd will convert yyyymmdd formate
    */

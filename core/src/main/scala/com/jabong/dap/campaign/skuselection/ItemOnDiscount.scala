@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.skuselection
 import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
 import grizzled.slf4j.{ Logging }
 import org.apache.spark.sql.DataFrame
@@ -68,7 +68,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
    */
   def getYesterdayItrData(itr30dayData: DataFrame): DataFrame = {
     //get data yesterday date
-    val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT))
+    val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT))
 
     val yesterdayDateYYYYmmDD = UdfUtils.getYYYYmmDD(yesterdayDate)
 

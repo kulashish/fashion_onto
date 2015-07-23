@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.traceablility
 import java.text.SimpleDateFormat
 
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
@@ -41,7 +41,7 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
   }
 
   "Past campaign Data with 47 mail type" should "return no customer whom we have sent the campaign" in {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val mailTypeCustomers = pastCampaignCheck.getCampaignCustomers(pastCampaignData, 47, ndays)
@@ -49,7 +49,7 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
   }
 
   "Past campaign Data with 46 mail type" should "return one customer whom we have sent the campaign" in {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val mailTypeCustomers = pastCampaignCheck.getCampaignCustomers(pastCampaignData, 46, ndays)
@@ -77,7 +77,7 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
   }
 
   "Past campaign Data with 46 mail type to past campaign check" should "return one customer whom we have not sent the campaign" in {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, customerSelected, 46, ndays)
@@ -85,7 +85,7 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
   }
 
   "Past campaign Data with 47 mail type to past campaign check" should "return two customer whom we have  not sent the campaign" in {
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
     val date = format.parse("2015-07-09 00:00:08.0")
     val ndays = TimeUtils.daysFromToday(date).toInt
     val campaignNotSendCustomers = pastCampaignCheck.campaignCheck(pastCampaignData, customerSelected, 47, ndays)
