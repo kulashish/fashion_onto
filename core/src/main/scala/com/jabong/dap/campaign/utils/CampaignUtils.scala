@@ -1,18 +1,27 @@
 package com.jabong.dap.campaign.utils
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.util.{ Date, Calendar }
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
+import com.jabong.dap.common.udf.Udf
+import grizzled.slf4j.Logging
+import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import java.math.BigDecimal
+
+import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class
  */
-object CampaignUtils {
+object CampaignUtils extends Logging {
+
+  val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
 
@@ -28,18 +37,18 @@ object CampaignUtils {
 
     import sqlContext.implicits._
 
-    if (refSkuData == null) {
+    if (refSkuData == null || NumberSku <= 0) {
       return null
     }
-    refSkuData.foreach(println)
-    refSkuData.printSchema()
+
     val customerData = refSkuData.filter(ProductVariables.SKU + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU)
+      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), t(1).toString))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.take(NumberSku).toList) }
+    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
+    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+    //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
     val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_LIST)
@@ -47,7 +56,11 @@ object CampaignUtils {
     return grouped
   }
 
-  val currentDaysDifference = udf((date: String) => currentTimeDiff(date: String, "days"))
+  val currentDaysDifference = udf((date: Timestamp) => currentTimeDiff(date: Timestamp, "days"))
+
+  val lastDayTimeDifference = udf((date: Timestamp) => lastDayTimeDiff(date: Timestamp, "days"))
+//FIXME:Remove this function
+  val lastDayTimeDifferenceString = udf((date: String) => lastDayTimeDiff(date: String, "days"))
 
   /**
    * To calculate difference between current time and date provided as argument either in days, minutes hours
@@ -55,15 +68,15 @@ object CampaignUtils {
    * @param diffType
    * @return
    */
-  def currentTimeDiff(date: String, diffType: String): Long = {
-    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    val prodDate = dateFormat.parse(date)
+  def currentTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
 
     val cal = Calendar.getInstance();
 
-    val diff = cal.getTime().getTime - prodDate.getTime()
+    val diff = cal.getTime().getTime - date.getTime
 
-    var diffTime: Long = 0
+    var diffTime: Double = 0
 
     diffType match {
       case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
@@ -76,6 +89,72 @@ object CampaignUtils {
   }
 
   /**
+   * To calculate difference between start time of previous day and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance();
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - date.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    return diffTime
+  }
+
+  /**
+   * Input date is string
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: String, diffType: String): Double = {
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance();
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - prodDate.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    return diffTime
+  }
+
+  /**
+   * get start time of the day
+   * @param time
+   * @return
+   */
+  def startOfDay(time: Date): Long = {
+    val cal = Calendar.getInstance();
+    cal.setTimeInMillis(time.getTime());
+    cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to 0
+    cal.set(Calendar.MINUTE, 0); // set minutes to 0
+    cal.set(Calendar.SECOND, 0); //set seconds to 0
+    return cal.getTime.getTime
+  }
+
+  /**
    * returns current time in given Format
    * @param dateFormat
    * @return date String
@@ -85,5 +164,136 @@ object CampaignUtils {
     val sdf = new SimpleDateFormat(dateFormat);
     return sdf.format(cal.getTime());
   }
+
+  /**
+   * get all Orders which are successful
+   * @param salesOrderItemData
+   * @return
+   */
+  def getSuccessfulOrders(salesOrderItemData: DataFrame): DataFrame = {
+    if (salesOrderItemData == null) {
+      return null
+    }
+    // Sales order skus with successful order status
+    val successfulSku = salesOrderItemData
+      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+      .select(
+        salesOrderItemData(ProductVariables.SKU),
+        salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE),
+        salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
+        salesOrderItemData(SalesOrderItemVariables.CREATED_AT),
+        salesOrderItemData(SalesOrderItemVariables.UPDATED_AT)
+      )
+
+    return successfulSku
+  }
+
+  /**
+   * returns the skuSimple which are not bought till Now (in reference to skus and updated_at time in inputData)
+   *
+   * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
+   *
+   * @param inputData - fk_customer, sku_simple, updated_at
+   * @param salesOrder -
+   * @param salesOrderItem
+   * @return
+   */
+  def skuSimpleNOTBought(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        successFulOrderItems(ProductVariables.SKU) as SUCCESS_ + ProductVariables.SKU,
+        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+      )
+
+    val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+
+    logger.info("Filtered all the sku simple which has been bought")
+
+    return skuSimpleNotBoughtTillNow
+  }
+
+  /**
+   * returns the skus which are not bought till Now (in reference to skus and updated_at time in inputData)
+   *
+   * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
+   *
+   * @param inputData
+   * @param salesOrder
+   * @param salesOrderItem
+   * @return
+   */
+  def skuNotBought(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFullOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        Udf.skuFromSimpleSku(successFullOrderItems(ProductVariables.SKU)) as SUCCESS_ + ProductVariables.SKU,
+        successFullOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+      )
+
+    val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
+      .select(
+        inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(ProductVariables.SKU),
+        inputData(ProductVariables.SPECIAL_PRICE)
+      )
+
+    logger.info("Filtered all the sku which has been bought")
+
+    return skuNotBoughtTillNow
+  }
+
+  /**
+   * Filtered Data based on before time to after Time yyyy-mm-dd HH:MM:SS.s
+   * @param inData
+   * @param timeField
+   * @param after
+   * @param before
+   * @return
+   */
+  def getTimeBasedDataFrame(inData: DataFrame, timeField: String, after: String, before: String): DataFrame = {
+    if (inData == null || timeField == null || before == null || after == null) {
+      logger.error("Any of the value in getTimeBasedDataFrame is null")
+      return null
+    }
+
+    if (after.length != before.length) {
+      logger.error("before and after time formats are different ")
+      return null
+    }
+
+    val Columns = inData.columns
+    if (!(Columns contains (timeField))) {
+      logger.error(timeField + "doesn't exist in the inData Frame Schema")
+      return null
+    }
+
+    val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
+    logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
+    return filteredData
+  }
+
 }
 

@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.recommendation
 
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
