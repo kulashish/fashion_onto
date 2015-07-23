@@ -30,7 +30,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     //    android.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4pushA" + ".json")
   }
   "dataFrameFromCsvPath: Data Frame" should "match with expected data" in {
-    val path = DataSets.CUSTOMER_RESPONSE + "/" + "test.csv"
+    val path = DataSets.Ad4Push + "/" + "test.csv"
     val dfReaction = DevicesReactions.readCsv(path);
     //dfReaction.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4push" + ".json")
     val dfExpected = JsonUtils.readFromJsonAbsPath(DataSets.DEVICE_REACTION_JSON_DIRECTORY, "testDF", DevicesReactionsSchema.dfFromCsv)

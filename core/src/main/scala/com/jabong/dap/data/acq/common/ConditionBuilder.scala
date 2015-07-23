@@ -1,7 +1,7 @@
 package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 
 /**
  * Builds the condition for the query to fetch the data and get the min and max values of primary key.
@@ -21,9 +21,9 @@ object ConditionBuilder {
     }
 
     if (rangeStart == null && rangeEnd == null && mode == "daily") {
-      val prevDayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT)
-      "WHERE t1.%s >= '%s %s' AND t1.%s <= '%s %s' %s".format(dateColumn, prevDayDate, Constants.START_TIME, dateColumn,
-        prevDayDate, Constants.END_TIME, tempFilterCondition)
+      val prevDayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
+      "WHERE t1.%s >= '%s %s' AND t1.%s <= '%s %s' %s".format(dateColumn, prevDayDate, TimeConstants.START_TIME, dateColumn,
+        prevDayDate, TimeConstants.END_TIME, tempFilterCondition)
     } else if (mode == "full" && filterCondition == null) {
       ""
     } else if (mode == "full" && filterCondition != null) {

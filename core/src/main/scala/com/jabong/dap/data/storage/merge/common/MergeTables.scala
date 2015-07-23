@@ -2,10 +2,11 @@ package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
 
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.read.{ FormatResolver, ValidFormatNotFound }
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.PathBuilder.DataNotExist
 import grizzled.slf4j.Logging
 
@@ -14,19 +15,13 @@ import grizzled.slf4j.Logging
  */
 
 object MergeTables extends Logging {
-  def getContext(saveFormat: String) = saveFormat match {
-    case "parquet" => Spark.getSqlContext()
-    case "orc" => Spark.getHiveContext()
-    case _ => null
-  }
-
   def mergeFull(mergeInfo: MergeInfo): Unit = {
     val primaryKey = mergeInfo.primaryKey
     val saveMode = mergeInfo.saveMode
     val source = mergeInfo.source
     val tableName = mergeInfo.tableName
     // If the incremental date is null than it is assumed that it will be yesterday's date.
-    val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
       .replaceAll("-", File.separator)
 
     val savePath = PathBuilder.getSavePathFullMerge(incrDate, source, tableName)
@@ -48,10 +43,10 @@ object MergeTables extends Logging {
     }
 
     // If incremental Data Mode is null then we assume that it will be "daily"
-    val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, "daily")
+    val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, DataSets.DAILY_MODE)
 
     // If full Data date is null then we assume that it will be day before the Incremental Data's date.
-    val prevFullDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, incrDate) + File.separator + "24"
+    val prevFullDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate) + File.separator + "24"
     val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, prevFullDate)
       .replaceAll("-", File.separator)
 
@@ -60,7 +55,7 @@ object MergeTables extends Logging {
       lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)
 
       val saveFormat = FormatResolver.getFormat(pathFull)
-      val context = getContext(saveFormat)
+      val context = Spark.getContext(saveFormat)
 
       val baseDF =
         context
@@ -107,10 +102,10 @@ object MergeTables extends Logging {
   def mergeHistory(mergeInfo: MergeInfo) = {
     var prevFullDate = OptionUtils.getOptValue(mergeInfo.fullDate)
 
-    val currMonthYear = TimeUtils.getMonthAndYear(null, Constants.DATE_FORMAT)
+    val currMonthYear = TimeUtils.getMonthAndYear(null, TimeConstants.DATE_FORMAT)
 
     val minDate = OptionUtils.getOptValue(mergeInfo.incrDate)
-    val monthYear = TimeUtils.getMonthAndYear(minDate, Constants.DATE_FORMAT)
+    val monthYear = TimeUtils.getMonthAndYear(minDate, TimeConstants.DATE_FORMAT)
 
     for (yr <- monthYear.year to currMonthYear.year) {
 
@@ -128,7 +123,7 @@ object MergeTables extends Logging {
 
       for (mnth <- startMonth to endMonth) {
         val mnthStr = TimeUtils.withLeadingZeros(mnth)
-        val days = TimeUtils.getMaxDaysOfMonth(yr.toString + "-" + mnthStr + "-01", Constants.DATE_FORMAT)
+        val days = TimeUtils.getMaxDaysOfMonth(yr.toString + "-" + mnthStr + "-01", TimeConstants.DATE_FORMAT)
         val end = yr.toString + File.separator + mnthStr + File.separator + days
 
         val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = "full",

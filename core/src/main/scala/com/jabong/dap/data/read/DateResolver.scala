@@ -10,13 +10,13 @@ object DateResolver {
    * WARNING: throws DataNotFound exception if data is not found in any
    * value of hour for the given date.
    */
-  def getDateWithHour(source: String, tableName: String, mode: String, date: String): String = {
+  def getDateWithHour(basePath: String, source: String, tableName: String, mode: String, date: String): String = {
     var hour: Int = 23
     var flag = 0
     var dateHour: String = null
     while (hour >= 0 && flag == 0) {
       dateHour = withLeadingZeros(hour)
-      val path = PathBuilder.buildPath(source, tableName, mode, date) + File.separator + dateHour
+      val path = PathBuilder.buildPath(basePath, source, tableName, mode, date) + File.separator + dateHour
       if (DataVerifier.dataExists(path)) {
         flag = 1
       }

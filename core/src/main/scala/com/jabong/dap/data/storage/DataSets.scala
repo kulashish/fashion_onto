@@ -8,14 +8,13 @@ import com.jabong.dap.common.AppConfig
  * Created by jabong on 28/5/15.
  */
 object DataSets {
+
   val basePath = AppConfig.config.basePath
 
-  //  val BOB = basePath + "bob"
-  val VARIABLE_PATH = basePath + File.separator + "variables"
+  val INPUT_PATH = basePath + File.separator + "input"
+  val OUTPUT_PATH = basePath + File.separator + "output"
 
   val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources" + File.separator
-
-  //read prequet file from these paths
 
   //sales
   val SALES_ORDER = "sales_order"
@@ -46,18 +45,33 @@ object DataSets {
   //Newsletter Preferences
   val NEWSLETTER_PREFERENCES = "newsletter_preferences"
 
-  //customer response
-  val CUSTOMER_RESPONSE = "customer_response"
+  //Ad4Push customer response
+  val AD4PUSH = "ad4Push"
 
   //non schema constants for ad4push
   val IPHONE_CSV_PREFIX = "exportMessagesReactions_517_"
   val ANDROID_CSV_PREFIX = "exportMessagesReactions_515_"
 
-  val IPHONE = "iphone"
-  val ANDROID = "android"
+  val REACTION_IOS = "reaction_ios"
+  val REACTION_ANDROID = "reaction_android"
 
-  val FULL_MODE = "full"
+  // modes for reading data
+  val FULL_MERGE_MODE = "full_merge"
+  val FULL_FETCH_MODE = "full_fetch"
+
+  // modes for reading and writing data
   val DAILY_MODE = "daily"
+  val MONTHLY_MODE = "monthly"
+  val HOURLY_MODE = "hourly"
 
-  val CSV_EXTENSION = ".csv"
+  // modes for writing data
+  val FULL = "full"
+
+  val CSV = "csv"
+  val PARQUET = "parquet"
+  val ORC = "orc"
+
+  val IGNORE_SAVEMODE = "ignore"
+  val ERROR_SAVEMODE = "error"
+
 }
