@@ -13,6 +13,9 @@ object DataSets {
 
   val INPUT_PATH = basePath + File.separator + "input"
   val OUTPUT_PATH = basePath + File.separator + "output"
+  val EXTRAS = basePath + File.separator + "extras"
+  val CLICKSTREAM = basePath + File.separator+ "clickstream"
+
 
   val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources" + File.separator
 
@@ -80,5 +83,7 @@ object DataSets {
   val ERP = "erp"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
+  val DEVICE_MAPPING = "device_mapping"
+  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
 }

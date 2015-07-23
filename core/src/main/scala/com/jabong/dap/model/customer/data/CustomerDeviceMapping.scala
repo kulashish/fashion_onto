@@ -2,6 +2,8 @@ package com.jabong.dap.model.customer.data
 
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.Spark
+import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.{ SparkConf}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -48,26 +50,29 @@ object CustomerDeviceMapping {
     return (a(4),a(3),a(2),a(1),a(0))
   }
 
-   def main(args: Array[String]) {
+   def main(date:String) {
      val conf = new SparkConf().setAppName("SparkExamples")
      Spark.init(conf)
      val sc = Spark.getContext()
      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-     val df1 =Spark.getSqlContext().read.parquet("/home/jabong/bobdata/userDeviceMapApp")
+//     val df1 =Spark.getSqlContext().read.parquet("/home/jabong/bobdata/userDeviceMapApp")
+     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CLICKSTREAM,DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, date)
      df1.printSchema()
      df1.show(5)
-     val csv = sc.textFile("/home/jabong/bobdata/device_mapping_20150714.csv")
-     val x= csv.map(x =>  tokenize(x))
-     val df2 = Spark.getSqlContext().createDataFrame(x).
-      withColumnRenamed("_1",CustomerVariables.RESPONSYS_ID).
-      withColumnRenamed("_2",CustomerVariables.ID_CUSTOMER).
-      withColumnRenamed("_3",CustomerVariables.EMAIL).
-      withColumnRenamed("_4",CustomerVariables.BROWSER_ID).
-      withColumnRenamed("_5",CustomerVariables.DOMAIN)
-     val df3 = df2.filter(!df2(CustomerVariables.RESPONSYS_ID).startsWith("RESPONSYS_ID"))
+//     val csv = sc.textFile("/home/jabong/bobdata/device_mapping_20150714.csv")
+//     val x= csv.map(x =>  tokenize(x))
+//     val df2 = Spark.getSqlContext().createDataFrame(x).
+//      withColumnRenamed("_1",CustomerVariables.RESPONSYS_ID).
+//      withColumnRenamed("_2",CustomerVariables.ID_CUSTOMER).
+//      withColumnRenamed("_3",CustomerVariables.EMAIL).
+//      withColumnRenamed("_4",CustomerVariables.BROWSER_ID).
+//      withColumnRenamed("_5",CustomerVariables.DOMAIN)
+     val df2 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, date)
+     val df3 = df2.filter(!df2(CustomerVariables.RESPONSYS_ID).startsWith(CustomerVariables.RESPONSYS_ID))
       df3.printSchema()
       df3.show(10)
-     val df4 =Spark.getSqlContext().read.parquet("/home/jabong/bobdata/customer/07/01")
+//     val df4 =Spark.getSqlContext().read.parquet("/home/jabong/bobdata/customer/07/01")
+     val df4 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, date)
      val res = getLatestDevice(df1,df3, df4)
      res.printSchema()
      res.show(20)
