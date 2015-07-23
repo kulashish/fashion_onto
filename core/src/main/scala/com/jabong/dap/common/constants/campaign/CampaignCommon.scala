@@ -12,7 +12,7 @@ object CampaignCommon {
   val PUSH_REF_SKUS = 1
   val NUMBER_REF_SKUS = 2
 
-  val BASE_PATH = "misc/campaignTestRun"
+  val BASE_PATH = "/user/rahulaneja/misc/campaignTestRun"
 
   val CANCEL_RETARGET_CAMPAIGN = "cancelReTarget"
   val RETURN_RETARGET_CAMPAIGN = "returnReTarget"
@@ -22,7 +22,7 @@ object CampaignCommon {
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
-  val DATE_FORMAT = "yyyy/mm/dd"
+  val DATE_FORMAT = "yyyy/MM/dd"
 
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
