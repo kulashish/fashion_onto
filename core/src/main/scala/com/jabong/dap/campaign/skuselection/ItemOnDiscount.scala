@@ -22,7 +22,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
   //
   // dfCustomerProductShortlist =  [(id_customer, sku simple)]
   // itr30dayData = [(skusimple, date, special price)]
-  override def skuFilter(customerSelected: DataFrame, df30DaysItrData: DataFrame, campaignName: String): DataFrame = {
+  override def skuFilter(customerSelected: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
 
     if (customerSelected == null || df30DaysItrData == null) {
 
@@ -233,6 +233,6 @@ class ItemOnDiscount extends SkuSelector with Logging {
   // not needed
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
 }
 
