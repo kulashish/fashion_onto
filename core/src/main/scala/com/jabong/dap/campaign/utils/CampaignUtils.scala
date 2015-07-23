@@ -59,7 +59,7 @@ object CampaignUtils extends Logging {
   val currentDaysDifference = udf((date: Timestamp) => currentTimeDiff(date: Timestamp, "days"))
 
   val lastDayTimeDifference = udf((date: Timestamp) => lastDayTimeDiff(date: Timestamp, "days"))
-//FIXME:Remove this function
+  //FIXME:Remove this function
   val lastDayTimeDifferenceString = udf((date: String) => lastDayTimeDiff(date: String, "days"))
 
   /**

@@ -186,12 +186,12 @@ object CampaignManager extends Serializable with Logging {
 
   def startPushCampaignMerge(campaignJsonPath: String) = {
 
-//    val conf = new Configuration()
-//          val fileSystem = FileSystem.get(conf)
-//          implicit val formats = net.liftweb.json.DefaultFormats
-//          val path = new Path(campaignJsonPath)
-//          val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-//          campaignInfo.campaigns = json.extract[campaignConfig]
+    //    val conf = new Configuration()
+    //          val fileSystem = FileSystem.get(conf)
+    //          implicit val formats = net.liftweb.json.DefaultFormats
+    //          val path = new Path(campaignJsonPath)
+    //          val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+    //          campaignInfo.campaigns = json.extract[campaignConfig]
   }
 
   //

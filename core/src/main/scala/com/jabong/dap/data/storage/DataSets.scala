@@ -14,7 +14,7 @@ object DataSets {
   val INPUT_PATH = basePath + File.separator + "input"
   val OUTPUT_PATH = basePath + File.separator + "output"
 
-  val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources" + File.separator
+  val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources"
 
   //sales
   val SALES_ORDER = "sales_order"
@@ -95,7 +95,7 @@ object DataSets {
   val ITR_30_DAY_DATA = "itr_30_day_data"
 
   val YESTERDAY_ITR_DATA = "yesterday_itr_data"
-  
+
   // Data sources
   val BOB_SOURCE = "bob"
   val ERP_SOURCE = "erp"

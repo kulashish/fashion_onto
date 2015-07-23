@@ -90,5 +90,5 @@ object DataReader extends Logging {
       context.read.format(saveFormat).load(fetchPath)
     }
   }
-  
+
 }

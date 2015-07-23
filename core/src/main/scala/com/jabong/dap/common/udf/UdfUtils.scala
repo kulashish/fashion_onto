@@ -1,14 +1,12 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.{ Date }
+import java.util.Date
 
 import com.jabong.dap.common.ArrayUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
-import org.codehaus.jettison.json.JSONArray
 
 /**
  * Created by raghu on 3/7/15.
@@ -235,7 +233,7 @@ object UdfUtils {
 
     val time = t1.toString()
 
-    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.START_TIME_MS)
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
   }
 
   /**

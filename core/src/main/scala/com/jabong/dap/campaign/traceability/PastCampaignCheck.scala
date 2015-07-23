@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.traceability
 
 import com.jabong.dap.common.constants.campaign.CampaignMerge
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables, ProductVariables, CustomerVariables }
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -26,7 +26,7 @@ class PastCampaignCheck extends Logging {
     }
     //FIXME: Add campaign type check in HashMap
 
-    val filterDate = TimeUtils.getDateAfterNDays(-nDays, Constants.DATE_FORMAT)
+    val filterDate = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT)
 
     val mailTypeCustomers = pastCampaignData.filter(CampaignMerge.CAMPAIGN_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMerge.END_OF_DATE + " >= '" + filterDate + "'")
       .select(pastCampaignData(CampaignMerge.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER, pastCampaignData(CampaignMerge.REF_SKU1) as ProductVariables.SKU)

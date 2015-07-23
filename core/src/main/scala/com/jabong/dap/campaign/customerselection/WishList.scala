@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
@@ -57,11 +57,11 @@ class WishList extends LiveCustomerSelector with Logging {
 
     }
 
-    val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, Constants.DATE_TIME_FORMAT_MS)
+    val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS)
 
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
 
-    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_TIME_FORMAT_MS)
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS)
 
     val endTimeStamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
 

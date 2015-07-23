@@ -312,7 +312,7 @@ object TimeUtils extends Logging {
 
     val time = t1.toString()
 
-    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.END_TIME_MS)
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + TimeConstants.END_TIME_MS)
   }
 
   /**
@@ -328,7 +328,7 @@ object TimeUtils extends Logging {
 
     val time = t1.toString()
 
-    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.START_TIME_MS)
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
   }
 
   /**
