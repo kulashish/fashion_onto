@@ -6,6 +6,7 @@ import com.jabong.dap.common.time.{ Constants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.read.{ FormatResolver, ValidFormatNotFound }
+import com.jabong.dap.data.storage.merge.common.PathBuilder.DataNotExist
 import grizzled.slf4j.Logging
 
 /**
@@ -19,7 +20,7 @@ object MergeTables extends Logging {
     case _ => null
   }
 
-  def mergeFull(mergeInfo: MergeInfo) = {
+  def mergeFull(mergeInfo: MergeInfo): Unit = {
     val primaryKey = mergeInfo.primaryKey
     val saveMode = mergeInfo.saveMode
     val source = mergeInfo.source
@@ -28,17 +29,36 @@ object MergeTables extends Logging {
     val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER))
       .replaceAll("-", File.separator)
 
+    val savePath = PathBuilder.getSavePathFullMerge(incrDate, source, tableName)
+    if (saveMode.equals("ignore")) {
+      if (DataVerifier.dataExists(savePath)) {
+        logger.info("File Already exists: " + savePath)
+        println("File Already exists so not doing anything: " + savePath)
+        return
+      }
+      if (DataVerifier.hdfsDirExists(savePath)) {
+        DataVerifier.hdfsDirDelete(savePath)
+        logger.info("Directory with no success file was removed: " + savePath)
+        println("Directory with no success file was removed: " + savePath)
+      }
+    } else if (saveMode.equals("error") && DataVerifier.hdfsDirExists(savePath)) {
+      logger.info("File Already exists and save Mode is error: " + savePath)
+      println("File Already exists and save Mode is error: " + savePath)
+      return
+    }
+
     // If incremental Data Mode is null then we assume that it will be "daily"
     val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, "daily")
 
     // If full Data date is null then we assume that it will be day before the Incremental Data's date.
-    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, incrDate))
+    val prevFullDate = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER, incrDate) + File.separator + "24"
+    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, prevFullDate)
       .replaceAll("-", File.separator)
 
-    val pathFull = PathBuilder.getFullDataPath(fullDataDate, source, tableName)
-    lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)
-
     try {
+      val pathFull = PathBuilder.getFullDataPath(fullDataDate, source, tableName)
+      lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)
+
       val saveFormat = FormatResolver.getFormat(pathFull)
       val context = getContext(saveFormat)
 
@@ -54,13 +74,15 @@ object MergeTables extends Logging {
           .load(MergePathResolver.incrementalPathResolver(pathIncr))
       val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
 
-      mergedDF.write.format(saveFormat).mode(saveMode).save(PathBuilder.getSavePathFullMerge(incrDate, source, tableName))
+      mergedDF.write.format(saveFormat).mode(saveMode).save(savePath)
       println("merged " + pathIncr + " with " + pathFull)
     } catch {
       case e: DataNotFound =>
         logger.error("Data not at location: " + e.getMessage)
       case e: ValidFormatNotFound =>
         logger.error("Could not resolve format in which the data is saved")
+      case e: DataNotExist =>
+        logger.error("Data in the given Path doesn't exist")
     }
   }
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-
 use strict;
 use 5.010;
 use warnings;
@@ -14,7 +13,7 @@ my $debug;
 my $target;
 my $component;
 
-GetOptions(
+GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
@@ -73,22 +72,39 @@ if ($target eq "stage") {
 }
 
 # spark path constants
+my $BASE_PATH = "/opt/alchemy-core/current";
 my $SPARK_HOME = "/ext/spark";
-my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
-my $CORE_JAR = "/opt/alchemy-core/current/jar/Alchemy-assembly-0.1.jar";
+my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
+my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
+my $CORE_JAR = "$BASE_PATH/jar/Alchemy-assembly.jar";
 my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
 my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 
-# bobAcq
-if ($component eq "bobAcq") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcquisitionTables.json";
+# bobAcq & merge
+if ($component eq "bob") {
+    my $command1 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
+    run_component($component, $command1);
+    my $command2 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
+    run_component($component, $command2);
+    my $command3 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
+    run_component($component, $command3);
+# bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
+} elsif ($component eq "bobFull") {
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
     run_component($component, $command);
-} if ($component eq "retargetPushCampaign") {
+# erpAcq & merge
+} elsif ($component eq "erp") {
+    my $command1 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
+    run_component($component, $command1);
+    my $command2 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
+    run_component($component, $command2);
+} elsif ($component eq "retargetPushCampaign") {
+# for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
     run_component($component, $command);
 } else {
    print "not a valid component\n";
-}   
+}
 
 
 sub send_mail {
