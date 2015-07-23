@@ -10,7 +10,7 @@ import com.jabong.dap.common.AppConfig
 object DataSets {
   val basePath = AppConfig.config.basePath
 
-//  val BOB = basePath + "bob"
+  //  val BOB = basePath + "bob"
   val VARIABLE_PATH = basePath + File.separator + "variables"
 
   val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources" + File.separator
@@ -59,8 +59,5 @@ object DataSets {
   val FULL_MODE = "full"
   val DAILY_MODE = "daily"
 
-//  val BEFORE_7_DAYS_DF_NAME = "Before7days"
-//  val BEFORE_15_DAYS_DF_NAME = "Before15days"
-//  val BEFORE_30_DAYS_DF_NAME = "Before30days"
   val CSV_EXTENSION = ".csv"
 }

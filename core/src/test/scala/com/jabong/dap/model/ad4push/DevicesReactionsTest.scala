@@ -3,7 +3,7 @@ package com.jabong.dap.model.ad4push
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import com.jabong.dap.common.{Spark, SharedSparkContext}
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.TimeUtils
@@ -16,18 +16,18 @@ import com.jabong.dap.model.ad4push.variables.DevicesReactions
 /**
  * Created by Kapil.Rajak on 13/7/15.
  */
-class DevicesReactionsTest  extends FlatSpec with SharedSparkContext {
+class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
 
   "io : DataFrame" should "match with expected DF" in {
-//    val full =JsonUtils.readFromJsonAbsPath(DataSets.DEVICE_REACTION_JSON_DIRECTORY, "fullSummary_full", DevicesReactionsSchema.deviceReaction)
-//    //full.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4push" + ".json")
-//    val path = DataSets.DEVICE_REACTION_DF_DIRECTORY+"/"+"exportMessagesReactions_515_20150721.parquet"
-//    //full.write.parquet(path)
-//    val df = Spark.getSqlContext().read.parquet(path)
+    //    val full =JsonUtils.readFromJsonAbsPath(DataSets.DEVICE_REACTION_JSON_DIRECTORY, "fullSummary_full", DevicesReactionsSchema.deviceReaction)
+    //    //full.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4push" + ".json")
+    //    val path = DataSets.DEVICE_REACTION_DF_DIRECTORY+"/"+"exportMessagesReactions_515_20150721.parquet"
+    //    //full.write.parquet(path)
+    //    val df = Spark.getSqlContext().read.parquet(path)
 
-//    val (iPhone,android) = DevicesReactions.io("20150722")
-//    iPhone.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4pushI" + ".json")
-//    android.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4pushA" + ".json")
+    //    val (iPhone,android) = DevicesReactions.io("20150722")
+    //    iPhone.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4pushI" + ".json")
+    //    android.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4pushA" + ".json")
   }
   "dataFrameFromCsvPath: Data Frame" should "match with expected data" in {
     val path = DataSets.CUSTOMER_RESPONSE + "/" + "test.csv"

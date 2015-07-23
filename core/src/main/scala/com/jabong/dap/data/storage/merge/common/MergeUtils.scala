@@ -59,13 +59,13 @@ object MergeUtils extends MergeData {
    * @return Dataframe
    */
   def joinOldAndNewDF(dfIncr: DataFrame, incrSchema: StructType, dfPrevVarFull: DataFrame, prevVarFullSchema: StructType, primaryKey: String): DataFrame = {
-    var dfIncrVar :DataFrame = dfIncr
-    if(null == dfIncr)  dfIncrVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row],incrSchema)
+    var dfIncrVar: DataFrame = dfIncr
+    if (null == dfIncr) dfIncrVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], incrSchema)
 
-    var dfPrevVarFullVar :DataFrame = dfPrevVarFull
-    if(null == dfPrevVarFull) dfPrevVarFullVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row],prevVarFullSchema)
+    var dfPrevVarFullVar: DataFrame = dfPrevVarFull
+    if (null == dfPrevVarFull) dfPrevVarFullVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], prevVarFullSchema)
 
-    joinOldAndNewDF(dfIncrVar,dfPrevVarFullVar, primaryKey)
+    joinOldAndNewDF(dfIncrVar, dfPrevVarFullVar, primaryKey)
   }
 
   /**

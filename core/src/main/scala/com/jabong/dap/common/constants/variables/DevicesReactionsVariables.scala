@@ -10,11 +10,11 @@ object DevicesReactionsVariables {
   val MESSAGE_ID = "message_id"
   val CAMPAIGN_ID = "campaign_id"
   val BOUNCE = "bounce"
-  val REACTION  = "reaction"
+  val REACTION = "reaction"
 
   //DeviceReaction variables Full
   val CUSTOMER_ID = "customer_id"
-  val LAST_CLICK_DATE =  "last_click_date"
+  val LAST_CLICK_DATE = "last_click_date"
   val CLICK_7 = "click_7"
   val CLICK_15 = "click_15"
   val CLICK_30 = "click_30"
@@ -30,10 +30,10 @@ object DevicesReactionsVariables {
   val MOST_CLICK_DAY = "most_click_day"
 
   //working constants
-  val EFFECTIVE_7_DAYS="effective_7_days"
-  val EFFECTIVE_15_DAYS="effective_15_days"
-  val EFFECTIVE_30_DAYS="effective_30_days"
-  val MONDAY="monday"
+  val EFFECTIVE_7_DAYS = "effective_7_days"
+  val EFFECTIVE_15_DAYS = "effective_15_days"
+  val EFFECTIVE_30_DAYS = "effective_30_days"
+  val MONDAY = "monday"
   val TUESDAY = "tuesday"
   val WEDNESDAY = "wednesday"
   val THURSDAY = "thursday"
@@ -44,7 +44,7 @@ object DevicesReactionsVariables {
 
   // DeviceReaction variables Incremental
   val CLICKED_TODAY = "clicked_today"
-  val CLICKED_7_DAYS="clicked_7_days"
-  val CLICKED_15_DAYS="clicked_15_days"
-  val CLICKED_30_DAYS="clicked_30_days"
+  val CLICKED_7_DAYS = "clicked_7_days"
+  val CLICKED_15_DAYS = "clicked_15_days"
+  val CLICKED_30_DAYS = "clicked_30_days"
 }

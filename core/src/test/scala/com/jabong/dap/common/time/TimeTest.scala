@@ -77,7 +77,7 @@ class TimeTest extends FlatSpec with Matchers {
     TimeUtils.isSameDay("2015-06-19 00:00:00", "2015-05-19 00:00:00") should be (false)
   }
 
-  "dayName: String" should "match with expected data" in{
+  "dayName: String" should "match with expected data" in {
     val text = "20150712";
     val result = TimeUtils.dayName(text, Constants.YYYYMMDD)
     assert(result.toLowerCase.equals("sunday"))

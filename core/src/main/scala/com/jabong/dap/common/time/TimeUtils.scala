@@ -1,7 +1,7 @@
 package com.jabong.dap.common.time
 
 import java.sql.Timestamp
-import java.text.{DateFormatSymbols, SimpleDateFormat}
+import java.text.{ DateFormatSymbols, SimpleDateFormat }
 import java.util
 import java.util.{ Calendar, Date }
 import grizzled.slf4j.Logging
@@ -10,7 +10,7 @@ import scala.collection.immutable.HashMap
 /**
  * Created by Rachit on 28/5/15.
  */
-object TimeUtils extends Logging{
+object TimeUtils extends Logging {
 
   /**
    * Returns the total number of days between two given date inputs
@@ -257,7 +257,7 @@ object TimeUtils extends Logging{
    * @param expectedFormat
    * @return
    */
-  def changeDateFormat(dateString: String, initialFormat:String, expectedFormat:String): String = {
+  def changeDateFormat(dateString: String, initialFormat: String, expectedFormat: String): String = {
     val format = new java.text.SimpleDateFormat(initialFormat)
     format.setLenient(false)
     val date = format.parse(dateString)
@@ -271,7 +271,7 @@ object TimeUtils extends Logging{
    * @param DateFormat
    * @return Weekday Name
    */
-  def dayName(ipDate: String, DateFormat: String): String ={
+  def dayName(ipDate: String, DateFormat: String): String = {
     //dayformat: yyyyMMdd
     val format = new java.text.SimpleDateFormat(DateFormat)
     format.setLenient(false)
@@ -287,16 +287,16 @@ object TimeUtils extends Logging{
    * @return the nth weekday name from dayName
    */
   def nextNDay(dayName: String, n: Int): String = {
-    val dfs  = new DateFormatSymbols()
+    val dfs = new DateFormatSymbols()
     val dayNameCaps = dayName.capitalize
-    val weekDays = util.Arrays.copyOfRange(dfs.getWeekdays(),1,8)
+    val weekDays = util.Arrays.copyOfRange(dfs.getWeekdays(), 1, 8)
 
     val index = weekDays.indexOf(dayNameCaps)
-    if(index == -1) {
+    if (index == -1) {
       logger.error("I don\'t understand: " + dayName)
     }
     val forwardedIndex = index + n
-    return weekDays.apply(forwardedIndex%7)
+    return weekDays.apply(forwardedIndex % 7)
   }
 
   /**
