@@ -14,7 +14,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import java.math.BigDecimal
 
-import org.apache.spark.sql.types.{Decimal, DecimalType}
+import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class

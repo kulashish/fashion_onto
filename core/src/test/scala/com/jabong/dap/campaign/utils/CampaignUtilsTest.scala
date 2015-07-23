@@ -28,7 +28,6 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
   val testDate = Timestamp.valueOf(dateFormat.format(calendar.getTime))
 
-
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()

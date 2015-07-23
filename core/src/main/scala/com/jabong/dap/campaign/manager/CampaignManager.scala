@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.campaignlist.{InvalidLowStockCampaign, InvalidFollowUpCampaign, LiveRetargetCampaign}
+import com.jabong.dap.campaign.campaignlist.{ InvalidLowStockCampaign, InvalidFollowUpCampaign, LiveRetargetCampaign }
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.time.TimeUtils
@@ -97,26 +97,23 @@ object CampaignManager extends Serializable with Logging {
 
     return true
   }
-  
-  
+
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
 
     val orderItemData = CampaignInput.loadYesterdayOrderItemData()
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val orderData = CampaignInput.loadLastNdaysOrderData(30,fullOrderData)
-    
+    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+
     liveRetargetCampaign.runCampaign(orderData, orderItemData)
   }
-  
-  
-  
+
   def startPushInvalidCampaign() = {
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
-    
-    val orderData = CampaignInput.loadLastNdaysOrderData(30,fullOrderData)
-    
+
+    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+
     // last 3 days of orderitem data
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
@@ -124,28 +121,26 @@ object CampaignManager extends Serializable with Logging {
     // yesterday itr - Qty of Ref SKU to be greater than/equal to 10
     // FIXME
     val yesterdayItrData = null
-    
+
     val invalidFollowUp = new InvalidFollowUpCampaign()
     invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData)
-    
+
     // invalid lowstock
     // last 30 days of order item data
     val last30DayOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData)
 
     // last 2 months order data
-    val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60,fullOrderData)
-    
+    val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
+
     val invalidLowStock = new InvalidLowStockCampaign()
     invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
-    
+
   }
-  
-  
+
   def startPushCampaignMerge(json: String) = {
-    
-    
+
   }
-  
+
   //
   //  def execute() = {
   //
