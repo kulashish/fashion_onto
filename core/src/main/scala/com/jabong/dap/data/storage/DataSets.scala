@@ -63,5 +63,10 @@ object DataSets {
   val BOB_SOURCE = "bob"
   val ERP_SOURCE = "erp"
   
+  // modes for reading data
+  val DAILY_MODE = "daily"
+  val MONTHLY_MODE = "monthly"
+  val FULL_MERGE_MODE = "full_merge"
+  val FULL_FETCH_MODE = "full_fetch"
 
 }
