@@ -9,6 +9,7 @@ import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
+import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import java.math.BigDecimal
@@ -45,7 +46,7 @@ object CampaignUtils extends Logging {
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal], t(1).toString)))
+    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
     val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
