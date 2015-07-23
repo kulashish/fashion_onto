@@ -73,5 +73,12 @@ object DataSets {
 
   val IGNORE_SAVEMODE = "ignore"
   val ERROR_SAVEMODE = "error"
+  val OVERWRITE_SAVEMODE = "overwrite"
+  val APPEND_SAVEMODE = "append"
+
+  val BOB = "bob"
+  val ERP = "erp"
+  val UNICOMMERCE = "unicommerce"
+  val NEXTBEE = "nextbee"
 
 }

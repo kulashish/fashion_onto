@@ -3,6 +3,7 @@ package com.jabong.dap.data.acq.history
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils }
 import com.jabong.dap.data.acq.common.{ DbConnection, GetData, TableInfo }
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Created by pooja on 13/7/15.
@@ -39,7 +40,7 @@ class getHistoricalData extends java.io.Serializable {
         val end = yr.toString + "-" + mnthStr + "-" + days + " " + TimeConstants.END_TIME
 
         val tblInfo = new TableInfo(source = tableInfo.source, tableName = tableInfo.tableName, primaryKey = tableInfo.primaryKey,
-          mode = "monthly", saveFormat = tableInfo.saveFormat, saveMode = "ignore", dateColumn = tableInfo.dateColumn,
+          mode = DataSets.MONTHLY_MODE, saveFormat = tableInfo.saveFormat, saveMode = DataSets.IGNORE_SAVEMODE, dateColumn = tableInfo.dateColumn,
           rangeStart = Option.apply(start), rangeEnd = Option.apply(end), limit = tableInfo.limit, filterCondition = tableInfo.filterCondition,
           joinTables = tableInfo.joinTables)
 
@@ -56,7 +57,7 @@ class getHistoricalData extends java.io.Serializable {
       val end = yrStr + "-" + mnthStr + "-" + TimeUtils.withLeadingZeros(day) + " " + TimeConstants.END_TIME
 
       val tblInfo = new TableInfo(source = tableInfo.source, tableName = tableInfo.tableName, primaryKey = tableInfo.primaryKey,
-        mode = "daily", saveFormat = tableInfo.saveFormat, saveMode = "ignore", dateColumn = tableInfo.dateColumn,
+        mode = DataSets.DAILY_MODE, saveFormat = tableInfo.saveFormat, saveMode = DataSets.IGNORE_SAVEMODE, dateColumn = tableInfo.dateColumn,
         rangeStart = Option.apply(start), rangeEnd = Option.apply(end), limit = tableInfo.limit, filterCondition = tableInfo.filterCondition,
         joinTables = tableInfo.joinTables)
 

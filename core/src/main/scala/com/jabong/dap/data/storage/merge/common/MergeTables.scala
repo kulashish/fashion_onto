@@ -25,7 +25,7 @@ object MergeTables extends Logging {
       .replaceAll("-", File.separator)
 
     val savePath = PathBuilder.getSavePathFullMerge(incrDate, source, tableName)
-    if (saveMode.equals("ignore")) {
+    if (saveMode.equals(DataSets.IGNORE_SAVEMODE)) {
       if (DataVerifier.dataExists(savePath)) {
         logger.info("File Already exists: " + savePath)
         println("File Already exists so not doing anything: " + savePath)
@@ -36,7 +36,7 @@ object MergeTables extends Logging {
         logger.info("Directory with no success file was removed: " + savePath)
         println("Directory with no success file was removed: " + savePath)
       }
-    } else if (saveMode.equals("error") && DataVerifier.hdfsDirExists(savePath)) {
+    } else if (saveMode.equals(DataSets.ERROR_SAVEMODE) && DataVerifier.hdfsDirExists(savePath)) {
       logger.info("File Already exists and save Mode is error: " + savePath)
       println("File Already exists and save Mode is error: " + savePath)
       return
@@ -126,8 +126,8 @@ object MergeTables extends Logging {
         val days = TimeUtils.getMaxDaysOfMonth(yr.toString + "-" + mnthStr + "-01", TimeConstants.DATE_FORMAT)
         val end = yr.toString + File.separator + mnthStr + File.separator + days
 
-        val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = "full",
-          incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply("monthly"), saveMode = "ignore")
+        val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = DataSets.FULL,
+          incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply(DataSets.MONTHLY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
 
         mergeFull(mrgInfo)
 
@@ -140,8 +140,8 @@ object MergeTables extends Logging {
       val yrStr = currMonthYear.year.toString
       val end = yrStr + File.separator + mnthStr + File.separator + TimeUtils.withLeadingZeros(day)
 
-      val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = "full",
-        incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply("daily"), saveMode = "ignore")
+      val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = DataSets.FULL,
+        incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply(DataSets.DAILY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
 
       mergeFull(mrgInfo)
 
