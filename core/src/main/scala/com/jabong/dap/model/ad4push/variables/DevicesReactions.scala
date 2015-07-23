@@ -36,10 +36,10 @@ object DevicesReactions extends Logging {
     val dateStr = TimeUtils.changeDateFormat(dateString, TimeConstants.YYYYMMDD, TimeConstants.DATE_FORMAT_FOLDER)
 
     val incIPhoneCSV = DataSets.IPHONE_CSV_PREFIX + dateString + DataSets.CSV
-    val incI = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, true)
+    val incI = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr, "true", ",")
 
     val incAndroidCSV = DataSets.ANDROID_CSV_PREFIX + dateString + DataSets.CSV
-    val incA = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, true)
+    val incA = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr, "true", ",")
 
     val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
@@ -52,15 +52,15 @@ object DevicesReactions extends Logging {
     //getting DF
     logger.info("Reading inputs (CSVs and Parquets)")
     //    val fullI = readParquet(CUSTOMER_RESPONSE_VAR_PATH, DataSets.REACTION_IOS, DataSets.FULL_MODE, yesterday)
-    val fullI = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, yesterday, false)
-    val b7I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before7daysString, false)
-    val b15I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before15daysString, false)
-    val b30I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before30daysString, false)
+    val fullI = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, yesterday)
+    val b7I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before7daysString)
+    val b15I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before15daysString)
+    val b30I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before30daysString)
 
-    val fullA = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, yesterday, false)
-    val b7A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before7daysString, false)
-    val b15A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before15daysString, false)
-    val b30A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before30daysString, false)
+    val fullA = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, yesterday)
+    val b7A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before7daysString)
+    val b15A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before15daysString)
+    val b30A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before30daysString)
 
     val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
     val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
