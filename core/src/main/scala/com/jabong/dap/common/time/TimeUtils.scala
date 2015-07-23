@@ -300,6 +300,38 @@ object TimeUtils extends Logging {
   }
 
   /**
+   * This will return Timestamp into YYYY-MM-DD hh:MM:ss.s format
+   * @param t1
+   * @return
+   */
+  def getEndTimestampMS(t1: Timestamp): Timestamp = {
+
+    if (t1 == null) {
+      return null
+    }
+
+    val time = t1.toString()
+
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.END_TIME_MS)
+  }
+
+  /**
+   * This will return Timestamp into YYYY-MM-DD hh:MM:ss.s format
+   * @param t1
+   * @return
+   */
+  def getStartTimestampMS(t1: Timestamp): Timestamp = {
+
+    if (t1 == null) {
+      return null
+    }
+
+    val time = t1.toString()
+
+    return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + Constants.START_TIME_MS)
+  }
+
+  /**
    * Converts integer containing day or month of date to a string with the format MM or dd, respectively.
    */
   def withLeadingZeros(input: Int): String = {

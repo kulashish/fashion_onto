@@ -6,22 +6,40 @@ import com.jabong.dap.campaign.recommendation.Recommender
 import com.jabong.dap.common.constants.campaign.SkuSelection
 
 class SkuSelectorFactory extends CampaignFactory {
+
   override def getCustomerSelector(customerType: String): CustomerSelector = ???
 
-  override def getSkuSelector(actionType: String): SkuSelector = {
-    if (actionType == null) {
+  override def getSkuSelector(skuSelectorType: String): SkuSelector = {
+    if (skuSelectorType == null) {
       return null
     }
-    if (actionType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)) {
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.CANCEL_RETARGET)) {
       return new CancelReTarget()
     }
 
-    if (actionType.equalsIgnoreCase(SkuSelection.RETURN_RETARGET)) {
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.RETURN_RETARGET)) {
       return new ReturnReTarget()
+    }
+
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.FOLLOW_UP)) {
+      return new FollowUp()
+    }
+
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.LOW_STOCK)) {
+      return new LowStock()
+    }
+
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.ITEM_ON_DISCOUNT)) {
+      return new ItemOnDiscount()
+    }
+
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.DAILY)) {
+      return new Daily()
     }
 
     return null
   }
 
   override def getRecommender(recType: String): Recommender = ???
+
 }

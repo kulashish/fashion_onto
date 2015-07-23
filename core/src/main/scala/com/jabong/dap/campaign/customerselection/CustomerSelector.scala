@@ -11,4 +11,7 @@ trait CustomerSelector {
   def customerSelection(inData: DataFrame): DataFrame
   def customerSelection(inData: DataFrame, ndays: Int): DataFrame
   def customerSelection(inData: DataFrame, inData2: DataFrame): DataFrame
+  def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame
+  def customerSelection(inData: DataFrame, inData2: DataFrame, inData3: DataFrame): DataFrame
+
 }

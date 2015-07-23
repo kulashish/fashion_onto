@@ -5,6 +5,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
+import com.jabong.dap.data.storage.DataSets
 
 object DataReader extends Logging {
 
@@ -68,15 +69,26 @@ object DataReader extends Logging {
    * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
    */
   private def fetchDataFrame(basePath: String, source: String, tableName: String, mode: String, date: String, header: Boolean): DataFrame = {
-    val dateWithHour = DateResolver.getDateWithHour(basePath, source, tableName, mode, date)
-    val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, dateWithHour)
+    var reqDate: String = null
+    if (mode.equals(DataSets.DAILY_MODE) || mode.equals(DataSets.MONTHLY_MODE)) {
+      reqDate = date
+    } else if (mode.equals(DataSets.FULL_MERGE_MODE)) {
+      reqDate = "%s-%s".format(date, "24")
+    } else if (mode.equals(DataSets.FULL_FETCH_MODE)) {
+      reqDate = DateResolver.getDateWithHour(basePath, source, tableName, mode, date)
+    } else {
+      reqDate = date
+    }
+
+    val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, reqDate)
     val saveFormat = FormatResolver.getFormat(fetchPath)
     val context = Spark.getContext(saveFormat)
     if (saveFormat.equals(DataSets.CSV)) {
       context.read.format("com.databricks.spark.csv").option("header", header.toString).load(fetchPath)
     } else {
+      logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)
       context.read.format(saveFormat).load(fetchPath)
     }
   }
-
+  
 }
