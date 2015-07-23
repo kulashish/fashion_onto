@@ -32,6 +32,7 @@ libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
 unmanagedJars in Compile += file("lib/sqljdbc4.jar")
 
 test in assembly := {}
+assemblyJarName in assembly := "Alchemy-assembly.jar"
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")

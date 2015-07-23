@@ -76,7 +76,7 @@ my $BASE_PATH = "/opt/alchemy-core/current";
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
-my $CORE_JAR = "$BASE_PATH/jar/Alchemy-assembly-0.1.jar";
+my $CORE_JAR = "$BASE_PATH/jar/Alchemy-assembly.jar";
 my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
 my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 
