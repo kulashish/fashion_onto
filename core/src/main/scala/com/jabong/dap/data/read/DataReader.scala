@@ -102,8 +102,7 @@ object DataReader extends Logging {
     require(date != null, "Date is null")
 
     try {
-      val reqDate = getDate(basePath, source, tableName, mode, date)
-      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, reqDate)
+      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
     } catch {
       case e: DataNotFound =>
