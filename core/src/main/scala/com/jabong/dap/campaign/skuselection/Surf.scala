@@ -18,7 +18,7 @@ import org.apache.spark.sql.functions._
 class Surf extends SkuSelector with Logging {
 
   /**
-   *
+   * surf 3
    * @param dfCustomerPageVisit
    * @param dfItrData
    * @param dfCustomer

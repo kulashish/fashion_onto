@@ -1,8 +1,6 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
-import org.apache.commons.net.ntp.TimeStamp
 import org.scalatest.FlatSpec
 
 /**
@@ -432,6 +430,48 @@ class UdfUtilsTest extends FlatSpec {
     val result = UdfUtils.getMaxSlot(slot)
 
     assert(result == 8)
+
+  }
+
+  //===============================getDistinctSku=========================================================
+  "getDistinctSku(): skuArray value " should "be null" in {
+
+    val skuArray = null
+
+    val result = UdfUtils.getDistinctSku(skuArray)
+
+    assert(result == null)
+
+  }
+
+  "getDistinctSku(): skuArray value " should "not be null" in {
+
+    val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
+
+    val result = UdfUtils.getDistinctSku(skuArray)
+
+    assert(result.length == 4)
+
+  }
+
+  //===============================getRepeatedSku=========================================================
+  "getRepeatedSku(): skuArray value " should "be null" in {
+
+    val skuArray = null
+
+    val result = UdfUtils.getRepeatedSku(skuArray)
+
+    assert(result == null)
+
+  }
+
+  "getRepeatedSku(): skuArray value " should "not be null" in {
+
+    val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
+
+    val result = UdfUtils.getRepeatedSku(skuArray)
+
+    assert(result.length == 3)
 
   }
 
