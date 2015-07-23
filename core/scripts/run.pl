@@ -24,7 +24,8 @@ GetOptions (
 sub run_component {
     my ($component, $command) = @_;
     my $start = time();
-    system($command);
+    my $YARN_CONF_DIR = "YARN_CONF_DIR=/etc/hadoop/conf ";
+    system($YARN_CONF_DIR . $command);
     my $status = $?;
     my $end = time();
     
@@ -42,7 +43,7 @@ sub run_component {
     my $diff = $end - $start;
 
     my $msg = "\n";
-    $msg .= "Command: $command\n";
+    $msg .= "Command: $YARN_CONF_DIR $command\n";
     $msg .= sprintf("Time Taken: %.2f secs\n",$diff);
     $msg .= "start: " . localtime($start) . "\n";
     $msg .= "end: " . localtime($end) . "\n";
@@ -75,6 +76,7 @@ if ($target eq "stage") {
 my $BASE_PATH = "/opt/alchemy-core/current";
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
+my $HIVE_JARS = "--jars /ext/spark-1.4.0-bin-hadoop2.6/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark-1.4.0-bin-hadoop2.6/lib/datanucleus-core-3.2.10.jar,/ext/spark-1.4.0-bin-hadoop2.6/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark-1.4.0-bin-hadoop2.6/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $CORE_JAR = "$BASE_PATH/jar/Alchemy-assembly-0.1.jar";
 my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
@@ -94,9 +96,9 @@ if ($component eq "bob") {
     run_component($component, $command);
 # erpAcq & merge
 } elsif ($component eq "erp") {
-    my $command1 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
+    my $command1 = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
     run_component($component, $command1);
-    my $command2 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
+    my $command2 = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command2);
 } else {
    print "not a valid component\n";
