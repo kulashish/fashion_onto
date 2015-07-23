@@ -22,14 +22,14 @@ object CampaignInput extends Logging {
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "daily", dateYesterday, false)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "daily", dateYesterday)
     orderItemData
   }
 
   def loadFullOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "full", dateYesterday, false)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "full", dateYesterday)
     orderItemData
   }
 
@@ -49,7 +49,7 @@ object CampaignInput extends Logging {
   def loadFullOrderData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order data from hdfs")
-    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER, "full", dateYesterday, false)
+    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER, "full", dateYesterday)
     orderData
   }
 
@@ -68,7 +68,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last 30 days acart item data from hdfs")
 
-    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_CART, "monthly", dateYesterday, false)
+    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_CART, "monthly", dateYesterday)
     acartData
   }
 
