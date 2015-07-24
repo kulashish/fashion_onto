@@ -30,6 +30,7 @@ class PastCampaignCheck extends Logging {
 
     val mailTypeCustomers = pastCampaignData.filter(CampaignMerge.CAMPAIGN_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMerge.END_OF_DATE + " >= '" + filterDate + "'")
       .select(pastCampaignData(CampaignMerge.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER, pastCampaignData(CampaignMerge.REF_SKU1) as ProductVariables.SKU)
+
     logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
 
     return mailTypeCustomers
@@ -49,10 +50,10 @@ class PastCampaignCheck extends Logging {
       return null
     }
 
-    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays).withColumnRenamed(CampaignMerge.FK_CUSTOMER, "pastCampaign_" + CampaignMerge.FK_CUSTOMER)
-    val pastCampaignNotSendCustomers = customerSelected.join(pastCampaignSendCustomers, customerSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CampaignMerge.FK_CUSTOMER), "left_outer")
+    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays).withColumnRenamed(CustomerVariables.FK_CUSTOMER, "pastCampaign_" + CustomerVariables.FK_CUSTOMER)
+    val pastCampaignNotSendCustomers = customerSelected.join(pastCampaignSendCustomers, customerSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CustomerVariables.FK_CUSTOMER), "left_outer")
       .filter(
-        "pastCampaign_" + CampaignMerge.FK_CUSTOMER + " is null"
+        "pastCampaign_" + CustomerVariables.FK_CUSTOMER + " is null"
       )
       .select(
         customerSelected(CustomerVariables.FK_CUSTOMER),
@@ -65,7 +66,7 @@ class PastCampaignCheck extends Logging {
   /**
    *  To check whether the campaign has been sent to customer for the same ref sku in last nDays
    * @param pastCampaignData
-   * @param customerSelected
+   * @param customerSkuSimpleSelected
    * @param campaignMailType
    * @param nDays
    * @return
