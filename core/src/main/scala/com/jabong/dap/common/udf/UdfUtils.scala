@@ -221,6 +221,22 @@ object UdfUtils {
   }
 
   /**
+   * getAppUserId  creates new userid for users not having any userid
+   * by using the browserid prepended with a constant
+   *
+   * @param userid
+   * @param domain
+   * @param browserid
+   * @return either transformed userid
+   */
+  def getAppUserId(userid: String, domain: String, browserid: String): String = {
+    var app_user_id = userid
+    if (app_user_id == null && (domain == "ios" || domain == "android" || domain == "windows")) {
+      app_user_id = "_app_" + browserid
+    }
+    return app_user_id
+  }
+  /**
    * This will return Timestamp into YYYYMMDD format
    * @param t1
    * @return

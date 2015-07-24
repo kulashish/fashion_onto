@@ -51,6 +51,9 @@ object DataSets {
   //Newsletter Preferences
   val NEWSLETTER_PREFERENCES = "newsletter_preferences"
 
+  //Clickstream
+  val CLICKSTREAM = "clickstream"
+
   //Ad4Push customer response
   val AD4PUSH = "ad4Push"
 
@@ -104,5 +107,4 @@ object DataSets {
   // Data sources
   val BOB_SOURCE = "bob"
   val ERP_SOURCE = "erp"
-
 }

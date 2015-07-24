@@ -1,0 +1,27 @@
+package com.jabong.dap.common.constants.variables
+
+object PageVisitVariables {
+  val BROWSER_ID = "browserid"
+  val USER_ID = "userid"
+  val APP_USER_ID = "appuserid"
+  val VISIT_ID = "visitid"
+  val VISIT_TIMESTAMP = "visitts"
+  val ACTUAL_VISIT_ID = "actualvisitid"
+  val PAGE_TIMESTAMP = "pagets"
+  val PAGE_TYPE = "pagetype"
+  val DOMAIN = "domain"
+  val DEVICE = "device"
+  val CHANNEL = "channel"
+  val DERIVED_CATEGORY = "derivedcategory"
+  val IP = "ip"
+  val URL = "url"
+  val BRAND = "brand"
+  val SESSION_ID = "sessionid"
+  val AJAX = "ajax"
+  val FORMULA = "formula"
+  val IMPRESSIONS = "impressions"
+  val PRODUCT_SKU = "productsku"
+  val PARTITION_DATE = "date1"
+  val PARTITION_MONTH = "month1"
+  val PARTITION_YEAR = "year1"
+}
