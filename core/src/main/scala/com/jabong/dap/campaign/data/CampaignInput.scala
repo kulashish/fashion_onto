@@ -15,6 +15,12 @@ import org.apache.spark.sql.DataFrame
  */
 object CampaignInput extends Logging {
 
+  def readCustomerData(path: String, date: String): DataFrame = {
+
+    return null
+
+  }
+
   def loadCustomerData(): DataFrame = {
     return null
   }

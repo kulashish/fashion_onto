@@ -1,12 +1,14 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.util.Date
-
+import java.util.{ Date }
 import com.jabong.dap.common.ArrayUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /**
  * Created by raghu on 3/7/15.
@@ -317,7 +319,6 @@ object UdfUtils {
 
     return simpleSku.substring(0, simpleSku.lastIndexOf('-'))
   }
-
   /**
    * returns dayName with max click given counts for 7 days
    * @param count1
@@ -358,5 +359,66 @@ object UdfUtils {
       index = 6
     }
     return TimeUtils.nextNDay("Monday", index)
+  }
+
+  /**
+   *
+   * @param skuArray
+   * @tparam T
+   * @return
+   */
+  def getDistinctSku[T](skuArray: Array[T]): List[T] = {
+
+    if (skuArray == null || skuArray.isEmpty) {
+      return null
+    }
+
+    val skuList = skuArray.toList.distinct
+
+    return skuList
+
+  }
+
+  /**
+   *
+   * @param skuArray
+   * @tparam T
+   * @return
+   */
+  def getRepeatedSku[T](skuArray: Array[T]): List[T] = {
+
+    if (skuArray == null || skuArray.isEmpty) {
+      return null
+    }
+
+    val setSkus = new mutable.HashSet[T]
+
+    val skuList = new ListBuffer[T]()
+
+    for (sku <- skuArray) {
+
+      if (!setSkus.contains(sku)) {
+        setSkus.add(sku)
+      } else {
+        skuList += sku
+      }
+    }
+
+    return skuList.toList
+  }
+
+  /**
+   *
+   * @param skuList
+   * @tparam T
+   * @return
+   */
+  def getCountSku[T](skuList: List[T]): Int = {
+
+    if (skuList == null || skuList.isEmpty) {
+      return 0
+    }
+
+    return skuList.length
   }
 }

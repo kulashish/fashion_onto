@@ -6,7 +6,7 @@ import java.util.{ Date, Calendar }
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.commons.collections.IteratorUtils
@@ -256,6 +256,7 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
         inputData(ProductVariables.SPECIAL_PRICE)
       )
@@ -293,6 +294,51 @@ object CampaignUtils extends Logging {
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
     logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
     return filteredData
+  }
+
+  /**
+   * get customer email to customer id mapping for all clickStream users
+   * @param dfCustomerPageVisit
+   * @param dfCustomer
+   * @return
+   */
+  def getMappingCustomerEmailToCustomerId(dfCustomerPageVisit: DataFrame, dfCustomer: DataFrame): DataFrame = {
+
+    if (dfCustomerPageVisit == null || dfCustomer == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
+
+    val skuCustomerPageVisit = dfCustomerPageVisit.select(
+      CustomerPageVisitVariables.USER_ID,
+      CustomerPageVisitVariables.PRODUCT_SKU,
+      CustomerPageVisitVariables.BROWER_ID,
+      CustomerPageVisitVariables.DOMAIN
+    )
+
+    val customer = dfCustomer.select(
+      CustomerVariables.FK_CUSTOMER,
+      CustomerVariables.EMAIL
+    )
+
+    //======= join data frame customer from skuCustomerPageVisit for mapping EMAIL to FK_CUSTOMER========
+    val dfJoinCustomerToCustomerPageVisit = skuCustomerPageVisit.join(
+      customer,
+      skuCustomerPageVisit(CustomerPageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
+      "left_outer"
+    )
+      .select(
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
+        col(CustomerPageVisitVariables.PRODUCT_SKU),
+        col(CustomerPageVisitVariables.BROWER_ID),
+        col(CustomerPageVisitVariables.DOMAIN)
+      )
+
+    return dfJoinCustomerToCustomerPageVisit
   }
 
 }

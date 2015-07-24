@@ -235,4 +235,13 @@ object Schema {
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
+  val surf2 = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BRICK, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
 }
