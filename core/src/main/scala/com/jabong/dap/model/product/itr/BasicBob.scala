@@ -1,5 +1,8 @@
 package com.jabong.dap.model.product.itr
 
+import java.sql.Date
+import java.util.Calendar
+
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -106,4 +109,33 @@ object BasicBob {
     ("%s-%s-d").format(brandUrlKey.replaceAll("/", ""), productName.replaceAll(" ", "-"), idCatalogConfig)
   }
 
+
+  val actualPrice = udf((specialPrice: java.math.BigDecimal , mrpPrice : java.math.BigDecimal, specialFromDate:Date,specialToDate:Date) => correctPrice(specialPrice: java.math.BigDecimal , mrpPrice : java.math.BigDecimal, specialFromDate:Date,specialToDate:Date))
+  /**
+   *
+   * @param specialPrice
+   * @param mrpPrice
+   * @param specialFromDate
+   * @param specialToDate
+   * @return
+   */
+  def correctPrice(specialPrice: java.math.BigDecimal , mrpPrice : java.math.BigDecimal, specialFromDate:Date,specialToDate:Date): java.math.BigDecimal ={
+    if(specialFromDate == null || specialToDate == null || specialPrice ==null || specialPrice ==0.0) {
+      return mrpPrice
+    }
+
+    if(mrpPrice == null || mrpPrice == 0.0) {
+      return specialPrice
+    }
+
+    val cal = Calendar.getInstance();
+
+    val currentTime = cal.getTime().getTime
+
+    if(currentTime >= specialFromDate.getTime && currentTime <= specialToDate.getTime) {
+      return specialPrice
+    }
+    return mrpPrice
+
+  }
 }
