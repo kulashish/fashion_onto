@@ -1,15 +1,13 @@
 package com.jabong.dap.model.customer.data
 
-import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.Spark
-import com.jabong.dap.data.read.DataReader._
-import com.jabong.dap.data.read.{ValidFormatNotFound, DataNotFound, DataReader}
+import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
+import com.jabong.dap.data.read.{DataNotFound, DataReader, ValidFormatNotFound}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
 
 /**
  * Created by mubarak on 15/7/15.
@@ -17,26 +15,26 @@ import org.apache.spark.sql.types._
 object CustomerDeviceMapping extends Logging {
 
   def getLatestDevice(clickStreamInc: DataFrame, dcf:DataFrame, customer:DataFrame):DataFrame={
-    //val filData = clickStreamInc.filter(!clickStreamInc(CustomerVariables.USERID).startsWith(CustomerVariables.APP_FILTER))
-    val clickStream = clickStreamInc.orderBy(CustomerVariables.PAGETS).groupBy(CustomerVariables.USERID).agg(
-      first(CustomerVariables.BROWSER_ID) as CustomerVariables.BROWSER_ID,
-      first(CustomerVariables.DOMAIN) as CustomerVariables.DOMAIN)
+    //val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
+    val clickStream = clickStreamInc.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.USER_ID).agg(
+      first(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
+      first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN)
 
     // outerjoin with customer table one day increment on userid = email
     // id_customer, email, browser_id, domain
     val broCust = Spark.getContext().broadcast(customer).value
-    val joinedDf = clickStream.join(broCust,broCust(CustomerVariables.EMAIL) === clickStream(CustomerVariables.USERID),"outer")
-      .select(coalesce(broCust(CustomerVariables.EMAIL),clickStream(CustomerVariables.USERID)) as CustomerVariables.EMAIL,
+    val joinedDf = clickStream.join(broCust,broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID),"outer")
+      .select(coalesce(broCust(CustomerVariables.EMAIL),clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
       broCust(CustomerVariables.ID_CUSTOMER),
-      clickStream(CustomerVariables.BROWSER_ID),
-      clickStream(CustomerVariables.DOMAIN)
+      clickStream(PageVisitVariables.BROWSER_ID),
+      clickStream(PageVisitVariables.DOMAIN)
     )
     val joined = joinedDf.join(dcf, dcf(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), "outer").select(
       coalesce(dcf(CustomerVariables.EMAIL),joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
       dcf(CustomerVariables.RESPONSYS_ID),
       dcf(CustomerVariables.ID_CUSTOMER),
-      coalesce(dcf(CustomerVariables.BROWSER_ID),joinedDf(CustomerVariables.BROWSER_ID)) as CustomerVariables.BROWSER_ID,
-      coalesce(dcf(CustomerVariables.DOMAIN),joinedDf(CustomerVariables.DOMAIN)) as CustomerVariables.DOMAIN)
+      coalesce(dcf(PageVisitVariables.BROWSER_ID),joinedDf(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+      coalesce(dcf(PageVisitVariables.DOMAIN),joinedDf(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN)
     joined
   }
 
@@ -73,8 +71,8 @@ object CustomerDeviceMapping extends Logging {
         withColumnRenamed("RESPONSYS_ID",CustomerVariables.RESPONSYS_ID).
         withColumnRenamed("ID_CUSTOMER",CustomerVariables.ID_CUSTOMER).
         withColumnRenamed("EMAIL",CustomerVariables.EMAIL).
-        withColumnRenamed("BID",CustomerVariables.BROWSER_ID).
-        withColumnRenamed("APPTYPE",CustomerVariables.DOMAIN)
+        withColumnRenamed("BID",PageVisitVariables.BROWSER_ID).
+        withColumnRenamed("APPTYPE",PageVisitVariables.DOMAIN)
       df
     } catch {
       case e: DataNotFound =>
