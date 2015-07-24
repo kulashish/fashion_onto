@@ -32,4 +32,10 @@ class CampaignManagerTest extends FlatSpec with Serializable {
     assert(CampaignManager.campaignPriorityMap.contains("cancelReTarge") != true)
     assert(status == true)
   }
+
+  "Correct json String with correct campaign Mail Type" should "return true" in {
+    val status = CampaignManager.createCampaignMaps(json)
+    assert(CampaignManager.mailTypePriorityMap.contains(55) != true)
+    assert(status == true)
+  }
 }

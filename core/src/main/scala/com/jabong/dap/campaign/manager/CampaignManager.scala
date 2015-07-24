@@ -13,6 +13,7 @@ import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.DataFrame
 
 import scala.collection.mutable.HashMap
 
@@ -25,6 +26,7 @@ object CampaignManager extends Serializable with Logging {
 
   var campaignPriorityMap = new HashMap[String, Int]
   var campaignMailTypeMap = new HashMap[String, Int]
+  var mailTypePriorityMap = new HashMap[Int, Int]
   //  def start(campaignJsonPath: String) = {
   //    val validated = try {
   //      val conf = new Configuration()
@@ -82,6 +84,7 @@ object CampaignManager extends Serializable with Logging {
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
         campaignPriorityMap.put(campaignDetails.campaignName, campaignDetails.priority)
         campaignMailTypeMap.put(campaignDetails.campaignName, campaignDetails.mailType)
+        mailTypePriorityMap.put(campaignDetails.mailType,campaignDetails.priority)
       }
 
     } catch {
@@ -202,4 +205,8 @@ object CampaignManager extends Serializable with Logging {
   //
   //  }
 
+
+  def campaignMerger(inputCampaignsData : DataFrame): DataFrame ={
+    return null
+  }
 }
