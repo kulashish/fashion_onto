@@ -1,7 +1,6 @@
 package com.jabong.dap.data.read
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
@@ -93,10 +92,12 @@ object DataReader extends Logging {
   }
 
   def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, header: String, delimeter: String): DataFrame = {
+
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
     require(mode != null, "Mode is null")
     require(date != null, "Date is null")
+
     try {
       val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
@@ -109,6 +110,5 @@ object DataReader extends Logging {
         throw new ValidFormatNotFound
     }
   }
-
 
 }
