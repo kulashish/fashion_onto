@@ -6,7 +6,10 @@ import java.util.Calendar
 
 import com.jabong.dap.campaign.skuselection.CancelReTarget
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, ProductVariables }
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.order.variables.SalesOrder
 import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
 import org.scalatest.FlatSpec
@@ -22,6 +25,8 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var salesOrderItem: DataFrame = _
   @transient var customerSelectedTime: DataFrame = _
   @transient var customerSelectedShortlist: DataFrame = _
+  @transient var dfCustomerPageVisit: DataFrame = _
+  @transient var dfCustomer: DataFrame = _
 
   val calendar = Calendar.getInstance()
   calendar.add(Calendar.DATE, -1)
@@ -37,6 +42,9 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
     salesOrderItem = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_item_bought.json")
     customerSelectedTime = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_filtered_time.json")
+
+    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
+    dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER, Schema.customer)
 
   }
 
@@ -161,4 +169,19 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   //    val currentTime = CampaignUtils.now("yyyy/mm/dd")
   //    assert(currentTime=="2015/07/13")
   //  }
+
+  "getMappingCustomerEmailToCustomerId(a,b): All Data Frame " should "null" in {
+
+    val result = CampaignUtils.getMappingCustomerEmailToCustomerId(null, null)
+
+    assert(result == null)
+
+  }
+
+  "getMappingCustomerEmailToCustomerId(a,b): count " should "3" in {
+
+    val result = CampaignUtils.getMappingCustomerEmailToCustomerId(dfCustomerPageVisit, dfCustomer)
+
+    assert(result.count() == 10)
+  }
 }

@@ -248,14 +248,15 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val successFullOrderItems = getSuccessfulOrders(salesOrderItem)
+    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
       .select(
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
-        successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
-        Udf.skuFromSimpleSku(successFullOrderItems(ProductVariables.SKU)) as SUCCESS_ + ProductVariables.SKU,
-        successFullOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+        successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        Udf.skuFromSimpleSku(successFulOrderItems(ProductVariables.SKU)) as SUCCESS_ + ProductVariables.SKU,
+        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT,
+        successFulOrderItems(SalesOrderItemVariables.UPDATED_AT)
       )
 
     val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
@@ -264,8 +265,7 @@ object CampaignUtils extends Logging {
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
-        inputData(ProductVariables.SKU),
-        inputData(ProductVariables.SPECIAL_PRICE)
+        inputData(ProductVariables.SKU)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -313,7 +313,7 @@ object CampaignUtils extends Logging {
   }
 
   /**
-   * get customer email to customer id mapping for all clickStream users
+   * get customer email to customer id mapping for all clickStream users of Surf
    * @param dfCustomerPageVisit
    * @param dfCustomer
    * @return
@@ -330,9 +330,7 @@ object CampaignUtils extends Logging {
 
     val skuCustomerPageVisit = dfCustomerPageVisit.select(
       CustomerPageVisitVariables.USER_ID,
-      CustomerPageVisitVariables.PRODUCT_SKU,
-      CustomerPageVisitVariables.BROWER_ID,
-      CustomerPageVisitVariables.DOMAIN
+      CustomerPageVisitVariables.SKU
     )
 
     val customer = dfCustomer.select(
@@ -349,9 +347,7 @@ object CampaignUtils extends Logging {
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
-        col(CustomerPageVisitVariables.PRODUCT_SKU),
-        col(CustomerPageVisitVariables.BROWER_ID),
-        col(CustomerPageVisitVariables.DOMAIN)
+        col(CustomerPageVisitVariables.SKU)
       )
 
     return dfJoinCustomerToCustomerPageVisit

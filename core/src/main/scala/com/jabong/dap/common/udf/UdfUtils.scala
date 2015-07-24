@@ -380,6 +380,10 @@ object UdfUtils {
       }
     }
 
+    if (skuList.toList.isEmpty) {
+      return null
+    }
+
     return skuList.toList
   }
 
