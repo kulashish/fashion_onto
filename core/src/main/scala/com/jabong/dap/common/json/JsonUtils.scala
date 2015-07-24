@@ -29,4 +29,11 @@ object JsonUtils {
     df
   }
 
+  def readFromJson(directoryName: String, fileName: String): DataFrame = {
+    val df = Spark.getSqlContext().read.format("json")
+      .load(DataSets.TEST_RESOURCES + File.separator + directoryName + File.separator + fileName + ".json")
+
+    df
+  }
+
 }
