@@ -29,8 +29,7 @@ class PastCampaignCheck extends Logging {
     val filterDate = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT)
 
     val mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
-      .select(pastCampaignData(CampaignMergedFields.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER
-        , pastCampaignData(CampaignMergedFields.REF_SKU1) as ProductVariables.SKU)
+      .select(pastCampaignData(CampaignMergedFields.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER, pastCampaignData(CampaignMergedFields.REF_SKU1) as ProductVariables.SKU)
 
     logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
 
@@ -87,7 +86,7 @@ class PastCampaignCheck extends Logging {
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CampaignMergedFields
 
-      .FK_CUSTOMER)
+        .FK_CUSTOMER)
         &&
         customerSkuSelected(ProductVariables.SKU_SIMPLE) === pastCampaignSendCustomers(CampaignMergedFields.REF_SKU1), "left_outer")
       .filter(

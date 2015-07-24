@@ -296,14 +296,13 @@ object CampaignUtils extends Logging {
     return filteredData
   }
 
-
-  def getCampaignPriority(mailType:Int): Int = {
-    if(mailType == 0){
-      val errorString = ("Priority doesn't exist for mailType %d",mailType)
+  def getCampaignPriority(mailType: Int): Int = {
+    if (mailType == 0) {
+      val errorString = ("Priority doesn't exist for mailType %d", mailType)
       logger.error(errorString)
       return CampaignCommon.VERY_LOW_PRIORITY
     }
-    return CampaignManager.mailTypePriorityMap.getOrElse(mailType,CampaignCommon.VERY_LOW_PRIORITY)
+    return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
   }
 
 }

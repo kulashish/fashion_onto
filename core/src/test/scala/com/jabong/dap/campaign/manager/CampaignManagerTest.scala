@@ -1,12 +1,12 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{Spark, SharedSparkContext}
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.schema.Schema
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -21,10 +21,9 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
   val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
   @transient var campaignsOutData: DataFrame = _
 
-
   override def beforeAll() {
     super.beforeAll()
-    campaignsOutData = JsonUtils.readFromJson("campaign/manager","campaign_output",Schema.campaignOutput)
+    campaignsOutData = JsonUtils.readFromJson("campaign/manager", "campaign_output", Schema.campaignOutput)
   }
 
   "empty json String" should "return false" in {

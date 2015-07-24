@@ -4,8 +4,8 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUdfs
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
-import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -82,7 +82,7 @@ object CampaignManager extends Serializable with Logging {
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
         campaignPriorityMap.put(campaignDetails.campaignName, campaignDetails.priority)
         campaignMailTypeMap.put(campaignDetails.campaignName, campaignDetails.mailType)
-        mailTypePriorityMap.put(campaignDetails.mailType,campaignDetails.priority)
+        mailTypePriorityMap.put(campaignDetails.mailType, campaignDetails.priority)
       }
 
     } catch {
@@ -208,24 +208,21 @@ object CampaignManager extends Serializable with Logging {
    * @param inputCampaignsData
    * @return
    */
-  def campaignMerger(inputCampaignsData : DataFrame): DataFrame ={
-    if(inputCampaignsData == null){
+  def campaignMerger(inputCampaignsData: DataFrame): DataFrame = {
+    if (inputCampaignsData == null) {
       logger.error("inputCampaignData is null")
       return null
     }
 
-    if(CampaignManager.mailTypePriorityMap.size == 0){
+    if (CampaignManager.mailTypePriorityMap.size == 0) {
       logger.error("priorityMap doesn't  Exists")
       return null
     }
 
-    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY, CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-        ,first(CampaignCommon.PRIORITY)
-        ,first(CampaignMergedFields.REF_SKU1)
-        ,first(CampaignMergedFields.REF_SKU2))
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE), first(CampaignCommon.PRIORITY), first(CampaignMergedFields.REF_SKU1), first(CampaignMergedFields.REF_SKU2))
 
     return campaignMerged
   }
