@@ -20,7 +20,7 @@ class YesterdaySession extends CustomerSelector {
    * @param customerSurfData
    * @return
    */
-  def customerSelectionSurf1(customerSurfData: DataFrame): DataFrame = {
+  override def customerSelection(customerSurfData: DataFrame): DataFrame = {
 
     val dfRepeatedSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),
@@ -37,7 +37,7 @@ class YesterdaySession extends CustomerSelector {
    * @param customerSurfData
    * @return
    */
-  def customerSelectionSurf2(customerSurfData: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
+  override def customerSelection(customerSurfData: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
 
     val dfDistinctSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),
@@ -115,11 +115,7 @@ class YesterdaySession extends CustomerSelector {
     return dfResult
   }
 
-  override def customerSelection(inData: DataFrame): DataFrame = ???
-
   override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
-
-  override def customerSelection(inData: DataFrame, inData2: DataFrame): DataFrame = ???
 
   override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 

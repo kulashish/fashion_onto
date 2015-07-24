@@ -22,13 +22,13 @@ class Surf extends SkuSelector with Logging {
    * @param dfCustomerPageVisit
    * @param dfItrData
    * @param dfCustomer
-   * @param salesOrder
-   * @param salesOrderItem
+   * @param dfSalesOrder
+   * @param dfSalesOrderItem
    * @return
    */
-  def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+  def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = {
 
-    if (dfCustomerPageVisit == null || dfItrData == null) {
+    if (dfCustomerPageVisit == null || dfItrData == null || dfSalesOrder == null || dfSalesOrderItem == null) {
 
       logger.error("Data frame should not be null")
 
@@ -36,48 +36,21 @@ class Surf extends SkuSelector with Logging {
 
     }
 
-    val skuCustomerPageVisit = dfCustomerPageVisit.select(
-      CustomerPageVisitVariables.USER_ID,
-      CustomerPageVisitVariables.PRODUCT_SKU,
-      CustomerPageVisitVariables.BROWER_ID,
-      CustomerPageVisitVariables.DOMAIN
-    )
-
-    val customer = dfCustomer.select(
-      CustomerVariables.FK_CUSTOMER,
-      CustomerVariables.EMAIL
-    )
-
-    //======= join data frame customer from skuCustomerPageVisit for mapping EMAIL to FK_CUSTOMER========
-    val dfJoinCustomerToCustomerPageVisit = skuCustomerPageVisit.join(
-      customer,
-      skuCustomerPageVisit(CustomerPageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
-      "left_outer"
-    )
-      .select(
-        col(CustomerVariables.FK_CUSTOMER),
-        col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
-        col(CustomerPageVisitVariables.PRODUCT_SKU),
-        col(CustomerPageVisitVariables.BROWER_ID),
-        col(CustomerPageVisitVariables.DOMAIN)
-      )
-
-    //=========calculate sku Not  Bought======================================================================
-    val dfSkuNotBought = CampaignUtils.skuNotBought(dfJoinCustomerToCustomerPageVisit, salesOrder, salesOrderItem)
-
     val itrData = dfItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
       col(ItrVariables.AVERAGE_PRICE) as ItrVariables.SPECIAL_PRICE
     )
 
-    //============== join data frame dfSkuNotBought from itrData===================================================
+    val dfCustomerEmailToCustomerId = CampaignUtils.getMappingCustomerEmailToCustomerId(dfCustomerPageVisit, dfCustomer)
+
+    val dfSkuNotBought = CampaignUtils.skuNotBought(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem)
+
     val dfJoin = dfSkuNotBought.join(
       itrData,
       dfSkuNotBought(CustomerPageVisitVariables.PRODUCT_SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
     )
 
-    //===============generate reference SKU=============
     val dfReferenceSku = CampaignUtils.generateReferenceSku(dfJoin, 2)
 
     //===========select USER_ID,SKU, SPECIAL_PRICE================================================================
