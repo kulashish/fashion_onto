@@ -74,7 +74,7 @@ object DevicesReactions extends Logging {
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
-    return df.select(df(DevicesReactionsVariables.LOGIN_USER_ID) as DevicesReactionsVariables.LOGIN_USER_ID,
+    return df.select(df(DevicesReactionsVariables.LOGIN_USER_ID) as DevicesReactionsVariables.CUSTOMER_ID,
       df(DevicesReactionsVariables.DEVICE_ID) as DevicesReactionsVariables.DEVICE_ID,
       df(DevicesReactionsVariables.MESSAGE_ID) as DevicesReactionsVariables.MESSAGE_ID,
       df(DevicesReactionsVariables.CAMPAIGN_ID) as DevicesReactionsVariables.CAMPAIGN_ID,
@@ -104,7 +104,7 @@ object DevicesReactions extends Logging {
 
     val reducedIncr = reduce(incrementalDF)
 
-    val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(DevicesReactionsVariables.LOGIN_USER_ID, DevicesReactionsVariables.CUSTOMER_ID)
+    val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.CUSTOMER_ID)
 
     val joinedDF = MergeUtils.joinOldAndNewDF(effective, DevicesReactionsSchema.effectiveDF, full, DevicesReactionsSchema.deviceReaction, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
 
@@ -147,27 +147,27 @@ object DevicesReactions extends Logging {
   def effectiveDFFull(incremental: DataFrame, effective7: DataFrame, effective15: DataFrame, effective30: DataFrame): DataFrame = {
     //send DataFrames after using reduce
 
-    val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7, DevicesReactionsSchema.reducedDF, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.LOGIN_USER_ID)
+    val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7, DevicesReactionsSchema.reducedDF, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
     val joined_7_15_summary = joined_7_15.select(
       coalesce(col(DevicesReactionsVariables.DEVICE_ID), col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
-      coalesce(col(DevicesReactionsVariables.LOGIN_USER_ID), col(DevicesReactionsVariables.LOGIN_USER_ID)) as DevicesReactionsVariables.LOGIN_USER_ID,
+      coalesce(col(DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
       col(DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
       col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_15_DAYS)
       .na.fill(0)
 
-    val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary, DevicesReactionsSchema.joined_7_15, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.LOGIN_USER_ID)
+    val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary, DevicesReactionsSchema.joined_7_15, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
     val joined_7_15_30_summary = joined_7_15_30.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.LOGIN_USER_ID), col(DevicesReactionsVariables.LOGIN_USER_ID)) as DevicesReactionsVariables.LOGIN_USER_ID,
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
       col(DevicesReactionsVariables.EFFECTIVE_7_DAYS) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
       col(DevicesReactionsVariables.EFFECTIVE_15_DAYS) as DevicesReactionsVariables.EFFECTIVE_15_DAYS,
       col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_30_DAYS)
       .na.fill(0)
 
-    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary, DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.LOGIN_USER_ID)
+    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary, DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
     val joinedAllSummary = joinedAll.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.LOGIN_USER_ID), col(DevicesReactionsVariables.LOGIN_USER_ID)) as DevicesReactionsVariables.LOGIN_USER_ID,
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
       col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) - col(DevicesReactionsVariables.EFFECTIVE_7_DAYS) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
       col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) - col(DevicesReactionsVariables.EFFECTIVE_15_DAYS) as DevicesReactionsVariables.EFFECTIVE_15_DAYS,
       col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) - col(DevicesReactionsVariables.EFFECTIVE_30_DAYS) as DevicesReactionsVariables.EFFECTIVE_30_DAYS,
@@ -178,16 +178,16 @@ object DevicesReactions extends Logging {
   }
 
   /**
-   * @param df DevicesReactions DataFrame with columns(LOGIN_USER_ID,DEVICE_ID,REACTION) & other columns are optional
-   * @return reduced df with DEVICE_ID as primary key and sum(REACTIONS) evaluated for each key & LOGIN_USER_ID taken
+   * @param df DevicesReactions DataFrame with columns(CUSTOMER_ID,DEVICE_ID,REACTION) & other columns are optional
+   * @return reduced df with DEVICE_ID as primary key and sum(REACTIONS) evaluated for each key & CUSTOMER_ID taken
    */
   def reduce(df: DataFrame): DataFrame = {
     if (df == null) {
       logger.info("DataFrame df is null, returning null")
       return null
     }
-    return df.select(DevicesReactionsVariables.LOGIN_USER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.LOGIN_USER_ID).agg(sum(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
-      .select(DevicesReactionsVariables.LOGIN_USER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION)
+    return df.select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID).agg(sum(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
+      .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION)
   }
 
 }

@@ -9,7 +9,7 @@ import org.apache.spark.sql.types._
 object DevicesReactionsSchema {
   //CSV schema
   val dfFromCsv = StructType(Array(
-    StructField(DevicesReactionsVariables.LOGIN_USER_ID, StringType, true),
+    StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
     StructField(DevicesReactionsVariables.MESSAGE_ID, StringType, true),
     StructField(DevicesReactionsVariables.CAMPAIGN_ID, StringType, true),
@@ -18,7 +18,7 @@ object DevicesReactionsSchema {
   ))
   //reduced SCHEMA from CSV
   val reducedDF = StructType(Array(
-    StructField(DevicesReactionsVariables.LOGIN_USER_ID, StringType, true),
+    StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
     StructField(DevicesReactionsVariables.REACTION, IntegerType, true)
   ))
@@ -26,7 +26,7 @@ object DevicesReactionsSchema {
   //full effective schema
   val effectiveDF = StructType(Array(
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
-    StructField(DevicesReactionsVariables.LOGIN_USER_ID, StringType, true),
+    StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_7_DAYS, IntegerType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_15_DAYS, IntegerType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_30_DAYS, IntegerType, true),
@@ -36,7 +36,7 @@ object DevicesReactionsSchema {
   //effective schema with 7, 15 days before
   val joined_7_15 = StructType(Array(
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
-    StructField(DevicesReactionsVariables.LOGIN_USER_ID, StringType, true),
+    StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_7_DAYS, IntegerType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_15_DAYS, IntegerType, true)
   ))
@@ -44,7 +44,7 @@ object DevicesReactionsSchema {
   //effective schema with 7, 15, 30 days before
   val joined_7_15_30 = StructType(Array(
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
-    StructField(DevicesReactionsVariables.LOGIN_USER_ID, StringType, true),
+    StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_7_DAYS, IntegerType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_15_DAYS, IntegerType, true),
     StructField(DevicesReactionsVariables.EFFECTIVE_30_DAYS, IntegerType, true)
