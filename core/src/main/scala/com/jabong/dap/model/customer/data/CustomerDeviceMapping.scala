@@ -66,12 +66,12 @@ object CustomerDeviceMapping extends Logging {
     require(path != null, "Path is null")
 
     try {
-      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(path).
-        withColumnRenamed("RESPONSYS_ID", CustomerVariables.RESPONSYS_ID).
-        withColumnRenamed("ID_CUSTOMER", CustomerVariables.ID_CUSTOMER).
-        withColumnRenamed("EMAIL", CustomerVariables.EMAIL).
-        withColumnRenamed("BID", PageVisitVariables.BROWSER_ID).
-        withColumnRenamed("APPTYPE", PageVisitVariables.DOMAIN)
+      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(path)
+        .withColumnRenamed("RESPONSYS_ID", CustomerVariables.RESPONSYS_ID)
+        .withColumnRenamed("CUSTOMER_ID", CustomerVariables.ID_CUSTOMER)
+        .withColumnRenamed("EMAIL", CustomerVariables.EMAIL)
+        .withColumnRenamed("BID", PageVisitVariables.BROWSER_ID)
+        .withColumnRenamed("APPTYPE", PageVisitVariables.DOMAIN)
       df
     } catch {
       case e: DataNotFound =>
