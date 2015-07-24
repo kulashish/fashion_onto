@@ -29,7 +29,7 @@ class LowStock extends SkuSelector with Logging {
       .filter(itrDataFrame(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE))
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),
-        customerSkuData(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
+        itrDataFrame(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
 
     return filteredSku
   }

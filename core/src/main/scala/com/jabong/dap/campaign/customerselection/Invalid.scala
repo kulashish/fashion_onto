@@ -70,7 +70,11 @@ class Invalid extends LiveCustomerSelector with Logging {
     val customerSelected = customerInValidItemsData.join(customerSuccessfulItemsData, customerInValidItemsData("invalid_" + SalesOrderVariables.FK_CUSTOMER) === customerSuccessfulItemsData("success_" + SalesOrderVariables.FK_CUSTOMER)
       && customerInValidItemsData("invalid_" + ProductVariables.SKU) === customerSuccessfulItemsData("success_" + ProductVariables.SKU), "left_outer")
       .filter("success_" + SalesOrderItemVariables.FK_SALES_ORDER + " is null or invalid_" + SalesOrderItemVariables.UPDATED_AT + " > " + "success_" + SalesOrderItemVariables.UPDATED_AT)
-      .select(customerInValidItemsData("invalid_" + SalesOrderVariables.FK_SALES_ORDER) as (SalesOrderVariables.FK_SALES_ORDER), customerInValidItemsData("invalid_" + CustomerVariables.FK_CUSTOMER) as (CustomerVariables.FK_CUSTOMER), customerInValidItemsData("invalid_" + ProductVariables.SKU) as (ProductVariables.SKU_SIMPLE), customerInValidItemsData("invalid_" + SalesOrderItemVariables.UNIT_PRICE) as (SalesOrderItemVariables.UNIT_PRICE))
+      .select(
+        customerInValidItemsData("invalid_" + SalesOrderVariables.FK_SALES_ORDER) as (SalesOrderVariables.FK_SALES_ORDER),
+        customerInValidItemsData("invalid_" + CustomerVariables.FK_CUSTOMER) as (CustomerVariables.FK_CUSTOMER),
+        customerInValidItemsData("invalid_" + ProductVariables.SKU) as (ProductVariables.SKU_SIMPLE),
+        customerInValidItemsData("invalid_" + SalesOrderItemVariables.UNIT_PRICE) as (SalesOrderItemVariables.UNIT_PRICE))
 
     return customerSelected
   }
