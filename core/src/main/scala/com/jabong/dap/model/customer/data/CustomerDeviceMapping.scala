@@ -2,7 +2,8 @@ package com.jabong.dap.model.customer.data
 
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.Spark
-import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.read.DataReader._
+import com.jabong.dap.data.read.{ValidFormatNotFound, DataNotFound, DataReader}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.DataFrame
@@ -44,7 +45,7 @@ object CustomerDeviceMapping {
      df1.show(5)
      var df2: DataFrame = null
      if (null != path) {
-       df2 = DataReader.getDataFrameCsv4mDCF(path,";")
+       df2 = getDataFrameCsv4mDCF(path,";")
      } else {
        df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, prevDate)
      }
@@ -56,5 +57,34 @@ object CustomerDeviceMapping {
      res.show(20)
      DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
    }
+
+
+  /**
+   *
+   * @param path
+   * @param delimeter
+   * @return
+   */
+  def getDataFrameCsv4mDCF(path: String, delimeter: String): DataFrame = {
+    require(path != null, "Path is null")
+    require(delimeter != null, "Date is null")
+
+    try {
+      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", delimeter).load(path).
+        withColumnRenamed("RESPONSYS_ID",CustomerVariables.RESPONSYS_ID).
+        withColumnRenamed("ID_CUSTOMER",CustomerVariables.ID_CUSTOMER).
+        withColumnRenamed("EMAIL",CustomerVariables.EMAIL).
+        withColumnRenamed("BID",CustomerVariables.BROWSER_ID).
+        withColumnRenamed("APPTYPE",CustomerVariables.DOMAIN)
+      df
+    } catch {
+      case e: DataNotFound =>
+        logger.error("Data not found for the given path ")
+        throw new DataNotFound
+      case e: ValidFormatNotFound =>
+        logger.error("Format could not be resolved for the given files in directory")
+        throw new ValidFormatNotFound
+    }
+  }
 
 }
