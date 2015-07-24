@@ -33,6 +33,10 @@ class SkuSelectorFactory extends CampaignFactory {
       return new ItemOnDiscount()
     }
 
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.DAILY)) {
+      return new Daily()
+    }
+
     return null
   }
 

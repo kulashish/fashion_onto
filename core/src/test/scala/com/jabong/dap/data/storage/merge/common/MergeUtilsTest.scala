@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
-import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.json.JsonUtils
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
@@ -12,10 +12,9 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    val sqlContext = Spark.getSqlContext()
 
-    df1 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/1.json")
-    df2 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/2.json")
+    df1 = JsonUtils.readFromJson("common/merge", "1")
+    df2 = JsonUtils.readFromJson("common/merge", "2")
     df1.collect.foreach(println)
   }
 
@@ -33,6 +32,12 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
 
   "A Merged DF" should "have size 3" in {
     var mergedDF = MergeUtils.InsertUpdateMerge(df1, null, "name")
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 3)
+  }
+
+  "A joined DF" should "have size 3" in {
+    var mergedDF = MergeUtils.joinOldAndNewDF(df1, df1.schema, null, df1.schema, "name")
     mergedDF.collect.foreach(println)
     assert(mergedDF.collect.size == 3)
   }

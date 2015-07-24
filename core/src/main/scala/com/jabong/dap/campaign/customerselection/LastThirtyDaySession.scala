@@ -10,9 +10,7 @@ class LastThirtyDaySession extends CustomerSelector {
 
   def customerSelection(path: String, date: String): DataFrame = {
 
-    val campaignInput = new CampaignInput()
-
-    val dfCustomerSelection = campaignInput.readCustomerData(path, date)
+    val dfCustomerSelection = CampaignInput.readCustomerData(path, date)
 
     return null
   }

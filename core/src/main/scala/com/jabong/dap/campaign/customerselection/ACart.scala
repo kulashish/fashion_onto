@@ -1,10 +1,9 @@
 package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.variables
-import com.jabong.dap.common.constants.variables.{ ProductVariables, ACartVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ ACartVariables, ProductVariables }
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ DataFrame, SQLContext }
+import org.apache.spark.sql.DataFrame
 
 /**
  * Created by rahul for Acart customer selection on 16/6/15.

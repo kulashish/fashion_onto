@@ -1,10 +1,11 @@
 package com.jabong.dap.init
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.custorder.CustOrderVarMerger
-import com.jabong.dap.model.product.itr.Itr
+import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
 import scopt.OptionParser
@@ -27,6 +28,7 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     coVarJson: String = null,
+    pushCamapignsJson: String = null,
     config: String = null)
 
   def main(args: Array[String]) {
@@ -64,6 +66,10 @@ object Init {
       opt[String]("varJson")
         .text("Path to customer and Order variables merge job json config file.")
         .action((x, c) => c.copy(coVarJson = x))
+
+      opt[String]("pushCampaignsJson")
+        .text("Path to push Campaigns priority config file.")
+        .action((x, c) => c.copy(pushCamapignsJson = x))
 
     }
 
@@ -105,9 +111,14 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
+      case "basicItr" => BasicITR.start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
       case "covariables" => new CustOrderVarMerger().start(params.coVarJson)
+      case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
+      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
+      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
+      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCamapignsJson)
     }
   }
 }

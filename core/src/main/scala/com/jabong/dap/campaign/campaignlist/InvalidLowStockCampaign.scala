@@ -21,12 +21,12 @@ class InvalidLowStockCampaign {
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
 
-    //FIXME:Filter the order items data for last 3 days
+    //FIXME:Filter the order items data for last 30 days
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = followUp.skuFilter(selectedCustomers, itrData)
+    val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
+    val refSkus = lowStock.skuFilter(selectedCustomers, itrData)
 
     //save campaign Output
     CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"

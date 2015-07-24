@@ -1,8 +1,11 @@
 package com.jabong.dap.campaign.utils
 
+import java.math.BigDecimal
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{ Date, Calendar }
+import java.util.{ Calendar, Date }
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
@@ -36,13 +39,18 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val customerData = refSkuData.filter(ProductVariables.SKU + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
+    refSkuData.printSchema()
+
+    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE + " is not null")
+      .select(CustomerVariables.FK_CUSTOMER,
+        ProductVariables.SKU_SIMPLE,
+        SalesOrderItemVariables.UNIT_PRICE)
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[Double], t(1).toString)))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
+    val customerGroup = customerSkuMap.groupByKey().
+      map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
@@ -51,9 +59,11 @@ object CampaignUtils extends Logging {
     return grouped
   }
 
-  val currentDaysDifference = udf((date: String) => currentTimeDiff(date: String, "days"))
+  val currentDaysDifference = udf((date: Timestamp) => currentTimeDiff(date: Timestamp, "days"))
 
-  val lastDayTimeDifference = udf((date: String) => lastDayTimeDiff(date: String, "days"))
+  val lastDayTimeDifference = udf((date: Timestamp) => lastDayTimeDiff(date: Timestamp, "days"))
+  //FIXME:Remove this function
+  val lastDayTimeDifferenceString = udf((date: String) => lastDayTimeDiff(date: String, "days"))
 
   /**
    * To calculate difference between current time and date provided as argument either in days, minutes hours
@@ -61,13 +71,13 @@ object CampaignUtils extends Logging {
    * @param diffType
    * @return
    */
-  def currentTimeDiff(date: String, diffType: String): Double = {
-    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    val prodDate = dateFormat.parse(date)
+  def currentTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
 
     val cal = Calendar.getInstance();
 
-    val diff = cal.getTime().getTime - prodDate.getTime()
+    val diff = cal.getTime().getTime - date.getTime
 
     var diffTime: Double = 0
 
@@ -83,6 +93,32 @@ object CampaignUtils extends Logging {
 
   /**
    * To calculate difference between start time of previous day and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance();
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - date.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    return diffTime
+  }
+
+  /**
+   * Input date is string
    * @param date
    * @param diffType
    * @return
@@ -308,5 +344,13 @@ object CampaignUtils extends Logging {
     return dfJoinCustomerToCustomerPageVisit
   }
 
+  def getCampaignPriority(mailType: Int): Int = {
+    if (mailType == 0) {
+      val errorString = ("Priority doesn't exist for mailType %d", mailType)
+      logger.error(errorString)
+      return CampaignCommon.VERY_LOW_PRIORITY
+    }
+    return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
+  }
 }
 

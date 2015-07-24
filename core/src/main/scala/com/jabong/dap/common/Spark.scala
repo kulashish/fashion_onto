@@ -1,8 +1,9 @@
 package com.jabong.dap.common
 
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{ SparkConf, SparkContext }
+import org.apache.spark.sql.hive.HiveContext
 
 /**
  * Application singleton Context. Every component
@@ -58,5 +59,15 @@ object Spark {
       hiveContext = new HiveContext(sc)
     }
     hiveContext
+  }
+
+  /**
+   * Gets the spark context for a given format
+   */
+  def getContext(saveFormat: String) = saveFormat match {
+    case DataSets.PARQUET => getSqlContext()
+    case DataSets.ORC => getHiveContext()
+    case DataSets.CSV => getSqlContext()
+    case _ => null
   }
 }

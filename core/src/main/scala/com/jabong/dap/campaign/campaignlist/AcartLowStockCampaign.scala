@@ -11,20 +11,20 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartLowStockCampaign {
 
-  def runCampaign(salesCartData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame): Unit = {
 
-    val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
+    val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for last day
-    val selectedCustomers = invalidCustomerSelector.customerSelection(salesCartData, orderItemData)
+    val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = followUp.skuFilter(selectedCustomers, itrData)
+    val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
+    val refSkus = lowStock.skuFilter(selectedCustomers, yesterdayItrData)
 
     //save campaign Output
     CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.ACART_FOLLOWUP_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      + CampaignCommon.ACART_LOWSTOCK_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
 
   }
 

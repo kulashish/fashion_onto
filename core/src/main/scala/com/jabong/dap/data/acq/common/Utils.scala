@@ -51,6 +51,7 @@ case class TableInfo(
  * @param tableName String The name of the table.
  * @param primaryKey String The primary key of the table.
  * @param mergeMode String The mode of the data merge.
+ * @param dateColumn String The name of the column which represents the date time when the row was updated.
  * @param incrDate String The date for the merge data is to be run.
  * @param fullDate String The full data date. Incase of merging incr data with full data from a specific.
  * @param incrMode String The incremental data is in monthly or daily mode
@@ -62,6 +63,7 @@ case class MergeInfo(
   tableName: String,
   primaryKey: String,
   mergeMode: String,
+  dateColumn: Option[String],
   incrDate: Option[String],
   fullDate: Option[String],
   incrMode: Option[String],

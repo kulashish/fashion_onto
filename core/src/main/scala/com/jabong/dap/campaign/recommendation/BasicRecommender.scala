@@ -44,7 +44,7 @@ class BasicRecommender extends Recommender {
     }
     import sqlContext.implicits._
     // FIXME:Cross check whether lastDayTimeDifference udf is working fine
-    val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.lastDayTimeDifference(orderItemData(SalesOrderVariables.CREATED_AT)))
+    val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.lastDayTimeDifferenceString(orderItemData(SalesOrderVariables.CREATED_AT)))
       .filter("daysPresent<=" + days)
 
     if (lastDaysData.count() == 0) {

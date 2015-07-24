@@ -70,6 +70,13 @@ object Udf {
   val age = udf((birthday: Date) => UdfUtils.getAge(birthday: Date))
 
   /**
+   * appUsers will convert null userid  to  _app_+browserid
+   */
+  val appUserId = udf((userid: String, domain: String, browserid: String) => UdfUtils.getAppUserId(userid: String, domain: String, browserid: String))
+
+  val maxClickDayName = udf((count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int) => UdfUtils.getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int))
+
+  /**
    * yyyymmdd will convert yyyymmdd formate
    */
   val yyyymmdd = udf((t1: Timestamp) => UdfUtils.getYYYYmmDD(t1: Timestamp))

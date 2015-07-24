@@ -11,20 +11,20 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartIODCampaign {
 
-  def runCampaign(salesCartData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(last30DayAcartData: DataFrame, last30daySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, last30daysItrData: DataFrame): Unit = {
 
-    val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
+    val acartCustomerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for 30 days
-    val selectedCustomers = invalidCustomerSelector.customerSelection(salesCartData, orderItemData)
+    val selectedCustomers = acartCustomerSelection.customerSelection(last30DayAcartData, last30daySalesOrderData, last30DaySalesOrderItemData)
 
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
-    val refSkus = followUp.skuFilter(selectedCustomers, itrData)
+    val iod = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
+    val refSkus = iod.skuFilter(selectedCustomers, last30daysItrData)
 
     //save campaign Output
     CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.ACART_FOLLOWUP_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      + CampaignCommon.ACART_IOD_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
 
   }
 

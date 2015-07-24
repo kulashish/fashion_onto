@@ -3,6 +3,7 @@ package com.jabong.dap.data.acq
 import com.jabong.dap.data.acq.common.{ ImportInfo, TableInfo }
 import com.jabong.dap.common.time.TimeUtils._
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Validator for the JSON file used for data acquisition.
@@ -18,10 +19,10 @@ object TablesJsonValidator {
   }
 
   def validatePossibleValues(table: TableInfo) = {
-    val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
-    val possibleModes = Array("full", "monthly", "daily", "hourly")
-    val possibleSaveFormats = Array("orc", "parquet")
-    val possibleSaveModes = Array("overwrite", "append", "ignore", "error")
+    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.UNICOMMERCE, DataSets.NEXTBEE)
+    val possibleModes = Array(DataSets.FULL, DataSets.MONTHLY_MODE, DataSets.DAILY_MODE, DataSets.HOURLY_MODE)
+    val possibleSaveFormats = Array(DataSets.ORC, DataSets.PARQUET)
+    val possibleSaveModes = Array(DataSets.OVERWRITE_SAVEMODE, DataSets.APPEND_SAVEMODE, DataSets.IGNORE_SAVEMODE, DataSets.ERROR_SAVEMODE)
 
     require(possibleSources.contains(table.source), "Source '%s' not recognized. Possible values: %s".
       format(table.source, possibleSources.mkString(",")))
@@ -48,7 +49,7 @@ object TablesJsonValidator {
 
     // Check if rangeStart doesn't have a value for hourly mode.
     // rangeEnd doesn't need to be checked as it will have a value if rangeStart has a value.
-    if (table.mode == "hourly") {
+    if (table.mode == DataSets.HOURLY_MODE) {
       require(
         !OptionUtils.optStringEmpty(table.rangeStart),
         "Range should be provided for hourly mode"
@@ -62,25 +63,25 @@ object TablesJsonValidator {
       "Start date time should be strictly less than End date time"
     )
     mode match {
-      case "monthly" =>
+      case DataSets.MONTHLY_MODE =>
         require(
           isSameYear(rngStart, rngEnd),
           "rangeFrom and rangeEnd must span only a single year for mode 'monthly'. Please run multiple jobs if you " +
             "want data spanning multiple years."
         )
-      case "daily" =>
+      case DataSets.DAILY_MODE =>
         require(
           isSameMonth(rngStart, rngEnd),
           "rangeFrom and rangeEnd must span only a single month for mode 'daily'. Please run multiple jobs if you " +
             "want data spanning multiple months."
         )
-      case "hourly" =>
+      case DataSets.HOURLY_MODE =>
         require(
           isSameDay(rngStart, rngEnd),
           "rangeFrom and rangeEnd must span only a single day for mode 'hourly'. Please run multiple jobs if you " +
             "want data spanning multiple days."
         )
-      case "full" =>
+      case DataSets.FULL =>
     }
   }
 
