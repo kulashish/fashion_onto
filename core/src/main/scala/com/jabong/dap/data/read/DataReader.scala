@@ -45,35 +45,15 @@ object DataReader extends Logging {
     require(mode != null, "Mode is null")
 
     try {
-      fetchDataFrame(basePath, source, tableName, mode, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
+      fetchDataFrame(basePath, source, tableName, mode, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
     } catch {
       case e: DataNotFound =>
-        logger.info("Data not found for the given table and source for today's date. Trying to fetch for yesterday's data.")
-        try {
-          fetchDataFrame(basePath, source, tableName, mode, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-        } catch {
-          case e: DataNotFound =>
-            logger.error("Data not found for the given table and source for yesterday's date")
-            throw new DataNotFound
-        }
+        logger.info("Data not found for the table " + tableName + " and source for yesterday's data.")
+        throw new DataNotFound
       case e: ValidFormatNotFound =>
         logger.error("Format could not be resolved for the given files in directory")
         throw new ValidFormatNotFound
     }
-  }
-
-  private def getDate(basePath: String, source: String, tableName: String, mode: String, date: String): String = {
-    var reqDate: String = null
-    if (mode.equals(DataSets.DAILY_MODE) || mode.equals(DataSets.MONTHLY_MODE)) {
-      reqDate = date
-    } else if (mode.equals(DataSets.FULL_MERGE_MODE)) {
-      reqDate = "%s-%s".format(date, "24")
-    } else if (mode.equals(DataSets.FULL_FETCH_MODE)) {
-      reqDate = DateResolver.getDateWithHour(basePath, source, tableName, mode, date)
-    } else {
-      reqDate = date
-    }
-    reqDate
   }
 
   /**
@@ -81,10 +61,25 @@ object DataReader extends Logging {
    * WARNING: Throws DataNotFound exception if data is not found.
    * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
    */
-
   private def fetchDataFrame(basePath: String, source: String, tableName: String, mode: String, date: String): DataFrame = {
-    val reqDate = getDate(basePath, source, tableName, mode, date)
-    val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, reqDate)
+    var diskMode = mode
+    var reqDate: String = null
+
+    if (mode.equals(DataSets.DAILY_MODE) || mode.equals(DataSets.MONTHLY_MODE)) {
+      reqDate = date
+    } else if (mode.equals(DataSets.FULL_MERGE_MODE)) {
+      diskMode = DataSets.FULL
+      reqDate = "%s-%s".format(date, "24")
+    } else if (mode.equals(DataSets.FULL_FETCH_MODE)) {
+      // scan next day data
+      diskMode = DataSets.FULL
+      val nextDay = TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT, date)
+      reqDate = DateResolver.getDateWithHour(basePath, source, tableName, diskMode, nextDay)
+    } else {
+      reqDate = date
+    }
+
+    val fetchPath = PathBuilder.buildPath(basePath, source, tableName, diskMode, reqDate)
     logger.info(fetchPath)
     val saveFormat = FormatResolver.getFormat(fetchPath)
     val context = Spark.getContext(saveFormat)
@@ -104,8 +99,7 @@ object DataReader extends Logging {
     require(date != null, "Date is null")
 
     try {
-      val reqDate = getDate(basePath, source, tableName, mode, date)
-      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, reqDate)
+      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
     } catch {
       case e: DataNotFound =>
