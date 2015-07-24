@@ -115,7 +115,8 @@ object DataReader extends Logging {
         withColumnRenamed("_3",CustomerVariables.EMAIL).
         withColumnRenamed("_4",CustomerVariables.BROWSER_ID).
         withColumnRenamed("_5",CustomerVariables.DOMAIN)
-      df2
+      val df3 = df2.filter(!df2(CustomerVariables.RESPONSYS_ID).startsWith(CustomerVariables.RESPONSYS_ID))
+      df3
     } catch {
       case e: DataNotFound =>
         logger.error("Data not found for the date")

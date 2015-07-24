@@ -5,6 +5,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
+import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.{ SparkConf}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -42,26 +43,22 @@ object CustomerDeviceMapping {
 
 
 
-   def main(date:String, path:String) {
-//     val conf = new SparkConf().setAppName("SparkExamples")
-//     Spark.init(conf)
-//     val df1 = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/userDeviceMapApp")
-     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CLICKSTREAM,DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, date)
+   def processData(prevDate:String, path:String, curDate: String) {
+     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CLICKSTREAM,DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
      df1.printSchema()
      df1.show(5)
      var df2: DataFrame = null
      if (null != path) {
        df2 = DataReader.getDataFrameCsv4mDCF(path,";")
      } else {
-       df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, date)
+       df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, prevDate)
      }
      df2.printSchema()
      df2.show(10)
-
-//     val df4 =Spark.getSqlContext().read.parquet("/home/jabong/bobdata/customer/07/01")
-     val df4 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, date)
-     val res = getLatestDevice(df1,df2, df4)
+     val df3 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
+     val res = getLatestDevice(df1,df2, df3)
      res.printSchema()
      res.show(20)
+     DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
    }
 }
