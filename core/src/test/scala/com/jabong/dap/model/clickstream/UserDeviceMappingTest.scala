@@ -6,6 +6,7 @@ import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
+import java.io.File
 
 class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
@@ -16,8 +17,8 @@ class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    dfInputUserDeviceMap = sqlContext.read.json(DataSets.TEST_RESOURCES + DataSets.CLICKSTREAM + "/userDeviceMappingInput.json")
-    dfOutputUserDeviceMap = sqlContext.read.json(DataSets.TEST_RESOURCES + DataSets.CLICKSTREAM + "/userDeviceMappingOutput.json")
+    dfInputUserDeviceMap = sqlContext.read.json(DataSets.TEST_RESOURCES + File.separator + DataSets.CLICKSTREAM + File.separator + "userDeviceMappingInput.json")
+    dfOutputUserDeviceMap = sqlContext.read.json(DataSets.TEST_RESOURCES + File.separator + DataSets.CLICKSTREAM + File.separator + "userDeviceMappingOutput.json")
   }
 
   "getUserDeviceMap: (null)" should " be null " in {
