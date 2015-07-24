@@ -11,12 +11,8 @@ import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
-import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import java.math.BigDecimal
-
-import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class
@@ -26,16 +22,17 @@ object CampaignUtils extends Logging {
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
-
-  def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    val customerRefSku = skuData.groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
-      as (CampaignCommon.REF_SKUS))
+  import sqlContext.implicits._
+  def generateReferenceSkus(skuData: DataFrame, NumberSku: Int): DataFrame = {
+    val customerRefSku = skuData.orderBy($"${SalesOrderItemVariables.UNIT_PRICE}".desc)
+      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU_SIMPLE)
+        as (CampaignCommon.REF_SKUS))
 
     return customerRefSku
 
   }
 
-  def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
+  def generateReferenceSkustemp(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     import sqlContext.implicits._
 
@@ -45,10 +42,13 @@ object CampaignUtils extends Logging {
 
     refSkuData.printSchema()
 
-    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE + " is not null")
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE + " is not null")
       .select(CustomerVariables.FK_CUSTOMER,
         ProductVariables.SKU_SIMPLE,
         SalesOrderItemVariables.UNIT_PRICE)
+
+    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr

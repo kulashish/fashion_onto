@@ -51,7 +51,7 @@ class Surf extends SkuSelector with Logging {
       "inner"
     )
 
-    val dfReferenceSku = CampaignUtils.generateReferenceSku(dfJoin, 2)
+    val dfReferenceSku = CampaignUtils.generateReferenceSkus(dfJoin, 2)
 
     //===========select USER_ID,SKU, SPECIAL_PRICE================================================================
     val dfResult = dfReferenceSku.select(
