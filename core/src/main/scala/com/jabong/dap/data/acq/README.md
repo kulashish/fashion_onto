@@ -21,7 +21,8 @@ For data acquisition, we are reading and parsing a JSON configuration file. The 
       "joinTables": [
         {
             "name": "",
-            "foreignKey": "" 
+            "foreignKey": "",
+            "selectString": ""
         },
         {
            ... 
@@ -51,6 +52,11 @@ their names)
 * **limit**: Use if limited data is to be fetched.
 * **filterCondition**: Condition to filter the data to be fetched.
 * **joinTables**: Contains information of tables that need to be joined with the original table.
+    * **name**: Name of the table to be joined.
+    * **foreignKey**: Foreign key to the original table to be joined.
+    * **selectString**: String representing which columns to select from the join table. The string is to be passed as
+     follows: For the 5-th table in the joinTables list, if c1, c2 ... cn are the columns to be selected, the string to
+     be passed is `"j5.c1, j5.c2, ...., j5.cn"`. If not passed or passed null, all the columns would be selected from the table
 
 ## Mode
 

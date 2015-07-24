@@ -1,6 +1,7 @@
 package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Builds the query which is used to fetch the requested data on the basis of the input parameters passed in the
@@ -9,9 +10,9 @@ import com.jabong.dap.common.OptionUtils
 
 object QueryBuilder {
 
-  def getJoinTableStrings(): (String, String) = {
-    val joinTables = if (null != AcqImportInfo.tableInfo.joinTables) AcqImportInfo.tableInfo.joinTables.orNull else null
-    val primaryKey = AcqImportInfo.tableInfo.primaryKey
+  def getJoinTableStrings(tableInfo: TableInfo): (String, String) = {
+    val joinTables = if (null != tableInfo.joinTables) tableInfo.joinTables.orNull else null
+    val primaryKey = tableInfo.primaryKey
     if (null == joinTables || joinTables.isEmpty) {
       return ("", "")
     }
@@ -22,7 +23,12 @@ object QueryBuilder {
 
     for (info <- joinTables) {
       val tableAlias = "j" + count
-      selectString = selectString + ", " + tableAlias + ".*"
+      val selectStr = OptionUtils.getOptValue(info.selectString)
+      if (null != selectStr) {
+        selectString = selectString + ", " + selectStr
+      } else {
+        selectString = selectString + ", " + tableAlias + ".*"
+      }
       joinString = joinString + " LEFT JOIN " + info.name + " AS " + tableAlias + " ON " + tableAlias + "." +
         info.foreignKey + " = t1." + primaryKey
       count = count + 1
@@ -31,15 +37,17 @@ object QueryBuilder {
     (selectString, joinString)
   }
 
-  def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String) = {
-    val tableName = AcqImportInfo.tableInfo.tableName
-    val limit = OptionUtils.getOptValue(AcqImportInfo.tableInfo.limit)
-    val primaryKey = AcqImportInfo.tableInfo.primaryKey
+  def getFullDataQuery(driver: String, condition: String, joinSelect: String, joinFrom: String, tableInfo: TableInfo) = {
+    val tableName = tableInfo.tableName
+    val limit = OptionUtils.getOptValue(tableInfo.limit)
+    val primaryKey = tableInfo.primaryKey
 
     driver match {
       case "sqlserver" =>
-        val limitString = if (limit != null) {
+        val limitString = if (limit != null && primaryKey != null) {
           ("TOP %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
+        } else if (limit != null && primaryKey == null) {
+          ("TOP %s".format(limit), "")
         } else {
           ("", "")
         }
@@ -57,16 +65,16 @@ object QueryBuilder {
     }
   }
 
-  def getDataQuery(driver: String, condition: String) = {
-    val mode = AcqImportInfo.tableInfo.mode
-    val tableName = AcqImportInfo.tableInfo.tableName
+  def getDataQuery(driver: String, condition: String, tableInfo: TableInfo) = {
+    val mode = tableInfo.mode
+    val tableName = tableInfo.tableName
 
-    val joinStrings = getJoinTableStrings()
+    val joinStrings = getJoinTableStrings(tableInfo)
 
     mode match {
-      case "full" => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2)
-      case "daily" | "hourly" | "monthly" => "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1",
-        joinStrings._2, condition)
+      case DataSets.FULL => getFullDataQuery(driver, condition, joinStrings._1, joinStrings._2, tableInfo)
+      case DataSets.HOURLY_MODE | DataSets.DAILY_MODE | DataSets.MONTHLY_MODE =>
+        "(SELECT t1.* %s FROM %s %s %s) AS t".format (joinStrings._1, tableName + " AS t1", joinStrings._2, condition)
       case _ => ""
     }
   }

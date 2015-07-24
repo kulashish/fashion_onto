@@ -8,6 +8,11 @@ import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ Path, FileSystem }
 
+/**
+ * Reads and parses the JSON file to run various
+ * merge jobs.
+ */
+
 class MergeDelegator extends Serializable with Logging {
   def start(mergeJsonPath: String) = {
     val validated = try {

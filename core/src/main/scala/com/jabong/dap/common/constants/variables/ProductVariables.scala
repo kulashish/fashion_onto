@@ -3,6 +3,7 @@ package com.jabong.dap.common.constants.variables
 object ProductVariables {
 
   val SKU = "sku"
+  val SKU_SIMPLE = "skuSimple"
   val BRAND = "brand"
   val BRICK = "brick"
   val GENDER = "gender"

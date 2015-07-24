@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
 
 class WishlistIODCampaign {
@@ -15,6 +17,8 @@ class WishlistIODCampaign {
     // 4. pick based on special price (descending)
 
     // null recommendation
+
+    val itemOnDiscountSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
 
   }
 }

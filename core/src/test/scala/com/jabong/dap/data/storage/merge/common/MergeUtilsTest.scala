@@ -14,8 +14,8 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     val sqlContext = Spark.getSqlContext()
 
-    df1 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/1.json")
-    df2 = sqlContext.read.json(DataSets.TEST_RESOURCES + "common/merge/2.json")
+    df1 = sqlContext.read.json(DataSets.TEST_RESOURCES + "/common/merge/1.json")
+    df2 = sqlContext.read.json(DataSets.TEST_RESOURCES + "/common/merge/2.json")
     df1.collect.foreach(println)
   }
 
@@ -23,6 +23,24 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     var mergedDF = MergeUtils.InsertUpdateMerge(df1, df2, "name")
     mergedDF.collect.foreach(println)
     assert(mergedDF.collect.size == 4)
+  }
+
+  "A merged DF" should "have size 3" in {
+    var mergedDF = MergeUtils.joinOldAndNewDF(df1, df1.schema, null, df1.schema, "name")
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 3)
+  }
+
+  "A Merged DF" should "have size 2" in {
+    var mergedDF = MergeUtils.InsertUpdateMerge(null, df2, "name")
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 2)
+  }
+
+  "A Merged DF" should "have size 3" in {
+    var mergedDF = MergeUtils.InsertUpdateMerge(df1, null, "name")
+    mergedDF.collect.foreach(println)
+    assert(mergedDF.collect.size == 3)
   }
 
   //  override def afterAll() {

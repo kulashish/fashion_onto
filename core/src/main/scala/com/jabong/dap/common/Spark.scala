@@ -1,5 +1,6 @@
 package com.jabong.dap.common
 
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{ SparkConf, SparkContext }
@@ -21,6 +22,17 @@ object Spark {
     sc = new SparkContext(sConf)
     sqlContext = new SQLContext(sc)
   }
+
+  //  /**
+  //   * Initialize spark context as well as sqlContext instances
+  //   * @param sConf SparkConf
+  //   * @param logLevel Log level for Spark
+  //   */
+  //  def init(sConf: SparkConf, logLevel: String) {
+  //    sc = new SparkContext(sConf)
+  //    sc.setLogLevel(logLevel)
+  //    sqlContext = new SQLContext(sc)
+  //  }
 
   /**
    * Return application specific spark context instance
@@ -47,5 +59,15 @@ object Spark {
       hiveContext = new HiveContext(sc)
     }
     hiveContext
+  }
+
+  /**
+   * Gets the spark context for a given format
+   */
+  def getContext(saveFormat: String) = saveFormat match {
+    case DataSets.PARQUET => getSqlContext()
+    case DataSets.ORC => getHiveContext()
+    case DataSets.CSV => getSqlContext()
+    case _ => null
   }
 }

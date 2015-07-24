@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
 
 class WishlistLowStockCampaign {
@@ -14,5 +16,6 @@ class WishlistLowStockCampaign {
 
     // null recommendation
 
+    val lowStockSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
   }
 }

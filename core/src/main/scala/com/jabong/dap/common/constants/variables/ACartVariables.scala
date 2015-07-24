@@ -3,7 +3,11 @@ package com.jabong.dap.common.constants.variables
 object ACartVariables {
 
   val UID = "UID"
-  val ACART_STATUS = "ACART_STATUS"
+  val ACART_STATUS = "status"
+  val SKU_SIMPLE = "sku"
+  val CREATED_AT = "created_at"
+  val UPDATED_AT = "updated_at"
+  val FK_CUSTOMER = "fk_customer"
   val ACART_SKU1 = "ACART_PRICE_SKU1"
   val ACART_SKU2 = "ACART_PRICE_SKU2"
   val ACART_PRICE_SKU1 = "MAX_MRP_ACART_SKU1"

@@ -3,8 +3,9 @@ package com.jabong.dap.data.acq.common
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.{ OptionUtils, AppConfig }
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Builds the path at which the requested data is to be saved.
@@ -13,60 +14,48 @@ import com.jabong.dap.common.time.{ Constants, TimeUtils }
 object PathBuilder {
 
   def getPath(tableInfo: TableInfo) = {
-    val basePath = AppConfig.config.basePath
     val source = tableInfo.source
     val tableName = tableInfo.tableName
     val rangeStart = OptionUtils.getOptValue(tableInfo.rangeStart)
     val rangeEnd = OptionUtils.getOptValue(tableInfo.rangeEnd)
 
     tableInfo.mode match {
-      case "full" =>
-        val dateNow = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT_HRS_FOLDER)
-        "%s/%s/%s/full/%s/".format(basePath, source, tableName, dateNow)
-      case "monthly" =>
-        val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+      case DataSets.FULL =>
+        val dateNow = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+        "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, DataSets.FULL, dateNow)
+      case DataSets.MONTHLY_MODE =>
+        val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
         val start = Calendar.getInstance()
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/monthly/%s/%s/%s/"
-          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(end.get(Calendar.MONTH) + 1),
-            withLeadingZeros(end.get(Calendar.DATE)))
-      case "daily" =>
+        "%s/%s/%s/%s/%s/%s/%s"
+          .format(DataSets.INPUT_PATH, source, tableName, DataSets.MONTHLY_MODE, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+            TimeUtils.withLeadingZeros(end.get(Calendar.DATE)))
+      case DataSets.DAILY_MODE =>
         if (rangeStart == null && rangeEnd == null) {
-          val dateYesterday = TimeUtils.getDateAfterNDays(-1, Constants.DATE_FORMAT_FOLDER)
-          "%s/%s/%s/daily/%s/".format(basePath, source, tableName, dateYesterday)
+          val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+          "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, DataSets.DAILY_MODE, dateYesterday)
         } else {
-          val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+          val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
           val start = Calendar.getInstance()
           val end = Calendar.getInstance()
           start.setTime(format.parse(rangeStart))
           end.setTime(format.parse(rangeEnd))
-          "%s/%s/%s/daily/%s/%s/%s_%s"
-            .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
-              withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(end.get(Calendar.DATE)))
+          "%s/%s/%s/%s/%s/%s/%s"
+            .format(DataSets.INPUT_PATH, source, tableName, DataSets.DAILY_MODE, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+              TimeUtils.withLeadingZeros(end.get(Calendar.DATE)))
         }
-      case "hourly" =>
-        val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+      case DataSets.HOURLY_MODE =>
+        val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
         val start = Calendar.getInstance()
         val end = Calendar.getInstance()
         start.setTime(format.parse(rangeStart))
         end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/hourly/%s/%s/%s/%s_%s"
-          .format(basePath, source, tableName, start.get(Calendar.YEAR), withLeadingZeros(start.get(Calendar.MONTH) + 1),
-            withLeadingZeros(start.get(Calendar.DATE)), withLeadingZeros(start.get(Calendar.HOUR_OF_DAY)), withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+        "%s/%s/%s/%s/%s/%s/%s/%s"
+          .format(DataSets.INPUT_PATH, source, tableName, DataSets.HOURLY_MODE, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+            TimeUtils.withLeadingZeros(end.get(Calendar.DATE)), TimeUtils.withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
       case _ => ""
-    }
-  }
-
-  /**
-   * Converts integer containing day or month of date to a string with the format MM or dd, respectively.
-   */
-  def withLeadingZeros(input: Int): String = {
-    if (input < 10) {
-      "0%s".format(input)
-    } else {
-      "%s".format(input)
     }
   }
 
