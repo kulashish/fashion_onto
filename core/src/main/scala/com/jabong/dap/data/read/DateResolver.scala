@@ -16,7 +16,6 @@ object DateResolver {
     var hour: Int = 0
     var flag = 0
     var dateHour: String = null
-    val nextDay = TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT, date)
     while (hour <= 23 && flag == 0) {
       dateHour = withLeadingZeros(hour)
       val path = PathBuilder.buildPath(basePath, source, tableName, mode, date) + File.separator + dateHour
@@ -28,7 +27,7 @@ object DateResolver {
     if (flag == 0) {
       throw new DataNotFound
     }
-    "%s-%s".format(nextDay, dateHour)
+    "%s-%s".format(date, dateHour)
   }
 
   def withLeadingZeros(input: Int): String = {
