@@ -42,8 +42,8 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val customerData = refSkuData.filter(ProductVariables.SKU + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
+    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null")
+      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_SIMPLE, SalesOrderItemVariables.UNIT_PRICE)
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr

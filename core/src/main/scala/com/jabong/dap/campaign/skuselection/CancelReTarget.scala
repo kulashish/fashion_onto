@@ -66,7 +66,9 @@ class CancelReTarget extends SkuSelector {
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.EXPORTABLE_CANCEL_CUST
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.EXPORTED_CANCEL_CUST)
       .orderBy(SalesOrderItemVariables.UNIT_PRICE)
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
+      .select(inDataFrame(CustomerVariables.FK_CUSTOMER),
+        inDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
+        inDataFrame(SalesOrderItemVariables.UNIT_PRICE))
 
     val refSku = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 

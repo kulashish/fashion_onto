@@ -25,8 +25,8 @@ class InvalidLowStockCampaign {
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = followUp.skuFilter(selectedCustomers, itrData)
+    val losStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
+    val refSkus = losStock.skuFilter(selectedCustomers, itrData)
 
     //save campaign Output
     CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
