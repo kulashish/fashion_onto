@@ -99,12 +99,12 @@ object Udf {
   /**
    * distinctSku will return list of distinct Sku
    */
-  val distinctSku = udf((skuList: Array[String]) => UdfUtils.getDistinctSku(skuList: Array[String]))
+  val distinctSku = udf((skuList: List[String]) => UdfUtils.getDistinctSku(skuList: List[String]))
 
   /**
    * repeatedSku will return list of repeated Sku
    */
-  val repeatedSku = udf((skuList: Array[String]) => UdfUtils.getRepeatedSku(skuList: Array[String]))
+  val repeatedSku = udf((skuList: List[String]) => UdfUtils.getRepeatedSku(skuList: List[String]))
 
   /**
    * countSku will return total no of sku

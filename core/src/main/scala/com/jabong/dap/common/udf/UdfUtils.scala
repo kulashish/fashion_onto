@@ -338,19 +338,18 @@ object UdfUtils {
   }
 
   /**
-<<<<<<< Temporary merge branch 1
    *
    * @param skuArray
    * @tparam T
    * @return
    */
-  def getDistinctSku[T](skuArray: Array[T]): List[T] = {
+  def getDistinctSku[T](skuArray: List[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
     }
 
-    val skuList = skuArray.toList.distinct
+    val skuList = skuArray.distinct
 
     return skuList
 
@@ -362,7 +361,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getRepeatedSku[T](skuArray: Array[T]): List[T] = {
+  def getRepeatedSku[T](skuArray: List[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null

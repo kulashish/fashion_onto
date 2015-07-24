@@ -449,7 +449,7 @@ class UdfUtilsTest extends FlatSpec {
 
     val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
 
-    val result = UdfUtils.getDistinctSku(skuArray)
+    val result = UdfUtils.getDistinctSku(skuArray.toList)
 
     assert(result.length == 4)
 
@@ -470,7 +470,7 @@ class UdfUtilsTest extends FlatSpec {
 
     val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
 
-    val result = UdfUtils.getRepeatedSku(skuArray)
+    val result = UdfUtils.getRepeatedSku(skuArray.toList)
 
     assert(result.length == 3)
 

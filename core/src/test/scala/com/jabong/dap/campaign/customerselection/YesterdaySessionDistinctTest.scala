@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -25,11 +25,11 @@ class YesterdaySessionDistinctTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  "YesterdaySessionDistinct: Data Frame customerSelection" should "null" in {
+  "YesterdaySessionDistinct: count " should "79" in {
 
-    //    val result = yesterdaySessionDistinct.customerSelection(dfCustomerSurfData)
-    //    assert(result == null)
+    val result = yesterdaySessionDistinct.customerSelection(dfCustomerSurfData)
 
+    assert(result.count() == 79)
   }
 
 }

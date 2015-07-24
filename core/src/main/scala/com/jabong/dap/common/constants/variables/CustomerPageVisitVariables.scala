@@ -7,7 +7,7 @@ object CustomerPageVisitVariables {
 
   val USER_ID = "user_id"
   val PRODUCT_SKU = "product_sku"
-  val BROWER_ID = "brower_id"
+  val BROWER_ID = "browser_id"
   val DOMAIN = "domain"
   val ACTUAL_VISIT_ID = "actual_visit_id"
   val SKU_LIST = "sku_list"
