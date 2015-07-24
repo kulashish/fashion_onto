@@ -29,7 +29,8 @@ object CampaignUtils extends Logging {
   val sqlContext = Spark.getSqlContext()
   import sqlContext.implicits._
   def generateReferenceSkus(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    val customerRefSku = skuData.orderBy($"${SalesOrderItemVariables.UNIT_PRICE}".desc).groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
+    val customerRefSku = skuData.orderBy($"${SalesOrderItemVariables.UNIT_PRICE}".desc)
+      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU_SIMPLE)
       as (CampaignCommon.REF_SKUS))
 
     return customerRefSku
