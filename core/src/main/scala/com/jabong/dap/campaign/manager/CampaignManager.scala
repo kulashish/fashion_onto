@@ -2,18 +2,16 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.campaign.utils.CampaignUdfs
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.TimeUtils
-import com.jabong.dap.data.acq.common.{ CampaignDetail, CampaignConfig, CampaignInfo }
-import com.jabong.dap.data.read.DataReader
-import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 import scala.collection.mutable.HashMap
 
@@ -205,8 +203,30 @@ object CampaignManager extends Serializable with Logging {
   //
   //  }
 
-
+  /**
+   * takes union input of all campaigns and return merged campaign list
+   * @param inputCampaignsData
+   * @return
+   */
   def campaignMerger(inputCampaignsData : DataFrame): DataFrame ={
-    return null
+    if(inputCampaignsData == null){
+      logger.error("inputCampaignData is null")
+      return null
+    }
+
+    if(CampaignManager.mailTypePriorityMap.size == 0){
+      logger.error("priorityMap doesn't  Exists")
+      return null
+    }
+
+    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+    val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
+      .groupBy(CampaignMergedFields.FK_CUSTOMER)
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+        ,first(CampaignCommon.PRIORITY)
+        ,first(CampaignMergedFields.REF_SKU1)
+        ,first(CampaignMergedFields.REF_SKU2))
+
+    return campaignMerged
   }
 }

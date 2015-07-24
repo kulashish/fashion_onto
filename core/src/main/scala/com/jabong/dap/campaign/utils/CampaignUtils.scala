@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Date, Calendar }
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
@@ -293,6 +294,16 @@ object CampaignUtils extends Logging {
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
     logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
     return filteredData
+  }
+
+
+  def getCampaignPriority(mailType:Int): Int = {
+    if(mailType == 0){
+      val errorString = ("Priority doesn't exist for mailType %d",mailType)
+      logger.error(errorString)
+      return CampaignCommon.VERY_LOW_PRIORITY
+    }
+    return CampaignManager.mailTypePriorityMap.getOrElse(mailType,CampaignCommon.VERY_LOW_PRIORITY)
   }
 
 }

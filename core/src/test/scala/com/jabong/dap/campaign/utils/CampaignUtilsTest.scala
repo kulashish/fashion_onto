@@ -161,5 +161,4 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   //    val currentTime = CampaignUtils.now("yyyy/mm/dd")
   //    assert(currentTime=="2015/07/13")
   //  }
-
 }
