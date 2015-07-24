@@ -105,4 +105,7 @@ object DataSets {
   // Data sources
   val BOB_SOURCE = "bob"
   val ERP_SOURCE = "erp"
+
+  val CUSTOMER_SELECTION = "customer_selection"
+  val CUSTOMER_SURF_DATA = "customer_surf_data"
 }

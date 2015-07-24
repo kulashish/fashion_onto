@@ -11,8 +11,12 @@ import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
+import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import java.math.BigDecimal
+
+import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class
@@ -299,6 +303,15 @@ object CampaignUtils extends Logging {
     return filteredData
   }
 
+  def getCampaignPriority(mailType: Int): Int = {
+    if (mailType == 0) {
+      val errorString = ("Priority doesn't exist for mailType %d", mailType)
+      logger.error(errorString)
+      return CampaignCommon.VERY_LOW_PRIORITY
+    }
+    return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
+  }
+
   /**
    * get customer email to customer id mapping for all clickStream users
    * @param dfCustomerPageVisit
@@ -344,13 +357,5 @@ object CampaignUtils extends Logging {
     return dfJoinCustomerToCustomerPageVisit
   }
 
-  def getCampaignPriority(mailType: Int): Int = {
-    if (mailType == 0) {
-      val errorString = ("Priority doesn't exist for mailType %d", mailType)
-      logger.error(errorString)
-      return CampaignCommon.VERY_LOW_PRIORITY
-    }
-    return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
-  }
 }
 

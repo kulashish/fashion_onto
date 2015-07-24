@@ -338,6 +338,7 @@ object UdfUtils {
   }
 
   /**
+<<<<<<< Temporary merge branch 1
    *
    * @param skuArray
    * @tparam T
