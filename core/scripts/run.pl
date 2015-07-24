@@ -101,8 +101,12 @@ if ($component eq "bob") {
     my $command2 = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command2);
 } elsif ($component eq "retargetPushCampaign") {
-# for retarget campaign module
+    # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+    run_component($component, $command);
+} elsif ($component eq "clickstreamYesterdaySession") {
+    # for retarget campaign module
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json";
     run_component($component, $command);
 } else {
    print "not a valid component\n";
