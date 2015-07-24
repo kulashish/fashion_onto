@@ -1,6 +1,8 @@
 package com.jabong.dap.data.storage.merge.common
 
-import com.jabong.dap.common.AppConfig
+import java.io.File
+
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Builds the path for the input data for creating the dataFrames and
@@ -8,28 +10,34 @@ import com.jabong.dap.common.AppConfig
  */
 object PathBuilder {
 
-  val basePath = AppConfig.config.basePath
-
-  def getFullDataPath(fullDataDate: String, source: String, tableName: String): String = {
-    val path = "%s/%s/%s/full/%s".format(basePath, source, tableName, fullDataDate)
+  def getPrevDataPath(source: String, tableName: String, mode: String, prevDataDate: String): String = {
+    var path = "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, mode, prevDataDate)
+    if (mode.equals(DataSets.FULL)) {
+      path = path + File.separator + "24"
+    }
     if (!DataVerifier.dataExists(path)) {
-      println("Full Data Path doesn't exist: " + path)
+      println("Prev Data Path doesn't exist: " + path)
       throw new DataNotExist
     }
     path
   }
 
   def getIncrDataPath(incrDate: String, incrDataMode: String, source: String, tableName: String): String = {
-    val path = "%s/%s/%s/%s/%s".format(basePath, source, tableName, incrDataMode, incrDate)
+    val path = "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, incrDataMode, incrDate)
     if (!DataVerifier.dataExists(path)) {
-      println("Full Data Path doesn't exist: " + path)
+      println("Incr Data Path doesn't exist: " + path)
       throw new DataNotExist
     }
     path
   }
 
-  def getSavePathFullMerge(incrDate: String, source: String, tableName: String): String = {
-    "%s/%s/%s/full/%s/24".format(basePath, source, tableName, incrDate)
+  def getSavePathMerge(source: String, tableName: String, mode: String, incrDate: String): String = {
+    mode match {
+      case DataSets.FULL =>
+        "%s/%s/%s/%s/%s/24".format(DataSets.INPUT_PATH, source, tableName, DataSets.FULL, incrDate)
+      case _ =>
+        "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, mode, incrDate)
+    }
   }
 
   class DataNotExist extends Exception

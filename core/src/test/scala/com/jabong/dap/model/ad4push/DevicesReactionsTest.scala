@@ -7,6 +7,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import org.scalatest.FlatSpec
+
 /**
  * Created by Kapil.Rajak on 13/7/15.
  */
@@ -24,8 +25,8 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     //    android.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4pushA" + ".json")
   }
 
-  "dataFrameFromCsvPath: Data Frame" should "match with expected data" in {
-    val dfReaction = DataReader.getDataFrame(DataSets.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/22")
+  "getDataFrame4mCsv: Data Frame" should "match with expected data" in {
+    val dfReaction = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "date", "true", ",")
     //dfReaction.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4push" + ".json")
     val dfExpected = JsonUtils.readFromJson(DataSets.AD4PUSH, "testDF", DevicesReactionsSchema.dfFromCsv)
     assert(dfExpected.collect().toSet.equals(dfReaction.collect().toSet))

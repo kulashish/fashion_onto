@@ -3,10 +3,9 @@ package com.jabong.dap.model.clickstream.utils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.hive.HiveContext
 
-
 /**
  * Created by Divya on 13/7/15.
-*/
+ */
 
 object GetMergedClickstreamData extends java.io.Serializable {
 

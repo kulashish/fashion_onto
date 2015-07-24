@@ -1,5 +1,6 @@
 package com.jabong.dap.common
 
+import com.jabong.dap.common.json.JsonUtils
 import org.apache.spark._
 import org.scalatest.{ BeforeAndAfterAll, Suite }
 
@@ -13,7 +14,7 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
       //      Spark.init(conf, "WARN")
       Spark.init(conf)
 
-    val config = new Config(basePath = "basePath")
+    val config = new Config(basePath = JsonUtils.TEST_RESOURCES)
     AppConfig.config = config
 
     super.beforeAll()

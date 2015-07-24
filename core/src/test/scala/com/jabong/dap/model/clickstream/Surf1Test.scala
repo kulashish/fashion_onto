@@ -5,14 +5,13 @@ package com.jabong.dap.model.clickstream
  */
 
 import com.jabong.dap.model.clickstream.utils.GroupData
-import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, VariableMethods}
+import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, VariableMethods }
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Row, DataFrame, SQLContext}
+import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
 import org.scalatest.FlatSpec
-
 
 import scala.collection.mutable
 
@@ -36,17 +35,16 @@ class Surf1Test extends FlatSpec with SharedSparkContext {
     //basicRecommender = new BasicRecommender()
     // orderItemDataFrame = sqlContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
     pagevisitDataFrame = sqlContext.read.json("core/src/test/resources/Clickstream/SurfVariables/surf1.json")
-//    println("After Json Read")
+    //    println("After Json Read")
     pagevisitDataFrame.foreach(println)
     userObj = new GroupData(hiveContext, pagevisitDataFrame)
     userObj.calculateColumns(pagevisitDataFrame)
     //surfVariableData = userObj.groupDataByAppUser(pagevisitDataFrame)
 
-
     //surfVariableData.collect().foreach(println)
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }
-/*
+  /*
   "Given userid" should "return number of sessions visited" in {
     val result1 = GetSurfVariables.variableSurf1(pagevisitDataFrame,userObj,hiveContext)
     val result2 =result1.filter("appuid ='YncVoQTjiRGHuyoJTuD7FMF7+e2qAxm3tGhdx0LfVzk='")

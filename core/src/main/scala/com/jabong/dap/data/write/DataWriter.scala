@@ -1,6 +1,8 @@
 package com.jabong.dap.data.write
 
 import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -34,6 +36,29 @@ object DataWriter extends Logging {
   def writeParquet(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String) {
     val writePath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
     df.write.parquet(writePath)
+  }
+
+  def canWrite(saveMode: String, savePath: String): Boolean = {
+    if (saveMode.equals(DataSets.IGNORE_SAVEMODE)) {
+      if (DataVerifier.dataExists(savePath)) {
+        logger.info("File Already exists: " + savePath)
+        println("File Already exists so not doing anything: " + savePath)
+        return false
+      }
+      if (DataVerifier.hdfsDirExists(savePath)) {
+        DataVerifier.hdfsDirDelete(savePath)
+        logger.info("Directory with no success file was removed: " + savePath)
+        println("Directory with no success file was removed: " + savePath)
+      }
+    }
+
+    if (saveMode.equals(DataSets.ERROR_SAVEMODE) && DataVerifier.hdfsDirExists(savePath)) {
+      logger.info("File Already exists and save Mode is error: " + savePath)
+      println("File Already exists and save Mode is error: " + savePath)
+      return false
+    }
+
+    true
   }
 
 }
