@@ -31,7 +31,7 @@ object CampaignUtils extends Logging {
   def generateReferenceSkus(skuData: DataFrame, NumberSku: Int): DataFrame = {
     val customerRefSku = skuData.orderBy($"${SalesOrderItemVariables.UNIT_PRICE}".desc)
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU_SIMPLE)
-      as (CampaignCommon.REF_SKUS))
+        as (CampaignCommon.REF_SKUS))
 
     return customerRefSku
 
@@ -47,13 +47,13 @@ object CampaignUtils extends Logging {
 
     refSkuData.printSchema()
 
-    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER +" is not null and "
-      + ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE +" is not null")
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE + " is not null")
       .select(CustomerVariables.FK_CUSTOMER,
         ProductVariables.SKU_SIMPLE,
         SalesOrderItemVariables.UNIT_PRICE)
 
-   // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
+    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr

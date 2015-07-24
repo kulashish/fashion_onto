@@ -143,7 +143,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderData = CampaignInput.loadFullOrderData()
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
-    val yesterdayItrData = null
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
@@ -180,8 +180,8 @@ object CampaignManager extends Serializable with Logging {
     // itr last 30 days
     val last30daysItrData = null // FIXME
 
-    val acartIOD = new AcartIODCampaign()
-    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+    val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
+    // acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
   def startPushCampaignMerge(campaignJsonPath: String) = {
