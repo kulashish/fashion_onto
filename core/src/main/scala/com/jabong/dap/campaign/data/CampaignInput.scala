@@ -3,10 +3,11 @@ package com.jabong.dap.campaign.data
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.variables.SalesOrderVariables
+import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -22,14 +23,14 @@ object CampaignInput extends Logging {
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "daily", dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, dateYesterday)
     orderItemData
   }
 
   def loadFullOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, "full", dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderItemData
   }
 
@@ -49,7 +50,7 @@ object CampaignInput extends Logging {
   def loadFullOrderData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order data from hdfs")
-    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER, "full", dateYesterday)
+    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderData
   }
 
@@ -68,7 +69,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last 30 days acart item data from hdfs")
 
-    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_CART, "monthly", dateYesterday)
+    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_CART, DataSets.MONTHLY_MODE, dateYesterday)
     acartData
   }
 
@@ -82,6 +83,16 @@ object CampaignInput extends Logging {
     nthDayOrderData
   }
 
+  def loadYesterdayItrSimpleData() = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last day basic itr data from hdfs")
+    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
+    val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE , 
+      itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE, 
+      itrData(ITR.QUANTITY) as ProductVariables.STOCK)
+    filteredItr
+  }
+  
   def loadProductData(): DataFrame = {
     return null
   }
