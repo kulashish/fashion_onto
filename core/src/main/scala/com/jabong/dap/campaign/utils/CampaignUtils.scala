@@ -42,13 +42,18 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_SIMPLE, SalesOrderItemVariables.UNIT_PRICE)
+    refSkuData.printSchema()
+    
+    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE +" is not null")
+      .select(CustomerVariables.FK_CUSTOMER,
+        ProductVariables.SKU_SIMPLE,
+        SalesOrderItemVariables.UNIT_PRICE)
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+    val customerGroup = customerSkuMap.groupByKey().
+      map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
