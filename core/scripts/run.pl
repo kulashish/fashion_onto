@@ -85,21 +85,21 @@ my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 # bobAcq & merge
 if ($component eq "bob") {
     my $command1 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
-    run_component($component, $command1);
+    run_component("bob Acquisition for Full tables", $command1);
     my $command2 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
-    run_component($component, $command2);
+    run_component("bob Acquisition for Incremental tables", $command2);
     my $command3 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
-    run_component($component, $command3);
+    run_component("bob Merge for Incremental tables", $command3);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobFull") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
-    run_component($component, $command);
+    run_component("bob Acquisition for customer_product_shortlist table", $command);
 # erpAcq & merge
 } elsif ($component eq "erp") {
     my $command1 = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
-    run_component($component, $command1);
+    run_component("erp Acquisition for Incremental tables", $command1);
     my $command2 = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
-    run_component($component, $command2);
+    run_component("erp Merge for Incremental tables", $command2);
 } elsif ($component eq "retargetPushCampaign") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
