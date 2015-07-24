@@ -10,4 +10,5 @@ object SkuSelection {
   val ITEM_ON_DISCOUNT = "ItemOnDiscount"
   val LOW_STOCK = "LowStock"
   val DAILY = "Daily"
+  val SURF = "Surf"
 }

@@ -37,6 +37,10 @@ class SkuSelectorFactory extends CampaignFactory {
       return new Daily()
     }
 
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.SURF)) {
+      return new Surf()
+    }
+
     return null
   }
 
