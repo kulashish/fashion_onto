@@ -59,12 +59,4 @@ object CustomerDeviceMapping {
      DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
    }
 
-  def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("SparkExamples")
-    Spark.init(conf)
-    val df2 = DataReader.getDataFrameCsv4mDCF("/home/jabong/bobdata/device_mapping_20150714.csv",";")
-    df2.printSchema()
-    df2.show(5)
-  }
-
 }
