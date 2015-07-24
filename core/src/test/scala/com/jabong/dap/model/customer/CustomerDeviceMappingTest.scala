@@ -22,14 +22,7 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
     df1 = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
 
-    df1.collect.foreach(println)
-
     df2 = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingOutput")
-
-    df2.printSchema()
-
-    df2.show(5)
-
 
   }
 
