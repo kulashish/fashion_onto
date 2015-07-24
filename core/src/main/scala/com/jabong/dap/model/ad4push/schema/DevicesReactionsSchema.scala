@@ -8,6 +8,15 @@ import org.apache.spark.sql.types._
  */
 object DevicesReactionsSchema {
   //CSV schema
+  val schemaCsv = StructType(Array(
+    StructField(DevicesReactionsVariables.LOGIN_USER_ID, StringType, true),
+    StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
+    StructField(DevicesReactionsVariables.MESSAGE_ID, StringType, true),
+    StructField(DevicesReactionsVariables.CAMPAIGN_ID, StringType, true),
+    StructField(DevicesReactionsVariables.BOUNCE, IntegerType, true),
+    StructField(DevicesReactionsVariables.REACTION, IntegerType, true)
+  ))
+
   val dfFromCsv = StructType(Array(
     StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
