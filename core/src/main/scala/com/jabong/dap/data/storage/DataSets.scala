@@ -51,7 +51,7 @@ object DataSets {
   val CLICKSTREAM = "clickstream"
 
   //Ad4Push customer response
-  val AD4PUSH = "ad4Push"
+  val AD4PUSH = "ad4push"
 
   //non schema constants for ad4push
   val IPHONE_CSV_PREFIX = "exportMessagesReactions_517_"
