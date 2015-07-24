@@ -6,6 +6,7 @@ import com.jabong.dap.data.read.DataReader._
 import com.jabong.dap.data.read.{ValidFormatNotFound, DataNotFound, DataReader}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -13,7 +14,7 @@ import org.apache.spark.sql.types._
 /**
  * Created by mubarak on 15/7/15.
  */
-object CustomerDeviceMapping {
+object CustomerDeviceMapping extends Logging {
 
   def getLatestDevice(clickStreamInc: DataFrame, dcf:DataFrame, customer:DataFrame):DataFrame={
     //val filData = clickStreamInc.filter(!clickStreamInc(CustomerVariables.USERID).startsWith(CustomerVariables.APP_FILTER))
@@ -45,7 +46,7 @@ object CustomerDeviceMapping {
      df1.show(5)
      var df2: DataFrame = null
      if (null != path) {
-       df2 = getDataFrameCsv4mDCF(path,";")
+       df2 = getDataFrameCsv4mDCF(path)
      } else {
        df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, prevDate)
      }
@@ -61,16 +62,14 @@ object CustomerDeviceMapping {
 
   /**
    *
-   * @param path
-   * @param delimeter
-   * @return
+   * @param path for the dcf csv file
+   * @return DataFrame
    */
-  def getDataFrameCsv4mDCF(path: String, delimeter: String): DataFrame = {
+  def getDataFrameCsv4mDCF(path: String): DataFrame = {
     require(path != null, "Path is null")
-    require(delimeter != null, "Date is null")
 
     try {
-      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", delimeter).load(path).
+      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(path).
         withColumnRenamed("RESPONSYS_ID",CustomerVariables.RESPONSYS_ID).
         withColumnRenamed("ID_CUSTOMER",CustomerVariables.ID_CUSTOMER).
         withColumnRenamed("EMAIL",CustomerVariables.EMAIL).
