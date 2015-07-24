@@ -30,4 +30,8 @@ object CampaignCommon {
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
 
+  val VERY_LOW_PRIORITY = 10000
+
+  val PRIORITY = "priority"
+
 }
