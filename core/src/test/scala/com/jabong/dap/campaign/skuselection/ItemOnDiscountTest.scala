@@ -126,7 +126,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   //=====================================skuFilter()=====================================================
   "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
 
-    val result = itemOnDiscount.skuFilter(null, null, null)
+    val result = itemOnDiscount.skuFilter(null, null)
 
     assert(result == null)
 
@@ -142,7 +142,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
   "skuFilter: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData, null)
+    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData)
     //        .limit(30).colle//ct().toSet
 
     //    result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")

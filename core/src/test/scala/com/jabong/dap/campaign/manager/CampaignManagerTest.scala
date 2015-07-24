@@ -14,7 +14,7 @@ class CampaignManagerTest extends FlatSpec with Serializable {
   val fileSystem = FileSystem.get(conf)
   implicit val formats = net.liftweb.json.DefaultFormats
   val path = new Path(jsonPath)
-  val json = scala.io.Source.fromInputStream(fileSystem.open(path)).mkString //"empty config json file"
+  val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString) //"empty config json file"
 
   "empty json String" should "return false" in {
     val status = CampaignManager.createCampaignMaps(null)

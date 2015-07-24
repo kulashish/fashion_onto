@@ -20,19 +20,14 @@ class LowStock extends SkuSelector with Logging {
   // input will be [(id_customer, sku simple)] or [(id_customer, sku)]
   // case 1: only sku simple
   // case 2: only sku
-  override def skuFilter(customerSkuData: DataFrame, itrDataFrame: DataFrame, campaignName: String): DataFrame = {
-    if (customerSkuData == null || itrDataFrame == null || campaignName == null) {
+  override def skuFilter(customerSkuData: DataFrame, itrDataFrame: DataFrame): DataFrame = {
+    if (customerSkuData == null || itrDataFrame == null) {
       return null
     }
-    var filteredSku: DataFrame = null
-    if (campaignName == CampaignCommon.INVALID_CAMPAIGN) {
-      filteredSku = customerSkuData.join(itrDataFrame, customerSkuData(ProductVariables.SKU) === itrDataFrame(ProductVariables.SKU), "inner")
-        .filter(itrDataFrame(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE))
-        .select(customerSkuData(CustomerVariables.FK_CUSTOMER), customerSkuData(ProductVariables.SKU), customerSkuData(ProductVariables.SPECIAL_PRICE))
-    } else if (campaignName == CampaignCommon.WISHLIST_CAMPAIGN) {
-      // separate sku and sku simples
 
-    }
+    val filteredSku = customerSkuData.join(itrDataFrame, customerSkuData(ProductVariables.SKU) === itrDataFrame(ProductVariables.SKU), "inner")
+      .filter(itrDataFrame(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE))
+      .select(customerSkuData(CustomerVariables.FK_CUSTOMER), customerSkuData(ProductVariables.SKU), customerSkuData(ProductVariables.SPECIAL_PRICE))
 
     return filteredSku
   }
@@ -163,6 +158,5 @@ class LowStock extends SkuSelector with Logging {
     return dfResult
   }
 
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
-
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
 }

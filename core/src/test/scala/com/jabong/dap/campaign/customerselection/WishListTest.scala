@@ -2,11 +2,10 @@ package com.jabong.dap.campaign.customerselection
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.Date
 
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
@@ -48,7 +47,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   "customerSelection: schema attributes and data type" should "match into DataFrames(dfCustomerProductShortlist)" in {
 
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
 
     val date = format.parse("2015-07-09 00:00:08.0")
 
@@ -62,7 +61,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   "customerSelection: Data Frame" should "match to resultant Data Frame, If dfFull is NULL" in {
 
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
 
     val date = format.parse("2015-07-09 00:00:08.0")
 
@@ -81,9 +80,9 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   "customerSelection: Timestamp" should "Today" in {
 
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
 
-    val date = TimeUtils.getTodayDate(Constants.DATE_TIME_FORMAT)
+    val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
 
     val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date)).toInt
 
@@ -95,7 +94,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   "customerSelection:result length" should "8" in {
 
-    val format = new SimpleDateFormat(Constants.DATE_TIME_FORMAT)
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
 
     val date = format.parse("2015-07-10 00:00:00.0")
 

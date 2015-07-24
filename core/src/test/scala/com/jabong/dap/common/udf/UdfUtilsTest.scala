@@ -1,8 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import com.jabong.dap.common.time.{ Constants, TimeUtils }
-import org.apache.commons.net.ntp.TimeStamp
+
 import org.scalatest.FlatSpec
 
 /**
@@ -258,19 +257,19 @@ class UdfUtilsTest extends FlatSpec {
     assert(result == 5)
 
   }
-
-  //===============================getLatest()============================================================================
-  "getLatest(): timestamp t1 and t2 value " should "be null" in {
-
-    val t1 = null
-
-    val t2 = null
-
-    val result = UdfUtils.getLatest(t1, t2)
-
-    assert(result == null)
-
-  }
+  //
+  //  //===============================getLatest()============================================================================
+  //  "getLatest(): timestamp t1 and t2 value " should "be null" in {
+  //
+  //    val t1 = null
+  //
+  //    val t2 = null
+  //
+  //    val result = UdfUtils.getLatest(t1, t2)
+  //
+  //    assert(result == t1)
+  //
+  //  }
 
   "getLatest(): timestamp t1" should "be null" in {
 

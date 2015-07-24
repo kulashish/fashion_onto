@@ -1,9 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.status.OrderStatus
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables, ProductVariables, SalesOrderItemVariables }
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
