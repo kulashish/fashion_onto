@@ -25,7 +25,7 @@ object Model {
 
   val category = Spark.getContext().broadcast(DataReader.getDataFrame(DataSets.INPUT_PATH, "bob", "catalog_category", DataSets.FULL_FETCH_MODE))
 
-  val categoryMapping = DataReader.getDataFrame(DataSets.INPUT_PATH, "bob", "catalog_config_has_catalog_category",DataSets.FULL_FETCH_MODE)
+  val categoryMapping = DataReader.getDataFrame(DataSets.INPUT_PATH, "bob", "catalog_config_has_catalog_category", DataSets.FULL_FETCH_MODE)
 
   val itemMaster: DataFrame = DataReader.getDataFrame(DataSets.INPUT_PATH, "erp", "item_master_complete_dump", DataSets.FULL_MERGE_MODE)
 }

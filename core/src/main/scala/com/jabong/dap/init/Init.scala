@@ -5,7 +5,7 @@ import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.custorder.CustOrderVarMerger
-import com.jabong.dap.model.product.itr.{BasicITR, Itr}
+import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
 import scopt.OptionParser

@@ -4,8 +4,6 @@ version := "0.1"
 
 scalaVersion := "2.10.5"
 
-test in assembly := {}
-
 resolvers ++= Seq(
   Resolver.sonatypeRepo("public")
 )

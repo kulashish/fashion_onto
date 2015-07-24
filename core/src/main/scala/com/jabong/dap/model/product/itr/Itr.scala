@@ -197,13 +197,13 @@ class Itr extends Serializable with Logging {
       return "%s/".
         format(
           AppConfig.config.basePath +
-            File.separator + "itr" +  File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+            File.separator + "itr" + File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
         )
     }
     return "%s/".
       format(
         AppConfig.config.basePath +
-          File.separator + "itr-sku-level" +  File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+          File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
       )
   }
 }
