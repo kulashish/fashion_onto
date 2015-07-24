@@ -17,7 +17,7 @@ class YesterdaySessionDistinct extends CustomerSelector {
    * @param customerSurfData
    * @return
    */
-  def customerSelection(customerSurfData: DataFrame): DataFrame = {
+  override def customerSelection(customerSurfData: DataFrame): DataFrame = {
 
     val dfDistinctSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),
