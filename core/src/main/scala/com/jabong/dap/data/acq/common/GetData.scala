@@ -1,8 +1,7 @@
 package com.jabong.dap.data.acq.common
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -19,20 +18,7 @@ object GetData extends Logging {
     val savePath = PathBuilder.getPath(tableInfo)
     val saveMode = tableInfo.saveMode
 
-    if (saveMode.equals(DataSets.IGNORE_SAVEMODE)) {
-      if (DataVerifier.dataExists(savePath)) {
-        logger.info("File Already exists: " + savePath)
-        println("File Already exists so not doing anything: " + savePath)
-        return
-      }
-      if (DataVerifier.hdfsDirExists(savePath)) {
-        DataVerifier.hdfsDirDelete(savePath)
-        logger.info("Directory with no success file was removed: " + savePath)
-        println("Directory with no success file was removed: " + savePath)
-      }
-    } else if (saveMode.equals(DataSets.ERROR_SAVEMODE) && DataVerifier.hdfsDirExists(savePath)) {
-      logger.info("File Already exists and save Mode is error: " + savePath)
-      println("File Already exists and save Mode is error: " + savePath)
+    if (!DataWriter.canWrite(saveMode, savePath)) {
       return
     }
 
@@ -75,3 +61,4 @@ object GetData extends Logging {
     println("Data written successfully using query: " + dbTableQuery)
   }
 }
+

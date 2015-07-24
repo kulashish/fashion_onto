@@ -108,6 +108,9 @@ if ($component eq "bob") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json";
     run_component($component, $command);
+} elsif ($component eq "basicItr") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicItr --config $HDFS_CONF/config.json";
+    run_component($component, $command);
 } else {
    print "not a valid component\n";
 }

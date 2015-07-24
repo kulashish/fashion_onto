@@ -1,6 +1,7 @@
 package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
+import java.sql.Timestamp
 
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -8,6 +9,7 @@ import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.read.{ FormatResolver, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.PathBuilder.DataNotExist
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 
 /**
@@ -15,30 +17,21 @@ import grizzled.slf4j.Logging
  */
 
 object MergeTables extends Logging {
-  def mergeFull(mergeInfo: MergeInfo): Unit = {
+
+  def merge(mergeInfo: MergeInfo): Unit = {
     val primaryKey = mergeInfo.primaryKey
     val saveMode = mergeInfo.saveMode
     val source = mergeInfo.source
     val tableName = mergeInfo.tableName
+    val mergeMode = mergeInfo.mergeMode
+
     // If the incremental date is null than it is assumed that it will be yesterday's date.
     val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
       .replaceAll("-", File.separator)
 
-    val savePath = PathBuilder.getSavePathFullMerge(incrDate, source, tableName)
-    if (saveMode.equals(DataSets.IGNORE_SAVEMODE)) {
-      if (DataVerifier.dataExists(savePath)) {
-        logger.info("File Already exists: " + savePath)
-        println("File Already exists so not doing anything: " + savePath)
-        return
-      }
-      if (DataVerifier.hdfsDirExists(savePath)) {
-        DataVerifier.hdfsDirDelete(savePath)
-        logger.info("Directory with no success file was removed: " + savePath)
-        println("Directory with no success file was removed: " + savePath)
-      }
-    } else if (saveMode.equals(DataSets.ERROR_SAVEMODE) && DataVerifier.hdfsDirExists(savePath)) {
-      logger.info("File Already exists and save Mode is error: " + savePath)
-      println("File Already exists and save Mode is error: " + savePath)
+    val savePath = PathBuilder.getSavePathMerge(source, tableName, mergeMode, incrDate)
+
+    if (!DataWriter.canWrite(saveMode, savePath)) {
       return
     }
 
@@ -46,22 +39,21 @@ object MergeTables extends Logging {
     val incrDataMode = OptionUtils.getOptValue(mergeInfo.incrMode, DataSets.DAILY_MODE)
 
     // If full Data date is null then we assume that it will be day before the Incremental Data's date.
-    val prevFullDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate) + File.separator + "24"
-    val fullDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, prevFullDate)
-      .replaceAll("-", File.separator)
+    val prevDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val prevDataDate = OptionUtils.getOptValue(mergeInfo.fullDate, prevDate).replaceAll("-", File.separator)
 
     try {
-      val pathFull = PathBuilder.getFullDataPath(fullDataDate, source, tableName)
+      val pathPrevData = PathBuilder.getPrevDataPath(source, tableName, mergeMode, prevDataDate)
       lazy val pathIncr = PathBuilder.getIncrDataPath(incrDate, incrDataMode, source, tableName)
 
-      val saveFormat = FormatResolver.getFormat(pathFull)
+      val saveFormat = FormatResolver.getFormat(pathPrevData)
       val context = Spark.getContext(saveFormat)
 
       val baseDF =
         context
           .read
           .format(saveFormat)
-          .load(MergePathResolver.basePathResolver(pathFull))
+          .load(MergePathResolver.basePathResolver(pathPrevData))
       val incrementalDF =
         context
           .read
@@ -69,8 +61,19 @@ object MergeTables extends Logging {
           .load(MergePathResolver.incrementalPathResolver(pathIncr))
       val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
 
-      mergedDF.write.format(saveFormat).mode(saveMode).save(savePath)
-      println("merged " + pathIncr + " with " + pathFull)
+      var filteredDF = mergedDF
+
+      if (DataSets.MONTHLY_MODE.equals(mergeMode)) {
+        val colName = OptionUtils.getOptValue(mergeInfo.dateColumn)
+        val before30Days = TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+        val time = TimeUtils.getStartTimestampMS(Timestamp.valueOf(before30Days))
+        filteredDF = mergedDF.filter(colName + " >= " + "'" + time + "'")
+      }
+      println("merged " + pathIncr + " with " + pathPrevData)
+
+      filteredDF.write.format(saveFormat).mode(saveMode).save(savePath)
+      println("Successfully written data to " + savePath)
+
     } catch {
       case e: DataNotFound =>
         logger.error("Data not at location: " + e.getMessage)
@@ -100,6 +103,7 @@ object MergeTables extends Logging {
    * @param mergeInfo - Merge Info object formed from the input mergeJson file.
    */
   def mergeHistory(mergeInfo: MergeInfo) = {
+
     var prevFullDate = OptionUtils.getOptValue(mergeInfo.fullDate)
 
     val currMonthYear = TimeUtils.getMonthAndYear(null, TimeConstants.DATE_FORMAT)
@@ -126,12 +130,19 @@ object MergeTables extends Logging {
         val days = TimeUtils.getMaxDaysOfMonth(yr.toString + "-" + mnthStr + "-01", TimeConstants.DATE_FORMAT)
         val end = yr.toString + File.separator + mnthStr + File.separator + days
 
-        val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = DataSets.FULL,
-          incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply(DataSets.MONTHLY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
+        // no need of Monthly data as we are assuming here that we got last month's data already.
+        // Hence this case to be run only in case of FULL data merge.
+        if (DataSets.FULL.equals(mergeInfo.mergeMode)) {
 
-        mergeFull(mrgInfo)
+          val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName,
+            primaryKey = mergeInfo.primaryKey, mergeMode = mergeInfo.mergeMode, dateColumn = mergeInfo.dateColumn,
+            incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate),
+            incrMode = Option.apply(DataSets.MONTHLY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
 
-        prevFullDate = end + File.separator + "24"
+          merge(mrgInfo)
+        }
+
+        prevFullDate = end
       }
     }
 
@@ -140,12 +151,14 @@ object MergeTables extends Logging {
       val yrStr = currMonthYear.year.toString
       val end = yrStr + File.separator + mnthStr + File.separator + TimeUtils.withLeadingZeros(day)
 
-      val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName, primaryKey = mergeInfo.primaryKey, mergeMode = DataSets.FULL,
-        incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate), incrMode = Option.apply(DataSets.DAILY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
+      val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName,
+        primaryKey = mergeInfo.primaryKey, mergeMode = mergeInfo.mergeMode, dateColumn = mergeInfo.dateColumn,
+        incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate),
+        incrMode = Option.apply(DataSets.DAILY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
 
-      mergeFull(mrgInfo)
+      merge(mrgInfo)
 
-      prevFullDate = end + File.separator + "24"
+      prevFullDate = end
 
     }
   }
