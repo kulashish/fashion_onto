@@ -13,8 +13,7 @@ object DataSets {
 
   val INPUT_PATH = basePath + File.separator + "input"
   val OUTPUT_PATH = basePath + File.separator + "output"
-  val EXTRAS = basePath + File.separator + "extras"
-  val CLICKSTREAM = basePath + File.separator+ "clickstream"
+  val EXTRAS = File.separator + "extras"
 
 
   val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources"
