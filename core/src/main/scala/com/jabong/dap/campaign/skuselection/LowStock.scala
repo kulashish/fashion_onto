@@ -25,8 +25,9 @@ class LowStock extends SkuSelector with Logging {
       return null
     }
 
-    val filteredSku = customerSkuData.join(itrDataFrame, customerSkuData(ProductVariables.SKU) === itrDataFrame(ProductVariables.SKU), "inner")
-      .filter(itrDataFrame(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE))
+    val filteredSku = customerSkuData.join(
+      itrDataFrame, customerSkuData(ProductVariables.SKU_SIMPLE) === itrDataFrame(ProductVariables.SKU_SIMPLE), "inner")
+      .filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),
         itrDataFrame(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
