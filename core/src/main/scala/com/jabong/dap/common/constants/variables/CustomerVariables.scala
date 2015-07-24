@@ -70,4 +70,11 @@ object CustomerVariables {
   //for renaming column name
   val NEW_ = "new_"
 
+  val USERID = "appuserid"
+  val APP_FILTER = "_app_"
+  val BROWSER_ID = "browserid"
+  val PAGETS = "pagets"
+  val APP_TYPE ="app_type"
+  val RESPONSYS_ID = "responsys_id"
+
 }
