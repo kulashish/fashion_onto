@@ -1,7 +1,8 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.util.{ Date }
+import java.util.Date
+
 import com.jabong.dap.common.ArrayUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
@@ -335,49 +336,9 @@ object UdfUtils {
 
     return simpleSku.substring(0, simpleSku.lastIndexOf('-'))
   }
-  /**
-   * returns dayName with max click given counts for 7 days
-   * @param count1
-   * @param count2
-   * @param count3
-   * @param count4
-   * @param count5
-   * @param count6
-   * @param count7
-   * @return day with maximum click
-   */
-  def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
-    var max = count1;
-    var index = 0;
-
-    if (max < count2) {
-      max = count2
-      index = 1
-    }
-    if (max < count3) {
-      max = count3
-      index = 2
-    }
-    if (max < count4) {
-      max = count4
-      index = 3
-    }
-    if (max < count5) {
-      max = count5
-      index = 4
-    }
-    if (max < count6) {
-      max = count6
-      index = 5
-    }
-    if (max < count7) {
-      max = count7
-      index = 6
-    }
-    return TimeUtils.nextNDay("Monday", index)
-  }
 
   /**
+<<<<<<< Temporary merge branch 1
    *
    * @param skuArray
    * @tparam T
@@ -437,4 +398,47 @@ object UdfUtils {
 
     return skuList.length
   }
+
+  /**
+   * returns dayName with max click given counts for 7 days
+   * @param count1
+   * @param count2
+   * @param count3
+   * @param count4
+   * @param count5
+   * @param count6
+   * @param count7
+   * @return
+   */
+  def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
+    var max = count1;
+    var index = 0;
+
+    if (max < count2) {
+      max = count2
+      index = 1
+    }
+    if (max < count3) {
+      max = count3
+      index = 2
+    }
+    if (max < count4) {
+      max = count4
+      index = 3
+    }
+    if (max < count5) {
+      max = count5
+      index = 4
+    }
+    if (max < count6) {
+      max = count6
+      index = 5
+    }
+    if (max < count7) {
+      max = count7
+      index = 6
+    }
+    return TimeUtils.nextNDay("Monday", index)
+  }
+
 }

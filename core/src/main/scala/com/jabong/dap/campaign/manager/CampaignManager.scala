@@ -119,8 +119,7 @@ object CampaignManager extends Serializable with Logging {
     val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
 
     // yesterday itr - Qty of Ref SKU to be greater than/equal to 10
-    // FIXME
-    val yesterdayItrData = null
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     val invalidFollowUp = new InvalidFollowUpCampaign()
     invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData)

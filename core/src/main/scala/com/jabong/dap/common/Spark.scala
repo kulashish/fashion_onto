@@ -2,8 +2,8 @@ package com.jabong.dap.common
 
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{ SparkConf, SparkContext }
+import org.apache.spark.sql.hive.HiveContext
 
 /**
  * Application singleton Context. Every component

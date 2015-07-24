@@ -47,3 +47,5 @@ project/plugins/project/
 project/target/
 project/project/
 config.json
+tables.json
+metastore_db

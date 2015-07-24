@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
@@ -11,8 +11,12 @@ import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
+import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import java.math.BigDecimal
+
+import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class
@@ -39,13 +43,18 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val customerData = refSkuData.filter(ProductVariables.SKU + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
+    refSkuData.printSchema()
+
+    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE + " is not null")
+      .select(CustomerVariables.FK_CUSTOMER,
+        ProductVariables.SKU_SIMPLE,
+        SalesOrderItemVariables.UNIT_PRICE)
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+    val customerGroup = customerSkuMap.groupByKey().
+      map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
@@ -254,6 +263,7 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
         inputData(ProductVariables.SPECIAL_PRICE)
       )
@@ -293,7 +303,7 @@ object CampaignUtils extends Logging {
     return filteredData
   }
 
-def getCampaignPriority(mailType: Int): Int = {
+  def getCampaignPriority(mailType: Int): Int = {
     if (mailType == 0) {
       val errorString = ("Priority doesn't exist for mailType %d", mailType)
       logger.error(errorString)
