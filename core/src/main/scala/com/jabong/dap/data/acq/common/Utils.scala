@@ -72,15 +72,17 @@ case class MergeInfo(
 /**
  * Case class for storing information for variable merging the data of customer and order.
  *
- * @param prevFullDate String The date for the last merged data is to be picked.
- * @param mergeDate String The date for the merge data is to be run.
+ * @param source String source for which to be run
+ * @param date String The date for the merge data is to be run.
+ * @param mode String data mode
  * @param saveFormat String The Format in which the data will be found and saved after the merge.
  * @param saveMode String The mode in which the data is to be saved. (Can be overwrite, append, error or ignore)
  */
 
 case class COVarInfo(
-  prevFullDate: String,
-  mergeDate: String,
+  source: String,
+  date: String,
+  mode: String,
   saveFormat: String,
   saveMode: String)
 
@@ -99,6 +101,7 @@ case class ImportInfo(
  * @param merge List[MergeInfo] List of Tables to run the merge job on.
  */
 case class MergeJobInfo(
+  isHistory: Option[Boolean],
   merge: List[MergeInfo]) extends EmptyClass
 
 /**

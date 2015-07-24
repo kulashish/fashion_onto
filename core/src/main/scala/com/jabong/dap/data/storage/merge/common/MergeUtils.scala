@@ -68,6 +68,33 @@ object MergeUtils extends MergeData {
     joinOldAndNewDF(dfIncrVar, dfPrevVarFullVar, primaryKey)
   }
 
+  def joinOldAndNewDF(dfIncr: DataFrame, incrSchema: StructType, dfPrevVarFull: DataFrame, prevVarFullSchema: StructType, primaryKey1: String, primaryKey2: String): DataFrame = {
+    var dfIncrVar: DataFrame = dfIncr
+    if (null == dfIncr) dfIncrVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], incrSchema)
+
+    var dfPrevVarFullVar: DataFrame = dfPrevVarFull
+    if (null == dfPrevVarFull) dfPrevVarFullVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], prevVarFullSchema)
+
+    joinOldAndNewDF(dfIncrVar, dfPrevVarFullVar, primaryKey1, primaryKey2)
+  }
+
+  def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey1: String, primaryKey2: String): DataFrame = {
+
+    var dfIncrVar = dfIncr
+
+    dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
+
+    val dfSchema = dfIncr.schema
+
+    // rename dfIncr column names with new_ as prefix
+    dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
+
+    // join old and new data frame on primary key
+    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), "outer")
+
+    joinedDF
+  }
+
   /**
    * join old and new data frame
    * @param dfIncr

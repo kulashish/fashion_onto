@@ -1,10 +1,13 @@
 {
+  "isHistory": true,
   "merge": [
     {
       "source": "bob",
       "tableName": "sales_order",
       "primaryKey": "id_sales_order",
       "mergeMode": "full",
+      "incrDate": "2013-10-31",
+      "fullDate": "2012/08/31/24",
       "saveMode": "ignore"
     },
     {
@@ -12,6 +15,8 @@
       "tableName": "sales_order_item",
       "primaryKey": "id_sales_order_item",
       "mergeMode": "full",
+      "incrDate": "2012-06-30",
+      "fullDate": "2012/05/31/24",
       "saveMode": "ignore"
     },
     {
@@ -19,6 +24,8 @@
       "tableName": "catalog_config",
       "primaryKey": "id_catalog_config",
       "mergeMode": "full",
+      "incrDate": "2015-02-28",
+      "fullDate": "2014/11/30/24",
       "saveMode": "ignore"
     },
     {
@@ -26,6 +33,8 @@
       "tableName": "catalog_simple",
       "primaryKey": "id_catalog_simple",
       "mergeMode": "full",
+      "incrDate": "2012-06-30",
+      "fullDate": "2012/05/31/24",
       "saveMode": "ignore"
     },
     {
@@ -34,6 +43,8 @@
       "primaryKey": "id_sales_cart",
       "mergeMode": "monthly",
       "dateColumn": "updated_at",
+      "incrDate": "2015-07-01",
+      "fullDate": "2015/06/30",
       "saveMode": "ignore"
     }
   ]

@@ -1,6 +1,8 @@
 package com.jabong.dap.model.custorder
 
 import com.jabong.dap.data.acq.common._
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -40,10 +42,10 @@ class CustOrderVarMerger extends Serializable with Logging {
     if (validated) {
       for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
         COVarJobConfig.coVarInfo = coVarJob
-        //        coVarJob.source match {
-        //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
-        //          case _ => logger.error("Unknown table source.")
-        //        }
+        coVarJob.source match {
+          case DataSets.AD4PUSH => DevicesReactions.customerResponse(coVarJob.date, coVarJob.mode)
+          case _ => logger.error("Unknown source.")
+        }
       }
     }
 
