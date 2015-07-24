@@ -99,6 +99,7 @@ case class ImportInfo(
  * @param merge List[MergeInfo] List of Tables to run the merge job on.
  */
 case class MergeJobInfo(
+  isHistory: Option[Boolean],
   merge: List[MergeInfo]) extends EmptyClass
 
 /**

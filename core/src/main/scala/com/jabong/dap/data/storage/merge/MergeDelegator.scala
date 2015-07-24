@@ -1,5 +1,6 @@
 package com.jabong.dap.data.storage.merge
 
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.merge.common.Merger
 import grizzled.slf4j.Logging
@@ -40,10 +41,11 @@ class MergeDelegator extends Serializable with Logging {
     }
 
     if (validated) {
+      val isHistory = OptionUtils.getOptBoolVal(MergeJobConfig.mergeJobInfo.isHistory)
       for (mergeJob <- MergeJobConfig.mergeJobInfo.merge) {
         MergeJobConfig.mergeInfo = mergeJob
         mergeJob.source match {
-          case "erp" | "bob" | "unicommerce" => new Merger().merge()
+          case "erp" | "bob" | "unicommerce" => new Merger().merge(isHistory)
           case _ => logger.error("Unknown table source.")
         }
       }
