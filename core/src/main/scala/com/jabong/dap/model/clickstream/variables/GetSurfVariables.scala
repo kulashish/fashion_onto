@@ -66,12 +66,17 @@ object GetSurfVariables extends java.io.Serializable {
     cal.setTime(dateFormat.parse(yesterDate))
     cal.add(Calendar.DATE, -29)
     var filterDate = dateFormat.format(cal.getTime())
-    val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
     val IncrementalMerge = incremental.map(t => (t(0).toString, t(1).toString))
       .reduceByKey((x, y) => (x + "," + y))
       .map(v => (v._1, yesterDate.toString, (v._2.split(",").toSet.toList)))
       .toDF("userid", "dt", "skuList")
-    return yesterMerge.unionAll(IncrementalMerge)
+    
+    if (mergedData != null) {
+      val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
+      return yesterMerge.unionAll(IncrementalMerge)
+    } else {
+      return IncrementalMerge
+    }
   }
 
   def uidToDeviceid(hiveContext: HiveContext): DataFrame = {

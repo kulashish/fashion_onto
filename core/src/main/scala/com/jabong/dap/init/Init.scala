@@ -123,6 +123,7 @@ object Init {
       
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
+      case "clickstreamSurf3Variable" => SurfVariablesMain.startSurf3Variable()
     }
   }
 }
