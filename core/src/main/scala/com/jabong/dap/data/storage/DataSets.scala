@@ -15,7 +15,6 @@ object DataSets {
   val OUTPUT_PATH = basePath + File.separator + "output"
   val EXTRAS = File.separator + "extras"
 
-
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"

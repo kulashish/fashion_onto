@@ -2,7 +2,7 @@ package com.jabong.dap.common
 
 import com.jabong.dap.common.json.JsonUtils
 import org.apache.spark._
-import org.scalatest.{BeforeAndAfterAll, Suite}
+import org.scalatest.{ BeforeAndAfterAll, Suite }
 
 /** Shares a local `SparkContext` between all tests in a suite and closes it at the end */
 trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
@@ -13,7 +13,6 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
     if (Spark.getContext() == null)
       //      Spark.init(conf, "WARN")
       Spark.init(conf)
-
 
     val config = new Config(basePath = JsonUtils.TEST_RESOURCES)
     AppConfig.config = config

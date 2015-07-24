@@ -1,7 +1,7 @@
 package com.jabong.dap.common.json
 
 import net.liftweb.json.JsonParser.ParseException
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{ FlatSpec, Matchers }
 
 /**
  * Created by Rachit on 19/6/15.

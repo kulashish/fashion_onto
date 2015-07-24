@@ -22,12 +22,12 @@ class MergeTablesTest extends FlatSpec with SharedSparkContext {
   }
 
   "A Merged DF" should "have size 4" in {
-//    val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName,
-//      primaryKey = mergeInfo.primaryKey, mergeMode = mergeInfo.mergeMode, dateColumn = mergeInfo.dateColumn,
-//      incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate),
-//      incrMode = Option.apply(DataSets.DAILY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
-//    var mergedDF = MergeTables.merge(mrgInfo)
-//    assert(mergedDF.collect.size == 4)
+    //    val mrgInfo = new MergeInfo(source = mergeInfo.source, tableName = mergeInfo.tableName,
+    //      primaryKey = mergeInfo.primaryKey, mergeMode = mergeInfo.mergeMode, dateColumn = mergeInfo.dateColumn,
+    //      incrDate = Option.apply(end), fullDate = Option.apply(prevFullDate),
+    //      incrMode = Option.apply(DataSets.DAILY_MODE), saveMode = DataSets.IGNORE_SAVEMODE)
+    //    var mergedDF = MergeTables.merge(mrgInfo)
+    //    assert(mergedDF.collect.size == 4)
   }
 
 }
