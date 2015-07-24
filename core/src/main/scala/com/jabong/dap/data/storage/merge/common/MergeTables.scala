@@ -2,10 +2,10 @@ package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
 
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common._
-import com.jabong.dap.data.read.{FormatResolver, ValidFormatNotFound}
+import com.jabong.dap.data.read.{ FormatResolver, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.PathBuilder.DataNotExist
 import com.jabong.dap.data.write.DataWriter
