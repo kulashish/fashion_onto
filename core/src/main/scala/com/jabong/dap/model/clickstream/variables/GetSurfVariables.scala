@@ -70,7 +70,7 @@ object GetSurfVariables extends java.io.Serializable {
       .reduceByKey((x, y) => (x + "," + y))
       .map(v => (v._1, yesterDate.toString, (v._2.split(",").toSet.toList)))
       .toDF("userid", "dt", "skuList")
-    
+
     if (mergedData != null) {
       val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
       return yesterMerge.unionAll(IncrementalMerge)

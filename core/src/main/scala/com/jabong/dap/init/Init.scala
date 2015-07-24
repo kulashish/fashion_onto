@@ -120,7 +120,7 @@ object Init {
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCamapignsJson)
-      
+
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
       case "clickstreamSurf3Variable" => SurfVariablesMain.startSurf3Variable()

@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.data.read.{DataVerifier, PathBuilder}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.read.{ DataVerifier, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.clickstream.utils.{ GroupData, GetMergedClickstreamData }
 import org.apache.spark.rdd.RDD
@@ -63,12 +63,11 @@ object SurfVariablesMain extends java.io.Serializable {
     val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, args(0))
     variableSurf1.write.save(surf1VariablePath)
   }
-  
-  
+
   def startClickstreamYesterdaySessionVariables() = {
     var gap = 1
     val hiveContext = Spark.getHiveContext()
-    
+
     // calculate yesterday date
     val cal = Calendar.getInstance()
     cal.add(Calendar.DATE, -gap);
@@ -78,16 +77,15 @@ object SurfVariablesMain extends java.io.Serializable {
     val month = mFormat.format(cal.getTime());
     val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     var dt = dateFormat.format(cal.getTime())
-    
+
     val tablename = "merge.merge_pagevisit"
     val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
-
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
 
     val userDeviceMapPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "userDeviceMap", "daily", yesterdayDate)
     var surf1VariablePath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", "daily", yesterdayDate)
-    
+
     var UserObj = new GroupData(hiveContext, pagevisit)
     var useridDeviceidFrame = UserObj.appuseridCreation()
     UserObj.calculateColumns(useridDeviceidFrame)
@@ -97,12 +95,11 @@ object SurfVariablesMain extends java.io.Serializable {
       .getUserDeviceMapApp(useridDeviceidFrame)
       .write.mode("error")
       .save(userDeviceMapPath)
-    
+
     // variable 1
     val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename)
     variableSurf1.write.save(surf1VariablePath)
   }
-
 
   def startSurf3Variable() = {
     var gap = 1
@@ -121,7 +118,6 @@ object SurfVariablesMain extends java.io.Serializable {
     val tablename = "merge.merge_pagevisit"
     val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
 
-
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
 
@@ -136,19 +132,19 @@ object SurfVariablesMain extends java.io.Serializable {
     if (DataVerifier.dataExists(oldMergedDataPath)) {
       oldMergedData = hiveContext.parquetFile(oldMergedDataPath)
     }
-    
+
     var UserObj = new GroupData(hiveContext, pagevisit)
     var useridDeviceidFrame = UserObj.appuseridCreation()
     UserObj.calculateColumns(useridDeviceidFrame)
     val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(useridDeviceidFrame)
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
-    
+
     if (null != oldMergedData) {
       var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
     }
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
     mergedData.saveAsParquetFile(currentMergedDataPath)
     incremental.save(processedVariablePath)
-    
+
   }
 }
