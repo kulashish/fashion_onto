@@ -92,34 +92,45 @@ object DataReader extends Logging {
     }
   }
 
-  def tokenize(x:String, delimiter: String):(String,String,String,String,String)={
-    val t =x.split(delimiter)
-    val a = scala.collection.mutable.ListBuffer[String]()
-    t.foreach(x => a.+=:(x))
-    if (a.length == 3){
-      return (a(2),a(1),a(0),null,null)
+  def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, header: String, delimeter: String): DataFrame = {
+    require(source != null, "Source Type is null")
+    require(tableName != null, "Table Name is null")
+    require(mode != null, "Mode is null")
+    require(date != null, "Date is null")
+    try {
+      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
+      Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
+    }catch {
+      case e: DataNotFound =>
+        logger.error("Data not found for the given path")
+        throw new DataNotFound
+      case e: ValidFormatNotFound =>
+        logger.error("Format could not be resolved for the given files in directory")
+        throw new ValidFormatNotFound
     }
-    return (a(4),a(3),a(2),a(1),a(0))
   }
 
+    /**
+   *
+   * @param path
+   * @param delimeter
+   * @return
+   */
   def getDataFrameCsv4mDCF(path: String, delimeter: String): DataFrame = {
     require(path != null, "Mode is null")
     require(delimeter != null, "Date is null")
 
     try {
-      val csv = Spark.getContext().textFile(path)
-      val x= csv.map(x =>  tokenize(x, delimeter))
-      val df2 = Spark.getSqlContext().createDataFrame(x).
-        withColumnRenamed("_1",CustomerVariables.RESPONSYS_ID).
-        withColumnRenamed("_2",CustomerVariables.ID_CUSTOMER).
-        withColumnRenamed("_3",CustomerVariables.EMAIL).
-        withColumnRenamed("_4",CustomerVariables.BROWSER_ID).
-        withColumnRenamed("_5",CustomerVariables.DOMAIN)
-      val df3 = df2.filter(!df2(CustomerVariables.RESPONSYS_ID).startsWith(CustomerVariables.RESPONSYS_ID))
-      df3
+      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", delimeter).load(path).
+        withColumnRenamed("RESPONSYS_ID",CustomerVariables.RESPONSYS_ID).
+        withColumnRenamed("ID_CUSTOMER",CustomerVariables.ID_CUSTOMER).
+        withColumnRenamed("EMAIL",CustomerVariables.EMAIL).
+        withColumnRenamed("BID",CustomerVariables.BROWSER_ID).
+        withColumnRenamed("APPTYPE",CustomerVariables.DOMAIN)
+      df
     } catch {
       case e: DataNotFound =>
-        logger.error("Data not found for the date")
+        logger.error("Data not found for the given path ")
         throw new DataNotFound
       case e: ValidFormatNotFound =>
         logger.error("Format could not be resolved for the given files in directory")

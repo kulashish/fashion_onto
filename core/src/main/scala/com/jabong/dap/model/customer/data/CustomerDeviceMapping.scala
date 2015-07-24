@@ -40,9 +40,6 @@ object CustomerDeviceMapping {
     joined
   }
 
-
-
-
    def processData(prevDate:String, path:String, curDate: String) {
      val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CLICKSTREAM,DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
      df1.printSchema()
@@ -61,4 +58,13 @@ object CustomerDeviceMapping {
      res.show(20)
      DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
    }
+
+  def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("SparkExamples")
+    Spark.init(conf)
+    val df2 = DataReader.getDataFrameCsv4mDCF("/home/jabong/bobdata/device_mapping_20150714.csv",";")
+    df2.printSchema()
+    df2.show(5)
+  }
+
 }
