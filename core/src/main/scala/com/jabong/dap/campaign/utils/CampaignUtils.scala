@@ -9,6 +9,8 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
@@ -43,11 +45,14 @@ object CampaignUtils extends Logging {
     }
 
     refSkuData.printSchema()
-    
-    val customerData = refSkuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE +" is not null")
+
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER +" is not null "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + SalesOrderItemVariables.UNIT_PRICE +" is not null")
       .select(CustomerVariables.FK_CUSTOMER,
         ProductVariables.SKU_SIMPLE,
         SalesOrderItemVariables.UNIT_PRICE)
+
+    DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
