@@ -6,6 +6,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.clickstream.variables.UserDeviceMapping
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
+import java.io.File
 
 class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
@@ -14,7 +15,6 @@ class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-
     dfInputUserDeviceMap = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingInput")
     dfOutputUserDeviceMap = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingOutput")
   }
