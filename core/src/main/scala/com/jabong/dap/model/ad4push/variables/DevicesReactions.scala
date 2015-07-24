@@ -2,7 +2,7 @@ package com.jabong.dap.model.ad4push.variables
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import com.jabong.dap.common.constants.variables.DevicesReactionsVariables._
+import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -25,7 +25,7 @@ object DevicesReactions extends Logging {
    * @param yyyyMMdd date for which summary is needed in YYYYMMDD format
    * @return (iPhoneResult, AndroidResult) for tgiven date
    */
-  def customerResponse(yyyyMMdd: String, mode: String) = {
+  def customerResponse(yyyyMMdd: String, mode: String): Unit = {
 
     //getting file names
     val today = Calendar.getInstance().getTime
@@ -36,10 +36,12 @@ object DevicesReactions extends Logging {
     val dateStr = TimeUtils.changeDateFormat(dateString, TimeConstants.YYYYMMDD, TimeConstants.DATE_FORMAT_FOLDER)
 
     val incIPhoneCSV = DataSets.IPHONE_CSV_PREFIX + dateString + DataSets.CSV
-    val incI = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr, "true", ",")
+    val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr, "true", ",")
+    val incI = dfCorrectSchema(incIStringSchema)
 
     val incAndroidCSV = DataSets.ANDROID_CSV_PREFIX + dateString + DataSets.CSV
-    val incA = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr, "true", ",")
+    val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr, "true", ",")
+    val incA = dfCorrectSchema(incAStringSchema)
 
     val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
@@ -51,7 +53,6 @@ object DevicesReactions extends Logging {
 
     //getting DF
     logger.info("Reading inputs (CSVs and Parquets)")
-    //    val fullI = readParquet(CUSTOMER_RESPONSE_VAR_PATH, DataSets.REACTION_IOS, DataSets.FULL_MODE, yesterday)
     val fullI = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, yesterday)
     val b7I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before7daysString)
     val b15I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before15daysString)
@@ -70,9 +71,16 @@ object DevicesReactions extends Logging {
 
     DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, dateStr)
     DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr)
-
   }
 
+  def dfCorrectSchema(df: DataFrame): DataFrame = {
+    return df.select(df(DevicesReactionsVariables.LOGIN_USER_ID) as DevicesReactionsVariables.CUSTOMER_ID,
+      df(DevicesReactionsVariables.DEVICE_ID) as DevicesReactionsVariables.DEVICE_ID,
+      df(DevicesReactionsVariables.MESSAGE_ID) as DevicesReactionsVariables.MESSAGE_ID,
+      df(DevicesReactionsVariables.CAMPAIGN_ID) as DevicesReactionsVariables.CAMPAIGN_ID,
+      df(DevicesReactionsVariables.BOUNCE).cast(IntegerType) as DevicesReactionsVariables.BOUNCE,
+      df(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
+  }
   /**
    *
    * @param incrementalDF
@@ -96,33 +104,33 @@ object DevicesReactions extends Logging {
 
     val reducedIncr = reduce(incrementalDF)
 
-    val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30)
+    val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.CUSTOMER_ID)
 
-    val joinedDF = MergeUtils.joinOldAndNewDF(effective, DevicesReactionsSchema.effectiveDF, full, DevicesReactionsSchema.deviceReaction, DEVICE_ID)
+    val joinedDF = MergeUtils.joinOldAndNewDF(effective, DevicesReactionsSchema.effectiveDF, full, DevicesReactionsSchema.deviceReaction, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
 
     val resultDF = joinedDF.select(
-      coalesce(col(MergeUtils.NEW_ + DEVICE_ID), col(DEVICE_ID)) as DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + LOGIN_USER_ID), col(CUSTOMER_ID)) as CUSTOMER_ID,
-      when(col(MergeUtils.NEW_ + CLICKED_TODAY) > 0, TimeUtils.changeDateFormat(incrDate, TimeConstants.YYYYMMDD, TimeConstants.DATE_FORMAT)).otherwise(col(LAST_CLICK_DATE)) as LAST_CLICK_DATE,
-      (col(CLICK_7) + col(MergeUtils.NEW_ + EFFECTIVE_7_DAYS)).cast(IntegerType) as CLICK_7,
-      (col(CLICK_15) + col(MergeUtils.NEW_ + EFFECTIVE_15_DAYS)).cast(IntegerType) as CLICK_15,
-      (col(CLICK_30) + col(MergeUtils.NEW_ + EFFECTIVE_30_DAYS)).cast(IntegerType) as CLICK_30,
-      (col(CLICK_LIFETIME) + col(MergeUtils.NEW_ + CLICKED_TODAY)).cast(IntegerType) as CLICK_LIFETIME,
-      (when(col(MergeUtils.NEW_ + CLICKED_TODAY) > 2, col(CLICKED_TWICE) + 1).otherwise(col(CLICKED_TWICE))).cast(IntegerType) as CLICKED_TWICE,
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
+      when(col(MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY) > 0, TimeUtils.changeDateFormat(incrDate, TimeConstants.YYYYMMDD, TimeConstants.DATE_FORMAT)).otherwise(col(DevicesReactionsVariables.LAST_CLICK_DATE)) as DevicesReactionsVariables.LAST_CLICK_DATE,
+      (col(DevicesReactionsVariables.CLICK_7) + col(MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_7_DAYS)).cast(IntegerType) as DevicesReactionsVariables.CLICK_7,
+      (col(DevicesReactionsVariables.CLICK_15) + col(MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_15_DAYS)).cast(IntegerType) as DevicesReactionsVariables.CLICK_15,
+      (col(DevicesReactionsVariables.CLICK_30) + col(MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_30_DAYS)).cast(IntegerType) as DevicesReactionsVariables.CLICK_30,
+      (col(DevicesReactionsVariables.CLICK_LIFETIME) + col(MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY)).cast(IntegerType) as DevicesReactionsVariables.CLICK_LIFETIME,
+      (when(col(MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY) > 2, col(DevicesReactionsVariables.CLICKED_TWICE) + 1).otherwise(col(DevicesReactionsVariables.CLICKED_TWICE))).cast(IntegerType) as DevicesReactionsVariables.CLICKED_TWICE,
 
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase()) + col(MergeUtils.NEW_ + CLICKED_TODAY)).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase(),
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase())).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase(),
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase())).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase(),
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase())).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase(),
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase())).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase(),
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase())).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase(),
-      (col(CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase())).cast(IntegerType) as CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase()
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase()) + col(MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY)).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase(),
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase(),
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase(),
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase(),
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase(),
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase(),
+      (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase()
     )
 
-    val result = resultDF.select(col(DEVICE_ID), col(CUSTOMER_ID), col(LAST_CLICK_DATE), col(CLICK_7), col(CLICK_15), col(CLICK_30), col(CLICK_LIFETIME),
-      col(CLICK_MONDAY), col(CLICK_TUESDAY), col(CLICK_WEDNESDAY), col(CLICK_THURSDAY),
-      col(CLICK_FRIDAY), col(CLICK_SATURDAY), col(CLICK_SUNDAY), col(CLICKED_TWICE),
-      Udf.maxClickDayName(col(CLICK_MONDAY), col(CLICK_TUESDAY), col(CLICK_WEDNESDAY), col(CLICK_THURSDAY), col(CLICK_FRIDAY), col(CLICK_SATURDAY), col(CLICK_SUNDAY)) as MOST_CLICK_DAY
+    val result = resultDF.select(col(DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.LAST_CLICK_DATE), col(DevicesReactionsVariables.CLICK_7), col(DevicesReactionsVariables.CLICK_15), col(DevicesReactionsVariables.CLICK_30), col(DevicesReactionsVariables.CLICK_LIFETIME),
+      col(DevicesReactionsVariables.CLICK_MONDAY), col(DevicesReactionsVariables.CLICK_TUESDAY), col(DevicesReactionsVariables.CLICK_WEDNESDAY), col(DevicesReactionsVariables.CLICK_THURSDAY),
+      col(DevicesReactionsVariables.CLICK_FRIDAY), col(DevicesReactionsVariables.CLICK_SATURDAY), col(DevicesReactionsVariables.CLICK_SUNDAY), col(DevicesReactionsVariables.CLICKED_TWICE),
+      Udf.maxClickDayName(col(DevicesReactionsVariables.CLICK_MONDAY), col(DevicesReactionsVariables.CLICK_TUESDAY), col(DevicesReactionsVariables.CLICK_WEDNESDAY), col(DevicesReactionsVariables.CLICK_THURSDAY), col(DevicesReactionsVariables.CLICK_FRIDAY), col(DevicesReactionsVariables.CLICK_SATURDAY), col(DevicesReactionsVariables.CLICK_SUNDAY)) as DevicesReactionsVariables.MOST_CLICK_DAY
     )
     logger.info("DeviceReaction for :" + incrDate + "processed")
     (result, reducedIncr)
@@ -139,47 +147,47 @@ object DevicesReactions extends Logging {
   def effectiveDFFull(incremental: DataFrame, effective7: DataFrame, effective15: DataFrame, effective30: DataFrame): DataFrame = {
     //send DataFrames after using reduce
 
-    val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7, DevicesReactionsSchema.reducedDF, DEVICE_ID)
+    val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7, DevicesReactionsSchema.reducedDF, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
     val joined_7_15_summary = joined_7_15.select(
-      coalesce(col(DEVICE_ID), col(MergeUtils.NEW_ + DEVICE_ID)) as DEVICE_ID,
-      coalesce(col(LOGIN_USER_ID), col(LOGIN_USER_ID)) as LOGIN_USER_ID,
-      col(REACTION) as EFFECTIVE_7_DAYS,
-      col(MergeUtils.NEW_ + REACTION) as EFFECTIVE_15_DAYS)
+      coalesce(col(DevicesReactionsVariables.DEVICE_ID), col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
+      coalesce(col(DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
+      col(DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
+      col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_15_DAYS)
       .na.fill(0)
 
-    val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary, DevicesReactionsSchema.joined_7_15, DEVICE_ID)
+    val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary, DevicesReactionsSchema.joined_7_15, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
     val joined_7_15_30_summary = joined_7_15_30.select(
-      coalesce(col(MergeUtils.NEW_ + DEVICE_ID), col(DEVICE_ID)) as DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + LOGIN_USER_ID), col(LOGIN_USER_ID)) as LOGIN_USER_ID,
-      col(EFFECTIVE_7_DAYS) as EFFECTIVE_7_DAYS,
-      col(EFFECTIVE_15_DAYS) as EFFECTIVE_15_DAYS,
-      col(MergeUtils.NEW_ + REACTION) as EFFECTIVE_30_DAYS)
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
+      col(DevicesReactionsVariables.EFFECTIVE_7_DAYS) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
+      col(DevicesReactionsVariables.EFFECTIVE_15_DAYS) as DevicesReactionsVariables.EFFECTIVE_15_DAYS,
+      col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_30_DAYS)
       .na.fill(0)
 
-    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary, DevicesReactionsSchema.joined_7_15_30, DEVICE_ID)
+    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary, DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
     val joinedAllSummary = joinedAll.select(
-      coalesce(col(MergeUtils.NEW_ + DEVICE_ID), col(DEVICE_ID)) as DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + LOGIN_USER_ID), col(LOGIN_USER_ID)) as LOGIN_USER_ID,
-      col(MergeUtils.NEW_ + REACTION) - col(EFFECTIVE_7_DAYS) as EFFECTIVE_7_DAYS,
-      col(MergeUtils.NEW_ + REACTION) - col(EFFECTIVE_15_DAYS) as EFFECTIVE_15_DAYS,
-      col(MergeUtils.NEW_ + REACTION) - col(EFFECTIVE_30_DAYS) as EFFECTIVE_30_DAYS,
-      col(MergeUtils.NEW_ + REACTION) as CLICKED_TODAY)
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
+      coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
+      col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) - col(DevicesReactionsVariables.EFFECTIVE_7_DAYS) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
+      col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) - col(DevicesReactionsVariables.EFFECTIVE_15_DAYS) as DevicesReactionsVariables.EFFECTIVE_15_DAYS,
+      col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) - col(DevicesReactionsVariables.EFFECTIVE_30_DAYS) as DevicesReactionsVariables.EFFECTIVE_30_DAYS,
+      col(MergeUtils.NEW_ + DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.CLICKED_TODAY)
       .na.fill(0)
 
     return joinedAllSummary
   }
 
   /**
-   * @param df DevicesReactions DataFrame with columns(LOGIN_USER_ID,DEVICE_ID,REACTION) & other columns are optional
-   * @return reduced df with DEVICE_ID as primary key and sum(REACTIONS) evaluated for each key & LOGIN_USER_ID taken
+   * @param df DevicesReactions DataFrame with columns(CUSTOMER_ID,DEVICE_ID,REACTION) & other columns are optional
+   * @return reduced df with DEVICE_ID as primary key and sum(REACTIONS) evaluated for each key & CUSTOMER_ID taken
    */
   def reduce(df: DataFrame): DataFrame = {
     if (df == null) {
       logger.info("DataFrame df is null, returning null")
       return null
     }
-    return df.select(LOGIN_USER_ID, DEVICE_ID, REACTION).groupBy(DEVICE_ID, LOGIN_USER_ID).agg(max(LOGIN_USER_ID) as LOGIN_USER_ID, sum(REACTION).cast(IntegerType) as REACTION)
-      .select(LOGIN_USER_ID, DEVICE_ID, REACTION)
+    return df.select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID).agg(sum(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
+      .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION)
   }
 
 }

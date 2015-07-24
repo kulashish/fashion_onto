@@ -35,7 +35,8 @@ object DataWriter extends Logging {
    */
   def writeParquet(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String) {
     val writePath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
-    df.write.parquet(writePath)
+    if (canWrite(mode, writePath))
+      df.write.parquet(writePath)
   }
 
   def canWrite(saveMode: String, savePath: String): Boolean = {
