@@ -2,9 +2,9 @@ package com.jabong.dap.model.clickstream
 
 import java.util.Calendar
 
-import com.jabong.dap.common.{Spark, SharedSparkContext}
-import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, VariableMethods}
-import org.apache.spark.sql.{DataFrame, SQLContext,Row}
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
+import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, VariableMethods }
+import org.apache.spark.sql.{ DataFrame, SQLContext, Row }
 import org.scalatest.FlatSpec
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.rdd.RDD
@@ -40,17 +40,16 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
     assert(dailyIncrementalSKUs.count() == 12)
   }
 
-
   "merged data " should "have onlu 2 skus matching in 2-30 days" in {
-    var surf3Variable = GetSurfVariables.ProcessSurf3Variable(YesterMergedData,dailyIncrementalSKUs)
+    var surf3Variable = GetSurfVariables.ProcessSurf3Variable(YesterMergedData, dailyIncrementalSKUs)
     assert(surf3Variable.count() == 2)
   }
 
   /**
    * Today's merge should only have the data for last 29 days and should filyet out the data before that
-    */
+   */
   "Today's merge" should "have 5 rows" in {
-    var mergeForTom = GetSurfVariables.mergeSurf3Variable(hiveContext,YesterMergedData,dailyIncrementalSKUs,"18/07/2015")
+    var mergeForTom = GetSurfVariables.mergeSurf3Variable(hiveContext, YesterMergedData, dailyIncrementalSKUs, "18/07/2015")
     assert(mergeForTom.count() == 5)
   }
 

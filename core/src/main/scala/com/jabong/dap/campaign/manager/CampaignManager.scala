@@ -60,7 +60,6 @@ object CampaignManager extends Serializable with Logging {
   //      }
   //    }
 
-
   def main(args: Array[String]) {
     val liveRetargetCampaign = new LiveRetargetCampaign()
     val conf = new SparkConf().setAppName("CampaignTest").set("spark.driver.allowMultipleContexts", "true")

@@ -70,4 +70,8 @@ object CustomerVariables {
   //for renaming column name
   val NEW_ = "new_"
 
+  val APP_FILTER = "_app_"
+  val APP_TYPE = "app_type"
+  val RESPONSYS_ID = "responsys_id"
+
 }
