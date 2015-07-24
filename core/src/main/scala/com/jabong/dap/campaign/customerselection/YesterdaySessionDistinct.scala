@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.variables.CustomerPageVisitVariables
 import com.jabong.dap.common.udf.Udf
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -10,7 +11,7 @@ import org.apache.spark.sql.functions._
  *
  * Input - (user, actual_visit_id, brower_id, domain, [list of skus])
  */
-class YesterdaySessionDistinct extends CustomerSelector {
+class YesterdaySessionDistinct extends CustomerSelector with Logging {
 
   /**
    * Surf6 - viewed more than 5 distinct skus in the actual_visit_id
@@ -18,6 +19,14 @@ class YesterdaySessionDistinct extends CustomerSelector {
    * @return
    */
   override def customerSelection(customerSurfData: DataFrame): DataFrame = {
+
+    if (customerSurfData == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
 
     val dfDistinctSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),

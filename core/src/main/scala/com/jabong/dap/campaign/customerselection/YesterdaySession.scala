@@ -4,6 +4,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.{ ItrVariables, CustomerPageVisitVariables }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 /**
@@ -12,7 +13,7 @@ import org.apache.spark.sql.functions._
  *
  * Input - (user, actual_visit_id, brower_id, domain, [list of skus])
  */
-class YesterdaySession extends CustomerSelector {
+class YesterdaySession extends CustomerSelector with Logging {
 
   /**
    * Surf1 - viewed same sku in the actual_visit_id
@@ -20,6 +21,14 @@ class YesterdaySession extends CustomerSelector {
    * @return
    */
   override def customerSelection(customerSurfData: DataFrame): DataFrame = {
+
+    if (customerSurfData == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
 
     val dfRepeatedSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),
@@ -38,6 +47,14 @@ class YesterdaySession extends CustomerSelector {
    */
   override def customerSelection(customerSurfData: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
 
+    if (customerSurfData == null || dfYesterdayItrData == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
+
     val dfDistinctSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),
       col(CustomerPageVisitVariables.ACTUAL_VISIT_ID),
@@ -50,6 +67,7 @@ class YesterdaySession extends CustomerSelector {
       ItrVariables.SKU,
       ItrVariables.BRICK
     )
+
     val dfJoin = dfDistinctSku.join(
       yesterdayItrData,
       dfDistinctSku(CustomerPageVisitVariables.PRODUCT_SKU) === yesterdayItrData(ItrVariables.SKU),
