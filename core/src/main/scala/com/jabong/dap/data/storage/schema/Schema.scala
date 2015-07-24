@@ -1,5 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
+import com.jabong.dap.common.constants.campaign.CampaignMerge
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -235,4 +236,10 @@ object Schema {
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
+  val campaignOutput =  StructType(Array(
+    StructField(CampaignMerge.FK_CUSTOMER, IntegerType, true),
+    StructField(CampaignMerge.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMerge.REF_SKU1, StringType, true),
+    StructField(CampaignMerge.REF_SKU2,StringType, true)
+  ))
 }
