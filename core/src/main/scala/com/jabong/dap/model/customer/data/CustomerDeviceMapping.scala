@@ -4,9 +4,7 @@ import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.Spark
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
-import org.apache.spark.{ SparkConf}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
