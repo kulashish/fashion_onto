@@ -61,3 +61,4 @@ object GetData extends Logging {
     println("Data written successfully using query: " + dbTableQuery)
   }
 }
+

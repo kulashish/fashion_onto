@@ -5,7 +5,7 @@ import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.custorder.CustOrderVarMerger
-import com.jabong.dap.model.product.itr.Itr
+import com.jabong.dap.model.product.itr.{BasicITR, Itr}
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
 import scopt.OptionParser
@@ -111,6 +111,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
+      case "basicItr" => BasicITR.start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
       case "covariables" => new CustOrderVarMerger().start(params.coVarJson)
