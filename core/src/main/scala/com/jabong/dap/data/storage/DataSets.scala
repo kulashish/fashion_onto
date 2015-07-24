@@ -73,6 +73,8 @@ object DataSets {
   // modes for writing data
   val FULL = "full"
 
+  val HISTORICAL = "historical"
+
   val CSV = "csv"
   val PARQUET = "parquet"
   val ORC = "orc"
