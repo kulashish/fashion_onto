@@ -21,8 +21,8 @@ class FollowUp extends SkuSelector with Logging {
 
     val filteredSku = customerSkuData.join(itrData, customerSkuData(ProductVariables.SKU_SIMPLE) === itrData(ProductVariables.SKU_SIMPLE), "inner")
       .filter(ProductVariables.STOCK + " >= " + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER), 
-        customerSkuData(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU, 
+      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
+        customerSkuData(ProductVariables.SKU_SIMPLE),
         itrData(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
 
     logger.info("Join selected customer sku with sku data and filter by stock>=" + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
