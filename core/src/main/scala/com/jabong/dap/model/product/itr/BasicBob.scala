@@ -35,10 +35,10 @@ object BasicBob {
     // direct stock from catalog stock table (without reserved calculations)
 
     val quantityDF = simpleDF.join(
-        Model.catalogStock.select("fk_catalog_simple", "quantity"),
-        simpleDF.col(ITR.ID_CATALOG_SIMPLE) === Model.catalogStock.col("fk_catalog_simple"),
-        "left_outer"
-      )
+      Model.catalogStock.select("fk_catalog_simple", "quantity"),
+      simpleDF.col(ITR.ID_CATALOG_SIMPLE) === Model.catalogStock.col("fk_catalog_simple"),
+      "left_outer"
+    )
 
     val config = Model.config.select(
       "id_catalog_config",
@@ -99,7 +99,6 @@ object BasicBob {
       )
   }
 
-
   /**
    * Prepare front end product url
    *
@@ -109,8 +108,7 @@ object BasicBob {
     ("%s-%s-d").format(brandUrlKey.replaceAll("/", ""), productName.replaceAll(" ", "-"), idCatalogConfig)
   }
 
-
-  val actualPrice = udf((specialPrice: java.math.BigDecimal , mrpPrice : java.math.BigDecimal, specialFromDate:Date,specialToDate:Date) => correctPrice(specialPrice: java.math.BigDecimal , mrpPrice : java.math.BigDecimal, specialFromDate:Date,specialToDate:Date))
+  val actualPrice = udf((specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date) => correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date))
   /**
    *
    * @param specialPrice
@@ -119,12 +117,12 @@ object BasicBob {
    * @param specialToDate
    * @return
    */
-  def correctPrice(specialPrice: java.math.BigDecimal , mrpPrice : java.math.BigDecimal, specialFromDate:Date,specialToDate:Date): java.math.BigDecimal ={
-    if(specialFromDate == null || specialToDate == null || specialPrice ==null || specialPrice ==0.0) {
+  def correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date): java.math.BigDecimal = {
+    if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == 0.0) {
       return mrpPrice
     }
 
-    if(mrpPrice == null || mrpPrice == 0.0) {
+    if (mrpPrice == null || mrpPrice == 0.0) {
       return specialPrice
     }
 
@@ -132,7 +130,7 @@ object BasicBob {
 
     val currentTime = cal.getTime().getTime
 
-    if(currentTime >= specialFromDate.getTime && currentTime <= specialToDate.getTime) {
+    if (currentTime >= specialFromDate.getTime && currentTime <= specialToDate.getTime) {
       return specialPrice
     }
     return mrpPrice
