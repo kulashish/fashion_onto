@@ -26,6 +26,7 @@ object BasicITR {
         ITR.SPECIAL_MARGIN -> 0.00,
         ITR.MARGIN -> 0.00,
         ITR.SPECIAL_PRICE -> 0.00,
+        ITR.ACTUAL_PRICE -> 0.00,
         ITR.QUANTITY -> 0
       ))
 
@@ -35,6 +36,7 @@ object BasicITR {
       groupBy(ITR.CONFIG_SKU).
       agg(
         first(ITR.BRAND_NAME) as ITR.BRAND_NAME,
+        avg(ITR.ACTUAL_PRICE) as ITR.ACTUAL_PRICE,
         avg(ITR.SPECIAL_PRICE) as ITR.SPECIAL_PRICE,
         //first(ITR.PRICE_BAND) as ITR.PRICE_BAND,
         //first(ITR.GENDER) as ITR.GENDER,
