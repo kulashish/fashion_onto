@@ -18,7 +18,7 @@ object BasicBob {
    * @return DataFrame
    */
   def getBobColumns(): DataFrame = {
-    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
+    val todayDate = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT)
     val simpleDF = Model.simple.select(
       Model.simple("id_catalog_simple"),
       actualPrice(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date")) as ("actual_price"),
@@ -101,7 +101,9 @@ object BasicBob {
         ITR.PRODUCT_URL,
         ITR.SPECIAL_MARGIN,
         ITR.MARGIN,
-        ITR.BRAND_NAME
+        ITR.BRAND_NAME,
+        ITR.ACTUAL_PRICE,
+        ITR.ITR_DATE
       )
   }
 

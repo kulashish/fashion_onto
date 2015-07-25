@@ -54,4 +54,5 @@ object ITR {
   val SUPPLIER_STATUS = "supplierStatus"
   val PRICE = "price"
   val ACTUAL_PRICE = "actual_price"
+  val ITR_DATE = "itr_date"
 }
