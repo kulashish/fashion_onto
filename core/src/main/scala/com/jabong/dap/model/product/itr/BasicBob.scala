@@ -3,6 +3,7 @@ package com.jabong.dap.model.product.itr
 import java.sql.Date
 import java.util.Calendar
 
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -17,16 +18,21 @@ object BasicBob {
    * @return DataFrame
    */
   def getBobColumns(): DataFrame = {
+    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
     val simpleDF = Model.simple.select(
-      "id_catalog_simple",
-      "special_price",
-      "special_to_date",
-      "special_from_date",
-      "sku",
-      "fk_catalog_config",
-      "barcode_ean"
+      Model.simple("id_catalog_simple"),
+      actualPrice(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date")) as ("actual_price"),
+      Model.simple("special_price"),
+      Model.simple("price"),
+      Model.simple("special_to_date"),
+      Model.simple("special_from_date"),
+      Model.simple("sku"),
+      Model.simple("fk_catalog_config"),
+      Model.simple("barcode_ean"),
+      lit(todayDate) as "itr_date"
     ).withColumnRenamed("id_catalog_simple", ITR.ID_CATALOG_SIMPLE).
       withColumnRenamed("special_price", ITR.SPECIAL_PRICE).
+      withColumnRenamed("price", ITR.PRICE).
       withColumnRenamed("special_to_date", ITR.SPECIAL_TO_DATE).
       withColumnRenamed("special_from_date", ITR.SPECIAL_FROM_DATE).
       withColumnRenamed("sku", ITR.SIMPLE_SKU).
@@ -112,17 +118,17 @@ object BasicBob {
   /**
    *
    * @param specialPrice
-   * @param mrpPrice
+   * @param price
    * @param specialFromDate
    * @param specialToDate
    * @return
    */
-  def correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date): java.math.BigDecimal = {
+  def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date): java.math.BigDecimal = {
     if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == 0.0) {
-      return mrpPrice
+      return price
     }
 
-    if (mrpPrice == null || mrpPrice == 0.0) {
+    if (price == null || price == 0.0) {
       return specialPrice
     }
 
@@ -133,7 +139,7 @@ object BasicBob {
     if (currentTime >= specialFromDate.getTime && currentTime <= specialToDate.getTime) {
       return specialPrice
     }
-    return mrpPrice
+    return price
 
   }
 }
