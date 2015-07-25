@@ -34,4 +34,22 @@ object CampaignCommon {
 
   val PRIORITY = "priority"
 
+  val campaignMailTypeMap = (
+    "cancelReTarget" -> 46,
+    "returnReTarget" -> 47,
+    "acartDaily" -> 42,
+    "wishListFollowUp" -> 53,
+    "acartIOD" -> 45,
+    "wishListIOD" -> 54,
+    "acartLowStock" -> 44,
+    "wishListLowStock" -> 55,
+    "acartFollowUp" -> 43,
+    "surf2" -> 57,
+    "surf6" -> 71,
+    "invalidFollowUp" -> 43,
+    "invalidLowStock" -> 49,
+    "surf1" -> 56,
+    "surf3" -> 58
+  )
+
 }
