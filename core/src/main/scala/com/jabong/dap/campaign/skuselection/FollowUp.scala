@@ -35,4 +35,6 @@ class FollowUp extends SkuSelector with Logging {
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
 }
