@@ -4,7 +4,8 @@ import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -117,6 +118,11 @@ object CampaignInput extends Logging {
     logger.info("Reading last day all campaigns data from hdfs")
    // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
     val campaignData = Spark.getSqlContext().read.parquet("/data/output/campaigns/*/2015/07/26/")
-    return campaignData
+    val allCampaignData = campaignData.select(
+      campaignData(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.FK_CUSTOMER),
+      campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      campaignData(CampaignMergedFields.REF_SKU1)
+    
+    return allCampaignData
   }
 }
