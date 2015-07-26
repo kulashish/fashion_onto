@@ -32,15 +32,15 @@ class FollowUpTest extends FlatSpec with SharedSparkContext {
     val skuData = followUp.skuFilter(customerSelected, null)
     assert(skuData == null)
   }
- //FIXME: change the test cases to pass
-    "Invalid customer selected data and last days itr " should "ref skus of fk_customer" in {
-      val refSkus = followUp.skuFilter(customerSelected, itrData)
-      val refSkuList = refSkus.filter(CustomerVariables.FK_CUSTOMER + " = " + 8552648)
-        .select(CampaignMergedFields.REF_SKU1).collect().toString
-      val expectedData =  "ES418WA79UAUINDFAS"
-      assert(refSkus.count() == 1)
+  //FIXME: change the test cases to pass
+  "Invalid customer selected data and last days itr " should "ref skus of fk_customer" in {
+    val refSkus = followUp.skuFilter(customerSelected, itrData)
+    val refSkuList = refSkus.filter(CustomerVariables.FK_CUSTOMER + " = " + 8552648)
+      .select(CampaignMergedFields.REF_SKU1).collect().toString
+    val expectedData = "ES418WA79UAUINDFAS"
+    assert(refSkus.count() == 1)
     //  assert(refSkuList.head === expectedData)
 
-    }
+  }
 
 }

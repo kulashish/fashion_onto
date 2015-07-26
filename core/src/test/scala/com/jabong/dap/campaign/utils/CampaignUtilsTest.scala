@@ -33,7 +33,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    refSkuInput = JsonUtils.readFromJson("campaign","ref_sku_input",Schema.refSkuInput)
+    refSkuInput = JsonUtils.readFromJson("campaign", "ref_sku_input", Schema.refSkuInput)
     customerSelected = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected.json")
     customerSelectedShortlist = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected_shortlist.json")
     salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
@@ -67,30 +67,29 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     assert(refSkus == null)
   }
 
+  "Generate reference skus with refernce sku input " should "return max 2 reference skus per customer sorted with price" in {
+    val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
+    val refSkuValues = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=16509341").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
+    val expectedData = Row(500.0, "IM794WA05ZGKINDFAS-4434414")
+    assert(refSkuValues.head === expectedData)
+    assert(refSkuValues.size == 2)
+  }
 
-    "Generate reference skus with refernce sku input " should "return max 2 reference skus per customer sorted with price" in {
-      val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
-      val refSkuValues = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=16509341").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
-      val expectedData = Row(500.0, "IM794WA05ZGKINDFAS-4434414")
-      assert(refSkuValues.head === expectedData)
-      assert(refSkuValues.size == 2)
-    }
+  "Generate reference skus with refernce sku input " should "return max 2 reference skus per customer sorted with price and take care of duplicate skus" in {
+    val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=5242607").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
+    val expectedData = Row(200.0, "VA613SH24VHFINDFAS-3716539")
+    assert(refSkuFirst.head === (expectedData))
+    //  assert(refSkuFirst.head._2 == "VA613SH24VHFINDFAS-3716539")
+  }
 
-    "Generate reference skus with refernce sku input " should "return max 2 reference skus per customer sorted with price and take care of duplicate skus" in {
-      val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
-      val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=5242607").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
-      val expectedData = Row(200.0, "VA613SH24VHFINDFAS-3716539")
-      assert(refSkuFirst.head === (expectedData))
-      //  assert(refSkuFirst.head._2 == "VA613SH24VHFINDFAS-3716539")
-    }
-
-    "Generate reference skus with refernce sku input " should "return max 1 reference skus per customer sorted with price" in {
-      val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 1)
-      val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
-      val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
-      assert(refSkuFirst.head === expectedData)
-      assert(refSkuFirst.size == 1)
-    }
+  "Generate reference skus with refernce sku input " should "return max 1 reference skus per customer sorted with price" in {
+    val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 1)
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
+    val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
+    assert(refSkuFirst.head === expectedData)
+    assert(refSkuFirst.size == 1)
+  }
 
   "No input Data for sku simple Not Bought" should "return null" in {
     val skuNotBought = CampaignUtils.skuSimpleNOTBought(null, salesOrder, salesOrderItem)

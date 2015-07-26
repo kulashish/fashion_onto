@@ -6,7 +6,7 @@ import java.util.{ Date, Calendar }
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
@@ -32,7 +32,7 @@ object CampaignUtils extends Logging {
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(
-      Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
+        Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
         skuData(CustomerVariables.FK_CUSTOMER),
         skuData(ProductVariables.SPECIAL_PRICE)
       )
@@ -52,7 +52,7 @@ object CampaignUtils extends Logging {
       return null
     }
 
-//    refSkuData.printSchema()
+    //    refSkuData.printSchema()
 
     val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -272,7 +272,7 @@ object CampaignUtils extends Logging {
 
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
-      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null" )
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null")
       .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
 
     logger.info("Filtered all the sku simple which has been bought")
@@ -359,21 +359,20 @@ object CampaignUtils extends Logging {
     return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
   }
 
+  def addCampaignMailType(campaignOutput: DataFrame, campaignName: String): DataFrame = {
+    if (campaignOutput == null || campaignName == null) {
+      logger.error("campaignOutput or campaignName is null")
+      return null
+    }
 
-def addCampaignMailType(campaignOutput:DataFrame,campaignName:String): DataFrame ={
-  if(campaignOutput ==null || campaignName ==null){
-    logger.error("campaignOutput or campaignName is null")
-    return null
+    if (!(CampaignCommon.campaignMailTypeMap.contains(campaignName))) {
+      logger.error("Incorrect campaignName")
+      return null
+    }
+
+    val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
+    return campaignOutputWithMailType
   }
-
-  if(!(CampaignCommon.campaignMailTypeMap.contains(campaignName))) {
-    logger.error("Incorrect campaignName")
-    return null
-  }
-
-  val campaignOutputWithMailType =  campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName,0)))
-  return campaignOutputWithMailType
-}
 
 }
 

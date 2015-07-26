@@ -75,7 +75,7 @@ class ReturnCancel extends LiveCustomerSelector {
     // 1. sales_order subset: last day order created at, customers in the customerLatestItemsData
     // 2. on that, group on fk_customer, order by created_by and create (customer, last_sales_order_id, last_order_time)
 
-    val latestCustomerOrders = customerOrderData.withColumn("DaysPresent",CampaignUtils.lastDayTimeDifference(customerOrderData(SalesOrderVariables.CREATED_AT)))
+    val latestCustomerOrders = customerOrderData.withColumn("DaysPresent", CampaignUtils.lastDayTimeDifference(customerOrderData(SalesOrderVariables.CREATED_AT)))
       .filter("DaysPresent <= 1")
       .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER).agg($"${SalesOrderVariables.FK_CUSTOMER}",
         first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.FK_SALES_ORDER,

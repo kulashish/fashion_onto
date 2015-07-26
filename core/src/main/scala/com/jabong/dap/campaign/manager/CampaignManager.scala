@@ -1,8 +1,8 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.{CampaignOutput, CampaignInput}
-import com.jabong.dap.campaign.utils.{CampaignUtils, CampaignUdfs}
+import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
+import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
@@ -236,44 +236,44 @@ object CampaignManager extends Serializable with Logging {
    * Merges all the campaign output based on priority
    * @param campaignJsonPath
    */
-    def startPushCampaignMerge(campaignJsonPath: String) = {
-      var json:JValue=null
-      val validated = try {
-        val conf = new Configuration()
-        val fileSystem = FileSystem.get(conf)
-        implicit val formats = net.liftweb.json.DefaultFormats
-        val path = new Path(campaignJsonPath)
-        json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-     //   campaignInfo.campaigns = json.extract[campaignConfig]
-       // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
-        true
-      } catch {
-        case e: ParseException =>
-          logger.error("Error while parsing JSON: " + e.getMessage)
-          false
+  def startPushCampaignMerge(campaignJsonPath: String) = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
 
-        case e: IllegalArgumentException =>
-          logger.error("Error while validating JSON: " + e.getMessage)
-          false
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
 
-        case e: Exception =>
-          logger.error("Some unknown error occurred: " + e.getMessage)
-          throw e
-          false
-      }
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
 
-      if (validated) {
-        createCampaignMaps(json)
-        val allCampaignsData = CampaignInput.loadAllCampaignsData()
-        val mergedData = campaignMerger(allCampaignsData)
-        CampaignOutput.saveCampaignData(mergedData,CampaignCommon.BASE_PATH + "/"
-          + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
-//        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
-//          COVarJobConfig.coVarInfo = coVarJob
-          //        coVarJob.source match {
-          //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
-          //          case _ => logger.error("Unknown table source.")
-          //        }
-        }
-      }
+    if (validated) {
+      createCampaignMaps(json)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData()
+      val mergedData = campaignMerger(allCampaignsData)
+      CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
+        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
+      //          COVarJobConfig.coVarInfo = coVarJob
+      //        coVarJob.source match {
+      //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
+      //          case _ => logger.error("Unknown table source.")
+      //        }
+    }
+  }
 }
