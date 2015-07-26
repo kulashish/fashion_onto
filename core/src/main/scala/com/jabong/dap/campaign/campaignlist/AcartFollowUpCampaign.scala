@@ -22,8 +22,11 @@ class AcartFollowUpCampaign {
     val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
     val refSkus = followUp.skuFilter(selectedCustomers, itrData)
 
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus,CampaignCommon.ACART_FOLLOWUP_CAMPAIGN)
+
+
     //save campaign Output
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
+    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
       + CampaignCommon.ACART_FOLLOWUP_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
 
   }
