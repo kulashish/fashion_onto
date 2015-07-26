@@ -22,8 +22,11 @@ class AcartLowStockCampaign {
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
     val refSkus = lowStock.skuFilter(selectedCustomers, yesterdayItrData)
 
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus,CampaignCommon.ACART_LOWSTOCK_CAMPAIGN)
+
+
     //save campaign Output
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
+    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
       + CampaignCommon.ACART_LOWSTOCK_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
 
   }
