@@ -93,6 +93,16 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
+  def loadItrSimpleData() = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last day basic itr data from hdfs")
+    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
+    val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+      itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
+      itrData(ITR.QUANTITY) as ProductVariables.STOCK)
+    filteredItr
+  }
+
   def loadProductData(): DataFrame = {
     return null
   }
