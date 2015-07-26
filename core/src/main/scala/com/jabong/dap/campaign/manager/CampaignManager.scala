@@ -225,9 +225,9 @@ object CampaignManager extends Serializable with Logging {
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1))
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        first(CampaignCommon.PRIORITY) as(CampaignCommon.PRIORITY),
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
 
     return campaignMerged
   }
