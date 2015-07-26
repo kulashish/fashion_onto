@@ -20,7 +20,7 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    pastCampaignCheck = new PastCampaignCheck
+    pastCampaignCheck = new PastCampaignCheck()
     pastCampaignData = sqlContext.read.json("src/test/resources/campaign/traceability/merged_campaign.json")
     customerSelected = sqlContext.read.json("src/test/resources/campaign/traceability/customer_selected.json")
   }
