@@ -356,6 +356,7 @@ object CampaignUtils extends Logging {
       logger.error(errorString)
       return CampaignCommon.VERY_LOW_PRIORITY
     }
+    println("Size of map"+CampaignManager.campaignMailTypeMap.size)
     return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
   }
 
