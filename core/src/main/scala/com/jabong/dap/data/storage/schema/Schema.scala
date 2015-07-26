@@ -322,5 +322,10 @@ object Schema {
     StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true)
   ))
 
+  val refSkuInput = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
+  ))
 
 }

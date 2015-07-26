@@ -2,47 +2,47 @@
   "pushBasePath":"misc/pushCampaignTestRun",
   "pushCampaignList": [
     {
-      "campaignName": "cancelReTarget",
+      "campaignName": "cancel_retarget",
       "priority": 1,
       "mailType": 46
     },
     {
-      "campaignName": "returnReTarget",
+      "campaignName": "return_retarget",
       "priority": 2,
       "mailType": 47
     },
     {
-      "campaignName": "acartDaily",
+      "campaignName": "acart_daily",
       "priority": 3,
       "mailType": 42
     },
     {
-      "campaignName": "wishListFollowUp",
+      "campaignName": "wishlist_followup",
       "priority": 4,
       "mailType": 53
     },
     {
-      "campaignName": "acartIOD",
+      "campaignName": "acart_iod",
       "priority": 5,
       "mailType": 45
     },
     {
-      "campaignName": "wishListIOD",
+      "campaignName": "wishlist_iod",
       "priority": 6,
       "mailType": 54
     },
     {
-      "campaignName": "acartLowStock",
+      "campaignName": "acart_lowstock",
       "priority": 7,
       "mailType": 44
     },
     {
-      "campaignName": "wishListLowStock",
+      "campaignName": "wishlist_lowstock",
       "priority": 8,
       "mailType": 55
     },
     {
-      "campaignName": "acartFollowUp",
+      "campaignName": "acart_followup",
       "priority": 9,
       "mailType": 43
     },
@@ -57,12 +57,12 @@
       "mailType": 71
     },
     {
-      "campaignName": "invalidFollowUp",
+      "campaignName": "invalid_followup",
       "priority": 12,
       "mailType": 48
     },
     {
-      "campaignName": "invalidLowStock",
+      "campaignName": "invalid_lowstock",
       "priority": 13,
       "mailType": 49
     },

@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.schema.Schema
@@ -33,7 +34,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
 
   "Correct json String" should "return true" in {
     val status = CampaignManager.createCampaignMaps(json)
-    assert(CampaignManager.campaignPriorityMap.contains("cancelReTarget") == true)
+    assert(CampaignManager.campaignPriorityMap.contains(CampaignCommon.CANCEL_RETARGET_CAMPAIGN) == true)
     assert(status == true)
   }
 
