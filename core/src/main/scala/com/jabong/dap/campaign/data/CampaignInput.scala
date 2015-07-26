@@ -119,10 +119,10 @@ object CampaignInput extends Logging {
    // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
     val campaignData = Spark.getSqlContext().read.parquet("/data/output/campaigns/*/2015/07/26/")
     val allCampaignData = campaignData.select(
-      campaignData(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.FK_CUSTOMER),
+      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.FK_CUSTOMER),
       campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-      campaignData(CampaignMergedFields.REF_SKU1)
-    
+      campaignData(CampaignMergedFields.REF_SKU1))
+
     return allCampaignData
   }
 }
