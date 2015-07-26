@@ -97,4 +97,14 @@ object CampaignInput extends Logging {
     return null
   }
 
+  /**
+   * Load all campaign data
+   * @return dataframe with call campaigns data
+   */
+  def loadAllCampaignsData():DataFrame ={
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last day all campaigns data from hdfs")
+    val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*", DataSets.DAILY_MODE, dateYesterday)
+    return campaignData
+  }
 }
