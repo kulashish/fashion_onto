@@ -83,7 +83,7 @@ object SurfVariablesMain extends java.io.Serializable {
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
 
-    val userDeviceMapPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "userDeviceMap", "daily", yesterdayDate)
+    val userDeviceMapPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", DataSets.USER_DEVICE_MAP_APP, "daily", yesterdayDate)
     var surf1VariablePath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", "daily", yesterdayDate)
 
     var UserObj = new GroupData(hiveContext, pagevisit)
