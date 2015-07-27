@@ -1,19 +1,22 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
+import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.TimeUtils
-import com.jabong.dap.data.acq.common.{ CampaignDetail, CampaignConfig, CampaignInfo }
-import com.jabong.dap.data.read.DataReader
-import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ Path, FileSystem }
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
+import scala.collection.mutable
 import scala.collection.mutable.HashMap
 
 /**
@@ -25,6 +28,7 @@ object CampaignManager extends Serializable with Logging {
 
   var campaignPriorityMap = new HashMap[String, Int]
   var campaignMailTypeMap = new HashMap[String, Int]
+  var mailTypePriorityMap = new HashMap[Int, Int]
   //  def start(campaignJsonPath: String) = {
   //    val validated = try {
   //      val conf = new Configuration()
@@ -82,6 +86,7 @@ object CampaignManager extends Serializable with Logging {
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
         campaignPriorityMap.put(campaignDetails.campaignName, campaignDetails.priority)
         campaignMailTypeMap.put(campaignDetails.campaignName, campaignDetails.mailType)
+        mailTypePriorityMap.put(campaignDetails.mailType, campaignDetails.priority)
       }
 
     } catch {
@@ -118,8 +123,7 @@ object CampaignManager extends Serializable with Logging {
     val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
 
     // yesterday itr - Qty of Ref SKU to be greater than/equal to 10
-    // FIXME
-    val yesterdayItrData = null
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     val invalidFollowUp = new InvalidFollowUpCampaign()
     invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData)
@@ -143,7 +147,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderData = CampaignInput.loadFullOrderData()
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
-    val yesterdayItrData = null
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
@@ -178,13 +182,15 @@ object CampaignManager extends Serializable with Logging {
     // last30DaySalesOrderData = null
 
     // itr last 30 days
-    val last30daysItrData = null // FIXME
+    val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
 
-    val acartIOD = new AcartIODCampaign()
+    val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-  def startPushCampaignMerge(campaignJsonPath: String) = {
+  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
+
+  def startCampaignMerge(campaignJsonPath: String) = {
 
     //    val conf = new Configuration()
     //          val fileSystem = FileSystem.get(conf)
@@ -202,4 +208,77 @@ object CampaignManager extends Serializable with Logging {
   //
   //  }
 
+  /**
+   * takes union input of all campaigns and return merged campaign list
+   * @param inputCampaignsData
+   * @return
+   */
+  def campaignMerger(inputCampaignsData: DataFrame): DataFrame = {
+    if (inputCampaignsData == null) {
+      logger.error("inputCampaignData is null")
+      return null
+    }
+
+    if (CampaignManager.mailTypePriorityMap.size == 0) {
+      logger.error("priorityMap doesn't  Exists")
+      return null
+    }
+
+    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
+      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+
+    val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
+      .groupBy(CampaignMergedFields.FK_CUSTOMER)
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
+
+    return campaignMerged
+  }
+
+  /**
+   * Merges all the campaign output based on priority
+   * @param campaignJsonPath
+   */
+  def startPushCampaignMerge(campaignJsonPath: String) = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
+    if (validated) {
+      createCampaignMaps(json)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData()
+
+      val mergedData = campaignMerger(allCampaignsData)
+      CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
+        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
+      //          COVarJobConfig.coVarInfo = coVarJob
+      //        coVarJob.source match {
+      //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
+      //          case _ => logger.error("Unknown table source.")
+      //        }
+    }
+  }
 }
