@@ -33,6 +33,27 @@ object DataReader extends Logging {
   }
 
   /**
+   * Method to read raw HDFS data for a source, table and a given date and get a dataFrame for the same.
+   * WARNING: Does not Throw DataNotFound exception instead return null data frame.
+   * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
+   */
+  def getDataFrameWithNull(basePath: String, source: String, tableName: String, mode: String, date: String): DataFrame = {
+    try {
+      getDataFrame(basePath, source, tableName, mode, date)
+    } catch {
+      case e: DataNotFound =>
+        logger.error("Data not found for the date")
+        null
+      case e: ValidFormatNotFound =>
+        logger.error("Format could not be resolved for the given files in directory")
+        throw new ValidFormatNotFound
+      case e =>
+        logger.error("Some other Error found: " + e.printStackTrace)
+        null
+    }
+  }
+
+  /**
    * Method to read raw HDFS data for a source and table and get a dataFrame for the same. Checks
    * for the data for today's date. In case data is not found, checks for the data for yesterday's
    * date.
