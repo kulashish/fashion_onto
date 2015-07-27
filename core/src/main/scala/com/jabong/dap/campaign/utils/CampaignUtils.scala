@@ -4,10 +4,13 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Date, Calendar }
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
@@ -24,10 +27,18 @@ object CampaignUtils extends Logging {
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
-
+  import sqlContext.implicits._
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    val customerRefSku = skuData.groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
-      as (CampaignCommon.REF_SKUS))
+    val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+      .select(
+        Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
+        skuData(CustomerVariables.FK_CUSTOMER),
+        skuData(ProductVariables.SPECIAL_PRICE)
+      )
+    val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
+        as (CampaignMergedFields.REF_SKU1))
 
     return customerRefSku
 
@@ -41,13 +52,21 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val customerData = refSkuData.filter(ProductVariables.SKU + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
+    //    refSkuData.printSchema()
+
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+      .select(CustomerVariables.FK_CUSTOMER,
+        ProductVariables.SKU_SIMPLE,
+        ProductVariables.SPECIAL_PRICE)
+
+    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+    val customerGroup = customerSkuMap.groupByKey().
+      map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
@@ -226,6 +245,42 @@ object CampaignUtils extends Logging {
   }
 
   /**
+   * returns the skuSimple which are not bought (Not Using Updated time of sku added)
+   *
+   * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
+   *
+   * @param inputData - fk_customer, sku_simple, updated_at
+   * @param salesOrder -
+   * @param salesOrderItem
+   * @return
+   */
+  def skuSimpleNOTBought1(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        successFulOrderItems(ProductVariables.SKU) as SUCCESS_ + ProductVariables.SKU,
+        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+      )
+
+    val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null")
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+
+    logger.info("Filtered all the sku simple which has been bought")
+
+    return skuSimpleNotBoughtTillNow
+  }
+
+  /**
    * returns the skus which are not bought till Now (in reference to skus and updated_at time in inputData)
    *
    * Assumption: we are filtering based on successful orders, using the created_at timestamp in order_item table
@@ -293,6 +348,31 @@ object CampaignUtils extends Logging {
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
     logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
     return filteredData
+  }
+
+  def getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]): Int = {
+    if (mailType == 0) {
+      val errorString = ("Priority doesn't exist for mailType %d", mailType)
+      logger.error(errorString)
+      return CampaignCommon.VERY_LOW_PRIORITY
+    }
+    logger.info("ALL KEYS " + mailTypePriorityMap.values)
+    return mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
+  }
+
+  def addCampaignMailType(campaignOutput: DataFrame, campaignName: String): DataFrame = {
+    if (campaignOutput == null || campaignName == null) {
+      logger.error("campaignOutput or campaignName is null")
+      return null
+    }
+
+    if (!(CampaignCommon.campaignMailTypeMap.contains(campaignName))) {
+      logger.error("Incorrect campaignName")
+      return null
+    }
+
+    val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
+    return campaignOutputWithMailType
   }
 
 }

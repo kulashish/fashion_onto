@@ -37,9 +37,12 @@ class ReturnReTarget extends SkuSelector {
     val filteredSku = orderItemDataFrame.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " in (" + OrderStatus.RETURN
       + "," + OrderStatus.RETURN_PAYMENT_PENDING + ")")
       .orderBy(SalesOrderItemVariables.UNIT_PRICE)
-      .select(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU, SalesOrderItemVariables.UNIT_PRICE)
+      .select(
+        orderItemDataFrame(CustomerVariables.FK_CUSTOMER),
+        orderItemDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
+        orderItemDataFrame(SalesOrderItemVariables.UNIT_PRICE) as ProductVariables.SPECIAL_PRICE)
 
-    val refSku = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.PUSH_REF_SKUS)
+    val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     return refSku
   }
