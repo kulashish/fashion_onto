@@ -28,7 +28,7 @@ object Init {
     component: String = null,
     tableJson: String = null,
     mergeJson: String = null,
-    coVarJson: String = null,
+    varJson: String = null,
     pushCamapignsJson: String = null,
     config: String = null)
 
@@ -66,7 +66,7 @@ object Init {
 
       opt[String]("varJson")
         .text("Path to customer and Order variables merge job json config file.")
-        .action((x, c) => c.copy(coVarJson = x))
+        .action((x, c) => c.copy(varJson = x))
 
       opt[String]("pushCampaignsJson")
         .text("Path to push Campaigns priority config file.")
@@ -115,7 +115,7 @@ object Init {
       case "basicItr" => BasicITR.start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
-      case "covariables" => new CustOrderVarMerger().start(params.coVarJson)
+      case "variables" => new CustOrderVarMerger().start(params.varJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()

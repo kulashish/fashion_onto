@@ -1,7 +1,9 @@
 package com.jabong.dap.model.customer.data
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.data.acq.common.VarInfo
 import com.jabong.dap.data.read.{ DataNotFound, DataReader, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -36,6 +38,13 @@ object CustomerDeviceMapping extends Logging {
       coalesce(dcf(PageVisitVariables.BROWSER_ID), joinedDf(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
       coalesce(dcf(PageVisitVariables.DOMAIN), joinedDf(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN)
     joined
+  }
+
+  def start(vars: VarInfo) = {
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2,TimeConstants.DATE_FORMAT))
+    val path = OptionUtils.getOptValue(vars.path)
+    processData(prevDate, path, incrDate)
   }
 
   def processData(prevDate: String, path: String, curDate: String) {
