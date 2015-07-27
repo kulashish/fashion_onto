@@ -57,8 +57,8 @@ object DataSets {
   val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
   val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
 
-  val REACTION_IOS = "reaction_ios"
-  val REACTION_ANDROID = "reaction_android"
+  val REACTIONS_IOS = "reactions_ios"
+  val REACTIONS_ANDROID = "reactions_android"
 
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"

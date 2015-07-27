@@ -1,21 +1,19 @@
 package com.jabong.dap.model.ad4push.variables
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.VarInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
-import grizzled.slf4j.Logging
-import com.jabong.dap.common.udf.Udf
 
 /**
  * Created by Kapil.Rajak on 13/7/15.
@@ -38,10 +36,10 @@ object DevicesReactions extends Logging {
 
     val dateStr = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr, "true", ",")
+    val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, mode, dateStr, "true", ",")
     val incI = dfCorrectSchema(incIStringSchema)
 
-    val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr, "true", ",")
+    val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, mode, dateStr, "true", ",")
     val incA = dfCorrectSchema(incAStringSchema)
 
     val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
@@ -54,24 +52,24 @@ object DevicesReactions extends Logging {
 
     //getting DF
     logger.info("Reading inputs (CSVs and Parquets)")
-    val fullI = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, yesterday)
-    val b7I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before7daysString)
-    val b15I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before15daysString)
-    val b30I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before30daysString)
+    val fullI = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL, yesterday)
+    val b7I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before7daysString)
+    val b15I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
+    val b30I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
 
-    val fullA = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, yesterday)
-    val b7A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before7daysString)
-    val b15A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before15daysString)
-    val b30A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before30daysString)
+    val fullA = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, yesterday)
+    val b7A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, before7daysString)
+    val b15A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, before15daysString)
+    val b30A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, before30daysString)
 
     val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
     val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
 
-    DataWriter.writeParquet(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, dateStr)
-    DataWriter.writeParquet(incrI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr)
+    DataWriter.writeParquet(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL, dateStr)
+    DataWriter.writeParquet(incrI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, mode, dateStr)
 
-    DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, dateStr)
-    DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr)
+    DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, dateStr)
+    DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, mode, dateStr)
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
