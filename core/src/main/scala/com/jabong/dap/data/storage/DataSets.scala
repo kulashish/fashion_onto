@@ -54,8 +54,8 @@ object DataSets {
   val AD4PUSH = "ad4push"
 
   //non schema constants for ad4push
-  val IPHONE_CSV_PREFIX = "exportMessagesReactions_517_"
-  val ANDROID_CSV_PREFIX = "exportMessagesReactions_515_"
+  val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
+  val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
 
   val REACTION_IOS = "reaction_ios"
   val REACTION_ANDROID = "reaction_android"
