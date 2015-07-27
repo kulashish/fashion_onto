@@ -93,7 +93,7 @@ object DevicesReactions extends Logging {
   /**
    *
    * @param incrementalDF
-   * @param incrDate Today's date in YYYYMMDD format
+   * @param incrDate Today's date in YYYY/MM/DD format
    * @param full yesterday's perquet
    * @param reduced7 8day's before DF
    * @param reduced15 16 day's before DF
