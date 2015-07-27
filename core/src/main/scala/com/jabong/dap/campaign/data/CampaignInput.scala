@@ -100,9 +100,9 @@ object CampaignInput extends Logging {
   //FIXME : change to last 30 days
   def loadLast30DaysItrSimpleData() = {
     val thirtyDayOldEndTime = TimeUtils.getDateAfterNDays(-30, "yyyy/MM/dd")
-    logger.info("Reading last day basic itr data from hdfs")
+    logger.info("Reading last 30 days basic itr data from hdfs")
     val yesterdayOldEndTime = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    val monthYear = TimeUtils.getMonthAndYear(thirtyDayOldEndTime, "yyyy/MM")
+    val monthYear = TimeUtils.getMonthAndYear(yesterdayOldEndTime, "yyyy/MM/dd")
     var itrData:DataFrame = null
     val currentMonthItrData = getCampaignInputDataFrame("orc",DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year+"/"+monthYear.month+"/*")
     val previousMonthItrData = getCampaignInputDataFrame("orc",DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year+"/"+(monthYear.month-1)+"/*")
@@ -112,11 +112,11 @@ object CampaignInput extends Logging {
       itrData = currentMonthItrData
     }
     // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
-    val last30DayOrderData = CampaignUtils.getTimeBasedDataFrame(itrData, SalesOrderVariables.CREATED_AT, thirtyDayOldEndTime.toString, thirtyDayOldEndTime.toString)
+    val last30DayItrData = CampaignUtils.getTimeBasedDataFrame(itrData, SalesOrderVariables.CREATED_AT, yesterdayOldEndTime.toString, thirtyDayOldEndTime.toString)
 
-    val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
-      itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
-      itrData(ITR.QUANTITY) as ProductVariables.STOCK)
+    val filteredItr = last30DayItrData.select(last30DayItrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+      last30DayItrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+      last30DayItrData(ITR.QUANTITY) as ProductVariables.STOCK)
     filteredItr
   }
 
