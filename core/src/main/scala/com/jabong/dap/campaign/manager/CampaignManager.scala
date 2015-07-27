@@ -80,10 +80,8 @@ object CampaignManager extends Serializable with Logging {
     implicit val formats = net.liftweb.json.DefaultFormats
     try {
       CampaignInfo.campaigns = parsedJson.extract[CampaignConfig]
-      println("length of campaign list"+CampaignInfo.campaigns.pushCampaignList.size)
       //  var campaignDetails:CampaignDetail = null
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-        println("campaignName"+campaignDetails.campaignName)
         campaignPriorityMap.put(campaignDetails.campaignName, campaignDetails.priority)
         campaignMailTypeMap.put(campaignDetails.campaignName, campaignDetails.mailType)
         mailTypePriorityMap.put(campaignDetails.mailType, campaignDetails.priority)
@@ -269,6 +267,8 @@ object CampaignManager extends Serializable with Logging {
         exit()
       }
       val allCampaignsData = CampaignInput.loadAllCampaignsData()
+      println("ALL KEYS "+CampaignManager.mailTypePriorityMap.values)
+
       val mergedData = campaignMerger(allCampaignsData)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
         + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))

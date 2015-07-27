@@ -120,7 +120,7 @@ if ($component eq "bob") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushAbandonedCartCampaign --config $HDFS_CONF/config.json";
      run_component($component, $command);
  }elsif ($component eq "pushCampaignMerge") {
-       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --pushCamapignsJson $HDFS_CONF/pushCampaignConfig.json";
+       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaignConfig.json";
        run_component($component, $command);
    }else {
     print "not a valid component\n";
