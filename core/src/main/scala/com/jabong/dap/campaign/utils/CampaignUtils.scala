@@ -354,6 +354,7 @@ object CampaignUtils extends Logging {
     if (mailType == 0) {
       val errorString = ("Priority doesn't exist for mailType %d", mailType)
       logger.error(errorString)
+      println("Size of map"+CampaignManager.campaignMailTypeMap.size)
       return CampaignCommon.VERY_LOW_PRIORITY
     }
     println("Size of map"+CampaignManager.campaignMailTypeMap.size)
