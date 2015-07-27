@@ -10,7 +10,7 @@ object CustomerProductShortlistVariables {
   val USER_SHORTLIST_KEY = "user_shortlist_key"
   val EMAIL = "email"
   val SKU = "sku"
-  val SIMPLE_SKU = "simple_sku"
+  val SIMPLE_SKU = "simpleSku"
   val EXTRA_DATA = "extra_data"
   val STOCK_WHEN_REMOVED = "stock_when_removed"
   val CUSTOMER_SOURCE = "customer_source"
@@ -20,7 +20,7 @@ object CustomerProductShortlistVariables {
   val USER_DEVICE_TYPE = "user_device_type"
   val PRICE = "price"
   val AVERAGE_PRICE = "average_price"
-  val SKU_SIMPLE = "sku_simple"
-  val SPECIAL_PRICE = "special_price"
+  val SKU_SIMPLE = "skuSimple"
+  val SPECIAL_PRICE = "specialPrice"
 
 }

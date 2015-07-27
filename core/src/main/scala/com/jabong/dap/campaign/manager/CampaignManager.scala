@@ -190,23 +190,26 @@ object CampaignManager extends Serializable with Logging {
 
   val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
-  def startCampaignMerge(campaignJsonPath: String) = {
+  def startWishlistCampaigns() = {
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    
+    val fullShortlistData = CampaignInput.loadFullShortlistData()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
+    val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
 
-    //    val conf = new Configuration()
-    //          val fileSystem = FileSystem.get(conf)
-    //          implicit val formats = net.liftweb.json.DefaultFormats
-    //          val path = new Path(campaignJsonPath)
-    //          val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-    //          campaignInfo.campaigns = json.extract[campaignConfig]
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+
+    // wishlist followup - 1 day wishlist data, last day order item, last day order, 
+    
+    // wishlist low stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr
+    val wishlistManager = new WishListCampaign();
+    wishlistManager.runCampaign(fullShortlistData, last30daysItrData, yesterdayItrData, last30DaySalesOrderItemData, last30DaySalesOrderData)
+
+    
   }
 
-  //
-  //  def execute() = {
-  //
-  //    val liveRetargetCampaign = new LiveRetargetCampaign()
-  //    liveRetargetCampaign.runCampaign(null)
-  //
-  //  }
 
   /**
    * takes union input of all campaigns and return merged campaign list

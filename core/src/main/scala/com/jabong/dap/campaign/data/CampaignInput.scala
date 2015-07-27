@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ItrVariables, CustomerVariables, ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -87,11 +87,25 @@ object CampaignInput extends Logging {
 
   def loadYesterdayItrSimpleData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    logger.info("Reading last day basic itr data from hdfs")
+    logger.info("Reading last day basic itr simple data from hdfs")
     val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
     val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
-      itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
-      itrData(ITR.QUANTITY) as ProductVariables.STOCK)
+      itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+      itrData(ITR.QUANTITY) as ProductVariables.STOCK,
+      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT)
+
+    filteredItr
+  }
+
+  def loadYesterdayItrSkuData() = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last day basic itr sku data from hdfs")
+    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, dateYesterday)
+    val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU) as ProductVariables.SKU,
+      itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+      itrData(ITR.QUANTITY) as ProductVariables.STOCK,
+      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
+    )
     filteredItr
   }
 
@@ -104,6 +118,17 @@ object CampaignInput extends Logging {
       itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK)
     filteredItr
+  }
+  
+  def loadLast30DaysItrSkuData(): DataFrame = {
+    null
+  }
+  
+  def loadFullShortlistData() = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading full fetch shortlist data from hdfs")
+    val shortlistData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, dateYesterday)
+    shortlistData
   }
 
   def loadProductData(): DataFrame = {
