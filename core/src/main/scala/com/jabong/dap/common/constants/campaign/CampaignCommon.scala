@@ -29,7 +29,6 @@ object CampaignCommon {
   val SURF6_CAMPAIGN = "surf6"
   val MERGED_CAMPAIGN = "merged"
 
-
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
   val DATE_FORMAT = "yyyy/MM/dd"
@@ -57,7 +56,6 @@ object CampaignCommon {
     "invalid_lowstock" -> 49,
     "surf1" -> 56,
     "surf3" -> 58
-    )
-
+  )
 
 }
