@@ -27,7 +27,7 @@ object CampaignManager extends Serializable with Logging {
 
   var campaignPriorityMap = new HashMap[String, Int]
   var campaignMailTypeMap = new HashMap[String, Int]
-  var mailTypePriorityMap = new HashMap[Int, Int]
+  val mailTypePriorityMap = new HashMap[Int, Int]
   //  def start(campaignJsonPath: String) = {
   //    val validated = try {
   //      val conf = new Configuration()
