@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
+import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -219,6 +220,7 @@ object CampaignManager extends Serializable with Logging {
       logger.error("priorityMap doesn't  Exists")
       return null
     }
+    println("CAMPAIGN MERGER "+CampaignManager.mailTypePriorityMap.keys+"\t"+mailTypePriorityMap.values)
 
     val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
       CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
