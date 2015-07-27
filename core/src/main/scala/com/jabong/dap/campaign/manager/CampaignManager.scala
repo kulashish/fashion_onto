@@ -29,7 +29,6 @@ object CampaignManager extends Serializable with Logging {
   var campaignPriorityMap = new HashMap[String, Int]
   var campaignMailTypeMap = new HashMap[String, Int]
   var mailTypePriorityMap = new HashMap[Int, Int]
-  
 
   def createCampaignMaps(parsedJson: JValue): Boolean = {
     if (parsedJson == null) {
