@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -81,7 +82,6 @@ class WishList extends LiveCustomerSelector with Logging {
         Udf.simpleSkuFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.SKU_SIMPLE,
         Udf.priceFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.PRICE
       )
-
     dfResult
   }
 

@@ -392,5 +392,10 @@ object CampaignUtils extends Logging {
     return dfYesterdayItrData
   }
 
+
+  def addPriority(campaignData: DataFrame): DataFrame ={
+  return null
+  }
+
 }
 
