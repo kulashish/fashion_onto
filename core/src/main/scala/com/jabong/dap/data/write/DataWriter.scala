@@ -33,9 +33,16 @@ object DataWriter extends Logging {
    * @param mode
    * @param date
    */
-  def writeParquet(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String) {
-    val writePath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
-    if (canWrite(mode, writePath))
+  def writeParquet(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String, saveMode: String) {
+    var diskMode = mode
+    var reqDate = date
+
+    if (mode.equals(DataSets.FULL_MERGE_MODE)) {
+      diskMode = DataSets.FULL
+      reqDate = "%s-%s".format(date, "24")
+    }
+    val writePath = PathBuilder.buildPath(basePath, source, tableName, diskMode, reqDate)
+    if (canWrite(saveMode, writePath))
       df.write.parquet(writePath)
   }
 
@@ -46,14 +53,14 @@ object DataWriter extends Logging {
         println("File Already exists so not doing anything: " + savePath)
         return false
       }
-      if (DataVerifier.hdfsDirExists(savePath)) {
-        DataVerifier.hdfsDirDelete(savePath)
+      if (DataVerifier.dirExists(savePath)) {
+        DataVerifier.dirDelete(savePath)
         logger.info("Directory with no success file was removed: " + savePath)
         println("Directory with no success file was removed: " + savePath)
       }
     }
 
-    if (saveMode.equals(DataSets.ERROR_SAVEMODE) && DataVerifier.hdfsDirExists(savePath)) {
+    if (saveMode.equals(DataSets.ERROR_SAVEMODE) && DataVerifier.dirExists(savePath)) {
       logger.info("File Already exists and save Mode is error: " + savePath)
       println("File Already exists and save Mode is error: " + savePath)
       return false

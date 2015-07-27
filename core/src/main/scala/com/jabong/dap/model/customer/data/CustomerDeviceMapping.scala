@@ -44,10 +44,11 @@ object CustomerDeviceMapping extends Logging {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT))
     val path = OptionUtils.getOptValue(vars.path)
-    processData(prevDate, path, incrDate)
+    val saveMode = vars.saveMode
+    processData(prevDate, path, incrDate, saveMode)
   }
 
-  def processData(prevDate: String, path: String, curDate: String) {
+  def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
     df1.printSchema()
     df1.show(5)
@@ -63,7 +64,7 @@ object CustomerDeviceMapping extends Logging {
     val res = getLatestDevice(df1, df2, df3)
     res.printSchema()
     res.show(20)
-    DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
+    DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate, saveMode)
   }
 
   /**
