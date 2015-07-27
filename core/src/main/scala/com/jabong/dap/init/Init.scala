@@ -4,6 +4,7 @@ import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
+import com.jabong.dap.model.clickstream.variables.SurfVariablesMain
 import com.jabong.dap.model.custorder.CustOrderVarMerger
 import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
 import net.liftweb.json.JsonParser.ParseException
@@ -119,6 +120,10 @@ object Init {
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCamapignsJson)
+
+      // clickstream use cases
+      case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
+      case "clickstreamSurf3Variable" => SurfVariablesMain.startSurf3Variable()
     }
   }
 }
