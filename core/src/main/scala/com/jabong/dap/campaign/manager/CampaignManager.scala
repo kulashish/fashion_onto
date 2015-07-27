@@ -188,7 +188,7 @@ object CampaignManager extends Serializable with Logging {
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: mutable.HashMap[Int, Int]))
+  val campaignPriority = udf((mailType: Int, mailTypePriorityMap: java.util.HashMap[Int, Int]) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: java.util.HashMap[Int, Int]))
 
   def startCampaignMerge(campaignJsonPath: String) = {
 
@@ -226,7 +226,7 @@ object CampaignManager extends Serializable with Logging {
     println("CAMPAIGN MERGER " + CampaignManager.mailTypePriorityMap.keys + "\t" + mailTypePriorityMap.values)
 
     val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
-      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),lit(mailTypePriorityMap)))
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
