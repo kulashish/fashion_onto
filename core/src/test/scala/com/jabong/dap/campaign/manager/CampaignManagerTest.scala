@@ -62,7 +62,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     assert(mergedCampaignData == null)
   }
 
-  "Input Campaigns Data with priority map loaded" should "return null" in {
+  "Input Campaigns Data with priority map loaded" should "return two " in {
     val status = CampaignManager.createCampaignMaps(json)
     val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData)
     assert(mergedCampaignData.count() == 2)

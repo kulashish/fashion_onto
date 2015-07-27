@@ -95,7 +95,8 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
-  def loadItrSimpleData() = {
+  //FIXME : change to last 30 days
+  def loadLast30DaysItrSimpleData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day basic itr data from hdfs")
     val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
@@ -116,6 +117,7 @@ object CampaignInput extends Logging {
   def loadAllCampaignsData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day all campaigns data from hdfs")
+    //FIXME:use proper data frame
     // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
     val campaignData = Spark.getSqlContext().read.parquet("/data/output/campaigns/*/2015/07/26/")
     val allCampaignData = campaignData.select(
