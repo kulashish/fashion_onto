@@ -54,8 +54,8 @@ object DataSets {
   val AD4PUSH = "ad4push"
 
   //non schema constants for ad4push
-  val IPHONE_CSV_PREFIX = "exportMessagesReactions_517_"
-  val ANDROID_CSV_PREFIX = "exportMessagesReactions_515_"
+  val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
+  val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
 
   val REACTION_IOS = "reaction_ios"
   val REACTION_ANDROID = "reaction_android"
@@ -77,6 +77,7 @@ object DataSets {
   val CSV = "csv"
   val PARQUET = "parquet"
   val ORC = "orc"
+  val JSON = "json"
 
   val IGNORE_SAVEMODE = "ignore"
   val ERROR_SAVEMODE = "error"
@@ -89,6 +90,8 @@ object DataSets {
   val NEXTBEE = "nextbee"
   val DEVICE_MAPPING = "device_mapping"
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"
+
+  val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
 
   val CAMPAIGN = "campaign"
 
