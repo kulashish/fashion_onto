@@ -8,7 +8,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.{DataReader}
+import com.jabong.dap.data.read.{ DataReader }
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
@@ -103,12 +103,12 @@ object CampaignInput extends Logging {
     logger.info("Reading last 30 days basic itr data from hdfs")
     val yesterdayOldEndTime = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     val monthYear = TimeUtils.getMonthAndYear(yesterdayOldEndTime, "yyyy/MM/dd")
-    var itrData:DataFrame = null
-    val currentMonthItrData = getCampaignInputDataFrame("orc",DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year+"/"+monthYear.month+"/*")
-    val previousMonthItrData = getCampaignInputDataFrame("orc",DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year+"/"+(monthYear.month-1)+"/*")
-    if(previousMonthItrData !=null){
+    var itrData: DataFrame = null
+    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year + "/" + monthYear.month + "/*")
+    val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year + "/" + (monthYear.month - 1) + "/*")
+    if (previousMonthItrData != null) {
       itrData = currentMonthItrData.unionAll(previousMonthItrData)
-    }else{
+    } else {
       itrData = currentMonthItrData
     }
     // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
@@ -142,25 +142,24 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
-
-  def getCampaignInputDataFrame(fileFormat:String,basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame ={
+  def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
     val filePath = buildPath(basePath, source, componentName, mode, date)
-    var loadedDataframe:DataFrame = null
-    if(fileFormat == "orc"){
-      if(DataVerifier.dataExists(filePath)){
+    var loadedDataframe: DataFrame = null
+    if (fileFormat == "orc") {
+      if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath)
-      }else{
+      } else {
         return null
       }
     }
-    if(fileFormat == "parquet") {
+    if (fileFormat == "parquet") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath)
       } else {
         return null
       }
     }
-      return loadedDataframe
+    return loadedDataframe
   }
 
   def buildPath(basePath: String, source: String, componentName: String, mode: String, date: String): String = {

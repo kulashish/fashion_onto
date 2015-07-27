@@ -25,7 +25,7 @@ class PastCampaignCheck extends Logging {
       logger.error("Any of the argument is null")
       return null
     }
-    if(!CampaignManager.mailTypePriorityMap.contains(campaignMailType)){
+    if (!CampaignManager.mailTypePriorityMap.contains(campaignMailType)) {
       logger.error("Invalid CampaignType")
       return null
     }
