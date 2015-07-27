@@ -14,7 +14,7 @@ import org.apache.hadoop.fs.{ FileSystem, Path }
 /**
  * Created by pooja on 9/7/15.
  */
-class CustOrderVarMerger extends Serializable with Logging {
+class VarMerger extends Serializable with Logging {
 
   def start(VarJsonPath: String) = {
     val validated = try {

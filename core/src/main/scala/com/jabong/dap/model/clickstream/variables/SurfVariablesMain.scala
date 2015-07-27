@@ -7,11 +7,10 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.{ DataVerifier, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.clickstream.utils.{ GroupData, GetMergedClickstreamData }
+import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
+import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ DataFrame, SaveMode, Row }
-import org.apache.spark.sql.{ SQLContext, DataFrame, SaveMode, Row }
-import org.apache.spark.{ SparkContext, SparkConf }
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by Divya on 13/7/15.
@@ -35,7 +34,7 @@ object SurfVariablesMain extends java.io.Serializable {
     val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
     val currentMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
     var processedVariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf3ProcessedVariable"
-    val userDeviceMapPath = args(2) + "/" + year + "/" + month + "/" + day + "/userDeviceMap"
+    val userDeviceMapPath = args(2) + "/" + year + "/" + month + "/" + day + "/" + DataSets.USER_DEVICE_MAP_APP
     var surf1VariablePath = args(3) + "/" + year + "/" + month + "/" + day + "/Surf1ProcessedVariable"
     cal.add(Calendar.DATE, -1);
     year = cal.get(Calendar.YEAR);
