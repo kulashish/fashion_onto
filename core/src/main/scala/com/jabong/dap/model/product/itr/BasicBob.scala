@@ -1,6 +1,6 @@
 package com.jabong.dap.model.product.itr
 
-import java.sql.Date
+import java.sql.{Timestamp, Date}
 import java.util.Calendar
 
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -18,21 +18,21 @@ object BasicBob {
    * @return DataFrame
    */
   def getBobColumns(): DataFrame = {
-    val todayDate = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT)
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT)   //YYYY-MM-DD
+    val yesterdayTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
+
     val simpleDF = Model.simple.select(
       Model.simple("id_catalog_simple"),
-      actualPrice(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date")) as ("actual_price"),
+      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date") , lit(yesterdayTime)) as (ITR.PRICE_ON_SITE),
       Model.simple("special_price"),
-      Model.simple("price"),
       Model.simple("special_to_date"),
       Model.simple("special_from_date"),
       Model.simple("sku"),
       Model.simple("fk_catalog_config"),
       Model.simple("barcode_ean"),
-      lit(todayDate) as "itr_date"
+      lit(yesterdayDate) as "itr_date"
     ).withColumnRenamed("id_catalog_simple", ITR.ID_CATALOG_SIMPLE).
       withColumnRenamed("special_price", ITR.SPECIAL_PRICE).
-      withColumnRenamed("price", ITR.PRICE).
       withColumnRenamed("special_to_date", ITR.SPECIAL_TO_DATE).
       withColumnRenamed("special_from_date", ITR.SPECIAL_FROM_DATE).
       withColumnRenamed("sku", ITR.SIMPLE_SKU).
@@ -102,7 +102,7 @@ object BasicBob {
         ITR.SPECIAL_MARGIN,
         ITR.MARGIN,
         ITR.BRAND_NAME,
-        ITR.ACTUAL_PRICE,
+        ITR.PRICE_ON_SITE,
         ITR.ITR_DATE
       )
   }
@@ -116,7 +116,8 @@ object BasicBob {
     ("%s-%s-d").format(brandUrlKey.replaceAll("/", ""), productName.replaceAll(" ", "-"), idCatalogConfig)
   }
 
-  val actualPrice = udf((specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date) => correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date))
+  val priceOnSite = udf((specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal,
+                         specialFromDate: Date, specialToDate: Date,reqTimeStamp:Timestamp) => correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date ,reqTimeStamp:Timestamp))
   /**
    *
    * @param specialPrice
@@ -125,7 +126,7 @@ object BasicBob {
    * @param specialToDate
    * @return
    */
-  def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date): java.math.BigDecimal = {
+  def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date , reqTimeStamp:Timestamp): java.math.BigDecimal = {
     if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == 0.0) {
       return price
     }
@@ -134,11 +135,8 @@ object BasicBob {
       return specialPrice
     }
 
-    val cal = Calendar.getInstance();
 
-    val currentTime = cal.getTime().getTime
-
-    if (currentTime >= specialFromDate.getTime && currentTime <= specialToDate.getTime) {
+    if (reqTimeStamp.getTime  >= specialFromDate.getTime && reqTimeStamp.getTime <= specialToDate.getTime) {
       return specialPrice
     }
     return price

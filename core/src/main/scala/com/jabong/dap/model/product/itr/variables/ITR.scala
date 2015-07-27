@@ -53,6 +53,6 @@ object ITR {
   val BRAND_NAME = "brandName"
   val SUPPLIER_STATUS = "supplierStatus"
   val PRICE = "price"
-  val ACTUAL_PRICE = "actual_price"
+  val PRICE_ON_SITE = "price_on_site"
   val ITR_DATE = "itr_date"
 }
