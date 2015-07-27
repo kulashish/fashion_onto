@@ -77,6 +77,7 @@ object DataSets {
   val CSV = "csv"
   val PARQUET = "parquet"
   val ORC = "orc"
+  val JSON = "json"
 
   val IGNORE_SAVEMODE = "ignore"
   val ERROR_SAVEMODE = "error"

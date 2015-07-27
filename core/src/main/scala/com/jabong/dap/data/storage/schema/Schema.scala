@@ -181,6 +181,21 @@ object Schema {
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true)
   ))
 
+  val salesCart = StructType(Array(
+    StructField(SalesCartVariables.ID_SALES_CART, IntegerType, true),
+    StructField(SalesCartVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesCartVariables.USER_CART_KEY, StringType, true),
+    StructField(SalesCartVariables.SKU, StringType, true),
+    StructField(SalesCartVariables.QUANTITY, IntegerType, true),
+    StructField(SalesCartVariables.STATUS, StringType, true),
+    StructField(SalesCartVariables.CUSTOMER_SOURCE, StringType, true),
+    StructField(SalesCartVariables.EMAIL, StringType, true),
+    StructField(SalesCartVariables.CREATED_AT, TimestampType, true),
+    StructField(SalesCartVariables.UPDATED_AT, TimestampType, true),
+    StructField(SalesCartVariables.DOMAIN, StringType, true),
+    StructField(SalesCartVariables.USER_DEVICE_TYPE, StringType, true)
+  ))
+
   val resultCustomerProductShortlist = StructType(Array(
     StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),

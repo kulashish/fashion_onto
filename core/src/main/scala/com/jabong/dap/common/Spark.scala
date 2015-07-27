@@ -65,9 +65,9 @@ object Spark {
    * Gets the spark context for a given format
    */
   def getContext(saveFormat: String) = saveFormat match {
-    case DataSets.PARQUET => getSqlContext()
     case DataSets.ORC => getHiveContext()
+    case DataSets.PARQUET => getSqlContext()
     case DataSets.CSV => getSqlContext()
-    case _ => null
+    case _ => getSqlContext()
   }
 }
