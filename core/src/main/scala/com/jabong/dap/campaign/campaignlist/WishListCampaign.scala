@@ -58,11 +58,11 @@ object WishListCampaign {
     //wishListIODCampaign.runCampaign(fullShortlistData, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
   }
-  
+
   /**
    * *
    * @param dfCustomerProductShortlist
-   * @param lastDaySkuItrData
+   * @param dfLastDaySkuItrData
    * @param last30daySkuItrData
    * @param orderData
    * @param orderItemData
