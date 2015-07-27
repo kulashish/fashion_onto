@@ -19,7 +19,7 @@ class WishlistIODCampaign {
 
     // null recommendation
 
-    val itemOnDiscountSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
+    val lowStockSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SKU_LOW_STOCK)
 
   }
 
