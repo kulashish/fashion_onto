@@ -4,7 +4,7 @@
       "source": "customerDeviceMapping",
       "incrMode": "daily",
       "path": "/data/input/device_mapping/device_mapping_20150727.csv",
-      "saveMode": "overwrite",
+      "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
   ]

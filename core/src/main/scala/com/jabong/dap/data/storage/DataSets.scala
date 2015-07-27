@@ -79,10 +79,10 @@ object DataSets {
   val ORC = "orc"
   val JSON = "json"
 
-  val IGNORE_SAVEMODE = "ignore"
-  val ERROR_SAVEMODE = "error"
-  val OVERWRITE_SAVEMODE = "overwrite"
-  val APPEND_SAVEMODE = "append"
+  val IGNORE_SAVEMODE = "Ignore"
+  val ERROR_SAVEMODE = "ErrorIfExists"
+  val OVERWRITE_SAVEMODE = "Overwrite"
+  val APPEND_SAVEMODE = "Append"
 
   val BOB = "bob"
   val ERP = "erp"

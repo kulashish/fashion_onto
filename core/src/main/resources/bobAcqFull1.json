@@ -6,7 +6,7 @@
       "primaryKey": "id_catalog_brand",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -14,7 +14,7 @@
       "primaryKey": "id_catalog_category",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -22,7 +22,7 @@
       "primaryKey": "id_catalog_config_has_catalog_category",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -30,7 +30,7 @@
       "primaryKey": "id_catalog_product_image",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -38,7 +38,7 @@
       "primaryKey": "id_catalog_stock",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -46,7 +46,7 @@
       "primaryKey": "id_catalog_supplier",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -54,7 +54,7 @@
       "primaryKey": "id_customer_storecredits_history",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -62,7 +62,7 @@
       "primaryKey": "id_sales_cart_custom_text",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -70,7 +70,7 @@
       "primaryKey": "id_sales_order_item_status",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     }
   ]
 }

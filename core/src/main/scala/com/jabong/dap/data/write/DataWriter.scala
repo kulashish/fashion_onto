@@ -4,7 +4,7 @@ import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{ SaveMode, DataFrame }
 
 /**
  * Created by pooja on 23/7/15.
@@ -24,16 +24,7 @@ object DataWriter extends Logging {
     df.write.format("com.databricks.spark.csv").option("delimiter", ";").save(writePath)
   }
 
-  /**
-   *
-   * @param df
-   * @param basePath
-   * @param source
-   * @param tableName
-   * @param mode
-   * @param date
-   */
-  def writeParquet(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String, saveMode: String) {
+  def getWritePath(basePath: String, source: String, tableName: String, mode: String, date: String): String = {
     var diskMode = mode
     var reqDate = date
 
@@ -41,9 +32,17 @@ object DataWriter extends Logging {
       diskMode = DataSets.FULL
       reqDate = "%s-%s".format(date, "24")
     }
-    val writePath = PathBuilder.buildPath(basePath, source, tableName, diskMode, reqDate)
-    if (canWrite(saveMode, writePath))
-      df.write.parquet(writePath)
+    PathBuilder.buildPath(basePath, source, tableName, diskMode, reqDate)
+  }
+
+  /**
+   *
+   * @param df
+   * @param writePath
+   */
+  def writeParquet(df: DataFrame, writePath: String, saveMode: String) {
+    df.write.mode(SaveMode.valueOf(saveMode)).parquet(writePath)
+    println("Parquet Data written successfully to the following Path: " + writePath)
   }
 
   def canWrite(saveMode: String, savePath: String): Boolean = {

@@ -6,7 +6,7 @@
       "primaryKey": "id_catalog_product_image",
       "mode": "full",
       "saveFormat": "parquet",
-      "saveMode": "overwrite",
+      "saveMode": "Overwrite",
       "dateColumn": "[Last Modification Date Time]",
       "rangeStart": "2014-06-12 00:00:00",
       "rangeEnd": "2014-06-12 23:59:59",

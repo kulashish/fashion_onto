@@ -22,26 +22,17 @@ object DevicesReactions extends Logging {
 
   def start(vars: VarInfo) = {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
-    val mode = OptionUtils.getOptValue(vars.incrMode, DataSets.DAILY_MODE)
     val saveMode = vars.saveMode
-    customerResponse(incrDate, mode, saveMode)
+    customerResponse(incrDate, saveMode)
   }
   /**
    * All read CSV, read perquet, write perquet
    * @param incrDate date for which summary is needed in YYYYMMDD format
    * @return (iPhoneResult, AndroidResult) for tgiven date
    */
-  def customerResponse(incrDate: String, mode: String, saveMode: String) = {
-
-    //getting file names
+  def customerResponse(incrDate: String, saveMode: String) = {
 
     val dateStr = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER)
-
-    val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, mode, dateStr, "true", ",")
-    val incI = dfCorrectSchema(incIStringSchema)
-
-    val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, mode, dateStr, "true", ",")
-    val incA = dfCorrectSchema(incAStringSchema)
 
     val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
@@ -51,26 +42,42 @@ object DevicesReactions extends Logging {
 
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
-    //getting DF
-    logger.info("Reading inputs (CSVs and Parquets)")
-    val fullI = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, yesterday)
-    val b7I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before7daysString)
-    val b15I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
-    val b30I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
+    val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, dateStr)
+    if (DataWriter.canWrite(savePathI, saveMode)) {
+      val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, dateStr, "true", ",")
+      val incI = dfCorrectSchema(incIStringSchema)
 
-    val fullA = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, yesterday)
-    val b7A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, before7daysString)
-    val b15A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, before15daysString)
-    val b30A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL, before30daysString)
+      //getting DF
+      logger.info("Reading inputs (CSVs and Parquets) for IOS")
+      val fullI = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, yesterday)
+      val b7I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before7daysString)
+      val b15I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
+      val b30I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
 
-    val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
-    val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
+      val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
 
-    DataWriter.writeParquet(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, dateStr, saveMode)
-    DataWriter.writeParquet(incrI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, mode, dateStr, saveMode)
+      DataWriter.writeParquet(resultI, savePathI, saveMode)
+      DataWriter.writeParquet(incrI, savePathI, saveMode)
 
-    DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, dateStr, saveMode)
-    DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, mode, dateStr, saveMode)
+    }
+
+    val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, dateStr)
+    if (DataWriter.canWrite(savePathA, saveMode)) {
+      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, dateStr, "true", ",")
+      val incA = dfCorrectSchema(incAStringSchema)
+
+      //getting DF
+      logger.info("Reading inputs (CSVs and Parquets) for Android")
+      val fullA = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, yesterday)
+      val b7A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before7daysString)
+      val b15A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before15daysString)
+      val b30A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before30daysString)
+
+      val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
+
+      DataWriter.writeParquet(resultA, savePathA, saveMode)
+      DataWriter.writeParquet(incrA, savePathA, saveMode)
+    }
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {

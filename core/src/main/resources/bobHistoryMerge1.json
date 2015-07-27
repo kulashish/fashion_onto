@@ -8,7 +8,7 @@
       "incrDate": "2012-06-30",
       "incrMode": "monthly",
       "fullDate": "2012/05/31/24",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -18,7 +18,7 @@
       "incrDate": "2012-07-31",
       "incrMode": "monthly",
       "fullDate": "2012/06/30/24",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -28,7 +28,7 @@
       "incrDate": "2012-08-31",
       "incrMode": "monthly",
       "fullDate": "2012/07/31/24",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
@@ -38,7 +38,7 @@
       "incrDate": "2014-11-30",
       "incrMode": "monthly",
       "fullDate": "2014/06/30/24",
-      "saveMode": "ignore"
+      "saveMode": "Ignore"
     }
   ]
 }

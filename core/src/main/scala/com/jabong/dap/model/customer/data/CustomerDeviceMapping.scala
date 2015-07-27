@@ -75,7 +75,9 @@ object CustomerDeviceMapping extends Logging {
     }
     val df3 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
     val res = getLatestDevice(df1, df2, df3)
-    DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate, saveMode)
+    val savePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
+    if (DataWriter.canWrite(saveMode, savePath))
+      DataWriter.writeParquet(res, savePath, saveMode)
   }
 
   /**
