@@ -16,6 +16,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
+import scala.collection.mutable
 import scala.collection.mutable.HashMap
 
 /**
@@ -187,6 +188,8 @@ object CampaignManager extends Serializable with Logging {
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
+  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int , mailTypePriorityMap :mutable.HashMap[Int,Int]))
+
   def startCampaignMerge(campaignJsonPath: String) = {
 
     //    val conf = new Configuration()
@@ -223,7 +226,7 @@ object CampaignManager extends Serializable with Logging {
     println("CAMPAIGN MERGER "+CampaignManager.mailTypePriorityMap.keys+"\t"+mailTypePriorityMap.values)
 
     val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
-      CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+        campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
