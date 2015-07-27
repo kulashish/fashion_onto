@@ -3,7 +3,7 @@ package com.jabong.dap.model.product.itr
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.time.{TimeUtils, TimeConstants}
+import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
 import org.apache.commons.net.ntp.TimeStamp
 import org.scalatest.FlatSpec
 import java.math.BigDecimal
@@ -11,24 +11,21 @@ import java.math.BigDecimal
 /**
  * Created by rahul for com.jabong.dap.model.product.itr on 25/7/15.
  */
-class BasicBobTest extends FlatSpec{
+class BasicBobTest extends FlatSpec {
 
-
-"Zero value for special price " should "return price" in {
-  val specialPrice = new BigDecimal(0.0)
-  val price = new BigDecimal(10.0)
-  val expectedPrice = BasicBob.correctPrice(specialPrice,price,null,null,null)
-  assert(expectedPrice == price)
-}
-
+  "Zero value for special price " should "return price" in {
+    val specialPrice = new BigDecimal(0.0)
+    val price = new BigDecimal(10.0)
+    val expectedPrice = BasicBob.correctPrice(specialPrice, price, null, null, null)
+    assert(expectedPrice == price)
+  }
 
   "null value for from date for special price " should "return price" in {
     val specialPrice = new BigDecimal(20.0)
     val price = new BigDecimal(10.0)
-    val expectedPrice = BasicBob.correctPrice(specialPrice,price,null,null,null)
+    val expectedPrice = BasicBob.correctPrice(specialPrice, price, null, null, null)
     assert(expectedPrice == price)
   }
-
 
   "current date falls in between special price from date and to date " should "return special Price" in {
     val specialPrice = new BigDecimal(20.0)
@@ -43,7 +40,7 @@ class BasicBobTest extends FlatSpec{
     cal.add(Calendar.DATE, 4)
     val nextDayDate = new java.sql.Date(cal.getTime().getTime);
 
-    val expectedPrice = BasicBob.correctPrice(specialPrice,price,yesterdayDate,nextDayDate,yesterdayTimeStamp)
+    val expectedPrice = BasicBob.correctPrice(specialPrice, price, yesterdayDate, nextDayDate, yesterdayTimeStamp)
     assert(expectedPrice == specialPrice)
   }
 
@@ -60,7 +57,7 @@ class BasicBobTest extends FlatSpec{
     cal.add(Calendar.DATE, 4)
     val nextDayDate = new java.sql.Date(cal.getTime().getTime);
 
-    val expectedPrice = BasicBob.correctPrice(specialPrice,price,yesterdayDate,nextDayDate,yesterdayTimeStamp)
+    val expectedPrice = BasicBob.correctPrice(specialPrice, price, yesterdayDate, nextDayDate, yesterdayTimeStamp)
     assert(expectedPrice == price)
   }
 

@@ -1,6 +1,6 @@
 package com.jabong.dap.model.product.itr
 
-import java.sql.{Timestamp, Date}
+import java.sql.{ Timestamp, Date }
 import java.util.Calendar
 
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -18,12 +18,12 @@ object BasicBob {
    * @return DataFrame
    */
   def getBobColumns(): DataFrame = {
-    val yesterdayDate = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT)   //YYYY-MM-DD
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
     val yesterdayTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
 
     val simpleDF = Model.simple.select(
       Model.simple("id_catalog_simple"),
-      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date") , lit(yesterdayTime)) as (ITR.PRICE_ON_SITE),
+      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date"), lit(yesterdayTime)) as (ITR.PRICE_ON_SITE),
       Model.simple("special_price"),
       Model.simple("special_to_date"),
       Model.simple("special_from_date"),
@@ -117,7 +117,7 @@ object BasicBob {
   }
 
   val priceOnSite = udf((specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal,
-                         specialFromDate: Date, specialToDate: Date,reqTimeStamp:Timestamp) => correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date ,reqTimeStamp:Timestamp))
+    specialFromDate: Date, specialToDate: Date, reqTimeStamp: Timestamp) => correctPrice(specialPrice: java.math.BigDecimal, mrpPrice: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date, reqTimeStamp: Timestamp))
   /**
    *
    * @param specialPrice
@@ -126,7 +126,7 @@ object BasicBob {
    * @param specialToDate
    * @return
    */
-  def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date , reqTimeStamp:Timestamp): java.math.BigDecimal = {
+  def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date, reqTimeStamp: Timestamp): java.math.BigDecimal = {
     if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == 0.0) {
       return price
     }
@@ -135,8 +135,7 @@ object BasicBob {
       return specialPrice
     }
 
-
-    if (reqTimeStamp.getTime  >= specialFromDate.getTime && reqTimeStamp.getTime <= specialToDate.getTime) {
+    if (reqTimeStamp.getTime >= specialFromDate.getTime && reqTimeStamp.getTime <= specialToDate.getTime) {
       return specialPrice
     }
     return price
