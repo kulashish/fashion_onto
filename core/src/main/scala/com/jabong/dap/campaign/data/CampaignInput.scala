@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.data
 
+import java.io.File
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -7,7 +8,8 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ItrVariables, CustomerVariables, ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.read.{ DataReader }
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
@@ -111,12 +113,24 @@ object CampaignInput extends Logging {
 
   //FIXME : change to last 30 days
   def loadLast30DaysItrSimpleData() = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-    logger.info("Reading last day basic itr data from hdfs")
-    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
-    val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
-      itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
-      itrData(ITR.QUANTITY) as ProductVariables.STOCK)
+    val thirtyDayOldEndTime = TimeUtils.getDateAfterNDays(-30, "yyyy/MM/dd")
+    logger.info("Reading last 30 days basic itr data from hdfs")
+    val yesterdayOldEndTime = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    val monthYear = TimeUtils.getMonthAndYear(yesterdayOldEndTime, "yyyy/MM/dd")
+    var itrData: DataFrame = null
+    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year + "/" + monthYear.month + "/*")
+    val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year + "/" + (monthYear.month - 1) + "/*")
+    if (previousMonthItrData != null) {
+      itrData = currentMonthItrData.unionAll(previousMonthItrData)
+    } else {
+      itrData = currentMonthItrData
+    }
+    // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
+    val last30DayItrData = CampaignUtils.getTimeBasedDataFrame(itrData, SalesOrderVariables.CREATED_AT, yesterdayOldEndTime.toString, thirtyDayOldEndTime.toString)
+
+    val filteredItr = last30DayItrData.select(last30DayItrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+      last30DayItrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+      last30DayItrData(ITR.QUANTITY) as ProductVariables.STOCK)
     filteredItr
   }
   
@@ -151,5 +165,30 @@ object CampaignInput extends Logging {
       campaignData(CampaignMergedFields.REF_SKU1))
 
     return allCampaignData
+  }
+
+  def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
+    val filePath = buildPath(basePath, source, componentName, mode, date)
+    var loadedDataframe: DataFrame = null
+    if (fileFormat == "orc") {
+      if (DataVerifier.dataExists(filePath)) {
+        loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath)
+      } else {
+        return null
+      }
+    }
+    if (fileFormat == "parquet") {
+      if (DataVerifier.dataExists(filePath)) {
+        loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath)
+      } else {
+        return null
+      }
+    }
+    return loadedDataframe
+  }
+
+  def buildPath(basePath: String, source: String, componentName: String, mode: String, date: String): String = {
+    //here if Date has "-", it will get changed to File.separator.
+    "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator))
   }
 }

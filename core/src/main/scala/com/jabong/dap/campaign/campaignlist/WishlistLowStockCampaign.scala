@@ -47,5 +47,4 @@ class WishlistLowStockCampaign {
       + CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
   }
 
-
 }
