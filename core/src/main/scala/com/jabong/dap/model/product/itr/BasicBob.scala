@@ -19,7 +19,8 @@ object BasicBob {
    */
   def getBobColumns(): DataFrame = {
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
-    val yesterdayTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
+    val yesterdayTimeStamp = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS)
+    val yesterdayTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayTimeStamp))
 
     val simpleDF = Model.simple.select(
       Model.simple("id_catalog_simple"),

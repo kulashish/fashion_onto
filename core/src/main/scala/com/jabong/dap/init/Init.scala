@@ -92,9 +92,11 @@ object Init {
       } catch {
         case e: ParseException =>
           println("Error while parsing JSON: " + e.getMessage)
+          throw e
 
         case e: IllegalArgumentException =>
           println("Error while validating JSON: " + e.getMessage)
+          throw e
 
         case e: Exception =>
           println("Some unknown error occurred: " + e.getMessage)
