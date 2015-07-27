@@ -102,10 +102,17 @@ object CampaignInput extends Logging {
     val thirtyDayOldEndTime = TimeUtils.getDateAfterNDays(-30, "yyyy/MM/dd")
     logger.info("Reading last day basic itr data from hdfs")
     val yesterdayOldEndTime = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
-   // val monthYear = TimeUtils.getMonthAndYear(thirtyDayOldEndTime, "yyyy/MM"))
-   // getCampaignInputDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, "2015/MM/dd")
-    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
-    val nthDayOrderData = CampaignUtils.getTimeBasedDataFrame(itrData, SalesOrderVariables.CREATED_AT, thirtyDayOldEndTime.toString, thirtyDayOldEndTime.toString)
+    val monthYear = TimeUtils.getMonthAndYear(thirtyDayOldEndTime, "yyyy/MM")
+    var itrData:DataFrame = null
+    val currentMonthItrData = getCampaignInputDataFrame("orc",DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year+"/"+monthYear.month+"/*")
+    val previousMonthItrData = getCampaignInputDataFrame("orc",DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, monthYear.year+"/"+(monthYear.month-1)+"/*")
+    if(previousMonthItrData !=null){
+      itrData = currentMonthItrData.unionAll(previousMonthItrData)
+    }else{
+      itrData = currentMonthItrData
+    }
+    // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
+    val last30DayOrderData = CampaignUtils.getTimeBasedDataFrame(itrData, SalesOrderVariables.CREATED_AT, thirtyDayOldEndTime.toString, thirtyDayOldEndTime.toString)
 
     val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
       itrData(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
