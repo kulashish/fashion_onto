@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -95,7 +95,8 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
-  def loadItrSimpleData() = {
+  //FIXME : change to last 30 days
+  def loadLast30DaysItrSimpleData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day basic itr data from hdfs")
     val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
@@ -116,10 +117,11 @@ object CampaignInput extends Logging {
   def loadAllCampaignsData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day all campaigns data from hdfs")
-   // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
+    //FIXME:use proper data frame
+    // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
     val campaignData = Spark.getSqlContext().read.parquet("/data/output/campaigns/*/2015/07/26/")
     val allCampaignData = campaignData.select(
-      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.FK_CUSTOMER) ,
+      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.FK_CUSTOMER),
       campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       campaignData(CampaignMergedFields.REF_SKU1))
 

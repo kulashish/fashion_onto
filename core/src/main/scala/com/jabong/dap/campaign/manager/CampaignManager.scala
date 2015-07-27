@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
+import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -15,6 +16,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
+import scala.collection.mutable
 import scala.collection.mutable.HashMap
 
 /**
@@ -180,11 +182,13 @@ object CampaignManager extends Serializable with Logging {
     // last30DaySalesOrderData = null
 
     // itr last 30 days
-    val last30daysItrData = CampaignInput.loadItrSimpleData() // FIXME
+    val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
+
+  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
   def startCampaignMerge(campaignJsonPath: String) = {
 
@@ -221,12 +225,12 @@ object CampaignManager extends Serializable with Logging {
     }
 
     val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
-      CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY) as(CampaignCommon.PRIORITY),
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
         first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
 
     return campaignMerged
@@ -263,11 +267,8 @@ object CampaignManager extends Serializable with Logging {
     }
 
     if (validated) {
-      if(!(createCampaignMaps(json))){
-        exit()
-      }
+      createCampaignMaps(json)
       val allCampaignsData = CampaignInput.loadAllCampaignsData()
-      println("ALL KEYS "+CampaignManager.mailTypePriorityMap.values)
 
       val mergedData = campaignMerger(allCampaignsData)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"

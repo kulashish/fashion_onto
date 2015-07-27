@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{ Calendar, Date }
+import java.util.{ Date, Calendar }
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
@@ -12,8 +12,12 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
+import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import java.math.BigDecimal
+
+import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class
@@ -346,18 +350,15 @@ object CampaignUtils extends Logging {
     return filteredData
   }
 
-  def getCampaignPriority(mailType: Int): Int = {
-    println("ALL KEYS " + CampaignManager.mailTypePriorityMap.values)
-
+  def getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]): Int = {
     if (mailType == 0) {
       val errorString = ("Priority doesn't exist for mailType %d", mailType)
       logger.error(errorString)
-      println("Size of map" + CampaignManager.campaignMailTypeMap.size)
+      println("Size of map"+CampaignManager.campaignMailTypeMap.size)
       return CampaignCommon.VERY_LOW_PRIORITY
     }
-    println("Size of map" + CampaignManager.campaignMailTypeMap.size)
-    println("ALL KEYS " + CampaignManager.mailTypePriorityMap.values)
-    return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
+    logger.info("ALL KEYS " + mailTypePriorityMap.values)
+    return mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
   }
 
   def addCampaignMailType(campaignOutput: DataFrame, campaignName: String): DataFrame = {
