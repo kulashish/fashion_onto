@@ -52,77 +52,6 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  //=====================================shortListSkuSimpleFilter()=====================================================
-
-  "shortListSkuSimpleFilter: Data Frame" should "match to resultant Data Frame" in {
-
-    var yesterdayItrData = dfYesterdayItrData
-
-    yesterdayItrData = yesterdayItrData.select(
-      col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
-      col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE
-    )
-
-    val result = itemOnDiscount.shortListSkuSimpleFilter(dfCustomerProductShortlist, yesterdayItrData)
-      .limit(30).collect().toSet
-
-    //                   result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_simple_filter" + ".json")
-
-    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_simple_filter", Schema.resultSkuSimpleFilter)
-      .collect().toSet
-
-    assert(result.equals(dfShortListSkuSimpleFilter) == true)
-
-  }
-
-  //==========================================shortListSkuFilter()======================================================
-
-  "shortListSkuFilter: Data Frame" should "match to resultant Data Frame" in {
-
-    var itr30Day = dfItr30DayData
-
-    itr30Day = dfItr30DayData.select(
-      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ItrVariables.AVERAGE_PRICE) as ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE,
-      col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
-    )
-
-    var yesterdayItrData = dfYesterdayItrData
-
-    yesterdayItrData = yesterdayItrData.select(
-      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ItrVariables.AVERAGE_PRICE) as ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE,
-      col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
-    )
-
-    val result = itemOnDiscount.shortListSkuFilter(dfCustomerProductShortlist, yesterdayItrData, itr30Day)
-      .limit(30).collect().toSet
-
-    //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_filter" + ".json")
-
-    val dfShortListSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_filter", Schema.resultSkuFilter)
-      .collect().toSet
-
-    assert(result.equals(dfShortListSkuFilter) == true)
-
-  }
-
-  //=====================================shortListFullSkuFilter()=====================================================
-
-  "shortListFullSkuFilter: Data Frame" should "match to resultant Data Frame" in {
-
-    val result = itemOnDiscount.shortListFullSkuFilter(dfCustomerProductShortlist, dfItr30DayData, dfYesterdayItrData)
-      .limit(30).collect().toSet
-
-    //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_full_sku_filter" + ".json")
-
-    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_full_sku_filter", Schema.resultFullSkuFilter)
-      .collect().toSet
-
-    assert(result.equals(dfShortListSkuSimpleFilter) == true)
-
-  }
-
   //=====================================skuFilter()=====================================================
   "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
 
@@ -143,7 +72,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   "skuFilter: Data Frame" should "match to resultant Data Frame" in {
 
     val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData)
-    //        .limit(30).colle//ct().toSet
+    //        .limit(30).collect().toSet
 
     //    result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")
 

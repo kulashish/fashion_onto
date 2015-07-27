@@ -48,4 +48,6 @@ class ReturnReTarget extends SkuSelector {
   }
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
 }

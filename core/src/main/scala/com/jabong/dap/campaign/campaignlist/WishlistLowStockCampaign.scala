@@ -16,6 +16,6 @@ class WishlistLowStockCampaign {
 
     // null recommendation
 
-    val lowStockSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
+    val lowStockSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SKU_LOW_STOCK)
   }
 }

@@ -1,16 +1,16 @@
 package com.jabong.dap.campaign.utils
 
+import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Date, Calendar }
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
-import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
 import org.apache.commons.collections.IteratorUtils
 import org.apache.spark.sql.DataFrame
@@ -373,6 +373,23 @@ object CampaignUtils extends Logging {
 
     val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
     return campaignOutputWithMailType
+  }
+
+  /**
+   *
+   * @param itr30dayData
+   * @return
+   */
+  def getYesterdayItrData(itr30dayData: DataFrame): DataFrame = {
+    //get data yesterday date
+    val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT))
+
+    val yesterdayDateYYYYmmDD = UdfUtils.getYYYYmmDD(yesterdayDate)
+
+    //filter yesterday itrData from itr30dayData
+    val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
+
+    return dfYesterdayItrData
   }
 
 }

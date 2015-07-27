@@ -5,6 +5,7 @@ import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
 
 class WishlistIODCampaign {
+
   def runCampaign(inData: DataFrame): Unit = {
 
     // select customers who have added one or more items to wishlist during 30 days
@@ -18,7 +19,8 @@ class WishlistIODCampaign {
 
     // null recommendation
 
-    val itemOnDiscountSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
+    val lowStockSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SKU_LOW_STOCK)
 
   }
+
 }
