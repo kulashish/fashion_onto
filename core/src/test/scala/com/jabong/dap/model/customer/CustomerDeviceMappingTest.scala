@@ -37,13 +37,16 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
   "Testing getLatestDevice method" should " match the output dataframe" in {
 
-    df3 = CustomerDeviceMapping.getDataFrameCsv4mDCF(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping_1.csv")
-
-    val res = CustomerDeviceMapping.getLatestDevice(df2, df3, df1)
-
     val df = Spark.getSqlContext().read.parquet(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping")
 
-    assert(res.collect().toSet.equals(df.collect().toSet))
+    val res = CustomerDeviceMapping.getLatestDevice(df2, df, df1)
+    df.collect().foreach(println)
+    df1.collect().foreach(println)
+    df2.collect().foreach(println)
+    res.collect().foreach(println)
+    val df3 = Spark.getSqlContext().read.parquet(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping_1")
+
+    assert(res.collect().toSet.equals(df3.collect().toSet))
   }
 
 }
