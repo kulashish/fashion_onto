@@ -259,7 +259,7 @@ object Schema {
   ))
 
   val campaignPriorityOutput =  StructType(Array(
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, LongType, true),
     StructField(CampaignMergedFields.FK_CUSTOMER, IntegerType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, true),
     StructField(CampaignCommon.PRIORITY,IntegerType, true)
