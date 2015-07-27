@@ -387,6 +387,7 @@ object CampaignUtils extends Logging {
     return dfYesterdayItrData
   }
 
+  //FIXME: make it generalized for all campaigns
   /**
    * shortListSkuFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of SKU
    * @param dfCustomerProductShortlist
@@ -432,6 +433,7 @@ object CampaignUtils extends Logging {
 
   }
 
+  //FIXME: make it generalized for all campaigns
   /**
    *  * shortListSkuSimpleFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of simple_sku
    * @param dfCustomerProductShortlist

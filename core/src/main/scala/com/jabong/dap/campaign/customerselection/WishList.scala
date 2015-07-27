@@ -2,8 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.variables.{ ProductVariables, ItrVariables, CustomerProductShortlistVariables }
+import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
