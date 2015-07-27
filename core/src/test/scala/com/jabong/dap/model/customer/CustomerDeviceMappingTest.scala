@@ -1,11 +1,11 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{ SharedSparkContext }
+import com.jabong.dap.common.{Spark, SharedSparkContext}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
-import org.apache.spark.sql.{ DataFrame }
+import org.apache.spark.sql.{DataFrame}
 import org.scalatest.FlatSpec
 
 /**
@@ -30,15 +30,20 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
     df3 = CustomerDeviceMapping.getDataFrameCsv4mDCF(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping.csv")
 
-    df3.show(5)
+    val res = CustomerDeviceMapping.getLatestDevice(df2, df3, df1)
+
+    assert(res.collect().length == 27)
+  }
+
+  "Testing getLatestDevice method" should " match the output dataframe" in {
+
+    df3 = CustomerDeviceMapping.getDataFrameCsv4mDCF(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping_1.csv")
 
     val res = CustomerDeviceMapping.getLatestDevice(df2, df3, df1)
 
-    res.printSchema()
+    val df = Spark.getSqlContext().read.parquet(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping")
 
-    res.show(5)
-
-    assert(res.collect().length == 27)
+    assert(res.collect().toSet.equals(df.collect().toSet))
   }
 
 }

@@ -29,13 +29,11 @@ class SalesRuleTest extends FlatSpec with SharedSparkContext {
 
   "The result Dataframe" should "have size 4" in {
     var wcCodes = SalesRule.getCode(df1, 1)
-    wcCodes.collect.foreach(println)
     assert(wcCodes.collect.size == 4)
   }
 
   "The result Dataframe" should "have size 3" in {
     var wcCodes = SalesRule.getCode(df1, 2)
-    wcCodes.collect.foreach(println)
     assert(wcCodes.collect.size == 3)
   }
 
