@@ -19,7 +19,7 @@ object DataWriter extends Logging {
    * @param mode
    * @param date
    */
-  def writeCsv(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String, header:String, delimeter: String) {
+  def writeCsv(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String, header: String, delimeter: String) {
     val writePath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
     if (canWrite(mode, writePath))
       df.coalesce(1).write.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
