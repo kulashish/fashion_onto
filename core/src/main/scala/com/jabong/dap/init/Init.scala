@@ -29,7 +29,7 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     coVarJson: String = null,
-    pushCamapignsJson: String = null,
+    pushCampaignsJson: String = null,
     config: String = null)
 
   def main(args: Array[String]) {
@@ -70,7 +70,7 @@ object Init {
 
       opt[String]("pushCampaignsJson")
         .text("Path to push Campaigns priority config file.")
-        .action((x, c) => c.copy(pushCamapignsJson = x))
+        .action((x, c) => c.copy(pushCampaignsJson = x))
 
     }
 
@@ -119,7 +119,7 @@ object Init {
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
-      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCamapignsJson)
+      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()

@@ -23,11 +23,11 @@ class FollowUp extends SkuSelector with Logging {
       .filter(ProductVariables.STOCK + " >= " + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),
-        itrData(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
+        itrData(ProductVariables.SPECIAL_PRICE))
 
     logger.info("Join selected customer sku with sku data and filter by stock>=" + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
     //generate reference skus
-    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     return refSkus
   }

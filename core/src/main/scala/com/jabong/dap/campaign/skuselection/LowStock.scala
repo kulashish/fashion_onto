@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.skuselection
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import grizzled.slf4j.Logging
@@ -25,9 +26,11 @@ class LowStock extends SkuSelector with Logging {
       .filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),
-        itrDataFrame(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
+        itrDataFrame(ProductVariables.SPECIAL_PRICE))
 
-    return filteredSku
+    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+
+    return refSkus
   }
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???

@@ -40,9 +40,9 @@ class ReturnReTarget extends SkuSelector {
       .select(
         orderItemDataFrame(CustomerVariables.FK_CUSTOMER),
         orderItemDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
-        orderItemDataFrame(SalesOrderItemVariables.UNIT_PRICE))
+        orderItemDataFrame(SalesOrderItemVariables.UNIT_PRICE) as ProductVariables.SPECIAL_PRICE)
 
-    val refSku = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.PUSH_REF_SKUS)
+    val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     return refSku
   }

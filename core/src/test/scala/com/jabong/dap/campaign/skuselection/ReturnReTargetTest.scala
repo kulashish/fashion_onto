@@ -29,9 +29,9 @@ class ReturnReTargetTest extends FlatSpec with SharedSparkContext {
   }
 
   //FIXME: change the test cases to pass
-  //  "Last day order items data " should "return two records from execute function" in {
-  //    val skuData = returnReTarget.skuFilter(orderItemDataFrame)
-  //    assert(skuData.count() == 1)
-  //  }
+  "Last day order items data " should "return two records from execute function" in {
+    val skuData = returnReTarget.skuFilter(orderItemDataFrame)
+    assert(skuData.count() == 1)
+  }
 
 }

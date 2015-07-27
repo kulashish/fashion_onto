@@ -1,14 +1,16 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.campaign.utils.CampaignUdfs
+import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
+import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -178,13 +180,13 @@ object CampaignManager extends Serializable with Logging {
     // last30DaySalesOrderData = null
 
     // itr last 30 days
-    val last30daysItrData = null // FIXME
+    val last30daysItrData = CampaignInput.loadItrSimpleData() // FIXME
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
-    // acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-  def startPushCampaignMerge(campaignJsonPath: String) = {
+  def startCampaignMerge(campaignJsonPath: String) = {
 
     //    val conf = new Configuration()
     //          val fileSystem = FileSystem.get(conf)
@@ -218,11 +220,64 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
-    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY, CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
+      CampaignUdfs.campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE), first(CampaignCommon.PRIORITY), first(CampaignMergedFields.REF_SKU1), first(CampaignMergedFields.REF_SKU2))
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        first(CampaignCommon.PRIORITY) as(CampaignCommon.PRIORITY),
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
 
     return campaignMerged
+  }
+
+  /**
+   * Merges all the campaign output based on priority
+   * @param campaignJsonPath
+   */
+  def startPushCampaignMerge(campaignJsonPath: String) = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
+    if (validated) {
+      if(!(createCampaignMaps(json))){
+        exit()
+      }
+      val allCampaignsData = CampaignInput.loadAllCampaignsData()
+      println("ALL KEYS "+CampaignManager.mailTypePriorityMap.values)
+
+      val mergedData = campaignMerger(allCampaignsData)
+      CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
+        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
+      //          COVarJobConfig.coVarInfo = coVarJob
+      //        coVarJob.source match {
+      //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
+      //          case _ => logger.error("Unknown table source.")
+      //        }
+    }
   }
 }

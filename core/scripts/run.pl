@@ -119,7 +119,10 @@ if ($component eq "bob") {
 }elsif ($component eq "pushAbandonedCartCampaign") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushAbandonedCartCampaign --config $HDFS_CONF/config.json";
      run_component($component, $command);
- }else {
+ }elsif ($component eq "pushCampaignMerge") {
+       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaignConfig.json";
+       run_component($component, $command);
+   }else {
     print "not a valid component\n";
 }
 

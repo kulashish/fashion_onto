@@ -51,7 +51,12 @@ class ReturnCancel extends LiveCustomerSelector {
 
     val returnCancelSku = salesOrderItemData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " in (" + OrderStatus.RETURN
       + "," + OrderStatus.RETURN_PAYMENT_PENDING + "," + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC_ITEM + "," + OrderStatus.CANCEL_PAYMENT_ERROR
-      + "," + OrderStatus.DECLINED + "," + OrderStatus.EXPORTABLE_CANCEL_CUST + "," + OrderStatus.EXPORTED_CANCEL_CUST + ")").select(salesOrderItemData(ProductVariables.SKU), salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE), salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER), salesOrderItemData(SalesOrderItemVariables.UPDATED_AT))
+      + "," + OrderStatus.DECLINED + "," + OrderStatus.EXPORTABLE_CANCEL_CUST + "," + OrderStatus.EXPORTED_CANCEL_CUST + ")")
+      .select(salesOrderItemData(ProductVariables.SKU),
+        salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE),
+        salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
+        salesOrderItemData(SalesOrderItemVariables.UPDATED_AT))
 
     // 2. inner join it with sales_order: short data
     // call it customerLatestItemsData
@@ -59,7 +64,12 @@ class ReturnCancel extends LiveCustomerSelector {
       returnCancelSku,
       customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner"
     )
-      .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER), customerOrderData(SalesOrderVariables.ID_SALES_ORDER), returnCancelSku(ProductVariables.SKU), returnCancelSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), returnCancelSku(SalesOrderItemVariables.UNIT_PRICE), returnCancelSku(SalesOrderItemVariables.UPDATED_AT), returnCancelSku(ProductVariables.SKU))
+      .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER),
+        customerOrderData(SalesOrderVariables.ID_SALES_ORDER),
+        returnCancelSku(ProductVariables.SKU),
+        returnCancelSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        returnCancelSku(SalesOrderItemVariables.UNIT_PRICE),
+        returnCancelSku(SalesOrderItemVariables.UPDATED_AT))
 
     // how to filter new orders after that
     // 1. sales_order subset: last day order created at, customers in the customerLatestItemsData
@@ -67,15 +77,20 @@ class ReturnCancel extends LiveCustomerSelector {
 
     val latestCustomerOrders = customerOrderData.withColumn("DaysPresent", CampaignUtils.lastDayTimeDifference(customerOrderData(SalesOrderVariables.CREATED_AT)))
       .filter("DaysPresent <= 1")
-      .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg($"${SalesOrderVariables.FK_CUSTOMER}", first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.FK_SALES_ORDER, first(SalesOrderVariables.CREATED_AT) as "last_order_time")
+      .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER).agg($"${SalesOrderVariables.FK_CUSTOMER}",
+        first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.FK_SALES_ORDER,
+        first(SalesOrderVariables.CREATED_AT) as "last_order_time")
 
     // 3. join it with rdf data and then filter by where item_updated_at < last_order_time
     val joinedData = customerLatestItemsData.join(latestCustomerOrders, latestCustomerOrders(SalesOrderVariables.FK_CUSTOMER) === customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER), "full_outer")
     //or "+customerLatestItemsData(SalesOrderItemVariables.UPDATED_AT)<latestCustomerOrders( "last_order_time")
     val filteredSku = joinedData.filter("updated_at is not null and (last_order_time  is null or last_order_time <= updated_at)")
-      .select(customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER), customerLatestItemsData(SalesOrderVariables.ID_SALES_ORDER), customerLatestItemsData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
-        customerLatestItemsData(SalesOrderItemVariables.UNIT_PRICE), customerLatestItemsData(SalesOrderItemVariables.UPDATED_AT), customerLatestItemsData(ProductVariables.SKU))
+      .select(customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER),
+        customerLatestItemsData(SalesOrderVariables.ID_SALES_ORDER),
+        customerLatestItemsData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        customerLatestItemsData(SalesOrderItemVariables.UNIT_PRICE),
+        customerLatestItemsData(SalesOrderItemVariables.UPDATED_AT),
+        customerLatestItemsData(ProductVariables.SKU))
 
     //  println("FOURTH"+latestCustomerOrders.count())
     //    filteredSku.collect().foreach(println)
