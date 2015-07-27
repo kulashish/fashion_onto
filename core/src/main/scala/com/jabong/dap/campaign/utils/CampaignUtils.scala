@@ -4,14 +4,16 @@ import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
-
+import akka.dispatch.sysmsg.Create
+import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 
 /**
@@ -387,9 +389,12 @@ object CampaignUtils extends Logging {
     return dfYesterdayItrData
   }
 
+
   //FIXME:add implementation
   def addPriority(campaignData: DataFrame): DataFrame = {
-    return null
+    val priorityMap = CampaignManager.mailTypePriorityMap
+    val campaignRDD = campaignData.map(e => Row.apply(e(1),e(0),e(2),priorityMap.get(e(1).asInstanceOf[Int])))
+    return Spark.getSqlContext().createDataFrame(campaignRDD,Schema.campaignPriorityOutput)
   }
   //FIXME: make it generalized for all campaigns
   /**
