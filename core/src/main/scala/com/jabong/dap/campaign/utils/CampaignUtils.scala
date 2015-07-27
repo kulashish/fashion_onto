@@ -393,15 +393,8 @@ object CampaignUtils extends Logging {
   //FIXME:add implementation
   def addPriority(campaignData: DataFrame): DataFrame = {
     val priorityMap = CampaignManager.mailTypePriorityMap
-    val campaignRDD = campaignData.map(e => Row.apply(e.getInt(0),e.getInt(1),e(2).toString, priorityMap.get(e(0).asInstanceOf[Int])))
-    val x = Spark.getSqlContext().createDataFrame(campaignRDD,Schema.campaignPriorityOutput)
-   /* return Spark.getSqlContext().createDataFrame(campaignRDD,Schema)
-      .withColumnRenamed("_1",CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-      .withColumnRenamed("_2",CampaignMergedFields.FK_CUSTOMER)
-      .withColumnRenamed("_3",CampaignMergedFields.REF_SKU1)
-      .withColumnRenamed("_4",CampaignCommon.PRIORITY)
-      */
-    return x
+    val campaignRDD = campaignData.map(e => Row.apply(e(1),e(0),e(2),priorityMap.get(e(1).asInstanceOf[Int])))
+    return Spark.getSqlContext().createDataFrame(campaignRDD,Schema.campaignPriorityOutput)
   }
   //FIXME: make it generalized for all campaigns
   /**
