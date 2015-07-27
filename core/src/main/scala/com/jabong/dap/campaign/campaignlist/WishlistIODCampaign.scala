@@ -8,7 +8,7 @@ import org.apache.spark.sql.DataFrame
 
 class WishlistIODCampaign {
 
-  def runCampaign(customerSelected: DataFrame,itrSku30DaysData:DataFrame,itrSkuSimpleYesterdayData:DataFrame): Unit = {
+  def runCampaign(customerSelected: DataFrame, itrSku30DaysData: DataFrame, itrSkuSimpleYesterdayData: DataFrame): Unit = {
 
     // select customers who have added one or more items to wishlist during 30 days
 
@@ -24,8 +24,7 @@ class WishlistIODCampaign {
     val iodSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).
       getSkuSelector(SkuSelection.SKU_ITEM_ON_DISCOUNT)
 
-    val refSkus = iodSkuSelector.skuFilter(customerSelected,itrSku30DaysData,itrSkuSimpleYesterdayData)
-
+    val refSkus = iodSkuSelector.skuFilter(customerSelected, itrSku30DaysData, itrSkuSimpleYesterdayData)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
     //save campaign Output
