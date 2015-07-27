@@ -58,7 +58,7 @@ object DevicesReactions extends Logging {
 
       DataWriter.writeParquet(resultI, savePathI, saveMode)
       DataWriter.writeParquet(incrI, savePathI, saveMode)
-      DataWriter.writeCsv(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL + DataSets.CSV, dateStr, "true", ",")
+      DataWriter.writeCsv(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, dateStr, "true", ",")
 
     }
 
@@ -78,7 +78,7 @@ object DevicesReactions extends Logging {
 
       DataWriter.writeParquet(resultA, savePathA, saveMode)
       DataWriter.writeParquet(incrA, savePathA, saveMode)
-      DataWriter.writeCsv(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL + DataSets.CSV, dateStr, "true", ",")
+      DataWriter.writeCsv(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, dateStr, "true", ",")
     }
   }
 

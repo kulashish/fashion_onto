@@ -59,6 +59,8 @@ object DataSets {
 
   val REACTIONS_IOS = "reactions_ios"
   val REACTIONS_ANDROID = "reactions_android"
+  val REACTIONS_IOS_CSV = "reactions_ios_csv"
+  val REACTIONS_ANDROID_CSV = "reactions_android_csv"
 
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"
