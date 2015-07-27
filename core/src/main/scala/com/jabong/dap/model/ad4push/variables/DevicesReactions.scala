@@ -2,8 +2,10 @@ package com.jabong.dap.model.ad4push.variables
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.VarInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
@@ -20,26 +22,25 @@ import com.jabong.dap.common.udf.Udf
  */
 object DevicesReactions extends Logging {
 
+  def start(vars: VarInfo) = {
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+    val mode = OptionUtils.getOptValue(vars.incrMode, DataSets.DAILY_MODE)
+    customerResponse(incrDate, mode)
+  }
   /**
    * All read CSV, read perquet, write perquet
-   * @param yyyyMMdd date for which summary is needed in YYYYMMDD format
+   * @param incrDate date for which summary is needed in YYYYMMDD format
    * @return (iPhoneResult, AndroidResult) for tgiven date
    */
-  def customerResponse(yyyyMMdd: String, mode: String): Unit = {
+  def customerResponse(incrDate: String, mode: String): Unit = {
 
     //getting file names
-    val today = Calendar.getInstance().getTime
-    val formatter = new SimpleDateFormat(TimeConstants.YYYYMMDD)
 
-    val dateString = if (yyyyMMdd != null) yyyyMMdd else formatter.format(today)
+    val dateStr = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val dateStr = TimeUtils.changeDateFormat(dateString, TimeConstants.YYYYMMDD, TimeConstants.DATE_FORMAT_FOLDER)
-
-    val incIPhoneCSV = DataSets.IPHONE_CSV_PREFIX + dateString + DataSets.CSV
     val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr, "true", ",")
     val incI = dfCorrectSchema(incIStringSchema)
 
-    val incAndroidCSV = DataSets.ANDROID_CSV_PREFIX + dateString + DataSets.CSV
     val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr, "true", ",")
     val incA = dfCorrectSchema(incAStringSchema)
 
@@ -67,9 +68,11 @@ object DevicesReactions extends Logging {
     val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
 
     DataWriter.writeParquet(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, dateStr)
+    DataWriter.writeCsv(resultI,DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL+DataSets.CSV, dateStr,"true",",")
     DataWriter.writeParquet(incrI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr)
 
     DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, dateStr)
+    DataWriter.writeCsv(resultA,DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL+DataSets.CSV, dateStr,"true",",")
     DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr)
   }
 
