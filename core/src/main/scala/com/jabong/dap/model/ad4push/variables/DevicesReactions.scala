@@ -56,28 +56,13 @@ object DevicesReactions extends Logging {
 
       val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
 
-      DataWriter.writeParquet(resultI, savePathI, saveMode)
-      DataWriter.writeParquet(incrI, savePathI, saveMode)
+    DataWriter.writeParquet(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, dateStr)
+    DataWriter.writeParquet(incrI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr)
+    DataWriter.writeCsv(resultI,DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL+DataSets.CSV, dateStr,"true",",")
 
-    }
-
-    val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, dateStr)
-    if (DataWriter.canWrite(savePathA, saveMode)) {
-      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, dateStr, "true", ",")
-      val incA = dfCorrectSchema(incAStringSchema)
-
-      //getting DF
-      logger.info("Reading inputs (CSVs and Parquets) for Android")
-      val fullA = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, yesterday)
-      val b7A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before7daysString)
-      val b15A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before15daysString)
-      val b30A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before30daysString)
-
-      val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
-
-      DataWriter.writeParquet(resultA, savePathA, saveMode)
-      DataWriter.writeParquet(incrA, savePathA, saveMode)
-    }
+    DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, dateStr)
+    DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr)
+    DataWriter.writeCsv(resultA,DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL+DataSets.CSV, dateStr,"true",",")
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
