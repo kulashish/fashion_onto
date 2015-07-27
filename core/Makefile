@@ -14,4 +14,6 @@ package:
 	cp src/main/resources/*.json $(BASE)/conf/
 	cp scripts/confInit.sh $(BASE)/bin/
 	cp scripts/run.pl $(BASE)/bin/
+	mkdir -p $(BASE)/bin/clickstream
+	cp scripts/clickstream/* $(BASE)/bin/clickstream/
 	tar -zcvf $(PKGNAME) $(BASE)
