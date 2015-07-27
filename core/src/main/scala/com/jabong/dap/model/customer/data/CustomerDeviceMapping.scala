@@ -16,7 +16,6 @@ import org.apache.spark.sql.functions._
  */
 object CustomerDeviceMapping extends Logging {
 
-
   /**
    *
    * @param clickStreamInc incremental click_stream data
@@ -47,7 +46,6 @@ object CustomerDeviceMapping extends Logging {
       coalesce(dcf(PageVisitVariables.DOMAIN), joinedDf(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN)
     joined
   }
-
 
   /**
    *

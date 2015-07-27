@@ -3,7 +3,7 @@ package com.jabong.dap.data.storage.merge.common
 import java.io.File
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 
 /**
  * Verifies if the data exits at a given location.
