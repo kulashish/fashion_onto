@@ -263,7 +263,7 @@ object CampaignManager extends Serializable with Logging {
     }
 
     if (validated) {
-      createCampaignMaps(json))
+      createCampaignMaps(json)
       val allCampaignsData = CampaignInput.loadAllCampaignsData()
 
       val mergedData = campaignMerger(allCampaignsData)

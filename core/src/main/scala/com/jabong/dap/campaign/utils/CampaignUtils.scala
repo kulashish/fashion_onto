@@ -351,7 +351,7 @@ object CampaignUtils extends Logging {
   }
 
   def getCampaignPriority(mailType: Int): Int = {
-    println("ALL KEYS "+CampaignManager.mailTypePriorityMap.values)
+    logger.info("ALL KEYS FIRST "+CampaignManager.mailTypePriorityMap.values)
 
     if (mailType == 0) {
       val errorString = ("Priority doesn't exist for mailType %d", mailType)
@@ -359,8 +359,8 @@ object CampaignUtils extends Logging {
       println("Size of map"+CampaignManager.campaignMailTypeMap.size)
       return CampaignCommon.VERY_LOW_PRIORITY
     }
-    println("Size of map"+CampaignManager.campaignMailTypeMap.size)
-    println("ALL KEYS "+CampaignManager.mailTypePriorityMap.values)
+    logger.info("Size of map"+CampaignManager.campaignMailTypeMap.size)
+    logger.info("ALL KEYS "+CampaignManager.mailTypePriorityMap.values)
     return CampaignManager.mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
   }
 
