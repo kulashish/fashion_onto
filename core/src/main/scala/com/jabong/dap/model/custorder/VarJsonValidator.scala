@@ -1,6 +1,6 @@
 package com.jabong.dap.model.custorder
 
-import com.jabong.dap.data.acq.common.{VarJobInfo, VarInfo}
+import com.jabong.dap.data.acq.common.{ VarJobInfo, VarInfo }
 import com.jabong.dap.data.storage.DataSets
 
 /**

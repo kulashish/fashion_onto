@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer.data
 
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
 import com.jabong.dap.data.acq.common.VarInfo
 import com.jabong.dap.data.read.{ DataNotFound, DataReader, ValidFormatNotFound }
@@ -41,8 +41,8 @@ object CustomerDeviceMapping extends Logging {
   }
 
   def start(vars: VarInfo) = {
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2,TimeConstants.DATE_FORMAT))
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT))
     val path = OptionUtils.getOptValue(vars.path)
     processData(prevDate, path, incrDate)
   }
