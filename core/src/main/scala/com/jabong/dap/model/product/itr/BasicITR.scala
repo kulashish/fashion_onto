@@ -38,6 +38,7 @@ object BasicITR {
         first(ITR.BRAND_NAME) as ITR.BRAND_NAME,
         avg(ITR.PRICE_ON_SITE) as ITR.PRICE_ON_SITE,
         avg(ITR.SPECIAL_PRICE) as ITR.SPECIAL_PRICE,
+        first(ITR.ITR_DATE),
         //first(ITR.PRICE_BAND) as ITR.PRICE_BAND,
         //first(ITR.GENDER) as ITR.GENDER,
         //first(ITR.MVP) as ITR.MVP,
