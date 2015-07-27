@@ -33,8 +33,11 @@ copyDRInFiles() {
 			yyyy=`echo $yyyymmdd | cut -c 1-4`
 			mm=`echo $yyyymmdd | cut -c 5-6`
 			dd=`echo $yyyymmdd | cut -c 7-8`
-			cmd="hadoop fs -copyFromLocal $i /data/input/ad4push/reactions_$dName/daily/$yyyy/$mm/$dd/"
+			dir="/data/input/ad4push/reactions_$dName/daily/$yyyy/$mm/$dd/"
+			cmd="hadoop fs -copyFromLocal $i $dir"
+			cmd_mkdir="hadoop fs -mkdir $dir"
 			echo "Running command for File: $i:\r\n\t\t $cmd"
+			eval $cmd_mkdir
 			eval $cmd
 		fi
 	done
