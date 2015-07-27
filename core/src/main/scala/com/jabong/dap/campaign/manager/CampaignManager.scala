@@ -224,11 +224,10 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
-    val inputCampaignData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+    val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
       CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
-    addPriority(inputCampaignsData)
-    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
-      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+
+    val inputDataWithPriority = addPriority(selectedData)
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
