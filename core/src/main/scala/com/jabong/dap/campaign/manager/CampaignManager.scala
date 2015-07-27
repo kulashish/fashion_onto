@@ -188,7 +188,7 @@ object CampaignManager extends Serializable with Logging {
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int , mailTypePriorityMap :mutable.HashMap[Int,Int]))
+  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: mutable.HashMap[Int, Int]))
 
   def startCampaignMerge(campaignJsonPath: String) = {
 
@@ -223,15 +223,15 @@ object CampaignManager extends Serializable with Logging {
       logger.error("priorityMap doesn't  Exists")
       return null
     }
-    println("CAMPAIGN MERGER "+CampaignManager.mailTypePriorityMap.keys+"\t"+mailTypePriorityMap.values)
+    println("CAMPAIGN MERGER " + CampaignManager.mailTypePriorityMap.keys + "\t" + mailTypePriorityMap.values)
 
     val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
-        campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY) as(CampaignCommon.PRIORITY),
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
         first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
 
     return campaignMerged

@@ -11,6 +11,6 @@ import scala.collection.mutable
 object CampaignUdfs {
 
   // udf to return the priority of campaign given campaign mail type
-  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int , CampaignManager.mailTypePriorityMap :mutable.HashMap[Int,Int]))
+  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, CampaignManager.mailTypePriorityMap: mutable.HashMap[Int, Int]))
 
 }

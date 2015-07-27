@@ -350,16 +350,13 @@ object CampaignUtils extends Logging {
     return filteredData
   }
 
-  def getCampaignPriority(mailType: Int,mailTypePriorityMap :scala.collection.mutable.HashMap[Int,Int]): Int = {
-    logger.info("ALL KEYS FIRST "+mailTypePriorityMap.values)
-    println("What the hell"+mailTypePriorityMap.values+"\t"+mailType)
-
+  def getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]): Int = {
     if (mailType == 0) {
       val errorString = ("Priority doesn't exist for mailType %d", mailType)
       logger.error(errorString)
       return CampaignCommon.VERY_LOW_PRIORITY
     }
-    logger.info("ALL KEYS "+mailTypePriorityMap.values)
+    logger.info("ALL KEYS " + mailTypePriorityMap.values)
     return mailTypePriorityMap.getOrElse(mailType, CampaignCommon.VERY_LOW_PRIORITY)
   }
 
