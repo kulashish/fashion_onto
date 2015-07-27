@@ -26,7 +26,6 @@ class SalesAddressTest extends FlatSpec with SharedSparkContext {
 
   "Testing max mobile No and city" should "have size 3" in {
     var maxCityPhon = SalesOrderAddress.getFav(df1)
-    maxCityPhon.collect().foreach(println)
     assert(maxCityPhon.collect.size == 3)
   }
 

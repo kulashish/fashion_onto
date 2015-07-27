@@ -16,6 +16,14 @@ import org.apache.spark.sql.functions._
  */
 object CustomerDeviceMapping extends Logging {
 
+
+  /**
+   *
+   * @param clickStreamInc incremental click_stream data
+   * @param dcf dcf customer->device_mapping data
+   * @param customer customer incremental data
+   * @return master customer device mapping with the last used device by the customer
+   */
   def getLatestDevice(clickStreamInc: DataFrame, dcf: DataFrame, customer: DataFrame): DataFrame = {
     //val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
     val clickStream = clickStreamInc.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.USER_ID).agg(
@@ -40,6 +48,11 @@ object CustomerDeviceMapping extends Logging {
     joined
   }
 
+
+  /**
+   *
+   * @param vars
+   */
   def start(vars: VarInfo) = {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT))
@@ -48,22 +61,22 @@ object CustomerDeviceMapping extends Logging {
     processData(prevDate, path, incrDate, saveMode)
   }
 
+  /**
+   *
+   * @param prevDate
+   * @param path
+   * @param curDate
+   */
   def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
-    df1.printSchema()
-    df1.show(5)
     var df2: DataFrame = null
     if (null != path) {
       df2 = getDataFrameCsv4mDCF(path)
     } else {
       df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, prevDate)
     }
-    df2.printSchema()
-    df2.show(10)
     val df3 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
     val res = getLatestDevice(df1, df2, df3)
-    res.printSchema()
-    res.show(20)
     DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate, saveMode)
   }
 
