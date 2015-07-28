@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, CustomerPageVisitVariables, ItrVariables }
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, CustomerPageVisitVariables, ItrVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -28,7 +28,7 @@ class Surf extends SkuSelector with Logging {
    */
   def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = {
 
-    if (dfCustomerPageVisit == null || dfItrData == null || dfSalesOrder == null || dfSalesOrderItem == null) {
+    if (dfCustomerPageVisit == null || dfItrData == null || dfCustomer == null || dfSalesOrder == null || dfSalesOrderItem == null) {
 
       logger.error("Data frame should not be null")
 
@@ -38,7 +38,7 @@ class Surf extends SkuSelector with Logging {
 
     val itrData = dfItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ItrVariables.AVERAGE_PRICE) as ItrVariables.SPECIAL_PRICE
+      col(ItrVariables.AVERAGE_PRICE) as ProductVariables.SPECIAL_PRICE
     )
 
     val dfCustomerEmailToCustomerId = CampaignUtils.getMappingCustomerEmailToCustomerId(dfCustomerPageVisit, dfCustomer)
@@ -47,21 +47,20 @@ class Surf extends SkuSelector with Logging {
 
     val dfJoin = dfSkuNotBought.join(
       itrData,
-      dfSkuNotBought(CustomerPageVisitVariables.PRODUCT_SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
+      dfSkuNotBought(CustomerPageVisitVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
     )
+      .select(
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerVariables.EMAIL), //EMAIL can be encrypted EMAIL or BrowserId
+        col(ItrVariables.SKU) as ProductVariables.SKU_SIMPLE,
+        col(ProductVariables.SPECIAL_PRICE)
+      )
 
-    val dfReferenceSku = CampaignUtils.generateReferenceSkus(dfJoin, 2)
+    //FIXME: generate Reference Skus
+    //    val dfReferenceSku = CampaignUtils.generateReferenceSkus(dfJoin, 2)
 
-    //===========select USER_ID,SKU, SPECIAL_PRICE================================================================
-    val dfResult = dfReferenceSku.select(
-      col(CustomerVariables.FK_CUSTOMER),
-      col(CustomerVariables.EMAIL), //EMAIL can be encrypted EMAIL or BrowserId
-      col(ItrVariables.SKU),
-      col(ItrVariables.SPECIAL_PRICE)
-    )
-
-    return dfResult
+    return dfJoin
   }
 
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???

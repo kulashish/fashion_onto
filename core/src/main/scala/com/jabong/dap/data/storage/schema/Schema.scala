@@ -265,6 +265,22 @@ object Schema {
     StructField(CampaignCommon.PRIORITY,IntegerType, true)
   ))
 
+  val customerPageVisitSkuListLevel = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
+  val customerPageVisitSkuLevel = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU, StringType, true)
+  ))
+
   val salesOrderItem = StructType(Array(
     StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, IntegerType, true),
     StructField(SalesOrderItemVariables.FK_SALES_ORDER, IntegerType, true),

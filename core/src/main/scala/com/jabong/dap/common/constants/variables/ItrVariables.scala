@@ -20,4 +20,6 @@ object ItrVariables {
   val STOCK = "stock"
 
   val ITR_ = "itr_"
+
+  val UNIT_PRICE = "unit_price"
 }

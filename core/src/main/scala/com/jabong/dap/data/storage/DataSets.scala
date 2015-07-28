@@ -112,5 +112,6 @@ object DataSets {
   val ERP_SOURCE = "erp"
 
   val CUSTOMER_SELECTION = "customer_selection"
-  val CUSTOMER_SURF_DATA = "customer_surf_data"
+  val CUSTOMER_PAGE_VISIT = "customer_page_visit"
+  val SURF = "surf"
 }

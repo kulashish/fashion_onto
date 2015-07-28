@@ -15,4 +15,6 @@ object CustomerPageVisitVariables {
   val REPEATED_SKU = "repeated_sku"
   val BRICK = "brick"
 
+  val SKU = "sku"
+
 }
