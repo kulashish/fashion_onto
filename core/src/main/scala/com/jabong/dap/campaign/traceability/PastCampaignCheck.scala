@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.traceability
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables, ProductVariables, CustomerVariables }
@@ -102,5 +103,15 @@ class PastCampaignCheck extends Logging {
       )
 
     return pastCampaignNotSendCustomers
+  }
+
+  def getLastNDaysData(n: Int): DataFrame={
+    var data: DataFrame = null
+    for(i <-1 to n){
+      val date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      var df = CampaignInput.loadAllCampaignsData(date)
+      data = data.unionAll(df)
+    }
+    data
   }
 }

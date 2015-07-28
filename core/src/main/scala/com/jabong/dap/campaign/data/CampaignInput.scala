@@ -153,12 +153,13 @@ object CampaignInput extends Logging {
    * Load all campaign data
    * @return dataframe with call campaigns data
    */
-  def loadAllCampaignsData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+  def loadAllCampaignsData( basePath: String, source: String, mode: String, date: String): DataFrame = {
+
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
     // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
-    val campaignData = Spark.getSqlContext().read.parquet("/data/output/campaigns/*/2015/07/26/")
+    val path = buildPath(basePath,source,"*",mode,date)
+    val campaignData = Spark.getSqlContext().read.parquet(path)
     val allCampaignData = campaignData.select(
       campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.FK_CUSTOMER),
       campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),

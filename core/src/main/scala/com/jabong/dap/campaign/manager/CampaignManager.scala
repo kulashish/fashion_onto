@@ -7,6 +7,7 @@ import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -212,7 +213,7 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData()
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.basePath,DataSets.CAMPAIGN,DataSets.DAILY_MODE,"")
 
       val mergedData = campaignMerger(allCampaignsData)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
