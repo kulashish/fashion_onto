@@ -95,4 +95,20 @@ object Udf {
    * skuFromSimpleSku will convert simple_sku to sku
    */
   val skuFromSimpleSku = udf((simpleSku: String) => UdfUtils.getskuFromSimpleSku(simpleSku: String))
+
+  /**
+   * distinctSku will return list of distinct Sku
+   */
+  val distinctSku = udf((skuList: List[String]) => UdfUtils.getDistinctSku(skuList: List[String]))
+
+  /**
+   * repeatedSku will return list of repeated Sku
+   */
+  val repeatedSku = udf((skuList: List[String]) => UdfUtils.getRepeatedSku(skuList: List[String]))
+
+  /**
+   * countSku will return total no of sku
+   */
+  val countSku = udf((skuList: List[String]) => UdfUtils.getCountSku(skuList: List[String]))
+
 }

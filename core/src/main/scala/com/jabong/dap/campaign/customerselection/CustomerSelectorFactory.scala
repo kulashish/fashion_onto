@@ -31,6 +31,18 @@ class CustomerSelectorFactory extends CampaignFactory {
       return new WishList()
     }
 
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.YESTERDAY_SESSION)) {
+      return new YesterdaySession()
+    }
+
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.YESTERDAY_SESSION_DISTINCT)) {
+      return new YesterdaySessionDistinct()
+    }
+
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.LAST_THIRTY_DAY_SESSION)) {
+      return new LastThirtyDaySession()
+    }
+
     return null
   }
 

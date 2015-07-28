@@ -8,6 +8,9 @@ import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 /**
  * Created by raghu on 3/7/15.
  */
@@ -335,6 +338,71 @@ object UdfUtils {
   }
 
   /**
+   *
+   * @param skuArray
+   * @tparam T
+   * @return
+   */
+  def getDistinctSku[T](skuArray: List[T]): List[T] = {
+
+    if (skuArray == null || skuArray.isEmpty) {
+      return null
+    }
+
+    val skuList = skuArray.distinct
+
+    return skuList
+
+  }
+
+  /**
+   *
+   * @param skuArray
+   * @tparam T
+   * @return
+   */
+  def getRepeatedSku[T](skuArray: List[T]): List[T] = {
+
+    if (skuArray == null || skuArray.isEmpty) {
+      return null
+    }
+
+    val setSkus = new mutable.HashSet[T]
+
+    val skuList = new ListBuffer[T]()
+
+    for (sku <- skuArray) {
+
+      if (!setSkus.contains(sku)) {
+        setSkus.add(sku)
+      } else {
+        skuList += sku
+      }
+    }
+
+    if (skuList.toList.isEmpty) {
+      return null
+    }
+
+    return skuList.toList
+  }
+
+  /**
+   *
+   * @param skuList
+   * @tparam T
+   * @return
+   */
+  def getCountSku[T](skuList: List[T]): Int = {
+
+    if (skuList == null || skuList.isEmpty) {
+      return 0
+    }
+
+    return skuList.length
+  }
+
+  /**
    * returns dayName with max click given counts for 7 days
    * @param count1
    * @param count2
@@ -343,7 +411,7 @@ object UdfUtils {
    * @param count5
    * @param count6
    * @param count7
-   * @return day with maximum click
+   * @return
    */
   def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
     var max = count1;
@@ -375,4 +443,5 @@ object UdfUtils {
     }
     return TimeUtils.nextNDay("Monday", index)
   }
+
 }
