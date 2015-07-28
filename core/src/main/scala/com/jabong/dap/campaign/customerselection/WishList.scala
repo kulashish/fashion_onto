@@ -52,8 +52,9 @@ class WishList extends LiveCustomerSelector with Logging {
 
     if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
 
-      logger.error("schema attributes or data type mismatch")
+      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
 
+      logger.error("schema should be this :" + dfCustomerProductShortlist.schema)
       return null
 
     }
