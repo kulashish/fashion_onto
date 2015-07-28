@@ -126,7 +126,7 @@ object CampaignInput extends Logging {
       itrData = currentMonthItrData
     }
 
-    println("COUNT "+itrData.count)
+    println("COUNT " + itrData.count)
     // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
     val last30DayItrData = CampaignUtils.getTimeBasedDataFrame(itrData, ITR.ITR_DATE, yesterdayOldEndTime.toString, thirtyDayOldEndTime.toString)
 
@@ -176,7 +176,7 @@ object CampaignInput extends Logging {
     if (fileFormat == "orc") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath)
-        logger.info(" orc data loaded from filepath"+filePath)
+        logger.info(" orc data loaded from filepath" + filePath)
       } else {
         return null
       }
@@ -184,7 +184,7 @@ object CampaignInput extends Logging {
     if (fileFormat == "parquet") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath)
-        logger.info(" parquet data loaded from filepath"+filePath)
+        logger.info(" parquet data loaded from filepath" + filePath)
 
       } else {
         return null

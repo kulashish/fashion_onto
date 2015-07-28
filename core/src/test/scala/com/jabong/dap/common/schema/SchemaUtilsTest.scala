@@ -1,7 +1,7 @@
 package com.jabong.dap.common.schema
 
 import com.jabong.dap.data.storage.schema.Schema
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by pooja on 28/7/15.
