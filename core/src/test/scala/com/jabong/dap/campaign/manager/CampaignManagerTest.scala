@@ -69,7 +69,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     assert(mergedCampaignData.count() == 2)
   }
 
-  "Test add Priority" should "add one more column" in{
+  "Test add Priority" should "add one more column" in {
     val status = CampaignManager.createCampaignMaps(json)
     val mergedCampaignData = CampaignUtils.addPriority(campaignsOutData)
     mergedCampaignData.show(5)
