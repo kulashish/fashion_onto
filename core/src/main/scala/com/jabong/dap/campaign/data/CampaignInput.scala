@@ -25,14 +25,14 @@ object CampaignInput extends Logging {
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, dateYesterday)
     orderItemData
   }
 
   def loadFullOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderItemData
   }
 
@@ -52,7 +52,7 @@ object CampaignInput extends Logging {
   def loadFullOrderData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order data from hdfs")
-    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderData
   }
 
@@ -71,7 +71,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last 30 days acart item data from hdfs")
 
-    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_CART, DataSets.MONTHLY_MODE, dateYesterday)
+    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_CART, DataSets.MONTHLY_MODE, dateYesterday)
     acartData
   }
 

@@ -87,7 +87,7 @@ object Init {
         ConfigJsonValidator.validate(config)
         AppConfig.config = config
         // initialize spark context
-        Spark.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
+        Spark.init(new SparkConf().setAppName(AppConfig.config.applicationName))
         run(params)
       } catch {
         case e: ParseException =>

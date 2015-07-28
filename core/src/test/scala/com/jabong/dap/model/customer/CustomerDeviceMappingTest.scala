@@ -1,5 +1,7 @@
 package com.jabong.dap.model.customer
 
+import java.io.File
+
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
@@ -34,7 +36,7 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
   "Testing getLatestDevice method" should " return size 27" in {
 
-    df3 = CustomerDeviceMapping.getDataFrameCsv4mDCF(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping.csv")
+    df3 = CustomerDeviceMapping.getDataFrameCsv4mDCF(JsonUtils.TEST_RESOURCES + File.separator + DataSets.EXTRAS + File.separator + "device_mapping.csv")
 
     val res = CustomerDeviceMapping.getLatestDevice(df2, df3, df1)
 

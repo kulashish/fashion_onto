@@ -28,14 +28,13 @@ case class Credentials(
  * parameters which matches to the keys in config.json.template
  *
  * @param applicationName String Set a name for your application. Shown in the Spark web UI
- * @param master String The master URL to connect to, such as "local" to run locally with one thread, "local[4]" to
- * run locally with 4 cores, or "spark://master:7077" to run on a Spark standalone cluster.
- * @param basePath String The base path for the location where the data will be saved.
+ * @param outputPath String The output path for the location where the data will be saved.
+ * @param basePath String The base path for the location where the data will be read and written.
  * @param credentials List[Credentials] List of credentials.
  */
 case class Config(
   applicationName: String = null,
-  master: String = null,
+  outputPath: String = null,
   basePath: String = null,
   credentials: List[Credentials] = null) extends EmptyClass
 

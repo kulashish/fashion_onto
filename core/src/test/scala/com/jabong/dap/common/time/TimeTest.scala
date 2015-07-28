@@ -150,4 +150,8 @@ class TimeTest extends FlatSpec with Matchers {
     TimeUtils.getStartTimestampMS(null) should be (null)
   }
 
+  "changeDateFormat" should "return empty string" in {
+    TimeUtils.changeDateFormat(null, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER) should be ("")
+  }
+
 }
