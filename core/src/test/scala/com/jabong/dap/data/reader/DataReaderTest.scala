@@ -7,7 +7,7 @@ import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
 import org.apache.spark.sql.types.IntegerType
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by Kapil.Rajak on 23/7/15.
