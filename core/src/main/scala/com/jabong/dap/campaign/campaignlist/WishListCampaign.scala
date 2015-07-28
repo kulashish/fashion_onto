@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
-import com.jabong.dap.common.constants.variables.{ ProductVariables, ItrVariables, CustomerProductShortlistVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
@@ -93,7 +93,8 @@ object WishListCampaign {
         col(CustomerProductShortlistVariables.SKU),
         col(ItrVariables.ITR_ + CustomerProductShortlistVariables.SPECIAL_PRICE) as CustomerProductShortlistVariables.SPECIAL_PRICE,
         col(ItrVariables.ITR_ + ItrVariables.STOCK) as ItrVariables.STOCK,
-        col(ItrVariables.ITR_ + ItrVariables.CREATED_AT) as ItrVariables.CREATED_AT
+        col(ItrVariables.ITR_ + ItrVariables.CREATED_AT) as ItrVariables.CREATED_AT,
+        col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT
       )
 
     var skuList = joinDf
@@ -148,6 +149,7 @@ object WishListCampaign {
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
         col(CustomerProductShortlistVariables.SKU_SIMPLE),
+        col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT,
         col(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE) as ItrVariables.SPECIAL_PRICE, // last day price
         col(ItrVariables.ITR_ + ItrVariables.STOCK) as ItrVariables.STOCK
       )
@@ -156,6 +158,7 @@ object WishListCampaign {
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
         col(CustomerProductShortlistVariables.SKU_SIMPLE),
+        col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT,
         col(CustomerProductShortlistVariables.PRICE) as ItrVariables.SPECIAL_PRICE
       )
 
@@ -182,6 +185,7 @@ object WishListCampaign {
       col(CustomerProductShortlistVariables.EMAIL),
       col(CustomerProductShortlistVariables.SKU),
       col(CustomerProductShortlistVariables.SPECIAL_PRICE),
+      col(SalesOrderItemVariables.UPDATED_AT),
       Udf.yyyymmdd(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT
     )
 
@@ -199,7 +203,8 @@ object WishListCampaign {
         CustomerProductShortlistVariables.FK_CUSTOMER,
         CustomerProductShortlistVariables.EMAIL,
         CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.SPECIAL_PRICE
+        CustomerProductShortlistVariables.SPECIAL_PRICE,
+        SalesOrderItemVariables.UPDATED_AT
       )
 
     return resultDf
