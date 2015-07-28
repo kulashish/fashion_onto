@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ Spark, SharedSparkContext }
@@ -67,4 +68,12 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData)
     assert(mergedCampaignData.count() == 2)
   }
+
+  "Test add Priority" should "add one more column" in {
+    val status = CampaignManager.createCampaignMaps(json)
+    val mergedCampaignData = CampaignUtils.addPriority(campaignsOutData)
+    mergedCampaignData.show(5)
+    assert(mergedCampaignData.columns.length == 4)
+  }
+
 }
