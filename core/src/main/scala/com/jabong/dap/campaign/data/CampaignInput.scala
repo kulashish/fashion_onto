@@ -131,14 +131,14 @@ object CampaignInput extends Logging {
     val filteredItr = last30DayItrData.select(last30DayItrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
       last30DayItrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       last30DayItrData(ITR.QUANTITY) as ProductVariables.STOCK)
-      last30DayItrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
+    last30DayItrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
     filteredItr
   }
-  
+
   def loadLast30DaysItrSkuData(): DataFrame = {
     null
   }
-  
+
   def loadFullShortlistData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     logger.info("Reading full fetch shortlist data from hdfs")

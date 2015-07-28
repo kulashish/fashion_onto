@@ -100,12 +100,12 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   }
 
   "No input Data for sku simple Not Bought" should "return null" in {
-    val skuNotBought = CampaignUtils.skuSimpleNOTBought(null, salesOrder, salesOrderItem)
+    val skuNotBought = CampaignUtils.skuSimpleNOTBoughtWithoutPrice(null, salesOrder, salesOrderItem)
     assert(skuNotBought == null)
   }
 
   "input Data  with order data " should "return sku simple not bought till now" in {
-    val skuNotBought = CampaignUtils.skuSimpleNOTBought(customerSelected, salesOrder, salesOrderItem)
+    val skuNotBought = CampaignUtils.skuSimpleNOTBoughtWithoutPrice(customerSelected, salesOrder, salesOrderItem)
     assert(skuNotBought.count() == 1)
   }
 

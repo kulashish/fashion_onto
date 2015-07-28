@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.variables.{ProductVariables, CustomerProductShortlistVariables, ItrVariables}
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerProductShortlistVariables, ItrVariables }
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -9,7 +9,7 @@ import org.apache.spark.sql.functions._
 class ShortlistFollowup {
 
   def skuFilter(dfCustomerProductShortlist: DataFrame, dfYesterdaySkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
-    
+
     //=====================================calculate SKU data frame=====================================================
     val itr30dayData = dfYesterdaySkuItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
@@ -56,5 +56,5 @@ class ShortlistFollowup {
 
     return dfResult
   }
-  
+
 }
