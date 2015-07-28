@@ -7,7 +7,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 28/7/15.
  */
-class SurfCampaign {
+object SurfCampaign {
 
   def runCampaign(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): Unit = {
 
