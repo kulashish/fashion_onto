@@ -52,7 +52,7 @@ object DataVerifier {
   }
 
   //TODO refactor and rename this file.
-  def rename(src:String, dest: String) = {
+  def rename(src: String, dest: String) = {
     fileSystem.rename(new Path(src), new Path(dest))
   }
 }
