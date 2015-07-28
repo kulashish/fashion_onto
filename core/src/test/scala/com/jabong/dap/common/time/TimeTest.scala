@@ -137,17 +137,17 @@ class TimeTest extends FlatSpec with Matchers {
   }
 
   "getMaxDaysOfMonth" should "return 30" in {
-    TimeUtils.getMaxDaysOfMonth("2015-06-09",TimeConstants.DATE_FORMAT) should be (30)
+    TimeUtils.getMaxDaysOfMonth("2015-06-09", TimeConstants.DATE_FORMAT) should be (30)
   }
 
   "getMaxDaysOfMonth1" should "return last date of the current month" in {
     val cal = Calendar.getInstance()
-    TimeUtils.getMaxDaysOfMonth("",TimeConstants.DATE_FORMAT) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+    TimeUtils.getMaxDaysOfMonth("", TimeConstants.DATE_FORMAT) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
   }
 
   "getMaxDaysOfMonth2" should "return last date of the current month" in {
     val cal = Calendar.getInstance()
-    TimeUtils.getMaxDaysOfMonth(null,TimeConstants.DATE_FORMAT) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+    TimeUtils.getMaxDaysOfMonth(null, TimeConstants.DATE_FORMAT) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
   }
 
   "getEndTimestampMS" should "return null" in {

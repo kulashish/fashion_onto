@@ -48,7 +48,7 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
     df1.collect().foreach(println)
     df2.collect().foreach(println)
     res.collect().foreach(println)
-//    val df3 = Spark.getSqlContext().read.parquet(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping_1")
+    //    val df3 = Spark.getSqlContext().read.parquet(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping_1")
 
     assert(res.collect().toSet.equals(df4.collect().toSet))
   }
