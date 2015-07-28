@@ -100,14 +100,6 @@ class TimeTest extends FlatSpec with Matchers {
     assert(TimeUtils.nextNDay("wednesday", 6).equals("Tuesday"))
   }
 
-  "dateStringEmpty" should "return true" in {
-    TimeUtils.dateStringEmpty("") should be (true)
-  }
-
-  "dateStringEmpty" should "return false" in {
-    TimeUtils.dateStringEmpty("2015-05-19") should be (false)
-  }
-
   "getTimeStamp" should "match with expected day" in {
     val sdf = new SimpleDateFormat(TimeConstants.DATE_FORMAT)
     val dt = sdf.parse("2015-06-19")

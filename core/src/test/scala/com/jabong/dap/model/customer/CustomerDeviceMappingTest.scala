@@ -22,13 +22,13 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
 
-    df = JsonUtils.readFromJson(DataSets.EXTRAS, DataSets.DEVICE_MAPPING)
+    df = JsonUtils.readFromJson(DataSets.EXTRAS, DataSets.DEVICE_MAPPING, Schema.customerDeviceMapping)
 
     df1 = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
 
     df2 = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingOutput")
 
-    df4 = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping_1")
+    df4 = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping_1", Schema.customerDeviceMapping)
 
   }
 
@@ -48,7 +48,6 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
     df1.collect().foreach(println)
     df2.collect().foreach(println)
     res.collect().foreach(println)
-    //    val df3 = Spark.getSqlContext().read.parquet(JsonUtils.TEST_RESOURCES + "/" + DataSets.EXTRAS + "/device_mapping_1")
 
     assert(res.collect().toSet.equals(df4.collect().toSet))
   }

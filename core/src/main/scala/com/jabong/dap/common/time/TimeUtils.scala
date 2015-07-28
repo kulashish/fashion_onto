@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.text.{ DateFormatSymbols, SimpleDateFormat }
 import java.util
 import java.util.{ Calendar, Date }
+import com.jabong.dap.common.StringUtils
 import grizzled.slf4j.Logging
 import scala.collection.immutable.HashMap
 
@@ -30,18 +31,6 @@ object TimeUtils extends Logging {
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
     daysBetweenTwoDates(today, date)
-  }
-
-  /**
-   * Boolean test to check whether a given date string is empty (returns true) or not (returns false).
-   * @param dt
-   * @return
-   */
-  def dateStringEmpty(dt: String): Boolean = {
-    if (dt == null || dt.length() == 0)
-      true
-    else
-      false
   }
 
   /**
@@ -183,7 +172,7 @@ object TimeUtils extends Logging {
    */
   def getMonthAndYear(dt: String, dateFormat: String): MonthYear = {
     val cal = Calendar.getInstance()
-    if (null != dt && 0 < dt.length) {
+    if (StringUtils.isEmpty(dt)) {
       val sdf = new SimpleDateFormat(dateFormat)
       val date = sdf.parse(dt)
       cal.setTime(date)
@@ -199,7 +188,7 @@ object TimeUtils extends Logging {
    */
   def getMaxDaysOfMonth(dt: String, dateFormat: String): Int = {
     val cal = Calendar.getInstance()
-    if (null != dt && 0 < dt.length) {
+    if (StringUtils.isEmpty(dt)) {
       val sdf = new SimpleDateFormat(dateFormat)
       val date = sdf.parse(dt)
       cal.setTime(date)
@@ -257,12 +246,16 @@ object TimeUtils extends Logging {
    * @return
    */
   def changeDateFormat(dateString: String, initialFormat: String, expectedFormat: String): String = {
-    val format = new java.text.SimpleDateFormat(initialFormat)
-    format.setLenient(false)
-    val date = format.parse(dateString)
-    val readableDf = new SimpleDateFormat(expectedFormat);
-    //we want to parse date strictly
-    return readableDf.format(date)
+    if (StringUtils.isEmpty(dateString)) {
+      return ""
+    } else {
+      val format = new java.text.SimpleDateFormat(initialFormat)
+      format.setLenient(false)
+      val date = format.parse(dateString)
+      val readableDf = new SimpleDateFormat(expectedFormat);
+      //we want to parse date strictly
+      return readableDf.format(date)
+    }
   }
 
   /**
