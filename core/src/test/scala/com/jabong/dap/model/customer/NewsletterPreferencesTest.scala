@@ -1,12 +1,12 @@
 package com.jabong.dap.model.customer
 
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.schema.NewsletterPrefSchema
 import com.jabong.dap.model.customer.variables.NewsletterPreferences
 import org.apache.spark.sql.DataFrame
-import com.jabong.dap.data.storage.schema.Schema
 import org.scalatest.FlatSpec
 
 /**
