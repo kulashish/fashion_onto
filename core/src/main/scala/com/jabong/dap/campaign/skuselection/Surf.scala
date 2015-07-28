@@ -55,11 +55,10 @@ class Surf extends SkuSelector with Logging {
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerVariables.EMAIL), //EMAIL can be encrypted EMAIL or BrowserId
         col(ItrVariables.SKU) as ProductVariables.SKU_SIMPLE,
-        col(ProductVariables.SPECIAL_PRICE)
+        col(ProductVariables.SPECIAL_PRICE),
+        col(CustomerPageVisitVariables.BROWER_ID),
+        col(CustomerPageVisitVariables.DOMAIN)
       )
-
-    //FIXME: generate Reference Skus
-    //    val dfReferenceSku = CampaignUtils.generateReferenceSku(dfJoin, 2)
 
     return dfJoin
   }

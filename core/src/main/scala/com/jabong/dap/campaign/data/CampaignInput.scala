@@ -8,7 +8,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.{PathBuilder, DataReader}
+import com.jabong.dap.data.read.{ PathBuilder, DataReader }
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
@@ -38,6 +38,15 @@ object CampaignInput extends Logging {
     surfSessionData
   }
 
+  //FIXME: Need to set correct DataSets for getting 30 day Surf Data
+  def loadLast30DaySurfSessionData(): DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last 30 days acart item data from hdfs")
+
+    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.CLICKSTREAM, DataSets.CUSTOMER_PAGE_VISIT, DataSets.MONTHLY_MODE, dateYesterday)
+    acartData
+  }
+
   def loadCustomerMasterData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day customer master data from hdfs")
@@ -45,7 +54,7 @@ object CampaignInput extends Logging {
     val customerMasterData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
     customerMasterData
   }
-  
+
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
@@ -143,7 +152,7 @@ object CampaignInput extends Logging {
     val monthPrevStr = TimeUtils.withLeadingZeros(monthYear.month)
 
     var itrData: DataFrame = null
-    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthStr )
+    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthStr)
     val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthPrevStr)
     if (previousMonthItrData != null) {
       itrData = currentMonthItrData.unionAll(previousMonthItrData)
@@ -198,11 +207,11 @@ object CampaignInput extends Logging {
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
     val filePath = buildPath(basePath, source, componentName, mode, date)
     var loadedDataframe: DataFrame = null
-    logger.info(" orc data loaded from filepath"+filePath)
+    logger.info(" orc data loaded from filepath" + filePath)
     if (fileFormat == "orc") {
-      
+
       if (DataVerifier.dirExists(filePath)) {
-        loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath+"/*")
+        loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath + "/*")
         logger.info(" orc data loaded from filepath" + filePath)
       } else {
         return null
@@ -210,7 +219,7 @@ object CampaignInput extends Logging {
     }
     if (fileFormat == "parquet") {
       if (DataVerifier.dirExists(filePath)) {
-        loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath+"/*")
+        loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath + "/*")
         logger.info(" parquet data loaded from filepath" + filePath)
 
       } else {
@@ -223,7 +232,7 @@ object CampaignInput extends Logging {
 
   def buildPath(basePath: String, source: String, componentName: String, mode: String, date: String): String = {
     //here if Date has "-", it will get changed to File.separator.
-    println( "PATH IS " +"%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator)))
+    println("PATH IS " + "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator)))
     "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator))
   }
 }

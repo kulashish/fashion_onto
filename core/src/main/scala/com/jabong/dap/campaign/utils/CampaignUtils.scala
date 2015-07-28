@@ -41,6 +41,27 @@ object CampaignUtils extends Logging {
 
   }
 
+  def generateReferenceSkuForSurf(skuData: DataFrame, NumberSku: Int): DataFrame = {
+    val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+      .select(
+        Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
+        skuData(CustomerVariables.FK_CUSTOMER),
+        skuData(ProductVariables.SPECIAL_PRICE),
+        skuData(CustomerPageVisitVariables.BROWER_ID),
+        skuData(CustomerPageVisitVariables.DOMAIN)
+      )
+    val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
+        as (CampaignMergedFields.REF_SKU1),
+        first(CustomerPageVisitVariables.BROWER_ID),
+        first(CustomerPageVisitVariables.DOMAIN)
+      )
+
+    return customerRefSku
+
+  }
+
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     import sqlContext.implicits._
@@ -347,7 +368,6 @@ object CampaignUtils extends Logging {
     return skuNotBoughtTillNow
   }
 
-
   /**
    * R2 - returns the skus which are not bought during last x days
    *    - We need to give salesOrder and salesOrderItem data pre-filtered for last x days
@@ -380,15 +400,13 @@ object CampaignUtils extends Logging {
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU)
-        //inputData(ProductVariables.SPECIAL_PRICE)
+      //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
 
     return skuNotBoughtTillNow
   }
-  
-  
 
   /**
    * Filtered Data based on before time to after Time yyyy-mm-dd HH:MM:SS.s
@@ -553,7 +571,7 @@ object CampaignUtils extends Logging {
     return dfResult
 
   }
- /**
+  /**
    * get customer email to customer id mapping for all clickStream users
    * @param dfCustomerPageVisit
    * @param dfCustomer

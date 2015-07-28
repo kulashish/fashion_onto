@@ -11,8 +11,8 @@ import org.apache.spark.sql.DataFrame
  */
 class Surf1Campaign {
 
-  def runCampaign(yestSurfSessionData: DataFrame, yestItrSkuData:DataFrame, customerMasterData:DataFrame, yestOrderData:DataFrame, yestOrderItemData:DataFrame): Unit = {
-    
+  def runCampaign(yestSurfSessionData: DataFrame, yestItrSkuData: DataFrame, customerMasterData: DataFrame, yestOrderData: DataFrame, yestOrderItemData: DataFrame): Unit = {
+
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.YESTERDAY_SESSION)
 
     val customerSurfData = customerSelector.customerSelection(yestSurfSessionData)
@@ -21,12 +21,10 @@ class Surf1Campaign {
 
     val skus = surfSkuSelector.skuFilter(customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
 
-    val dfReferenceSku = CampaignUtils.generateReferenceSku(skus, 1)
+    val dfReferenceSku = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(dfReferenceSku, CampaignCommon.SURF1_CAMPAIGN)
 
-    campaignOutput.printSchema()
-    
     //save campaign Output
     CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
       + CampaignCommon.SURF1_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
