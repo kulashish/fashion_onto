@@ -16,4 +16,12 @@ class OptionUtilsTest extends FlatSpec with Matchers {
     val opt = Option.apply("2015-06-19")
     OptionUtils.optStringEmpty(opt) should be (false)
   }
+
+  "getOptValue" should "return value" in {
+    OptionUtils.getOptValue(null, "2015-06-19") should be ("2015-06-19")
+  }
+
+  "getOptBoolVal" should "return false" in {
+    OptionUtils.getOptBoolVal(null) should be (false)
+  }
 }

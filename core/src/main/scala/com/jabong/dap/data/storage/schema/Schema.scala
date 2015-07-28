@@ -342,4 +342,12 @@ object Schema {
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
+  val customerDeviceMapping = StructType(Array(
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.RESPONSYS_ID, StringType, true),
+    StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
+    StructField(PageVisitVariables.BROWSER_ID, StringType, true),
+    StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
+
 }

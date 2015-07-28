@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.traceability
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -24,7 +25,10 @@ class PastCampaignCheck extends Logging {
       logger.error("Any of the argument is null")
       return null
     }
-    //FIXME: Add campaign type check in HashMap
+    if (!CampaignManager.mailTypePriorityMap.contains(campaignMailType)) {
+      logger.error("Invalid CampaignType")
+      return null
+    }
 
     val filterDate = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT)
 
