@@ -6,7 +6,7 @@
       "primaryKey": null,
       "mode": "daily",
       "saveFormat": "orc",
-      "saveMode": "error",
+      "saveMode": "Ignore",
       "dateColumn": "[Last Modification Date Time]"
     }
   ]

@@ -1,11 +1,9 @@
 {
   "vars": [
     {
-      "source": "customerDeviceMapping",
-      "incrMode": "daily",
+      "source": "ad4push",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
   ]
 }
-

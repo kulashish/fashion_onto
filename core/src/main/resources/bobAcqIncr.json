@@ -6,7 +6,7 @@
       "primaryKey": "id_catalog_config",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -15,7 +15,7 @@
       "primaryKey": "id_catalog_simple",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -24,7 +24,7 @@
       "primaryKey": "id_customer",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at",
       "joinTables": [
         {
@@ -39,7 +39,7 @@
       "primaryKey": "id_customer_segments",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -48,7 +48,7 @@
       "primaryKey": "id_newsletter_subscription",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -57,7 +57,7 @@
       "primaryKey": "id_sales_cart",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -66,7 +66,7 @@
       "primaryKey": "id_sales_cart_guest_info",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -75,7 +75,7 @@
       "primaryKey": "id_sales_order",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at",
       "joinTables": [
         {
@@ -95,7 +95,7 @@
       "primaryKey": "id_sales_order_address",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -104,7 +104,7 @@
       "primaryKey": "id_sales_order_item",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at",
       "joinTables": [
         {
@@ -119,7 +119,7 @@
       "primaryKey": "id_sales_order_payback_earn",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -128,7 +128,7 @@
       "primaryKey": "id_sales_order_payback_redeem",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     },
     {
@@ -137,7 +137,7 @@
       "primaryKey": "id_sales_rule",
       "mode": "daily",
       "saveFormat": "parquet",
-      "saveMode": "ignore",
+      "saveMode": "Ignore",
       "dateColumn": "updated_at"
     }
   ]
