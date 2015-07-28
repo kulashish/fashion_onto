@@ -117,9 +117,12 @@ object CampaignInput extends Logging {
     logger.info("Reading last 30 days basic itr data from hdfs")
     val yesterdayOldEndTime = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     val monthYear = TimeUtils.getMonthAndYear(yesterdayOldEndTime, "yyyy/MM/dd")
+    val monthStr = TimeUtils.withLeadingZeros(monthYear.month + 1)
+    val monthPrevStr = TimeUtils.withLeadingZeros(monthYear.month)
+
     var itrData: DataFrame = null
-    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthYear.month + "/*")
-    val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + (monthYear.month - 1) + "/*")
+    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthStr + "/*")
+    val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthPrevStr + "/*")
     if (previousMonthItrData != null) {
       itrData = currentMonthItrData.unionAll(previousMonthItrData)
     } else {
