@@ -48,7 +48,7 @@ class GroupData() extends java.io.Serializable {
   def groupDataByAppUser(useridDeviceidFrame: DataFrame): RDD[(String, Row)] = {
     useridDeviceidFrame.as('useridDeviceidFrame)
     val ug: RDD[(String, Row)] = useridDeviceidFrame.filter("pagets is not null")
-      .map(x => (x(uid).toString, x)).partitionBy(new org.apache.spark.HashPartitioner(200)).persist()
+      .map(x => (x(uid).toString, x)).partitionBy(new org.apache.spark.HashPartitioner(400)).persist()
     return ug
   }
 

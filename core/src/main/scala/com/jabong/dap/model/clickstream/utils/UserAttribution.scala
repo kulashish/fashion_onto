@@ -22,6 +22,7 @@ class UserAttribution (hiveContext: HiveContext, sqlContext: SQLContext, pagevis
     pagevisit.as('pagevisit)
     calculateColumns(pagevisit)
     val bg = pagevisit.map(x => (x(browserid).toString,List(Tuple2(x(pagets),(Array(x(uid),x(browserid),x(device),x(domain),x(pagetype),x(actualvisitid),x(visitts),x(productsku),x(brand)))))))
+      .partitionBy(new org.apache.spark.HashPartitioner(400))
       .reduceByKey((x, y) => allocateUserToPreviousNull(x, y))
       .mapValues(x=> allocateUserToLaterNull(x) )
       .flatMap(_._2)
