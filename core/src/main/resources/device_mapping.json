@@ -1,0 +1,11 @@
+{
+  "vars": [
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
+

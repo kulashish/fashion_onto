@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.schema.Schema
@@ -33,7 +35,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
 
   "Correct json String" should "return true" in {
     val status = CampaignManager.createCampaignMaps(json)
-    assert(CampaignManager.campaignPriorityMap.contains("cancelReTarget") == true)
+    assert(CampaignManager.campaignPriorityMap.contains(CampaignCommon.CANCEL_RETARGET_CAMPAIGN) == true)
     assert(status == true)
   }
 
@@ -61,9 +63,17 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     assert(mergedCampaignData == null)
   }
 
-  "Input Campaigns Data with priority map loaded" should "return null" in {
+  "Input Campaigns Data with priority map loaded" should "return two " in {
     val status = CampaignManager.createCampaignMaps(json)
     val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData)
     assert(mergedCampaignData.count() == 2)
   }
+
+  "Test add Priority" should "add one more column" in {
+    val status = CampaignManager.createCampaignMaps(json)
+    val mergedCampaignData = CampaignUtils.addPriority(campaignsOutData)
+    mergedCampaignData.show(5)
+    assert(mergedCampaignData.columns.length == 4)
+  }
+
 }

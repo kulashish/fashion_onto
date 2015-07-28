@@ -2,6 +2,8 @@ package com.jabong.dap.campaign.skuselection
 
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
@@ -39,7 +41,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     )
 
     //filter yesterday itrData from itr30dayData
-    val dfYesterdayItrData = getYesterdayItrData(itr30dayData)
+    val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
 
     // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = itr30dayData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
@@ -57,8 +59,9 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
     // FIXME: generate ref skus
+    val refSkus = CampaignUtils.generateReferenceSku(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    return dfResult
+    return refSkus
   }
 
   /**
@@ -234,5 +237,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
 }
 

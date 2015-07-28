@@ -2,6 +2,7 @@ package com.jabong.dap.data.read
 
 import java.io.File
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ LocatedFileStatus, RemoteIterator, Path, FileSystem }
 
@@ -17,28 +18,32 @@ object FormatResolver {
    */
   def getFormat(directory: String): String = {
     val fileSystem = FileSystem.get(new Configuration())
-    val directoryListingIterator: RemoteIterator[LocatedFileStatus] = fileSystem.listFiles(new Path(directory), false)
-    var flag: String = null
-    if (directoryListingIterator.hasNext) {
-      breakable {
-        while (directoryListingIterator.hasNext) {
-          val fileStatus: LocatedFileStatus = directoryListingIterator.next()
-          val filename: String = fileStatus.getPath.getName
-          val file = new File(filename)
-          val extension = getFileExtension(file)
-          if (extension == DataSets.ORC || extension == DataSets.PARQUET || extension == DataSets.CSV) {
-            flag = extension
-            break()
+    if (DataVerifier.dirExists(directory)) {
+      val directoryListingIterator: RemoteIterator[LocatedFileStatus] = fileSystem.listFiles(new Path(directory), false)
+      var flag: String = null
+      if (directoryListingIterator.hasNext) {
+        breakable {
+          while (directoryListingIterator.hasNext) {
+            val fileStatus: LocatedFileStatus = directoryListingIterator.next()
+            val filename: String = fileStatus.getPath.getName
+            val file = new File(filename)
+            val extension = getFileExtension(file)
+            if (extension == DataSets.ORC || extension == DataSets.PARQUET || extension == DataSets.CSV || extension == DataSets.JSON) {
+              flag = extension
+              break()
+            }
           }
         }
+      } else {
+        throw new ValidFormatNotFound
+      }
+      if (flag != null) {
+        flag
+      } else {
+        throw new ValidFormatNotFound
       }
     } else {
-      throw new ValidFormatNotFound
-    }
-    if (flag != null) {
-      flag
-    } else {
-      throw new ValidFormatNotFound
+      throw new DataNotFound
     }
   }
 

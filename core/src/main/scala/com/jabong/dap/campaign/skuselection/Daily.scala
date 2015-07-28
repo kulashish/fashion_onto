@@ -21,11 +21,11 @@ class Daily extends SkuSelector with Logging {
     val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), "inner")
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
-        yesterdayItrData(ProductVariables.SPECIAL_PRICE) as SalesOrderItemVariables.UNIT_PRICE)
+        yesterdayItrData(ProductVariables.SPECIAL_PRICE))
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
-    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     return refSkus
   }
@@ -33,4 +33,6 @@ class Daily extends SkuSelector with Logging {
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
 }

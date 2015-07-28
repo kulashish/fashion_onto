@@ -22,6 +22,15 @@ object JsonUtils {
 
   }
 
+  //Reads Parquet file, convert to dataframe, writes it in Json format file for test cases
+  def writeToJson(parquetFilePath: String, fileName: String, filterCond: String): Any = {
+
+    val df = Spark.getSqlContext().read.parquet(parquetFilePath + fileName + File.separator)
+
+    df.filter(filterCond).select("*").write.format("json").json(TEST_RESOURCES + File.separator + fileName + ".json")
+
+  }
+
   //read Json file
   def readFromJson(directoryName: String, fileName: String, schema: StructType): DataFrame = {
     val df = Spark.getSqlContext().read.schema(schema).format("json")

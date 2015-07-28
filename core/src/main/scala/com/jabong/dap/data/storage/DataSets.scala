@@ -54,11 +54,13 @@ object DataSets {
   val AD4PUSH = "ad4push"
 
   //non schema constants for ad4push
-  val IPHONE_CSV_PREFIX = "exportMessagesReactions_517_"
-  val ANDROID_CSV_PREFIX = "exportMessagesReactions_515_"
+  val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
+  val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
 
-  val REACTION_IOS = "reaction_ios"
-  val REACTION_ANDROID = "reaction_android"
+  val REACTIONS_IOS = "reactions_ios"
+  val REACTIONS_ANDROID = "reactions_android"
+  val REACTIONS_IOS_CSV = "reactions_ios_csv"
+  val REACTIONS_ANDROID_CSV = "reactions_android_csv"
 
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"
@@ -77,11 +79,12 @@ object DataSets {
   val CSV = "csv"
   val PARQUET = "parquet"
   val ORC = "orc"
+  val JSON = "json"
 
-  val IGNORE_SAVEMODE = "ignore"
-  val ERROR_SAVEMODE = "error"
-  val OVERWRITE_SAVEMODE = "overwrite"
-  val APPEND_SAVEMODE = "append"
+  val IGNORE_SAVEMODE = "Ignore"
+  val ERROR_SAVEMODE = "ErrorIfExists"
+  val OVERWRITE_SAVEMODE = "Overwrite"
+  val APPEND_SAVEMODE = "Append"
 
   val BOB = "bob"
   val ERP = "erp"
@@ -89,6 +92,8 @@ object DataSets {
   val NEXTBEE = "nextbee"
   val DEVICE_MAPPING = "device_mapping"
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"
+
+  val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
 
   val CAMPAIGN = "campaign"
 

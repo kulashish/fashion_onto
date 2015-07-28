@@ -3,3 +3,17 @@
 18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c bobFull  >>/opt/alchemy-core/logs/bobFull_logs.txt
 
 18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c erp  >>/opt/alchemy-core/logs/erp_logs.txt
+
+0 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c basicItr >>/opt/alchemy-core/logs/basicItr_logs.txt
+
+0 3 * * * sh /opt/alchemy-core/current/bin/clickstream/clickstream_pipe.sh >>/opt/alchemy-core/logs/clickstream_logs.txt
+
+0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushInvalidCampaign  >>/opt/alchemy-core/logs/pushInvalidCampaign_logs.txt
+
+0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushAbandonedCartCampaign  >>/opt/alchemy-core/logs/pushAbandonedCartCampaign_logs.txt
+
+0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c retargetPushCampaign  >>/opt/alchemy-core/logs/retargetPushCampaign_logs.txt
+
+18 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c deviceMapping >>/opt/alchemy-core/logs/deviceMapping_logs.txt
+
+0 7 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt

@@ -73,16 +73,18 @@ case class MergeInfo(
  * Case class for storing information for variable merging the data of customer and order.
  *
  * @param source String source for which to be run
- * @param date String The date for the merge data is to be run.
- * @param mode String data mode
+ * @param incrDate String The date for the merge data is to be run.
+ * @param incrMode String data mode
  * @param saveFormat String The Format in which the data will be found and saved after the merge.
  * @param saveMode String The mode in which the data is to be saved. (Can be overwrite, append, error or ignore)
  */
 
-case class COVarInfo(
+case class VarInfo(
   source: String,
-  date: String,
-  mode: String,
+  fullDate: Option[String],
+  incrDate: Option[String],
+  path: Option[String],
+  incrMode: Option[String],
   saveFormat: String,
   saveMode: String)
 
@@ -107,17 +109,17 @@ case class MergeJobInfo(
 /**
  * Case class for storing the information for the customer and order variables job.
  *
- * @param coVar List[COVarInfo] List of variables to run the customer and order variables job on.
+ * @param vars List[COVarInfo] List of variables to run the customer and order variables job on.
  */
-case class COVarJobInfo(
-  coVar: List[COVarInfo]) extends EmptyClass
+case class VarJobInfo(
+  vars: List[VarInfo]) extends EmptyClass
 
 /**
  * Object to access config variables application wide
  */
-object COVarJobConfig {
-  var coVarJobInfo: COVarJobInfo = null
-  var coVarInfo: COVarInfo = null
+object VarJobConfig {
+  var varJobInfo: VarJobInfo = null
+  var varInfo: VarInfo = null
 }
 
 /**

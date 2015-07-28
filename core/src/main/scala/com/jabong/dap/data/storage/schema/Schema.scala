@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -168,8 +168,8 @@ object Schema {
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
 
   val customerProductShortlist = StructType(Array(
-    StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, IntegerType, true),
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.USER_SHORTLIST_KEY, StringType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
@@ -180,6 +180,21 @@ object Schema {
     StructField(CustomerProductShortlistVariables.REMOVED_AT, TimestampType, true),
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true)
+  ))
+  
+  val salesCart = StructType(Array(
+    StructField(SalesCartVariables.ID_SALES_CART, IntegerType, true),
+    StructField(SalesCartVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesCartVariables.USER_CART_KEY, StringType, true),
+    StructField(SalesCartVariables.SKU, StringType, true),
+    StructField(SalesCartVariables.QUANTITY, IntegerType, true),
+    StructField(SalesCartVariables.STATUS, StringType, true),
+    StructField(SalesCartVariables.CUSTOMER_SOURCE, StringType, true),
+    StructField(SalesCartVariables.EMAIL, StringType, true),
+    StructField(SalesCartVariables.CREATED_AT, TimestampType, true),
+    StructField(SalesCartVariables.UPDATED_AT, TimestampType, true),
+    StructField(SalesCartVariables.DOMAIN, StringType, true),
+    StructField(SalesCartVariables.USER_DEVICE_TYPE, StringType, true)
   ))
 
   val resultCustomerProductShortlist = StructType(Array(
@@ -243,6 +258,98 @@ object Schema {
     StructField(CampaignMergedFields.REF_SKU2, StringType, true)
   ))
 
+  val campaignPriorityOutput =  StructType(Array(
+    StructField(CampaignMergedFields.FK_CUSTOMER, IntegerType, true),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, true),
+    StructField(CampaignCommon.PRIORITY,IntegerType, true)
+  ))
+
+  val salesOrderItem = StructType(Array(
+    StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_MERCHANT_ORDER, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_SHIPMENT, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_MERCHANT, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_MARKETPLACE_MERCHANT, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ADDRESS_WAREHOUSE, IntegerType, true),
+    StructField(SalesOrderItemVariables.UNIT_PRICE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.TAX_AMOUNT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.STORE_CREDITS_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.COUPON_MONEY_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.COUPON_PERCENT, IntegerType, true),
+    StructField(SalesOrderItemVariables.COUPON_REFUNDABLE, IntegerType, true),
+    StructField(SalesOrderItemVariables.COUPON_CATEGORY, IntegerType, true),
+    StructField(SalesOrderItemVariables.NAME, StringType, true),
+    StructField(SalesOrderItemVariables.SKU, StringType, true),
+    StructField(SalesOrderItemVariables.WEIGHT, DecimalType(12, 4), true),
+    StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
+    StructField(SalesOrderItemVariables.UPDATED_AT, TimestampType, true),
+    StructField(SalesOrderItemVariables.ADDITIONAL_TEXT, StringType, true),
+    StructField(SalesOrderItemVariables.LAST_STATUS_CHANGE, TimestampType, true),
+    StructField(SalesOrderItemVariables.AMOUNT_PAID, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.REFUNDED_MONEY, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.REFUNDED_VOUCHER, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.TAX_PERCENT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.ORIGINAL_UNIT_PRICE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.CART_RULE_DISCOUNT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.CART_RULE_DISPLAY_NAMES, StringType, true),
+    StructField(SalesOrderItemVariables.FK_CATALOG_SHIPMENT_TYPE, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_RESERVED, IntegerType, true),
+    StructField(SalesOrderItemVariables.DELIVERY_TIME, StringType, true),
+    StructField(SalesOrderItemVariables.DISPATCH_TIME, IntegerType, true),
+    StructField(SalesOrderItemVariables.BUNDLE_DISCOUNT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.FK_SKU_BUNDLE, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_FREEBIE, IntegerType, true),
+    StructField(SalesOrderItemVariables.SHIPPING_CHARGE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM_ADDITIONAL_INFO, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_CANCELABLE, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_RETURNABLE, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_COD, IntegerType, true),
+    StructField(SalesOrderItemVariables.NOT_BUYABLE, IntegerType, true),
+    StructField(SalesOrderItemVariables.PROCESSING_TIME, StringType, true),
+    StructField(SalesOrderItemVariables.EXPECTED_DISPATCH_DATE, DateType, true),
+    StructField(SalesOrderItemVariables.EXPECTED_DELIVERY_DATE, DateType, true),
+    StructField(SalesOrderItemVariables.IS_DATE_CHANGED, IntegerType, true),
+    StructField(SalesOrderItemVariables.PACK_ID, IntegerType, true),
+    StructField(SalesOrderItemVariables.BUNDLE_PACK_IDENTIFIER, StringType, true),
+    StructField(SalesOrderItemVariables.PACK_QTY, IntegerType, true),
+    StructField(SalesOrderItemVariables.MARGIN, DecimalType(6, 2), true),
+    StructField(SalesOrderItemVariables.SHIPPING_LIABILITY, StringType, true),
+    StructField(SalesOrderItemVariables.DISPATCH_LOCATION, StringType, true),
+    StructField(SalesOrderItemVariables.HOLIDAY_COUNT, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_GIFT_WRAPPED, IntegerType, true),
+    StructField(SalesOrderItemVariables.MODE_OF_DISCOUNT_AMOUNT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.MODE_OF_PAYMENT_AMOUNT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.DISCOUNT_CAP, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.VAT_AMOUNT, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.IS_VAT_CHARGED, IntegerType, true),
+    StructField(SalesOrderItemVariables.FK_CATALOG_ATTRIBUTE_OPTION_GLOBAL_ORDER_TYPE, IntegerType, true),
+    StructField(SalesOrderItemVariables.PRE_ORDER_ITEM_DISPATCH_DATE, DateType, true),
+    StructField(SalesOrderItemVariables.PRE_ORDER_ITEM_CAMPAIGN_NAME, StringType, true),
+    StructField(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.IS_PAYBACK_REFUNDED, IntegerType, true),
+    StructField(SalesOrderItemVariables.IS_CUSTOMIZED, IntegerType, true),
+    StructField(SalesOrderItemVariables.CUSTOMIZATION_COST, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.PAYBACK_EARN_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.REWARD_POINTS, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.PROCESSED_BITMAP, IntegerType, true),
+    StructField(SalesOrderItemVariables.EXPECTED_SHIPPING_PARTNER, StringType, true),
+    StructField(SalesOrderItemVariables.IS_MULTIPLE_SHIPMENTS, IntegerType, true),
+    StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true)
+  ))
+
+  val refSkuInput = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
+  ))
+
+
   val surf2 = StructType(Array(
     StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
     StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
@@ -259,4 +366,5 @@ object Schema {
     StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
     StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
   ))
+
 }

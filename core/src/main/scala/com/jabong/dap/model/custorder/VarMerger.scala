@@ -3,6 +3,7 @@ package com.jabong.dap.model.custorder
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
+import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -12,17 +13,17 @@ import org.apache.hadoop.fs.{ FileSystem, Path }
 /**
  * Created by pooja on 9/7/15.
  */
-class CustOrderVarMerger extends Serializable with Logging {
+class VarMerger extends Serializable with Logging {
 
-  def start(COVarJsonPath: String) = {
+  def start(VarJsonPath: String) = {
     val validated = try {
       val conf = new Configuration()
       val fileSystem = FileSystem.get(conf)
       implicit val formats = net.liftweb.json.DefaultFormats
-      val path = new Path(COVarJsonPath)
+      val path = new Path(VarJsonPath)
       val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      COVarJobConfig.coVarJobInfo = json.extract[COVarJobInfo]
-      COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      VarJobConfig.varJobInfo = json.extract[VarJobInfo]
+      VarJsonValidator.validate(VarJobConfig.varJobInfo)
       true
     } catch {
       case e: ParseException =>
@@ -40,10 +41,11 @@ class CustOrderVarMerger extends Serializable with Logging {
     }
 
     if (validated) {
-      for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
-        COVarJobConfig.coVarInfo = coVarJob
-        coVarJob.source match {
-          case DataSets.AD4PUSH => DevicesReactions.customerResponse(coVarJob.date, coVarJob.mode)
+      for (varJob <- VarJobConfig.varJobInfo.vars) {
+        VarJobConfig.varInfo = varJob
+        varJob.source match {
+          case DataSets.AD4PUSH => DevicesReactions.start(varJob)
+          case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(varJob)
           case _ => logger.error("Unknown source.")
         }
       }

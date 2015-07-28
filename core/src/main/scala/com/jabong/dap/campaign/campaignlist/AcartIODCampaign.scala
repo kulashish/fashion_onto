@@ -22,8 +22,10 @@ class AcartIODCampaign {
     val iod = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
     val refSkus = iod.skuFilter(selectedCustomers, last30daysItrData)
 
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_IOD_CAMPAIGN)
+
     //save campaign Output
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
+    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
       + CampaignCommon.ACART_IOD_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
 
   }

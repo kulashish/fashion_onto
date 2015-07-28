@@ -5,7 +5,7 @@ import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.clickstream.variables.SurfVariablesMain
-import com.jabong.dap.model.custorder.CustOrderVarMerger
+import com.jabong.dap.model.custorder.VarMerger
 import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
@@ -28,8 +28,8 @@ object Init {
     component: String = null,
     tableJson: String = null,
     mergeJson: String = null,
-    coVarJson: String = null,
-    pushCamapignsJson: String = null,
+    varJson: String = null,
+    pushCampaignsJson: String = null,
     config: String = null)
 
   def main(args: Array[String]) {
@@ -66,11 +66,11 @@ object Init {
 
       opt[String]("varJson")
         .text("Path to customer and Order variables merge job json config file.")
-        .action((x, c) => c.copy(coVarJson = x))
+        .action((x, c) => c.copy(varJson = x))
 
       opt[String]("pushCampaignsJson")
         .text("Path to push Campaigns priority config file.")
-        .action((x, c) => c.copy(pushCamapignsJson = x))
+        .action((x, c) => c.copy(pushCampaignsJson = x))
 
     }
 
@@ -92,9 +92,11 @@ object Init {
       } catch {
         case e: ParseException =>
           println("Error while parsing JSON: " + e.getMessage)
+          throw e
 
         case e: IllegalArgumentException =>
           println("Error while validating JSON: " + e.getMessage)
+          throw e
 
         case e: Exception =>
           println("Some unknown error occurred: " + e.getMessage)
@@ -115,11 +117,13 @@ object Init {
       case "basicItr" => BasicITR.start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
-      case "covariables" => new CustOrderVarMerger().start(params.coVarJson)
+      case "deviceMapping" => new VarMerger().start(params.varJson)
+      case "Ad4pushCustReact" => new VarMerger().start(params.varJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
-      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCamapignsJson)
+      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns()
+      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()

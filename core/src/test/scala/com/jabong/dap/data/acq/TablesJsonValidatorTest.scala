@@ -216,7 +216,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val dt1 = Option.apply("2015-06-20 15:00:00")
     val dtCol = Option.apply("created_at")
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
-      mode = "daily", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol,
+      mode = "daily", saveFormat = "orc", saveMode = "Overwrite", dateColumn = dtCol,
       rangeStart = dt1, rangeEnd = dt2, limit = null, filterCondition = null,
       joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(false))
@@ -227,7 +227,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val lmt1 = Option.apply("3000")
     val dtCol = Option.apply("created_at")
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
-      mode = "full", saveFormat = "orc", saveMode = "overwrite", dateColumn = dtCol, rangeStart = null,
+      mode = "full", saveFormat = "orc", saveMode = "Overwrite", dateColumn = dtCol, rangeStart = null,
       rangeEnd = null, limit = lmt1, filterCondition = null, joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(false))
     TablesJsonValidator.validate(importInfo)
@@ -236,7 +236,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
   "Tables Json Validator" should "not throw an IllegalArgumentException if isHistory true and range start not given" in {
     val dtCol = Option.apply("updated_at")
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
-      mode = "monthly", saveFormat = "parquet", saveMode = "ignore", dateColumn = dtCol, rangeStart = null,
+      mode = "monthly", saveFormat = "parquet", saveMode = "Ignore", dateColumn = dtCol, rangeStart = null,
       rangeEnd = null, limit = null, filterCondition = null, joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(true))
     a[IllegalArgumentException] should be thrownBy {
@@ -248,7 +248,7 @@ class TablesJsonValidatorTest extends FlatSpec with Matchers {
     val dtCol = Option.apply("updated_at")
     val dt1 = Option.apply("2015-06-20 15:00:00")
     val tableInfo = new TableInfo(source = "bob", tableName = "catalog_config", primaryKey = "id_catalog_config",
-      mode = "monthly", saveFormat = "parquet", saveMode = "ignore", dateColumn = dtCol, rangeStart = dt1,
+      mode = "monthly", saveFormat = "parquet", saveMode = "Ignore", dateColumn = dtCol, rangeStart = dt1,
       rangeEnd = null, limit = null, filterCondition = null, joinTables = null)
     val importInfo = new ImportInfo(acquisition = List(tableInfo), isHistory = Option.apply(true))
     TablesJsonValidator.validate(importInfo)

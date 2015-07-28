@@ -29,8 +29,16 @@ class SkuSelectorFactory extends CampaignFactory {
       return new LowStock()
     }
 
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.SKU_LOW_STOCK)) {
+      return new SkuLowStock()
+    }
+
     if (skuSelectorType.equalsIgnoreCase(SkuSelection.ITEM_ON_DISCOUNT)) {
       return new ItemOnDiscount()
+    }
+
+    if (skuSelectorType.equalsIgnoreCase(SkuSelection.SKU_ITEM_ON_DISCOUNT)) {
+      return new SkuItemOnDiscount()
     }
 
     if (skuSelectorType.equalsIgnoreCase(SkuSelection.DAILY)) {
