@@ -27,14 +27,14 @@ object CampaignInput extends Logging {
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, dateYesterday)
     orderItemData
   }
 
   def loadFullOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val orderItemData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderItemData
   }
 
@@ -54,7 +54,7 @@ object CampaignInput extends Logging {
   def loadFullOrderData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading full order data from hdfs")
-    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val orderData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderData
   }
 
@@ -73,7 +73,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last 30 days acart item data from hdfs")
 
-    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.SALES_CART, DataSets.MONTHLY_MODE, dateYesterday)
+    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.SALES_CART, DataSets.MONTHLY_MODE, dateYesterday)
     acartData
   }
 
@@ -126,7 +126,7 @@ object CampaignInput extends Logging {
       itrData = currentMonthItrData
     }
 
-    println("COUNT "+itrData.count)
+    println("COUNT " + itrData.count)
     // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
     val last30DayItrData = CampaignUtils.getTimeBasedDataFrame(itrData, ITR.ITR_DATE, yesterdayOldEndTime.toString, thirtyDayOldEndTime.toString)
 
@@ -144,7 +144,7 @@ object CampaignInput extends Logging {
   def loadFullShortlistData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     logger.info("Reading full fetch shortlist data from hdfs")
-    val shortlistData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB_SOURCE, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, dateYesterday)
+    val shortlistData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, dateYesterday)
     shortlistData
   }
 
@@ -176,7 +176,7 @@ object CampaignInput extends Logging {
     if (fileFormat == "orc") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath)
-        logger.info(" orc data loaded from filepath"+filePath)
+        logger.info(" orc data loaded from filepath" + filePath)
       } else {
         return null
       }
@@ -184,7 +184,7 @@ object CampaignInput extends Logging {
     if (fileFormat == "parquet") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath)
-        logger.info(" parquet data loaded from filepath"+filePath)
+        logger.info(" parquet data loaded from filepath" + filePath)
 
       } else {
         return null
