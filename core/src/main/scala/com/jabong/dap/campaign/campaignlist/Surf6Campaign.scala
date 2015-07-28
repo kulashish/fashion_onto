@@ -14,5 +14,5 @@ class Surf6Campaign {
 
   val dfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
 
-  val skuSelector = dfSkuSelector.skuFilter(customerSurfData, null, null)
+  //val skuSelector = dfSkuSelector.skuFilter(customerSurfData, null, null)
 }
