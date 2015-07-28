@@ -361,7 +361,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getRepeatedSku[T](skuArray: List[T]): List[T] = {
+  def getRepeatedSku[T](skuArray: Array[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
@@ -371,7 +371,7 @@ object UdfUtils {
 
     val skuList = new ListBuffer[T]()
 
-    for (sku <- skuArray) {
+    for (sku <- skuArray.toList) {
 
       if (!setSkus.contains(sku)) {
         setSkus.add(sku)

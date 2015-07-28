@@ -104,7 +104,7 @@ object Udf {
   /**
    * repeatedSku will return list of repeated Sku
    */
-  val repeatedSku = udf((skuList: List[String]) => UdfUtils.getRepeatedSku(skuList: List[String]))
+  val repeatedSku = udf((skuArray: Array[String]) => UdfUtils.getRepeatedSku(skuArray: Array[String]))
 
   /**
    * countSku will return total no of sku
