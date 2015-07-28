@@ -29,6 +29,7 @@ class PastCampaignCheck extends Logging {
       logger.error("Invalid CampaignType")
       return null
     }
+
     val filterDate = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT)
 
     val mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")

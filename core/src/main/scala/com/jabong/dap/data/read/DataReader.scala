@@ -117,7 +117,7 @@ object DataReader extends Logging {
   }
 
   def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, header: String, delimeter: String): DataFrame = {
-
+    require(basePath != null, "Base Path is null")
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
     require(mode != null, "Mode is null")
