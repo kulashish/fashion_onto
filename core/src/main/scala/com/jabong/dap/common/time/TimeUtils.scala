@@ -172,7 +172,7 @@ object TimeUtils extends Logging {
    */
   def getMonthAndYear(dt: String, dateFormat: String): MonthYear = {
     val cal = Calendar.getInstance()
-    if (StringUtils.isEmpty(dt)) {
+    if (!StringUtils.isEmpty(dt)) {
       val sdf = new SimpleDateFormat(dateFormat)
       val date = sdf.parse(dt)
       cal.setTime(date)
@@ -188,7 +188,7 @@ object TimeUtils extends Logging {
    */
   def getMaxDaysOfMonth(dt: String, dateFormat: String): Int = {
     val cal = Calendar.getInstance()
-    if (StringUtils.isEmpty(dt)) {
+    if (!StringUtils.isEmpty(dt)) {
       val sdf = new SimpleDateFormat(dateFormat)
       val date = sdf.parse(dt)
       cal.setTime(date)
