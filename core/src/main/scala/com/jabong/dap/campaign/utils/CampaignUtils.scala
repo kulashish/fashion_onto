@@ -583,7 +583,7 @@ object CampaignUtils extends Logging {
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
-        col(CustomerPageVisitVariables.PRODUCT_SKU),
+        col(CustomerPageVisitVariables.SKU),
         col(CustomerPageVisitVariables.BROWER_ID),
         col(CustomerPageVisitVariables.DOMAIN)
       )
