@@ -12,8 +12,11 @@ object DataSets {
   val basePath = AppConfig.config.basePath
 
   val INPUT_PATH = basePath + File.separator + "input"
-  val OUTPUT_PATH = basePath + File.separator + "output"
-  val EXTRAS = File.separator + "extras"
+
+  val OUTPUT_PATH = AppConfig.config.outputPath
+  //  val OUTPUT_PATH = OUTPUT_PATH = basePath + File.separator + "output"
+
+  val EXTRAS = "extras"
 
   //sales
   val SALES_ORDER = "sales_order"
@@ -76,20 +79,28 @@ object DataSets {
 
   val HISTORICAL = "historical"
 
+  // File formats
   val CSV = "csv"
   val PARQUET = "parquet"
   val ORC = "orc"
   val JSON = "json"
 
+  // File Save modes
   val IGNORE_SAVEMODE = "Ignore"
   val ERROR_SAVEMODE = "ErrorIfExists"
   val OVERWRITE_SAVEMODE = "Overwrite"
   val APPEND_SAVEMODE = "Append"
 
+  //DB Server
+  val MYSQL = "mysql"
+  val SQLSERVER = "sqlserver"
+
+  // Data sources
   val BOB = "bob"
   val ERP = "erp"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
+
   val DEVICE_MAPPING = "device_mapping"
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
@@ -107,9 +118,6 @@ object DataSets {
 
   val YESTERDAY_ITR_DATA = "yesterday_itr_data"
 
-  // Data sources
-  val BOB_SOURCE = "bob"
-  val ERP_SOURCE = "erp"
 
   val CUSTOMER_SELECTION = "customer_selection"
   val CUSTOMER_PAGE_VISIT = "customer_page_visit"
