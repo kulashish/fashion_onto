@@ -3,6 +3,7 @@ package com.jabong.dap.data.read
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -29,6 +30,27 @@ object DataReader extends Logging {
       case e: ValidFormatNotFound =>
         logger.error("Format could not be resolved for the given files in directory")
         throw new ValidFormatNotFound
+    }
+  }
+
+  /**
+   * Method to read raw HDFS data for a source, table and a given date and get a dataFrame for the same.
+   * WARNING: Does not Throw DataNotFound exception instead return null data frame.
+   * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
+   */
+  def getDataFrameOrNull(basePath: String, source: String, tableName: String, mode: String, date: String): DataFrame = {
+    try {
+      getDataFrame(basePath, source, tableName, mode, date)
+    } catch {
+      case e: DataNotFound =>
+        logger.error("Data not found for the date")
+        null
+      case e: ValidFormatNotFound =>
+        logger.error("Format could not be resolved for the given files in directory")
+        throw new ValidFormatNotFound
+      case e: Throwable =>
+        logger.error("Some other Error found: " + e.printStackTrace)
+        null
     }
   }
 
@@ -87,7 +109,10 @@ object DataReader extends Logging {
       context.read.format("com.databricks.spark.csv").load(fetchPath)
     } else {
       logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)
-      context.read.format(saveFormat).load(fetchPath)
+      if (DataVerifier.dataExists(fetchPath))
+        context.read.format(saveFormat).load(fetchPath)
+      else
+        throw new DataNotFound
     }
   }
 

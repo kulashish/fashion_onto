@@ -22,12 +22,10 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
     df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order1", OrderVarSchema.salesOrder)
 
     df2 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order2", OrderVarSchema.salesOrderCoupon)
-    df1.collect.foreach(println)
   }
 
   "The result" should "have size 3" in {
     var ordersCount = SalesOrder.couponScore(df2)
-    ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 3)
   }
 

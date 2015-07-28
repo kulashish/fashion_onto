@@ -1,6 +1,6 @@
 #!/bin/sh
 copyDRInFiles() {
-	rootFolder="copy"
+	rootFolder="/data/ad4push"
 	re=$1
 	echo $re
 	if [ -z $re ] 
@@ -34,7 +34,7 @@ copyDRInFiles() {
 			mm=`echo $yyyymmdd | cut -c 5-6`
 			dd=`echo $yyyymmdd | cut -c 7-8`
 			dir="/data/input/ad4push/reactions_$dName/daily/$yyyy/$mm/$dd/"
-			cmd="hadoop fs -copyFromLocal $i $dir"
+			cmd="hadoop fs -copyFromLocal $rootFolder$i $dir"
 			cmd_mkdir="hadoop fs -mkdir $dir"
 			echo "Running command for File: $i:\r\n\t\t $cmd"
 			eval $cmd_mkdir

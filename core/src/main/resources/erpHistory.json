@@ -6,7 +6,7 @@
       "primaryKey": null,
       "mode": "full",
       "saveFormat": "orc",
-      "saveMode": "error"
+      "saveMode": "Ignore"
     }
   ]
 }

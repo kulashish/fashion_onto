@@ -125,6 +125,12 @@ if ($component eq "bob") {
 } elsif ($component eq "pushCampaignMerge") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaignConfig.json";
      run_component($component, $command);
+} elsif ($component eq "deviceMapping") {
+       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component deviceMapping --config $HDFS_CONF/config.json --varJson $HDFS_CONF/device_mapping.json";
+       run_component($component, $command);
+} elsif ($component eq "Ad4pushCustReact") {
+       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component Ad4pushCustReact --config $HDFS_CONF/config.json --varJson $HDFS_CONF/ad4push.json";
+       run_component($component, $command);
 } else {
     print "not a valid component\n";
 }
