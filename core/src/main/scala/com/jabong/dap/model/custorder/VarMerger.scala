@@ -1,6 +1,5 @@
 package com.jabong.dap.model.custorder
 
-import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
@@ -45,7 +44,7 @@ class VarMerger extends Serializable with Logging {
       for (varJob <- VarJobConfig.varJobInfo.vars) {
         VarJobConfig.varInfo = varJob
         varJob.source match {
-          case DataSets.AD4PUSH => DevicesReactions.customerResponse(OptionUtils.getOptValue(varJob.incrDate), OptionUtils.getOptValue(varJob.incrMode))
+          case DataSets.AD4PUSH => DevicesReactions.start(varJob)
           case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(varJob)
           case _ => logger.error("Unknown source.")
         }

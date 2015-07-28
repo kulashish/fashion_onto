@@ -1,7 +1,9 @@
 package com.jabong.dap.common.time
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
+import com.jabong.dap.common.time.TimeUtils.MonthYear
 import org.scalatest.{ Matchers, FlatSpec }
 import java.util.{ Calendar, Date }
 
@@ -61,6 +63,14 @@ class TimeTest extends FlatSpec with Matchers {
     TimeUtils.isStrictlyLessThan("2015-07-19 00:00:00", "2015-06-19 00:00:00") should be (false)
   }
 
+  "isSameYear" should "return true" in {
+    TimeUtils.isSameYear("2015-06-19 00:00:00", "2015-06-20 00:00:00") should be (true)
+  }
+
+  "isSameYear" should "return false" in {
+    TimeUtils.isSameYear("2014-06-19 00:00:00", "2015-05-19 00:00:00") should be (false)
+  }
+
   "isSameMonth" should "return true" in {
     TimeUtils.isSameMonth("2015-06-19 00:00:00", "2015-06-20 00:00:00") should be (true)
   }
@@ -82,11 +92,70 @@ class TimeTest extends FlatSpec with Matchers {
     val result = TimeUtils.dayName(text, TimeConstants.YYYYMMDD)
     assert(result.toLowerCase.equals("sunday"))
   }
+
   "nextNDay: String" should "match with expected day" in {
     assert(TimeUtils.nextNDay("Thursday", 0).equals("Thursday"))
     assert(TimeUtils.nextNDay("thursday", 0).equals("Thursday"))
     assert(TimeUtils.nextNDay("Friday", 3).equals("Monday"))
     assert(TimeUtils.nextNDay("wednesday", 6).equals("Tuesday"))
+  }
+
+  "dateStringEmpty" should "return true" in {
+    TimeUtils.dateStringEmpty("") should be (true)
+  }
+
+  "dateStringEmpty" should "return false" in {
+    TimeUtils.dateStringEmpty("2015-05-19") should be (false)
+  }
+
+  "getTimeStamp" should "match with expected day" in {
+    val sdf = new SimpleDateFormat(TimeConstants.DATE_FORMAT)
+    val dt = sdf.parse("2015-06-19")
+    val time = new Timestamp(dt.getTime())
+    TimeUtils.getTimeStamp("2015-06-19", TimeConstants.DATE_FORMAT) should be (time)
+  }
+
+  "getMonthAndYear" should "return Date, month and year" in {
+    val dmy = new MonthYear(5, 2015, 19)
+    TimeUtils.getMonthAndYear("2015-06-19", TimeConstants.DATE_FORMAT) should be (dmy)
+  }
+
+  "getMonthAndYear1" should "return today's date, month and year" in {
+    val cal = Calendar.getInstance()
+    val dmy = new MonthYear(cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
+    TimeUtils.getMonthAndYear("", TimeConstants.DATE_FORMAT) should be (dmy)
+  }
+
+  "getMonthAndYear2" should "return today's date, month and year" in {
+    val cal = Calendar.getInstance()
+    val dmy = new MonthYear(cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_MONTH))
+    TimeUtils.getMonthAndYear(null, TimeConstants.DATE_FORMAT) should be (dmy)
+  }
+
+  "getYearFromToday" should "return 0" in {
+    TimeUtils.getYearFromToday(null) should be (0)
+  }
+
+  "getMaxDaysOfMonth" should "return 30" in {
+    TimeUtils.getMaxDaysOfMonth("2015-06-09", TimeConstants.DATE_FORMAT) should be (30)
+  }
+
+  "getMaxDaysOfMonth1" should "return last date of the current month" in {
+    val cal = Calendar.getInstance()
+    TimeUtils.getMaxDaysOfMonth("", TimeConstants.DATE_FORMAT) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+  }
+
+  "getMaxDaysOfMonth2" should "return last date of the current month" in {
+    val cal = Calendar.getInstance()
+    TimeUtils.getMaxDaysOfMonth(null, TimeConstants.DATE_FORMAT) should be (cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+  }
+
+  "getEndTimestampMS" should "return null" in {
+    TimeUtils.getEndTimestampMS(null) should be (null)
+  }
+
+  "getStartTimestampMS" should "return null" in {
+    TimeUtils.getStartTimestampMS(null) should be (null)
   }
 
 }

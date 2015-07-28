@@ -18,7 +18,7 @@ object JsonUtils {
 
     val df = Spark.getSqlContext().read.parquet(parquetFilePath + fileName + File.separator)
 
-    df.limit(5).select("*").write.format("json").json(TEST_RESOURCES + File.separator + fileName + ".json")
+    df.select("*").write.format("json").json(TEST_RESOURCES + File.separator + fileName + ".json")
 
   }
 

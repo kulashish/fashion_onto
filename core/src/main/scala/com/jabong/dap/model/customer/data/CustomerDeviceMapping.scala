@@ -16,7 +16,6 @@ import org.apache.spark.sql.functions._
  */
 object CustomerDeviceMapping extends Logging {
 
-
   /**
    *
    * @param clickStreamInc incremental click_stream data
@@ -48,7 +47,6 @@ object CustomerDeviceMapping extends Logging {
     joined
   }
 
-
   /**
    *
    * @param vars
@@ -57,7 +55,8 @@ object CustomerDeviceMapping extends Logging {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT))
     val path = OptionUtils.getOptValue(vars.path)
-    processData(prevDate, path, incrDate)
+    val saveMode = vars.saveMode
+    processData(prevDate, path, incrDate, saveMode)
   }
 
   /**
@@ -66,17 +65,19 @@ object CustomerDeviceMapping extends Logging {
    * @param path
    * @param curDate
    */
-  def processData(prevDate: String, path: String, curDate: String) {
+  def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
     var df2: DataFrame = null
     if (null != path) {
       df2 = getDataFrameCsv4mDCF(path)
     } else {
-      df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, prevDate)
+      df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
     }
     val df3 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
     val res = getLatestDevice(df1, df2, df3)
-    DataWriter.writeParquet(res, DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, curDate)
+    val savePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
+    if (DataWriter.canWrite(saveMode, savePath))
+      DataWriter.writeParquet(res, savePath, saveMode)
   }
 
   /**

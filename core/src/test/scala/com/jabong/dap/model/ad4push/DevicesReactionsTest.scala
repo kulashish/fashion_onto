@@ -2,7 +2,6 @@ package com.jabong.dap.model.ad4push
 
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets._
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
@@ -35,7 +34,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
   "fullSummary: DataFrame" should "match with expected data" in {
-    val toDay = "20150712"
+    val toDay = "2015/07/12"
     val full = JsonUtils.readFromJson(AD4PUSH, "fullSummary_full", deviceReaction)
     val incrementalDF = JsonUtils.readFromJson(AD4PUSH, "fullSummary_incremental", dfFromCsv)
     val before7days = JsonUtils.readFromJson(AD4PUSH, "fullSummary_before7days", dfFromCsv)
