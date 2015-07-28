@@ -14,7 +14,7 @@ import org.apache.spark.sql.hive.HiveContext
  * Created by Divya on 14/7/15.
  */
 class Surf3VariableTest extends FlatSpec with SharedSparkContext {
-  @transient var sqlContext: SQLContext = _
+   var sqlContext: SQLContext = _
   @transient var pagevisitDataFrame: DataFrame = _
   @transient var userObj: GroupData = _
   @transient var userWiseData: RDD[(String, Row)] = _

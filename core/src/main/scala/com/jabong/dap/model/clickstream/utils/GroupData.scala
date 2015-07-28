@@ -17,7 +17,7 @@ class GroupData(hiveContext: HiveContext, pagevisit: DataFrame) extends java.io.
   var pagetype = 0
   var brand = 0
   var domain = 0
-  var actualvisitid, visitts, uid, browserid, productsku, appuid = 0
+  var actualvisitid, visitts, uid, browserid, productsku, device, appuid = 0
 
   def appuseridCreation(): DataFrame = {
     var useridDeviceidFrame = pagevisit.selectExpr("case when userid is null and domain!='w' and domain!='m' then concat('_app_',browserid) else userid end as appuserid", "*")
@@ -32,31 +32,32 @@ class GroupData(hiveContext: HiveContext, pagevisit: DataFrame) extends java.io.
     return ug
   }
 
-  def calculateColumns(useridDeviceidFrame: DataFrame): Unit =
-    {
-      val res = useridDeviceidFrame.columns
-      for (i <- 1 to (res.length - 1)) {
-        if (res(i) == "pagetype")
-          pagetype = i
-        else if (res(i) == "pagets")
-          pagets = i
-        else if (res(i) == "brand")
-          brand = i
-        else if (res(i) == "domain")
-          domain = i
-        else if (res(i) == "actualvisitid")
-          actualvisitid = i
-        else if (res(i) == "visitts")
-          visitts = i
-        else if (res(i) == "userid")
-          uid = i
-        else if (res(i) == "browserid")
-          browserid = i
-        else if (res(i) == "productsku")
-          productsku = i
-        else if (res(i) == "appuserid")
-          appuid = i
-      }
 
+  def calculateColumns(useridDeviceidFrame: DataFrame): Unit = {
+    val res = useridDeviceidFrame.columns
+    for (i <- 1 to (res.length - 1)) {
+      if (res(i) == "pagetype")
+        pagetype = i
+      else if (res(i) == "pagets")
+        pagets = i
+      else if (res(i) == "brand")
+        brand = i
+      else if (res(i) == "domain")
+        domain = i
+      else if (res(i) == "actualvisitid")
+        actualvisitid = i
+      else if (res(i) == "visitts")
+        visitts = i
+      else if (res(i) == "userid")
+        uid = i
+      else if (res(i) == "browserid")
+        browserid = i
+      else if (res(i) == "productsku")
+        productsku = i
+      else if (res(i) == "appuserid")
+        appuid = i
+      else if (res(i) == "device")
+        device = i
     }
+  }
 }

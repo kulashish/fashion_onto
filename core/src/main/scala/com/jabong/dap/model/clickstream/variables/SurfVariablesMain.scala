@@ -18,10 +18,11 @@ import org.apache.spark.sql.{ DataFrame, Row }
 object SurfVariablesMain extends java.io.Serializable {
 
   def main(args: Array[String]) {
-    var gap = 1
+    var gap = 2
     val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
     Spark.init(conf)
     val hiveContext = Spark.getHiveContext()
+    val sqlContext = Spark.getSqlContext()
     val cal = Calendar.getInstance()
     cal.add(Calendar.DATE, -gap);
     val mFormat = new SimpleDateFormat("MM")
@@ -35,14 +36,13 @@ object SurfVariablesMain extends java.io.Serializable {
     val currentMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
     var processedVariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf3ProcessedVariable"
     val userDeviceMapPath = args(2) + "/" + year + "/" + month + "/" + day + "/userDeviceMap"
-    var surf1VariablePath = args(3) + "/" + year + "/" + month + "/" + day + "/Surf1ProcessedVariable"
+    var surf1VariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf1ProcessedVariable"
     cal.add(Calendar.DATE, -1);
     year = cal.get(Calendar.YEAR);
     day = cal.get(Calendar.DAY_OF_MONTH);
     month = mFormat.format(cal.getTime());
     var oldMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
-    var sqlContext = Spark.getSqlContext()
-    var oldMergedData = hiveContext.parquetFile(oldMergedDataPath)
+    var oldMergedData = sqlContext.read.load(oldMergedDataPath)
     val today = "_daily"
     var UserObj = new GroupData(hiveContext, pagevisit)
     var useridDeviceidFrame = UserObj.appuseridCreation()
@@ -51,16 +51,17 @@ object SurfVariablesMain extends java.io.Serializable {
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
     var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
-    mergedData.saveAsParquetFile(currentMergedDataPath)
-    incremental.save(processedVariablePath)
+    mergedData.repartition(300).write.save(currentMergedDataPath)
+    incremental.repartition(300).write.save(processedVariablePath)
 
     // user device mapping
-    var userDeviceMapping = UserDeviceMapping
+    /*var userDeviceMapping = UserDeviceMapping
       .getUserDeviceMapApp(useridDeviceidFrame)
       .write.mode("error")
       .save(userDeviceMapPath)
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, args(0))
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename)
     variableSurf1.write.save(surf1VariablePath)
+    */
   }
 
   def startClickstreamYesterdaySessionVariables() = {

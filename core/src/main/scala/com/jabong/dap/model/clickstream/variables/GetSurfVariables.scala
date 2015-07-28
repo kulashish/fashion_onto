@@ -91,7 +91,7 @@ object GetSurfVariables extends java.io.Serializable {
    * @return (DataFrame)
    */
   def listOfProductsViewedInSession(hiveContext: HiveContext, tablename: String): DataFrame = {
-    val query = "select case when (domain in('android','ios','windows') and userid is null) then concat('_app_',browserid) else userid end as userid,browserid,actualvisitid,domain,collect_set(productsku) from " + tablename + " where browserid is not null and productsku is not null and pagetype in ('CPD','DPD','QPD') and (userid is not null and domain in ('w','m') or domain in ('android','ios','windows'))group by userid,browserid,actualvisitid,domain"
+    val query = "select case when (domain in('android','ios','windows') and userid is null) then concat('_app_',browserid) else userid end as userid,browserid,actualvisitid,domain,collect_set(productsku) from " + tablename + " where browserid is not null and productsku is not null and pagetype in ('CPD','DPD','QPD') and (userid is not null and domain in ('w','m','android','ios','windows'))group by userid,browserid,actualvisitid,domain"
     val surf1Variables = hiveContext.sql(query)
     return surf1Variables
   }
