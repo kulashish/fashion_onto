@@ -122,6 +122,7 @@ object Init {
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
+      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns()
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
 
       // clickstream use cases

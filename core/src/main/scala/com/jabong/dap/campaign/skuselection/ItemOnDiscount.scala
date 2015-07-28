@@ -41,7 +41,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     )
 
     //filter yesterday itrData from itr30dayData
-    val dfYesterdayItrData = getYesterdayItrData(itr30dayData)
+    val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
 
     // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = itr30dayData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
@@ -237,5 +237,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
+
+  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
 }
 

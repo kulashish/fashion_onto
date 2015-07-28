@@ -29,51 +29,6 @@ object CampaignManager extends Serializable with Logging {
   var campaignPriorityMap = new HashMap[String, Int]
   var campaignMailTypeMap = new HashMap[String, Int]
   var mailTypePriorityMap = new HashMap[Int, Int]
-  //  def start(campaignJsonPath: String) = {
-  //    val validated = try {
-  //      val conf = new Configuration()
-  //      val fileSystem = FileSystem.get(conf)
-  //      implicit val formats = net.liftweb.json.DefaultFormats
-  //      val path = new Path(campaignJsonPath)
-  //      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-  //      campaignInfo.campaigns = json.extract[campaignConfig]
-  //     // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
-  //      true
-  //    } catch {
-  //      case e: ParseException =>
-  //        logger.error("Error while parsing JSON: " + e.getMessage)
-  //        false
-  //
-  //      case e: IllegalArgumentException =>
-  //        logger.error("Error while validating JSON: " + e.getMessage)
-  //        false
-  //
-  //      case e: Exception =>
-  //        logger.error("Some unknown error occurred: " + e.getMessage)
-  //        throw e
-  //        false
-  //    }
-  //
-  //    if (validated) {
-  //      for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
-  //        COVarJobConfig.coVarInfo = coVarJob
-  //        //        coVarJob.source match {
-  //        //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
-  //        //          case _ => logger.error("Unknown table source.")
-  //        //        }
-  //      }
-  //    }
-
-  def main(args: Array[String]) {
-    val liveRetargetCampaign = new LiveRetargetCampaign()
-    val conf = new SparkConf().setAppName("CampaignTest").set("spark.driver.allowMultipleContexts", "true")
-
-    Spark.init(conf)
-    val hiveContext = Spark.getHiveContext()
-    val orderData = hiveContext.read.parquet(args(0))
-    val orderItemData = hiveContext.read.parquet(args(1))
-    liveRetargetCampaign.runCampaign(orderData, orderItemData)
-  }
 
   def createCampaignMaps(parsedJson: JValue): Boolean = {
     if (parsedJson == null) {
@@ -190,23 +145,9 @@ object CampaignManager extends Serializable with Logging {
 
   val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
-  def startCampaignMerge(campaignJsonPath: String) = {
-
-    //    val conf = new Configuration()
-    //          val fileSystem = FileSystem.get(conf)
-    //          implicit val formats = net.liftweb.json.DefaultFormats
-    //          val path = new Path(campaignJsonPath)
-    //          val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-    //          campaignInfo.campaigns = json.extract[campaignConfig]
+  def startWishlistCampaigns() = {
+    WishListCampaign.runCampaign()
   }
-
-  //
-  //  def execute() = {
-  //
-  //    val liveRetargetCampaign = new LiveRetargetCampaign()
-  //    liveRetargetCampaign.runCampaign(null)
-  //
-  //  }
 
   /**
    * takes union input of all campaigns and return merged campaign list
@@ -224,8 +165,10 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
-    val inputDataWithPriority = inputCampaignsData.withColumn(CampaignCommon.PRIORITY,
-      campaignPriority(inputCampaignsData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)))
+    val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+      CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
+
+    val inputDataWithPriority = addPriority(selectedData)
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(CampaignMergedFields.FK_CUSTOMER)

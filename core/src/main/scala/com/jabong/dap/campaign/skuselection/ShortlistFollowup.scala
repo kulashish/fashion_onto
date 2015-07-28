@@ -1,45 +1,20 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerProductShortlistVariables, ItrVariables }
 import com.jabong.dap.common.udf.Udf
-import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-class FollowUp extends SkuSelector with Logging {
+class ShortlistFollowup {
 
-  // 1. stock should be >= 10
-  // 2. pick based on special price (descending)
-  // 1 day data
-  // inDataFrame =  [(id_customer, sku simple)]
-  // itrData = [(skusimple, date, stock, special price)]
-  override def skuFilter(customerSkuData: DataFrame, itrData: DataFrame): DataFrame = {
-    if (customerSkuData == null || itrData == null) {
-      logger.error("either customer selected skus are null or itrData is null")
-      return null
-    }
+  def skuFilter(dfCustomerProductShortlist: DataFrame, dfYesterdaySkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
 
-    val filteredSku = customerSkuData.join(itrData, customerSkuData(ProductVariables.SKU_SIMPLE) === itrData(ProductVariables.SKU_SIMPLE), "inner")
-      .filter(ProductVariables.STOCK + " >= " + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
-        customerSkuData(ProductVariables.SKU_SIMPLE),
-        itrData(ProductVariables.SPECIAL_PRICE))
-
-    logger.info("Join selected customer sku with sku data and filter by stock>=" + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
-    //generate reference skus
-    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
-
-    return refSkus
-  }
-
-  override def skuFilter(dfCustomerProductShortlist: DataFrame, df30DaysSkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
     //=====================================calculate SKU data frame=====================================================
-    val itr30dayData = df30DaysSkuItrData.select(
+    val itr30dayData = dfYesterdaySkuItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
       col(ItrVariables.AVERAGE_PRICE) as ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE,
-      Udf.yyyymmdd(df30DaysSkuItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
+      col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
     )
 
     //========df30DaysSkuItrData filter for yesterday===================================================================
@@ -81,7 +56,5 @@ class FollowUp extends SkuSelector with Logging {
 
     return dfResult
   }
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
 
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
 }

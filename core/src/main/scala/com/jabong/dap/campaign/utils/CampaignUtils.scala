@@ -1,23 +1,20 @@
 package com.jabong.dap.campaign.utils
 
+import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{ Date, Calendar }
-
+import java.util.{ Calendar, Date }
+import akka.dispatch.sysmsg.Create
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, SalesOrderItemVariables, ProductVariables, CustomerVariables }
-import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
-import org.apache.commons.collections.IteratorUtils
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
-import java.math.BigDecimal
-
-import org.apache.spark.sql.types.{ Decimal, DecimalType }
 
 /**
  * Utility Class
@@ -231,7 +228,35 @@ object CampaignUtils extends Logging {
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
         successFulOrderItems(ProductVariables.SKU) as SUCCESS_ + ProductVariables.SKU,
-        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT,
+        successFulOrderItems(SalesOrderItemVariables.UPDATED_AT) as SUCCESS_ + SalesOrderItemVariables.UPDATED_AT
+      )
+
+    val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ProductVariables.SPECIAL_PRICE))
+
+    logger.info("Filtered all the sku simple which has been bought")
+
+    return skuSimpleNotBoughtTillNow
+  }
+
+  def skuSimpleNOTBoughtWithoutPrice(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        successFulOrderItems(ProductVariables.SKU) as SUCCESS_ + ProductVariables.SKU,
+        successFulOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT,
+        successFulOrderItems(SalesOrderItemVariables.UPDATED_AT) as SUCCESS_ + SalesOrderItemVariables.UPDATED_AT
       )
 
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
@@ -303,7 +328,8 @@ object CampaignUtils extends Logging {
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
         Udf.skuFromSimpleSku(successFullOrderItems(ProductVariables.SKU)) as SUCCESS_ + ProductVariables.SKU,
-        successFullOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT
+        successFullOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT,
+        successFullOrderItems(SalesOrderItemVariables.UPDATED_AT) as SUCCESS_ + SalesOrderItemVariables.UPDATED_AT
       )
 
     val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
@@ -373,6 +399,115 @@ object CampaignUtils extends Logging {
 
     val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
     return campaignOutputWithMailType
+  }
+
+  /**
+   *
+   * @param itr30dayData
+   * @return
+   */
+  def getYesterdayItrData(itr30dayData: DataFrame): DataFrame = {
+    //get data yesterday date
+    val yesterdayDate = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT))
+
+    val yesterdayDateYYYYmmDD = UdfUtils.getYYYYmmDD(yesterdayDate)
+
+    //filter yesterday itrData from itr30dayData
+    val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
+
+    return dfYesterdayItrData
+  }
+
+  //FIXME:add implementation
+  def addPriority(campaignData: DataFrame): DataFrame = {
+    val priorityMap = CampaignManager.mailTypePriorityMap
+    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), priorityMap.get(Integer.parseInt(e(0).toString))))
+    return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
+  }
+  //FIXME: make it generalized for all campaigns
+  /**
+   * shortListSkuFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of SKU
+   * @param dfCustomerProductShortlist
+   * @param dfYesterdayItrData
+   * @param df30DaysItrData
+   * @return DataFrame
+   */
+
+  def shortListSkuItrJoin(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
+
+    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is null or " + CustomerProductShortlistVariables.PRICE + " is null ")
+      .select(
+        CustomerProductShortlistVariables.FK_CUSTOMER,
+        CustomerProductShortlistVariables.EMAIL,
+        CustomerProductShortlistVariables.SKU,
+        CustomerProductShortlistVariables.CREATED_AT
+      )
+
+    val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.AVERAGE_PRICE)
+
+    val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
+      &&
+      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
+      .select(
+        CustomerProductShortlistVariables.FK_CUSTOMER,
+        CustomerProductShortlistVariables.EMAIL,
+        CustomerProductShortlistVariables.SKU,
+        CustomerProductShortlistVariables.AVERAGE_PRICE
+      )
+
+    //join yesterdayItrData and joinDf on the basis of SKU
+    //filter on the basis of AVERAGE_PRICE
+    val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerProductShortlistVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
+      .select(
+        col(CustomerProductShortlistVariables.FK_CUSTOMER),
+        col(CustomerProductShortlistVariables.EMAIL),
+        col(CustomerProductShortlistVariables.SKU),
+        col(CustomerProductShortlistVariables.AVERAGE_PRICE),
+        col(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE)
+      )
+
+    return dfResult
+
+  }
+
+  //FIXME: make it generalized for all campaigns
+  /**
+   *  * shortListSkuSimpleFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of simple_sku
+   * @param dfCustomerProductShortlist
+   * @param dfYesterdayItrData
+   * @return DataFrame
+   */
+  def shortListSkuSimpleItrJoin(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
+
+    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is not null and " + CustomerProductShortlistVariables.PRICE + " is not null ")
+      .select(
+        CustomerProductShortlistVariables.FK_CUSTOMER,
+        CustomerProductShortlistVariables.EMAIL,
+        CustomerProductShortlistVariables.SKU_SIMPLE,
+        CustomerProductShortlistVariables.PRICE
+      )
+
+    val yesterdayItrData = dfYesterdayItrData.select(
+      ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
+      ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE
+    )
+
+    val dfJoin = skuSimpleCustomerProductShortlist.join(
+      yesterdayItrData,
+      skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
+      "inner"
+    )
+
+    val dfResult = dfJoin.select(
+      col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.EMAIL),
+      col(CustomerProductShortlistVariables.SKU_SIMPLE),
+      col(CustomerProductShortlistVariables.PRICE),
+      col(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
+    )
+
+    return dfResult
+
   }
 
 }

@@ -31,7 +31,7 @@ object BasicBob {
       Model.simple("sku"),
       Model.simple("fk_catalog_config"),
       Model.simple("barcode_ean"),
-      lit(yesterdayDate) as "itr_date"
+      lit(yesterdayDate) as ITR.ITR_DATE
     ).withColumnRenamed("id_catalog_simple", ITR.ID_CATALOG_SIMPLE).
       withColumnRenamed("special_price", ITR.SPECIAL_PRICE).
       withColumnRenamed("special_to_date", ITR.SPECIAL_TO_DATE).
