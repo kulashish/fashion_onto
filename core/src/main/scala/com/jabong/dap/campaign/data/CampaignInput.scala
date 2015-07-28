@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ItrVariables, CustomerVariables, ProductVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.{ DataReader }
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -125,19 +125,22 @@ object CampaignInput extends Logging {
     } else {
       itrData = currentMonthItrData
     }
+
+    println("COUNT "+itrData.count)
     // val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, yesterdayOldEndTime)
-    val last30DayItrData = CampaignUtils.getTimeBasedDataFrame(itrData, SalesOrderVariables.CREATED_AT, yesterdayOldEndTime.toString, thirtyDayOldEndTime.toString)
+    val last30DayItrData = CampaignUtils.getTimeBasedDataFrame(itrData, ITR.ITR_DATE, yesterdayOldEndTime.toString, thirtyDayOldEndTime.toString)
 
     val filteredItr = last30DayItrData.select(last30DayItrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
       last30DayItrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       last30DayItrData(ITR.QUANTITY) as ProductVariables.STOCK)
+    last30DayItrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
     filteredItr
   }
-  
+
   def loadLast30DaysItrSkuData(): DataFrame = {
     null
   }
-  
+
   def loadFullShortlistData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     logger.info("Reading full fetch shortlist data from hdfs")
@@ -174,6 +177,7 @@ object CampaignInput extends Logging {
     if (fileFormat == "orc") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath)
+        logger.info(" orc data loaded from filepath"+filePath)
       } else {
         return null
       }
@@ -181,10 +185,13 @@ object CampaignInput extends Logging {
     if (fileFormat == "parquet") {
       if (DataVerifier.dataExists(filePath)) {
         loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath)
+        logger.info(" parquet data loaded from filepath"+filePath)
+
       } else {
         return null
       }
     }
+
     return loadedDataframe
   }
 

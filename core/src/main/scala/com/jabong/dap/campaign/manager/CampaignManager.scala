@@ -150,7 +150,6 @@ object CampaignManager extends Serializable with Logging {
     WishListCampaign.runCampaign()
   }
 
-
   /**
    * takes union input of all campaigns and return merged campaign list
    * @param inputCampaignsData

@@ -168,8 +168,8 @@ object Schema {
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
 
   val customerProductShortlist = StructType(Array(
-    StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, IntegerType, true),
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.USER_SHORTLIST_KEY, StringType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
@@ -181,7 +181,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true)
   ))
-
+  
   val salesCart = StructType(Array(
     StructField(SalesCartVariables.ID_SALES_CART, IntegerType, true),
     StructField(SalesCartVariables.FK_CUSTOMER, IntegerType, true),
