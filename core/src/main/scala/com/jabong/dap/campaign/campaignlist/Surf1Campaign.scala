@@ -25,6 +25,8 @@ class Surf1Campaign {
 
     val campaignOutput = CampaignUtils.addCampaignMailType(skus, CampaignCommon.SURF1_CAMPAIGN)
 
+    campaignOutput.printSchema()
+    
     //save campaign Output
     CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
       + CampaignCommon.SURF1_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
