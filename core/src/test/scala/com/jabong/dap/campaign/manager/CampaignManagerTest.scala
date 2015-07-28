@@ -1,16 +1,15 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.data.storage.schema.Schema
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
-
 /**
  * Created by rahul for com.jabong.dap.campaign.manager on 21/7/15.
  */

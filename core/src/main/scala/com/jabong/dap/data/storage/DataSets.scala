@@ -65,6 +65,10 @@ object DataSets {
   val REACTIONS_IOS_CSV = "reactions_ios_csv"
   val REACTIONS_ANDROID_CSV = "reactions_android_csv"
 
+  val IOS = "ios"
+  val WINDOWS = "windows"
+  val ANDROID = "android"
+
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"
   val FULL_FETCH_MODE = "full_fetch"
