@@ -4,7 +4,9 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, SkuSelection, CampaignCommon }
+import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 class WishlistLowStockCampaign {
 
@@ -34,7 +36,11 @@ class WishlistLowStockCampaign {
 
     // union list1 and list2, group by customer, order by price, first/last
     //=======union both sku and sku simple==============================================================================
-    val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords)
+    val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
+      col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
+    )
 
     val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
 

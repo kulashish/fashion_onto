@@ -30,7 +30,11 @@ class WishlistFollowupCampaign {
 
     // union list1 and list2, group by customer, order by price, first/last
     //=======union both sku and sku simple==============================================================================
-    val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords)
+    val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
+      col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
+    )
 
     val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
 

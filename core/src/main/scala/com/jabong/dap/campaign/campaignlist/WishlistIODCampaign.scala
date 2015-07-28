@@ -4,7 +4,9 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, SkuSelection, CampaignCommon }
+import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 class WishlistIODCampaign {
 
@@ -36,7 +38,11 @@ class WishlistIODCampaign {
     //=======union both sku and sku simple==============================================================================
     val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords)
 
-    val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS).select(
+      col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
+    )
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
     //save campaign Output
