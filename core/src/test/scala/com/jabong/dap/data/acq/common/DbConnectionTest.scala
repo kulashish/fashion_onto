@@ -20,7 +20,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "erp", driver = null, server = null, port = null, dbName = null,
       userName = null, password = null)
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     a[IllegalArgumentException] should be thrownBy {
       new DbConnection("bob")
@@ -31,7 +31,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "mysql", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     val output = new Properties()
@@ -46,7 +46,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "sqlserver", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     val output = new Properties()
@@ -59,7 +59,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "randomDriver", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     dbConnection.getConnectionProperties should be (null)
@@ -69,7 +69,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "mysql", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     val output = "jdbc:mysql://1.2.3.4:1234/dbTest"
@@ -80,7 +80,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "sqlserver", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     val output = "jdbc:sqlserver://1.2.3.4:1234;database=dbTest"
@@ -91,7 +91,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "randomDriver", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     dbConnection.getConnectionString should be ("")
@@ -101,7 +101,7 @@ class DbConnectionTest extends FlatSpec with Matchers {
     val credentials = new Credentials(source = "source", driver = "randomDriver", server = "1.2.3.4", port = "1234",
       dbName = "dbTest", userName = "mark", password = "antony")
     val credentialsList = List(credentials)
-    val config = new Config(applicationName = null, master = null, basePath = null, credentials = credentialsList)
+    val config = new Config(applicationName = null, outputPath = null, basePath = null, credentials = credentialsList)
     AppConfig.config = config
     val dbConnection = new DbConnection("source")
     dbConnection.getDriver should be ("randomDriver")
