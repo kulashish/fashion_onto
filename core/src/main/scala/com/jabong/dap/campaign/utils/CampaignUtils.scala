@@ -570,8 +570,8 @@ object CampaignUtils extends Logging {
     }
 
     val customer = dfCustomer.select(
-      CustomerVariables.FK_CUSTOMER,
-      CustomerVariables.EMAIL
+      col("id_customer") as CustomerVariables.FK_CUSTOMER,
+      col(CustomerVariables.EMAIL)
     )
 
     //======= join data frame customer from skuCustomerPageVisit for mapping EMAIL to FK_CUSTOMER========
