@@ -34,7 +34,7 @@ class YesterdaySession extends CustomerSelector with Logging {
       col(CustomerPageVisitVariables.USER_ID),
       col(CustomerPageVisitVariables.BROWER_ID),
       col(CustomerPageVisitVariables.DOMAIN),
-      explode(Udf.repeatedSku(col(CustomerPageVisitVariables.SKU_LIST))) as CustomerPageVisitVariables.PRODUCT_SKU
+      explode(Udf.repeatedSku(col(CustomerPageVisitVariables.SKU_LIST))) as CustomerPageVisitVariables.SKU
     )
 
     return dfRepeatedSku
@@ -60,7 +60,7 @@ class YesterdaySession extends CustomerSelector with Logging {
       col(CustomerPageVisitVariables.ACTUAL_VISIT_ID),
       col(CustomerPageVisitVariables.BROWER_ID),
       col(CustomerPageVisitVariables.DOMAIN),
-      explode(Udf.distinctSku(col(CustomerPageVisitVariables.SKU_LIST))) as CustomerPageVisitVariables.PRODUCT_SKU
+      explode(Udf.distinctSku(col(CustomerPageVisitVariables.SKU_LIST))) as CustomerPageVisitVariables.SKU
     )
 
     val yesterdayItrData = dfYesterdayItrData.select(
@@ -70,7 +70,7 @@ class YesterdaySession extends CustomerSelector with Logging {
 
     val dfJoin = dfDistinctSku.join(
       yesterdayItrData,
-      dfDistinctSku(CustomerPageVisitVariables.PRODUCT_SKU) === yesterdayItrData(ItrVariables.SKU),
+      dfDistinctSku(CustomerPageVisitVariables.SKU) === yesterdayItrData(ItrVariables.SKU),
       "inner"
     )
       .select(
@@ -79,7 +79,7 @@ class YesterdaySession extends CustomerSelector with Logging {
         col(ItrVariables.BRICK),
         col(CustomerPageVisitVariables.BROWER_ID),
         col(CustomerPageVisitVariables.DOMAIN),
-        col(CustomerPageVisitVariables.PRODUCT_SKU)
+        col(CustomerPageVisitVariables.SKU)
       )
 
     val rdd = dfJoin.map(row => ((row(0), row(1), row(2), row(3), row(4)) -> (Array(row(5)))))
@@ -91,7 +91,7 @@ class YesterdaySession extends CustomerSelector with Logging {
         col(CustomerPageVisitVariables.USER_ID),
         col(CustomerPageVisitVariables.BROWER_ID),
         col(CustomerPageVisitVariables.DOMAIN),
-        explode(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.PRODUCT_SKU
+        explode(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.SKU
       )
 
     return dfResult
