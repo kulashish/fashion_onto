@@ -37,7 +37,7 @@ class Surf1Test extends FlatSpec with SharedSparkContext {
     pagevisitDataFrame = sqlContext.read.json("core/src/test/resources/Clickstream/SurfVariables/surf1.json")
     //    println("After Json Read")
     pagevisitDataFrame.foreach(println)
-    userObj = new GroupData(hiveContext, pagevisitDataFrame)
+    userObj = new GroupData()
     userObj.calculateColumns(pagevisitDataFrame)
     //surfVariableData = userObj.groupDataByAppUser(pagevisitDataFrame)
 
