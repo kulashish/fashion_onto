@@ -8,7 +8,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.{ DataReader }
+import com.jabong.dap.data.read.{PathBuilder, DataReader}
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
@@ -30,6 +30,22 @@ object CampaignInput extends Logging {
     return null
   }
 
+  def loadYesterdaySurfSessionData(): DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last day surf session data from hdfs")
+
+    val surfSessionData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+    surfSessionData
+  }
+
+  def loadCustomerMasterData(): DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    logger.info("Reading last day customer master data from hdfs")
+
+    val customerMasterData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
+    customerMasterData
+  }
+  
   def loadYesterdayOrderItemData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
     logger.info("Reading last day order item data from hdfs")
@@ -184,6 +200,7 @@ object CampaignInput extends Logging {
     var loadedDataframe: DataFrame = null
     logger.info(" orc data loaded from filepath"+filePath)
     if (fileFormat == "orc") {
+      
       if (DataVerifier.dirExists(filePath)) {
         loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath+"/*")
         logger.info(" orc data loaded from filepath" + filePath)

@@ -148,6 +148,11 @@ object CampaignManager extends Serializable with Logging {
   def startWishlistCampaigns() = {
     WishListCampaign.runCampaign()
   }
+  
+  def startSurfCampaigns() = {
+    SurfCampaign.runCampaign()
+
+  }
 
   /**
    * takes union input of all campaigns and return merged campaign list

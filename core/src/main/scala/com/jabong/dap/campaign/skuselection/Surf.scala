@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, CustomerPageVisitVariables, ItrVariables }
+import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -36,14 +37,14 @@ class Surf extends SkuSelector with Logging {
 
     }
 
-    val itrData = dfItrData.select(
-      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ItrVariables.AVERAGE_PRICE) as ProductVariables.SPECIAL_PRICE
-    )
-
     val dfCustomerEmailToCustomerId = CampaignUtils.getMappingCustomerEmailToCustomerId(dfCustomerPageVisit, dfCustomer)
 
-    val dfSkuNotBought = CampaignUtils.skuNotBought(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem)
+    val itrData = dfItrData.select(
+      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
+      col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE
+    )
+
+    val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem)
 
     val dfJoin = dfSkuNotBought.join(
       itrData,
@@ -58,7 +59,7 @@ class Surf extends SkuSelector with Logging {
       )
 
     //FIXME: generate Reference Skus
-    //    val dfReferenceSku = CampaignUtils.generateReferenceSkus(dfJoin, 2)
+    //    val dfReferenceSku = CampaignUtils.generateReferenceSku(dfJoin, 2)
 
     return dfJoin
   }

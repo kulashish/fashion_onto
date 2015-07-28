@@ -1,6 +1,8 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
 
@@ -9,14 +11,23 @@ import org.apache.spark.sql.DataFrame
  */
 class Surf1Campaign {
 
-  def runCampaign(): Unit = {
-
+  def runCampaign(yestSurfSessionData: DataFrame, yestItrSkuData:DataFrame, customerMasterData:DataFrame, yestOrderData:DataFrame, yestOrderItemData:DataFrame): Unit = {
+    
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.YESTERDAY_SESSION)
 
-    val customerSurfData = customerSelector.customerSelection(null)
+    val customerSurfData = customerSelector.customerSelection(yestSurfSessionData)
 
-    val dfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
+    val surfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
 
-    //    val skuSelector = dfSkuSelector.skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem)
+    val skus = surfSkuSelector.skuFilter(customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
+
+    val dfReferenceSku = CampaignUtils.generateReferenceSku(skus, 1)
+
+    val campaignOutput = CampaignUtils.addCampaignMailType(skus, CampaignCommon.SURF1_CAMPAIGN)
+
+    //save campaign Output
+    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
+      + CampaignCommon.SURF1_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+
   }
 }
