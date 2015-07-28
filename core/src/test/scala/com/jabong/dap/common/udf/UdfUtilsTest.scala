@@ -434,4 +434,9 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
+  "getMaxClickDayName" should "be Sunday" in {
+    val day = UdfUtils.getMaxClickDayName(1,2,3,4,5,6,7)
+    assert(day.equals("Sunday"))
+  }
+
 }
