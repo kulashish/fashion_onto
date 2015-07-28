@@ -4,6 +4,8 @@ import java.sql.{ Date, Timestamp }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.functions._
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * Created by raghu on 3/7/15.
  */
@@ -99,16 +101,16 @@ object Udf {
   /**
    * distinctSku will return list of distinct Sku
    */
-  val distinctSku = udf((skuList: List[String]) => UdfUtils.getDistinctSku(skuList: List[String]))
+  val distinctSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getDistinctSku(skuArrayBuffer: ArrayBuffer[String]))
 
   /**
    * repeatedSku will return list of repeated Sku
    */
-  val repeatedSku = udf((skuList: List[String]) => UdfUtils.getRepeatedSku(skuList: List[String]))
+  val repeatedSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getRepeatedSku(skuArrayBuffer: ArrayBuffer[String]))
 
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuList: List[String]) => UdfUtils.getCountSku(skuList: List[String]))
+  val countSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getCountSku(skuArrayBuffer: ArrayBuffer[String]))
 
 }
