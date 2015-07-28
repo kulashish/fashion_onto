@@ -470,9 +470,9 @@ class UdfUtilsTest extends FlatSpec {
 
     val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
 
-//    val result = UdfUtils.getRepeatedSku(skuArray.toList)
+    val result = UdfUtils.getRepeatedSku(skuArray.toList)
 
-//    assert(result.length == 3)
+    assert(result.length == 3)
 
   }
 
