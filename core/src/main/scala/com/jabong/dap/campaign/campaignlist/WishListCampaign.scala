@@ -158,8 +158,7 @@ object WishListCampaign {
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
         col(CustomerProductShortlistVariables.SKU_SIMPLE),
-        col(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE) as ItrVariables.SPECIAL_PRICE, // last day price
-        col(ItrVariables.ITR_ + ItrVariables.STOCK) as ItrVariables.STOCK
+        col(CustomerProductShortlistVariables.PRICE) as ItrVariables.SPECIAL_PRICE
       )
       
     }
