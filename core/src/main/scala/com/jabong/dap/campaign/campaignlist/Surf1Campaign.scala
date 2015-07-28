@@ -9,7 +9,7 @@ import org.apache.spark.sql.DataFrame
  */
 class Surf1Campaign {
 
-  def runCampaign(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): Unit = {
+  def runCampaign(): Unit = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.YESTERDAY_SESSION)
 
@@ -17,6 +17,6 @@ class Surf1Campaign {
 
     val dfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
 
-    val skuSelector = dfSkuSelector.skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem)
+    //    val skuSelector = dfSkuSelector.skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem)
   }
 }

@@ -8,11 +8,13 @@ import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelectio
  */
 class Surf6Campaign {
 
-  val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.YESTERDAY_SESSION_DISTINCT)
+  def runCampaign(): Unit = {
+    val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.YESTERDAY_SESSION_DISTINCT)
 
-  val customerSurfData = customerSelector.customerSelection(null)
+    val customerSurfData = customerSelector.customerSelection(null)
 
-  val dfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
+    val dfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
 
-  //val skuSelector = dfSkuSelector.skuFilter(customerSurfData, null, null)
+    //val skuSelector = dfSkuSelector.skuFilter(customerSurfData, null, null)
+  }
 }
