@@ -169,7 +169,7 @@ object WishListCampaign {
     // convert sku simple to sku
     val result = skuOnlyRecordsNotBought.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.EMAIL),
+      //col(CustomerProductShortlistVariables.EMAIL),
       Udf.skuFromSimpleSku(dfCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE)) as CustomerProductShortlistVariables.SKU,
       col(CustomerProductShortlistVariables.SPECIAL_PRICE)
     )
