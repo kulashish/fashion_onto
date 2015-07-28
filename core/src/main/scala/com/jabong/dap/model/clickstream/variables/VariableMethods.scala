@@ -82,6 +82,17 @@ object VariableMethods extends java.io.Serializable {
     } else
       return false
   }
+  def comparePagetsInDescending(a: TimeBasedSorter, b: TimeBasedSorter): Boolean = {
+    val a1: String = a.pagets.toString
+    val b1: String = b.pagets.toString
+    val format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS")
+    val date1 = format.parse(a1)
+    val date2 = format.parse(b1)
+    if (date1 before date2) {
+      return true
+    } else
+      return false
+  }
 
   def returnLast3Reducer(x: List[(Any, Array[Any])], y: List[(Any, Array[Any])]): List[(Any, Array[Any])] = {
     val merge = x ::: y

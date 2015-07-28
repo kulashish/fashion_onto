@@ -26,8 +26,10 @@ class UserAttributionTestCases extends FlatSpec with SharedSparkContext {
     var today = "_daily"
     userObj = new UserAttribution(hiveContext, sqlContext, pagevisitDataFrame)
     var newData = userObj.attribute()
+    newData.show()
     assert(pagevisitDataFrame.filter("userid = 'user1'").count()==1)
     assert(newData.filter("userid = 'user1'").count()==4)
+    assert(newData.filter("userid = 'user2'").count()==2)
   }
 
 

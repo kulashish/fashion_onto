@@ -21,12 +21,15 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
   @transient var hiveContext: HiveContext = _
   @transient var YesterMergedData: DataFrame = _
   @transient var dailyIncrementalSKUs: DataFrame = _
+  @transient var pagevisitDataFrame2: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
     hiveContext = Spark.getHiveContext()
     sqlContext = Spark.getSqlContext()
     pagevisitDataFrame = sqlContext.read.json("src/test/resources/clickstream/pagevisitSingleUser.json")
+    pagevisitDataFrame2 = sqlContext.read.json("src/test/resources/clickstream/pagevisitMultiUser.json")
+
     YesterMergedData = sqlContext.read.json("src/test/resources/clickstream/Surf3MergedData")
   }
 
@@ -40,6 +43,17 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
     assert(dailyIncrementalSKUs.count() == 12)
   }
 
+ /* "AppCreation for surf3" should "have 12 unique PDP records " in {
+    var today = "_daily"
+    userObj = new GroupData(hiveContext, pagevisitDataFrame2)
+    var AppDataFrame = userObj.appuseridCreation
+    userObj.calculateColumns(AppDataFrame)
+    userWiseData = userObj.groupDataByAppUser(AppDataFrame)
+
+    dailyIncrementalSKUs = GetSurfVariables.Surf3Incremental(userWiseData, userObj, hiveContext)
+    assert(dailyIncrementalSKUs.count() == 12)
+  }
+*/
   "merged data " should "have onlu 2 skus matching in 2-30 days" in {
     var surf3Variable = GetSurfVariables.ProcessSurf3Variable(YesterMergedData, dailyIncrementalSKUs)
     assert(surf3Variable.count() == 2)

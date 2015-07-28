@@ -22,34 +22,26 @@ class UserAttribution (hiveContext: HiveContext, sqlContext: SQLContext, pagevis
     pagevisit.as('pagevisit)
     calculateColumns(pagevisit)
     val bg = pagevisit.map(x => (x(browserid).toString,List(Tuple2(x(pagets),(Array(x(uid),x(browserid),x(device),x(domain),x(pagetype),x(actualvisitid),x(visitts),x(productsku),x(brand)))))))
-      .reduceByKey((x, y) => allocateUserToNull(x, y))
+      .reduceByKey((x, y) => allocateUserToPreviousNull(x, y))
+      .mapValues(x=> allocateUserToLaterNull(x) )
       .flatMap(_._2)
       .map(x=> Row(x._1,x._2(0),x._2(1),x._2(2),x._2(3),x._2(4),x._2(5),x._2(6),x._2(7),x._2(8)))
     val newDataFrame = sqlContext.createDataFrame(bg,PagevisitSchema.userAttribute)
-       //var newData = bg.reduceByKey((x, y) => allocateUserToNull(x, y))
 
-    //bg.toDF("bid","list").explode("")
-
- //   val dt = bg.toDF("bid","list")
-//    dt.show()
-    newDataFrame.show()
     return newDataFrame
   }
 
-  def allocateUserToNull(x: List[(Any, Array[Any])], y:List[(Any, Array[Any])]):List[(Any, Array[Any])] = {
+  def allocateUserToPreviousNull(x: List[(Any, Array[Any])], y:List[(Any, Array[Any])]):List[(Any, Array[Any])] = {
     val merge = x ::: y
     val data =
       for (m <- 0 to merge.length - 1) yield new  TimeBasedSorter(merge(m)._1.toString, merge(m)._2)
     var sortedData = data sortWith comparePagets
-
     var cnt = 0
     var list: List[(Any, Array[Any])] = List()
-
     var previousUser:Any= ""
     for (b <- sortedData) {
       if (cnt == 0) {
           list.++=(List(b.pagets -> b.info))
-
           previousUser = b.info(0)
           cnt += 1
         } else if ((b.info(0) == null)) {
@@ -60,9 +52,36 @@ class UserAttribution (hiveContext: HiveContext, sqlContext: SQLContext, pagevis
         else
         {
           list.++=(List(b.pagets -> b.info))
-          previousUser = b.info(1).toString
+          previousUser = b.info(0).toString
         }
       }
+    return list
+  }
+
+  def allocateUserToLaterNull(x: List[(Any, Array[Any])]):List[(Any, Array[Any])] = {
+    val merge = x
+    val data =
+      for (m <- 0 to merge.length - 1) yield new  TimeBasedSorter(merge(m)._1.toString, merge(m)._2)
+    var sortedData = data sortWith comparePagetsInDescending
+    var cnt = 0
+    var list: List[(Any, Array[Any])] = List()
+    var previousUser:Any= ""
+    for (b <- sortedData) {
+      if (cnt == 0) {
+        list.++=(List(b.pagets -> b.info))
+        previousUser = b.info(0)
+        cnt += 1
+      } else if ((b.info(0) == null)) {
+        b.info(0) = previousUser
+        list.++=(List(b.pagets -> b.info))
+        cnt += 1
+      }
+      else
+      {
+        list.++=(List(b.pagets -> b.info))
+        previousUser = b.info(0).toString
+      }
+    }
     return list
   }
 
