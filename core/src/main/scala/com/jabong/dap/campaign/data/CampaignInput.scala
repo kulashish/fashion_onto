@@ -127,8 +127,8 @@ object CampaignInput extends Logging {
     val monthPrevStr = TimeUtils.withLeadingZeros(monthYear.month)
 
     var itrData: DataFrame = null
-    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthStr + "/*")
-    val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthPrevStr + "/*")
+    val currentMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthStr )
+    val previousMonthItrData = getCampaignInputDataFrame("orc", DataSets.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthPrevStr)
     if (previousMonthItrData != null) {
       itrData = currentMonthItrData.unionAll(previousMonthItrData)
     } else {
@@ -185,7 +185,7 @@ object CampaignInput extends Logging {
     logger.info(" orc data loaded from filepath"+filePath)
     if (fileFormat == "orc") {
       if (DataVerifier.dirExists(filePath)) {
-        loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath)
+        loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath+"/*")
         logger.info(" orc data loaded from filepath" + filePath)
       } else {
         return null
@@ -193,7 +193,7 @@ object CampaignInput extends Logging {
     }
     if (fileFormat == "parquet") {
       if (DataVerifier.dirExists(filePath)) {
-        loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath)
+        loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath+"/*")
         logger.info(" parquet data loaded from filepath" + filePath)
 
       } else {
