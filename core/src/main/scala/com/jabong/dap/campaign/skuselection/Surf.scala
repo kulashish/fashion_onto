@@ -41,7 +41,7 @@ class Surf extends SkuSelector with Logging {
 
     val itrData = dfItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE
+      col(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
     )
 
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem)
