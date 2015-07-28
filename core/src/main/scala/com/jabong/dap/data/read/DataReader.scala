@@ -38,7 +38,7 @@ object DataReader extends Logging {
    * WARNING: Does not Throw DataNotFound exception instead return null data frame.
    * WARNING: Throws ValidFormatNotFound exception if suitable format is not found.
    */
-  def getDataFrameWithNull(basePath: String, source: String, tableName: String, mode: String, date: String): DataFrame = {
+  def getDataFrameOrNull(basePath: String, source: String, tableName: String, mode: String, date: String): DataFrame = {
     try {
       getDataFrame(basePath, source, tableName, mode, date)
     } catch {

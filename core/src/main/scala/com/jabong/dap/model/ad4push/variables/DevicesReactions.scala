@@ -49,10 +49,10 @@ object DevicesReactions extends Logging {
 
       //getting DF
       logger.info("Reading inputs (CSVs and Parquets) for IOS")
-      val fullI = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, yesterday)
-      val b7I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before7daysString)
-      val b15I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
-      val b30I = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
+      val fullI = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, yesterday)
+      val b7I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before7daysString)
+      val b15I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
+      val b30I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
 
       val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
 
@@ -69,10 +69,10 @@ object DevicesReactions extends Logging {
 
       //getting DF
       logger.info("Reading inputs (CSVs and Parquets) for Android")
-      val fullA = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, yesterday)
-      val b7A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before7daysString)
-      val b15A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before15daysString)
-      val b30A = DataReader.getDataFrameWithNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before30daysString)
+      val fullA = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, yesterday)
+      val b7A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before7daysString)
+      val b15A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before15daysString)
+      val b30A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before30daysString)
 
       val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
 
