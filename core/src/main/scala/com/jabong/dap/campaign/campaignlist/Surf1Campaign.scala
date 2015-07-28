@@ -23,7 +23,7 @@ class Surf1Campaign {
 
     val dfReferenceSku = CampaignUtils.generateReferenceSku(skus, 1)
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(skus, CampaignCommon.SURF1_CAMPAIGN)
+    val campaignOutput = CampaignUtils.addCampaignMailType(dfReferenceSku, CampaignCommon.SURF1_CAMPAIGN)
 
     campaignOutput.printSchema()
     
