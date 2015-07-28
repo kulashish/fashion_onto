@@ -7,7 +7,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.{ DataVerifier, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
+import com.jabong.dap.model.clickstream.utils.{UserAttribution, GetMergedClickstreamData, GroupData}
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -44,10 +44,14 @@ object SurfVariablesMain extends java.io.Serializable {
     var oldMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
     var oldMergedData = sqlContext.read.load(oldMergedDataPath)
     val today = "_daily"
-    var UserObj = new GroupData(hiveContext, pagevisit)
+    var attributeObj:UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisit)
+    var userAttributedData: DataFrame = attributeObj.attribute()
+
+    var UserObj = new GroupData(hiveContext, userAttributedData)
     var useridDeviceidFrame = UserObj.appuseridCreation()
     UserObj.calculateColumns(useridDeviceidFrame)
     val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(useridDeviceidFrame)
+    
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
     var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
