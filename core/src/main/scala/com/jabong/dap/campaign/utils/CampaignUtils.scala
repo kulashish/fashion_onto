@@ -399,7 +399,9 @@ object CampaignUtils extends Logging {
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
-        inputData(ProductVariables.SKU)
+        inputData(ProductVariables.SKU),
+        inputData(CustomerPageVisitVariables.BROWER_ID),
+        inputData(CustomerPageVisitVariables.DOMAIN)
       //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
