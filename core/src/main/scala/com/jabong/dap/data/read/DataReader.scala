@@ -126,7 +126,7 @@ object DataReader extends Logging {
     require(date != null, "Date is null")
 
     val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
-    logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + "in csv format")
+    logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
     if (DataVerifier.dataExists(fetchPath, filename))
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
     else {
