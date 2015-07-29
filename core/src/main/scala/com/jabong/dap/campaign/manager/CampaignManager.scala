@@ -137,7 +137,7 @@ object CampaignManager extends Serializable with Logging {
     // last30DaySalesOrderData = null
 
     // itr last 30 days
-    val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
+    val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
     acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)

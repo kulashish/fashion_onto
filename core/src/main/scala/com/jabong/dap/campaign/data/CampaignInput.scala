@@ -8,12 +8,13 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.read.{PathBuilder, DataReader}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -137,11 +138,13 @@ object CampaignInput extends Logging {
     val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU) as ProductVariables.SKU,
       itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK,
-      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
+      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+      itrData(ITR.BRICK)
     )
     filteredItr
   }
 
+  /*
   //FIXME : change to last 30 days
   def loadLast30DaysItrSimpleData() = {
     val thirtyDayOldEndTime = TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_FORMAT_FOLDER)
@@ -169,11 +172,8 @@ object CampaignInput extends Logging {
       last30DayItrData(ITR.QUANTITY) as ProductVariables.STOCK)
     last30DayItrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
     filteredItr
-  }
-
-  def loadLast30DaysItrSkuData(): DataFrame = {
-    null
-  }
+  }*/
+  
 
   def loadFullShortlistData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
@@ -235,4 +235,69 @@ object CampaignInput extends Logging {
     println("PATH IS " + "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator)))
     "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator))
   }
+
+  def load30DayItrSkuData() = {
+
+    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+
+    val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+      .select(
+        col(ITR.CONFIG_SKU) as ProductVariables.SKU,
+        col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
+      )
+
+    for (i <- 2 to 30) {
+
+      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      logger.info("Reading last " + i + " day basic itr sku data from hdfs")
+
+      val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+      val itrExits = DataVerifier.dataExists(path)
+
+      if (itrExits) {
+        val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+        itr30Day.unionAll(itrData.select(
+          col(ITR.CONFIG_SKU) as ProductVariables.SKU,
+          col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
+        ))
+      }
+    }
+
+    itr30Day
+  }
+
+  def load30DayItrSkuSimpleData() = {
+
+    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+
+    val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+      .select(
+        col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+        col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
+      )
+
+    for (i <- 2 to 30) {
+
+      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      logger.info("Reading last " + i + " day basic itr sku data from hdfs")
+
+      val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+      val itrExits = DataVerifier.dataExists(path)
+
+      if (itrExits) {
+        val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+        itr30Day.unionAll(itrData.select(
+          col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+          col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
+        ))
+      }
+    }
+
+    itr30Day
+  }
+
 }

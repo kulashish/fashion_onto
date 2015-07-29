@@ -84,6 +84,11 @@ object Udf {
   val yyyymmdd = udf((t1: Timestamp) => UdfUtils.getYYYYmmDD(t1: Timestamp))
 
   /**
+   * yyyymmdd will convert yyyymmdd formate
+   */
+  val yyyymmddString = udf((t1: String) => UdfUtils.getYYYYmmDD(t1: String))
+  
+  /**
    * simpleSkuFromExtraData will extract data from extraData
    */
   val simpleSkuFromExtraData = udf((extraData: String) => UdfUtils.getSimpleSkuFromExtraData(extraData: String))
@@ -111,6 +116,6 @@ object Udf {
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getCountSku(skuArrayBuffer: ArrayBuffer[String]))
+  val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
 
 }

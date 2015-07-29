@@ -54,8 +54,8 @@ object CampaignUtils extends Logging {
     val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1),
-        first(CustomerPageVisitVariables.BROWER_ID),
-        first(CustomerPageVisitVariables.DOMAIN)
+        first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
+        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
       )
 
     return customerRefSku
@@ -283,7 +283,7 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE),inputData(ItrVariables.CREATED_AT))
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -358,7 +358,7 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
-        inputData(CustomerVariables.EMAIL),
+        //inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
         inputData(ProductVariables.SPECIAL_PRICE)
       )
@@ -399,7 +399,9 @@ object CampaignUtils extends Logging {
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
-        inputData(ProductVariables.SKU)
+        inputData(ProductVariables.SKU),
+        inputData(CustomerPageVisitVariables.BROWER_ID),
+        inputData(CustomerPageVisitVariables.DOMAIN)
       //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
