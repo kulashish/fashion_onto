@@ -108,6 +108,7 @@ if ($component eq "bob") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json";
     run_component($component, $command);
 } elsif ($component eq "clickstreamSurf3Variable") {
+    $AMMUNITION = "--num-executors 5 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json";
     run_component($component, $command);
 } elsif ($component eq "basicItr") {
@@ -132,6 +133,7 @@ if ($component eq "bob") {
        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component Ad4pushCustReact --config $HDFS_CONF/config.json --varJson $HDFS_CONF/ad4push.json";
        run_component($component, $command);
 } elsif ($component eq "pushSurfCampaign") {
+    $AMMUNITION = "--num-executors 7 --executor-memory 9G";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json";
      run_component($component, $command);
 }else {
