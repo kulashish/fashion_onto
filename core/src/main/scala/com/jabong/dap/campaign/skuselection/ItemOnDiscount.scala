@@ -95,7 +95,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
-      CustomerProductShortlistVariables.EMAIL,
+      //CustomerProductShortlistVariables.EMAIL,
       CustomerProductShortlistVariables.SKU_SIMPLE,
       CustomerProductShortlistVariables.SPECIAL_PRICE
     )
