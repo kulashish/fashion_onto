@@ -14,14 +14,14 @@ object CampaignMergedFields {
   val DOMAIN = "domain"
 
   //Working fields
-  val IOS_CODE="515"
-  val ANDROID_CODE="517"
+  val IOS_CODE = "515"
+  val ANDROID_CODE = "517"
 
   val deviceId = "deviceId"
   val LIVE_MAIL_TYPE = "LIVE_MAIL_TYPE"
   val LIVE_BRAND = "LIVE_BRAND"
-  val LIVE_REF_SKU1="LIVE_REF_SKU1"
-  val LIVE_BRICK="LIVE_BRICK"
-  val LIVE_PROD_NAME="LIVE_PROD_NAME"
-  val LIVE_CART_URL="LIVE_CART_URL"
+  val LIVE_REF_SKU1 = "LIVE_REF_SKU1"
+  val LIVE_BRICK = "LIVE_BRICK"
+  val LIVE_PROD_NAME = "LIVE_PROD_NAME"
+  val LIVE_CART_URL = "LIVE_CART_URL"
 }

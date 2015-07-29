@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.traceability
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables, ProductVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
@@ -37,6 +37,7 @@ class PastCampaignCheck extends Logging {
       .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
         pastCampaignData(CampaignMergedFields.REF_SKU1) as ProductVariables.SKU,
         pastCampaignData(CampaignMergedFields.DEVICE_ID))
+
 
     logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
 
@@ -92,7 +93,6 @@ class PastCampaignCheck extends Logging {
 
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CampaignMergedFields
-
         .CUSTOMER_ID)
         &&
         customerSkuSelected(ProductVariables.SKU_SIMPLE) === pastCampaignSendCustomers(CampaignMergedFields.REF_SKU1), "left_outer")

@@ -9,7 +9,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -393,7 +393,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: ArrayBuffer[T]): Int = {
+  def getCountSku[T](skuList: List[T]): Int = {
 
     if (skuList == null || skuList.isEmpty) {
       return 0

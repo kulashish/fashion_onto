@@ -27,24 +27,22 @@ object DevicesReactions extends Logging {
   }
   /**
    * All read CSV, read perquet, write perquet
-   * @param incrDate date for which summary is needed in YYYYMMDD format
+   * @param incrDate date for which summary is needed in YYYY/MM/DD format
    * @return (iPhoneResult, AndroidResult) for tgiven date
    */
   def customerResponse(incrDate: String, saveMode: String) = {
 
-    val dateStr = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER)
+    val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
+    val before15daysString = TimeUtils.getDateAfterNDays(-16, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val before15daysString = TimeUtils.getDateAfterNDays(-16, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
+    val before30daysString = TimeUtils.getDateAfterNDays(-31, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val before30daysString = TimeUtils.getDateAfterNDays(-31, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
+    val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
-
-    val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, dateStr)
+    val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(savePathI, saveMode)) {
-      val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, dateStr, "true", ",")
+      val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, "true", ",")
       val incI = dfCorrectSchema(incIStringSchema)
 
       //getting DF
@@ -54,17 +52,19 @@ object DevicesReactions extends Logging {
       val b15I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
       val b30I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
 
-      val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
+      val (resultI, incrI) = fullSummary(incI, incrDate, fullI, b7I, b15I, b30I)
 
       DataWriter.writeParquet(resultI, savePathI, saveMode)
       DataWriter.writeParquet(incrI, savePathI, saveMode)
-      DataWriter.writeCsv(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, dateStr, "true", ",")
 
+      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_"
+      TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
 
-    val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, dateStr)
+    val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(savePathA, saveMode)) {
-      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, dateStr, "true", ",")
+      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate, "true", ",")
       val incA = dfCorrectSchema(incAStringSchema)
 
       //getting DF
@@ -74,11 +74,14 @@ object DevicesReactions extends Logging {
       val b15A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before15daysString)
       val b30A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before30daysString)
 
-      val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
+      val (resultA, incrA) = fullSummary(incA, incrDate, fullA, b7A, b15A, b30A)
 
       DataWriter.writeParquet(resultA, savePathA, saveMode)
       DataWriter.writeParquet(incrA, savePathA, saveMode)
-      DataWriter.writeCsv(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, dateStr, "true", ",")
+
+      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_"
+      TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
   }
 

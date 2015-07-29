@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -181,7 +181,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true)
   ))
-  
+
   val salesCart = StructType(Array(
     StructField(SalesCartVariables.ID_SALES_CART, IntegerType, true),
     StructField(SalesCartVariables.FK_CUSTOMER, IntegerType, true),
@@ -398,7 +398,6 @@ object Schema {
     StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
 
-
   val surf2 = StructType(Array(
     StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
     StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
@@ -415,6 +414,5 @@ object Schema {
     StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
     StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
   ))
-
 
 }
