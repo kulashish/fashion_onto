@@ -46,7 +46,7 @@ class WishlistIODCampaign {
     val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
-    
+
     //save campaign Output
     CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
       + CampaignCommon.WISHLIST_IOD_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))

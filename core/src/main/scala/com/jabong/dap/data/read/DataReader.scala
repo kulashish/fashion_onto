@@ -1,5 +1,7 @@
 package com.jabong.dap.data.read
 
+import java.io.File
+
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -116,7 +118,7 @@ object DataReader extends Logging {
     }
   }
 
-  def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, header: String, delimeter: String): DataFrame = {
+  def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, filename: String, header: String, delimeter: String): DataFrame = {
     require(basePath != null, "Base Path is null")
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
@@ -124,13 +126,13 @@ object DataReader extends Logging {
     require(date != null, "Date is null")
 
     val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
-    val filename = "*.csv"
+    logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
     if (DataVerifier.dataExists(fetchPath, filename))
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
-    else
-      logger.error("Data not found for the date")
-    throw new DataNotFound
-
+    else {
+      logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
+      throw new DataNotFound
+    }
   }
 
 }
