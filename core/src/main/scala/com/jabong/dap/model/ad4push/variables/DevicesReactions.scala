@@ -41,7 +41,6 @@ object DevicesReactions extends Logging {
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
     val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, incrDate)
-    val incrSavePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate)
 
     if (DataWriter.canWrite(savePathI, saveMode)) {
       val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, "true", ",")
@@ -56,8 +55,12 @@ object DevicesReactions extends Logging {
 
       val (resultI, incrI) = fullSummary(incI, incrDate, fullI, b7I, b15I, b30I)
 
+      val incrSavePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate)
+      if (DataWriter.canWrite(incrSavePathI, saveMode)) {
+        DataWriter.writeParquet(incrI, incrSavePathI, saveMode)
+      }
+
       DataWriter.writeParquet(resultI, savePathI, saveMode)
-      DataWriter.writeParquet(incrI, incrSavePathI, saveMode)
 
       val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_"
       TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
@@ -65,7 +68,6 @@ object DevicesReactions extends Logging {
     }
 
     val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, incrDate)
-    val incrSavePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate)
     if (DataWriter.canWrite(savePathA, saveMode)) {
       val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate, "true", ",")
       val incA = dfCorrectSchema(incAStringSchema)
@@ -79,8 +81,11 @@ object DevicesReactions extends Logging {
 
       val (resultA, incrA) = fullSummary(incA, incrDate, fullA, b7A, b15A, b30A)
 
+      val incrSavePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate)
+      if (DataWriter.canWrite(incrSavePathA, saveMode)) {
+        DataWriter.writeParquet(incrA, incrSavePathA, saveMode)
+      }
       DataWriter.writeParquet(resultA, savePathA, saveMode)
-      DataWriter.writeParquet(incrA, incrSavePathA, saveMode)
 
       val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_"
       TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
