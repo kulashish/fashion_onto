@@ -42,8 +42,7 @@ object CampaignUtils extends Logging {
   }
 
   def generateReferenceSkuForSurf(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
-      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+    val customerFilteredData = skuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(
         Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
         skuData(CustomerVariables.FK_CUSTOMER),
