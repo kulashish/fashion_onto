@@ -51,7 +51,7 @@ object DataVerifier {
     fileSystem.delete(new Path(directory), true)
   }
 
-  //TODO refactor and rename this file.
+  //TODO refactor and rename DataVerifier file.
   def rename(src: String, dest: String) = {
     fileSystem.rename(new Path(src), new Path(dest))
   }

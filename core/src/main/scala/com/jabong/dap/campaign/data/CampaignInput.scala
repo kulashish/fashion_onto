@@ -10,7 +10,7 @@ import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.{PathBuilder, DataReader}
+import com.jabong.dap.data.read.{ PathBuilder, DataReader }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -50,7 +50,7 @@ object CampaignInput extends Logging {
     surf3Data
   }
 
-  def loadCampaignOutput(date: String):DataFrame = {
+  def loadCampaignOutput(date: String): DataFrame = {
     return null
   }
 
@@ -150,8 +150,7 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
-
-  def loadYesterdayItrSkuDataForCampaignMerge():DataFrame = {
+  def loadYesterdayItrSkuDataForCampaignMerge(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day basic itr sku data from hdfs")
     val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, dateYesterday)
@@ -192,7 +191,6 @@ object CampaignInput extends Logging {
     last30DayItrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
     filteredItr
   }*/
-  
 
   def loadFullShortlistData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
@@ -214,16 +212,16 @@ object CampaignInput extends Logging {
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
     CampaignManager.campaignMailTypeMap.foreach(
-    e => (
-      allCampaignData = allCampaignData.unionAll(getCampaignData(e._1,date))
+      e => (
+        allCampaignData = allCampaignData.unionAll(getCampaignData(e._1, date))
       )
     )
     return allCampaignData
   }
 
-  def getCampaignData(name:String, date: String):DataFrame={
-    val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CAMPAIGN,name,DataSets.DAILY_MODE,date)
-    if(!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)){
+  def getCampaignData(name: String, date: String): DataFrame = {
+    val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
+    if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
       return SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).select(
         campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
         campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),

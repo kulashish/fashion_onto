@@ -282,7 +282,7 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE),inputData(ItrVariables.CREATED_AT))
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT))
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -484,7 +484,7 @@ object CampaignUtils extends Logging {
   //FIXME:add implementation
   def addPriority(campaignData: DataFrame): DataFrame = {
     val priorityMap = CampaignManager.mailTypePriorityMap
-    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3),e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
+    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3), e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
     return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
   }
   //FIXME: make it generalized for all campaigns

@@ -171,7 +171,7 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
-    if(!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))){
+    if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
       logger.error("Keys doesn't Exists")
       return null
     }
@@ -212,7 +212,7 @@ object CampaignManager extends Serializable with Logging {
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, "true", ";")
   }
 
-  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER)) {
+  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)) {
     val iosDF = df.filter((CampaignMergedFields.DOMAIN + " = " + DataSets.IOS))
     val androidDF = df.filter(CampaignMergedFields.DOMAIN + " = " + DataSets.ANDROID)
 
@@ -276,7 +276,7 @@ object CampaignManager extends Serializable with Logging {
     if (validated) {
       createCampaignMaps(json)
       val saveMode = DataSets.IGNORE_SAVEMODE
-      val dateFolder = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER)
+      val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
       val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
@@ -286,7 +286,7 @@ object CampaignManager extends Serializable with Logging {
       val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr)
 
       val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-      if(DataWriter.canWrite(saveMode, writePath))
+      if (DataWriter.canWrite(saveMode, writePath))
         DataWriter.writeParquet(mergedData, writePath, saveMode)
 
       //writing csv file

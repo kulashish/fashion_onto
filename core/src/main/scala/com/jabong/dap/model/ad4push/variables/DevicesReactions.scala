@@ -1,6 +1,7 @@
 package com.jabong.dap.model.ad4push.variables
 
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
@@ -40,9 +41,13 @@ object DevicesReactions extends Logging {
 
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
+    val incrDateInFileFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+
     val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, incrDate)
+
     if (DataWriter.canWrite(savePathI, saveMode)) {
-      val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, "true", ",")
+      val fName = "exportMessagesReactions_" + CampaignMergedFields.IOS_CODE + "_" + incrDateInFileFormat + ".csv"
+      val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
       val incI = dfCorrectSchema(incIStringSchema)
 
       //getting DF
@@ -54,17 +59,22 @@ object DevicesReactions extends Logging {
 
       val (resultI, incrI) = fullSummary(incI, incrDate, fullI, b7I, b15I, b30I)
 
-      DataWriter.writeParquet(resultI, savePathI, saveMode)
-      DataWriter.writeParquet(incrI, savePathI, saveMode)
+      val incrSavePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate)
+      if (DataWriter.canWrite(incrSavePathI, saveMode)) {
+        DataWriter.writeParquet(incrI, incrSavePathI, saveMode)
+      }
 
-      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_"
-      TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeParquet(resultI, savePathI, saveMode)
+
+      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_" + incrDateInFileFormat
+
       DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
 
     val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(savePathA, saveMode)) {
-      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate, "true", ",")
+      val fName = "exportMessagesReactions_" + CampaignMergedFields.ANDROID_CODE + "_" + incrDateInFileFormat + ".csv"
+      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
       val incA = dfCorrectSchema(incAStringSchema)
 
       //getting DF
@@ -76,11 +86,13 @@ object DevicesReactions extends Logging {
 
       val (resultA, incrA) = fullSummary(incA, incrDate, fullA, b7A, b15A, b30A)
 
+      val incrSavePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate)
+      if (DataWriter.canWrite(incrSavePathA, saveMode)) {
+        DataWriter.writeParquet(incrA, incrSavePathA, saveMode)
+      }
       DataWriter.writeParquet(resultA, savePathA, saveMode)
-      DataWriter.writeParquet(incrA, savePathA, saveMode)
 
-      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_"
-      TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
       DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
   }
