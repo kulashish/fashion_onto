@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -17,7 +17,6 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import com.jabong.dap.campaign.manager.CampaignProcessor
 import scala.collection.mutable.HashMap
 
 /**

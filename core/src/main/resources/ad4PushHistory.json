@@ -95,6 +95,12 @@
       "incrDate": "2015/07/26",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
+    },
+    {
+      "source": "ad4push",
+      "incrDate": "2015/07/27",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
     }
   ]
 }
