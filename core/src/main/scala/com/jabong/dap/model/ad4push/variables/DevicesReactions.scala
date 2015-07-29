@@ -132,27 +132,29 @@ object DevicesReactions extends Logging {
 
     val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.CUSTOMER_ID)
 
-    val joinedDF = MergeUtils.joinOldAndNewDF(effective, DevicesReactionsSchema.effectiveDF, full, DevicesReactionsSchema.deviceReaction, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
-      .na.fill(
-        Map(
-          DevicesReactionsVariables.CLICK_7 -> 0,
-          DevicesReactionsVariables.CLICK_15 -> 0,
-          DevicesReactionsVariables.CLICK_30 -> 0,
-          DevicesReactionsVariables.CLICK_LIFETIME -> 0,
-          DevicesReactionsVariables.CLICKED_TWICE -> 0,
-          DevicesReactionsVariables.CLICK_MONDAY -> 0,
-          DevicesReactionsVariables.CLICK_TUESDAY -> 0,
-          DevicesReactionsVariables.CLICK_WEDNESDAY -> 0,
-          DevicesReactionsVariables.CLICK_THURSDAY -> 0,
-          DevicesReactionsVariables.CLICK_FRIDAY -> 0,
-          DevicesReactionsVariables.CLICK_SATURDAY -> 0,
-          DevicesReactionsVariables.CLICK_SUNDAY -> 0,
-          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
-          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
-          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0,
-          MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY -> 0
-        )
-      )
+    val joinedDF = MergeUtils.joinOldAndNewDF(effective, DevicesReactionsSchema.effectiveDF, full,
+      DevicesReactionsSchema.deviceReaction, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+      .na.fill(0)
+//      .na.fill(
+//        Map(
+//          DevicesReactionsVariables.CLICK_7 -> 0,
+//          DevicesReactionsVariables.CLICK_15 -> 0,
+//          DevicesReactionsVariables.CLICK_30 -> 0,
+//          DevicesReactionsVariables.CLICK_LIFETIME -> 0,
+//          DevicesReactionsVariables.CLICKED_TWICE -> 0,
+//          DevicesReactionsVariables.CLICK_MONDAY -> 0,
+//          DevicesReactionsVariables.CLICK_TUESDAY -> 0,
+//          DevicesReactionsVariables.CLICK_WEDNESDAY -> 0,
+//          DevicesReactionsVariables.CLICK_THURSDAY -> 0,
+//          DevicesReactionsVariables.CLICK_FRIDAY -> 0,
+//          DevicesReactionsVariables.CLICK_SATURDAY -> 0,
+//          DevicesReactionsVariables.CLICK_SUNDAY -> 0,
+//          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
+//          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
+//          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0,
+//          MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY -> 0
+//        )
+//      )
 
     val resultDF = joinedDF.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
@@ -193,40 +195,46 @@ object DevicesReactions extends Logging {
   def effectiveDFFull(incremental: DataFrame, effective7: DataFrame, effective15: DataFrame, effective30: DataFrame): DataFrame = {
     //send DataFrames after using reduce
 
-    val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7, DevicesReactionsSchema.reducedDF, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+    val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7,
+      DevicesReactionsSchema.reducedDF, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+      .na.fill(0)
     val joined_7_15_summary = joined_7_15.select(
       coalesce(col(DevicesReactionsVariables.DEVICE_ID), col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
       coalesce(col(DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
       col(DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
       col(new_reaction) as DevicesReactionsVariables.EFFECTIVE_15_DAYS)
-      .na.fill(
-        Map(
-          DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
-          DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0
-        )
-      )
+//      .na.fill(
+//        Map(
+//          DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
+//          DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0
+//        )
+//      )
 
-    val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary, DevicesReactionsSchema.joined_7_15, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+    val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary,
+      DevicesReactionsSchema.joined_7_15, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+      .na.fill(0)
     val joined_7_15_30_summary = joined_7_15_30.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
       col(DevicesReactionsVariables.EFFECTIVE_7_DAYS) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
       col(DevicesReactionsVariables.EFFECTIVE_15_DAYS) as DevicesReactionsVariables.EFFECTIVE_15_DAYS,
       col(new_reaction) as DevicesReactionsVariables.EFFECTIVE_30_DAYS)
-      .na.fill(
-        Map(
-          DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
-          DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
-          DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0
-        )
-      )
+//      .na.fill(
+//        Map(
+//          DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
+//          DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
+//          DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0
+//        )
+//      )
 
-    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary, DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
-      .na.fill(
-        Map(
-          new_reaction -> 0
-        )
-      )
+    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary,
+      DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+      .na.fill(0)
+//      .na.fill(
+//        Map(
+//          new_reaction -> 0
+//        )
+//      )
     val joinedAllSummary = joinedAll.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
