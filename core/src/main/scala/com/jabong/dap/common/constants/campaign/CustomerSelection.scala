@@ -8,5 +8,8 @@ object CustomerSelection {
   val INVALID = "Invalid"
   val ACART = "Acart"
   val WISH_LIST = "WishList"
+  val YESTERDAY_SESSION = "YesterdaySession"
+  val YESTERDAY_SESSION_DISTINCT = "YesterdaySessionDistinct"
+  val LAST_THIRTY_DAY_SESSION = "LastThirtyDaySession"
 
 }

@@ -265,6 +265,22 @@ object Schema {
     StructField(CampaignCommon.PRIORITY,IntegerType, true)
   ))
 
+  val customerPageVisitSkuListLevel = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
+  val customerPageVisitSkuLevel = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU, StringType, true)
+  ))
+
   val salesOrderItem = StructType(Array(
     StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, IntegerType, true),
     StructField(SalesOrderItemVariables.FK_SALES_ORDER, IntegerType, true),
@@ -348,5 +364,32 @@ object Schema {
     StructField(ProductVariables.SKU_SIMPLE, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
+
+  val customerDeviceMapping = StructType(Array(
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.RESPONSYS_ID, StringType, true),
+    StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
+    StructField(PageVisitVariables.BROWSER_ID, StringType, true),
+    StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
+
+
+  val surf2 = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BRICK, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
+  val customerSurfData = StructType(Array(
+    StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.BROWER_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
+    StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
+    StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
 
 }

@@ -19,7 +19,7 @@ class QueryBuilderTest extends FlatSpec with Matchers {
     QueryBuilder.getJoinTableStrings(tableInfo) should be ("", "")
   }
 
-  "getJoinTableStrings" should "return correct strings when tables are passed in joinTables" in {
+  "getJoinTableStrings1" should "return correct strings when tables are passed in joinTables" in {
     val tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = "pk", mode = "mode",
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
       limit = null, filterCondition = null,
@@ -28,6 +28,19 @@ class QueryBuilderTest extends FlatSpec with Matchers {
         new JoinTables(name = "testTable2", foreignKey = "fk_testTable2", selectString = null)
       )))
     val selectString = ", j1.*, j2.*"
+    val joinString = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk LEFT JOIN testTable2 AS j2 ON j2.fk_testTable2 = t1.pk"
+    QueryBuilder.getJoinTableStrings(tableInfo) should be (selectString, joinString)
+  }
+
+  "getJoinTableStrings2" should "return correct strings when tables are passed in joinTables" in {
+    val tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = "pk", mode = "mode",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
+      limit = null, filterCondition = null,
+      joinTables = Option.apply(List(
+        new JoinTables(name = "testTable1", foreignKey = "fk_testTable1", selectString = null),
+        new JoinTables(name = "testTable2", foreignKey = "fk_testTable2", selectString = Option.apply("j2.fk_testTable2, j2.col1, j2. col2"))
+      )))
+    val selectString = ", j1.*, j2.fk_testTable2, j2.col1, j2. col2"
     val joinString = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk LEFT JOIN testTable2 AS j2 ON j2.fk_testTable2 = t1.pk"
     QueryBuilder.getJoinTableStrings(tableInfo) should be (selectString, joinString)
   }
@@ -90,6 +103,19 @@ class QueryBuilderTest extends FlatSpec with Matchers {
     val joinSelect = ", j1.*"
     val joinFrom = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk"
     val query = "(SELECT TOP limit t1.* , j1.* FROM tableName AS t1  LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk condition ORDER BY pk DESC) AS t"
+    QueryBuilder.getFullDataQuery(driver, condition, joinSelect, joinFrom, tableInfo) should be (query)
+  }
+
+  "getFullDataQuery" should "give correct query for sqlserver and limit not null and primary key is null" in {
+    val lmt = Option.apply("limit")
+    val tableInfo = new TableInfo(source = "source", tableName = "tableName", primaryKey = null, mode = "mode",
+      saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
+      limit = lmt, filterCondition = null,
+      joinTables = jnTbls)
+    val driver = "sqlserver"
+    val joinSelect = ", j1.*"
+    val joinFrom = " LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk"
+    val query = "(SELECT TOP limit t1.* , j1.* FROM tableName AS t1  LEFT JOIN testTable1 AS j1 ON j1.fk_testTable1 = t1.pk condition ) AS t"
     QueryBuilder.getFullDataQuery(driver, condition, joinSelect, joinFrom, tableInfo) should be (query)
   }
 
