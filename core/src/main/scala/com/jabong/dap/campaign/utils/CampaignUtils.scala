@@ -54,8 +54,8 @@ object CampaignUtils extends Logging {
     val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1),
-        first(CustomerPageVisitVariables.BROWER_ID),
-        first(CustomerPageVisitVariables.DOMAIN)
+        first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
+        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
       )
 
     return customerRefSku
