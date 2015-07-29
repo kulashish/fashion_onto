@@ -80,7 +80,7 @@ object GetSurfVariables extends java.io.Serializable {
   }
 
   def uidToDeviceid(hiveContext: HiveContext): DataFrame = {
-    val uiddeviceiddf = hiveContext.sql("select distinct case when userid is null then concat('_app_',bid) else userid end as userid,bid as deviceid,domain,max(pagets) as pagets from merge.app where bid is not null and pagets is not null group by userid,bid,domain order by userid,pagets desc")
+    val uiddeviceiddf = hiveContext.sql("select distinct case when userid is null then concat('_app_',bid) else userid end as userid,bid as deviceid,domain,max(pagets) as pagets from finalpagevisit where bid is not null and pagets is not null group by userid,bid,domain order by userid,pagets desc")
     return uiddeviceiddf
   }
 

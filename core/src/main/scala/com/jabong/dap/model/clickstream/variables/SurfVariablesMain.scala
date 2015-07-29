@@ -34,6 +34,7 @@ object SurfVariablesMain extends java.io.Serializable {
     val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     var dt = dateFormat.format(cal.getTime())
     val tablename = args(0)
+    val finalTempTable = "finalpagevisit"
 
     val currentMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
     var processedVariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf3ProcessedVariable"
@@ -60,14 +61,14 @@ object SurfVariablesMain extends java.io.Serializable {
     processedVariable.repartition(300).write.save(processedVariablePath)
 
     // user device mapping
-    /*var userDeviceMapping = UserDeviceMapping
+    var userDeviceMapping = UserDeviceMapping
       .getUserDeviceMapApp(useridDeviceidFrame)
       .write.mode("error")
       .save(userDeviceMapPath)
 
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, finalTempTable)
     variableSurf1.write.save(surf1VariablePath)
-    */
+
   }
 
   def startClickstreamYesterdaySessionVariables() = {
@@ -81,6 +82,7 @@ object SurfVariablesMain extends java.io.Serializable {
     var dt = dateFormat.format(cal.getTime())
 
     val tablename = "merge.merge_pagevisit"
+    val finalTempTable = "finalpagevisit"
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
 
@@ -99,7 +101,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .save(userDeviceMapPath)
 
     // variable 1
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, finalTempTable)
     variableSurf1.write.save(surf1VariablePath)
   }
 
@@ -141,7 +143,7 @@ object SurfVariablesMain extends java.io.Serializable {
       processedVariable.write.save(processedVariablePath)
     }
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
-    mergedData.saveAsParquetFile(currentMergedDataPath)
+    mergedData.write.parquet(currentMergedDataPath)
 
 
   }

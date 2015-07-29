@@ -42,13 +42,14 @@ class GroupData() extends java.io.Serializable {
     ).filter("userid is not null")
   //  var useridDeviceidFrame = pagevisit.selectExpr("case when userid is null and domain!='w' and domain!='m' then concat('_app_',browserid) else userid end as appuserid", "*")
 
+    useridDeviceidFrame.registerTempTable("finalpagevisit")
     return useridDeviceidFrame
   }
 
   def groupDataByAppUser(useridDeviceidFrame: DataFrame): RDD[(String, Row)] = {
     useridDeviceidFrame.as('useridDeviceidFrame)
-    val ug: RDD[(String, Row)] = useridDeviceidFrame.filter("pagets is not null")
-      .map(x => (x(uid).toString, x)).partitionBy(new org.apache.spark.HashPartitioner(400)).persist()
+    val ug: RDD[(String, Row)] = useridDeviceidFrame.repartition(800)
+      .map(x => (x(uid).toString, x)).partitionBy(new org.apache.spark.HashPartitioner(800)).persist()
     return ug
   }
 
