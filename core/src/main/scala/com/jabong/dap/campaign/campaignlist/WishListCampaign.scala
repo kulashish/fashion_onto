@@ -184,7 +184,7 @@ object WishListCampaign {
       col(CustomerProductShortlistVariables.SKU),
       col(CustomerProductShortlistVariables.SPECIAL_PRICE),
       col(SalesOrderItemVariables.UPDATED_AT),
-      Udf.yyyymmddString(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT
+      Udf.yyyymmdd(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT
     )
 
     val irt30Day = df30DaysItrData.select(
