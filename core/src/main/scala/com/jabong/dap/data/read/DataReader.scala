@@ -127,10 +127,10 @@ object DataReader extends Logging {
     val filename = "*.csv"
     if (DataVerifier.dataExists(fetchPath, filename))
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
-    else
-      logger.error("Data not found for the date")
-    throw new DataNotFound
-
+    else {
+      logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
+      throw new DataNotFound
+    }
   }
 
 }
