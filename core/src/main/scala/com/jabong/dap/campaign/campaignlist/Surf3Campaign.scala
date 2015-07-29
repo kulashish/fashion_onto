@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, SkuSelection}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import com.jabong.dap.common.time.TimeConstants
 import org.apache.spark.sql.DataFrame
 
