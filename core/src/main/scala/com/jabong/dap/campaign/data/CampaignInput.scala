@@ -8,7 +8,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.read.{PathBuilder, DataReader}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.product.itr.variables.ITR
@@ -144,6 +144,7 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
+  /*
   //FIXME : change to last 30 days
   def loadLast30DaysItrSimpleData() = {
     val thirtyDayOldEndTime = TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_FORMAT_FOLDER)
@@ -171,11 +172,8 @@ object CampaignInput extends Logging {
       last30DayItrData(ITR.QUANTITY) as ProductVariables.STOCK)
     last30DayItrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
     filteredItr
-  }
-
-  def loadLast30DaysItrSkuData(): DataFrame = {
-    null
-  }
+  }*/
+  
 
   def loadFullShortlistData() = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)

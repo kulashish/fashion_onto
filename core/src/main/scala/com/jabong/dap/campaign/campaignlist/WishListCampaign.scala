@@ -27,9 +27,6 @@ object WishListCampaign {
 
     val fullShortlistData = CampaignInput.loadFullShortlistData()
 
-    //val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
-    //val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
-
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
@@ -44,7 +41,6 @@ object WishListCampaign {
 
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
-    val itrSku30DayData = CampaignInput.loadLast30DaysItrSkuData()
 
     val wishlistFollowupCampaign = new WishlistFollowupCampaign()
     wishlistFollowupCampaign.runCampaign(lastDayCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, yesterdaySalesOrderData, yesterdaySalesOrderItemData)
@@ -53,8 +49,10 @@ object WishListCampaign {
     wishListLowStockCampaign.runCampaign(fullShortlistData, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
     // call iod campaign
-    //val wishListIODCampaign = new WishlistIODCampaign()
-    //wishListIODCampaign.runCampaign(fullShortlistData, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    val itrSku30DayData = CampaignInput.load30DayItrSkuData()
+
+    val wishListIODCampaign = new WishlistIODCampaign()
+    wishListIODCampaign.runCampaign(fullShortlistData, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
   }
 
