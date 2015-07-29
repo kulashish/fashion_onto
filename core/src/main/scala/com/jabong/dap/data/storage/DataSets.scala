@@ -64,6 +64,7 @@ object DataSets {
   val REACTIONS_ANDROID = "reactions_android"
   val REACTIONS_IOS_CSV = "reactions_ios_csv"
   val REACTIONS_ANDROID_CSV = "reactions_android_csv"
+  val CUSTOMER_RESPONSE = "customer_response"
 
   val IOS = "ios"
   val WINDOWS = "windows"
