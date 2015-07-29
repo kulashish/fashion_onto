@@ -11,7 +11,7 @@ import org.apache.spark.sql.types.{StringType, LongType, IntegerType, StructFiel
 /**
  * Created by Mubarak on 28/7/15.
  */
-class CampaignProcessor {
+object CampaignProcessor {
 
   def mapDeviceFromDCF(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame={
     val notNull = campaign.na.drop(Array(

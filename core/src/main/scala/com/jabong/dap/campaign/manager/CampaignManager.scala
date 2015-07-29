@@ -7,6 +7,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
@@ -16,7 +17,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-
+import com.jabong.dap.campaign.manager.CampaignProcessor
 import scala.collection.mutable.HashMap
 
 /**
@@ -274,9 +275,13 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.basePath,DataSets.CAMPAIGN,DataSets.DAILY_MODE,TimeUtils.getTodayDate("YYYY/MM/DD"))
-
-      val mergedData = campaignMerger(allCampaignsData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.CAMPAIGN, DataSets.DAILY_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
+      val surfCapaignData =  CampaignInput.loadAllCampaignsData(DataSets.SURF_CAMPAIGN, DataSets.DAILY_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
+      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
+      val allCamp = CampaignProcessor.mapDeviceFromDCF(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
+      val surfCamp = CampaignProcessor.mapDeviceFromDCF(cmr, allCampaignsData, CampaignMergedFields.DEVICE_ID)
+      val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
+      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, surfCamp, itr)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
         + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
       //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {

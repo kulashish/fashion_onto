@@ -150,6 +150,19 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
+
+  def loadYesterdayItrSkuDataForCampaignMerge():DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading last day basic itr sku data from hdfs")
+    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, dateYesterday)
+    val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU),
+      itrData(ITR.BRAND_NAME),
+      itrData(ITR.PRODUCT_NAME),
+      itrData(ITR.BRICK)
+    )
+    filteredItr
+  }
+
   /*
   //FIXME : change to last 30 days
   def loadLast30DaysItrSimpleData() = {
@@ -199,7 +212,7 @@ object CampaignInput extends Logging {
   def loadAllCampaignsData(source: String, mode: String, date: String): DataFrame = {
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
-    val campaignData = DataReader.getDataFrame(DataSets.basePath,source,"*",DataSets.DAILY_MODE)
+    val campaignData = DataReader.getDataFrame(DataSets.basePath,source,"*",DataSets.DAILY_MODE,date)
     val allCampaignData = campaignData.select(
       campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
       campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
