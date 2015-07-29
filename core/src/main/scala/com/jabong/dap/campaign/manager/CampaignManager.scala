@@ -7,6 +7,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
@@ -16,7 +17,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-
+import com.jabong.dap.campaign.manager.CampaignProcessor
 import scala.collection.mutable.HashMap
 
 /**
@@ -159,7 +160,7 @@ object CampaignManager extends Serializable with Logging {
    * @param inputCampaignsData
    * @return
    */
-  def campaignMerger(inputCampaignsData: DataFrame): DataFrame = {
+  def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
     if (inputCampaignsData == null) {
       logger.error("inputCampaignData is null")
       return null
@@ -170,16 +171,27 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
-    val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKU1)
+    if(!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))){
+      logger.error("Keys doesn't Exists")
+      return null
+    }
 
+    val selectedData = inputCampaignsData.select(
+      CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+      CampaignMergedFields.CUSTOMER_ID,
+      CampaignMergedFields.REF_SKU1,
+      CampaignMergedFields.DOMAIN,
+      CampaignMergedFields.DEVICE_ID,
+      CampaignMergedFields.EMAIL)
     val inputDataWithPriority = addPriority(selectedData)
-
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
-      .groupBy(CampaignMergedFields.CUSTOMER_ID)
+      .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
+        first(key1) as key1,
+        first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+        first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
 
     return campaignMerged
   }
@@ -200,7 +212,7 @@ object CampaignManager extends Serializable with Logging {
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, "true", ";")
   }
 
-  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)) {
+  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER)) {
     val iosDF = df.filter((CampaignMergedFields.DOMAIN + " = " + DataSets.IOS))
     val androidDF = df.filter(CampaignMergedFields.DOMAIN + " = " + DataSets.ANDROID)
 
@@ -263,17 +275,22 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData()
+      val saveMode = DataSets.IGNORE_SAVEMODE
+      val dateFolder = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
-      val mergedData = campaignMerger(allCampaignsData)
-      CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
-        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
-      //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
-      //          COVarJobConfig.coVarInfo = coVarJob
-      //        coVarJob.source match {
-      //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
-      //          case _ => logger.error("Unknown table source.")
-      //        }
+      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
+
+      val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
+      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr)
+
+      val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      if(DataWriter.canWrite(saveMode, writePath))
+        DataWriter.writeParquet(mergedData, writePath, saveMode)
+
+      //writing csv file
+      splitFileToCSV(mergedData, dateFolder)
     }
   }
 }

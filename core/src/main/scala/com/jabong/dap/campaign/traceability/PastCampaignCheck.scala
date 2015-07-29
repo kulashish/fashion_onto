@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.traceability
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
@@ -34,7 +35,9 @@ class PastCampaignCheck extends Logging {
 
     val mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
       .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
-        pastCampaignData(CampaignMergedFields.REF_SKU1) as ProductVariables.SKU)
+        pastCampaignData(CampaignMergedFields.REF_SKU1) as ProductVariables.SKU,
+        pastCampaignData(CampaignMergedFields.DEVICE_ID))
+
 
     logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
 
@@ -102,5 +105,15 @@ class PastCampaignCheck extends Logging {
       )
 
     return pastCampaignNotSendCustomers
+  }
+
+  def getLastNDaysData(n: Int): DataFrame={
+    var data: DataFrame = null
+    for(i <-1 to n){
+      val date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      var df = CampaignInput.loadCampaignOutput(date)
+      data = data.unionAll(df)
+    }
+    data
   }
 }

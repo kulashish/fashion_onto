@@ -3,13 +3,16 @@ package com.jabong.dap.campaign.data
 import java.io.File
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.{PathBuilder, DataReader}
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
@@ -46,6 +49,10 @@ object CampaignInput extends Logging {
 
     val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.CLICKSTREAM, DataSets.CUSTOMER_PAGE_VISIT, DataSets.MONTHLY_MODE, dateYesterday)
     acartData
+  }
+
+  def loadCampaignOutput(date: String):DataFrame = {
+    return null
   }
 
   def loadCustomerMasterData(): DataFrame = {
@@ -144,6 +151,19 @@ object CampaignInput extends Logging {
     filteredItr
   }
 
+
+  def loadYesterdayItrSkuDataForCampaignMerge():DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading last day basic itr sku data from hdfs")
+    val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, dateYesterday)
+    val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU),
+      itrData(ITR.BRAND_NAME),
+      itrData(ITR.PRODUCT_NAME),
+      itrData(ITR.BRICK)
+    )
+    filteredItr
+  }
+
   /*
   //FIXME : change to last 30 days
   def loadLast30DaysItrSimpleData() = {
@@ -190,18 +210,27 @@ object CampaignInput extends Logging {
    * Load all campaign data
    * @return dataframe with call campaigns data
    */
-  def loadAllCampaignsData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  def loadAllCampaignsData(date: String): DataFrame = {
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
-    // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
-    val campaignData = Spark.getSqlContext().read.parquet("/data/output/campaigns/*/2015/07/26/")
-    val allCampaignData = campaignData.select(
-      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-      campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-      campaignData(CampaignMergedFields.REF_SKU1))
-
+    var allCampaignData: DataFrame = null
+    CampaignManager.campaignMailTypeMap.foreach(
+    e => (
+      allCampaignData = allCampaignData.unionAll(getCampaignData(e._1,date))
+      )
+    )
     return allCampaignData
+  }
+
+  def getCampaignData(name:String, date: String):DataFrame={
+    val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CAMPAIGN,name,DataSets.DAILY_MODE,date)
+    if(!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)){
+      return SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).select(
+        campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+        campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        campaignData(CampaignMergedFields.REF_SKU1))
+    }
+    campaignData
   }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
