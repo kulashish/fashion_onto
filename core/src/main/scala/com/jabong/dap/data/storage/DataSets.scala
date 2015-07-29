@@ -111,7 +111,9 @@ object DataSets {
 
   val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
 
-  val CAMPAIGN = "campaign"
+  val CAMPAIGN = "campaigns"
+
+  val SURF_CAMPAIGN = "surfCampaigns"
 
   val ITEM_ON_DISCOUNT = "item_on_discount"
 
