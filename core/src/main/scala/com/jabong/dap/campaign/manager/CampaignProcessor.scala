@@ -6,14 +6,13 @@ import org.apache.spark.sql.DataFrame
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import org.apache.spark.sql.functions._
 import com.jabong.dap.model.product.itr.variables.ITR
-import org.apache.spark.sql.types.{StringType, LongType, IntegerType, StructField}
 
 /**
  * Created by Mubarak on 28/7/15.
  */
 object CampaignProcessor {
 
-  def mapDeviceFromDCF(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame={
+  def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame={
     val notNull = campaign.na.drop(Array(
       CampaignMergedFields.CUSTOMER_ID,
       CampaignMergedFields.DEVICE_ID
@@ -38,13 +37,11 @@ object CampaignProcessor {
     campaignDevice
   }
 
-  def splitNMergeCampaigns(surfCampaign: DataFrame, campaign: DataFrame, itr: DataFrame): DataFrame ={
+  def splitNMergeCampaigns(campaign: DataFrame, itr: DataFrame): DataFrame ={
 
-    var joinedDF = surfCampaign.unionAll(campaign)
+    val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
 
-    val custIdNUll = joinedDF.filter(joinedDF(CampaignMergedFields.CUSTOMER_ID) === null)
-
-    val custIdNotNUll = joinedDF.filter(!joinedDF(CampaignMergedFields.CUSTOMER_ID) === null)
+    val custIdNotNUll = campaign.filter(!campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
 
     val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
 

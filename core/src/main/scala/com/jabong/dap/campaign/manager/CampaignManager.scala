@@ -212,7 +212,7 @@ object CampaignManager extends Serializable with Logging {
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, "true", ";")
   }
 
-  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)) {
+  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER)) {
     val iosDF = df.filter((CampaignMergedFields.DOMAIN + " = " + DataSets.IOS))
     val androidDF = df.filter(CampaignMergedFields.DOMAIN + " = " + DataSets.ANDROID)
 
@@ -275,21 +275,22 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.CAMPAIGN, TimeUtils.getTodayDate("YYYY/MM/DD"))
-      val surfCapaignData =  CampaignInput.loadAllCampaignsData(DataSets.SURF_CAMPAIGN, TimeUtils.getTodayDate("YYYY/MM/DD"))
-      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
-      val allCamp = CampaignProcessor.mapDeviceFromDCF(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
-      val surfCamp = CampaignProcessor.mapDeviceFromDCF(cmr, allCampaignsData, CampaignMergedFields.DEVICE_ID)
+      val saveMode = DataSets.IGNORE_SAVEMODE
+      val dateFolder = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
+
+      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
+
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, surfCamp, itr)
-      CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
-        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
-      //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
-      //          COVarJobConfig.coVarInfo = coVarJob
-      //        coVarJob.source match {
-      //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
-      //          case _ => logger.error("Unknown table source.")
-      //        }
+      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr)
+
+      val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      if(DataWriter.canWrite(saveMode, writePath))
+        DataWriter.writeParquet(mergedData, writePath, saveMode)
+
+      //writing csv file
+      splitFileToCSV(mergedData, dateFolder)
     }
   }
 }

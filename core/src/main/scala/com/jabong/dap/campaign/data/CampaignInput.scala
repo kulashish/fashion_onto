@@ -210,7 +210,7 @@ object CampaignInput extends Logging {
    * Load all campaign data
    * @return dataframe with call campaigns data
    */
-  def loadAllCampaignsData(source: String, date: String): DataFrame = {
+  def loadAllCampaignsData(date: String): DataFrame = {
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
@@ -223,15 +223,14 @@ object CampaignInput extends Logging {
   }
 
   def getCampaignData(name:String, date: String):DataFrame={
-    val campaignData = DataReader.getDataFrame(DataSets.basePath,DataSets.CAMPAIGN,name,DataSets.DAILY_MODE,date)
-    val allCampaignData = campaignData.select(
-      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-      campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-      campaignData(CampaignMergedFields.REF_SKU1))
-    if(!SchemaUtils.isSchemaEqual(allCampaignData.schema, Schema.campaignSchema)){
-      return SchemaUtils.changeSchema(allCampaignData, Schema.campaignSchema)
+    val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH,DataSets.CAMPAIGN,name,DataSets.DAILY_MODE,date)
+    if(!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)){
+      return SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).select(
+        campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+        campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        campaignData(CampaignMergedFields.REF_SKU1))
     }
-    allCampaignData
+    campaignData
   }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
