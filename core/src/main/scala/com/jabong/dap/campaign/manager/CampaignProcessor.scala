@@ -5,13 +5,15 @@ import com.jabong.dap.common.constants.variables.CustomerVariables
 import org.apache.spark.sql.DataFrame
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import org.apache.spark.sql.functions._
+import com.jabong.dap.model.product.itr.variables.ITR
+import org.apache.spark.sql.types.{StringType, LongType, IntegerType, StructField}
 
 /**
  * Created by Mubarak on 28/7/15.
  */
 class CampaignProcessor {
 
-  def mapDeviceFromDCF(dcf: DataFrame, campaign: DataFrame, key: String): DataFrame={
+  def mapDeviceFromDCF(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame={
     val notNull = campaign.na.drop(Array(
       CampaignMergedFields.CUSTOMER_ID,
       CampaignMergedFields.DEVICE_ID
@@ -23,20 +25,20 @@ class CampaignProcessor {
     else{
       key1 = key
     }
-    val dcfn = dcf.filter(!dcf(CampaignMergedFields.DEVICE_ID)===null)
+    val cmrn = cmr.filter(!cmr(CampaignMergedFields.DEVICE_ID)===null)
     val bcCampaign = Spark.getContext().broadcast(notNull).value
-    val campaignDevice = dcfn.join(bcCampaign,bcCampaign(key)===dcfn(key1))
+    val campaignDevice = cmrn.join(bcCampaign,bcCampaign(key)===cmrn(key1))
     .select(bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKU1),
-        coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), dcfn(CampaignMergedFields.DEVICE_ID)),
-        coalesce(bcCampaign(CampaignMergedFields.EMAIL), dcfn(CampaignMergedFields.EMAIL)),
-        coalesce(bcCampaign(CampaignMergedFields.DOMAIN), dcfn(CampaignMergedFields.DOMAIN))
+        coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(CampaignMergedFields.DEVICE_ID)),
+        coalesce(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)),
+        coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN))
       )
     campaignDevice
   }
 
-  def splitNMergeCampaigns(surfCampaign: DataFrame, campaign: DataFrame): DataFrame ={
+  def splitNMergeCampaigns(surfCampaign: DataFrame, campaign: DataFrame, itr: DataFrame): DataFrame ={
 
     var joinedDF = surfCampaign.unionAll(campaign)
 
@@ -48,8 +50,21 @@ class CampaignProcessor {
 
     val DeviceId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
 
-    custId.unionAll(DeviceId)
+    val camp = custId.unionAll(DeviceId)
 
+    val finalCampaign = camp.join(itr, camp(CampaignMergedFields.REF_SKU1)===itr(ITR.CONFIG_SKU)).select(
+      camp(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+      camp(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.LIVE_MAIL_TYPE,
+      camp(CampaignMergedFields.REF_SKU1) as CampaignMergedFields.LIVE_REF_SKU1,
+      camp(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL,
+      camp(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+      camp(CampaignMergedFields.DEVICE_ID) as CampaignMergedFields.deviceId,
+      itr(ITR.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
+      itr(ITR.BRAND_NAME) as CampaignMergedFields.LIVE_BRAND,
+      itr(ITR.BRICK) as CampaignMergedFields.LIVE_BRICK,
+      itr(ITR.BRICK).leq("") as CampaignMergedFields.LIVE_CART_URL
+    )
+    finalCampaign
   }
 
 }
