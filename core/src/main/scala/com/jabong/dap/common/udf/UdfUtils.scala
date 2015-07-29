@@ -269,7 +269,7 @@ object UdfUtils {
     if(t1.contains(" ")) {
       return Timestamp.valueOf(t1.substring(0, t1.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
     } else {
-      return Timestamp.valueOf(t1 + " " + TimeConstants.START_TIME_MS)  
+      return Timestamp.valueOf(t1 + " " + TimeConstants.START_TIME_MS)
     }
   }
 
