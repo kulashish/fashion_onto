@@ -212,6 +212,25 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
+  def loadSurfCampaignsData( basePath: String, source: String, mode: String, date: String): DataFrame = {
+    logger.info("Reading last day all campaigns data from hdfs")
+    //FIXME:use proper data frame
+    // val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "*","", dateYesterday)
+    val path = buildPath(basePath,source,"*",mode,date)
+    val campaignData = Spark.getSqlContext().read.parquet(path)
+    val allCampaignData = campaignData.select(
+      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+      campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      campaignData(CampaignMergedFields.REF_SKU1),
+      campaignData(CampaignMergedFields.DOMAIN),
+      campaignData(CampaignMergedFields.DEVICE_ID)
+    )
+    if(SchemaUtils.isSchemaEqual(allCampaignData.schema,Schema.campaignSchema)){
+      return SchemaUtils.changeSchema(allCampaignData, Schema.campaignSchema)
+    }
+    return allCampaignData
+  }
+
 
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
