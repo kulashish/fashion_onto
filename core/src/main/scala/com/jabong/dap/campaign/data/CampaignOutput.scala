@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.data
 
-import com.jabong.dap.common.Spark
 import org.apache.spark.sql.DataFrame
 
 object CampaignOutput {

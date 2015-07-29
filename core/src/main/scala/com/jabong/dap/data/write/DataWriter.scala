@@ -25,9 +25,9 @@ object DataWriter extends Logging {
       val csvFullPath = writePath + "/" + csvFileName + ".csv"
       DataVerifier.rename(writePath, csvFullPath)
     }
-//    val writePath = getWritePath(DataSets.OUTPUT_PATH, source, tableName, mode, date)
-//    if (canWrite(mode, writePath))
-//      writeCsv(df, writePath, "Ignore", header, delimeter)
+    //    val writePath = getWritePath(DataSets.OUTPUT_PATH, source, tableName, mode, date)
+    //    if (canWrite(mode, writePath))
+    //      writeCsv(df, writePath, "Ignore", header, delimeter)
   }
 
   /**

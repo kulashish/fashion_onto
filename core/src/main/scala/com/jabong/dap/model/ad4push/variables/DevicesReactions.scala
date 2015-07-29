@@ -58,7 +58,7 @@ object DevicesReactions extends Logging {
       DataWriter.writeParquet(incrI, savePathI, saveMode)
 
       val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_"
-        TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
 
@@ -80,7 +80,7 @@ object DevicesReactions extends Logging {
       DataWriter.writeParquet(incrA, savePathA, saveMode)
 
       val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_"
-        TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
   }
