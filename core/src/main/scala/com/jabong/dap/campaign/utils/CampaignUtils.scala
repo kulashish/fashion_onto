@@ -41,6 +41,27 @@ object CampaignUtils extends Logging {
 
   }
 
+  def generateReferenceSkuForSurf(skuData: DataFrame, NumberSku: Int): DataFrame = {
+    val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+      .select(
+        Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
+        skuData(CustomerVariables.FK_CUSTOMER),
+        skuData(ProductVariables.SPECIAL_PRICE),
+        skuData(CustomerPageVisitVariables.BROWER_ID),
+        skuData(CustomerPageVisitVariables.DOMAIN)
+      )
+    val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
+        as (CampaignMergedFields.REF_SKU1),
+        first(CustomerPageVisitVariables.BROWER_ID),
+        first(CustomerPageVisitVariables.DOMAIN)
+      )
+
+    return customerRefSku
+
+  }
+
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     import sqlContext.implicits._
@@ -337,8 +358,49 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
         inputData(ProductVariables.SPECIAL_PRICE)
+      )
+
+    logger.info("Filtered all the sku which has been bought")
+
+    return skuNotBoughtTillNow
+  }
+
+  /**
+   * R2 - returns the skus which are not bought during last x days
+   *    - We need to give salesOrder and salesOrderItem data pre-filtered for last x days
+   * @param inputData - FK_CUSTOMER, EMAIL, SKU
+   * @param salesOrder
+   * @param salesOrderItem
+   * @return
+   */
+  def skuNotBoughtR2(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+    if (inputData == null || salesOrder == null || salesOrderItem == null) {
+      logger.error("Either input Data is null or sales order or sales order item is null")
+      return null
+    }
+
+    val successFullOrderItems = getSuccessfulOrders(salesOrderItem)
+
+    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+      .select(
+        salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
+        successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
+        Udf.skuFromSimpleSku(successFullOrderItems(ProductVariables.SKU)) as SUCCESS_ + ProductVariables.SKU,
+        successFullOrderItems(SalesOrderItemVariables.CREATED_AT) as SUCCESS_ + SalesOrderItemVariables.CREATED_AT,
+        successFullOrderItems(SalesOrderItemVariables.UPDATED_AT) as SUCCESS_ + SalesOrderItemVariables.UPDATED_AT
+      )
+
+    val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
+      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null")
+      .select(
+        inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(CustomerVariables.EMAIL),
+        inputData(ProductVariables.SKU)
+      //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -509,6 +571,42 @@ object CampaignUtils extends Logging {
     return dfResult
 
   }
+  /**
+   * get customer email to customer id mapping for all clickStream users
+   * @param dfCustomerPageVisit
+   * @param dfCustomer
+   * @return
+   */
+  def getMappingCustomerEmailToCustomerId(dfCustomerPageVisit: DataFrame, dfCustomer: DataFrame): DataFrame = {
 
+    if (dfCustomerPageVisit == null || dfCustomer == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
+
+    val customer = dfCustomer.select(
+      col("id_customer") as CustomerVariables.FK_CUSTOMER,
+      col(CustomerVariables.EMAIL)
+    )
+
+    //======= join data frame customer from skuCustomerPageVisit for mapping EMAIL to FK_CUSTOMER========
+    val dfJoinCustomerToCustomerPageVisit = dfCustomerPageVisit.join(
+      customer,
+      dfCustomerPageVisit(CustomerPageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
+      "left_outer"
+    )
+      .select(
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
+        col(CustomerPageVisitVariables.SKU),
+        col(CustomerPageVisitVariables.BROWER_ID),
+        col(CustomerPageVisitVariables.DOMAIN)
+      )
+
+    return dfJoinCustomerToCustomerPageVisit
+  }
 }
 

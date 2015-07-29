@@ -4,14 +4,14 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.constants.variables.{ ItrVariables, ProductVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ItrVariables, ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.common.{SharedSparkContext, Spark}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.scalatest.FlatSpec
+import org.apache.spark.sql.functions._
 
 /**
  * Utilities test class
@@ -24,6 +24,8 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var salesOrderItem: DataFrame = _
   @transient var customerSelectedTime: DataFrame = _
   @transient var customerSelectedShortlist: DataFrame = _
+  @transient var dfCustomerPageVisit: DataFrame = _
+  @transient var dfCustomer: DataFrame = _
 
   @transient var dfCustomerProductShortlist: DataFrame = _
   @transient var dfItr30DayData: DataFrame = _
@@ -37,14 +39,17 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    refSkuInput = JsonUtils.readFromJson("campaign", "ref_sku_input", Schema.refSkuInput)
+    refSkuInput = sqlContext.read.json("src/test/resources/campaign/ref_sku_input.json")
     customerSelected = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected.json")
     customerSelectedShortlist = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected_shortlist.json")
     salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
     salesOrderItem = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_item_bought.json")
     customerSelectedTime = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_filtered_time.json")
 
-    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
+    dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER, Schema.customer)
+
+  dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
     dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.ITR_30_DAY_DATA, Schema.itr)
     dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.YESTERDAY_ITR_DATA, Schema.itr)
 
@@ -169,6 +174,22 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   //    val currentTime = CampaignUtils.now("yyyy/mm/dd")
   //    assert(currentTime=="2015/07/13")
   //  }
+
+  "getMappingCustomerEmailToCustomerId(a,b): All Data Frame " should "null" in {
+
+    val result = CampaignUtils.getMappingCustomerEmailToCustomerId(null, null)
+
+    assert(result == null)
+
+  }
+
+  "getMappingCustomerEmailToCustomerId(a,b): count " should "3" in {
+
+    val result = CampaignUtils.getMappingCustomerEmailToCustomerId(dfCustomerPageVisit, dfCustomer)
+
+    assert(result.count() == 10)
+  }
+
 
   //==========================================shortListSkuFilter()======================================================
 

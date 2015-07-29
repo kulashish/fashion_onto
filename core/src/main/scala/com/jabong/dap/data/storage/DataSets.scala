@@ -122,4 +122,8 @@ object DataSets {
 
   val YESTERDAY_ITR_DATA = "yesterday_itr_data"
 
+
+  val CUSTOMER_SELECTION = "customer_selection"
+  val CUSTOMER_PAGE_VISIT = "customer_page_visit"
+  val SURF = "surf"
 }
