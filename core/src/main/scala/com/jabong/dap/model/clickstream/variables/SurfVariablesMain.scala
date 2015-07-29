@@ -141,10 +141,10 @@ object SurfVariablesMain extends java.io.Serializable {
 
     if (null != oldMergedData) {
       var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
+      processedVariable.save(processedVariablePath)
     }
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
     mergedData.saveAsParquetFile(currentMergedDataPath)
-    incremental.save(processedVariablePath)
 
   }
 }

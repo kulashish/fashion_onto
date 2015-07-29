@@ -1,6 +1,10 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 
 /**
  * Created by raghu on 28/7/15.
@@ -33,13 +37,23 @@ object SurfCampaign {
     val surf6Campaign = new Surf6Campaign()
     surf6Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
 
-    /*
-    //surf3
-    val last30DaySurfSessionData = CampaignInput.loadLast30DaySurfSessionData()
 
-    val surf3Campaign = new Surf3Campaign()
-    surf3Campaign.runCampaign(last30DaySurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
-    */
+    //surf3
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    val surf3DataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+    if (DataVerifier.dataExists(surf3DataPath)) {
+      val lastDaySurf3Data = CampaignInput.loadLastDaySurf3Data()
+      val surf3Campaign = new Surf3Campaign()
+      surf3Campaign.runCampaign(lastDaySurf3Data, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    } else {
+      println("Note: Surf3 campaign not run due to surf 3 data not available")
+    }
+
   }
 
 }

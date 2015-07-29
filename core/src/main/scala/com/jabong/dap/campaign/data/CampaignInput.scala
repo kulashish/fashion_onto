@@ -42,13 +42,12 @@ object CampaignInput extends Logging {
     surfSessionData
   }
 
-  //FIXME: Need to set correct DataSets for getting 30 day Surf Data
-  def loadLast30DaySurfSessionData(): DataFrame = {
+  def loadLastDaySurf3Data(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last 30 days acart item data from hdfs")
+    logger.info("Reading last day surf 3 data from hdfs")
 
-    val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.CLICKSTREAM, DataSets.CUSTOMER_PAGE_VISIT, DataSets.MONTHLY_MODE, dateYesterday)
-    acartData
+    val surf3Data = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+    surf3Data
   }
 
   def loadCampaignOutput(date: String):DataFrame = {
