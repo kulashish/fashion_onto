@@ -48,7 +48,7 @@ object CampaignCommon {
     "acart_daily" -> 42,
     "wishlist_followup" -> 53,
     "acart_iod" -> 45,
-    "acart_iod" -> 54,
+    "wishlist_iod" -> 54,
     "acart_lowstock" -> 44,
     "wishlist_lowstock" -> 55,
     "acart_followup" -> 43,

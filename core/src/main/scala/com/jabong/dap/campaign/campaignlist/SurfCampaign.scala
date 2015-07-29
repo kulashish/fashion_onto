@@ -33,12 +33,13 @@ object SurfCampaign {
     val surf6Campaign = new Surf6Campaign()
     surf6Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
 
+    /*
     //surf3
     val last30DaySurfSessionData = CampaignInput.loadLast30DaySurfSessionData()
 
     val surf3Campaign = new Surf3Campaign()
     surf3Campaign.runCampaign(last30DaySurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
-
+    */
   }
 
 }
