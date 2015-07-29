@@ -10,4 +10,6 @@ object CampaignMergedFields {
   val FK_CUSTOMER = "customer_id"
   val REF_SKU1 = "ref_sku1"
   val REF_SKU2 = "ref_sku2"
+  val EMAIL = "email"
+  val DOMAIN = "domain"
 }

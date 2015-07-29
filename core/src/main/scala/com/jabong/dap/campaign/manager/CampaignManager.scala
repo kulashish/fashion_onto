@@ -6,6 +6,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.campaign.utils.{ CampaignUtils, CampaignUdfs }
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
@@ -155,7 +156,7 @@ object CampaignManager extends Serializable with Logging {
    * @param inputCampaignsData
    * @return
    */
-  def campaignMerger(inputCampaignsData: DataFrame): DataFrame = {
+  def campaignMerger(inputCampaignsData: DataFrame, key: String): DataFrame = {
     if (inputCampaignsData == null) {
       logger.error("inputCampaignData is null")
       return null
@@ -172,7 +173,7 @@ object CampaignManager extends Serializable with Logging {
     val inputDataWithPriority = addPriority(selectedData)
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
-      .groupBy(CampaignMergedFields.FK_CUSTOMER)
+      .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
         first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
@@ -212,9 +213,9 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.basePath,DataSets.CAMPAIGN,DataSets.DAILY_MODE,"")
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.basePath,DataSets.CAMPAIGN,DataSets.DAILY_MODE,TimeUtils.getTodayDate("YYYY/MM/DD"))
 
-      val mergedData = campaignMerger(allCampaignsData)
+      val mergedData = campaignMerger(allCampaignsData,CampaignMergedFields.FK_CUSTOMER)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
         + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
       //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
