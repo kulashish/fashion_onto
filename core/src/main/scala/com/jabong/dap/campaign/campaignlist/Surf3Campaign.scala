@@ -17,7 +17,7 @@ class Surf3Campaign {
 
     // rename domain to browserid
     val lastdaySurf3DataFixed = lastdaySurf3Data.withColumnRenamed("device", CustomerPageVisitVariables.BROWER_ID)
-    
+
     val surfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
 
     val skus = surfSkuSelector.skuFilter(lastdaySurf3DataFixed, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)

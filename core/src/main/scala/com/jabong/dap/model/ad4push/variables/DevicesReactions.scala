@@ -248,7 +248,7 @@ object DevicesReactions extends Logging {
     }
     return df.filter(DevicesReactionsVariables.REACTION + "> 0")
       .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID,
-      DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+        DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
       .agg(sum(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
       .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION)
   }

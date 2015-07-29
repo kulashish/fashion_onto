@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -36,7 +36,6 @@ object SurfCampaign {
 
     val surf6Campaign = new Surf6Campaign()
     surf6Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
-
 
     //surf3
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
