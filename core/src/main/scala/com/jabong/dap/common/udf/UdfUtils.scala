@@ -9,7 +9,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.

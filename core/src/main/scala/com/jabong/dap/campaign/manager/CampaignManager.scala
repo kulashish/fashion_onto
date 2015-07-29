@@ -1,14 +1,13 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
-import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -17,6 +16,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -148,7 +148,7 @@ object CampaignManager extends Serializable with Logging {
   def startWishlistCampaigns() = {
     WishListCampaign.runCampaign()
   }
-  
+
   def startSurfCampaigns() = {
     SurfCampaign.runCampaign()
 
@@ -171,12 +171,12 @@ object CampaignManager extends Serializable with Logging {
     }
 
     val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
+      CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKU1)
 
     val inputDataWithPriority = addPriority(selectedData)
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
-      .groupBy(CampaignMergedFields.FK_CUSTOMER)
+      .groupBy(CampaignMergedFields.CUSTOMER_ID)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
         first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
@@ -184,44 +184,51 @@ object CampaignManager extends Serializable with Logging {
     return campaignMerged
   }
 
-  def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String){
-    val dfResult = df.select(CampaignMergedFields.deviceId, CampaignMergedFields.LIVE_MAIL_TYPE, CampaignMergedFields.LIVE_BRAND,CampaignMergedFields.LIVE_REF_SKU1, CampaignMergedFields.LIVE_BRICK,CampaignMergedFields.LIVE_PROD_NAME, CampaignMergedFields.LIVE_CART_URL)
-    val fileName = "UpdateDevices"+"_"+domain+"_"+date
+  def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String) {
+    val dfResult = df.select(CampaignMergedFields.deviceId, CampaignMergedFields.LIVE_MAIL_TYPE, CampaignMergedFields.LIVE_BRAND, CampaignMergedFields.LIVE_REF_SKU1, CampaignMergedFields.LIVE_BRICK, CampaignMergedFields.LIVE_PROD_NAME, CampaignMergedFields.LIVE_CART_URL)
+    val tablename =
+      domain match {
+        case CampaignMergedFields.IOS_CODE => DataSets.IOS
+        case CampaignMergedFields.ANDROID_CODE => DataSets.ANDROID
+      }
 
-    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileName, DataSets.DAILY_MODE, date)
-    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
-      DataWriter.writeCsv(dfResult, path, DataSets.IGNORE_SAVEMODE, "true", ";")
-      DataVerifier.rename(path,path +"/" + fileName+".csv")
-    }
+    val fileName = "UpdateDevices" + "_" + domain + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+
+    //    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
+    //    val csvFullPath = path + "/" + fileName
+
+    DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, "true", ";")
   }
 
   def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)) {
     val iosDF = df.filter((CampaignMergedFields.DOMAIN + " = " + DataSets.IOS))
     val androidDF = df.filter(CampaignMergedFields.DOMAIN + " = " + DataSets.ANDROID)
 
-    exportCampaignCSV(iosDF,date, CampaignMergedFields.IOS_CODE)
-    exportCampaignCSV(androidDF,date, CampaignMergedFields.ANDROID_CODE)
+    exportCampaignCSV(iosDF, date, CampaignMergedFields.IOS_CODE)
+    exportCampaignCSV(androidDF, date, CampaignMergedFields.ANDROID_CODE)
 
-    for(campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
+    for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
       val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignDetails.mailType).select(CampaignMergedFields.deviceId).distinct
       val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignDetails.mailType).select(CampaignMergedFields.deviceId).distinct
 
       val fileI = campaignDetails.campaignName + campaignDetails.mailType + "_" + CampaignMergedFields.IOS_CODE
       val fileA = campaignDetails.campaignName + campaignDetails.mailType + "_" + CampaignMergedFields.ANDROID_CODE
-      val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-      val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-      val pathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date)
-      if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, pathI)) {
-        DataWriter.writeCsv(iosSplitDF, pathI, DataSets.IGNORE_SAVEMODE, "true", ";")
-        DataVerifier.rename(pathI,pathI+"/" + filenameI+".csv")
-      }
-
-      val pathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date)
-      if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, pathA)) {
-        DataWriter.writeCsv(androidSplitDF, pathA, DataSets.IGNORE_SAVEMODE, "true", ";")
-        DataVerifier.rename(pathA,pathA+"/" + filenameA+".csv")
-      }
+      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, "true", ";")
+      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, "true", ";")
+      //      val pathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date)
+      //      if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, pathI)) {
+      //        DataWriter.writeCsv(iosSplitDF, pathI, DataSets.IGNORE_SAVEMODE, "true", ";")
+      //        DataVerifier.rename(pathI, pathI + "/" + filenameI + ".csv")
+      //      }
+      //
+      //      val pathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date)
+      //      if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, pathA)) {
+      //        DataWriter.writeCsv(androidSplitDF, pathA, DataSets.IGNORE_SAVEMODE, "true", ";")
+      //        DataVerifier.rename(pathA, pathA + "/" + filenameA + ".csv")
+      //      }
     }
   }
   /**
@@ -260,7 +267,7 @@ object CampaignManager extends Serializable with Logging {
 
       val mergedData = campaignMerger(allCampaignsData)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
-        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
       //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
       //          COVarJobConfig.coVarInfo = coVarJob
       //        coVarJob.source match {
