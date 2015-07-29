@@ -6,7 +6,6 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.clickstream.variables.UserDeviceMapping
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
-import java.io.File
 
 class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
