@@ -54,7 +54,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
       .filter(ItrVariables.SPECIAL_PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
       .select(
         col(CustomerVariables.FK_CUSTOMER),
-        col(CustomerVariables.EMAIL),
+        //col(CustomerVariables.EMAIL),
         col(ItrVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
