@@ -29,7 +29,7 @@ class YesterdaySession extends CustomerSelector with Logging {
       return null
 
     }
-logger.info("schema of customerSurfData: " + customerSurfData.printSchema())
+    logger.info("schema of customerSurfData: " + customerSurfData.printSchema())
 
     val dfRepeatedSku = customerSurfData.select(
       col(CustomerPageVisitVariables.USER_ID),

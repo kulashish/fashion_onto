@@ -4,6 +4,7 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
+import com.jabong.dap.common.time.TimeConstants
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -25,7 +26,7 @@ class LiveCancelReTargetCampaign {
     // val recommendations = recommender.recommend(refSkus)
 
     // save 2 ref skus + 8 recommendation per customer (null allowed for mobile push)
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/" + CampaignCommon.CANCEL_RETARGET_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/" + CampaignCommon.CANCEL_RETARGET_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
 
     //    returnCancelCustomer.customerSelection()
 

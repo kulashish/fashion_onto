@@ -16,4 +16,4 @@
 
 18 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c deviceMapping >>/opt/alchemy-core/logs/deviceMapping_logs.txt
 
-0 7 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
+0 11 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
