@@ -123,17 +123,14 @@ object DataReader extends Logging {
     require(mode != null, "Mode is null")
     require(date != null, "Date is null")
 
-    try {
-      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
+    val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
+    val filename = "*.csv"
+    if (DataVerifier.dataExists(fetchPath,filename))
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
-    } catch {
-      case e: DataNotFound =>
-        logger.error("Data not found for the date")
-        throw new DataNotFound
-      case e: ValidFormatNotFound =>
-        logger.error("Format could not be resolved for the given files in directory")
-        throw new ValidFormatNotFound
-    }
+    else
+      logger.error("Data not found for the date")
+      throw new DataNotFound
+
   }
 
 }
