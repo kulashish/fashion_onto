@@ -12,7 +12,7 @@ object CampaignMergedFields {
   val REF_SKU2 = "ref_sku2"
   val EMAIL = "email"
   val DOMAIN = "domain"
-  
+
   //Working fields
   val IOS_CODE="515"
   val ANDROID_CODE="517"

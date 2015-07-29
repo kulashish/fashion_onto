@@ -2,7 +2,6 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.CustomerVariables
-import com.jabong.dap.data.read.DataReader
 import org.apache.spark.sql.DataFrame
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import org.apache.spark.sql.functions._
@@ -37,7 +36,7 @@ class CampaignProcessor {
     campaignDevice
   }
 
-  def splitCampaigns(surfCampaign: DataFrame, campaign: DataFrame): DataFrame ={
+  def splitNMergeCampaigns(surfCampaign: DataFrame, campaign: DataFrame): DataFrame ={
 
     var joinedDF = surfCampaign.unionAll(campaign)
 
@@ -45,9 +44,9 @@ class CampaignProcessor {
 
     val custIdNotNUll = joinedDF.filter(!joinedDF(CampaignMergedFields.FK_CUSTOMER) === null)
 
-    val custId = CampaignManager.campaignMerger(custIdNotNUll,CampaignMergedFields.FK_CUSTOMER)
+    val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.DEVICE_ID)
 
-    val DeviceId = CampaignManager.campaignMerger(custIdNotNUll,CampaignMergedFields.DEVICE_ID)
+    val DeviceId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.FK_CUSTOMER)
 
     custId.unionAll(DeviceId)
 

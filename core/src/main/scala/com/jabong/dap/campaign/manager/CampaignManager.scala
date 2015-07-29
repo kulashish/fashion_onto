@@ -159,7 +159,7 @@ object CampaignManager extends Serializable with Logging {
    * @param inputCampaignsData
    * @return
    */
-  def campaignMerger(inputCampaignsData: DataFrame, key: String): DataFrame = {
+  def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
     if (inputCampaignsData == null) {
       logger.error("inputCampaignData is null")
       return null
@@ -170,8 +170,13 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
-    val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
+    val selectedData = inputCampaignsData.select(
+      CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+      CampaignMergedFields.FK_CUSTOMER,
+      CampaignMergedFields.REF_SKU1,
+      CampaignMergedFields.DOMAIN,
+      CampaignMergedFields.DEVICE_ID,
+      CampaignMergedFields.EMAIL)
 
     val inputDataWithPriority = addPriority(selectedData)
 
@@ -179,7 +184,10 @@ object CampaignManager extends Serializable with Logging {
       .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
+        first(key1) as key1,
+        first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+        first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
 
     return campaignMerged
   }
@@ -258,7 +266,7 @@ object CampaignManager extends Serializable with Logging {
       createCampaignMaps(json)
       val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.basePath,DataSets.CAMPAIGN,DataSets.DAILY_MODE,TimeUtils.getTodayDate("YYYY/MM/DD"))
 
-      val mergedData = campaignMerger(allCampaignsData,CampaignMergedFields.FK_CUSTOMER)
+      val mergedData = campaignMerger(allCampaignsData, CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.DEVICE_ID)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
         + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
       //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
