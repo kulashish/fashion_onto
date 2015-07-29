@@ -24,7 +24,7 @@ object DevicesReactions extends Logging {
   val new_reaction = MergeUtils.NEW_ + DevicesReactionsVariables.REACTION
 
   def start(vars: VarInfo) = {
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
     customerResponse(incrDate, saveMode)
   }
