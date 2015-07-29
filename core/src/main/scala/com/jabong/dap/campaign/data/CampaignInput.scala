@@ -14,6 +14,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -236,4 +237,69 @@ object CampaignInput extends Logging {
     println("PATH IS " + "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator)))
     "%s/%s/%s/%s/%s".format(basePath, source, componentName, mode, date.replaceAll("-", File.separator))
   }
+
+  def load30DayItrSkuData() = {
+
+    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+
+    val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+      .select(
+        col(ITR.CONFIG_SKU) as ProductVariables.SKU,
+        col(ITR.PRICE_ON_SITE),
+        col(ITR.ITR_DATE)
+      )
+
+    for (i <- 2 to 30) {
+
+      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      logger.info("Reading last " + i + " day basic itr sku data from hdfs")
+
+      val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+      val itrExits = DataVerifier.dataExists(path)
+
+      if (itrExits) {
+        val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+        itr30Day.unionAll(itrData.select(
+          col(ITR.CONFIG_SKU) as ProductVariables.SKU,
+          col(ITR.PRICE_ON_SITE),
+          col(ITR.ITR_DATE)
+        ))
+      }
+    }
+
+    itr30Day
+  }
+
+  def load30DayItrSkuSimpleData() = {
+
+    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+
+    val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+      .select(
+        col(ITR.CONFIG_SKU) as ProductVariables.SKU,
+        col(ITR.PRICE_ON_SITE),
+        col(ITR.ITR_DATE)
+      )
+
+    for (i <- 2 to 30) {
+
+      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      logger.info("Reading last " + i + " day basic itr sku data from hdfs")
+
+      val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+      val itrExits = DataVerifier.dataExists(path)
+
+      if (itrExits) {
+        val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+        itr30Day.unionAll(itrData.select(
+          col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+          col(ITR.PRICE_ON_SITE),
+          col(ITR.ITR_DATE)
+        ))
+      }
+    }
+
+    itr30Day
+  }
+
 }
