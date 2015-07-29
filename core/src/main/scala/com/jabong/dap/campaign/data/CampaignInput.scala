@@ -137,7 +137,8 @@ object CampaignInput extends Logging {
     val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU) as ProductVariables.SKU,
       itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK,
-      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT
+      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+      itrData(ITR.BRICK)
     )
     filteredItr
   }

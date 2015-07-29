@@ -65,13 +65,13 @@ logger.info("schema of customerSurfData: " + customerSurfData.printSchema())
     )
 
     val yesterdayItrData = dfYesterdayItrData.select(
-      ItrVariables.SKU,
-      ItrVariables.BRICK
+      col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
+      col(ItrVariables.BRICK)
     )
 
     val dfJoin = dfDistinctSku.join(
       yesterdayItrData,
-      dfDistinctSku(CustomerPageVisitVariables.SKU) === yesterdayItrData(ItrVariables.SKU),
+      dfDistinctSku(CustomerPageVisitVariables.SKU) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
     )
       .select(
