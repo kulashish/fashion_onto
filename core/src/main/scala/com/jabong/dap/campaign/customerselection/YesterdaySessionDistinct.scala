@@ -50,7 +50,7 @@ class YesterdaySessionDistinct extends CustomerSelector with Logging {
         col(CustomerPageVisitVariables.USER_ID),
         col(CustomerPageVisitVariables.BROWER_ID),
         col(CustomerPageVisitVariables.DOMAIN),
-        explode(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.PRODUCT_SKU
+        explode(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.SKU
       )
 
     return dfResult
