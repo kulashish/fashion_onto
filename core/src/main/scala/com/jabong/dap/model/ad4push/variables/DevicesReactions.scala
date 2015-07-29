@@ -149,7 +149,8 @@ object DevicesReactions extends Logging {
           DevicesReactionsVariables.CLICK_SUNDAY -> 0,
           MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
           MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
-          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0
+          MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0,
+          MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY -> 0
         )
       )
 
