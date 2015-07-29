@@ -35,13 +35,11 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
 
   "Testing JoinDataframe" should "have size 148" in {
     var ordersCount = SalesOrderItem.joinDataFrames(df1, df2, df3)
-    ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 148)
   }
 
   "Testing Successful orders Count" should "have size 3" in {
     var ordersCount = SalesOrderItem.getSucessfulOrders(df4)
-    ordersCount.collect.foreach(println)
     assert(ordersCount.collect.size == 3)
   }
 

@@ -3,7 +3,7 @@
     {
       "source": "customerDeviceMapping",
       "incrMode": "daily",
-      "saveMode": "overwrite",
+      "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
   ]

@@ -87,7 +87,7 @@ object Init {
         ConfigJsonValidator.validate(config)
         AppConfig.config = config
         // initialize spark context
-        Spark.init(new SparkConf().setMaster(AppConfig.config.master).setAppName(AppConfig.config.applicationName))
+        Spark.init(new SparkConf().setAppName(AppConfig.config.applicationName))
         run(params)
       } catch {
         case e: ParseException =>
@@ -122,7 +122,9 @@ object Init {
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
+      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns()
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
+      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns()
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()

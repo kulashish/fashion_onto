@@ -28,7 +28,8 @@ object CampaignCommon {
   val SURF3_CAMPAIGN = "surf3"
   val SURF6_CAMPAIGN = "surf6"
   val MERGED_CAMPAIGN = "merged"
-
+  val WISHLIST_FOLLOWUP_CAMPAIGN = "wishlist_followup"
+  val WISHLIST_LOWSTOCK_CAMPAIGN = "wishlist_lowstock"
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
@@ -57,7 +58,6 @@ object CampaignCommon {
     "invalid_lowstock" -> 49,
     "surf1" -> 56,
     "surf3" -> 58
-    )
-
+  )
 
 }

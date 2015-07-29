@@ -1,17 +1,17 @@
 package com.jabong.dap.data.storage.merge.common
 
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ Path, FileSystem }
-import com.jabong.dap.common.Spark
 import java.io.File
+
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{ FileSystem, Path }
 
 /**
  * Verifies if the data exits at a given location.
  */
 object DataVerifier {
 
-  val hconf = Spark.getContext().hadoopConfiguration
-  val hdfs = FileSystem.get(hconf)
+  val conf = new Configuration()
+  val fileSystem = FileSystem.get(conf)
 
   /**
    * Returns true if the file exists in the directory
@@ -20,8 +20,6 @@ object DataVerifier {
    * @return true or false
    */
   def dataExists(directory: String, fileName: String): Boolean = {
-    val conf = new Configuration()
-    val fileSystem = FileSystem.get(conf)
     val successFile = "%s%s%s".format(directory, File.separator, fileName)
     fileSystem.exists(new Path(successFile))
   }
@@ -40,8 +38,8 @@ object DataVerifier {
    * @param directory directory to be checked.
    * @return true or false
    */
-  def hdfsDirExists(directory: String): Boolean = {
-    hdfs.exists(new Path(directory))
+  def dirExists(directory: String): Boolean = {
+    fileSystem.exists(new Path(directory))
   }
 
   /**
@@ -49,7 +47,12 @@ object DataVerifier {
    * @param directory directory to be checked.
    * @return true or false
    */
-  def hdfsDirDelete(directory: String): Boolean = {
-    hdfs.delete(new Path(directory), true)
+  def dirDelete(directory: String): Boolean = {
+    fileSystem.delete(new Path(directory), true)
+  }
+
+  //TODO refactor and rename this file.
+  def rename(src: String, dest: String) = {
+    fileSystem.rename(new Path(src), new Path(dest))
   }
 }

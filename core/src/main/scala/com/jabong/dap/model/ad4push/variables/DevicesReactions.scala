@@ -1,21 +1,19 @@
 package com.jabong.dap.model.ad4push.variables
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.VarInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
-import grizzled.slf4j.Logging
-import com.jabong.dap.common.udf.Udf
 
 /**
  * Created by Kapil.Rajak on 13/7/15.
@@ -24,25 +22,17 @@ object DevicesReactions extends Logging {
 
   def start(vars: VarInfo) = {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
-    val mode = OptionUtils.getOptValue(vars.incrMode, DataSets.DAILY_MODE)
-    customerResponse(incrDate, mode)
+    val saveMode = vars.saveMode
+    customerResponse(incrDate, saveMode)
   }
   /**
    * All read CSV, read perquet, write perquet
    * @param incrDate date for which summary is needed in YYYYMMDD format
    * @return (iPhoneResult, AndroidResult) for tgiven date
    */
-  def customerResponse(incrDate: String, mode: String): Unit = {
-
-    //getting file names
+  def customerResponse(incrDate: String, saveMode: String) = {
 
     val dateStr = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER)
-
-    val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr, "true", ",")
-    val incI = dfCorrectSchema(incIStringSchema)
-
-    val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr, "true", ",")
-    val incA = dfCorrectSchema(incAStringSchema)
 
     val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
@@ -52,26 +42,44 @@ object DevicesReactions extends Logging {
 
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
-    //getting DF
-    logger.info("Reading inputs (CSVs and Parquets)")
-    val fullI = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, yesterday)
-    val b7I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before7daysString)
-    val b15I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before15daysString)
-    val b30I = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.DAILY_MODE, before30daysString)
+    val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, dateStr)
+    if (DataWriter.canWrite(savePathI, saveMode)) {
+      val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, dateStr, "true", ",")
+      val incI = dfCorrectSchema(incIStringSchema)
 
-    val fullA = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, yesterday)
-    val b7A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before7daysString)
-    val b15A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before15daysString)
-    val b30A = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, before30daysString)
+      //getting DF
+      logger.info("Reading inputs (CSVs and Parquets) for IOS")
+      val fullI = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, yesterday)
+      val b7I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before7daysString)
+      val b15I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before15daysString)
+      val b30I = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, before30daysString)
 
-    val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
-    val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
+      val (resultI, incrI) = fullSummary(incI, dateStr, fullI, b7I, b15I, b30I)
 
-    DataWriter.writeParquet(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, DataSets.FULL, dateStr)
-    DataWriter.writeParquet(incrI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_IOS, mode, dateStr)
+      DataWriter.writeParquet(resultI, savePathI, saveMode)
+      DataWriter.writeParquet(incrI, savePathI, saveMode)
+      DataWriter.writeCsv(resultI, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, dateStr, "true", ",")
 
-    DataWriter.writeParquet(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, DataSets.FULL, dateStr)
-    DataWriter.writeParquet(incrA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTION_ANDROID, mode, dateStr)
+    }
+
+    val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, dateStr)
+    if (DataWriter.canWrite(savePathA, saveMode)) {
+      val incAStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, dateStr, "true", ",")
+      val incA = dfCorrectSchema(incAStringSchema)
+
+      //getting DF
+      logger.info("Reading inputs (CSVs and Parquets) for Android")
+      val fullA = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, yesterday)
+      val b7A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before7daysString)
+      val b15A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before15daysString)
+      val b30A = DataReader.getDataFrameOrNull(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, before30daysString)
+
+      val (resultA, incrA) = fullSummary(incA, dateStr, fullA, b7A, b15A, b30A)
+
+      DataWriter.writeParquet(resultA, savePathA, saveMode)
+      DataWriter.writeParquet(incrA, savePathA, saveMode)
+      DataWriter.writeCsv(resultA, DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, dateStr, "true", ",")
+    }
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
@@ -85,7 +93,7 @@ object DevicesReactions extends Logging {
   /**
    *
    * @param incrementalDF
-   * @param incrDate Today's date in YYYYMMDD format
+   * @param incrDate Today's date in YYYY/MM/DD format
    * @param full yesterday's perquet
    * @param reduced7 8day's before DF
    * @param reduced15 16 day's before DF
@@ -101,7 +109,7 @@ object DevicesReactions extends Logging {
       return (full, null)
     }
 
-    val incrDay = TimeUtils.dayName(incrDate, TimeConstants.YYYYMMDD).toLowerCase
+    val incrDay = TimeUtils.dayName(incrDate, TimeConstants.DATE_FORMAT_FOLDER).toLowerCase
 
     val reducedIncr = reduce(incrementalDF)
 
@@ -112,7 +120,7 @@ object DevicesReactions extends Logging {
     val resultDF = joinedDF.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
-      when(col(MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY) > 0, TimeUtils.changeDateFormat(incrDate, TimeConstants.YYYYMMDD, TimeConstants.DATE_FORMAT)).otherwise(col(DevicesReactionsVariables.LAST_CLICK_DATE)) as DevicesReactionsVariables.LAST_CLICK_DATE,
+      when(col(MergeUtils.NEW_ + DevicesReactionsVariables.CLICKED_TODAY) > 0, TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)).otherwise(col(DevicesReactionsVariables.LAST_CLICK_DATE)) as DevicesReactionsVariables.LAST_CLICK_DATE,
       (col(DevicesReactionsVariables.CLICK_7) + col(MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_7_DAYS)).cast(IntegerType) as DevicesReactionsVariables.CLICK_7,
       (col(DevicesReactionsVariables.CLICK_15) + col(MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_15_DAYS)).cast(IntegerType) as DevicesReactionsVariables.CLICK_15,
       (col(DevicesReactionsVariables.CLICK_30) + col(MergeUtils.NEW_ + DevicesReactionsVariables.EFFECTIVE_30_DAYS)).cast(IntegerType) as DevicesReactionsVariables.CLICK_30,

@@ -9,7 +9,7 @@ object OptionUtils {
    */
   def optStringEmpty(strOpt: Option[String]): Boolean = {
     val opt = getOptValue(strOpt)
-    if (opt == null || opt.length() == 0)
+    if (StringUtils.isEmpty(opt))
       true
     else
       false
