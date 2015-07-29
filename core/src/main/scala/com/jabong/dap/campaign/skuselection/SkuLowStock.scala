@@ -14,6 +14,8 @@ import org.apache.spark.sql.functions._
  */
 class SkuLowStock extends SkuSelector with Logging {
 
+  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
+
   /**
    *
    * @param dfCustomerProductShortlist

@@ -5,12 +5,12 @@ package com.jabong.dap.common.constants.variables
  */
 object CustomerPageVisitVariables {
 
-  val USER_ID = "user_id"
+  val USER_ID = "userid"
   val PRODUCT_SKU = "product_sku"
-  val BROWER_ID = "browser_id"
+  val BROWER_ID = "browserid"
   val DOMAIN = "domain"
-  val ACTUAL_VISIT_ID = "actual_visit_id"
-  val SKU_LIST = "sku_list"
+  val ACTUAL_VISIT_ID = "actualvisitid"
+  val SKU_LIST = "_c4"
   val COUNT_SKU = "count_sku"
   val REPEATED_SKU = "repeated_sku"
   val BRICK = "brick"

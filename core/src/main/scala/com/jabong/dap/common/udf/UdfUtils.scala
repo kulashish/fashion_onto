@@ -9,7 +9,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
  * Created by raghu on 3/7/15.
@@ -343,13 +343,13 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getDistinctSku[T](skuArray: List[T]): List[T] = {
+  def getDistinctSku[T](skuArray: ArrayBuffer[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
     }
 
-    val skuList = skuArray.distinct
+    val skuList = skuArray.toList.distinct
 
     return skuList
 
@@ -361,7 +361,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getRepeatedSku[T](skuArray: List[T]): List[T] = {
+  def getRepeatedSku[T](skuArray: ArrayBuffer[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
@@ -371,7 +371,7 @@ object UdfUtils {
 
     val skuList = new ListBuffer[T]()
 
-    for (sku <- skuArray) {
+    for (sku <- skuArray.toList) {
 
       if (!setSkus.contains(sku)) {
         setSkus.add(sku)
@@ -393,7 +393,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: List[T]): Int = {
+  def getCountSku[T](skuList: ArrayBuffer[T]): Int = {
 
     if (skuList == null || skuList.isEmpty) {
       return 0

@@ -124,6 +124,7 @@ object Init {
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
       case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns()
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
+      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns()
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()

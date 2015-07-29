@@ -131,7 +131,10 @@ if ($component eq "bob") {
 } elsif ($component eq "Ad4pushCustReact") {
        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component Ad4pushCustReact --config $HDFS_CONF/config.json --varJson $HDFS_CONF/ad4push.json";
        run_component($component, $command);
-} else {
+} elsif ($component eq "pushSurfCampaign") {
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json";
+     run_component($component, $command);
+}else {
     print "not a valid component\n";
 }
 

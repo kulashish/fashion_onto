@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import org.apache.spark.sql.DataFrame
 
 /**
- * surf3 - viewed a sku yesterday and at least once during last 1-20 days (already available as input)
+ * surf3 - viewed a sku yesterday and at least once during last 1-30 days (already available as input)
  */
 class LastThirtyDaySession extends CustomerSelector {
 
