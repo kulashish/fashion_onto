@@ -222,8 +222,9 @@ class UdfUtilsTest extends FlatSpec {
 
   //===============================getYYYYmmDD()========================================================================
   "getYYYYmmDD: Timestamp value" should "null" in {
+    val ts: String = null
 
-    val result = UdfUtils.getYYYYmmDD(null)
+    val result = UdfUtils.getYYYYmmDD(ts)
 
     assert(result == null)
 
