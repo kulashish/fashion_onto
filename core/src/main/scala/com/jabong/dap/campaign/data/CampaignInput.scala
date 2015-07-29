@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.data
 import java.io.File
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
@@ -209,18 +210,28 @@ object CampaignInput extends Logging {
    * Load all campaign data
    * @return dataframe with call campaigns data
    */
-  def loadAllCampaignsData(source: String, mode: String, date: String): DataFrame = {
+  def loadAllCampaignsData(source: String, date: String): DataFrame = {
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
-    val campaignData = DataReader.getDataFrame(DataSets.basePath,source,"*",DataSets.DAILY_MODE,date)
+    var allCampaignData: DataFrame = null
+    CampaignManager.campaignMailTypeMap.foreach(
+    e => (
+      allCampaignData = allCampaignData.unionAll(getCampaignData(e._1,date))
+      )
+    )
+    return allCampaignData
+  }
+
+  def getCampaignData(name:String, date: String):DataFrame={
+    val campaignData = DataReader.getDataFrame(DataSets.basePath,DataSets.CAMPAIGN,name,DataSets.DAILY_MODE,date)
     val allCampaignData = campaignData.select(
       campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
       campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       campaignData(CampaignMergedFields.REF_SKU1))
-    if(SchemaUtils.isSchemaEqual(allCampaignData.schema,Schema.campaignSchema)){
+    if(!SchemaUtils.isSchemaEqual(allCampaignData.schema, Schema.campaignSchema)){
       return SchemaUtils.changeSchema(allCampaignData, Schema.campaignSchema)
     }
-    return allCampaignData
+    allCampaignData
   }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {

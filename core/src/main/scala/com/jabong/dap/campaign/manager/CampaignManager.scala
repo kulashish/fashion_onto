@@ -275,8 +275,8 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.CAMPAIGN, DataSets.DAILY_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
-      val surfCapaignData =  CampaignInput.loadAllCampaignsData(DataSets.SURF_CAMPAIGN, DataSets.DAILY_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.CAMPAIGN, TimeUtils.getTodayDate("YYYY/MM/DD"))
+      val surfCapaignData =  CampaignInput.loadAllCampaignsData(DataSets.SURF_CAMPAIGN, TimeUtils.getTodayDate("YYYY/MM/DD"))
       val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, TimeUtils.getTodayDate("YYYY/MM/DD"))
       val allCamp = CampaignProcessor.mapDeviceFromDCF(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
       val surfCamp = CampaignProcessor.mapDeviceFromDCF(cmr, allCampaignsData, CampaignMergedFields.DEVICE_ID)
