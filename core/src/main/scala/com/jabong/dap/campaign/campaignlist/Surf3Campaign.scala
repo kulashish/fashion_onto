@@ -3,7 +3,8 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, SkuSelection}
+import com.jabong.dap.common.time.TimeConstants
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -23,7 +24,7 @@ class Surf3Campaign {
 
     //save campaign Output
     CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.SURF3_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+      + CampaignCommon.SURF3_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
 
   }
 }

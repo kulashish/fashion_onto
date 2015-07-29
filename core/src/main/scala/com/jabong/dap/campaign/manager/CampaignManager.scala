@@ -171,12 +171,12 @@ object CampaignManager extends Serializable with Logging {
     }
 
     val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
+      CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKU1)
 
     val inputDataWithPriority = addPriority(selectedData)
 
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
-      .groupBy(CampaignMergedFields.FK_CUSTOMER)
+      .groupBy(CampaignMergedFields.CUSTOMER_ID)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
         first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
@@ -260,7 +260,7 @@ object CampaignManager extends Serializable with Logging {
 
       val mergedData = campaignMerger(allCampaignsData)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
-        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
       //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
       //          COVarJobConfig.coVarInfo = coVarJob
       //        coVarJob.source match {
