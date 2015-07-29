@@ -258,14 +258,14 @@ object Schema {
     StructField(CampaignMergedFields.REF_SKU2, StringType, true)
   ))
 
-  val campaignPriorityOutput =  StructType(Array(
+  val campaignPriorityOutput = StructType(Array(
     StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, LongType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, true),
     StructField(CampaignMergedFields.EMAIL, StringType, true),
     StructField(CampaignMergedFields.DOMAIN, StringType, true),
     StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
-    StructField(CampaignCommon.PRIORITY,IntegerType, true)
+    StructField(CampaignCommon.PRIORITY, IntegerType, true)
   ))
 
   val campaignSchema = StructType(Array(

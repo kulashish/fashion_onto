@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.data.storage.schema.Schema
@@ -52,19 +52,19 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
 
   "No Input Campaigns Data" should "return null" in {
     val status = CampaignManager.createCampaignMaps(json)
-    val expectedData = CampaignManager.campaignMerger(null,null,null)
+    val expectedData = CampaignManager.campaignMerger(null, null, null)
     assert(expectedData == null)
   }
 
   "Input Campaigns Data but no priority map loaded" should "return null" in {
     CampaignManager.mailTypePriorityMap.clear()
-    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData,CampaignMergedFields.CUSTOMER_ID,CampaignMergedFields.DEVICE_ID)
+    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
     assert(mergedCampaignData == null)
   }
 
   "Input Campaigns Data with priority map loaded" should "return two " in {
     val status = CampaignManager.createCampaignMaps(json)
-    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData,CampaignMergedFields.CUSTOMER_ID,CampaignMergedFields.DEVICE_ID)
+    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
     assert(mergedCampaignData.count() == 2)
   }
 

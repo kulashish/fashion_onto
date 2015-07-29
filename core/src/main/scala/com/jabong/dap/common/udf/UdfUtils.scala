@@ -266,14 +266,13 @@ object UdfUtils {
       return null
     }
 
-    if(t1.contains(" ")) {
+    if (t1.contains(" ")) {
       return Timestamp.valueOf(t1.substring(0, t1.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
     } else {
       return Timestamp.valueOf(t1 + " " + TimeConstants.START_TIME_MS)
     }
   }
 
-  
   /**
    *  getSimpleSkuFromExtraData will extract data from extraData
    * @param extraData

@@ -12,22 +12,21 @@ import com.jabong.dap.model.product.itr.variables.ITR
  */
 object CampaignProcessor {
 
-  def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame={
+  def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame = {
     val notNull = campaign.na.drop(Array(
       CampaignMergedFields.CUSTOMER_ID,
       CampaignMergedFields.DEVICE_ID
     ))
     var key1: String = null
-    if (key.equals(CampaignMergedFields.CUSTOMER_ID)){
+    if (key.equals(CampaignMergedFields.CUSTOMER_ID)) {
       key1 = CustomerVariables.ID_CUSTOMER
-    }
-    else{
+    } else {
       key1 = key
     }
-    val cmrn = cmr.filter(!cmr(CampaignMergedFields.DEVICE_ID)===null)
+    val cmrn = cmr.filter(!cmr(CampaignMergedFields.DEVICE_ID) === null)
     val bcCampaign = Spark.getContext().broadcast(notNull).value
-    val campaignDevice = cmrn.join(bcCampaign,bcCampaign(key)===cmrn(key1))
-    .select(bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(key) === cmrn(key1))
+      .select(bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKU1),
         coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(CampaignMergedFields.DEVICE_ID)),
@@ -37,7 +36,7 @@ object CampaignProcessor {
     campaignDevice
   }
 
-  def splitNMergeCampaigns(campaign: DataFrame, itr: DataFrame): DataFrame ={
+  def splitNMergeCampaigns(campaign: DataFrame, itr: DataFrame): DataFrame = {
 
     val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
 
@@ -49,7 +48,7 @@ object CampaignProcessor {
 
     val camp = custId.unionAll(DeviceId)
 
-    val finalCampaign = camp.join(itr, camp(CampaignMergedFields.REF_SKU1)===itr(ITR.CONFIG_SKU)).select(
+    val finalCampaign = camp.join(itr, camp(CampaignMergedFields.REF_SKU1) === itr(ITR.CONFIG_SKU)).select(
       camp(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
       camp(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.LIVE_MAIL_TYPE,
       camp(CampaignMergedFields.REF_SKU1) as CampaignMergedFields.LIVE_REF_SKU1,
