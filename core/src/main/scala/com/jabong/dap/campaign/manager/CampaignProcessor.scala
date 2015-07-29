@@ -13,11 +13,11 @@ class CampaignProcessor {
 
   def mapDeviceFromDCF(dcf: DataFrame, campaign: DataFrame, key: String): DataFrame={
     val notNull = campaign.na.drop(Array(
-      CampaignMergedFields.FK_CUSTOMER,
+      CampaignMergedFields.CUSTOMER_ID,
       CampaignMergedFields.DEVICE_ID
     ))
     var key1: String = null
-    if (key.equals(CampaignMergedFields.FK_CUSTOMER)){
+    if (key.equals(CampaignMergedFields.CUSTOMER_ID)){
       key1 = CustomerVariables.ID_CUSTOMER
     }
     else{
@@ -26,7 +26,7 @@ class CampaignProcessor {
     val dcfn = dcf.filter(!dcf(CampaignMergedFields.DEVICE_ID)===null)
     val bcCampaign = Spark.getContext().broadcast(notNull).value
     val campaignDevice = dcfn.join(bcCampaign,bcCampaign(key)===dcfn(key1))
-    .select(bcCampaign(CampaignMergedFields.FK_CUSTOMER) as CampaignMergedFields.FK_CUSTOMER,
+    .select(bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKU1),
         coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), dcfn(CampaignMergedFields.DEVICE_ID)),
@@ -40,13 +40,13 @@ class CampaignProcessor {
 
     var joinedDF = surfCampaign.unionAll(campaign)
 
-    val custIdNUll = joinedDF.filter(joinedDF(CampaignMergedFields.FK_CUSTOMER) === null)
+    val custIdNUll = joinedDF.filter(joinedDF(CampaignMergedFields.CUSTOMER_ID) === null)
 
-    val custIdNotNUll = joinedDF.filter(!joinedDF(CampaignMergedFields.FK_CUSTOMER) === null)
+    val custIdNotNUll = joinedDF.filter(!joinedDF(CampaignMergedFields.CUSTOMER_ID) === null)
 
-    val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.DEVICE_ID)
+    val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
 
-    val DeviceId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.FK_CUSTOMER)
+    val DeviceId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
 
     custId.unionAll(DeviceId)
 

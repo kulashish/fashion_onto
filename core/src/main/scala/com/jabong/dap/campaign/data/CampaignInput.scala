@@ -7,10 +7,12 @@ import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.{ PathBuilder, DataReader }
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -45,6 +47,10 @@ object CampaignInput extends Logging {
 
     val acartData = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.CLICKSTREAM, DataSets.CUSTOMER_PAGE_VISIT, DataSets.MONTHLY_MODE, dateYesterday)
     acartData
+  }
+
+  def loadCampaignOutput(date: String):DataFrame = {
+    return null
   }
 
   def loadCustomerMasterData(): DataFrame = {
@@ -198,12 +204,16 @@ object CampaignInput extends Logging {
     val path = buildPath(basePath,source,"*",mode,date)
     val campaignData = Spark.getSqlContext().read.parquet(path)
     val allCampaignData = campaignData.select(
-      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.FK_CUSTOMER),
+      campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
       campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       campaignData(CampaignMergedFields.REF_SKU1))
-
+    if(SchemaUtils.isSchemaEqual(allCampaignData.schema,Schema.campaignSchema)){
+      return SchemaUtils.changeSchema(allCampaignData, Schema.campaignSchema)
+    }
     return allCampaignData
   }
+
+
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
     val filePath = buildPath(basePath, source, componentName, mode, date)

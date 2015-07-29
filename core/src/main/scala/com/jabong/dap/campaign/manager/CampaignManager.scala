@@ -9,6 +9,7 @@ import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -170,9 +171,14 @@ object CampaignManager extends Serializable with Logging {
       return null
     }
 
+    if(!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))){
+      logger.error("Keys doesn't Exists")
+      return null
+    }
+
     val selectedData = inputCampaignsData.select(
       CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.FK_CUSTOMER,
+      CampaignMergedFields.CUSTOMER_ID,
       CampaignMergedFields.REF_SKU1,
       CampaignMergedFields.DOMAIN,
       CampaignMergedFields.DEVICE_ID,
@@ -266,7 +272,7 @@ object CampaignManager extends Serializable with Logging {
       createCampaignMaps(json)
       val allCampaignsData = CampaignInput.loadAllCampaignsData(DataSets.basePath,DataSets.CAMPAIGN,DataSets.DAILY_MODE,TimeUtils.getTodayDate("YYYY/MM/DD"))
 
-      val mergedData = campaignMerger(allCampaignsData, CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.DEVICE_ID)
+      val mergedData = campaignMerger(allCampaignsData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
       CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
         + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
       //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
