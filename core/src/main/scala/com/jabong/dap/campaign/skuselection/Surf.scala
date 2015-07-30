@@ -57,7 +57,7 @@ class Surf extends SkuSelector with Logging {
 
     val dfJoin = skusFiltered.join(
       itrData,
-      skusFiltered(CustomerPageVisitVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
+      skusFiltered(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
     )
       .select(
