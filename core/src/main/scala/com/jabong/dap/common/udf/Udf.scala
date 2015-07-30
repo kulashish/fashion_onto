@@ -1,7 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable.ArrayBuffer
@@ -10,11 +10,6 @@ import scala.collection.mutable.ArrayBuffer
  * Created by raghu on 3/7/15.
  */
 object Udf {
-
-  //  val hiveContext = Spark.getHiveContext()
-  //  import hiveContext.implicits._
-  // Define User Defined Functions
-  //  val sqlContext = Spark.getSqlContext()
 
   /**
    * minTimestamp will return min of Timestamp t1 or t2
@@ -118,4 +113,9 @@ object Udf {
    */
   val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
 
+  /**
+   * Removes all zeroes string and null string to emptyString.
+   */
+
+  val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
 }

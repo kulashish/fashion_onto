@@ -17,4 +17,8 @@ object StringUtils {
       true
   }
 
+  def isAllZero(str: String): Boolean = {
+    (!isEmpty(str)) && str.matches("^[0]*")
+  }
+
 }
