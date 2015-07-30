@@ -19,6 +19,8 @@ import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import com.jabong.dap.data.storage.merge.common.DataVerifier
+
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -212,12 +214,19 @@ object CampaignInput extends Logging {
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
+    var df: DataFrame = null
     CampaignManager.campaignMailTypeMap.foreach(
       e => (
         if (null == allCampaignData) {
-          allCampaignData = getCampaignData(e._1, date)
+          if(null!=df){
+            df = getCampaignData(e._1, date)
+            allCampaignData = df
+          }
         } else {
-          allCampaignData = allCampaignData.unionAll(getCampaignData(e._1, date))
+          df = getCampaignData(e._1, date)
+          if(null!=df){
+            allCampaignData = allCampaignData.unionAll(df)
+          }
         }
       )
     )
@@ -225,26 +234,31 @@ object CampaignInput extends Logging {
   }
 
   def getCampaignData(name: String, date: String): DataFrame = {
-    try {
-      val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
-      if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-        val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
-        return res.select(
-          res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-          res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-          res(CampaignMergedFields.REF_SKU1),
-          res(CampaignMergedFields.EMAIL),
-          res(CampaignMergedFields.DOMAIN),
-          res(CampaignMergedFields.DEVICE_ID))
+      var path:String = DataSets.OUTPUT_PATH +"/"+ DataSets.CAMPAIGN+"/"+ name +"/"+ DataSets.DAILY_MODE +"/"+ date
+      if(DataVerifier.dataExists(path)){
+        try {
+        val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
+        if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
+          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
+          return res.select(
+            res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+            res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+            res(CampaignMergedFields.REF_SKU1),
+            res(CampaignMergedFields.EMAIL),
+            res(CampaignMergedFields.DOMAIN),
+            res(CampaignMergedFields.DEVICE_ID))
+        }
+        campaignData
+      } catch {
+      // TODO: fix when data not found skip
+      case th: Throwable => {
+        logger.info("File Not found at ->"+ path)
+        throw new SparkException("Data not available ?", th)
       }
-      campaignData
-    } catch {
-                // TODO: fix when data not found skip
-                 case th: Throwable => {
-                   logger.info("File Not found at ->"+ DataSets.OUTPUT_PATH +"/"+ DataSets.CAMPAIGN+"/"+ name +"/"+ DataSets.DAILY_MODE +"/"+ date)
-                   throw new SparkException("Data not available ?", th)
-                 }
     }
+      }else{
+        return null
+      }
     }
 
 
