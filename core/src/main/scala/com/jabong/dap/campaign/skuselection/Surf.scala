@@ -1,6 +1,8 @@
 package com.jabong.dap.campaign.skuselection
 
+import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, CustomerPageVisitVariables, ItrVariables }
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
@@ -27,7 +29,7 @@ class Surf extends SkuSelector with Logging {
    * @param dfSalesOrderItem
    * @return
    */
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = {
+  override def skuFilter(past30DayCampaignMergedData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = {
 
     if (dfCustomerPageVisit == null || dfItrData == null || dfCustomer == null || dfSalesOrder == null || dfSalesOrderItem == null) {
 
@@ -46,7 +48,13 @@ class Surf extends SkuSelector with Logging {
 
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem)
 
-    val dfJoin = dfSkuNotBought.join(
+    //past campaign check whether the campaign has been sent to customer in last 30 days
+    val pastCampaignCheck = new PastCampaignCheck()
+    val skusFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfSkuNotBought,
+      CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
+
+
+    val dfJoin = skusFiltered.join(
       itrData,
       dfSkuNotBought(CustomerPageVisitVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
@@ -70,4 +78,6 @@ class Surf extends SkuSelector with Logging {
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
+
+  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
 }
