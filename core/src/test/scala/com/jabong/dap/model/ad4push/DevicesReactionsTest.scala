@@ -33,6 +33,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     val expectedDF = JsonUtils.readFromJson(AD4PUSH, "effectiveDFFull_result", effectiveDF)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
+
   "fullSummary: DataFrame" should "match with expected data" in {
     val toDay = "2015/07/12"
     val full = JsonUtils.readFromJson(AD4PUSH, "fullSummary_full", deviceReaction)
