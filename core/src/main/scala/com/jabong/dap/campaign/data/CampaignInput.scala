@@ -228,7 +228,10 @@ object CampaignInput extends Logging {
       return SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).select(
         campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
         campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        campaignData(CampaignMergedFields.REF_SKU1))
+        campaignData(CampaignMergedFields.REF_SKU1),
+        campaignData(CampaignMergedFields.DOMAIN),
+        campaignData(CampaignMergedFields.EMAIL),
+        campaignData(CampaignMergedFields.DEVICE_ID))
     }
     campaignData
   }
