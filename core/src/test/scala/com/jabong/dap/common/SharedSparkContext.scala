@@ -6,7 +6,7 @@ import org.scalatest.{ BeforeAndAfterAll, Suite }
 import grizzled.slf4j.Logging
 
 /** Shares a local `SparkContext` between all tests in a suite and closes it at the end */
-trait SharedSparkContext extends BeforeAndAfterAll with Logging{ self: Suite =>
+trait SharedSparkContext extends BeforeAndAfterAll with Logging { self: Suite =>
 
   val conf = new SparkConf().setMaster("local").setAppName("test").set("spark.driver.allowMultipleContexts", "true")
 
