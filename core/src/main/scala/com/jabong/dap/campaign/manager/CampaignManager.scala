@@ -4,11 +4,13 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -24,6 +26,7 @@ import scala.collection.mutable.HashMap
  *  TODO: this class will need to be refactored to create a proper data flow of campaigns
  *
  */
+
 object CampaignManager extends Serializable with Logging {
 
   var campaignPriorityMap = new HashMap[String, Int]
@@ -183,6 +186,7 @@ object CampaignManager extends Serializable with Logging {
       CampaignMergedFields.DEVICE_ID,
       CampaignMergedFields.EMAIL)
     val inputDataWithPriority = addPriority(selectedData)
+
     val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
       .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
