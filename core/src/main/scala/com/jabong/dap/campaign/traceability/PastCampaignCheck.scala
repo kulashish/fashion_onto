@@ -62,8 +62,7 @@ class PastCampaignCheck extends Logging {
         "pastCampaign_" + CustomerVariables.FK_CUSTOMER + " is null"
       )
       .select(
-        customerSelected(CustomerVariables.FK_CUSTOMER),
-        customerSelected(ProductVariables.SKU_SIMPLE)
+        customerSelected("*")
       )
 
     return pastCampaignNotSendCustomers
