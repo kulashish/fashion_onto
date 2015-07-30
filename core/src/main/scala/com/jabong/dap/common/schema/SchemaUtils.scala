@@ -48,14 +48,7 @@ object SchemaUtils {
   def changeSchema(df: DataFrame, schema: StructType): DataFrame={
     var res: DataFrame =df
     schema.foreach(e =>(res = addColumn(res, e.name, e.dataType)))
-    ///Now only for specific schema with 6 cols for campaign data need to change this
-    return res.select(
-    res(schema(0).name),
-    res(schema(1).name),
-    res(schema(2).name),
-    res(schema(3).name),
-    res(schema(4).name),
-    res(schema(5).name))
+    return res
 
   }
 }
