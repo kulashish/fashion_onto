@@ -110,6 +110,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
@@ -126,7 +127,7 @@ object CampaignManager extends Serializable with Logging {
     val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
 
     val acartFollowup = new AcartFollowUpCampaign()
-    acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData)
+    acartFollowup.runCampaign(past30DayCampaignMergedData, prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData)
 
     // FIXME: part of customerselction for iod and lowstock can be merged
 
@@ -136,7 +137,7 @@ object CampaignManager extends Serializable with Logging {
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
     val acartLowStock = new AcartLowStockCampaign()
-    acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
+    acartLowStock.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
 
     // item on discount
     // last30DayAcartData
@@ -147,7 +148,7 @@ object CampaignManager extends Serializable with Logging {
     val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
-    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+    acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
   val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
