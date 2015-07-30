@@ -36,6 +36,7 @@ object BasicITR {
       groupBy(ITR.CONFIG_SKU).
       agg(
         first(ITR.BRAND_NAME) as ITR.BRAND_NAME,
+        first(ITR.PRODUCT_NAME) as ITR.PRODUCT_NAME,
         avg(ITR.PRICE_ON_SITE) as ITR.PRICE_ON_SITE,
         avg(ITR.SPECIAL_PRICE) as ITR.SPECIAL_PRICE,
         first(ITR.ITR_DATE) as ITR.ITR_DATE,
