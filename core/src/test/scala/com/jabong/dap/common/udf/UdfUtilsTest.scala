@@ -482,4 +482,14 @@ class UdfUtilsTest extends FlatSpec {
     assert(day.equals("Sunday"))
   }
 
+  "removeAllZero" should "be empty String" in {
+    val str = UdfUtils.removeAllZero("000000")
+    assert(str.equals(""))
+  }
+
+  "removeAllZero" should "be same as input string" in {
+    val str = UdfUtils.removeAllZero("DE683C47-06E5-4817-BE06-066DEEBA8E4D")
+    assert(str.equals("DE683C47-06E5-4817-BE06-066DEEBA8E4D"))
+  }
+
 }
