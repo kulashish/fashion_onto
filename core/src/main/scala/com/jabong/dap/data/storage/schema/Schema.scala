@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -181,7 +181,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
     StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true)
   ))
-  
+
   val salesCart = StructType(Array(
     StructField(SalesCartVariables.ID_SALES_CART, IntegerType, true),
     StructField(SalesCartVariables.FK_CUSTOMER, IntegerType, true),
@@ -252,17 +252,42 @@ object Schema {
   ))
 
   val campaignOutput = StructType(Array(
-    StructField(CampaignMergedFields.FK_CUSTOMER, IntegerType, true),
+    StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, true),
     StructField(CampaignMergedFields.REF_SKU2, StringType, true)
   ))
 
-  val campaignPriorityOutput =  StructType(Array(
-    StructField(CampaignMergedFields.FK_CUSTOMER, IntegerType, true),
+  val campaignPriorityOutput = StructType(Array(
+    StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, LongType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, true),
-    StructField(CampaignCommon.PRIORITY,IntegerType, true)
+    StructField(CampaignMergedFields.EMAIL, StringType, true),
+    StructField(CampaignMergedFields.DOMAIN, StringType, true),
+    StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
+    StructField(CampaignCommon.PRIORITY, IntegerType, true)
+  ))
+
+  val campaignSchema = StructType(Array(
+    StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, true),
+    StructField(CampaignMergedFields.EMAIL, StringType, true),
+    StructField(CampaignMergedFields.DOMAIN, StringType, true),
+    StructField(CampaignMergedFields.DEVICE_ID, StringType, true)
+  ))
+
+  val campaign = StructType(Array(
+    StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_MAIL_TYPE, LongType, true),
+    StructField(CampaignMergedFields.LIVE_REF_SKU1, StringType, true),
+    StructField(CampaignMergedFields.EMAIL, StringType, true),
+    StructField(CampaignMergedFields.DOMAIN, StringType, true),
+    StructField(CampaignMergedFields.deviceId, StringType, true),
+    StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType, true),
+    StructField(CampaignMergedFields.LIVE_BRAND, StringType, true),
+    StructField(CampaignMergedFields.LIVE_BRICK, StringType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
   val customerPageVisitSkuListLevel = StructType(Array(
@@ -373,7 +398,6 @@ object Schema {
     StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
 
-
   val surf2 = StructType(Array(
     StructField(CustomerPageVisitVariables.USER_ID, StringType, true),
     StructField(CustomerPageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
@@ -390,6 +414,5 @@ object Schema {
     StructField(CustomerPageVisitVariables.DOMAIN, StringType, true),
     StructField(CustomerPageVisitVariables.SKU_LIST, ArrayType(StringType), true)
   ))
-
 
 }

@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ CustomerSelection, SkuSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -36,16 +36,15 @@ class WishlistIODCampaign {
 
     // union list1 and list2, group by customer, order by price, first/last
     //=======union both sku and sku simple==============================================================================
-    val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords)
-
-    val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS).select(
+    val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
       col(CustomerProductShortlistVariables.SPECIAL_PRICE)
     )
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
+    val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
 
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
     //save campaign Output
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
 

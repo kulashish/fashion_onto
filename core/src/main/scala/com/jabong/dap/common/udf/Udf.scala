@@ -84,6 +84,11 @@ object Udf {
   val yyyymmdd = udf((t1: Timestamp) => UdfUtils.getYYYYmmDD(t1: Timestamp))
 
   /**
+   * yyyymmdd will convert yyyymmdd formate
+   */
+  val yyyymmddString = udf((t1: String) => UdfUtils.getYYYYmmDD(t1: String))
+
+  /**
    * simpleSkuFromExtraData will extract data from extraData
    */
   val simpleSkuFromExtraData = udf((extraData: String) => UdfUtils.getSimpleSkuFromExtraData(extraData: String))

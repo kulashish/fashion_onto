@@ -2,97 +2,103 @@
   "vars": [
     {
       "source": "ad4push",
-      "incrDate": "2015-07-11",
+      "incrDate": "2015/07/11",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-12",
+      "incrDate": "2015/07/12",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-13",
+      "incrDate": "2015/07/13",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-14",
+      "incrDate": "2015/07/14",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-15",
+      "incrDate": "2015/07/15",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-16",
+      "incrDate": "2015/07/16",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-17",
+      "incrDate": "2015/07/17",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-18",
+      "incrDate": "2015/07/18",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-19",
+      "incrDate": "2015/07/19",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-20",
+      "incrDate": "2015/07/20",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-21",
+      "incrDate": "2015/07/21",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-22",
+      "incrDate": "2015/07/22",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-23",
+      "incrDate": "2015/07/23",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-24",
+      "incrDate": "2015/07/24",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-25",
+      "incrDate": "2015/07/25",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "ad4push",
-      "incrDate": "2015-07-26",
+      "incrDate": "2015/07/26",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "ad4push",
+      "incrDate": "2015/07/27",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }

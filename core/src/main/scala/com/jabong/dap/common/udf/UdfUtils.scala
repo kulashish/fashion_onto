@@ -9,7 +9,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -253,6 +253,24 @@ object UdfUtils {
     val time = t1.toString()
 
     return Timestamp.valueOf(time.substring(0, time.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
+  }
+
+  /**
+   * This will return Timestamp into YYYYMMDD format
+   * @param t1
+   * @return
+   */
+  def getYYYYmmDD(t1: String): Timestamp = {
+
+    if (t1 == null) {
+      return null
+    }
+
+    if (t1.contains(" ")) {
+      return Timestamp.valueOf(t1.substring(0, t1.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
+    } else {
+      return Timestamp.valueOf(t1 + " " + TimeConstants.START_TIME_MS)
+    }
   }
 
   /**

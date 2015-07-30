@@ -29,6 +29,9 @@ object SurfVariablesMain extends java.io.Serializable {
     var year = cal.get(Calendar.YEAR);
     var day = cal.get(Calendar.DAY_OF_MONTH);
     var month = mFormat.format(cal.getTime());
+    var yearSurf1=cal.get(Calendar.YEAR);
+    var daySurf1 = cal.get(Calendar.DAY_OF_MONTH);
+    var monthSurf1 = mFormat.format(cal.getTime());
     val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     var dt = dateFormat.format(cal.getTime())
     val tablename = args(0)
@@ -60,7 +63,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .getUserDeviceMapApp(useridDeviceidFrame)
       .write.mode("error")
       .save(userDeviceMapPath)
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, args(0))
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, args(0),year,day,month)
     variableSurf1.write.save(surf1VariablePath)
   }
 
@@ -97,7 +100,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .save(userDeviceMapPath)
 
     // variable 1
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename,year, day, month)
     variableSurf1.write.save(surf1VariablePath)
   }
 
@@ -141,10 +144,10 @@ object SurfVariablesMain extends java.io.Serializable {
 
     if (null != oldMergedData) {
       var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
+      processedVariable.save(processedVariablePath)
     }
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
     mergedData.saveAsParquetFile(currentMergedDataPath)
-    incremental.save(processedVariablePath)
 
   }
 }
