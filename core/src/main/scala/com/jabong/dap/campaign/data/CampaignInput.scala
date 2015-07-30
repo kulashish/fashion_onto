@@ -230,16 +230,16 @@ object CampaignInput extends Logging {
       if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
         val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
         return res.select(
-          res(CustomerVariables.FK_CUSTOMER).cast(Schema.campaignSchema(0).dataType) as (CampaignMergedFields.CUSTOMER_ID),
-          res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE).cast(Schema.campaignSchema(1).dataType),
-          res(CampaignMergedFields.REF_SKU1).cast(Schema.campaignSchema(2).dataType),
-          res(CampaignMergedFields.EMAIL).cast(Schema.campaignSchema(3).dataType),
-          res(CampaignMergedFields.DOMAIN).cast(Schema.campaignSchema(4).dataType),
-          res(CampaignMergedFields.DEVICE_ID).cast(Schema.campaignSchema(5).dataType))
+          res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+          res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+          res(CampaignMergedFields.REF_SKU1),
+          res(CampaignMergedFields.EMAIL),
+          res(CampaignMergedFields.DOMAIN),
+          res(CampaignMergedFields.DEVICE_ID))
       }
       campaignData
     } catch {
-                // TODO: Enumerate the exact reasons why it can fail
+                // TODO: fix when data not found skip
                  case th: Throwable => {
                    logger.info("File Not found at ->"+ DataSets.OUTPUT_PATH +"/"+ DataSets.CAMPAIGN+"/"+ name +"/"+ DataSets.DAILY_MODE +"/"+ date)
                    throw new SparkException("Data not available ?", th)

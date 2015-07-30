@@ -216,8 +216,8 @@ object CampaignManager extends Serializable with Logging {
   }
 
   def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)) {
-    val iosDF = df.filter((CampaignMergedFields.DOMAIN + " = " + DataSets.IOS))
-    val androidDF = df.filter(CampaignMergedFields.DOMAIN + " = " + DataSets.ANDROID)
+    val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
+    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
 
     exportCampaignCSV(iosDF, date, CampaignMergedFields.IOS_CODE)
     exportCampaignCSV(androidDF, date, CampaignMergedFields.ANDROID_CODE)
