@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.constants.variables.{PageVisitVariables, CustomerVariables}
 import org.apache.spark.sql.DataFrame
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import org.apache.spark.sql.functions._
@@ -23,15 +23,15 @@ object CampaignProcessor {
     } else {
       key1 = key
     }
-    val cmrn = cmr.filter(!cmr(CampaignMergedFields.DEVICE_ID) === null)
+    val cmrn = cmr.filter(!cmr(PageVisitVariables.BROWSER_ID) === null)
     val bcCampaign = Spark.getContext().broadcast(notNull).value
     val campaignDevice = cmrn.join(bcCampaign, bcCampaign(key) === cmrn(key1))
       .select(bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKU1),
-        coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(CampaignMergedFields.DEVICE_ID)),
-        coalesce(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)),
-        coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN))
+        coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(PageVisitVariables.BROWSER_ID)) as CampaignMergedFields.DEVICE_ID,
+        coalesce(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
+        coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
       )
     campaignDevice
   }
