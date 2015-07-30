@@ -2,7 +2,7 @@ package com.jabong.dap.common.schema
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.types.{ DataType, StructType }
 
 /**
  * Created by raghu on 3/7/15.
@@ -23,19 +23,19 @@ object SchemaUtils {
     return true
   }
 
-  def addColumn(df: DataFrame, key: String, dataType: DataType):DataFrame={
-    if(df.columns.contains(key)){
+  def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
+    if (df.columns.contains(key)) {
       return df
     } else {
       var i: Int = 0
       var f: Int = 0
       df.schema.iterator.foreach(e => (
-        if(e.dataType == dataType){
-          f=i
-        }else{
-          i = i+1
+        if (e.dataType == dataType) {
+          f = i
+        } else {
+          i = i + 1
         }))
-      df.withColumn(key,df(df.columns(f)).leq(null))
+      df.withColumn(key, df(df.columns(f)).leq(null))
     }
   }
 
@@ -56,5 +56,6 @@ object SchemaUtils {
     res(schema(3).name),
     res(schema(4).name),
     res(schema(5).name))
+
   }
 }

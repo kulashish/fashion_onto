@@ -1,5 +1,7 @@
 package com.jabong.dap.data.write
 
+import java.io.File
+
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -19,15 +21,13 @@ object DataWriter extends Logging {
    * @param date
    */
   def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, header: String, delimeter: String) {
-    val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, source, tableName, DataSets.DAILY_MODE, date)
+    val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, source, tableName, mode, date)
     if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, writePath)) {
       DataWriter.writeCsv(df, writePath, DataSets.IGNORE_SAVEMODE, "true", ";")
-      val csvFullPath = writePath + "/" + csvFileName + ".csv"
-      DataVerifier.rename(writePath, csvFullPath)
+      val csvSrcFile = writePath + File.separator + "part-00000"
+      val csvdestFile = writePath + File.separator + csvFileName + ".csv"
+      DataVerifier.rename(csvSrcFile, csvdestFile)
     }
-    //    val writePath = getWritePath(DataSets.OUTPUT_PATH, source, tableName, mode, date)
-    //    if (canWrite(mode, writePath))
-    //      writeCsv(df, writePath, "Ignore", header, delimeter)
   }
 
   /**
