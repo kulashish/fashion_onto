@@ -363,7 +363,7 @@ object CampaignInput extends Logging {
       val campaignMergedExits = DataVerifier.dataExists(path)
 
       if (campaignMergedExits) {
-        val mergedCampaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaign", "merged", DataSets.DAILY_MODE, date)
+        val mergedCampaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
