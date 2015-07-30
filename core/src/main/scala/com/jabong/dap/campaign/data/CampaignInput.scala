@@ -224,12 +224,12 @@ object CampaignInput extends Logging {
     if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
       val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
       return res.select(
-        campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-        campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        campaignData(CampaignMergedFields.REF_SKU1),
-        campaignData(CampaignMergedFields.DOMAIN),
-        campaignData(CampaignMergedFields.EMAIL),
-        campaignData(CampaignMergedFields.DEVICE_ID))
+        res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+        res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        res(CampaignMergedFields.REF_SKU1),
+        res(CampaignMergedFields.DOMAIN),
+        res(CampaignMergedFields.EMAIL),
+        res(CampaignMergedFields.DEVICE_ID))
     }
     campaignData
   }
