@@ -153,7 +153,8 @@ object CampaignManager extends Serializable with Logging {
     WishListCampaign.runCampaign()
   }
 
-  def startSurfCampaigns() = {
+  def startSurfCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
     SurfCampaign.runCampaign()
 
   }
@@ -247,6 +248,40 @@ object CampaignManager extends Serializable with Logging {
       //      }
     }
   }
+  
+  def initCampaignsConfig(campaignJsonPath: String) = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
+    if (validated) {
+      createCampaignMaps(json)
+    }
+  }
+  
+  
+  
   /**
    * Merges all the campaign output based on priority
    * @param campaignJsonPath

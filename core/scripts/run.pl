@@ -134,7 +134,7 @@ if ($component eq "bob") {
        run_component($component, $command);
 } elsif ($component eq "pushSurfCampaign") {
     $AMMUNITION = "--num-executors 7 --executor-memory 9G";
-     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json";
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
 }else {
     print "not a valid component\n";
