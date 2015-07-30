@@ -35,11 +35,11 @@ object DevicesReactions extends Logging {
    */
   def customerResponse(incrDate: String, saveMode: String) = {
 
-    val before7daysString = TimeUtils.getDateAfterNDays(-8, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val before7daysString = TimeUtils.getDateAfterNDays(-7, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val before15daysString = TimeUtils.getDateAfterNDays(-16, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val before15daysString = TimeUtils.getDateAfterNDays(-15, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val before30daysString = TimeUtils.getDateAfterNDays(-31, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val before30daysString = TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
@@ -107,6 +107,7 @@ object DevicesReactions extends Logging {
       df(DevicesReactionsVariables.BOUNCE).cast(IntegerType) as DevicesReactionsVariables.BOUNCE,
       df(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
       .filter(!(col(DevicesReactionsVariables.CUSTOMER_ID) === "" && col(DevicesReactionsVariables.DEVICE_ID) === ""))
+      .filter(col(DevicesReactionsVariables.REACTION).gt(0) || col(DevicesReactionsVariables.BOUNCE).gt(0))
   }
   /**
    *
@@ -215,20 +216,27 @@ object DevicesReactions extends Logging {
 
     val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, DevicesReactionsSchema.reducedDF, effective7,
       DevicesReactionsSchema.reducedDF, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
-    val joined_7_15_summary = joined_7_15.select(
-      coalesce(col(DevicesReactionsVariables.DEVICE_ID), col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
-      coalesce(col(DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
-      col(DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
-      col(new_reaction) as DevicesReactionsVariables.EFFECTIVE_15_DAYS)
       .na.fill(
         Map(
-          DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
-          DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0
+          DevicesReactionsVariables.REACTION -> 0,
+          new_reaction -> 0
         )
       )
+    val joined_7_15_summary = joined_7_15.select(
+      coalesce(col(DevicesReactionsVariables.DEVICE_ID), col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
+      coalesce(col(DevicesReactionsVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + DevicesReactionsVariables.CUSTOMER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
+      col(DevicesReactionsVariables.REACTION) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
+      col(new_reaction) as DevicesReactionsVariables.EFFECTIVE_15_DAYS)
 
     val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, DevicesReactionsSchema.reducedDF, joined_7_15_summary,
       DevicesReactionsSchema.joined_7_15, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+      .na.fill(
+        Map(
+          DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
+          DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
+          new_reaction -> 0
+        )
+      )
 
     val joined_7_15_30_summary = joined_7_15_30.select(
       coalesce(col(MergeUtils.NEW_ + DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
@@ -266,7 +274,7 @@ object DevicesReactions extends Logging {
       logger.info("DataFrame df is null, returning null")
       return null
     }
-    return df.filter(DevicesReactionsVariables.REACTION + "> 0")
+    return df.filter(col(DevicesReactionsVariables.REACTION).gt(0))
       .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID,
         DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
       .agg(sum(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)

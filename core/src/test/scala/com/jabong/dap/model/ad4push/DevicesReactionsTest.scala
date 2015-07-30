@@ -29,6 +29,12 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     assert(incI.count() == 181)
   }
 
+  "reduce" should "match with the expected Data" in {
+    val inputDF = JsonUtils.readFromJson(DataSets.AD4PUSH, "CorrectedSchema20150727", dfFromCsv)
+    val result = DevicesReactions.reduce(inputDF)
+    assert(result.count() == 108915)
+  }
+
   "reduce: dataFrame" should "match with expected data" in {
     val reduceInDF = JsonUtils.readFromJson(AD4PUSH, "reduceIn", dfFromCsv)
     val result = DevicesReactions.reduce(reduceInDF)
@@ -36,6 +42,18 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     assert(result.collect().toSet.equals(expectedResult.collect().toSet))
     //result.limit(10).write.json(TEST_RESOURCES + "ad4push" + ".json")
   }
+
+  "effectiveDFFull" should "match with expected data" in {
+//    val srcFile = DataWriter.getWritePath(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/20")
+//    result.select("*").coalesce(1).write.format("json").json(srcFile)
+    val incremental = JsonUtils.readFromJson(AD4PUSH, "Reduced20150727", reducedDF)
+    val reduced7 = JsonUtils.readFromJson(AD4PUSH, "Incr20150720", reducedDF)
+    val reduced15 = JsonUtils.readFromJson(AD4PUSH, "Incr20150712", reducedDF)
+    val reduced30 = null
+    val effectiveDFFull = DevicesReactions.effectiveDFFull(incremental, reduced7, reduced15, reduced30)
+    assert(effectiveDFFull.count() == 134230)
+  }
+
 
   "effectiveDFFull: DataFrame" should "match with expected data" in {
     val incremental = JsonUtils.readFromJson(AD4PUSH, "effectiveDFFull_incremental", dfFromCsv)
