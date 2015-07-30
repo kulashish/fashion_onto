@@ -222,7 +222,8 @@ object CampaignInput extends Logging {
   def getCampaignData(name: String, date: String): DataFrame = {
     val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
     if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-      return SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).select(
+      val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
+      return res.select(
         campaignData(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
         campaignData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         campaignData(CampaignMergedFields.REF_SKU1),
