@@ -3,7 +3,7 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.util.Date
 
-import com.jabong.dap.common.ArrayUtils
+import com.jabong.dap.common.{StringUtils, ArrayUtils}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -460,6 +460,18 @@ object UdfUtils {
       index = 6
     }
     return TimeUtils.nextNDay("Monday", index)
+  }
+
+  /**
+   * Returns empty string if the string contains all zeros or null.
+   * @param str
+   * @return String
+   */
+  def removeAllZero(str: String): String = {
+    if (null == str || StringUtils.isAllZero(str)) {
+      return ""
+    }
+    return str
   }
 
 }

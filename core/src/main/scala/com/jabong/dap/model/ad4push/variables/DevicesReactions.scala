@@ -50,7 +50,13 @@ object DevicesReactions extends Logging {
     if (DataWriter.canWrite(savePathI, saveMode)) {
       val fName = "exportMessagesReactions_" + CampaignMergedFields.IOS_CODE + "_" + incrDateInFileFormat + ".csv"
       val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
+      incIStringSchema.printSchema()
+      incIStringSchema.show(10)
+      println("Count before filtering: " + incIStringSchema.count())
       val incI = dfCorrectSchema(incIStringSchema)
+      incI.printSchema()
+      incI.show(10)
+      println("Count after filtering: " + incI.count())
 
       //getting DF
       logger.info("Reading inputs (CSVs and Parquets) for IOS")
@@ -100,12 +106,13 @@ object DevicesReactions extends Logging {
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
-    return df.select(df(DevicesReactionsVariables.LOGIN_USER_ID) as DevicesReactionsVariables.CUSTOMER_ID,
-      df(DevicesReactionsVariables.DEVICE_ID) as DevicesReactionsVariables.DEVICE_ID,
+    df.select(Udf.removeAllZero(df(DevicesReactionsVariables.LOGIN_USER_ID)) as DevicesReactionsVariables.CUSTOMER_ID,
+      Udf.removeAllZero(df(DevicesReactionsVariables.DEVICE_ID)) as DevicesReactionsVariables.DEVICE_ID,
       df(DevicesReactionsVariables.MESSAGE_ID) as DevicesReactionsVariables.MESSAGE_ID,
       df(DevicesReactionsVariables.CAMPAIGN_ID) as DevicesReactionsVariables.CAMPAIGN_ID,
       df(DevicesReactionsVariables.BOUNCE).cast(IntegerType) as DevicesReactionsVariables.BOUNCE,
       df(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
+      .filter(!(col(DevicesReactionsVariables.CUSTOMER_ID) === "" && col(DevicesReactionsVariables.DEVICE_ID) === ""))
   }
   /**
    *

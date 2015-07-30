@@ -5,6 +5,8 @@ import java.io.File
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables._
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.DataSets._
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
@@ -19,6 +21,12 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
 
   "customerResponse : DataFrame" should "match with expected DF" in {
     //DevicesReactions.customerResponse("20150722", DAILY_MODE)
+  }
+
+  "dfCorrectSchema" should "filter and give correct count" in {
+    val incIStringSchema = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/27", "exportMessagesReactions_517_20150727.csv", "true", ",")
+    val incI = DevicesReactions.dfCorrectSchema(incIStringSchema)
+    assert(incI.count() == 1426848)
   }
 
   "reduce: dataFrame" should "match with expected data" in {
