@@ -83,19 +83,17 @@ class PastCampaignCheck extends Logging {
       return null
     }
 
-    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays)
-      .withColumnRenamed(CampaignMergedFields.CUSTOMER_ID, "pastCampaign_" + CampaignMergedFields.CUSTOMER_ID)
+    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays).withColumnRenamed(CustomerVariables.FK_CUSTOMER, "pastCampaign_" + CustomerVariables.FK_CUSTOMER)
 
     val customerSkuSelected = customerSkuSimpleSelected.
       withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
     val pastCampaignNotSendCustomers = customerSkuSelected
-      .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CampaignMergedFields
-        .CUSTOMER_ID)
+      .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CustomerVariables.FK_CUSTOMER)
         &&
         customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), "left_outer")
       .filter(
-        "pastCampaign_" + CampaignMergedFields.CUSTOMER_ID + " is null"
+        "pastCampaign_" + CustomerVariables.FK_CUSTOMER + " is null"
       )
       .select(
         customerSkuSelected("*")
