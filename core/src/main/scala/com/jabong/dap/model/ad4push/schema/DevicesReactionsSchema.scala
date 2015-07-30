@@ -36,10 +36,10 @@ object DevicesReactionsSchema {
   val effectiveDF = StructType(Array(
     StructField(DevicesReactionsVariables.DEVICE_ID, StringType, true),
     StructField(DevicesReactionsVariables.CUSTOMER_ID, StringType, true),
-    StructField(DevicesReactionsVariables.EFFECTIVE_7_DAYS, IntegerType, true),
-    StructField(DevicesReactionsVariables.EFFECTIVE_15_DAYS, IntegerType, true),
-    StructField(DevicesReactionsVariables.EFFECTIVE_30_DAYS, IntegerType, true),
-    StructField(DevicesReactionsVariables.CLICKED_TODAY, IntegerType, true)
+    StructField(DevicesReactionsVariables.EFFECTIVE_7_DAYS, IntegerType, false),
+    StructField(DevicesReactionsVariables.EFFECTIVE_15_DAYS, IntegerType, false),
+    StructField(DevicesReactionsVariables.EFFECTIVE_30_DAYS, IntegerType, false),
+    StructField(DevicesReactionsVariables.CLICKED_TODAY, IntegerType, false)
   ))
 
   //effective schema with 7, 15 days before
