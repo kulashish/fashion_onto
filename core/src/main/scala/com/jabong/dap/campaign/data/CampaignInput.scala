@@ -253,6 +253,7 @@ object CampaignInput extends Logging {
       }
     } else {
       return null
+
     }
   }
 
