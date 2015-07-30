@@ -213,7 +213,11 @@ object CampaignInput extends Logging {
     var allCampaignData: DataFrame = null
     CampaignManager.campaignMailTypeMap.foreach(
       e => (
-        allCampaignData = allCampaignData.unionAll(getCampaignData(e._1, date))
+        if (null == allCampaignData) {
+          allCampaignData = getCampaignData(e._1, date)
+        } else {
+          allCampaignData = allCampaignData.unionAll(getCampaignData(e._1, date))
+        }
       )
     )
     return allCampaignData
