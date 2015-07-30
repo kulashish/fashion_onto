@@ -3,11 +3,9 @@ package com.jabong.dap.model.ad4push
 import java.io.File
 
 import com.jabong.dap.common.SharedSparkContext
-import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables._
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets._
-import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import org.scalatest.FlatSpec
@@ -17,7 +15,7 @@ import scala.collection.mutable.ListBuffer
 /**
  * Created by Kapil.Rajak on 13/7/15.
  */
-class DevicesReactionsTest extends FlatSpec with SharedSparkContext{
+class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
 
   "customerResponse : DataFrame" should "match with expected DF" in {
     //DevicesReactions.customerResponse("20150722", DAILY_MODE)
@@ -48,11 +46,11 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext{
     val lines = scala.io.Source.fromFile(file).mkString
     val arrayJson = lines.split("\n")
     var listMaps: ListBuffer[Map[String, Any]] = ListBuffer()
-    for(json <- arrayJson)  {
-      val map =json.trim.substring(1, json.length - 1)
+    for (json <- arrayJson) {
+      val map = json.trim.substring(1, json.length - 1)
         .split(",")
         .map(_.split(":"))
-        .map { case Array(k, v) => (k.dropRight(1).drop(1), v filterNot ("\"" contains _))}
+        .map { case Array(k, v) => (k.dropRight(1).drop(1), v filterNot ("\"" contains _)) }
         .toMap
       listMaps += map
     }
@@ -89,27 +87,27 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext{
 
     val result = JsonUtils.jsonsFile2ArrayOfMap(AD4PUSH, "i_f_7_15_30")
 
-    for(map <- result){
-      var custId = if(map.contains(CUSTOMER_ID)) map(CUSTOMER_ID) else null
-      var devId = if(map.contains(DEVICE_ID)) map(DEVICE_ID) else null
-      var lastClickD = if(map.contains(LAST_CLICK_DATE)) map(LAST_CLICK_DATE) else null
-      var click7 = if(map.contains(CLICK_7)) map(CLICK_7).toInt else 0
-      var click15 = if(map.contains(CLICK_15)) map(CLICK_15).toInt else 0
-      var click30 = if(map.contains(CLICK_30)) map(CLICK_30).toInt else 0
-      var clickLife = if(map.contains(CLICK_LIFETIME)) map(CLICK_LIFETIME).toInt else null
-      var clickMon = if(map.contains(CLICK_MONDAY)) map(CLICK_MONDAY).toInt else 0
-      var clickTue = if(map.contains(CLICK_TUESDAY)) map(CLICK_TUESDAY).toInt else 0
-      var clickWed = if(map.contains(CLICK_WEDNESDAY)) map(CLICK_WEDNESDAY).toInt else 0
-      var clickThu = if(map.contains(CLICK_THURSDAY)) map(CLICK_THURSDAY).toInt else 0
-      var clickFri = if(map.contains(CLICK_FRIDAY)) map(CLICK_FRIDAY).toInt else 0
-      var clickSat = if(map.contains(CLICK_SATURDAY)) map(CLICK_SATURDAY).toInt else 0
-      var clickSun = if(map.contains(CLICK_SUNDAY)) map(CLICK_SUNDAY).toInt else 0
-      var click2wice = if(map.contains(CLICKED_TWICE)) map(CLICKED_TWICE).toInt else 0
-      var mostClickDay = if(map.contains(MOST_CLICK_DAY)) map(MOST_CLICK_DAY) else null
+    for (map <- result) {
+      var custId = if (map.contains(CUSTOMER_ID)) map(CUSTOMER_ID) else null
+      var devId = if (map.contains(DEVICE_ID)) map(DEVICE_ID) else null
+      var lastClickD = if (map.contains(LAST_CLICK_DATE)) map(LAST_CLICK_DATE) else null
+      var click7 = if (map.contains(CLICK_7)) map(CLICK_7).toInt else 0
+      var click15 = if (map.contains(CLICK_15)) map(CLICK_15).toInt else 0
+      var click30 = if (map.contains(CLICK_30)) map(CLICK_30).toInt else 0
+      var clickLife = if (map.contains(CLICK_LIFETIME)) map(CLICK_LIFETIME).toInt else null
+      var clickMon = if (map.contains(CLICK_MONDAY)) map(CLICK_MONDAY).toInt else 0
+      var clickTue = if (map.contains(CLICK_TUESDAY)) map(CLICK_TUESDAY).toInt else 0
+      var clickWed = if (map.contains(CLICK_WEDNESDAY)) map(CLICK_WEDNESDAY).toInt else 0
+      var clickThu = if (map.contains(CLICK_THURSDAY)) map(CLICK_THURSDAY).toInt else 0
+      var clickFri = if (map.contains(CLICK_FRIDAY)) map(CLICK_FRIDAY).toInt else 0
+      var clickSat = if (map.contains(CLICK_SATURDAY)) map(CLICK_SATURDAY).toInt else 0
+      var clickSun = if (map.contains(CLICK_SUNDAY)) map(CLICK_SUNDAY).toInt else 0
+      var click2wice = if (map.contains(CLICKED_TWICE)) map(CLICKED_TWICE).toInt else 0
+      var mostClickDay = if (map.contains(MOST_CLICK_DAY)) map(MOST_CLICK_DAY) else null
 
-      logger.info("Testing row with device_id: " +devId+", customer_id: "+ custId)
+      logger.info("Testing row with device_id: " + devId + ", customer_id: " + custId)
 
-      val shouldBe = maxClickDay(clickMon,clickTue,clickWed,clickThu,clickFri,clickSat,clickSun)
+      val shouldBe = maxClickDay(clickMon, clickTue, clickWed, clickThu, clickFri, clickSat, clickSun)
       assert(mostClickDay.toLowerCase.equals(shouldBe))
       //:TODO add consistent inputs/files to get correct result
       //assert(clickLife.equals(clickMon+clickTue+clickWed+clickThu+clickFri+clickSat+clickSun))
@@ -118,13 +116,13 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext{
   }
 
   def maxClickDay(clicks: Int*): String = {
-    val days = List( "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday","Sunday")
+    val days = List("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     var max = clicks(0)
-    var maxIndex:Int = 0
-    for(i <- 1 until clicks.length) {
-      if ( max < clicks(i) ) {
+    var maxIndex: Int = 0
+    for (i <- 1 until clicks.length) {
+      if (max < clicks(i)) {
         max = clicks(i)
-        maxIndex=i
+        maxIndex = i
       }
     }
     days(maxIndex).toLowerCase

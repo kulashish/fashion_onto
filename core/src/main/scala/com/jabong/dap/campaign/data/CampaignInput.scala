@@ -16,6 +16,7 @@ import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
+import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -224,19 +225,28 @@ object CampaignInput extends Logging {
   }
 
   def getCampaignData(name: String, date: String): DataFrame = {
-    val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
-    if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-      val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
-      return res.select(
-        res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-        res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        res(CampaignMergedFields.REF_SKU1),
-        res(CampaignMergedFields.DOMAIN),
-        res(CampaignMergedFields.EMAIL),
-        res(CampaignMergedFields.DEVICE_ID))
+    try {
+      val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
+      if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
+        val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
+        return res.select(
+          res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+          res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+          res(CampaignMergedFields.REF_SKU1),
+          res(CampaignMergedFields.EMAIL),
+          res(CampaignMergedFields.DOMAIN),
+          res(CampaignMergedFields.DEVICE_ID))
+      }
+      campaignData
+    } catch {
+                // TODO: fix when data not found skip
+                 case th: Throwable => {
+                   logger.info("File Not found at ->"+ DataSets.OUTPUT_PATH +"/"+ DataSets.CAMPAIGN+"/"+ name +"/"+ DataSets.DAILY_MODE +"/"+ date)
+                   throw new SparkException("Data not available ?", th)
+                 }
     }
-    campaignData
-  }
+    }
+
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
     val filePath = buildPath(basePath, source, componentName, mode, date)
