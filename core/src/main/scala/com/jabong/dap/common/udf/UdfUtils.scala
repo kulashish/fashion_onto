@@ -3,7 +3,7 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.util.Date
 
-import com.jabong.dap.common.{StringUtils, ArrayUtils}
+import com.jabong.dap.common.{ StringUtils, ArrayUtils }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
