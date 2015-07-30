@@ -21,7 +21,6 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 
-
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
  */
@@ -148,8 +147,7 @@ object CampaignInput extends Logging {
       itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK,
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
-      itrData(ITR.BRICK)
-    )
+      itrData(ITR.BRICK))
     filteredItr
   }
 
@@ -160,8 +158,7 @@ object CampaignInput extends Logging {
     val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU),
       itrData(ITR.BRAND_NAME),
       itrData(ITR.PRODUCT_NAME),
-      itrData(ITR.BRICK)
-    )
+      itrData(ITR.BRICK))
     filteredItr
   }
 
@@ -218,25 +215,23 @@ object CampaignInput extends Logging {
     CampaignManager.campaignMailTypeMap.foreach(
       e => (
         if (null == allCampaignData) {
-          if(null!=df){
-            df = getCampaignData(e._1, date)
+          df = getCampaignData(e._1, date)
+          if (null != df) {
             allCampaignData = df
           }
         } else {
           df = getCampaignData(e._1, date)
-          if(null!=df){
+          if (null != df) {
             allCampaignData = allCampaignData.unionAll(df)
           }
-        }
-      )
-    )
+        }))
     return allCampaignData
   }
 
   def getCampaignData(name: String, date: String): DataFrame = {
-      var path:String = DataSets.OUTPUT_PATH +"/"+ DataSets.CAMPAIGN+"/"+ name +"/"+ DataSets.DAILY_MODE +"/"+ date
-      if(DataVerifier.dataExists(path)){
-        try {
+    var path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
+    if (DataVerifier.dataExists(path)) {
+      try {
         val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
           val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
@@ -250,17 +245,16 @@ object CampaignInput extends Logging {
         }
         campaignData
       } catch {
-      // TODO: fix when data not found skip
-      case th: Throwable => {
-        logger.info("File Not found at ->"+ path)
-        throw new SparkException("Data not available ?", th)
+        // TODO: fix when data not found skip
+        case th: Throwable => {
+          logger.info("File Not found at ->" + path)
+          throw new SparkException("Data not available ?", th)
+        }
       }
+    } else {
+      return null
     }
-      }else{
-        return null
-      }
-    }
-
+  }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
     val filePath = buildPath(basePath, source, componentName, mode, date)
@@ -302,8 +296,7 @@ object CampaignInput extends Logging {
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-      )
+        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
 
@@ -318,8 +311,7 @@ object CampaignInput extends Logging {
         itr30Day.unionAll(itrData.select(
           col(ITR.CONFIG_SKU) as ProductVariables.SKU,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-        ))
+          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
 
@@ -334,8 +326,7 @@ object CampaignInput extends Logging {
       .select(
         col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-      )
+        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
 
@@ -350,8 +341,7 @@ object CampaignInput extends Logging {
         itr30Day.unionAll(itrData.select(
           col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-        ))
+          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
 

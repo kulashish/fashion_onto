@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.{PageVisitVariables, CustomerVariables}
+import com.jabong.dap.common.time.{TimeUtils, TimeConstants}
 import org.apache.spark.sql.DataFrame
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import org.apache.spark.sql.functions._
@@ -47,6 +48,8 @@ object CampaignProcessor {
     val DeviceId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
 
     val camp = custId.unionAll(DeviceId)
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
+
 
     val finalCampaign = camp.join(itr, camp(CampaignMergedFields.REF_SKU1) === itr(ITR.CONFIG_SKU)).select(
       camp(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
@@ -58,7 +61,9 @@ object CampaignProcessor {
       itr(ITR.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
       itr(ITR.BRAND_NAME) as CampaignMergedFields.LIVE_BRAND,
       itr(ITR.BRICK) as CampaignMergedFields.LIVE_BRICK,
-      itr(ITR.BRICK).leq("") as CampaignMergedFields.LIVE_CART_URL
+      itr(ITR.BRICK).leq("") as CampaignMergedFields.LIVE_CART_URL,
+      lit(yesterdayDate) as CampaignMergedFields.END_OF_DATE
+
     )
     finalCampaign
   }
