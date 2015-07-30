@@ -9,6 +9,7 @@ import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
@@ -212,7 +213,8 @@ object CampaignUtils extends Logging {
     }
     // Sales order skus with successful order status
     val successfulSku = salesOrderItemData
-      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+      .filter(SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.CANCEL_PAYMENT_ERROR + " and " +
+        SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.INVALID)
       .select(
         salesOrderItemData(ProductVariables.SKU),
         salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),

@@ -70,10 +70,13 @@ object CampaignManager extends Serializable with Logging {
     liveRetargetCampaign.runCampaign(orderData, orderItemData)
   }
 
-  def startPushInvalidCampaign() = {
+  def startPushInvalidCampaign(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
 
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
     // last 3 days of orderitem data
@@ -84,7 +87,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     val invalidFollowUp = new InvalidFollowUpCampaign()
-    invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData)
+    invalidFollowUp.runCampaign(past30DayCampaignMergedData, orderData, orderItemData, yesterdayItrData)
 
     // invalid lowstock
     // last 30 days of order item data
@@ -94,11 +97,12 @@ object CampaignManager extends Serializable with Logging {
     val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
 
     val invalidLowStock = new InvalidLowStockCampaign()
-    invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
+    invalidLowStock.runCampaign(past30DayCampaignMergedData, last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
 
   }
 
-  def startPushAbandonedCartCampaign() = {
+  def startPushAbandonedCartCampaign(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
 
     // acart daily, acart followup, acart low stock, acart iod
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
@@ -106,6 +110,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
@@ -122,7 +127,7 @@ object CampaignManager extends Serializable with Logging {
     val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
 
     val acartFollowup = new AcartFollowUpCampaign()
-    acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData)
+    acartFollowup.runCampaign(past30DayCampaignMergedData, prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData)
 
     // FIXME: part of customerselction for iod and lowstock can be merged
 
@@ -132,7 +137,7 @@ object CampaignManager extends Serializable with Logging {
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
     val acartLowStock = new AcartLowStockCampaign()
-    acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
+    acartLowStock.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
 
     // item on discount
     // last30DayAcartData
@@ -143,16 +148,18 @@ object CampaignManager extends Serializable with Logging {
     val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
-    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+    acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
   val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
-  def startWishlistCampaigns() = {
+  def startWishlistCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
     WishListCampaign.runCampaign()
   }
 
-  def startSurfCampaigns() = {
+  def startSurfCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
     SurfCampaign.runCampaign()
 
   }
@@ -246,6 +253,40 @@ object CampaignManager extends Serializable with Logging {
       //      }
     }
   }
+  
+  def initCampaignsConfig(campaignJsonPath: String) = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
+    if (validated) {
+      createCampaignMaps(json)
+    }
+  }
+  
+  
+  
   /**
    * Merges all the campaign output based on priority
    * @param campaignJsonPath

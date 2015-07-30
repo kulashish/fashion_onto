@@ -120,11 +120,11 @@ object Init {
       case "deviceMapping" => new VarMerger().start(params.varJson)
       case "Ad4pushCustReact" => new VarMerger().start(params.varJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
-      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign()
-      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign()
-      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns()
+      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.pushCampaignsJson)
+      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.pushCampaignsJson)
+      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns(params.pushCampaignsJson)
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
-      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns()
+      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.pushCampaignsJson)
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
