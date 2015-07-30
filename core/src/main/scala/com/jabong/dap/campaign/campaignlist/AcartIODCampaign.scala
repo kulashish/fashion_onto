@@ -19,11 +19,15 @@ class AcartIODCampaign {
     //FIXME:Filter the order items data for 30 days
     val selectedCustomers = acartCustomerSelection.customerSelection(last30DayAcartData, last30daySalesOrderData, last30DaySalesOrderItemData)
 
-    //past campaign check whether the campaign has been sent to customer in last 30 days
-    val pastCampaignCheck = new PastCampaignCheck()
-    val custFiltered = pastCampaignCheck.campaignCheck(past30DayCampaignMergedData, selectedCustomers,
-      CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_IOD_CAMPAIGN, 1000), 30)
-    
+    var custFiltered = selectedCustomers
+
+    if (past30DayCampaignMergedData != null) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      val pastCampaignCheck = new PastCampaignCheck()
+      custFiltered = pastCampaignCheck.campaignCheck(past30DayCampaignMergedData, selectedCustomers,
+        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_IOD_CAMPAIGN, 1000), 30)
+
+    }
     //sku selection
     val iod = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
     val refSkus = iod.skuFilter(custFiltered, last30daysItrData)

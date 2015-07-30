@@ -19,11 +19,15 @@ class AcartLowStockCampaign {
     //FIXME:Filter the order items data for last day
     val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
-    //past campaign check whether the campaign has been sent to customer in last 30 days
-    val pastCampaignCheck = new PastCampaignCheck()
-    val custFiltered = pastCampaignCheck.campaignCheck(past30DayCampaignMergedData, selectedCustomers,
-      CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, 1000), 30)
-    
+    var custFiltered = selectedCustomers
+
+    if (past30DayCampaignMergedData != null) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      val pastCampaignCheck = new PastCampaignCheck()
+      custFiltered = pastCampaignCheck.campaignCheck(past30DayCampaignMergedData, selectedCustomers,
+        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, 1000), 30)
+    }
+
     //sku selection
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
     val refSkus = lowStock.skuFilter(selectedCustomers, yesterdayItrData)
