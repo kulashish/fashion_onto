@@ -22,13 +22,12 @@ class Surf3Campaign {
 
     val skus = surfSkuSelector.skuFilter(lastdaySurf3DataFixed, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
-    val dfReferenceSku = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
+    val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(dfReferenceSku, CampaignCommon.SURF3_CAMPAIGN)
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.SURF3_CAMPAIGN)
 
     //save campaign Output
-    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.SURF3_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.SURF3_CAMPAIGN)
 
   }
 }

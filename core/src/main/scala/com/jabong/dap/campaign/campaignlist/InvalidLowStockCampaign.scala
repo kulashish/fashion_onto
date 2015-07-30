@@ -4,7 +4,6 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
-import com.jabong.dap.common.time.TimeConstants
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -29,9 +28,10 @@ class InvalidLowStockCampaign {
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
     val refSkus = lowStock.skuFilter(selectedCustomers, itrData)
 
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
+
     //save campaign Output
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
 
   }
 }
