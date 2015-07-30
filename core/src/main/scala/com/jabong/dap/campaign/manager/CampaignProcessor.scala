@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{PageVisitVariables, CustomerVariables}
+import com.jabong.dap.common.constants.variables.{ PageVisitVariables, CustomerVariables }
 import org.apache.spark.sql.DataFrame
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import org.apache.spark.sql.functions._

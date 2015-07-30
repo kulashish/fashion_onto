@@ -239,14 +239,13 @@ object CampaignInput extends Logging {
       }
       campaignData
     } catch {
-                // TODO: fix when data not found skip
-                 case th: Throwable => {
-                   logger.info("File Not found at ->"+ DataSets.OUTPUT_PATH +"/"+ DataSets.CAMPAIGN+"/"+ name +"/"+ DataSets.DAILY_MODE +"/"+ date)
-                   throw new SparkException("Data not available ?", th)
-                 }
+      // TODO: fix when data not found skip
+      case th: Throwable => {
+        logger.info("File Not found at ->" + DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date)
+        throw new SparkException("Data not available ?", th)
+      }
     }
-    }
-
+  }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
     val filePath = buildPath(basePath, source, componentName, mode, date)
