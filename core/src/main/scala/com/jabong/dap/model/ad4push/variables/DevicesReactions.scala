@@ -50,13 +50,7 @@ object DevicesReactions extends Logging {
     if (DataWriter.canWrite(savePathI, saveMode)) {
       val fName = "exportMessagesReactions_" + CampaignMergedFields.IOS_CODE + "_" + incrDateInFileFormat + ".csv"
       val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
-      incIStringSchema.printSchema()
-      incIStringSchema.show(10)
-      println("Count before filtering: " + incIStringSchema.count())
       val incI = dfCorrectSchema(incIStringSchema)
-      incI.printSchema()
-      incI.show(10)
-      println("Count after filtering: " + incI.count())
 
       //getting DF
       logger.info("Reading inputs (CSVs and Parquets) for IOS")
