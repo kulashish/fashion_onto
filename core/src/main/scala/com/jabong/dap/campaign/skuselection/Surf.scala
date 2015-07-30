@@ -46,7 +46,8 @@ class Surf extends SkuSelector with Logging {
       col(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
     )
 
-    val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem)
+    val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem).
+                          withColumnRenamed(ItrVariables.SKU, ProductVariables.SKU_SIMPLE)
 
     //past campaign check whether the campaign has been sent to customer in last 30 days
     val pastCampaignCheck = new PastCampaignCheck()
@@ -56,13 +57,13 @@ class Surf extends SkuSelector with Logging {
 
     val dfJoin = skusFiltered.join(
       itrData,
-      dfSkuNotBought(CustomerPageVisitVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
+      skusFiltered(CustomerPageVisitVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
     )
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerVariables.EMAIL), //EMAIL can be encrypted EMAIL or BrowserId
-        col(ItrVariables.SKU) as ProductVariables.SKU_SIMPLE,
+        col(ProductVariables.SKU_SIMPLE),
         col(ProductVariables.SPECIAL_PRICE),
         col(CustomerPageVisitVariables.BROWER_ID),
         col(CustomerPageVisitVariables.DOMAIN)
