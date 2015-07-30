@@ -17,6 +17,7 @@ class LiveReturnReTargetCampaign {
     // filter by campaign -- i.e., campaign shount not have gone to customer in last 30 days
 
     // find list of (customers, ref skus)
+
     val cancelRetargetSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.RETURN_RETARGET)
     val refSkus = cancelRetargetSkuSelector.skuFilter(targetCustomersWithOrderItems)
 

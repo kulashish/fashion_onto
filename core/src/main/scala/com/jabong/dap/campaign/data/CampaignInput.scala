@@ -358,4 +358,25 @@ object CampaignInput extends Logging {
     itr30Day
   }
 
+  def load30DayCampaignMergedData(): DataFrame = {
+    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+
+    val campaignMerged30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+
+    for (i <- 2 to 30) {
+
+      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
+
+      val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+      val campaignMergedExits = DataVerifier.dataExists(path)
+
+      if (campaignMergedExits) {
+        val mergedCampaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaign", "merged", DataSets.DAILY_MODE, date)
+        campaignMerged30Day.unionAll(mergedCampaignData)
+      }
+    }
+    campaignMerged30Day
+  }
+
 }
