@@ -4,7 +4,6 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
-import com.jabong.dap.common.time.TimeConstants
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -25,8 +24,7 @@ class AcartDailyCampaign {
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_DAILY_CAMPAIGN)
     //save campaign Output
-    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.ACART_DAILY_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_DAILY_CAMPAIGN)
 
   }
 }
