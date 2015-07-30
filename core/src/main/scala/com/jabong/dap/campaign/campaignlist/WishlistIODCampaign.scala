@@ -5,7 +5,6 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
-import com.jabong.dap.common.time.TimeConstants
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -46,10 +45,9 @@ class WishlistIODCampaign {
     val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
-
     //save campaign Output
-    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.WISHLIST_IOD_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
+
   }
 
 }

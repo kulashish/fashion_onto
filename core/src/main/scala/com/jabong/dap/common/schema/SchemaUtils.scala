@@ -2,7 +2,7 @@ package com.jabong.dap.common.schema
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ DataType, StructType }
+import org.apache.spark.sql.types.{StringType, DataType, StructType}
 
 /**
  * Created by raghu on 3/7/15.
@@ -35,13 +35,21 @@ object SchemaUtils {
         } else {
           i = i + 1
         }))
-      df.withColumn(key, df(df.columns(f)).leq(null))
+      df.printSchema()
+      df.withColumn(key, df(df.columns(0)).cast(StringType).substr(0,0))
     }
   }
 
-  def changeSchema(df: DataFrame, schema: StructType): DataFrame = {
-    var res: DataFrame = df
-    schema.foreach(e => (res = addColumn(res, e.name, e.dataType)))
+  /**
+   *
+   * @param df
+   * @param schema
+   * @return
+   */
+  def changeSchema(df: DataFrame, schema: StructType): DataFrame={
+    var res: DataFrame =df
+    schema.foreach(e =>(res = addColumn(res, e.name, e.dataType)))
     return res
+
   }
 }

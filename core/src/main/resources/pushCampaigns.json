@@ -1,0 +1,80 @@
+{
+  "pushBasePath":"misc/pushCampaignTestRun",
+  "pushCampaignList": [
+    {
+      "campaignName": "cancel_retarget",
+      "priority": 1,
+      "mailType": 46
+    },
+    {
+      "campaignName": "return_retarget",
+      "priority": 2,
+      "mailType": 47
+    },
+    {
+      "campaignName": "acart_daily",
+      "priority": 3,
+      "mailType": 42
+    },
+    {
+      "campaignName": "wishlist_followup",
+      "priority": 4,
+      "mailType": 53
+    },
+    {
+      "campaignName": "acart_iod",
+      "priority": 5,
+      "mailType": 45
+    },
+    {
+      "campaignName": "wishlist_iod",
+      "priority": 6,
+      "mailType": 54
+    },
+    {
+      "campaignName": "acart_lowstock",
+      "priority": 7,
+      "mailType": 44
+    },
+    {
+      "campaignName": "wishlist_lowstock",
+      "priority": 8,
+      "mailType": 55
+    },
+    {
+      "campaignName": "acart_followup",
+      "priority": 9,
+      "mailType": 43
+    },
+    {
+      "campaignName": "surf2",
+      "priority": 10,
+      "mailType": 57
+    },
+    {
+      "campaignName": "surf6",
+      "priority": 11,
+      "mailType": 71
+    },
+    {
+      "campaignName": "invalid_followup",
+      "priority": 12,
+      "mailType": 48
+    },
+    {
+      "campaignName": "invalid_lowstock",
+      "priority": 13,
+      "mailType": 49
+    },
+    {
+      "campaignName": "surf1",
+      "priority": 14,
+      "mailType": 56
+    },
+    {
+      "campaignName": "surf3",
+      "priority": 15,
+      "mailType": 58
+    }
+  ]
+}

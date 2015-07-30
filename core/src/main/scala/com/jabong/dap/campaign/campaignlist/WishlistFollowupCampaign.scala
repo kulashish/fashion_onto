@@ -1,10 +1,11 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
-import com.jabong.dap.common.time.TimeConstants
+import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.variables.{ ProductVariables, ItrVariables, CustomerProductShortlistVariables }
+import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -40,8 +41,7 @@ class WishlistFollowupCampaign {
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN)
 
     //save campaign Output
-    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN + "/" + CampaignUtils.now(TimeConstants.DATE_FORMAT_FOLDER))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN)
 
   }
 
