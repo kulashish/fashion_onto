@@ -27,15 +27,17 @@ object SurfCampaign {
     // load customer master record for email id to fk_customer mapping
     val customerMasterData = CampaignInput.loadCustomerMasterData()
 
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+
     // common customer selection for surf 1, 2, 6
     val surf1Campaign = new Surf1Campaign()
-    surf1Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
+    surf1Campaign.runCampaign(past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
 
     val surf2Campaign = new Surf2Campaign()
-    surf2Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
+    surf2Campaign.runCampaign(past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
 
     val surf6Campaign = new Surf6Campaign()
-    surf6Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
+    surf6Campaign.runCampaign(past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
 
     //surf3
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
@@ -48,7 +50,7 @@ object SurfCampaign {
     if (DataVerifier.dataExists(surf3DataPath)) {
       val lastDaySurf3Data = CampaignInput.loadLastDaySurf3Data()
       val surf3Campaign = new Surf3Campaign()
-      surf3Campaign.runCampaign(lastDaySurf3Data, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+      surf3Campaign.runCampaign(past30DayCampaignMergedData, lastDaySurf3Data, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)
     } else {
       println("Note: Surf3 campaign not run due to surf 3 data not available")
     }

@@ -19,6 +19,7 @@ import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -146,8 +147,7 @@ object CampaignInput extends Logging {
       itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK,
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
-      itrData(ITR.BRICK)
-    )
+      itrData(ITR.BRICK))
     filteredItr
   }
 
@@ -158,8 +158,7 @@ object CampaignInput extends Logging {
     val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU),
       itrData(ITR.BRAND_NAME),
       itrData(ITR.PRODUCT_NAME),
-      itrData(ITR.BRICK)
-    )
+      itrData(ITR.BRICK))
     filteredItr
   }
 
@@ -212,38 +211,48 @@ object CampaignInput extends Logging {
     logger.info("Reading last day all campaigns data from hdfs")
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
+    var df: DataFrame = null
     CampaignManager.campaignMailTypeMap.foreach(
       e => (
         if (null == allCampaignData) {
-          allCampaignData = getCampaignData(e._1, date)
+          df = getCampaignData(e._1, date)
+          if (null != df) {
+            allCampaignData = df
+          }
         } else {
-          allCampaignData = allCampaignData.unionAll(getCampaignData(e._1, date))
-        }
-      )
-    )
+          df = getCampaignData(e._1, date)
+          if (null != df) {
+            allCampaignData = allCampaignData.unionAll(df)
+          }
+        }))
     return allCampaignData
   }
 
   def getCampaignData(name: String, date: String): DataFrame = {
-    try {
-      val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
-      if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-        val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
-        return res.select(
-          res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-          res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-          res(CampaignMergedFields.REF_SKU1),
-          res(CampaignMergedFields.EMAIL),
-          res(CampaignMergedFields.DOMAIN),
-          res(CampaignMergedFields.DEVICE_ID))
+    var path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
+    if (DataVerifier.dataExists(path)) {
+      try {
+        val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
+        if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
+          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
+          return res.select(
+            res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+            res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+            res(CampaignMergedFields.REF_SKU1),
+            res(CampaignMergedFields.EMAIL),
+            res(CampaignMergedFields.DOMAIN),
+            res(CampaignMergedFields.DEVICE_ID))
+        }
+        campaignData
+      } catch {
+        // TODO: fix when data not found skip
+        case th: Throwable => {
+          logger.info("File Not found at ->" + path)
+          throw new SparkException("Data not available ?", th)
+        }
       }
-      campaignData
-    } catch {
-      // TODO: fix when data not found skip
-      case th: Throwable => {
-        logger.info("File Not found at ->" + DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date)
-        throw new SparkException("Data not available ?", th)
-      }
+    } else {
+      return null
     }
   }
 
@@ -287,8 +296,7 @@ object CampaignInput extends Logging {
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-      )
+        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
 
@@ -303,8 +311,7 @@ object CampaignInput extends Logging {
         itr30Day.unionAll(itrData.select(
           col(ITR.CONFIG_SKU) as ProductVariables.SKU,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-        ))
+          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
 
@@ -319,8 +326,7 @@ object CampaignInput extends Logging {
       .select(
         col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-      )
+        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
 
@@ -335,12 +341,36 @@ object CampaignInput extends Logging {
         itr30Day.unionAll(itrData.select(
           col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT
-        ))
+          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
 
     itr30Day
+  }
+
+  def load30DayCampaignMergedData(): DataFrame = {
+
+    var campaignMerged30Day: DataFrame = null
+
+    for (i <- 1 to 30) {
+
+      val date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+
+      logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
+
+      val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+      val campaignMergedExits = DataVerifier.dataExists(path)
+
+      if (campaignMergedExits) {
+        val mergedCampaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+        if (campaignMerged30Day == null) {
+          campaignMerged30Day = mergedCampaignData
+        } else {
+          campaignMerged30Day.unionAll(mergedCampaignData)
+        }
+      }
+    }
+    campaignMerged30Day
   }
 
 }

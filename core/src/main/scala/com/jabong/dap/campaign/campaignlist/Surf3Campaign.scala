@@ -13,14 +13,14 @@ import org.apache.spark.sql.DataFrame
  */
 class Surf3Campaign {
 
-  def runCampaign(lastdaySurf3Data: DataFrame, yestItrSkuData: DataFrame, customerMasterData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame): Unit = {
+  def runCampaign(past30DayCampaignMergedData: DataFrame, lastdaySurf3Data: DataFrame, yestItrSkuData: DataFrame, customerMasterData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame): Unit = {
 
     // rename domain to browserid
     val lastdaySurf3DataFixed = lastdaySurf3Data.withColumnRenamed("device", CustomerPageVisitVariables.BROWER_ID)
 
     val surfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
 
-    val skus = surfSkuSelector.skuFilter(lastdaySurf3DataFixed, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    val skus = surfSkuSelector.skuFilter(past30DayCampaignMergedData, lastdaySurf3DataFixed, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData, CampaignCommon.SURF3_CAMPAIGN)
 
     val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
 

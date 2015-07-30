@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
@@ -11,7 +12,7 @@ import org.apache.spark.sql.functions._
 class WishlistIODCampaign {
 
   // wishlist iod stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr, 30 day itr sku
-  def runCampaign(shortListFullData: DataFrame, itrSkuYesterdayData: DataFrame, itrSku30DayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
+  def runCampaign(past30DayCampaignMergedData: DataFrame, shortListFullData: DataFrame, itrSkuYesterdayData: DataFrame, itrSku30DayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
     // select customers who have added one or more items to wishlist during 30 days
 
     // sku filter
@@ -42,7 +43,16 @@ class WishlistIODCampaign {
       col(CustomerProductShortlistVariables.SPECIAL_PRICE)
     )
 
-    val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
+    var skusFiltered = dfUnion
+
+    if (past30DayCampaignMergedData != null) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      val pastCampaignCheck = new PastCampaignCheck()
+
+      skusFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfUnion,
+        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.WISHLIST_IOD_CAMPAIGN, 1000), 30)
+    }
+    val refSkus = CampaignUtils.generateReferenceSku(skusFiltered, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_IOD_CAMPAIGN)
     //save campaign Output
