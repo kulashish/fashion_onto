@@ -216,19 +216,14 @@ object DevicesReactions extends Logging {
       col(DevicesReactionsVariables.EFFECTIVE_7_DAYS) as DevicesReactionsVariables.EFFECTIVE_7_DAYS,
       col(DevicesReactionsVariables.EFFECTIVE_15_DAYS) as DevicesReactionsVariables.EFFECTIVE_15_DAYS,
       col(new_reaction) as DevicesReactionsVariables.EFFECTIVE_30_DAYS)
+
+    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary, DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
       .na.fill(
         Map(
+          new_reaction -> 0,
           DevicesReactionsVariables.EFFECTIVE_7_DAYS -> 0,
           DevicesReactionsVariables.EFFECTIVE_15_DAYS -> 0,
           DevicesReactionsVariables.EFFECTIVE_30_DAYS -> 0
-        )
-      )
-
-    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, DevicesReactionsSchema.reducedDF, joined_7_15_30_summary,
-      DevicesReactionsSchema.joined_7_15_30, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
-      .na.fill(
-        Map(
-          new_reaction -> 0
         )
       )
     val joinedAllSummary = joinedAll.select(
