@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.data
 
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -18,13 +18,13 @@ object CampaignOutput {
 
   def saveCampaignDataForYesterday(campaignOutput: DataFrame, campaignName: String) = {
 
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
-    val itrExits = DataVerifier.dataExists(path)
+    val dataExits = DataVerifier.dataExists(path)
 
-    if (!itrExits) {
+    if (!dataExits) {
       campaignOutput.write.parquet(path)
     }
 
