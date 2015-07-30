@@ -25,13 +25,19 @@ class InvalidLowStockCampaign {
     //FIXME:Filter the order items data for last 30 days
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
-    //past campaign check whether the campaign has been sent to customer in last 30 days
-    val pastCampaignCheck = new PastCampaignCheck()
-    pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
-      CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, 1000), 30)
+    var custFiltered = selectedCustomers
+    
+    if (past30DayCampaignMergedData != null) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      val pastCampaignCheck = new PastCampaignCheck()
+      custFiltered = pastCampaignCheck.campaignCheck(past30DayCampaignMergedData, selectedCustomers,
+        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, 1000), 30)
+
+    }
+
     //sku selection
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = lowStock.skuFilter(selectedCustomers, itrData)
+    val refSkus = lowStock.skuFilter(custFiltered, itrData)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
 
