@@ -45,9 +45,10 @@ class WishlistLowStockCampaign {
     val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN)
+
     //save campaign Output
-    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN)
+
   }
 
 }

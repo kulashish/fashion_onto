@@ -28,9 +28,10 @@ class InvalidLowStockCampaign {
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
     val refSkus = lowStock.skuFilter(selectedCustomers, itrData)
 
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
+
     //save campaign Output
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
 
   }
 }

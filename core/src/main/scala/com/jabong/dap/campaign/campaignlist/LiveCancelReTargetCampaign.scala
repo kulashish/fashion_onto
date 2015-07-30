@@ -25,9 +25,10 @@ class LiveCancelReTargetCampaign {
     // val recommendations = recommender.recommend(refSkus)
 
     // save 2 ref skus + 8 recommendation per customer (null allowed for mobile push)
-    CampaignOutput.saveCampaignData(refSkus, CampaignCommon.BASE_PATH + "/" + CampaignCommon.CANCEL_RETARGET_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.CANCEL_RETARGET_CAMPAIGN)
 
-    //    returnCancelCustomer.customerSelection()
+    //save campaign Output
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.CANCEL_RETARGET_CAMPAIGN)
 
   }
 
