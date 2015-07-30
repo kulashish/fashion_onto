@@ -26,7 +26,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
   "dfCorrectSchema" should "filter and give correct count" in {
     val incIStringSchema = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/27", "exportMessagesReactions_517_20150727.csv", "true", ",")
     val incI = DevicesReactions.dfCorrectSchema(incIStringSchema)
-    assert(incI.count() == 181)
+    assert(incI.count() == 97)
   }
 
   "reduce" should "match with the expected Data" in {
