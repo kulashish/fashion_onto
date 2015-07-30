@@ -39,9 +39,16 @@ object SchemaUtils {
     }
   }
 
-  def changeSchema(df: DataFrame, schema: StructType): DataFrame = {
-    var res: DataFrame = df
-    schema.foreach(e => (res = addColumn(res, e.name, e.dataType)))
+  /**
+   *
+   * @param df
+   * @param schema
+   * @return
+   */
+  def changeSchema(df: DataFrame, schema: StructType): DataFrame={
+    var res: DataFrame =df
+    schema.foreach(e =>(res = addColumn(res, e.name, e.dataType)))
     return res
+
   }
 }
