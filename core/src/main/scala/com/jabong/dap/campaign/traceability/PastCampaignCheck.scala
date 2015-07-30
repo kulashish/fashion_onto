@@ -33,10 +33,9 @@ class PastCampaignCheck extends Logging {
 
     val filterDate = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT)
 
-    val mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
+    val mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
       .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
-        pastCampaignData(CampaignMergedFields.REF_SKU1) as ProductVariables.SKU,
-        pastCampaignData(CampaignMergedFields.DEVICE_ID))
+        pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1))
 
     logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
 
@@ -88,19 +87,18 @@ class PastCampaignCheck extends Logging {
       .withColumnRenamed(CampaignMergedFields.CUSTOMER_ID, "pastCampaign_" + CampaignMergedFields.CUSTOMER_ID)
 
     val customerSkuSelected = customerSkuSimpleSelected.
-      withColumn(ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
+      withColumn("temp_"+ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CampaignMergedFields
         .CUSTOMER_ID)
         &&
-        customerSkuSelected(ProductVariables.SKU_SIMPLE) === pastCampaignSendCustomers(CampaignMergedFields.REF_SKU1), "left_outer")
+        customerSkuSelected("temp_"+ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), "left_outer")
       .filter(
         "pastCampaign_" + CampaignMergedFields.CUSTOMER_ID + " is null"
       )
       .select(
-        customerSkuSelected(CustomerVariables.FK_CUSTOMER),
-        customerSkuSelected(ProductVariables.SKU_SIMPLE)
+        customerSkuSelected("*")
       )
 
     return pastCampaignNotSendCustomers
