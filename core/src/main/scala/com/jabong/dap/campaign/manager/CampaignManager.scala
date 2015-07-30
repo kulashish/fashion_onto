@@ -70,7 +70,9 @@ object CampaignManager extends Serializable with Logging {
     liveRetargetCampaign.runCampaign(orderData, orderItemData)
   }
 
-  def startPushInvalidCampaign() = {
+  def startPushInvalidCampaign(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
 
@@ -99,7 +101,8 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-  def startPushAbandonedCartCampaign() = {
+  def startPushAbandonedCartCampaign(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
 
     // acart daily, acart followup, acart low stock, acart iod
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
@@ -149,7 +152,8 @@ object CampaignManager extends Serializable with Logging {
 
   val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
-  def startWishlistCampaigns() = {
+  def startWishlistCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
     WishListCampaign.runCampaign()
   }
 
