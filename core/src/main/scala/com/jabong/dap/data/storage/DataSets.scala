@@ -13,6 +13,8 @@ object DataSets {
 
   val INPUT_PATH = basePath + File.separator + "input"
 
+  val TMP_PATH = basePath + File.separator + "tmp"
+
   val OUTPUT_PATH = AppConfig.config.outputPath
   //  val OUTPUT_PATH = OUTPUT_PATH = basePath + File.separator + "output"
 
