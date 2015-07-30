@@ -174,10 +174,28 @@ object DevicesReactions extends Logging {
       (col(DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase())).cast(IntegerType) as DevicesReactionsVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase()
     )
 
-    val result = resultDF.select(col(DevicesReactionsVariables.DEVICE_ID), col(DevicesReactionsVariables.CUSTOMER_ID), col(DevicesReactionsVariables.LAST_CLICK_DATE), col(DevicesReactionsVariables.CLICK_7), col(DevicesReactionsVariables.CLICK_15), col(DevicesReactionsVariables.CLICK_30), col(DevicesReactionsVariables.CLICK_LIFETIME),
-      col(DevicesReactionsVariables.CLICK_MONDAY), col(DevicesReactionsVariables.CLICK_TUESDAY), col(DevicesReactionsVariables.CLICK_WEDNESDAY), col(DevicesReactionsVariables.CLICK_THURSDAY),
-      col(DevicesReactionsVariables.CLICK_FRIDAY), col(DevicesReactionsVariables.CLICK_SATURDAY), col(DevicesReactionsVariables.CLICK_SUNDAY), col(DevicesReactionsVariables.CLICKED_TWICE),
-      Udf.maxClickDayName(col(DevicesReactionsVariables.CLICK_MONDAY), col(DevicesReactionsVariables.CLICK_TUESDAY), col(DevicesReactionsVariables.CLICK_WEDNESDAY), col(DevicesReactionsVariables.CLICK_THURSDAY), col(DevicesReactionsVariables.CLICK_FRIDAY), col(DevicesReactionsVariables.CLICK_SATURDAY), col(DevicesReactionsVariables.CLICK_SUNDAY)) as DevicesReactionsVariables.MOST_CLICK_DAY
+    val result = resultDF.select(
+      col(DevicesReactionsVariables.DEVICE_ID),
+      col(DevicesReactionsVariables.CUSTOMER_ID),
+      col(DevicesReactionsVariables.LAST_CLICK_DATE),
+      col(DevicesReactionsVariables.CLICK_7),
+      col(DevicesReactionsVariables.CLICK_15),
+      col(DevicesReactionsVariables.CLICK_30),
+      col(DevicesReactionsVariables.CLICK_LIFETIME),
+      col(DevicesReactionsVariables.CLICK_MONDAY),
+      col(DevicesReactionsVariables.CLICK_TUESDAY),
+      col(DevicesReactionsVariables.CLICK_WEDNESDAY),
+      col(DevicesReactionsVariables.CLICK_THURSDAY),
+      col(DevicesReactionsVariables.CLICK_FRIDAY),
+      col(DevicesReactionsVariables.CLICK_SATURDAY),
+      col(DevicesReactionsVariables.CLICK_SUNDAY),
+      col(DevicesReactionsVariables.CLICKED_TWICE),
+      Udf.maxClickDayName(
+        col(DevicesReactionsVariables.CLICK_MONDAY), col(DevicesReactionsVariables.CLICK_TUESDAY),
+        col(DevicesReactionsVariables.CLICK_WEDNESDAY), col(DevicesReactionsVariables.CLICK_THURSDAY),
+        col(DevicesReactionsVariables.CLICK_FRIDAY), col(DevicesReactionsVariables.CLICK_SATURDAY),
+        col(DevicesReactionsVariables.CLICK_SUNDAY)
+      ) as DevicesReactionsVariables.MOST_CLICK_DAY
     )
     logger.info("DeviceReaction for :" + incrDate + "processed")
     (result, reducedIncr)
