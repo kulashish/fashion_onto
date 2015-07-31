@@ -57,13 +57,15 @@ class Surf extends SkuSelector with Logging {
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
 
+    val toLong    = udf[Long, String]( _.toLong)
+
     val dfJoin = skusFiltered.join(
       itrData,
       skusFiltered(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       "inner"
     )
       .select(
-        col(CustomerVariables.FK_CUSTOMER),
+        toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
         col(CustomerVariables.EMAIL), //EMAIL can be encrypted EMAIL or BrowserId
         col(ProductVariables.SKU_SIMPLE),
         col(ProductVariables.SPECIAL_PRICE),
