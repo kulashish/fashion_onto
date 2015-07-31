@@ -21,15 +21,29 @@ class UserAttribution (hiveContext: HiveContext, sqlContext: SQLContext, pagevis
   def attribute(): DataFrame = {
     pagevisit.as('pagevisit)
     calculateColumns(pagevisit)
-    val bg = pagevisit.map(x => (x(browserid).toString,List(Tuple2(x(pagets),(Array(x(uid),x(browserid),x(device),x(domain),x(pagetype),x(actualvisitid),x(visitts),x(productsku),x(brand)))))))
-      .partitionBy(new org.apache.spark.HashPartitioner(400))
+    val bg = pagevisit.map(x => (
+      x(browserid).toString,
+      List(
+        Tuple2(
+          x(pagets),(
+            Array(
+              x(uid),x(browserid),x(device),x(domain),x(pagetype),
+              x(actualvisitid),x(visitts),x(productsku),x(brand)
+            )
+          )
+        )
+      )
+      )
+    )
+      .partitionBy(new org.apache.spark.HashPartitioner(500))
       .reduceByKey((x, y) => allocateUserToPreviousNull(x, y))
       .mapValues(x=> allocateUserToLaterNull(x) )
-      .flatMap(_._2)
-      .map(x=> Row(x._1,x._2(0),x._2(1),x._2(2),x._2(3),x._2(4),x._2(5),x._2(6),x._2(7),x._2(8)))
+      .flatMap(x=>(x._2))
+      .map(x=> (Row(x._2(0),x._1,x._2(1),x._2(2),x._2(3),x._2(4),x._2(5),x._2(6),x._2(7),x._2(8))))
     val newDataFrame = sqlContext.createDataFrame(bg,PagevisitSchema.userAttribute)
 
     return newDataFrame
+
   }
 
   def allocateUserToPreviousNull(x: List[(Any, Array[Any])], y:List[(Any, Array[Any])]):List[(Any, Array[Any])] = {

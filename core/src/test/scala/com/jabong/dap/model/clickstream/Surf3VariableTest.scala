@@ -42,7 +42,7 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
     var useridDeviceidFrame = userObj.appuseridCreation(userAttributedData)
 
     userObj.calculateColumns(useridDeviceidFrame)
-    userWiseData = userObj.groupDataByAppUser(useridDeviceidFrame)
+    userWiseData = userObj.groupDataByAppUser(hiveContext, useridDeviceidFrame)
 
     dailyIncrementalSKUs = GetSurfVariables.Surf3Incremental(userWiseData, userObj, hiveContext)
     assert(dailyIncrementalSKUs.filter("userid_daily = 'user1'").count()==10)

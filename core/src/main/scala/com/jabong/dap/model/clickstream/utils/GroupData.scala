@@ -46,10 +46,10 @@ class GroupData() extends java.io.Serializable {
     return useridDeviceidFrame
   }
 
-  def groupDataByAppUser(useridDeviceidFrame: DataFrame): RDD[(String, Row)] = {
+  def groupDataByAppUser(hiveContext: HiveContext,useridDeviceidFrame: DataFrame): RDD[(String, Row)] = {
     useridDeviceidFrame.as('useridDeviceidFrame)
-    val ug: RDD[(String, Row)] = useridDeviceidFrame.repartition(800)
-      .map(x => (x(uid).toString, x)).partitionBy(new org.apache.spark.HashPartitioner(800)).persist()
+    val ug: RDD[(String, Row)] = useridDeviceidFrame
+      .map(x => (x(uid).toString, x))//.partitionBy(new org.apache.spark.HashPartitioner(200)).persist()
     return ug
   }
 

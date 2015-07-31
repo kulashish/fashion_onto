@@ -3,11 +3,15 @@ package com.jabong.dap.model.clickstream.variables
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.model.clickstream.schema.PagevisitSchema
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ SQLContext, DataFrame, Row }
 import org.apache.spark.sql.hive.HiveContext
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by Divya on 15/7/15.
@@ -41,7 +45,9 @@ object GetSurfVariables extends java.io.Serializable {
    */
   def ProcessSurf3Variable(mergedData: DataFrame, incremental: DataFrame): DataFrame = {
     var today = "_daily"
-    var explodedMergedData = mergedData.explode("skuList", "sku") { str: List[String] => str.toList }
+    var explodedMergedData = mergedData.explode("skuList", "sku") { str: ArrayBuffer[String] => str.toList }
+   // var explodedMergedData = mergedData.explode("skuList", "sku") { str: List[String] => str.toList }
+
     var joinResult = incremental.join(explodedMergedData, incremental("userid" + today) === explodedMergedData("userid"))
       .where(incremental("sku" + today) === explodedMergedData("sku"))
       .select("userid", "sku", "device" + today, "domain" + today)
@@ -61,22 +67,32 @@ object GetSurfVariables extends java.io.Serializable {
   def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, yesterDate: String): DataFrame = {
     import hiveContext.implicits._
 
+    val sqlContext = Spark.getSqlContext()
     val dateFormat = new SimpleDateFormat("dd/MM/yyyy")
     val cal = Calendar.getInstance()
     cal.setTime(dateFormat.parse(yesterDate))
     cal.add(Calendar.DATE, -29)
     var filterDate = dateFormat.format(cal.getTime())
-    val IncrementalMerge = incremental.map(t => (t(0).toString, t(1).toString))
+    incremental.select("userid_daily","sku_daily").registerTempTable("tempincremental")
+
+
+    var IncrementalMerge = hiveContext.sql("select userid_daily as userid,collect_list(sku_daily) as skuList from tempincremental group by userid_daily")
+      .map(x=> (x(0).toString,yesterDate.toString, x(1).asInstanceOf[ArrayBuffer[String]])).toDF("userid","dt","skuList")
+    /*
+    var IncrementalMerge = incremental.map(t => (t(0).toString, t(1).toString))
       .reduceByKey((x, y) => (x + "," + y))
       .map(v => (v._1, yesterDate.toString, (v._2.split(",").toSet.toList)))
       .toDF("userid", "dt", "skuList")
+    */
 
     if (mergedData != null) {
       val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
+        .select("userid","dt","skuList")
       return yesterMerge.unionAll(IncrementalMerge)
     } else {
       return IncrementalMerge
     }
+
   }
 
   def uidToDeviceid(hiveContext: HiveContext): DataFrame = {

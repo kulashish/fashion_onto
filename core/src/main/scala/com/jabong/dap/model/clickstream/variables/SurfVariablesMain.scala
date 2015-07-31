@@ -20,7 +20,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 object SurfVariablesMain extends java.io.Serializable {
 
   def main(args: Array[String]) {
-    var gap = 5
+    var gap = 8
     val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
     Spark.init(conf)
     val hiveContext = Spark.getHiveContext()
@@ -52,23 +52,23 @@ object SurfVariablesMain extends java.io.Serializable {
     var useridDeviceidFrame = getAppIdUserIdData(cal, tablename)
     var UserObj = new GroupData()
     UserObj.calculateColumns(useridDeviceidFrame)
-    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(useridDeviceidFrame)
+    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(hiveContext, useridDeviceidFrame)
 
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
     var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
     var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
-    mergedData.repartition(300).write.save(currentMergedDataPath)
-    processedVariable.repartition(300).write.save(processedVariablePath)
+    mergedData.write.save(currentMergedDataPath)
+    processedVariable.write.save(processedVariablePath)
 
     // user device mapping
-    var userDeviceMapping = UserDeviceMapping
+   /* var userDeviceMapping = UserDeviceMapping
       .getUserDeviceMapApp(useridDeviceidFrame)
       .write.mode("error")
       .save(userDeviceMapPath)
 
     val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, finalTempTable)
     variableSurf1.write.save(surf1VariablePath)
-
+*/
   }
 
   def startClickstreamYesterdaySessionVariables() = {
@@ -129,13 +129,13 @@ object SurfVariablesMain extends java.io.Serializable {
 
     // check if merged data exists
     if (DataVerifier.dataExists(oldMergedDataPath)) {
-      oldMergedData = hiveContext.parquetFile(oldMergedDataPath)
+      oldMergedData = hiveContext.read.load(oldMergedDataPath)
     }
 
     var useridDeviceidFrame = getAppIdUserIdData(cal, tablename)
     var UserObj = new GroupData()
     UserObj.calculateColumns(useridDeviceidFrame)
-    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(useridDeviceidFrame)
+    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(hiveContext,useridDeviceidFrame)
     var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
 
     if (null != oldMergedData) {
@@ -157,13 +157,16 @@ object SurfVariablesMain extends java.io.Serializable {
     val day = cal.get(Calendar.DAY_OF_MONTH);
     val month = mFormat.format(cal.getTime());
 
-    val pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
+    var pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
 
     var attributeObj:UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisit)
     var userAttributedData: DataFrame = attributeObj.attribute()
 
     var UserObj = new GroupData()
-    var useridDeviceidFrame = UserObj.appuseridCreation(userAttributedData)
+    //var useridDeviceidFrame = UserObj.appuseridCreation(userAttributedData)
+    var useridDeviceidFrame = UserObj.appuseridCreation(pagevisit)
+
     return useridDeviceidFrame
+
   }
 }
