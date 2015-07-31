@@ -47,6 +47,8 @@ object DevicesReactions extends Logging {
 
     val savePathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.FULL_MERGE_MODE, incrDate)
 
+    var unionFinalDF: DataFrame = null
+
     if (DataWriter.canWrite(savePathI, saveMode)) {
       val fName = "exportMessagesReactions_" + CampaignMergedFields.IOS_CODE + "_" + incrDateInFileFormat + ".csv"
       val incIStringSchema = DataReader.getDataFrame4mCsv(DataSets.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
@@ -68,9 +70,11 @@ object DevicesReactions extends Logging {
 
       DataWriter.writeParquet(resultI, savePathI, saveMode)
 
-      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_" + incrDateInFileFormat
+      unionFinalDF = resultI
 
-      DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
+//      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_" + incrDateInFileFormat
+//
+//      DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
 
     val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, incrDate)
@@ -92,11 +96,17 @@ object DevicesReactions extends Logging {
       if (DataWriter.canWrite(incrSavePathA, saveMode)) {
         DataWriter.writeParquet(incrA, incrSavePathA, saveMode)
       }
+
       DataWriter.writeParquet(resultA, savePathA, saveMode)
 
-      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
-      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
+      unionFinalDF = resultA
+
+//      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
+//      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
+
+    val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + incrDateInFileFormat
+    DataWriter.writeCsv(unionFinalDF, DataSets.AD4PUSH, DataSets.CUSTOMER_RESPONSE, DataSets.FULL, incrDate, filename, saveMode, "true", ",")
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
