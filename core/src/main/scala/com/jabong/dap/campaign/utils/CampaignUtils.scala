@@ -42,6 +42,38 @@ object CampaignUtils extends Logging {
 
   }
 
+  def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
+
+    import sqlContext.implicits._
+
+    if (refSkuData == null || NumberSku <= 0) {
+      return null
+    }
+
+    //    refSkuData.printSchema()
+
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+      .select(CustomerVariables.FK_CUSTOMER,
+        ProductVariables.SKU_SIMPLE,
+        ProductVariables.SPECIAL_PRICE)
+
+    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
+
+    // FIXME: need to sort by special price
+    // For some campaign like wishlist, we will have to write another variant where we get price from itr
+    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
+    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).map(_._2)) }
+    //  .map{case(key,value) => (key,value(0)._2.toString())}
+
+    val acartUrl = "acart/skumulti:"
+    // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
+    val customerFinalGroup = customerGroup.map{case (key,value) => (key,value(0),value.foreach(acartUrl.concat(_)))}
+    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.REF_SKU1,CampaignMergedFields.LIVE_CART_URL)
+
+    return grouped
+  }
+
   def generateReferenceSkuForSurf(skuData: DataFrame, NumberSku: Int): DataFrame = {
     val customerFilteredData = skuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(
