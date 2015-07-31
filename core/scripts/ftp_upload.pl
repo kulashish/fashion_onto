@@ -41,7 +41,14 @@ if ($component eq "campaigns") {
 sub fetchCampaign {
    my ($id, $cname, $base) = @_;
    #system("hadoop fs -get /data/tmp/campaigns/$cname" . "_$id/daily/$date/staticlist_$cname" . "_$id" . "_$date_with_zero.csv $base/");
-   system("hadoop fs -get /data/tmp/campaigns/$cname" . "_$id/daily/$date/part-00000 $base/staticlist_$cname" . "_$id" . "_$date_with_zero.csv");
+   my $name = "staticlist_$cname" . "_$id" . "_$date_with_zero.csv";
+   my $nametxt = "staticlist_$cname" . "_$id" . "_$date_with_zero.txt";
+
+   #my $tmpName = "$base/tmp/staticlist_$cname" . "_$id" . "_$date_with_zero.csv";
+   system("hadoop fs -get /data/tmp/campaigns/$cname" . "_$id/daily/$date/$name $base/$name");
+   system("touch $base/$nametxt");
+
+   #system("sed 1i'\"deviceId\"' $tmpName | sed 's/\(\[\|\]\)//g' > $name");
 
 }
 
@@ -50,18 +57,24 @@ sub uploadCampaign {
     my $base = "/data/export/$date_with_zero/campaigns";
     print "directory is $base\n";
     system("mkdir -p $base");
+    #system("mkdir -p $base/tmp");
+
 
     # /data/tmp/campaigns/acart_daily42_515/daily/2015/07/30/staticlist_acart_daily42_515_20150730.csv
     for (my $i = 0; $i <= 1 ; $i++) {
        my $id = "515";  # ios
        if ($i == 1) {
            $id = "517";
-           #system("hadoop fs -get /data/tmp/campaigns/android/daily/$date/UpdateDevices_$id" . "_$date_with_zero.csv $base/");
-           system("hadoop fs -get /data/tmp/campaigns/android/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
+           system("hadoop fs -get /data/tmp/campaigns/android/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
+           system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
+
+           #system("hadoop fs -get /data/tmp/campaigns/android/daily/$date/ $base/UpdateDevices_$id" . "_$date_with_zero.csv");
            
        } else {
-           #system("hadoop fs -get /data/tmp/campaigns/ios/daily/$date/UpdateDevices_$id" . "_$date_with_zero.csv $base/");
-           system("hadoop fs -get /data/tmp/campaigns/ios/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
+           system("hadoop fs -get /data/tmp/campaigns/ios/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
+           system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
+
+           #system("hadoop fs -get /data/tmp/campaigns/ios/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
 
        }
 
@@ -123,10 +136,10 @@ sub upload_ad4push_customer_response {
     system("mkdir -p $base");
 
    # /data/tmp/ad4push/customer_response/full/2015/07/30/part-00000
-   print "hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/part-00000 $base/ad4push_customer_response_$date_with_zero.csv\n";
+   print "hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/ad4push_customer_response_$date_with_zero.csv $base/\n";
 
    # /data/tmp/ad4push/customer_response/full/2015/07/30/part-00000
-   system("hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/part-00000 $base/ad4push_customer_response_$date_with_zero.csv");
+   system("hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/ad4push_customer_response_$date_with_zero.csv $base/");
 
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
 
