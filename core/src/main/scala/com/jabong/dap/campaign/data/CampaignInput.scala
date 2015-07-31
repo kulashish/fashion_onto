@@ -9,17 +9,16 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.{ PathBuilder, DataReader }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.data.read.{DataReader, PathBuilder}
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import com.jabong.dap.data.storage.merge.common.DataVerifier
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -260,6 +259,7 @@ object CampaignInput extends Logging {
     val filePath = buildPath(basePath, source, componentName, mode, date)
     var loadedDataframe: DataFrame = null
     logger.info(" orc data loaded from filepath" + filePath)
+    //FIXME Compress the below if else loop.
     if (fileFormat == "orc") {
 
       if (DataVerifier.dirExists(filePath)) {
@@ -290,7 +290,7 @@ object CampaignInput extends Logging {
 
   def load30DayItrSkuData() = {
 
-    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       .select(
@@ -300,7 +300,7 @@ object CampaignInput extends Logging {
 
     for (i <- 2 to 30) {
 
-      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       logger.info("Reading last " + i + " day basic itr sku data from hdfs")
 
       val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
@@ -320,7 +320,7 @@ object CampaignInput extends Logging {
 
   def load30DayItrSkuSimpleData() = {
 
-    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       .select(
@@ -330,7 +330,7 @@ object CampaignInput extends Logging {
 
     for (i <- 2 to 30) {
 
-      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       logger.info("Reading last " + i + " day basic itr sku data from hdfs")
 
       val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
@@ -354,7 +354,7 @@ object CampaignInput extends Logging {
 
     for (i <- 1 to 30) {
 
-      val date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
 
       logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
 

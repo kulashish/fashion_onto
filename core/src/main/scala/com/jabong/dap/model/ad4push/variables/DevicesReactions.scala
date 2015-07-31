@@ -99,7 +99,7 @@ object DevicesReactions extends Logging {
 
       DataWriter.writeParquet(resultA, savePathA, saveMode)
 
-      unionFinalDF = resultA
+      unionFinalDF = unionFinalDF.unionAll(resultA)
 
 //      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
 //      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
