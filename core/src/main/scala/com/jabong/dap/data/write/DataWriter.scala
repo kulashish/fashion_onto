@@ -1,5 +1,7 @@
 package com.jabong.dap.data.write
 
+import java.io.File
+
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -22,9 +24,9 @@ object DataWriter extends Logging {
     val writePath = DataWriter.getWritePath(DataSets.TMP_PATH, source, tableName, mode, date)
     if (DataWriter.canWrite(saveMode, writePath)) {
       DataWriter.writeCsv(df, writePath, saveMode, "true", ";")
-//      val csvSrcFile = writePath + File.separator + "part-00000"
-//      val csvdestFile = writePath + File.separator + csvFileName + ".csv"
-//      DataVerifier.rename(csvSrcFile, csvdestFile)
+      val csvSrcFile = writePath + File.separator + "part-00000"
+      val csvdestFile = writePath + File.separator + csvFileName + ".csv"
+      DataVerifier.rename(csvSrcFile, csvdestFile)
     }
   }
 
@@ -34,7 +36,7 @@ object DataWriter extends Logging {
    * @param writePath
    */
   private def writeCsv(df: DataFrame, writePath: String, saveMode: String, header: String, delimeter: String) {
-    df.coalesce(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
+    df.repartition(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
     println("CSV Data written successfully to the following Path: " + writePath)
   }
 
