@@ -35,4 +35,11 @@ object OptionUtils {
     else
       false
   }
+
+  def getOptIntVal(intOpt: Option[Int], value: Int): Int = {
+    if (null != intOpt)
+      intOpt.getOrElse(value)
+    else
+      value
+  }
 }

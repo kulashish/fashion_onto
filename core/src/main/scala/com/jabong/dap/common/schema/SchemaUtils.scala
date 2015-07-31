@@ -2,7 +2,7 @@ package com.jabong.dap.common.schema
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ StringType, DataType, StructType }
+import org.apache.spark.sql.types.{DataType, StructType}
 
 /**
  * Created by raghu on 3/7/15.
@@ -24,19 +24,11 @@ object SchemaUtils {
   }
 
   def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
+    //TODO Add check for datatype as well.
     if (df.columns.contains(key)) {
       return df
     } else {
-      var i: Int = 0
-      var f: Int = 0
-      df.schema.iterator.foreach(e => (
-        if (e.dataType == dataType) {
-          f = i
-        } else {
-          i = i + 1
-        }))
-      df.printSchema()
-      df.withColumn(key, df(df.columns(0)).cast(StringType).substr(0, 0))
+      return df.withColumn(key, lit(null).cast(dataType))
     }
   }
 
