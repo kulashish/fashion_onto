@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
+import java.util
 import java.util.{ Calendar, Date }
 import akka.dispatch.sysmsg.Create
 import com.jabong.dap.data.storage.schema.Schema
@@ -14,6 +15,7 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 
@@ -63,7 +65,15 @@ object CampaignUtils extends Logging {
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    val customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).map(_._2)) }
+    var customerGroup:RDD[(String,scala.collection.immutable.List[String])] = null
+    try{
+       customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).map(_._2)) }
+
+    }catch {
+      case e :Exception => {
+       e.printStackTrace()
+      }
+    }
     //  .map{case(key,value) => (key,value(0)._2.toString())}
 
     val acartUrl = "cart/addmulti?skus="
