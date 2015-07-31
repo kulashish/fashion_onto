@@ -225,18 +225,17 @@ object CampaignManager extends Serializable with Logging {
     exportCampaignCSV(androidDF, date, CampaignMergedFields.ANDROID_CODE, saveMode)
 
     for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-      val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignDetails.mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignDetails.mailType).select(CampaignMergedFields.deviceId).distinct
+      val mailType = campaignDetails.mailType
+      val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
+      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
 
-      val fileI = campaignDetails.campaignName + campaignDetails.mailType + "_" + CampaignMergedFields.IOS_CODE
-      val fileA = campaignDetails.campaignName + campaignDetails.mailType + "_" + CampaignMergedFields.ANDROID_CODE
+      val fileI = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.IOS_CODE
+      val fileA = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.ANDROID_CODE
       val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-      if (iosSplitDF.count() > 0)
-        DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
-      if (androidSplitDF.count() > 0)
-        DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
+      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
+      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
     }
   }
   
@@ -313,7 +312,7 @@ object CampaignManager extends Serializable with Logging {
       val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
 
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr)
+      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr).repartition(1).cache()
 
       val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
