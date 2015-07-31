@@ -4,9 +4,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.clickstream.schema.PagevisitSchema
-import com.jabong.dap.model.clickstream.utils.GroupData
+import com.jabong.dap.model.clickstream.utils.{GetMergedClickstreamData, GroupData}
+import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ SQLContext, DataFrame, Row }
 import org.apache.spark.sql.hive.HiveContext
@@ -45,16 +49,28 @@ object GetSurfVariables extends java.io.Serializable {
    */
   def ProcessSurf3Variable(mergedData: DataFrame, incremental: DataFrame): DataFrame = {
     var today = "_daily"
-    var explodedMergedData = mergedData.explode("skuList", "sku") { str: ArrayBuffer[String] => str.toList }
-   // var explodedMergedData = mergedData.explode("skuList", "sku") { str: List[String] => str.toList }
+    var explodedMergedData : DataFrame = null
+    if (mergedData != null) {
+      explodedMergedData = mergedData.explode("skuList", "sku") { str: ArrayBuffer[String] => str.toList }
+      //explodedMergedData = mergedData.explode("skuList", "sku") { str: List[String] => str.toList }
 
-    var joinResult = incremental.join(explodedMergedData, incremental("userid" + today) === explodedMergedData("userid"))
-      .where(incremental("sku" + today) === explodedMergedData("sku"))
-      .select("userid", "sku", "device" + today, "domain" + today)
-      .withColumnRenamed("device" + today, "device")
-      .withColumnRenamed("domain" + today, "domain")
-      .distinct
-    return joinResult
+      var joinResult = incremental.join(explodedMergedData, incremental("userid" + today) === explodedMergedData("userid"))
+        .where(incremental("sku" + today) === explodedMergedData("sku"))
+        .select("userid", "sku", "device" + today, "domain" + today)
+        .withColumnRenamed("device" + today, "device")
+        .withColumnRenamed("domain" + today, "domain")
+        .distinct
+      return joinResult
+    }
+    else {
+      var joinResult = incremental.select("userid"+today, "sku"+today, "device" + today, "domain" + today)
+        .withColumnRenamed("userid" + today, "userid")
+        .withColumnRenamed("sku" + today, "sku")
+        .withColumnRenamed("device" + today, "device")
+        .withColumnRenamed("domain" + today, "domain")
+        .distinct
+      return joinResult
+    }
   }
 
   /**
@@ -75,15 +91,8 @@ object GetSurfVariables extends java.io.Serializable {
     var filterDate = dateFormat.format(cal.getTime())
     incremental.select("userid_daily","sku_daily").registerTempTable("tempincremental")
 
-
     var IncrementalMerge = hiveContext.sql("select userid_daily as userid,collect_list(sku_daily) as skuList from tempincremental group by userid_daily")
       .map(x=> (x(0).toString,yesterDate.toString, x(1).asInstanceOf[ArrayBuffer[String]])).toDF("userid","dt","skuList")
-    /*
-    var IncrementalMerge = incremental.map(t => (t(0).toString, t(1).toString))
-      .reduceByKey((x, y) => (x + "," + y))
-      .map(v => (v._1, yesterDate.toString, (v._2.split(",").toSet.toList)))
-      .toDF("userid", "dt", "skuList")
-    */
 
     if (mergedData != null) {
       val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
@@ -92,6 +101,72 @@ object GetSurfVariables extends java.io.Serializable {
     } else {
       return IncrementalMerge
     }
+
+  }
+
+  def getSurf3mergedForLast30Days(): DataFrame =
+  {
+    var tablename = "merge.merge_pagevisit"
+    for (i <- 30 to 1 by -1) {
+      val cal = Calendar.getInstance()
+      cal.add(Calendar.DATE, -i)
+      var year = cal.get(Calendar.YEAR);
+      var day = cal.get(Calendar.DAY_OF_MONTH);
+      var month = cal.get(Calendar.MONTH);
+      var dataPath = "/data/clickstream/merge" + "/" + year + "/" + month.toInt+1 + "/" + day
+
+      val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
+      Spark.init(conf)
+      val hiveContext = Spark.getHiveContext()
+      val sqlContext = Spark.getSqlContext()
+
+      if (DataVerifier.dataExists(dataPath)) {
+
+       val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
+        var dt = dateFormat.format(cal.getTime())
+
+        val yesterdayDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT)
+        val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-i-1, TimeConstants.DATE_FORMAT)
+
+        val currentMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
+        var oldMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
+
+        var oldMergedData: DataFrame = null
+        // check if merged data exists
+        if (DataVerifier.dataExists(oldMergedDataPath)) {
+          oldMergedData = hiveContext.read.load(oldMergedDataPath)
+        }
+        var useridDeviceidFrame: DataFrame = SurfVariablesMain.getAppIdUserIdData(cal,"merge.merge_pagevisit")
+
+        var UserObj = new GroupData()
+        UserObj.calculateColumns(useridDeviceidFrame)
+        val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(hiveContext,useridDeviceidFrame)
+        var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
+
+        var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dt)
+        mergedData.write.parquet(currentMergedDataPath)
+
+      }
+      else
+      {
+        val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
+        var dt = dateFormat.format(cal.getTime())
+
+        val yesterdayDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT)
+        val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-i-1, TimeConstants.DATE_FORMAT)
+
+        val currentMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
+        var oldMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
+
+        var oldMergedData: DataFrame = null
+        // check if merged data exists
+        if (DataVerifier.dataExists(oldMergedDataPath)) {
+          oldMergedData = hiveContext.read.load(oldMergedDataPath)
+          oldMergedData.write.parquet(currentMergedDataPath)
+        }
+      }
+    }
+    return null
 
   }
 
