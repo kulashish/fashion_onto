@@ -67,7 +67,7 @@ object CampaignUtils extends Logging {
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
     var customerGroup:RDD[(String,scala.collection.immutable.List[String])] = null
     try{
-       customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).map(_._2)) }
+       customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.map(_._2)) }
 
     }catch {
       case e :Exception => {
