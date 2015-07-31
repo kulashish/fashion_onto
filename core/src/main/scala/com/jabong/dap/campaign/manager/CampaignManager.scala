@@ -233,8 +233,10 @@ object CampaignManager extends Serializable with Logging {
       val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
-      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
+      if (iosSplitDF.count() > 0)
+        DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
+      if (androidSplitDF.count() > 0)
+        DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
     }
   }
   
