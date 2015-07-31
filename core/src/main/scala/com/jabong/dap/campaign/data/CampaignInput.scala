@@ -5,8 +5,8 @@ import java.sql.Timestamp
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
+import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
@@ -211,15 +211,17 @@ object CampaignInput extends Logging {
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
     var df: DataFrame = null
-    CampaignManager.campaignMailTypeMap.foreach(
+    CampaignManager.campaignMailTypeMap.foreach (
       e => (
         if (null == allCampaignData) {
-          df = getCampaignData(e._1, date)
+          val campaignPriority = OptionUtils.getOptIntVal(CampaignManager.mailTypePriorityMap.get(e._2),CampaignCommon.VERY_LOW_PRIORITY)
+          df = getCampaignData(e._1, date, campaignPriority)
           if (null != df) {
             allCampaignData = df
           }
         } else {
-          df = getCampaignData(e._1, date)
+          val campaignPriority = OptionUtils.getOptIntVal(CampaignManager.mailTypePriorityMap.get(e._2),CampaignCommon.VERY_LOW_PRIORITY)
+          df = getCampaignData(e._1, date, campaignPriority)
           if (null != df) {
             allCampaignData = allCampaignData.unionAll(df)
           }
@@ -227,20 +229,23 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
-  def getCampaignData(name: String, date: String): DataFrame = {
+  def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
     var path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
     if (DataVerifier.dataExists(path)) {
       try {
         val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
-          return res.select(
-            res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-            res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-            res(CampaignMergedFields.REF_SKU1),
-            res(CampaignMergedFields.EMAIL),
-            res(CampaignMergedFields.DOMAIN),
-            res(CampaignMergedFields.DEVICE_ID))
+          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).withColumn(CampaignCommon.PRIORITY, lit(priority))
+          return res
+            .select(
+              res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+              res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+              res(CampaignMergedFields.REF_SKU1),
+              res(CampaignMergedFields.EMAIL),
+              res(CampaignMergedFields.DOMAIN),
+              res(CampaignMergedFields.DEVICE_ID),
+              res(CampaignCommon.PRIORITY)
+            )
         }
         campaignData
       } catch {

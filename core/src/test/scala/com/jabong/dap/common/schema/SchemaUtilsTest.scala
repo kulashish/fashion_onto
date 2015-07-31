@@ -1,13 +1,14 @@
 package com.jabong.dap.common.schema
 
 import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.schema.Schema
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ Path, FileSystem }
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.DataFrame
-import org.scalatest.{ Matchers, FlatSpec }
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Created by pooja on 28/7/15.
@@ -24,6 +25,11 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
   override def beforeAll() {
     super.beforeAll()
     campaignsOutData = JsonUtils.readFromJson("campaign/manager", "campaign_output", Schema.campaignOutput)
+      .select(
+        CampaignMergedFields.CUSTOMER_ID,
+        CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+        CampaignMergedFields.REF_SKU1
+      )
   }
 
   "isSchemaEqual" should "return false" in {
@@ -34,8 +40,17 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
     val res = SchemaUtils.changeSchema(campaignsOutData, Schema.campaignSchema)
     res.printSchema()
     res.collect().foreach(println)
-    assert(res.columns.length == 7)
+    assert(res.columns.length == 6)
+    assert(SchemaUtils.isSchemaEqual(res.schema, Schema.campaignSchema))
 
+  }
+
+  "changeSchemaWithInteger" should "add columns" in {
+    val res = SchemaUtils.changeSchema(campaignsOutData, Schema.campaignPriorityOutput)
+    res.printSchema()
+    res.collect().foreach(println)
+    assert(res.columns.length == 7)
+    assert(SchemaUtils.isSchemaEqual(res.schema, Schema.campaignPriorityOutput))
   }
 
 }
