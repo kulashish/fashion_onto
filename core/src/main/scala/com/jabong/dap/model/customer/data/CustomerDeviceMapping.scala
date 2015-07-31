@@ -43,7 +43,7 @@ object CustomerDeviceMapping extends Logging {
     val joined = joinedDf.join(dcf, dcf(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), "outer").select(
       coalesce(dcf(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
       dcf(CustomerVariables.RESPONSYS_ID),
-      dcf(CustomerVariables.ID_CUSTOMER).cast(LongType) as CustomerVariables.ID_CUSTOMER,
+      dcf(CustomerVariables.ID_CUSTOMER),
       coalesce(dcf(PageVisitVariables.BROWSER_ID), joinedDf(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
       coalesce(dcf(PageVisitVariables.DOMAIN), joinedDf(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN)
     joined
