@@ -402,7 +402,7 @@ object UdfUtils {
       return null
     }
 
-    return skuList.toList
+    return skuList.toList.distinct
   }
 
   /**
