@@ -116,6 +116,11 @@ object Udf {
   /**
    * Removes all zeroes string and null string to emptyString.
    */
-
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
+
+  /**
+   * toLong will convert String data to Long data
+   */
+  val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
+
 }

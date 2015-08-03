@@ -644,7 +644,7 @@ object CampaignUtils extends Logging {
       "left_outer"
     )
       .select(
-        col(CustomerVariables.FK_CUSTOMER),
+        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
         col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
         col(CustomerPageVisitVariables.SKU),
         col(CustomerPageVisitVariables.BROWER_ID),
