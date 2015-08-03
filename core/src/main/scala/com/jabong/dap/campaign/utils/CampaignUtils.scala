@@ -78,7 +78,7 @@ object CampaignUtils extends Logging {
 
     val acartUrl = "cart/addmulti?skus="
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val customerFinalGroup = customerGroup.map{case (key,value) => (key,value(0),createAcartUrl(value))}
+    val customerFinalGroup = customerGroup.map{case (key,value) => (key,value(0)._2,createAcartUrl(value))}
     val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.REF_SKU1,CampaignMergedFields.LIVE_CART_URL)
 
     return grouped
@@ -662,7 +662,7 @@ object CampaignUtils extends Logging {
           acartUrl+=skuSimple._2
         }
       else{
-          acartUrl+=","+skuSimple._2
+          acartUrl= acartUrl + ","+skuSimple._2
         }
     }
     return acartUrl
