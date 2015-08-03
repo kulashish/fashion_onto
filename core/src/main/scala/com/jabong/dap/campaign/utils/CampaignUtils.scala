@@ -55,10 +55,16 @@ object CampaignUtils extends Logging {
     // null or 0 FK_CUSTOMER
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
       .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
-      .groupBy(CustomerPageVisitVariables.BROWER_ID).agg(first(ProductVariables.SKU)
-      as (CampaignMergedFields.REF_SKU1),
-        first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
+      .groupBy(CustomerPageVisitVariables.BROWER_ID).agg(
+        first(ProductVariables.SKU) as (CampaignMergedFields.REF_SKU1),
+        first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
         first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
+      ).select(
+        col(CampaignMergedFields.REF_SKU1),
+        col(CustomerVariables.FK_CUSTOMER),
+        col(ProductVariables.SPECIAL_PRICE),
+        col(CustomerPageVisitVariables.BROWER_ID) as "device_id",
+        col(CustomerPageVisitVariables.DOMAIN)
       )
     
     // non zero FK_CUSTOMER
@@ -69,6 +75,12 @@ object CampaignUtils extends Logging {
         as (CampaignMergedFields.REF_SKU1),
         first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
         first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
+      ).select(
+        col(CampaignMergedFields.REF_SKU1),
+        col(CustomerVariables.FK_CUSTOMER),
+        col(ProductVariables.SPECIAL_PRICE),
+        col("device_id"),
+        col(CustomerPageVisitVariables.DOMAIN)
       )
 
     val customerRefSku = deviceOnlyCustomerRefSku.unionAll(registeredCustomerRefSku)
