@@ -6,7 +6,7 @@
 
 0 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c basicItr >>/opt/alchemy-core/logs/basicItr_logs.txt
 
-0 3 * * * sh /opt/alchemy-core/current/bin/clickstream/clickstream_pipe.sh >>/opt/alchemy-core/logs/clickstream_logs.txt
+30 3 * * * sh /opt/alchemy-core/current/bin/clickstream/clickstream_pipe.sh >>/opt/alchemy-core/logs/clickstream_logs.txt
 
 0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushInvalidCampaign  >>/opt/alchemy-core/logs/pushInvalidCampaign_logs.txt
 
@@ -18,12 +18,10 @@
 
 18 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c deviceMapping >>/opt/alchemy-core/logs/deviceMapping_logs.txt
 
-15 4 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushSurfCampaign >>/opt/alchemy-core/logs/pushSurfCampaign_logs.txt
+30 4 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushSurfCampaign >>/opt/alchemy-core/logs/pushSurfCampaign_logs.txt
 
-40 4 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushCampaignMerge >>/opt/alchemy-core/logs/pushCampaignMerge_logs.txt
+30 5 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushCampaignMerge >>/opt/alchemy-core/logs/pushCampaignMerge_logs.txt
 
-0 6 * * * perl /opt/alchemy-core/base/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
+30 6 * * * perl /opt/alchemy-core/base/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
 
 0 11 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
-
-0 12 * * * perl /opt/alchemy-core/base/ftp_upload.pl -c ad4push_customer_response >>/opt/alchemy-core/logs/ad4pushReaction_upload_logs.txt
