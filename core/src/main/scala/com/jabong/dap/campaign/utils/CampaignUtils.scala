@@ -78,7 +78,7 @@ object CampaignUtils extends Logging {
 
     val acartUrl = "cart/addmulti?skus="
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val customerFinalGroup = customerGroup.map{case (key,value) => (key,value(0),value)}
+    val customerFinalGroup = customerGroup.map{case (key,value) => (key,value(0),acartUrl.concat(value.foreach(_._2).toString))}
     val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.REF_SKU1,CampaignMergedFields.LIVE_CART_URL)
 
     return grouped
