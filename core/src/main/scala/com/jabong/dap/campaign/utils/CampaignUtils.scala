@@ -62,11 +62,10 @@ object CampaignUtils extends Logging {
       ).select(
         col(CampaignMergedFields.REF_SKU1),
         col(CustomerVariables.FK_CUSTOMER),
-        col(ProductVariables.SPECIAL_PRICE),
         col(CustomerPageVisitVariables.BROWER_ID) as "device_id",
         col(CustomerPageVisitVariables.DOMAIN)
       )
-    
+
     // non zero FK_CUSTOMER
     
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
@@ -78,7 +77,6 @@ object CampaignUtils extends Logging {
       ).select(
         col(CampaignMergedFields.REF_SKU1),
         col(CustomerVariables.FK_CUSTOMER),
-        col(ProductVariables.SPECIAL_PRICE),
         col("device_id"),
         col(CustomerPageVisitVariables.DOMAIN)
       )
