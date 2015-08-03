@@ -659,13 +659,8 @@ object CampaignUtils extends Logging {
     var i:Int = 0
     skuSimpleList.sortBy(-_._1)
     for ( skuSimple <- skuSimpleList){
-        if(i==0){
-          acartUrl+=skuSimple._2
-        }
-      else{
-          acartUrl= acartUrl+","+skuSimple._2
-        }
-      i=i+1;
+        if(i==0) acartUrl+=skuSimple._2 else  acartUrl= acartUrl+","+skuSimple._2
+        i=i+1;
     }
     return (skuSimpleList(0)._2,acartUrl)
   }
