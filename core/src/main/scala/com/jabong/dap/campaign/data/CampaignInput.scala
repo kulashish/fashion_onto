@@ -5,21 +5,20 @@ import java.sql.Timestamp
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
+import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.{ PathBuilder, DataReader }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.data.read.{DataReader, PathBuilder}
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import com.jabong.dap.data.storage.merge.common.DataVerifier
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -212,15 +211,17 @@ object CampaignInput extends Logging {
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
     var df: DataFrame = null
-    CampaignManager.campaignMailTypeMap.foreach(
+    CampaignManager.campaignMailTypeMap.foreach (
       e => (
         if (null == allCampaignData) {
-          df = getCampaignData(e._1, date)
+          val campaignPriority = OptionUtils.getOptIntVal(CampaignManager.mailTypePriorityMap.get(e._2),CampaignCommon.VERY_LOW_PRIORITY)
+          df = getCampaignData(e._1, date, campaignPriority)
           if (null != df) {
             allCampaignData = df
           }
         } else {
-          df = getCampaignData(e._1, date)
+          val campaignPriority = OptionUtils.getOptIntVal(CampaignManager.mailTypePriorityMap.get(e._2),CampaignCommon.VERY_LOW_PRIORITY)
+          df = getCampaignData(e._1, date, campaignPriority)
           if (null != df) {
             allCampaignData = allCampaignData.unionAll(df)
           }
@@ -228,20 +229,23 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
-  def getCampaignData(name: String, date: String): DataFrame = {
+  def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
     var path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
     if (DataVerifier.dataExists(path)) {
       try {
         val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
-          return res.select(
-            res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
-            res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-            res(CampaignMergedFields.REF_SKU1),
-            res(CampaignMergedFields.EMAIL),
-            res(CampaignMergedFields.DOMAIN),
-            res(CampaignMergedFields.DEVICE_ID))
+          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).withColumn(CampaignCommon.PRIORITY, lit(priority))
+          return res
+            .select(
+              res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
+              res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+              res(CampaignMergedFields.REF_SKU1),
+              res(CampaignMergedFields.EMAIL),
+              res(CampaignMergedFields.DOMAIN),
+              res(CampaignMergedFields.DEVICE_ID),
+              res(CampaignCommon.PRIORITY)
+            )
         }
         campaignData
       } catch {
@@ -260,6 +264,7 @@ object CampaignInput extends Logging {
     val filePath = buildPath(basePath, source, componentName, mode, date)
     var loadedDataframe: DataFrame = null
     logger.info(" orc data loaded from filepath" + filePath)
+    //FIXME Compress the below if else loop.
     if (fileFormat == "orc") {
 
       if (DataVerifier.dirExists(filePath)) {
@@ -290,7 +295,7 @@ object CampaignInput extends Logging {
 
   def load30DayItrSkuData() = {
 
-    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       .select(
@@ -300,7 +305,7 @@ object CampaignInput extends Logging {
 
     for (i <- 2 to 30) {
 
-      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       logger.info("Reading last " + i + " day basic itr sku data from hdfs")
 
       val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
@@ -320,7 +325,7 @@ object CampaignInput extends Logging {
 
   def load30DayItrSkuSimpleData() = {
 
-    var date = TimeUtils.getDateAfterNDays(-1, "yyyy/MM/dd")
+    var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       .select(
@@ -330,7 +335,7 @@ object CampaignInput extends Logging {
 
     for (i <- 2 to 30) {
 
-      date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       logger.info("Reading last " + i + " day basic itr sku data from hdfs")
 
       val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
@@ -354,7 +359,7 @@ object CampaignInput extends Logging {
 
     for (i <- 1 to 30) {
 
-      val date = TimeUtils.getDateAfterNDays(-i, "yyyy/MM/dd")
+      val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
 
       logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
 

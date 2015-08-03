@@ -99,7 +99,7 @@ object DevicesReactions extends Logging {
 
       DataWriter.writeParquet(resultA, savePathA, saveMode)
 
-      unionFinalDF = resultA
+      unionFinalDF = unionFinalDF.unionAll(resultA)
 
 //      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
 //      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
@@ -140,7 +140,7 @@ object DevicesReactions extends Logging {
 
     val incrDay = TimeUtils.dayName(incrDate, TimeConstants.DATE_FORMAT_FOLDER).toLowerCase
 
-    val reducedIncr = reduce(incrementalDF)
+    val reducedIncr = reduce(incrementalDF).cache()
 
     val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.CUSTOMER_ID)
 
@@ -208,7 +208,7 @@ object DevicesReactions extends Logging {
         col(DevicesReactionsVariables.CLICK_FRIDAY), col(DevicesReactionsVariables.CLICK_SATURDAY),
         col(DevicesReactionsVariables.CLICK_SUNDAY)
       ) as DevicesReactionsVariables.MOST_CLICK_DAY
-    )
+    ).cache()
     logger.info("DeviceReaction for :" + incrDate + "processed")
     (result, reducedIncr)
   }

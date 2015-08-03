@@ -124,7 +124,8 @@ if ($component eq "bob") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushWishlistCampaign --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
 } elsif ($component eq "pushCampaignMerge") {
-     $AMMUNITION = "--num-executors 7 --executor-memory 9G";
+     $SPARK_HOME = "/ext/spark-1.4.1-bin-hadoop2.6";
+     $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
 } elsif ($component eq "deviceMapping") {
