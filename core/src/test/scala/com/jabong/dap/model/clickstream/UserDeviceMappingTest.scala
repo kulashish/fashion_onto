@@ -38,9 +38,9 @@ class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
     assert(udMap == null)
   }
 
-  "getUserDeviceMapApp: (DF)" should "have 16 records only " in {
+  "getUserDeviceMapApp: (DF)" should "have 10 records only " in {
     var udMap = UserDeviceMapping.getUserDeviceMapApp(dfInputUserDeviceMap)
-    assert(udMap.collect.size == 16)
+    assert(udMap.collect.size == 10)
   }
 
   "getUserDeviceMapApp: (DF)" should " match the output DF" in {
