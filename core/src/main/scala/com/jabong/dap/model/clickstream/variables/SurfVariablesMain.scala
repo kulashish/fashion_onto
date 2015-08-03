@@ -166,8 +166,8 @@ object SurfVariablesMain extends java.io.Serializable {
 
     var pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, year, day, month)
 
-      var attributeObj: UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisit)
-      var userAttributedData: DataFrame = attributeObj.attribute()
+      //var attributeObj: UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisit)
+      //var userAttributedData: DataFrame = attributeObj.attribute()
       var UserObj = new GroupData()
       //var useridDeviceidFrame = UserObj.appuseridCreation(userAttributedData)
       var useridDeviceidFrame = UserObj.appuseridCreation(pagevisit)
