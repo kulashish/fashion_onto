@@ -65,9 +65,9 @@ object CampaignUtils extends Logging {
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    var customerGroup:RDD[(String,scala.collection.immutable.List[String])] = null
+    var customerGroup:RDD[(String,scala.collection.immutable.List[(Double,String)])] = null
     try{
-       customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct.map(_._2)) }
+       customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct) }
 
     }catch {
       case e :Exception => {
