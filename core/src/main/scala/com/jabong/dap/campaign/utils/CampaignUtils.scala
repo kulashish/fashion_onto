@@ -78,8 +78,8 @@ object CampaignUtils extends Logging {
 
     val acartUrl = "cart/addmulti?skus="
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val customerFinalGroup = customerGroup.map{case (key,value) => (key,createAcartUrl(value))}
-    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.LIVE_CART_URL)
+    val customerFinalGroup = customerGroup.map{case (key,value) => (key,value(0)._2,createAcartUrl(value))}
+    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.REF_SKU1,CampaignMergedFields.LIVE_CART_URL)
 
     return grouped
   }
@@ -656,14 +656,15 @@ object CampaignUtils extends Logging {
 
   def createAcartUrl(skuSimpleList:scala.collection.immutable.List[(Double,String)]): String ={
     var acartUrl = "cart/addmulti?skus="
-    val i:Int = 0
+    var i:Int = 0
     for ( skuSimple <- skuSimpleList){
         if(i==0){
           acartUrl+=skuSimple._2
         }
       else{
-          acartUrl= acartUrl + ","+skuSimple._2
+          acartUrl= acartUrl+","+skuSimple._2
         }
+      i=i+1;
     }
     return acartUrl
   }
