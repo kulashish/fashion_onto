@@ -17,6 +17,8 @@ class CancelReTarget extends SkuSelector {
   Given list of ordered sku return those which are cancelled
    */
 
+  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
+
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
 
   //  def execute(orderItemDataFrame: DataFrame): DataFrame = {

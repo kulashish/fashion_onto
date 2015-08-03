@@ -33,7 +33,6 @@ object CampaignCommon {
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
-  val DATE_FORMAT = "yyyy/MM/dd"
 
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
@@ -48,7 +47,7 @@ object CampaignCommon {
     "acart_daily" -> 42,
     "wishlist_followup" -> 53,
     "acart_iod" -> 45,
-    "acart_iod" -> 54,
+    "wishlist_iod" -> 54,
     "acart_lowstock" -> 44,
     "wishlist_lowstock" -> 55,
     "acart_followup" -> 43,

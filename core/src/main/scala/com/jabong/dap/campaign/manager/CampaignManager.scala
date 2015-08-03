@@ -1,22 +1,22 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
-import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
+import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -24,6 +24,7 @@ import scala.collection.mutable.HashMap
  *  TODO: this class will need to be refactored to create a proper data flow of campaigns
  *
  */
+
 object CampaignManager extends Serializable with Logging {
 
   var campaignPriorityMap = new HashMap[String, Int]
@@ -67,10 +68,13 @@ object CampaignManager extends Serializable with Logging {
     liveRetargetCampaign.runCampaign(orderData, orderItemData)
   }
 
-  def startPushInvalidCampaign() = {
+  def startPushInvalidCampaign(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
 
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
     // last 3 days of orderitem data
@@ -81,7 +85,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     val invalidFollowUp = new InvalidFollowUpCampaign()
-    invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData)
+    invalidFollowUp.runCampaign(past30DayCampaignMergedData, orderData, orderItemData, yesterdayItrData)
 
     // invalid lowstock
     // last 30 days of order item data
@@ -91,11 +95,12 @@ object CampaignManager extends Serializable with Logging {
     val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
 
     val invalidLowStock = new InvalidLowStockCampaign()
-    invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
+    invalidLowStock.runCampaign(past30DayCampaignMergedData, last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
 
   }
 
-  def startPushAbandonedCartCampaign() = {
+  def startPushAbandonedCartCampaign(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
 
     // acart daily, acart followup, acart low stock, acart iod
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
@@ -103,6 +108,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
@@ -119,7 +125,7 @@ object CampaignManager extends Serializable with Logging {
     val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
 
     val acartFollowup = new AcartFollowUpCampaign()
-    acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData)
+    acartFollowup.runCampaign(past30DayCampaignMergedData, prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData)
 
     // FIXME: part of customerselction for iod and lowstock can be merged
 
@@ -129,7 +135,7 @@ object CampaignManager extends Serializable with Logging {
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
     val acartLowStock = new AcartLowStockCampaign()
-    acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
+    acartLowStock.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
 
     // item on discount
     // last30DayAcartData
@@ -137,19 +143,21 @@ object CampaignManager extends Serializable with Logging {
     // last30DaySalesOrderData = null
 
     // itr last 30 days
-    val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
+    val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
-    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+    acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
   val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
-  def startWishlistCampaigns() = {
+  def startWishlistCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
     WishListCampaign.runCampaign()
   }
-  
-  def startSurfCampaigns() = {
+
+  def startSurfCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
     SurfCampaign.runCampaign()
 
   }
@@ -159,71 +167,111 @@ object CampaignManager extends Serializable with Logging {
    * @param inputCampaignsData
    * @return
    */
-  def campaignMerger(inputCampaignsData: DataFrame): DataFrame = {
+  def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
     if (inputCampaignsData == null) {
       logger.error("inputCampaignData is null")
       return null
     }
 
-    if (CampaignManager.mailTypePriorityMap.size == 0) {
-      logger.error("priorityMap doesn't  Exists")
+    if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
+      logger.error("Keys doesn't Exists")
       return null
     }
 
-    val selectedData = inputCampaignsData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
-
-    val inputDataWithPriority = addPriority(selectedData)
-
-    val campaignMerged = inputDataWithPriority.orderBy(CampaignCommon.PRIORITY)
-      .groupBy(CampaignMergedFields.FK_CUSTOMER)
+    val campaignMerged = inputCampaignsData.orderBy(CampaignCommon.PRIORITY)
+      .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1))
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
+        first(key1) as key1,
+        first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+        first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
 
     return campaignMerged
   }
 
-  def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String){
-    val dfResult = df.select(CampaignMergedFields.deviceId, CampaignMergedFields.LIVE_MAIL_TYPE, CampaignMergedFields.LIVE_BRAND,CampaignMergedFields.LIVE_REF_SKU1, CampaignMergedFields.LIVE_BRICK,CampaignMergedFields.LIVE_PROD_NAME, CampaignMergedFields.LIVE_CART_URL)
-    val fileName = "UpdateDevices"+"_"+domain+"_"+date
-
-    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileName, DataSets.DAILY_MODE, date)
-    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
-      DataWriter.writeCsv(dfResult, path, DataSets.IGNORE_SAVEMODE, "true", ";")
-      DataVerifier.rename(path,path +"/" + fileName+".csv")
-    }
-  }
-
-  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)) {
-    val iosDF = df.filter((CampaignMergedFields.DOMAIN + " = " + DataSets.IOS))
-    val androidDF = df.filter(CampaignMergedFields.DOMAIN + " = " + DataSets.ANDROID)
-
-    exportCampaignCSV(iosDF,date, CampaignMergedFields.IOS_CODE)
-    exportCampaignCSV(androidDF,date, CampaignMergedFields.ANDROID_CODE)
-
-    for(campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-      val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignDetails.mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignDetails.mailType).select(CampaignMergedFields.deviceId).distinct
-
-      val fileI = campaignDetails.campaignName + campaignDetails.mailType + "_" + CampaignMergedFields.IOS_CODE
-      val fileA = campaignDetails.campaignName + campaignDetails.mailType + "_" + CampaignMergedFields.ANDROID_CODE
-      val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-      val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-
-      val pathI = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date)
-      if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, pathI)) {
-        DataWriter.writeCsv(iosSplitDF, pathI, DataSets.IGNORE_SAVEMODE, "true", ";")
-        DataVerifier.rename(pathI,pathI+"/" + filenameI+".csv")
+  def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String, saveMode: String) {
+    val dfResult = df.select(
+      CampaignMergedFields.deviceId,
+      CampaignMergedFields.LIVE_MAIL_TYPE,
+      CampaignMergedFields.LIVE_BRAND,
+      CampaignMergedFields.LIVE_REF_SKU1,
+      CampaignMergedFields.LIVE_BRICK,
+      CampaignMergedFields.LIVE_PROD_NAME,
+      CampaignMergedFields.LIVE_CART_URL
+    )
+    val tablename =
+      domain match {
+        case CampaignMergedFields.IOS_CODE => DataSets.IOS
+        case CampaignMergedFields.ANDROID_CODE => DataSets.ANDROID
       }
 
-      val pathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date)
-      if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, pathA)) {
-        DataWriter.writeCsv(androidSplitDF, pathA, DataSets.IGNORE_SAVEMODE, "true", ";")
-        DataVerifier.rename(pathA,pathA+"/" + filenameA+".csv")
-      }
+    val fileName = "updateDevices" + "_" + domain + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+//    println("writing to csv: " + dfResult.count())
+//    dfResult.printSchema()
+//    dfResult.show(10)
+
+    //    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
+    //    val csvFullPath = path + "/" + fileName
+
+    DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
+  }
+
+  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
+    val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
+    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
+
+    exportCampaignCSV(iosDF, date, CampaignMergedFields.IOS_CODE, saveMode)
+    exportCampaignCSV(androidDF, date, CampaignMergedFields.ANDROID_CODE, saveMode)
+
+    for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
+      val mailType = campaignDetails.mailType
+      val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
+      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
+
+      val fileI = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.IOS_CODE
+      val fileA = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.ANDROID_CODE
+      val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+
+      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
+      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
     }
   }
+  
+  def initCampaignsConfig(campaignJsonPath: String) = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
+    if (validated) {
+      createCampaignMaps(json)
+    }
+  }
+  
+  
+  
   /**
    * Merges all the campaign output based on priority
    * @param campaignJsonPath
@@ -256,17 +304,22 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData()
+      val saveMode = DataSets.OVERWRITE_SAVEMODE
+      val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
-      val mergedData = campaignMerger(allCampaignsData)
-      CampaignOutput.saveCampaignData(mergedData, CampaignCommon.BASE_PATH + "/"
-        + CampaignCommon.MERGED_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
-      //        for (coVarJob <- COVarJobConfig.coVarJobInfo.coVar) {
-      //          COVarJobConfig.coVarInfo = coVarJob
-      //        coVarJob.source match {
-      //          case "erp" | "bob" | "unicommerce" => new Merger().merge()
-      //          case _ => logger.error("Unknown table source.")
-      //        }
+      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
+
+      val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
+      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr).repartition(1).cache()
+
+      val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      if (DataWriter.canWrite(saveMode, writePath))
+        DataWriter.writeParquet(mergedData, writePath, saveMode)
+
+      //writing csv file
+      splitFileToCSV(mergedData, dateFolder)
     }
   }
 }

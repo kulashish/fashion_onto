@@ -24,8 +24,7 @@ class AcartDailyCampaign {
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_DAILY_CAMPAIGN)
     //save campaign Output
-    CampaignOutput.saveCampaignData(campaignOutput, CampaignCommon.BASE_PATH + "/"
-      + CampaignCommon.ACART_DAILY_CAMPAIGN + "/" + CampaignUtils.now(CampaignCommon.DATE_FORMAT))
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_DAILY_CAMPAIGN)
 
   }
 }

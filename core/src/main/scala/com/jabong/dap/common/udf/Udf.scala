@@ -1,7 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable.ArrayBuffer
@@ -10,11 +10,6 @@ import scala.collection.mutable.ArrayBuffer
  * Created by raghu on 3/7/15.
  */
 object Udf {
-
-  //  val hiveContext = Spark.getHiveContext()
-  //  import hiveContext.implicits._
-  // Define User Defined Functions
-  //  val sqlContext = Spark.getSqlContext()
 
   /**
    * minTimestamp will return min of Timestamp t1 or t2
@@ -84,6 +79,11 @@ object Udf {
   val yyyymmdd = udf((t1: Timestamp) => UdfUtils.getYYYYmmDD(t1: Timestamp))
 
   /**
+   * yyyymmdd will convert yyyymmdd formate
+   */
+  val yyyymmddString = udf((t1: String) => UdfUtils.getYYYYmmDD(t1: String))
+
+  /**
    * simpleSkuFromExtraData will extract data from extraData
    */
   val simpleSkuFromExtraData = udf((extraData: String) => UdfUtils.getSimpleSkuFromExtraData(extraData: String))
@@ -111,6 +111,16 @@ object Udf {
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getCountSku(skuArrayBuffer: ArrayBuffer[String]))
+  val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
+
+  /**
+   * Removes all zeroes string and null string to emptyString.
+   */
+  val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
+
+  /**
+   * toLong will convert String data to Long data
+   */
+  val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
 
 }

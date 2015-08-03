@@ -37,7 +37,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     val itr30dayData = df30DaysItrData.select(
       col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
       col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE,
-      Udf.yyyymmdd(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
+      Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
     )
 
     //filter yesterday itrData from itr30dayData
@@ -54,7 +54,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
       .filter(ItrVariables.SPECIAL_PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
       .select(
         col(CustomerVariables.FK_CUSTOMER),
-        col(CustomerVariables.EMAIL),
+        //col(CustomerVariables.EMAIL),
         col(ItrVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
@@ -95,7 +95,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
-      CustomerProductShortlistVariables.EMAIL,
+      //CustomerProductShortlistVariables.EMAIL,
       CustomerProductShortlistVariables.SKU_SIMPLE,
       CustomerProductShortlistVariables.SPECIAL_PRICE
     )
@@ -241,5 +241,8 @@ class ItemOnDiscount extends SkuSelector with Logging {
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
 
   override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
+
+  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
+
 }
 

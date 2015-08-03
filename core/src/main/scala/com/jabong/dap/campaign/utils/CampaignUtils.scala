@@ -9,6 +9,7 @@ import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
@@ -42,8 +43,7 @@ object CampaignUtils extends Logging {
   }
 
   def generateReferenceSkuForSurf(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
-      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+    val customerFilteredData = skuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(
         Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
         skuData(CustomerVariables.FK_CUSTOMER),
@@ -54,8 +54,8 @@ object CampaignUtils extends Logging {
     val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1),
-        first(CustomerPageVisitVariables.BROWER_ID),
-        first(CustomerPageVisitVariables.DOMAIN)
+        first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
+        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
       )
 
     return customerRefSku
@@ -213,7 +213,8 @@ object CampaignUtils extends Logging {
     }
     // Sales order skus with successful order status
     val successfulSku = salesOrderItemData
-      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+      .filter(SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.CANCEL_PAYMENT_ERROR + " and " +
+        SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.INVALID)
       .select(
         salesOrderItemData(ProductVariables.SKU),
         salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
@@ -283,7 +284,7 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT))
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -358,7 +359,7 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
-        inputData(CustomerVariables.EMAIL),
+        //inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
         inputData(ProductVariables.SPECIAL_PRICE)
       )
@@ -399,7 +400,9 @@ object CampaignUtils extends Logging {
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
-        inputData(ProductVariables.SKU)
+        inputData(ProductVariables.SKU),
+        inputData(CustomerPageVisitVariables.BROWER_ID),
+        inputData(CustomerPageVisitVariables.DOMAIN)
       //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
@@ -483,7 +486,7 @@ object CampaignUtils extends Logging {
   //FIXME:add implementation
   def addPriority(campaignData: DataFrame): DataFrame = {
     val priorityMap = CampaignManager.mailTypePriorityMap
-    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), priorityMap.get(Integer.parseInt(e(0).toString))))
+    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3), e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
     return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
   }
   //FIXME: make it generalized for all campaigns
@@ -599,7 +602,7 @@ object CampaignUtils extends Logging {
       "left_outer"
     )
       .select(
-        col(CustomerVariables.FK_CUSTOMER),
+        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
         col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
         col(CustomerPageVisitVariables.SKU),
         col(CustomerPageVisitVariables.BROWER_ID),

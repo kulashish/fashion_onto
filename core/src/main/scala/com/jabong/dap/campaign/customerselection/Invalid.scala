@@ -89,9 +89,13 @@ class Invalid extends LiveCustomerSelector with Logging {
       return null
     }
     // Sales order skus with successful order status
-    val successfulSku = salesOrderItemData.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
-      .select(salesOrderItemData(ProductVariables.SKU), salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
-        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE), salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
+    val successfulSku = salesOrderItemData.
+      filter(SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.CANCEL_PAYMENT_ERROR + " and " +
+        SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.INVALID)
+      .select(salesOrderItemData(ProductVariables.SKU),
+        salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        salesOrderItemData(SalesOrderItemVariables.UNIT_PRICE),
+        salesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER),
         salesOrderItemData(SalesOrderItemVariables.UPDATED_AT))
 
     return successfulSku

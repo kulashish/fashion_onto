@@ -68,7 +68,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .write.mode("error")
       .save(userDeviceMapPath)
 
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, finalTempTable)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, args(0), year, day, month)
     variableSurf1.write.save(surf1VariablePath)
 */
   }
@@ -82,6 +82,11 @@ object SurfVariablesMain extends java.io.Serializable {
     cal.add(Calendar.DATE, -gap);
     val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     var dt = dateFormat.format(cal.getTime())
+
+    val mFormat = new SimpleDateFormat("MM")
+    var year = cal.get(Calendar.YEAR)
+    var day = cal.get(Calendar.DAY_OF_MONTH)
+    var month = mFormat.format(cal.getTime())
 
     val tablename = "merge.merge_pagevisit"
     val finalTempTable = "finalpagevisit"
@@ -103,7 +108,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .save(userDeviceMapPath)
 
     // variable 1
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, finalTempTable)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename, year, day, month)
     variableSurf1.write.save(surf1VariablePath)
   }
 

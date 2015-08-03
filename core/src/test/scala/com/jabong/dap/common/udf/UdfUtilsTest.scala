@@ -222,8 +222,9 @@ class UdfUtilsTest extends FlatSpec {
 
   //===============================getYYYYmmDD()========================================================================
   "getYYYYmmDD: Timestamp value" should "null" in {
+    val ts: String = null
 
-    val result = UdfUtils.getYYYYmmDD(null)
+    val result = UdfUtils.getYYYYmmDD(ts)
 
     assert(result == null)
 
@@ -445,15 +446,15 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
-//  "getDistinctSku(): skuArray value " should "not be null" in {
-//
-//    val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
-//
-//    val result = UdfUtils.getDistinctSku(skuArray.toList)
-//
-//    assert(result.length == 4)
-//
-//  }
+  //  "getDistinctSku(): skuArray value " should "not be null" in {
+  //
+  //    val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
+  //
+  //    val result = UdfUtils.getDistinctSku(skuArray.toList)
+  //
+  //    assert(result.length == 4)
+  //
+  //  }
 
   //===============================getRepeatedSku=========================================================
   "getRepeatedSku(): skuArray value " should "be null" in {
@@ -466,19 +467,60 @@ class UdfUtilsTest extends FlatSpec {
 
   }
 
-//  "getRepeatedSku(): skuArray value " should "not be null" in {
-//
-//    val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
-//
-//    val result = UdfUtils.getRepeatedSku(skuArray.toBuffer)
-//
-//    assert(result.length == 3)
-//
-//  }
+  //  "getRepeatedSku(): skuArray value " should "not be null" in {
+  //
+  //    val skuArray = Array("a", "b", "a", "c", "c", "d", "d")
+  //
+  //    val result = UdfUtils.getRepeatedSku(skuArray.toBuffer)
+  //
+  //    assert(result.length == 3)
+  //
+  //  }
 
   "getMaxClickDayName" should "be Sunday" in {
     val day = UdfUtils.getMaxClickDayName(1, 2, 3, 4, 5, 6, 7)
     assert(day.equals("Sunday"))
+  }
+
+  "removeAllZero" should "be empty String" in {
+    val str = UdfUtils.removeAllZero("000000")
+    assert(str.equals(""))
+  }
+
+  "removeAllZero" should "be same as input string" in {
+    val str = UdfUtils.removeAllZero("DE683C47-06E5-4817-BE06-066DEEBA8E4D")
+    assert(str.equals("DE683C47-06E5-4817-BE06-066DEEBA8E4D"))
+  }
+
+  //===============================getToLong=========================================================
+  "getToLong():String value " should "be null" in {
+
+    val str = null
+
+    val result = UdfUtils.getToLong(str)
+
+    assert(result == 0)
+
+  }
+
+  "getToLong():String value " should "be -ve value" in {
+
+    val str = "-3"
+
+    val result = UdfUtils.getToLong(str)
+
+    assert(result == -3)
+
+  }
+
+  "getToLong():String value " should "be +ve value" in {
+
+    val str = "3"
+
+    val result = UdfUtils.getToLong(str)
+
+    assert(result == 3)
+
   }
 
 }

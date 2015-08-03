@@ -27,9 +27,6 @@ object WishListCampaign {
 
     val fullShortlistData = CampaignInput.loadFullShortlistData()
 
-    //val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
-    //val last30daysItrData = CampaignInput.loadLast30DaysItrSimpleData() // FIXME
-
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
@@ -44,17 +41,20 @@ object WishListCampaign {
 
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
-    val itrSku30DayData = CampaignInput.loadLast30DaysItrSkuData()
 
     val wishlistFollowupCampaign = new WishlistFollowupCampaign()
     wishlistFollowupCampaign.runCampaign(lastDayCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, yesterdaySalesOrderData, yesterdaySalesOrderItemData)
 
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+
     val wishListLowStockCampaign = new WishlistLowStockCampaign()
-    wishListLowStockCampaign.runCampaign(fullShortlistData, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    wishListLowStockCampaign.runCampaign(past30DayCampaignMergedData, fullShortlistData, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
     // call iod campaign
-    //val wishListIODCampaign = new WishlistIODCampaign()
-    //wishListIODCampaign.runCampaign(fullShortlistData, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    val itrSku30DayData = CampaignInput.load30DayItrSkuData()
+
+    val wishListIODCampaign = new WishlistIODCampaign()
+    wishListIODCampaign.runCampaign(past30DayCampaignMergedData, fullShortlistData, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
   }
 
@@ -186,13 +186,13 @@ object WishListCampaign {
       col(CustomerProductShortlistVariables.SKU),
       col(CustomerProductShortlistVariables.SPECIAL_PRICE),
       col(SalesOrderItemVariables.UPDATED_AT),
-      Udf.yyyymmdd(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT
+      Udf.yyyymmddString(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT
     )
 
     val irt30Day = df30DaysItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
       col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE,
-      Udf.yyyymmdd(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.CREATED_AT
+      Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
     )
 
     val resultDf = joinCustomerWithYestardayItr.join(irt30Day, joinCustomerWithYestardayItr(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)

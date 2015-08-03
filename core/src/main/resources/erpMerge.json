@@ -5,7 +5,7 @@
       "tableName": "item_master_complete_dump",
       "primaryKey": "No_",
       "mergeMode": "full",
-      "saveMode": "Ignore"
+      "saveMode": "Overwrite"
     }
   ]
 }

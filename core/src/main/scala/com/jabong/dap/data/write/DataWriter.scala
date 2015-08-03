@@ -1,10 +1,12 @@
 package com.jabong.dap.data.write
 
+import java.io.File
+
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ SaveMode, DataFrame }
+import org.apache.spark.sql.{DataFrame, SaveMode}
 
 /**
  * Created by pooja on 23/7/15.
@@ -13,16 +15,19 @@ object DataWriter extends Logging {
   /**
    *
    * @param df
-   * @param basePath
    * @param source
    * @param tableName
    * @param mode
    * @param date
    */
-  def writeCsv(df: DataFrame, basePath: String, source: String, tableName: String, mode: String, date: String, header: String, delimeter: String) {
-    val writePath = getWritePath(basePath, source, tableName, mode, date)
-    if (canWrite(mode, writePath))
-      writeCsv(df, writePath, "Ignore", header, delimeter)
+  def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, saveMode: String, header: String, delimeter: String) {
+    val writePath = DataWriter.getWritePath(DataSets.TMP_PATH, source, tableName, mode, date)
+    if (DataWriter.canWrite(saveMode, writePath)) {
+      DataWriter.writeCsv(df, writePath, saveMode, "true", ";")
+      val csvSrcFile = writePath + File.separator + "part-00000"
+      val csvdestFile = writePath + File.separator + csvFileName + ".csv"
+      DataVerifier.rename(csvSrcFile, csvdestFile)
+    }
   }
 
   /**
@@ -30,8 +35,8 @@ object DataWriter extends Logging {
    * @param df
    * @param writePath
    */
-  def writeCsv(df: DataFrame, writePath: String, saveMode: String, header: String, delimeter: String) {
-    df.coalesce(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
+  private def writeCsv(df: DataFrame, writePath: String, saveMode: String, header: String, delimeter: String) {
+    df.repartition(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
     println("CSV Data written successfully to the following Path: " + writePath)
   }
 

@@ -3,13 +3,13 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.util.Date
 
-import com.jabong.dap.common.ArrayUtils
+import com.jabong.dap.common.{ StringUtils, ArrayUtils }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -256,6 +256,24 @@ object UdfUtils {
   }
 
   /**
+   * This will return Timestamp into YYYYMMDD format
+   * @param t1
+   * @return
+   */
+  def getYYYYmmDD(t1: String): Timestamp = {
+
+    if (t1 == null) {
+      return null
+    }
+
+    if (t1.contains(" ")) {
+      return Timestamp.valueOf(t1.substring(0, t1.indexOf(" ") + 1) + TimeConstants.START_TIME_MS)
+    } else {
+      return Timestamp.valueOf(t1 + " " + TimeConstants.START_TIME_MS)
+    }
+  }
+
+  /**
    *  getSimpleSkuFromExtraData will extract data from extraData
    * @param extraData
    * @return
@@ -384,7 +402,7 @@ object UdfUtils {
       return null
     }
 
-    return skuList.toList
+    return skuList.toList.distinct
   }
 
   /**
@@ -393,7 +411,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: ArrayBuffer[T]): Int = {
+  def getCountSku[T](skuList: List[T]): Int = {
 
     if (skuList == null || skuList.isEmpty) {
       return 0
@@ -442,6 +460,38 @@ object UdfUtils {
       index = 6
     }
     return TimeUtils.nextNDay("Monday", index)
+  }
+
+  /**
+   * Returns empty string if the string contains all zeros or null.
+   * @param str
+   * @return String
+   */
+  def removeAllZero(str: String): String = {
+    if (null == str || StringUtils.isAllZero(str)) {
+      return ""
+    }
+    return str
+  }
+
+  /**
+   * convert string to long
+   * @param str
+   * @return
+   */
+  def getToLong(str: String): Long = {
+
+    if (str == null) {
+      return 0
+    }
+    try {
+      return str.toLong
+    } catch {
+      case ex: NumberFormatException => {
+        ex.printStackTrace()
+        return 0
+      }
+    }
   }
 
 }
