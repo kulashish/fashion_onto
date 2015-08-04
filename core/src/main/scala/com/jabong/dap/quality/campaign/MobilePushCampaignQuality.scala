@@ -26,6 +26,8 @@ object MobilePushCampaignQuality extends Logging {
 
   def startMobilePushCampaignQuality(campaignsConfig: String) = {
 
+    logger.info("Calling method startMobilePushCampaignQuality........")
+
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
     val dfCampaignQuality = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], schema)
@@ -55,11 +57,23 @@ object MobilePushCampaignQuality extends Logging {
 
     dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday))
 
+    logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
+
     CampaignOutput.saveCampaignDataForYesterday(dfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
+
+    logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
+      + DataSets.OUTPUT_PATH + "/"
+      + DataSets.CAMPAIGN + "/"
+      + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY+ "/"
+      +  DataSets.DAILY_MODE+ "/"
+      + dateYesterday
+    )
 
   }
 
   def getCampaignQuality(campaignName: String, dateYesterday: String): DataFrame = {
+
+    logger.info("Calling method getCampaignQuality........")
 
     val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
@@ -67,21 +81,21 @@ object MobilePushCampaignQuality extends Logging {
 
     var row: Row = null
 
-    val dfCampaignQuality = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], schema)
+    var dfCampaignQuality = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], schema)
 
-    if (!dataExits) { //if data frame is not null
+    if (dataExits) { //if data frame is not null
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
-      val dataFrame = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+      val dataFrame = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
         for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
 
-          val count = dataFrame.filter(CampaignManager.mailTypePriorityMap.get(mailType) + " = " + mailType).count()
+          val count = dataFrame.filter("LIVE_MAIL_TYPE" + " = " + mailType).count()
           row = Row(campaignName + "_" + mailType, count)
-          dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
 
@@ -92,22 +106,25 @@ object MobilePushCampaignQuality extends Logging {
 
         val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
         row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", countNonZeroFkCustomer)
-        dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
         row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", countZeroFkCustomer)
-        dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       } else {
         row = Row(campaignName, dataFrame.count())
-        dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       }
 
     } else { //if data frame is null
+
+      logger.info("Data Frame of: " + campaignName + " is null")
+
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
         for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
           row = Row(campaignName + "_" + mailType, 0)
-          dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
 
@@ -117,13 +134,13 @@ object MobilePushCampaignQuality extends Logging {
         || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
 
         row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", 0)
-        dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", 0)
-        dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       } else {
         row = Row(campaignName, 0)
-        dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       }
     }
 
