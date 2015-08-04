@@ -17,10 +17,10 @@ system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.cla
 system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  get  exports/exportMessagesReactions_517_$date_with_zero.csv; bye\"");
 
 # copy data to hdfs
-system("hadoop fs -mkdir /data/input/ad4push/reactions_android/daily/$date/");
+system("hadoop fs -mkdir -p /data/input/ad4push/reactions_android/daily/$date/");
 system("hadoop fs -copyFromLocal exportMessagesReactions_517_$date_with_zero.csv /data/input/ad4push/reactions_android/daily/$date/.");
 
-system("hadoop fs -mkdir /data/input/ad4push/reactions_ios/daily/$date/");
+system("hadoop fs -mkdir -p /data/input/ad4push/reactions_ios/daily/$date/");
 system("hadoop fs -copyFromLocal exportMessagesReactions_515_$date_with_zero.csv /data/input/ad4push/reactions_ios/daily/$date/.");
 
 # call ad4push pipeline
