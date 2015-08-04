@@ -10,7 +10,7 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ StringType, LongType }
+import org.apache.spark.sql.types.StringType
 
 /**
  * Created by Mubarak on 28/7/15.
@@ -37,7 +37,7 @@ object CampaignProcessor {
       .select(
         cmr(CustomerVariables.EMAIL),
         cmr(CustomerVariables.RESPONSYS_ID),
-        cmr(CustomerVariables.ID_CUSTOMER).cast(LongType) as CustomerVariables.ID_CUSTOMER,
+        cmr(CustomerVariables.ID_CUSTOMER),
         cmr(PageVisitVariables.BROWSER_ID),
         cmr(PageVisitVariables.DOMAIN)
       )

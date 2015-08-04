@@ -4,8 +4,7 @@ import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
-import akka.dispatch.sysmsg.Create
-import com.jabong.dap.data.storage.schema.Schema
+
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -13,9 +12,10 @@ import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Utility Class
@@ -627,7 +627,8 @@ object CampaignUtils extends Logging {
       "left_outer"
     )
       .select(
-        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
+        //        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
+        col(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
         col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
         col(CustomerPageVisitVariables.SKU),
         col(CustomerPageVisitVariables.BROWER_ID),

@@ -248,9 +248,9 @@ object CampaignInput extends Logging {
               res(CampaignCommon.PRIORITY)
             )
         }
-        println("Adding campaign data to allCampaigns: ")// + campaignData.count())
-//        campaignData.printSchema()
-//        campaignData.show(9)
+        println("Adding campaign data to allCampaigns: ") // + campaignData.count())
+        //        campaignData.printSchema()
+        //        campaignData.show(9)
         campaignData
       } catch {
         // TODO: fix when data not found skip

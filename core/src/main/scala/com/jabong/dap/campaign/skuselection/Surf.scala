@@ -57,9 +57,6 @@ class Surf extends SkuSelector with Logging {
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
 
-    //FIXME: when it is fixed in customer master records
-    val toLong = udf[Long, String](_.toLong)
-
     val dfJoin = skusFiltered.join(
       itrData,
       skusFiltered(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
