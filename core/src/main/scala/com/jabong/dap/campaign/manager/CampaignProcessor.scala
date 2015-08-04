@@ -63,28 +63,28 @@ object CampaignProcessor {
 
     val custIdNotNUll = campaign.filter(!campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
     println("After campaign filtering on not null CustomerId")
-    custIdNotNUll.printSchema()
+//    custIdNotNUll.printSchema()
 //    custIdNotNUll.show(10)
 
     val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
     println("After campaign merger on CustomerId")
-    custId.printSchema()
+//    custId.printSchema()
 //    custId.show(10)
 
 
     val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
     println("After campaign filtering on null CustomerId")
-    custIdNUll.printSchema()
+//    custIdNUll.printSchema()
 //    custIdNUll.show(10)
 
     val DeviceId = CampaignManager.campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
     println("After campaign merger on DeviceId")
-    DeviceId.printSchema()
+//    DeviceId.printSchema()
 //    DeviceId.show(10)
 
     val camp = custId.unionAll(DeviceId)
     println("After unionAll count = ")// + camp.count())
-    camp.printSchema()
+//    camp.printSchema()
 //    camp.show(10)
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
@@ -104,7 +104,7 @@ object CampaignProcessor {
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
     println("Final Campaign after join with ITR: ")// + finalCampaign.count())
-    finalCampaign.printSchema()
+//    finalCampaign.printSchema()
 //    finalCampaign.show(10)
 
     finalCampaign

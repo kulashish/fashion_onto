@@ -1,5 +1,7 @@
 package com.jabong.dap.model.customer.data
 
+import java.io.File
+
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -22,7 +24,7 @@ object CustomerDeviceMapping extends Logging {
   /**
    *
    * @param clickStreamInc incremental click_stream data
-   * @param cmr dcf customer->device_mapping data
+   * @param cmr customer->device_mapping data
    * @param customer customer incremental data
    * @return master customer device mapping with the last used device by the customer
    */
@@ -31,13 +33,16 @@ object CustomerDeviceMapping extends Logging {
     println("clickStreamInc: " + clickStreamInc.count())
     clickStreamInc.printSchema()
     clickStreamInc.show(10)
-    val clickStream = clickStreamInc.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.USER_ID)
+
+    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN+" IN ('ios', 'android', 'windows')")
+      .orderBy(col(PageVisitVariables.PAGE_TIMESTAMP).desc)
+      .groupBy(PageVisitVariables.USER_ID)
       .agg(
         first(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
         first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       )
 
-    println("clickStream after aggregation: " + clickStream.count())
+    println("clickStream after aggregation and filtering: " + clickStream.count())
     clickStream.printSchema()
     clickStream.show(10)
 
@@ -68,6 +73,7 @@ object CustomerDeviceMapping extends Logging {
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
     joined.printSchema()
     joined.show(10)
+    println("Distinct email count for device Mapping: " + joined.select("email").distinct.count())
 
     joined
   }
@@ -77,8 +83,8 @@ object CustomerDeviceMapping extends Logging {
    * @param vars
    */
   def start(vars: VarInfo) = {
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT))
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
     val path = OptionUtils.getOptValue(vars.path)
     val saveMode = vars.saveMode
     processData(prevDate, path, incrDate, saveMode)
@@ -93,14 +99,15 @@ object CustomerDeviceMapping extends Logging {
   def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
     var df2: DataFrame = null
+    val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
     if (null != path) {
       df2 = getDataFrameCsv4mDCF(path)
     } else {
-      df2 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+      df2 = DataReader.getDataFrame(TMP_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
     }
     val df3 = DataReader.getDataFrame(DataSets.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
     val res = getLatestDevice(df1, df2, df3)
-    val savePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
+    val savePath = DataWriter.getWritePath(TMP_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
   }
