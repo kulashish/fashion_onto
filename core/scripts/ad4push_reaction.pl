@@ -25,3 +25,6 @@ system("hadoop fs -copyFromLocal exportMessagesReactions_515_$date_with_zero.csv
 
 # call ad4push pipeline
 system("perl /opt/alchemy-core/current/bin/run.pl -t prod -c Ad4pushCustReact");
+
+# copy processed data to ftp location
+system("perl /opt/alchemy-core/base/ftp_upload.pl -c ad4push_customer_response");

@@ -1,15 +1,18 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.campaign.data.CampaignInput._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
 
 /**
  * Created by raghu on 28/7/15.
  */
-object SurfCampaign {
+object SurfCampaign extends Logging {
 
   def runCampaign(): Unit = {
 
@@ -25,7 +28,7 @@ object SurfCampaign {
     val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData()
 
     // load customer master record for email id to fk_customer mapping
-    val customerMasterData = CampaignInput.loadCustomerMasterData()
+    val customerMasterData = loadCustomerMasterData()
 
     val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
@@ -55,6 +58,15 @@ object SurfCampaign {
       println("Note: Surf3 campaign not run due to surf 3 data not available")
     }
 
+  }
+
+  def loadCustomerMasterData(): DataFrame = {
+
+    //    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading last day customer master data from hdfs")
+
+    val customerMasterData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, "2015/07/29")
+    customerMasterData
   }
 
 }

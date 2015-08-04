@@ -13,6 +13,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.LongType
 
+
 /**
  * Created by mubarak on 15/7/15.
  */

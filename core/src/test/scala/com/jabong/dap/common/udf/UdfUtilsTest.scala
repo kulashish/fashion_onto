@@ -492,4 +492,35 @@ class UdfUtilsTest extends FlatSpec {
     assert(str.equals("DE683C47-06E5-4817-BE06-066DEEBA8E4D"))
   }
 
+  //===============================getToLong=========================================================
+  "getToLong():String value " should "be null" in {
+
+    val str = null
+
+    val result = UdfUtils.getToLong(str)
+
+    assert(result == 0)
+
+  }
+
+  "getToLong():String value " should "be -ve value" in {
+
+    val str = "-3"
+
+    val result = UdfUtils.getToLong(str)
+
+    assert(result == -3)
+
+  }
+
+  "getToLong():String value " should "be +ve value" in {
+
+    val str = "3"
+
+    val result = UdfUtils.getToLong(str)
+
+    assert(result == 3)
+
+  }
+
 }

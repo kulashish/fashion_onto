@@ -122,4 +122,10 @@ object Udf {
    * For populating empty email id from dcf data as _app_deviceid
    */
   val populateEmail = udf((email: String, deviceid: String) => UdfUtils.dcfEmail(email: String, deviceid: String))
+
+  /**
+   * toLong will convert String data to Long data
+   */
+  val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
+
 }

@@ -402,7 +402,7 @@ object UdfUtils {
       return null
     }
 
-    return skuList.toList
+    return skuList.toList.distinct
   }
 
   /**
@@ -472,6 +472,26 @@ object UdfUtils {
       return ""
     }
     return str
+  }
+
+  /**
+   * convert string to long
+   * @param str
+   * @return
+   */
+  def getToLong(str: String): Long = {
+
+    if (str == null) {
+      return 0
+    }
+    try {
+      return str.toLong
+    } catch {
+      case ex: NumberFormatException => {
+        ex.printStackTrace()
+        return 0
+      }
+    }
   }
 
   /**
