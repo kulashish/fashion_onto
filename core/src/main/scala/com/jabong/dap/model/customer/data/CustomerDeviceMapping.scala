@@ -29,21 +29,21 @@ object CustomerDeviceMapping extends Logging {
    */
   def getLatestDevice(clickStreamInc: DataFrame, cmr: DataFrame, customer: DataFrame): DataFrame = {
     //val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
-    println("clickStreamInc: " + clickStreamInc.count())
-    clickStreamInc.printSchema()
-    clickStreamInc.show(10)
+    println("clickStreamInc: ") // + clickStreamInc.count())
+    //    clickStreamInc.printSchema()
+    //    clickStreamInc.show(10)
 
     val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('ios', 'android', 'windows')")
-      .orderBy(col(PageVisitVariables.PAGE_TIMESTAMP).desc)
+      .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.USER_ID)
       .agg(
         first(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
         first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       )
 
-    println("clickStream after aggregation and filtering: " + clickStream.count())
-    clickStream.printSchema()
-    clickStream.show(10)
+    println("clickStream after aggregation and filtering: ") // + clickStream.count())
+    //    clickStream.printSchema()
+    //    clickStream.show(10)
 
     // outerjoin with customer table one day increment on userid = email
     // id_customer, email, browser_id, domain
@@ -56,9 +56,9 @@ object CustomerDeviceMapping extends Logging {
         clickStream(PageVisitVariables.BROWSER_ID),
         clickStream(PageVisitVariables.DOMAIN)
       )
-    println("After outer join with customer table: " + joinedDf.count())
-    joinedDf.printSchema()
-    joinedDf.show(10)
+    println("After outer join with customer table: ") // + joinedDf.count())
+    //    joinedDf.printSchema()
+    //    joinedDf.show(10)
 
     val joined = joinedDf.join(cmr, cmr(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), "outer")
       .select(
@@ -71,7 +71,7 @@ object CustomerDeviceMapping extends Logging {
 
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
     joined.printSchema()
-    joined.show(10)
+    //    joined.show(10)
     println("Distinct email count for device Mapping: " + joined.select("email").distinct.count())
 
     joined
