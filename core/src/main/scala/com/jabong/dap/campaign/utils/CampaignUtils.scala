@@ -51,7 +51,7 @@ object CampaignUtils extends Logging {
         skuData(CustomerPageVisitVariables.BROWER_ID),
         skuData(CustomerPageVisitVariables.DOMAIN)
       )
-    
+
     // null or 0 FK_CUSTOMER
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
       .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
@@ -60,14 +60,14 @@ object CampaignUtils extends Logging {
         first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
         first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
       ).select(
-        col(CampaignMergedFields.REF_SKU1),
-        col(CustomerVariables.FK_CUSTOMER),
-        col(CustomerPageVisitVariables.BROWER_ID) as "device_id",
-        col(CustomerPageVisitVariables.DOMAIN)
-      )
+          col(CampaignMergedFields.REF_SKU1),
+          col(CustomerVariables.FK_CUSTOMER),
+          col(CustomerPageVisitVariables.BROWER_ID) as "device_id",
+          col(CustomerPageVisitVariables.DOMAIN)
+        )
 
     // non zero FK_CUSTOMER
-    
+
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
       .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
@@ -75,14 +75,14 @@ object CampaignUtils extends Logging {
         first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
         first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
       ).select(
-        col(CampaignMergedFields.REF_SKU1),
-        col(CustomerVariables.FK_CUSTOMER),
-        col("device_id"),
-        col(CustomerPageVisitVariables.DOMAIN)
-      )
+          col(CampaignMergedFields.REF_SKU1),
+          col(CustomerVariables.FK_CUSTOMER),
+          col("device_id"),
+          col(CustomerPageVisitVariables.DOMAIN)
+        )
 
     val customerRefSku = deviceOnlyCustomerRefSku.unionAll(registeredCustomerRefSku)
-    
+
     return customerRefSku
 
   }

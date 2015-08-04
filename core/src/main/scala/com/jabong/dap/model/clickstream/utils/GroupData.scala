@@ -22,7 +22,7 @@ class GroupData() extends java.io.Serializable {
   var domain = 0
   var actualvisitid, visitts, uid, browserid, productsku, device, appuid = 0
 
-  def appuseridCreation(pagevisit:DataFrame): DataFrame = {
+  def appuseridCreation(pagevisit: DataFrame): DataFrame = {
     var useridDeviceidFrame = pagevisit.select(
 
       Udf.appUserId(
@@ -40,19 +40,18 @@ class GroupData() extends java.io.Serializable {
       col(PageVisitVariables.ACTUAL_VISIT_ID),
       col(PageVisitVariables.PRODUCT_SKU)
     ).filter("userid is not null")
-  //  var useridDeviceidFrame = pagevisit.selectExpr("case when userid is null and domain!='w' and domain!='m' then concat('_app_',browserid) else userid end as appuserid", "*")
+    //  var useridDeviceidFrame = pagevisit.selectExpr("case when userid is null and domain!='w' and domain!='m' then concat('_app_',browserid) else userid end as appuserid", "*")
 
     useridDeviceidFrame.registerTempTable("finalpagevisit")
     return useridDeviceidFrame
   }
 
-  def groupDataByAppUser(hiveContext: HiveContext,useridDeviceidFrame: DataFrame): RDD[(String, Row)] = {
+  def groupDataByAppUser(hiveContext: HiveContext, useridDeviceidFrame: DataFrame): RDD[(String, Row)] = {
     useridDeviceidFrame.as('useridDeviceidFrame)
     val ug: RDD[(String, Row)] = useridDeviceidFrame
-      .map(x => (x(uid).toString, x))//.partitionBy(new org.apache.spark.HashPartitioner(200)).persist()
+      .map(x => (x(uid).toString, x)) //.partitionBy(new org.apache.spark.HashPartitioner(200)).persist()
     return ug
   }
-
 
   def calculateColumns(useridDeviceidFrame: DataFrame): Unit = {
     val res = useridDeviceidFrame.columns
