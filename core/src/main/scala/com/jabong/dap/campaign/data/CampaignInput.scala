@@ -5,11 +5,11 @@ import java.sql.Timestamp
 
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.read.{DataReader, PathBuilder}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -226,6 +226,7 @@ object CampaignInput extends Logging {
             allCampaignData = allCampaignData.unionAll(df)
           }
         }))
+    println("merging full campaign done")
     return allCampaignData
   }
 
@@ -247,6 +248,9 @@ object CampaignInput extends Logging {
               res(CampaignCommon.PRIORITY)
             )
         }
+        println("Adding campaign data to allCampaigns: " + campaignData.count())
+        campaignData.printSchema()
+        campaignData.show(9)
         campaignData
       } catch {
         // TODO: fix when data not found skip

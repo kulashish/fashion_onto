@@ -247,7 +247,7 @@ object CampaignManager extends Serializable with Logging {
       implicit val formats = net.liftweb.json.DefaultFormats
       val path = new Path(campaignJsonPath)
       json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      //   CampaignInfo.campaigns = json.extract[campaignConfig]
       // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
       true
     } catch {
@@ -284,7 +284,7 @@ object CampaignManager extends Serializable with Logging {
       implicit val formats = net.liftweb.json.DefaultFormats
       val path = new Path(campaignJsonPath)
       json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      //   campaignInfo.campaigns = json.extract[campaignConfig]
+      //   CampaignInfo.campaigns = json.extract[CampaignConfig]
       // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
       true
     } catch {
@@ -312,8 +312,9 @@ object CampaignManager extends Serializable with Logging {
       val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
 
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-      val mergedData = CampaignProcessor.splitNMergeCampaigns(allCamp, itr).repartition(1).cache()
+      val mergedData = CampaignProcessor.mergeCampaigns(allCamp, itr).coalesce(1).cache()
 
+      println("Starting write parquet after repartitioning and caching")
       val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
         DataWriter.writeParquet(mergedData, writePath, saveMode)
