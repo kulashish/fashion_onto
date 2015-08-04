@@ -43,7 +43,8 @@ object CustomerDeviceMapping extends Logging {
 
     // outerjoin with customer table one day increment on userid = email
     // id_customer, email, browser_id, domain
-    val broCust = Spark.getContext().broadcast(customer).value
+    val custUnq = customer.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
+    val broCust = Spark.getContext().broadcast(custUnq).value
     val joinedDf = clickStream.join(broCust, broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), "outer")
       .select(
         coalesce(broCust(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
@@ -60,8 +61,8 @@ object CustomerDeviceMapping extends Logging {
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
         cmr(CustomerVariables.ID_CUSTOMER),
-        coalesce(cmr(PageVisitVariables.BROWSER_ID), joinedDf(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
-        coalesce(cmr(PageVisitVariables.DOMAIN), joinedDf(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
+        coalesce(joinedDf(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+        coalesce(joinedDf(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
       )
 
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())

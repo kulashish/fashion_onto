@@ -190,55 +190,6 @@ object CampaignManager extends Serializable with Logging {
     return campaignMerged
   }
 
-  def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String, saveMode: String) {
-    val dfResult = df.select(
-      CampaignMergedFields.deviceId,
-      CampaignMergedFields.LIVE_MAIL_TYPE,
-      CampaignMergedFields.LIVE_BRAND,
-      CampaignMergedFields.LIVE_REF_SKU1,
-      CampaignMergedFields.LIVE_BRICK,
-      CampaignMergedFields.LIVE_PROD_NAME,
-      CampaignMergedFields.LIVE_CART_URL
-    )
-    val tablename =
-      domain match {
-        case CampaignMergedFields.IOS_CODE => DataSets.IOS
-        case CampaignMergedFields.ANDROID_CODE => DataSets.ANDROID
-      }
-
-    val fileName = "updateDevices" + "_" + domain + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-//    println("writing to csv: " + dfResult.count())
-//    dfResult.printSchema()
-//    dfResult.show(10)
-
-    //    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
-    //    val csvFullPath = path + "/" + fileName
-
-    DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
-  }
-
-  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
-    val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
-    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
-
-    exportCampaignCSV(iosDF, date, CampaignMergedFields.IOS_CODE, saveMode)
-    exportCampaignCSV(androidDF, date, CampaignMergedFields.ANDROID_CODE, saveMode)
-
-    for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-      val mailType = campaignDetails.mailType
-      val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
-
-      val fileI = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.IOS_CODE
-      val fileA = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.ANDROID_CODE
-      val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-      val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-
-      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
-      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
-    }
-  }
-  
   def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
@@ -320,7 +271,7 @@ object CampaignManager extends Serializable with Logging {
         DataWriter.writeParquet(mergedData, writePath, saveMode)
 
       //writing csv file
-      splitFileToCSV(mergedData, dateFolder)
+      CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
     }
   }
 }
