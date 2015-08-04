@@ -26,7 +26,7 @@ class InvalidLowStockCampaign {
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     var custFiltered = selectedCustomers
-    
+
     if (past30DayCampaignMergedData != null) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
       val pastCampaignCheck = new PastCampaignCheck()

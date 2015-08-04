@@ -502,7 +502,7 @@ object UdfUtils {
    */
   def dcfEmail(email: String, deviceid: String): String = {
     if (StringUtils.isEmpty(email))
-      return "_app_"+deviceid
+      return "_app_" + deviceid
     return email
   }
 

@@ -22,6 +22,6 @@ object PagevisitSchema {
   val incremental = StructType(Array(
     StructField("userid", StringType, true),
     StructField("dt", StringType, true),
-    StructField("dt", ArrayType(StringType,true), true)
+    StructField("dt", ArrayType(StringType, true), true)
   ))
 }

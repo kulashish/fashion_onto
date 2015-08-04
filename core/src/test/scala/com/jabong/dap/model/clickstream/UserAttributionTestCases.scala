@@ -1,9 +1,9 @@
 package com.jabong.dap.model.clickstream
 
-import com.jabong.dap.common.{Spark, SharedSparkContext}
-import com.jabong.dap.model.clickstream.utils.{UserAttribution, GroupData}
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
+import com.jabong.dap.model.clickstream.utils.{ UserAttribution, GroupData }
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{Row, DataFrame, SQLContext}
+import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -32,6 +32,5 @@ class UserAttributionTestCases extends FlatSpec with SharedSparkContext {
     //assert(newData.filter("userid = 'user1'").count()==4)
     //assert(newData.filter("userid = 'user2'").count()==2)
   }
-
 
 }

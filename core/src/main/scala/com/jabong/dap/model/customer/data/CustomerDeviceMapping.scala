@@ -15,7 +15,6 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.LongType
 
-
 /**
  * Created by mubarak on 15/7/15.
  */
@@ -34,7 +33,7 @@ object CustomerDeviceMapping extends Logging {
     clickStreamInc.printSchema()
     clickStreamInc.show(10)
 
-    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN+" IN ('ios', 'android', 'windows')")
+    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('ios', 'android', 'windows')")
       .orderBy(col(PageVisitVariables.PAGE_TIMESTAMP).desc)
       .groupBy(PageVisitVariables.USER_ID)
       .agg(

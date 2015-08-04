@@ -6,7 +6,7 @@ import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.apache.spark.sql.{ DataFrame, SaveMode }
 
 /**
  * Created by pooja on 23/7/15.

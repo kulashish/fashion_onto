@@ -58,7 +58,7 @@ class Surf extends SkuSelector with Logging {
     }
 
     //FIXME: when it is fixed in customer master records
-    val toLong    = udf[Long, String]( _.toLong)
+    val toLong = udf[Long, String](_.toLong)
 
     val dfJoin = skusFiltered.join(
       itrData,
