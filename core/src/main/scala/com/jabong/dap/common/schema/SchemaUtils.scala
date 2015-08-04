@@ -2,7 +2,7 @@ package com.jabong.dap.common.schema
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.types.{ DataType, StructType }
 
 /**
  * Created by raghu on 3/7/15.

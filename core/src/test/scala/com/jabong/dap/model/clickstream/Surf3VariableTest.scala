@@ -6,7 +6,7 @@ import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, VariableMethods }
 import org.apache.spark.sql.{ DataFrame, SQLContext, Row }
 import org.scalatest.FlatSpec
-import com.jabong.dap.model.clickstream.utils.{UserAttribution, GroupData}
+import com.jabong.dap.model.clickstream.utils.{ UserAttribution, GroupData }
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 
@@ -14,7 +14,7 @@ import org.apache.spark.sql.hive.HiveContext
  * Created by Divya on 14/7/15.
  */
 class Surf3VariableTest extends FlatSpec with SharedSparkContext {
-   var sqlContext: SQLContext = _
+  var sqlContext: SQLContext = _
   @transient var pagevisitDataFrame: DataFrame = _
   @transient var userObj: GroupData = _
   @transient var userWiseData: RDD[(String, Row)] = _
@@ -35,7 +35,7 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
 
   "DailyIncremetal for surf3" should "assert to given no of unique PDP records for given user" in {
     var today = "_daily"
-    var attributeObj:UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisitDataFrame)
+    var attributeObj: UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisitDataFrame)
     var userAttributedData: DataFrame = attributeObj.attribute()
 
     userObj = new GroupData()
@@ -45,11 +45,11 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
     userWiseData = userObj.groupDataByAppUser(hiveContext, useridDeviceidFrame)
 
     dailyIncrementalSKUs = GetSurfVariables.Surf3Incremental(userWiseData, userObj, hiveContext)
-    assert(dailyIncrementalSKUs.filter("userid_daily = 'user1'").count()==10)
-    assert(dailyIncrementalSKUs.filter("userid_daily = '_app_b1'").count()==2)
+    assert(dailyIncrementalSKUs.filter("userid_daily = 'user1'").count() == 10)
+    assert(dailyIncrementalSKUs.filter("userid_daily = '_app_b1'").count() == 2)
   }
 
- /* "AppCreation for surf3" should "have 12 unique PDP records " in {
+  /* "AppCreation for surf3" should "have 12 unique PDP records " in {
     var today = "_daily"
     userObj = new GroupData()
     var AppDataFrame = userObj.appuseridCreation
