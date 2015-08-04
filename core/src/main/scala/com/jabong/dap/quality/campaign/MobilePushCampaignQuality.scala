@@ -30,32 +30,32 @@ object MobilePushCampaignQuality extends Logging {
 
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
-    val dfCampaignQuality = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], schema)
+    var dfCampaignQuality = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], schema)
 
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_DAILY_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_DAILY_CAMPAIGN, dateYesterday))
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_IOD_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_IOD_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, dateYesterday))
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, dateYesterday))
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.CANCEL_RETARGET_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.RETURN_RETARGET_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.CANCEL_RETARGET_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.RETURN_RETARGET_CAMPAIGN, dateYesterday))
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF1_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF2_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF3_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF6_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF1_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF2_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF3_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF6_CAMPAIGN, dateYesterday))
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_IOD_CAMPAIGN, dateYesterday))
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_IOD_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dateYesterday))
 
-    dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday))
+    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday))
 
     logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
 
@@ -64,8 +64,8 @@ object MobilePushCampaignQuality extends Logging {
     logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
       + DataSets.OUTPUT_PATH + "/"
       + DataSets.CAMPAIGN + "/"
-      + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY+ "/"
-      +  DataSets.DAILY_MODE+ "/"
+      + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "/"
+      + DataSets.DAILY_MODE + "/"
       + dateYesterday
     )
 
@@ -104,11 +104,11 @@ object MobilePushCampaignQuality extends Logging {
         || campaignName.equals(CampaignCommon.SURF3_CAMPAIGN)
         || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
 
-        val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
+        val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null").count()
         row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", countNonZeroFkCustomer)
         dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-        val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
+        val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null").count()
         row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", countZeroFkCustomer)
         dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       } else {
@@ -143,6 +143,8 @@ object MobilePushCampaignQuality extends Logging {
         dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       }
     }
+    println("collecting dataframe: " + dfCampaignQuality)
+    dfCampaignQuality.collect().foreach(println)
 
     return dfCampaignQuality
 
