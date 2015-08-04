@@ -1,9 +1,9 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.acq.common.CampaignInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -32,7 +32,7 @@ object CampaignProcessor {
       key1 = key
     }
 
-    println("Starting the CMR: ") // + cmr.count())
+    println("Starting the CMR: ")// + cmr.count())
     val cmrn = cmr.na.drop(Array(PageVisitVariables.BROWSER_ID))
       .select(
         cmr(CustomerVariables.EMAIL),
@@ -41,7 +41,7 @@ object CampaignProcessor {
         cmr(PageVisitVariables.BROWSER_ID),
         cmr(PageVisitVariables.DOMAIN)
       )
-    println("After removing empty browser ids: ") // + cmrn.count())
+    println("After removing empty browser ids: ")// + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
     val campaignDevice = cmrn.join(bcCampaign, bcCampaign(key) === cmrn(key1))
@@ -54,7 +54,7 @@ object CampaignProcessor {
         coalesce(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
         coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
       )
-    println("After joining campaigns with the cmr: ") // + campaignDevice.count())
+    println("After joining campaigns with the cmr: ")// + campaignDevice.count())
     campaignDevice
   }
 
@@ -62,29 +62,30 @@ object CampaignProcessor {
     println("Inside priority based merge")
 
     val custIdNotNUll = campaign.filter(!campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    println("After campaign filtering on not null CustomerId")
-    //    custIdNotNUll.printSchema()
-    //    custIdNotNUll.show(10)
+    println("After campaign filtering on not null CustomerId ")// + custIdNotNUll.count())
+    //custIdNotNUll.printSchema()
+    //custIdNotNUll.show(10)
 
     val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
     println("After campaign merger on CustomerId")
-    //    custId.printSchema()
-    //    custId.show(10)
+    //custId.printSchema()
+    //custId.show(10)
 
     val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    println("After campaign filtering on null CustomerId")
-    //    custIdNUll.printSchema()
-    //    custIdNUll.show(10)
+    custIdNUll.show(100)
+    println("After campaign filtering on null CustomerId " + custIdNUll.count())
+    custIdNUll.printSchema()
+
 
     val DeviceId = CampaignManager.campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
     println("After campaign merger on DeviceId")
-    //    DeviceId.printSchema()
-    //    DeviceId.show(10)
+        DeviceId.printSchema()
+        DeviceId.show(10)
 
     val camp = custId.unionAll(DeviceId)
-    println("After unionAll count = ") // + camp.count())
-    //    camp.printSchema()
-    //    camp.show(10)
+    println("After unionAll count = " + camp.count())
+        camp.printSchema()
+        camp.show(10)
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
 
@@ -102,9 +103,9 @@ object CampaignProcessor {
         lit("www.jabong.com/cart/addmulti?skus=" + camp(CampaignMergedFields.REF_SKU1)).cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
-    println("Final Campaign after join with ITR: ") // + finalCampaign.count())
-    //    finalCampaign.printSchema()
-    //    finalCampaign.show(10)
+    println("Final Campaign after join with ITR: " + finalCampaign.count())
+        finalCampaign.printSchema()
+        finalCampaign.show(10)
 
     finalCampaign
   }

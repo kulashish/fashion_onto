@@ -249,8 +249,8 @@ object CampaignInput extends Logging {
             )
         }
         println("Adding campaign data to allCampaigns: ") // + campaignData.count())
-        //        campaignData.printSchema()
-        //        campaignData.show(9)
+        //campaignData.printSchema()
+        //campaignData.show(9)
         campaignData
       } catch {
         // TODO: fix when data not found skip
