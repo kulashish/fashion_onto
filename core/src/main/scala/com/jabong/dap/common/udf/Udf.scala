@@ -116,6 +116,10 @@ object Udf {
   /**
    * Removes all zeroes string and null string to emptyString.
    */
-
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
+
+  /**
+   * For populating empty email id from dcf data as _app_deviceid
+   */
+  val populateEmail = udf((email: String, deviceid: String) => UdfUtils.dcfEmail(email: String, deviceid: String))
 }
