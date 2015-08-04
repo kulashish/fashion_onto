@@ -227,7 +227,7 @@ object CampaignInput extends Logging {
           }
         }))
     println("merging full campaign done")
-    return allCampaignData
+    return allCampaignData.dropDuplicates()
   }
 
   def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
@@ -246,6 +246,12 @@ object CampaignInput extends Logging {
               res(CampaignMergedFields.DOMAIN),
               res(CampaignMergedFields.DEVICE_ID),
               res(CampaignCommon.PRIORITY)
+            )
+            .na.fill(
+              Map(
+                CampaignMergedFields.CUSTOMER_ID -> 0,
+                CampaignMergedFields.DEVICE_ID -> ""
+              )
             )
         }
         println("Adding campaign data to allCampaigns: ") // + campaignData.count())
