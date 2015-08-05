@@ -37,7 +37,10 @@ class InvalidLowStockCampaign {
 
     //sku selection
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = lowStock.skuFilter(custFiltered, itrData)
+    val filteredSku = lowStock.skuFilter(custFiltered, itrData)
+
+    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
 

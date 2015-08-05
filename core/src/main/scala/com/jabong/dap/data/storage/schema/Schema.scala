@@ -274,7 +274,8 @@ object Schema {
     StructField(CampaignMergedFields.REF_SKU1, StringType, true),
     StructField(CampaignMergedFields.EMAIL, StringType, true),
     StructField(CampaignMergedFields.DOMAIN, StringType, true),
-    StructField(CampaignMergedFields.DEVICE_ID, StringType, true)
+    StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
   val campaign = StructType(Array(

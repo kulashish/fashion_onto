@@ -28,9 +28,9 @@ class LowStock extends SkuSelector with Logging {
         customerSkuData(ProductVariables.SKU_SIMPLE),
         itrDataFrame(ProductVariables.SPECIAL_PRICE))
 
-    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+  //  val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    return filteredSku
   }
 
   override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???

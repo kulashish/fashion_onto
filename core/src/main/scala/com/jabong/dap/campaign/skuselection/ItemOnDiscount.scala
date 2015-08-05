@@ -59,9 +59,9 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
     // FIXME: generate ref skus
-    val refSkus = CampaignUtils.generateReferenceSku(dfResult, CampaignCommon.NUMBER_REF_SKUS)
+  //  val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    return dfResult
   }
 
   /**

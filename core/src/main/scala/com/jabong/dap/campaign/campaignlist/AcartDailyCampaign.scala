@@ -20,7 +20,9 @@ class AcartDailyCampaign {
 
     //sku selection
     val daily = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.DAILY)
-    val refSkus = daily.skuFilter(selectedCustomers, yesterdayItrData)
+    val filteredSku = daily.skuFilter(selectedCustomers, yesterdayItrData)
+
+    val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_DAILY_CAMPAIGN)
     //save campaign Output

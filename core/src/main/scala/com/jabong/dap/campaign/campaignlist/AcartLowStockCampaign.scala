@@ -30,7 +30,9 @@ class AcartLowStockCampaign {
 
     //sku selection
     val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = lowStock.skuFilter(selectedCustomers, yesterdayItrData)
+    val filteredSku = lowStock.skuFilter(selectedCustomers, yesterdayItrData)
+
+    val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN)
 

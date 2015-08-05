@@ -25,9 +25,9 @@ class Daily extends SkuSelector with Logging {
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
-    val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+   // val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    return filteredSku
   }
 
   override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
