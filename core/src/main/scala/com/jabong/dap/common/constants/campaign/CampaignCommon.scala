@@ -53,7 +53,7 @@ object CampaignCommon {
     "acart_followup" -> 43,
     "surf2" -> 57,
     "surf6" -> 71,
-    "invalid_followup" -> 43,
+    "invalid_followup" -> 48,
     "invalid_lowstock" -> 49,
     "surf1" -> 56,
     "surf3" -> 58
