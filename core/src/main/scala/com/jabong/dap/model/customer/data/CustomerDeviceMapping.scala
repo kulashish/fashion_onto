@@ -72,7 +72,13 @@ object CustomerDeviceMapping extends Logging {
     //    joined.show(10)
     println("Distinct email count for device Mapping: " + joined.select("email").distinct.count())
 
-    joined
+    joined.na
+      .fill(
+        Map(
+          CustomerVariables.ID_CUSTOMER -> 0,
+          PageVisitVariables.BROWSER_ID -> ""
+        )
+      ).dropDuplicates()
   }
 
   /**

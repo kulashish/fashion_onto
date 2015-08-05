@@ -258,7 +258,7 @@ object CampaignManager extends Serializable with Logging {
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
       val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
-      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
+      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
 
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
       val mergedData = CampaignProcessor.mergeCampaigns(allCamp, itr).coalesce(1).cache()

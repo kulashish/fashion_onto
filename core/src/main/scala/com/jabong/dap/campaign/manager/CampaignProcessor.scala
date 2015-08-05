@@ -21,19 +21,12 @@ object CampaignProcessor {
   val device = udf((s : String, s1: String, s2: String) => if(s.contains("windows") || s.contains("android")| s.contains("ios")) s1 else s2)
   val domain = udf((s : String, s1: String) => if(s.contains("windows") || s.contains("android")| s.contains("ios")) s else s1)
 
-  def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame = {
+  def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: " + campaign.count())
 
     val notNullCampaign = campaign.filter(!(col(CampaignMergedFields.CUSTOMER_ID) === 0 && col(CampaignMergedFields.DEVICE_ID) === ""))
 
     println("After dropping empty customer and device ids: " + notNullCampaign.count())
-
-    var key1: String = null
-    if (key.equals(CampaignMergedFields.CUSTOMER_ID)) {
-      key1 = CustomerVariables.ID_CUSTOMER
-    } else {
-      key1 = key
-    }
 
     println("Starting the CMR: " + cmr.count())
     println("printing customer id = 0 records:")
@@ -48,7 +41,8 @@ object CampaignProcessor {
     println("printing device id = null records:")
     cmr.filter(PageVisitVariables.BROWSER_ID + " IS NULL").show(10)
 
-    val cmrn = cmr.na.drop(Array(CustomerVariables.ID_CUSTOMER)).filter(col(CustomerVariables.ID_CUSTOMER) > 0)
+    val cmrn = cmr
+      .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
       .select(
         cmr(CustomerVariables.EMAIL),
         cmr(CustomerVariables.RESPONSYS_ID),
@@ -56,10 +50,11 @@ object CampaignProcessor {
         cmr(PageVisitVariables.BROWSER_ID),
         cmr(PageVisitVariables.DOMAIN)
       )
-    println("After removing empty browser ids: " + cmrn.count())
+
+    println("After removing customer id = 0 or null: " + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(key) === cmrn(key1))
+    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER))
       .select(
         bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
