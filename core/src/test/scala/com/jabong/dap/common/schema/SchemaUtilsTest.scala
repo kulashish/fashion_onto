@@ -40,7 +40,7 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
     val res = SchemaUtils.changeSchema(campaignsOutData, Schema.campaignSchema)
     res.printSchema()
     res.collect().foreach(println)
-    assert(res.columns.length == 6)
+    assert(res.columns.length == 7)
     assert(SchemaUtils.isSchemaEqual(res.schema, Schema.campaignSchema))
 
   }

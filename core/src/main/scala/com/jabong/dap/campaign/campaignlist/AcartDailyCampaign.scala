@@ -20,7 +20,10 @@ class AcartDailyCampaign {
 
     //sku selection
     val daily = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.DAILY)
+
+    //filter sku based on daily filter
     val filteredSku = daily.skuFilter(selectedCustomers, yesterdayItrData)
+
     //generate reference sku for acart with acart url
     val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 

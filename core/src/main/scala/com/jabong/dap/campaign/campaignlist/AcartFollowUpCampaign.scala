@@ -26,8 +26,11 @@ class AcartFollowUpCampaign {
 
     //sku selection
     val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
+
+    //filter sku based on followup filter
     val filteredSku = followUp.skuFilter(selectedCustomers, itrData)
 
+    //generate reference sku for acart with acart url
     val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN)

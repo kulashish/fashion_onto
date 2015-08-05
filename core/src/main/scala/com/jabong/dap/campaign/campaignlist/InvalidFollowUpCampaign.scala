@@ -31,8 +31,11 @@ class InvalidFollowUpCampaign {
 
     //sku selection
     val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
+
+    //filter sku based on followup filter
     val filteredSku = followUp.skuFilter(custFiltered, itrData)
 
+    //generate reference sku
     val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN)

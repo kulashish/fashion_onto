@@ -41,6 +41,9 @@ object CampaignCommon {
 
   val PRIORITY = "priority"
 
+  val ACART_BASE_URL = "www.jabong.com/cart/addmulti?skus="
+
+
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
     "return_retarget" -> 47,
