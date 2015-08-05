@@ -275,13 +275,13 @@ object CampaignInput extends Logging {
       finalRes.filter(col(CampaignMergedFields.CUSTOMER_ID) === 0).show(10)
 
       println("printing customer id = null records:")
-      finalRes.filter(CampaignMergedFields.CUSTOMER_ID + "IS NULL").show(10)
+      finalRes.filter(CampaignMergedFields.CUSTOMER_ID + " IS NULL").show(10)
 
       println("printing device id = empty records:")
       finalRes.filter(col(CampaignMergedFields.DEVICE_ID) === "").show(10)
 
       println("printing device id = null records:")
-      finalRes.filter(CampaignMergedFields.DEVICE_ID + "IS NULL").show(10)
+      finalRes.filter(CampaignMergedFields.DEVICE_ID + " IS NULL").show(10)
       return finalRes
     }
     return null
