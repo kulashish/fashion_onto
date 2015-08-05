@@ -32,6 +32,18 @@ object CampaignProcessor {
     }
 
     println("Starting the CMR: " + cmr.count())
+    println("printing customer id = 0 records:")
+    cmr.filter(col(CampaignMergedFields.CUSTOMER_ID) === 0).show(10)
+
+    println("printing customer id = null records:")
+    cmr.filter(CampaignMergedFields.CUSTOMER_ID + " IS NULL").show(10)
+
+    println("printing device id = empty records:")
+    cmr.filter(col(PageVisitVariables.BROWSER_ID) === "").show(10)
+
+    println("printing device id = null records:")
+    cmr.filter(PageVisitVariables.BROWSER_ID + " IS NULL").show(10)
+
     val cmrn = cmr.na.drop(Array(PageVisitVariables.BROWSER_ID))
       .select(
         cmr(CustomerVariables.EMAIL),
