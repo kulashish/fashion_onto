@@ -18,8 +18,8 @@ import org.apache.spark.sql.types.StringType
 object CampaignProcessor {
 
   val email = udf((s : String, s1: String) => if(null == s || s.equals("")) s1 else s)
-  val device = udf((s : String, s1: String, s2: String) => if(s.contains("windows") || s.contains("android")| s.contains("ios")) s1 else s2)
-  val domain = udf((s : String, s1: String) => if(s.contains("windows") || s.contains("android")| s.contains("ios")) s else s1)
+  val device = udf((s : String, s1: String, s2: String) => if(null != s && (s.contains("windows") || s.contains("android")| s.contains("ios"))) s1 else s2)
+  val domain = udf((s : String, s1: String) => if(null != s && (s.contains("windows") || s.contains("android")| s.contains("ios"))) s else s1)
 
   def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ")// + campaign.count())
