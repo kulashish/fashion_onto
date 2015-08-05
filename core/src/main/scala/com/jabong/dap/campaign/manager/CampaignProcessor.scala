@@ -1,9 +1,9 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.acq.common.CampaignInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -51,7 +51,8 @@ object CampaignProcessor {
         cmr(PageVisitVariables.DOMAIN)
       )
 
-    println("After removing customer id = 0 or null: ")// + cmrn.count())
+    println("After removing customer id = 0 or null: " + cmrn.count())
+    println("Total distinct id_customer: " + cmrn.select(CustomerVariables.ID_CUSTOMER).distinct.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
     val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), "rightouter")
@@ -80,6 +81,42 @@ object CampaignProcessor {
     campaignDevice
   }
 
+  /**
+   * takes union input of all campaigns and return merged campaign list
+   * @param inputCampaignsData
+   * @return
+   */
+  def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
+    if (inputCampaignsData == null) {
+//      logger.error("inputCampaignData is null")
+      return null
+    }
+
+    if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
+//      logger.error("Keys doesn't Exists")
+      return null
+    }
+
+    val campaignMerged = inputCampaignsData.orderBy(CampaignCommon.PRIORITY)
+      .groupBy(key)
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
+        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
+        first(key1) as key1,
+        first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+        first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
+
+    return campaignMerged
+      .select(
+        campaignMerged(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+        campaignMerged(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.LIVE_MAIL_TYPE,
+        campaignMerged(CampaignMergedFields.REF_SKU1) as CampaignMergedFields.LIVE_REF_SKU1,
+        campaignMerged(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL,
+        campaignMerged(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+        campaignMerged(CampaignMergedFields.DEVICE_ID)
+      )
+  }
+
   def mergeCampaigns(campaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
 
@@ -88,7 +125,7 @@ object CampaignProcessor {
     //custIdNotNUll.printSchema()
     //custIdNotNUll.show(10)
 
-    val custId = CampaignManager.campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
+    val custId = campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
     println("After campaign merger on CustomerId")
     //custId.printSchema()
     //custId.show(10)
@@ -98,7 +135,7 @@ object CampaignProcessor {
     println("After campaign filtering on null CustomerId " + custIdNUll.count())
     custIdNUll.printSchema()
 
-    val DeviceId = CampaignManager.campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
+    val DeviceId = campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
     println("After campaign merger on DeviceId")
     DeviceId.printSchema()
     DeviceId.show(10)
