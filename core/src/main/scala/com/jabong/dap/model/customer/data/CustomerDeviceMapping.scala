@@ -1,11 +1,11 @@
 package com.jabong.dap.model.customer.data
 
-import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.VarInfo
-import com.jabong.dap.data.read.{DataNotFound, DataReader, ValidFormatNotFound}
+import com.jabong.dap.data.read.{ DataNotFound, DataReader, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
@@ -54,6 +54,7 @@ object CustomerDeviceMapping extends Logging {
         clickStream(PageVisitVariables.BROWSER_ID),
         clickStream(PageVisitVariables.DOMAIN)
       )
+
     println("After outer join with customer table: ") // + joinedDf.count())
     //    joinedDf.printSchema()
     //    joinedDf.show(10)
@@ -72,7 +73,13 @@ object CustomerDeviceMapping extends Logging {
     //    joined.show(10)
     println("Distinct email count for device Mapping: " + joined.select("email").distinct.count())
 
-    joined
+    joined.na
+      .fill(
+        Map(
+          CustomerVariables.ID_CUSTOMER -> 0,
+          PageVisitVariables.BROWSER_ID -> ""
+        )
+      ).dropDuplicates()
   }
 
   /**
@@ -96,7 +103,7 @@ object CustomerDeviceMapping extends Logging {
   def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
     var df2: DataFrame = null
-//    val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
+    //    val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
     if (null != path) {
       df2 = getDataFrameCsv4mDCF(path)
     } else {

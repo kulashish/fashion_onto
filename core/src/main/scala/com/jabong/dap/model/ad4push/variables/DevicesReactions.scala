@@ -285,8 +285,11 @@ object DevicesReactions extends Logging {
       return null
     }
     return df.filter(col(DevicesReactionsVariables.REACTION).gt(0))
-      .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID,
-        DevicesReactionsVariables.REACTION).groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
+      .select(
+        DevicesReactionsVariables.CUSTOMER_ID,
+        DevicesReactionsVariables.DEVICE_ID,
+        DevicesReactionsVariables.REACTION)
+      .groupBy(DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.CUSTOMER_ID)
       .agg(sum(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
       .select(DevicesReactionsVariables.CUSTOMER_ID, DevicesReactionsVariables.DEVICE_ID, DevicesReactionsVariables.REACTION)
   }
