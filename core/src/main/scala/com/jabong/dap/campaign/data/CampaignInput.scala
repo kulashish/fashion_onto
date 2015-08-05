@@ -229,6 +229,13 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
+  /**
+   * get campaign data for particular with priority
+   * @param name
+   * @param date
+   * @param priority
+   * @return
+   */
   def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
     var path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
     if (DataVerifier.dataExists(path)) {
@@ -244,7 +251,8 @@ object CampaignInput extends Logging {
               res(CampaignMergedFields.EMAIL),
               res(CampaignMergedFields.DOMAIN),
               res(CampaignMergedFields.DEVICE_ID),
-              res(CampaignCommon.PRIORITY)
+              res(CampaignCommon.PRIORITY),
+              res(CampaignMergedFields.LIVE_CART_URL)
             )
         }
         campaignData
