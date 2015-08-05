@@ -226,18 +226,20 @@ object CampaignInput extends Logging {
             allCampaignData = allCampaignData.unionAll(df)
           }
         }))
-    println("merging full campaign done")
+    println("merging full campaign done before dropping duplicates: " + allCampaignData.count())
     return allCampaignData.dropDuplicates()
   }
 
   def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
-    var path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
+    val path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
+    var result: DataFrame = null
     if (DataVerifier.dataExists(path)) {
       try {
         val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
+          .withColumn(CampaignCommon.PRIORITY, lit(priority))
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema).withColumn(CampaignCommon.PRIORITY, lit(priority))
-          return res
+          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
+          result = res
             .select(
               res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
               res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
@@ -247,17 +249,10 @@ object CampaignInput extends Logging {
               res(CampaignMergedFields.DEVICE_ID),
               res(CampaignCommon.PRIORITY)
             )
-            .na.fill(
-              Map(
-                CampaignMergedFields.CUSTOMER_ID -> 0,
-                CampaignMergedFields.DEVICE_ID -> ""
-              )
-            )
+        } else {
+          println("Adding campaign data to allCampaigns without changing the schema")
+          result = campaignData
         }
-        println("Adding campaign data to allCampaigns: ") // + campaignData.count())
-        //campaignData.printSchema()
-        //campaignData.show(9)
-        campaignData
       } catch {
         // TODO: fix when data not found skip
         case th: Throwable => {
@@ -265,9 +260,29 @@ object CampaignInput extends Logging {
           throw new SparkException("Data not available ?", th)
         }
       }
-    } else {
-      return null
-    }
+      println("Before replacing null customer id with 0 and device_id with empty string: " + result.count())
+      //campaignData.printSchema()
+      //campaignData.show(9)
+      val finalRes = result.na.fill(
+        Map(
+          CampaignMergedFields.CUSTOMER_ID -> 0,
+          CampaignMergedFields.DEVICE_ID -> ""
+        )
+      )
+      println("After replacing: " + finalRes.count())
+
+      println("printing customer id = 0 records:")
+      finalRes.filter(col(CampaignMergedFields.CUSTOMER_ID) === 0).show(10)
+
+      println("printing customer id = null records:")
+      finalRes.filter(col(CampaignMergedFields.CUSTOMER_ID) + "IS NULL").show(10)
+
+      println("printing device id = empty records:")
+      finalRes.filter(col(CampaignMergedFields.DEVICE_ID) === "").show(10)
+
+      println("printing device id = null records:")
+      finalRes.filter(col(CampaignMergedFields.DEVICE_ID) + "IS NULL").show(10)
+      return finalRes
   }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {

@@ -18,7 +18,7 @@ import org.apache.spark.sql.types.StringType
 object CampaignProcessor {
 
   def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame = {
-    println("Starting the device mapping: ") // + campaign.count())
+    println("Starting the device mapping after dropping duplicates: " + campaign.count())
 
     val notNullCampaign = campaign.filter(!(col(CampaignMergedFields.CUSTOMER_ID) === 0) && col(CampaignMergedFields.DEVICE_ID) === "")
 
@@ -31,7 +31,7 @@ object CampaignProcessor {
       key1 = key
     }
 
-    println("Starting the CMR: ") // + cmr.count())
+    println("Starting the CMR: " + cmr.count())
     val cmrn = cmr.na.drop(Array(PageVisitVariables.BROWSER_ID))
       .select(
         cmr(CustomerVariables.EMAIL),
@@ -40,7 +40,7 @@ object CampaignProcessor {
         cmr(PageVisitVariables.BROWSER_ID),
         cmr(PageVisitVariables.DOMAIN)
       )
-    println("After removing empty browser ids: ") // + cmrn.count())
+    println("After removing empty browser ids: " + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
     val campaignDevice = cmrn.join(bcCampaign, bcCampaign(key) === cmrn(key1))
@@ -53,7 +53,7 @@ object CampaignProcessor {
         coalesce(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
         coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
       )
-    println("After joining campaigns with the cmr: ") // + campaignDevice.count())
+    println("After joining campaigns with the cmr: " + campaignDevice.count())
     campaignDevice
   }
 
@@ -61,7 +61,7 @@ object CampaignProcessor {
     println("Inside priority based merge")
 
     val custIdNotNUll = campaign.filter(!campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
+    println("After campaign filtering on not null CustomerId " + custIdNotNUll.count())
     //custIdNotNUll.printSchema()
     //custIdNotNUll.show(10)
 
