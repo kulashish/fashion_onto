@@ -1,13 +1,13 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
-import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{StringType, LongType}
+import org.apache.spark.sql.types.{ StringType, LongType }
 
 /**
  * Created by Mubarak on 28/7/15.
@@ -74,7 +74,7 @@ object CampaignProcessor {
         itr(ITR.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
         itr(ITR.BRAND_NAME) as CampaignMergedFields.LIVE_BRAND,
         itr(ITR.BRICK) as CampaignMergedFields.LIVE_BRICK,
-     // lit("www.jabong.com/cart/addmulti?skus="+camp(CampaignMergedFields.REF_SKU1)).cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
+        // lit("www.jabong.com/cart/addmulti?skus="+camp(CampaignMergedFields.REF_SKU1)).cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
 

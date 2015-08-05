@@ -65,21 +65,21 @@ object CampaignUtils extends Logging {
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    var customerGroup:RDD[(String,scala.collection.immutable.List[(Double,String)])] = null
-    try{
-       customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct) }
+    var customerGroup: RDD[(String, scala.collection.immutable.List[(Double, String)])] = null
+    try {
+      customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct) }
 
-    }catch {
-      case e :Exception => {
-       e.printStackTrace()
+    } catch {
+      case e: Exception => {
+        e.printStackTrace()
       }
     }
     //  .map{case(key,value) => (key,value(0)._2.toString())}
 
     val acartUrl = "cart/addmulti?skus="
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val customerFinalGroup = customerGroup.map{case (key,value) => (key,createRefSkuAcartUrl(value))}.map{case (key,value) =>(key,value._1,value._2)}
-    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.REF_SKU1,CampaignMergedFields.LIVE_CART_URL)
+    val customerFinalGroup = customerGroup.map{ case (key, value) => (key, createRefSkuAcartUrl(value)) }.map{ case (key, value) => (key, value._1, value._2) }
+    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.LIVE_CART_URL)
 
     return grouped
   }
@@ -654,15 +654,15 @@ object CampaignUtils extends Logging {
     return dfJoinCustomerToCustomerPageVisit
   }
 
-  def createRefSkuAcartUrl(skuSimpleList:scala.collection.immutable.List[(Double,String)]): (String,String) ={
+  def createRefSkuAcartUrl(skuSimpleList: scala.collection.immutable.List[(Double, String)]): (String, String) = {
     var acartUrl = "cart/addmulti?skus="
-    var i:Int = 0
+    var i: Int = 0
     skuSimpleList.sortBy(-_._1)
-    for ( skuSimple <- skuSimpleList){
-        if(i==0) acartUrl+=skuSimple._2 else  acartUrl= acartUrl+","+skuSimple._2
-        i=i+1;
+    for (skuSimple <- skuSimpleList) {
+      if (i == 0) acartUrl += skuSimple._2 else acartUrl = acartUrl + "," + skuSimple._2
+      i = i + 1;
     }
-    return (skuSimpleList(0)._2,acartUrl)
+    return (skuSimpleList(0)._2, acartUrl)
   }
 }
 

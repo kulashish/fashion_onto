@@ -19,12 +19,11 @@ class AcartFollowUpCampaign {
     //FIXME:Filter the order items data for last 3 days
     val selectedCustomers = acartCustomerSelector.customerSelection(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData)
 
-
     //past campaign check whether the campaign has been sent to customer in last 30 days
     val pastCampaignCheck = new PastCampaignCheck()
     val custFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
       CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, 1000), 30)
-    
+
     //sku selection
     val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
     val filteredSku = followUp.skuFilter(selectedCustomers, itrData)

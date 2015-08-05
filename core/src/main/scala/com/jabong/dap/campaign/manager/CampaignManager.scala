@@ -3,9 +3,9 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -13,7 +13,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -207,9 +207,9 @@ object CampaignManager extends Serializable with Logging {
       }
 
     val fileName = "updateDevices" + "_" + domain + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-//    println("writing to csv: " + dfResult.count())
-//    dfResult.printSchema()
-//    dfResult.show(10)
+    //    println("writing to csv: " + dfResult.count())
+    //    dfResult.printSchema()
+    //    dfResult.show(10)
 
     //    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
     //    val csvFullPath = path + "/" + fileName
@@ -238,7 +238,7 @@ object CampaignManager extends Serializable with Logging {
       DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
     }
   }
-  
+
   def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
@@ -269,9 +269,7 @@ object CampaignManager extends Serializable with Logging {
       createCampaignMaps(json)
     }
   }
-  
-  
-  
+
   /**
    * Merges all the campaign output based on priority
    * @param campaignJsonPath
