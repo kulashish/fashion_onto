@@ -70,7 +70,7 @@ object UserDeviceMapping {
 
     // Fetch required columns only
     val dfAppUser = dfUser.select(
-      col(PageVisitVariables.APP_USER_ID), // Taken care in input DF
+      col(PageVisitVariables.USER_ID), // Taken care in input DF
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.PAGE_TIMESTAMP)
@@ -81,15 +81,15 @@ object UserDeviceMapping {
 
     // Get user device mapping sorted by time
     val dfuserDeviceMap = dfAppUser
-      .filter(PageVisitVariables.APP_USER_ID + " IS NOT NULL")
+      .filter(PageVisitVariables.USER_ID + " IS NOT NULL")
       .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
-      .groupBy(PageVisitVariables.APP_USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
+      .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
       .agg(
         max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
       )
 
     return dfuserDeviceMap.select(
-      col(PageVisitVariables.APP_USER_ID) as PageVisitVariables.USER_ID,
+      col(PageVisitVariables.USER_ID),
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.PAGE_TIMESTAMP)

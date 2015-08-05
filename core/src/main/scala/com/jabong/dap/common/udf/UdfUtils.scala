@@ -494,4 +494,16 @@ object UdfUtils {
     }
   }
 
+  /**
+   * For populating empty email id from dcf as _app_deviceid
+   * @param email
+   * @param deviceid
+   * @return
+   */
+  def dcfEmail(email: String, deviceid: String): String = {
+    if (StringUtils.isEmpty(email))
+      return "_app_" + deviceid
+    return email
+  }
+
 }

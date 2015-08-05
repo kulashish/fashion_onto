@@ -72,9 +72,9 @@ object DevicesReactions extends Logging {
 
       unionFinalDF = resultI
 
-//      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_" + incrDateInFileFormat
-//
-//      DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
+      //      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.IOS + "_" + incrDateInFileFormat
+      //
+      //      DataWriter.writeCsv(resultI, DataSets.AD4PUSH, DataSets.REACTIONS_IOS_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
 
     val savePathA = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, incrDate)
@@ -101,8 +101,8 @@ object DevicesReactions extends Logging {
 
       unionFinalDF = unionFinalDF.unionAll(resultA)
 
-//      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
-//      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
+      //      val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + DataSets.ANDROID + "_" + incrDateInFileFormat
+      //      DataWriter.writeCsv(resultA, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID_CSV, DataSets.FULL_MERGE_MODE, incrDate, filename, "true", ",")
     }
 
     val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + incrDateInFileFormat

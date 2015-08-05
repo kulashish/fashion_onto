@@ -59,7 +59,7 @@ object VariableMethods extends java.io.Serializable {
       return y
   }
 
-  def getBrands(brands: Tuple2[Any, List[(Any, Array[Any])]]): Array[String] =
+  def getBrands(brands: Tuple2[String, List[(Any, Array[Any])]]): Array[String] =
     {
       var cnt = 0
       var arr = new Array[String](4)
@@ -71,7 +71,7 @@ object VariableMethods extends java.io.Serializable {
       return arr
     }
 
-  def comparePagets(a: Brand, b: Brand): Boolean = {
+  def comparePagets(a: TimeBasedSorter, b: TimeBasedSorter): Boolean = {
     val a1: String = a.pagets.toString
     val b1: String = b.pagets.toString
     val format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS")
@@ -82,11 +82,22 @@ object VariableMethods extends java.io.Serializable {
     } else
       return false
   }
+  def comparePagetsInDescending(a: TimeBasedSorter, b: TimeBasedSorter): Boolean = {
+    val a1: String = a.pagets.toString
+    val b1: String = b.pagets.toString
+    val format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS")
+    val date1 = format.parse(a1)
+    val date2 = format.parse(b1)
+    if (date1 before date2) {
+      return true
+    } else
+      return false
+  }
 
   def returnLast3Reducer(x: List[(Any, Array[Any])], y: List[(Any, Array[Any])]): List[(Any, Array[Any])] = {
     val merge = x ::: y
     val brand =
-      for (m <- 0 to merge.length - 1) yield new Brand(merge(m)._1, merge(m)._2)
+      for (m <- 0 to merge.length - 1) yield new TimeBasedSorter(merge(m)._1.toString, merge(m)._2)
     var lastBrands = brand sortWith comparePagets
     // Get last three brands
     var cnt = 0
@@ -161,8 +172,8 @@ object VariableMethods extends java.io.Serializable {
     return domain
   }
 
-  class Brand(
-      val pagets: Any,
+  class TimeBasedSorter(
+      val pagets: String,
       val info: Array[Any]) {
     override def toString() =
       "(" + pagets + ") " + info
