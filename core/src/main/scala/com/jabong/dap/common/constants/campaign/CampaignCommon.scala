@@ -41,6 +41,8 @@ object CampaignCommon {
 
   val PRIORITY = "priority"
 
+  val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
+
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
     "return_retarget" -> 47,

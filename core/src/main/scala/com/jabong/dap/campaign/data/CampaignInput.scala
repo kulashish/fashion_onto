@@ -382,4 +382,11 @@ object CampaignInput extends Logging {
     campaignMerged30Day
   }
 
+  def loadYesterdayMobilePushCampaignQualityData(): DataFrame = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading last day Mobile Push Campaign Quality data from hdfs")
+    val mobilePushCampaignQuality = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday)
+    mobilePushCampaignQuality
+  }
+
 }
