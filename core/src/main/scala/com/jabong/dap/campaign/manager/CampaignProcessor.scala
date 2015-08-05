@@ -17,6 +17,10 @@ import org.apache.spark.sql.types.StringType
  */
 object CampaignProcessor {
 
+  val email = udf((s : String, s1: String) => if(null == s || s.equals("")) s1 else s)
+  val device = udf((s : String, s1: String, s2: String) => if(s.contains("windows") || s.contains("android")| s.contains("ios")) s1 else s2)
+  val domain = udf((s : String, s1: String) => if(s.contains("windows") || s.contains("android")| s.contains("ios")) s else s1)
+
   def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame, key: String): DataFrame = {
     println("Starting the device mapping after dropping duplicates: " + campaign.count())
 
@@ -61,9 +65,21 @@ object CampaignProcessor {
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKU1),
         bcCampaign(CampaignCommon.PRIORITY),
-        coalesce(bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(PageVisitVariables.BROWSER_ID)) as CampaignMergedFields.DEVICE_ID,
-        coalesce(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
+        /*  Other logic if UDF not required
+        when(bcCampaign(CampaignMergedFields.DOMAIN).contains("windows") ||
+          bcCampaign(CampaignMergedFields.DOMAIN).contains("android") ||
+          bcCampaign(CampaignMergedFields.DOMAIN).contains("ios"), bcCampaign(CampaignMergedFields.DEVICE_ID).
+        otherwise(cmrn(CampaignMergedFields.DEVICE_ID))
+        ) as CampaignMergedFields.DEVICE_ID,
+        when(bcCampaign(CampaignMergedFields.EMAIL) === null ||
+          bcCampaign(CampaignMergedFields.EMAIL).equalTo(""),
+          cmrn(CampaignMergedFields.EMAIL)).
+          otherwise(bcCampaign(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
         coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
+        */
+        device(bcCampaign(CampaignMergedFields.DOMAIN), bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID,
+        email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
+        domain( bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN)
       )
     println("After joining campaigns with the cmr: " + campaignDevice.count())
     campaignDevice
