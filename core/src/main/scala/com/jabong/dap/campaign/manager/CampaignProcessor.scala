@@ -74,7 +74,7 @@ object CampaignProcessor {
         */
         device(bcCampaign(CampaignMergedFields.DOMAIN), bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(PageVisitVariables.BROWSER_ID)) as CampaignMergedFields.DEVICE_ID,
         email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
-        domain( bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN)
+        domain(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
       )
     println("After joining campaigns with the cmr: " + campaignDevice.count())
     campaignDevice
@@ -83,7 +83,7 @@ object CampaignProcessor {
   def mergeCampaigns(campaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
 
-    val custIdNotNUll = campaign.filter(!campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
+    val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
     println("After campaign filtering on not null CustomerId " + custIdNotNUll.count())
     //custIdNotNUll.printSchema()
     //custIdNotNUll.show(10)
@@ -93,7 +93,7 @@ object CampaignProcessor {
     //custId.printSchema()
     //custId.show(10)
 
-    val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0 || campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
+    val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
     custIdNUll.show(100)
     println("After campaign filtering on null CustomerId " + custIdNUll.count())
     custIdNUll.printSchema()
