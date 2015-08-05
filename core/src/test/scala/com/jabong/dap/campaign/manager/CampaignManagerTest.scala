@@ -50,23 +50,24 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     assert(status == true)
   }
 
-  "No Input Campaigns Data" should "return null" in {
-    val status = CampaignManager.createCampaignMaps(json)
-    val expectedData = CampaignManager.campaignMerger(null, null, null)
-    assert(expectedData == null)
-  }
-
-  "Input Campaigns Data but no priority map loaded" should "return null" in {
-    CampaignManager.mailTypePriorityMap.clear()
-    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-    assert(mergedCampaignData == null)
-  }
-
-  "Input Campaigns Data with priority map loaded" should "return two " in {
-    val status = CampaignManager.createCampaignMaps(json)
-    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-    assert(mergedCampaignData.count() == 2)
-  }
+  //FIXME: move test cases to campaign processor
+//  "No Input Campaigns Data" should "return null" in {
+//    val status = CampaignManager.createCampaignMaps(json)
+//    val expectedData = CampaignManager.campaignMerger(null, null, null)
+//    assert(expectedData == null)
+//  }
+//
+//  "Input Campaigns Data but no priority map loaded" should "return null" in {
+//    CampaignManager.mailTypePriorityMap.clear()
+//    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
+//    assert(mergedCampaignData == null)
+//  }
+//
+//  "Input Campaigns Data with priority map loaded" should "return two " in {
+//    val status = CampaignManager.createCampaignMaps(json)
+//    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
+//    assert(mergedCampaignData.count() == 2)
+//  }
 
   "Test add Priority" should "add one more column" in {
     val status = CampaignManager.createCampaignMaps(json)

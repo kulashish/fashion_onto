@@ -7,6 +7,7 @@ import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.custorder.VarMerger
 import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
+import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
 import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.SparkConf
 import scopt.OptionParser
@@ -130,6 +131,9 @@ object Init {
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
       case "clickstreamSurf3Variable" => SurfVariablesMain.startSurf3Variable()
       case "clickstreamSurf3MergeData30" => GetSurfVariables.getSurf3mergedForLast30Days()
+
+      //campaign quality check
+      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.startMobilePushCampaignQuality(params.pushCampaignsJson)
     }
   }
 }

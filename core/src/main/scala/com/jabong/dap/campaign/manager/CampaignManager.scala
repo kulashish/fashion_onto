@@ -3,9 +3,9 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -13,8 +13,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
-import org.apache.spark.sql.DataFrame
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable.HashMap
@@ -162,35 +161,7 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-  /**
-   * takes union input of all campaigns and return merged campaign list
-   * @param inputCampaignsData
-   * @return
-   */
-  def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
-    if (inputCampaignsData == null) {
-      logger.error("inputCampaignData is null")
-      return null
-    }
-
-    if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
-      logger.error("Keys doesn't Exists")
-      return null
-    }
-
-    val campaignMerged = inputCampaignsData.orderBy(CampaignCommon.PRIORITY)
-      .groupBy(key)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
-        first(key1) as key1,
-        first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
-        first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
-
-    return campaignMerged
-  }
-
-  def initCampaignsConfig(campaignJsonPath: String) = {
+   def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
       val conf = new Configuration()
@@ -258,7 +229,7 @@ object CampaignManager extends Serializable with Logging {
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
       val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
-      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData, CampaignMergedFields.CUSTOMER_ID)
+      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
 
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
       val mergedData = CampaignProcessor.mergeCampaigns(allCamp, itr).coalesce(1).cache()

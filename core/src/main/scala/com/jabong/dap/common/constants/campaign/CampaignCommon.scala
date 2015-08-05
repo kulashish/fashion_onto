@@ -43,6 +43,7 @@ object CampaignCommon {
 
   val ACART_BASE_URL = "www.jabong.com/cart/addmulti?skus="
 
+  val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
 
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
@@ -56,7 +57,7 @@ object CampaignCommon {
     "acart_followup" -> 43,
     "surf2" -> 57,
     "surf6" -> 71,
-    "invalid_followup" -> 43,
+    "invalid_followup" -> 48,
     "invalid_lowstock" -> 49,
     "surf1" -> 56,
     "surf3" -> 58
