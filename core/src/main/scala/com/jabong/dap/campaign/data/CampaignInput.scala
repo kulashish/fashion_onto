@@ -232,8 +232,8 @@ object CampaignInput extends Logging {
 
   def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
     val path: String = DataSets.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
-    var result: DataFrame = null
     if (DataVerifier.dataExists(path)) {
+      var result: DataFrame = null
       try {
         val campaignData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
           .withColumn(CampaignCommon.PRIORITY, lit(priority))
@@ -283,6 +283,8 @@ object CampaignInput extends Logging {
       println("printing device id = null records:")
       finalRes.filter(col(CampaignMergedFields.DEVICE_ID) + "IS NULL").show(10)
       return finalRes
+    }
+    return null
   }
 
   def getCampaignInputDataFrame(fileFormat: String, basePath: String, source: String, componentName: String, mode: String, date: String): DataFrame = {
