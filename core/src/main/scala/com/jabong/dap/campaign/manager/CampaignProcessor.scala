@@ -97,7 +97,8 @@ object CampaignProcessor {
       return null
     }
 
-    val campaignMerged = inputCampaignsData.orderBy(CampaignCommon.PRIORITY)
+    val campaignMerged = inputCampaignsData.na.drop("all", Array(CampaignMergedFields.DEVICE_ID, CampaignMergedFields.DOMAIN))
+      .orderBy(CampaignCommon.PRIORITY)
       .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
@@ -121,7 +122,7 @@ object CampaignProcessor {
     println("Inside priority based merge")
 
     val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
-    println("After campaign filtering on not null CustomerId " + custIdNotNUll.count())
+    println("After campaign filtering on not null CustomerId ")// + custIdNotNUll.count())
     //custIdNotNUll.printSchema()
     //custIdNotNUll.show(10)
 
@@ -131,19 +132,19 @@ object CampaignProcessor {
     //custId.show(10)
 
     val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    custIdNUll.show(100)
-    println("After campaign filtering on null CustomerId " + custIdNUll.count())
-    custIdNUll.printSchema()
+    println("After campaign filtering on null CustomerId ")// + custIdNUll.count())
+    //custIdNUll.printSchema()
+    //custIdNUll.show(10)
 
     val DeviceId = campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
     println("After campaign merger on DeviceId")
-    DeviceId.printSchema()
-    DeviceId.show(10)
+    //DeviceId.printSchema()
+    //DeviceId.show(10)
 
     val camp = custId.unionAll(DeviceId)
-    println("After unionAll count = " + camp.count())
-    camp.printSchema()
-    camp.show(10)
+    println("After unionAll count = ")// + camp.count())
+    //camp.printSchema()
+    //camp.show(10)
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
 
@@ -161,9 +162,9 @@ object CampaignProcessor {
         lit("www.jabong.com/cart/addmulti?skus=" + camp(CampaignMergedFields.REF_SKU1)).cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
-    println("Final Campaign after join with ITR: " + finalCampaign.count())
-    finalCampaign.printSchema()
-    finalCampaign.show(10)
+    println("Final Campaign after join with ITR: ")// + finalCampaign.count())
+    //finalCampaign.printSchema()
+    //finalCampaign.show(10)
 
     finalCampaign
   }
