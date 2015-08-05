@@ -21,7 +21,7 @@ object MobilePushCampaignQuality extends Logging {
 
   val schema = StructType(Array(
     StructField("name", StringType, true),
-    StructField("count", IntegerType, true)
+    StructField("count", LongType, true)
   ))
 
   def startMobilePushCampaignQuality(campaignsConfig: String) = {
@@ -30,32 +30,15 @@ object MobilePushCampaignQuality extends Logging {
 
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
-    var dfCampaignQuality = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], schema)
-
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_DAILY_CAMPAIGN, dateYesterday))
+    var dfCampaignQuality = getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday)
 
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_IOD_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, dateYesterday))
+    for (campaignName <- CampaignManager.campaignMailTypeMap.keys) {
 
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, dateYesterday))
+      dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(campaignName, dateYesterday))
 
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.CANCEL_RETARGET_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.RETURN_RETARGET_CAMPAIGN, dateYesterday))
-
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF1_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF2_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF3_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.SURF6_CAMPAIGN, dateYesterday))
-
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_IOD_CAMPAIGN, dateYesterday))
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dateYesterday))
-
-    dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday))
+    }
 
     logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
 
@@ -118,12 +101,14 @@ object MobilePushCampaignQuality extends Logging {
 
     } else { //if data frame is null
 
+      val count: Long = 0
+
       logger.info("Data Frame of: " + campaignName + " is null")
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
         for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
-          row = Row(campaignName + "_" + mailType, 0)
+          row = Row(campaignName + "_" + mailType, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
@@ -133,18 +118,16 @@ object MobilePushCampaignQuality extends Logging {
         || campaignName.equals(CampaignCommon.SURF3_CAMPAIGN)
         || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
 
-        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", 0)
+        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", count)
         dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", 0)
+        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", count)
         dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       } else {
-        row = Row(campaignName, 0)
+        row = Row(campaignName, count)
         dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
       }
     }
-    println("collecting dataframe: " + dfCampaignQuality)
-    dfCampaignQuality.collect().foreach(println)
 
     return dfCampaignQuality
 
