@@ -26,12 +26,12 @@ object Init {
    * @param config String Path of application config json file
    */
   case class Params(
-                     component: String = null,
-                     tableJson: String = null,
-                     mergeJson: String = null,
-                     varJson: String = null,
-                     pushCampaignsJson: String = null,
-                     config: String = null)
+    component: String = null,
+    tableJson: String = null,
+    mergeJson: String = null,
+    varJson: String = null,
+    pushCampaignsJson: String = null,
+    config: String = null)
 
   def main(args: Array[String]) {
     options(args)
