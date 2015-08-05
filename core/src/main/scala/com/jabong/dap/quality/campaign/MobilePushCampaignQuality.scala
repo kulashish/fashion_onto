@@ -9,6 +9,7 @@ import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types._
@@ -42,7 +43,11 @@ object MobilePushCampaignQuality extends Logging {
 
     logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
 
-    CampaignOutput.saveCampaignDataForYesterday(dfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
+    val cachedfCampaignQuality = dfCampaignQuality.cache()
+
+    CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
+
+    DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "_csv", DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
     logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
       + DataSets.OUTPUT_PATH + "/"
