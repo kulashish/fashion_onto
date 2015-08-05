@@ -54,6 +54,7 @@ object CustomerDeviceMapping extends Logging {
         clickStream(PageVisitVariables.BROWSER_ID),
         clickStream(PageVisitVariables.DOMAIN)
       )
+
     println("After outer join with customer table: ") // + joinedDf.count())
     //    joinedDf.printSchema()
     //    joinedDf.show(10)

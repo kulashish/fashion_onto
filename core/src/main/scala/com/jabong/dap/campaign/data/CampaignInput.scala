@@ -226,8 +226,8 @@ object CampaignInput extends Logging {
             allCampaignData = allCampaignData.unionAll(df)
           }
         }))
-    println("merging full campaign done before dropping duplicates: " + allCampaignData.count())
-    return allCampaignData.dropDuplicates()
+    println("merging full campaign done")
+    return allCampaignData
   }
 
   def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
@@ -260,7 +260,7 @@ object CampaignInput extends Logging {
           throw new SparkException("Data not available ?", th)
         }
       }
-      println("Before replacing null customer id with 0 and device_id with empty string: " + result.count())
+      println("Before replacing null customer id with 0 and device_id with empty string: ")// + result.count())
       //campaignData.printSchema()
       //campaignData.show(9)
       val finalRes = result.na.fill(
@@ -269,16 +269,16 @@ object CampaignInput extends Logging {
           CampaignMergedFields.DEVICE_ID -> ""
         )
       )
-      println("After replacing: " + finalRes.count())
+      println("After replacing: ")// + finalRes.count())
 
-      println("printing customer id = 0 records:")
-      finalRes.filter(col(CampaignMergedFields.CUSTOMER_ID) === 0).show(10)
+      //println("printing customer id = 0 records:")
+      //finalRes.filter(col(CampaignMergedFields.CUSTOMER_ID) === 0).show(10)
 
       //println("printing customer id = null records:")
       //finalRes.filter(CampaignMergedFields.CUSTOMER_ID + " IS NULL").show(10)
 
-      println("printing device id = empty records:")
-      finalRes.filter(col(CampaignMergedFields.DEVICE_ID) === "").show(10)
+      //println("printing device id = empty records:")
+      //finalRes.filter(col(CampaignMergedFields.DEVICE_ID) === "").show(10)
 
       //println("printing device id = null records:")
       //finalRes.filter(CampaignMergedFields.DEVICE_ID + " IS NULL").show(10)
