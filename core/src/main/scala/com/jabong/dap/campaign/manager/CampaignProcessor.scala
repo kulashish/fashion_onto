@@ -108,11 +108,11 @@ object CampaignProcessor {
 
     return campaignMerged
       .select(
-        campaignMerged(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
-        campaignMerged(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.LIVE_MAIL_TYPE,
-        campaignMerged(CampaignMergedFields.REF_SKU1) as CampaignMergedFields.LIVE_REF_SKU1,
-        campaignMerged(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL,
-        campaignMerged(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
+        campaignMerged(CampaignMergedFields.CUSTOMER_ID),
+        campaignMerged(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        campaignMerged(CampaignMergedFields.REF_SKU1),
+        campaignMerged(CampaignMergedFields.EMAIL),
+        campaignMerged(CampaignMergedFields.DOMAIN),
         campaignMerged(CampaignMergedFields.DEVICE_ID)
       )
   }
