@@ -131,7 +131,7 @@ object CustomerDeviceMapping extends Logging {
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
           col("BID") as PageVisitVariables.BROWSER_ID,
-          col("APPTYPE") as PageVisitVariables.DOMAIN
+          when(col("APPTYPE").contains("ios"),lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
       df
     } catch {
