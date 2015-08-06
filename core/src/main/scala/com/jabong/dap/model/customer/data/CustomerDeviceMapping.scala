@@ -71,7 +71,7 @@ object CustomerDeviceMapping extends Logging {
 
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
     joined.printSchema()
-    //    joined.show(10)
+    joined.show(20)
     println("Distinct email count for device Mapping: " + joined.select(CustomerVariables.EMAIL).distinct.count())
 
     val result = joined.na
@@ -140,9 +140,10 @@ object CustomerDeviceMapping extends Logging {
           when(col("APPTYPE").contains("ios"), lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
       println("Total recs in DCF file initially: ") // + df.count())
+      df
       // df.printSchema()
       // df.show(9)
-
+/*
       val dupFile = "/data/output/extras/duplicate/cust_email.csv"
       val duplicate = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ",").load(dupFile)
       println("Total recs in duplicate file: ") // + duplicate.count())
@@ -180,7 +181,7 @@ object CustomerDeviceMapping extends Logging {
       // res.printSchema()
       // res.show(9)
 
-      return res
+      return res*/
 
     } catch {
       case e: DataNotFound =>

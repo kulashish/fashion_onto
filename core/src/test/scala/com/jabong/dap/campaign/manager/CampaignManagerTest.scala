@@ -31,6 +31,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     val status = CampaignManager.createCampaignMaps(null)
     assert(status == false)
   }
+  /*
 
   "Correct json String" should "return true" in {
     val status = CampaignManager.createCampaignMaps(json)
@@ -74,6 +75,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
       CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKU1))
     mergedCampaignData.show(5)
     assert(mergedCampaignData.columns.length == 4)
-  }
 
+  }
+*/
 }
