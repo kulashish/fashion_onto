@@ -3,15 +3,15 @@ package com.jabong.dap.quality.campaign
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.CampaignInfo
 import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
 
@@ -29,33 +29,34 @@ object MobilePushCampaignQuality extends Logging {
 
     logger.info("Calling method startMobilePushCampaignQuality........")
 
-    CampaignManager.initCampaignsConfig(campaignsConfig)
+    if (CampaignManager.initCampaignsConfigJson(campaignsConfig)) {
 
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+      val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    var dfCampaignQuality = getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday)
+      var dfCampaignQuality = getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday)
 
-    for (campaignName <- CampaignManager.campaignMailTypeMap.keys) {
+      for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
 
-      dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(campaignName, dateYesterday))
+        dfCampaignQuality = dfCampaignQuality.unionAll(getCampaignQuality(campaignDetails.campaignName, dateYesterday))
 
+      }
+
+      logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
+
+      val cachedfCampaignQuality = dfCampaignQuality.cache()
+
+      CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
+
+      DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "_csv", DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+
+      logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
+        + DataSets.OUTPUT_PATH + "/"
+        + DataSets.CAMPAIGN + "/"
+        + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "/"
+        + DataSets.DAILY_MODE + "/"
+        + dateYesterday
+      )
     }
-
-    logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
-
-    val cachedfCampaignQuality = dfCampaignQuality.cache()
-
-    CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
-
-    DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "_csv", DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
-
-    logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
-      + DataSets.OUTPUT_PATH + "/"
-      + DataSets.CAMPAIGN + "/"
-      + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "/"
-      + DataSets.DAILY_MODE + "/"
-      + dateYesterday
-    )
 
   }
 
@@ -79,10 +80,23 @@ object MobilePushCampaignQuality extends Logging {
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
-        for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
+        //        for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
+        for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
 
-          val count = dataFrame.filter("LIVE_MAIL_TYPE" + " = " + mailType).count()
-          row = Row(campaignName + "_" + mailType, count)
+          val count = dataFrame.filter("LIVE_MAIL_TYPE" + " = " + campaignDetails.mailType).count()
+          row = Row(campaignName + "_" + campaignDetails.campaignName, count)
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+
+          val countAndroid = dataFrame.filter(CampaignMergedFields.DOMAIN + " = '" + CampaignMergedFields.ANDROID + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.ANDROID, countAndroid)
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+
+          val countIos = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + CampaignMergedFields.IOS + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.IOS, countIos)
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+
+          val countWindows = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + CampaignMergedFields.WINDOWS + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.WINDOWS, countWindows)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
@@ -112,8 +126,19 @@ object MobilePushCampaignQuality extends Logging {
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
-        for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
-          row = Row(campaignName + "_" + mailType, count)
+        //        for (mailType <- CampaignManager.mailTypePriorityMap.keys) {
+        for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
+
+          row = Row(campaignName + "_" + campaignDetails.campaignName, count)
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.ANDROID, count)
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.IOS, count)
+          dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
+
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.WINDOWS, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
