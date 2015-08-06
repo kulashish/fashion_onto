@@ -3,19 +3,17 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
-import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
-import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Utility Class
@@ -508,12 +506,13 @@ object CampaignUtils extends Logging {
     return dfYesterdayItrData
   }
 
-  //FIXME:add implementation
-  def addPriority(campaignData: DataFrame): DataFrame = {
-    val priorityMap = CampaignManager.mailTypePriorityMap
-    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3), e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
-    return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
-  }
+  //  //FIXME:add implementation
+  //  def addPriority(campaignData: DataFrame): DataFrame = {
+  //    val priorityMap = CampaignManager.mailTypePriorityMap
+  //    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3), e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
+  //    return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
+  //  }
+
   //FIXME: make it generalized for all campaigns
   /**
    * shortListSkuFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of SKU
@@ -627,7 +626,7 @@ object CampaignUtils extends Logging {
       "left_outer"
     )
       .select(
-//        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
+        //        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
         col(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
         col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
         col(CustomerPageVisitVariables.SKU),

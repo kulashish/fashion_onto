@@ -24,7 +24,4 @@ object CampaignMergedFields {
   val LIVE_BRICK = "LIVE_BRICK"
   val LIVE_PROD_NAME = "LIVE_PROD_NAME"
   val LIVE_CART_URL = "LIVE_CART_URL"
-  val ANDROID = "android"
-  val IOS = "ios"
-  val WINDOWS = "windows"
 }

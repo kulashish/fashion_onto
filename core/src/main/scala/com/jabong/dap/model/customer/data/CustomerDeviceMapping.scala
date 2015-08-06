@@ -7,6 +7,7 @@ import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.VarInfo
 import com.jabong.dap.data.read.{ DataNotFound, DataReader, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -31,7 +32,7 @@ object CustomerDeviceMapping extends Logging {
     //    clickStreamInc.printSchema()
     //    clickStreamInc.show(10)
 
-    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('ios', 'android', 'windows')")
+    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.USER_ID)
       .agg(
@@ -71,15 +72,20 @@ object CustomerDeviceMapping extends Logging {
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
     joined.printSchema()
     //    joined.show(10)
-    println("Distinct email count for device Mapping: " + joined.select("email").distinct.count())
+    println("Distinct email count for device Mapping: " + joined.select(CustomerVariables.EMAIL).distinct.count())
 
-    joined.na
+    val result = joined.na
       .fill(
         Map(
           CustomerVariables.ID_CUSTOMER -> 0,
           PageVisitVariables.BROWSER_ID -> ""
         )
       ).dropDuplicates()
+    val resWithout0 = result.filter(col(CustomerVariables.ID_CUSTOMER) > 0)
+    println("Total count with id_customer > 0: " + resWithout0.count())
+    println("Distinct id_customer count for device Mapping: " + resWithout0.select(CustomerVariables.ID_CUSTOMER).distinct.count())
+
+    return result
   }
 
   /**
@@ -131,9 +137,51 @@ object CustomerDeviceMapping extends Logging {
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
           col("BID") as PageVisitVariables.BROWSER_ID,
-          when(col("APPTYPE").contains("ios"),lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
+          when(col("APPTYPE").contains("ios"), lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
-      df
+      println("Total recs in DCF file initially: ") // + df.count())
+      // df.printSchema()
+      // df.show(9)
+
+      val dupFile = "/data/output/extras/duplicate/cust_email.csv"
+      val duplicate = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ",").load(dupFile)
+      println("Total recs in duplicate file: ") // + duplicate.count())
+      // duplicate.printSchema()
+      // duplicate.show(9)
+
+      val NEW_RESPONSYS_ID = MergeUtils.NEW_ + CustomerVariables.RESPONSYS_ID
+      val NEW_ID_CUSTOMER = MergeUtils.NEW_ + CustomerVariables.ID_CUSTOMER
+      val NEW_EMAIL = MergeUtils.NEW_ + CustomerVariables.EMAIL
+      val NEW_BROWSER_ID = MergeUtils.NEW_ + PageVisitVariables.BROWSER_ID
+      val NEW_DOMAIN = MergeUtils.NEW_ + PageVisitVariables.DOMAIN
+
+      val correctRecs = df.join(duplicate, df(CustomerVariables.ID_CUSTOMER) === duplicate(CustomerVariables.ID_CUSTOMER) && df(CustomerVariables.EMAIL) === duplicate(CustomerVariables.EMAIL))
+        .select(
+          df(CustomerVariables.RESPONSYS_ID) as NEW_RESPONSYS_ID,
+          df(CustomerVariables.ID_CUSTOMER) as NEW_ID_CUSTOMER,
+          df(CustomerVariables.EMAIL) as NEW_EMAIL,
+          df(PageVisitVariables.BROWSER_ID) as NEW_BROWSER_ID,
+          df(PageVisitVariables.DOMAIN) as NEW_DOMAIN
+        )
+      println("Total recs corrected: ") // + correctRecs.count())
+      // correctRecs.printSchema()
+      // correctRecs.show(9)
+
+      val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), "leftouter")
+        .select(
+          coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as CustomerVariables.RESPONSYS_ID,
+          coalesce(correctRecs(NEW_ID_CUSTOMER), df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+          coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+          coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+          coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
+        ).dropDuplicates()
+
+      println("Total recs after correction: ") // + res.count())
+      // res.printSchema()
+      // res.show(9)
+
+      return res
+
     } catch {
       case e: DataNotFound =>
         logger.error("Data not found for the given path ")

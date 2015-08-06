@@ -2,10 +2,9 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -13,9 +12,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
-import org.apache.spark.sql.functions._
-
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import scala.collection.mutable.HashMap
 
 /**
@@ -26,8 +23,8 @@ import scala.collection.mutable.HashMap
 
 object CampaignManager extends Serializable with Logging {
 
-  var campaignPriorityMap = new HashMap[String, Int]
-  var campaignMailTypeMap = new HashMap[String, Int]
+  // var campaignPriorityMap = new HashMap[String, Int]
+  // var campaignMailTypeMap = new HashMap[String, Int]
   var mailTypePriorityMap = new HashMap[Int, Int]
 
   def createCampaignMaps(parsedJson: JValue): Boolean = {
@@ -39,8 +36,8 @@ object CampaignManager extends Serializable with Logging {
       CampaignInfo.campaigns = parsedJson.extract[CampaignConfig]
       //  var campaignDetails:CampaignDetail = null
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-        campaignPriorityMap.put(campaignDetails.campaignName, campaignDetails.priority)
-        campaignMailTypeMap.put(campaignDetails.campaignName, campaignDetails.mailType)
+        // campaignPriorityMap.put(campaignDetails.campaignName, campaignDetails.priority)
+        // campaignMailTypeMap.put(campaignDetails.campaignName, campaignDetails.mailType)
         mailTypePriorityMap.put(campaignDetails.mailType, campaignDetails.priority)
       }
 
@@ -148,7 +145,7 @@ object CampaignManager extends Serializable with Logging {
     acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
+  //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
   def startWishlistCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
@@ -161,15 +158,15 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-   def initCampaignsConfig(campaignJsonPath: String) = {
+  def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
       val conf = new Configuration()
       val fileSystem = FileSystem.get(conf)
-      implicit val formats = net.liftweb.json.DefaultFormats
+      //      implicit val formats = net.liftweb.json.DefaultFormats
       val path = new Path(campaignJsonPath)
       json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      //   CampaignInfo.campaigns = json.extract[campaignConfig]
+      // CampaignInfo.campaigns = json.extract[CampaignConfig]
       // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
       true
     } catch {
@@ -189,58 +186,6 @@ object CampaignManager extends Serializable with Logging {
 
     if (validated) {
       createCampaignMaps(json)
-    }
-  }
-
-  /**
-   * Merges all the campaign output based on priority
-   * @param campaignJsonPath
-   */
-  def startPushCampaignMerge(campaignJsonPath: String) = {
-    var json: JValue = null
-    val validated = try {
-      val conf = new Configuration()
-      val fileSystem = FileSystem.get(conf)
-      implicit val formats = net.liftweb.json.DefaultFormats
-      val path = new Path(campaignJsonPath)
-      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      //   CampaignInfo.campaigns = json.extract[CampaignConfig]
-      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
-      true
-    } catch {
-      case e: ParseException =>
-        logger.error("Error while parsing JSON: " + e.getMessage)
-        false
-
-      case e: IllegalArgumentException =>
-        logger.error("Error while validating JSON: " + e.getMessage)
-        false
-
-      case e: Exception =>
-        logger.error("Some unknown error occurred: " + e.getMessage)
-        throw e
-        false
-    }
-
-    if (validated) {
-      createCampaignMaps(json)
-      val saveMode = DataSets.OVERWRITE_SAVEMODE
-      val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
-
-      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
-      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
-
-      val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-      val mergedData = CampaignProcessor.mergeCampaigns(allCamp, itr).coalesce(1).cache()
-
-      println("Starting write parquet after repartitioning and caching")
-      val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-      if (DataWriter.canWrite(saveMode, writePath))
-        DataWriter.writeParquet(mergedData, writePath, saveMode)
-
-      //writing csv file
-      CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
     }
   }
 
@@ -271,4 +216,32 @@ object CampaignManager extends Serializable with Logging {
     }
     return validated
   }
+
+  /**
+   * Merges all the campaign output based on priority
+   * @param campaignJsonPath
+   */
+  def startPushCampaignMerge(campaignJsonPath: String) = {
+    if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
+      //      createCampaignMaps(json)
+      val saveMode = DataSets.OVERWRITE_SAVEMODE
+      val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
+
+      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
+
+      val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
+      val mergedData = CampaignProcessor.mergeCampaigns(allCamp, itr).coalesce(1).cache()
+
+      println("Starting write parquet after repartitioning and caching")
+      val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      if (DataWriter.canWrite(saveMode, writePath))
+        DataWriter.writeParquet(mergedData, writePath, saveMode)
+
+      //writing csv file
+      CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
+    }
+  }
+
 }
