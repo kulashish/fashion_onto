@@ -27,10 +27,10 @@ object CustomerDeviceMapping extends Logging {
    * @return master customer device mapping with the last used device by the customer
    */
   def getLatestDevice(clickStreamInc: DataFrame, cmr: DataFrame, customer: DataFrame): DataFrame = {
-    //val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
+    // val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
     println("clickStreamInc: ") // + clickStreamInc.count())
-    //    clickStreamInc.printSchema()
-    //    clickStreamInc.show(10)
+    // clickStreamInc.printSchema()
+    // clickStreamInc.show(10)
 
     val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
@@ -41,8 +41,8 @@ object CustomerDeviceMapping extends Logging {
       )
 
     println("clickStream after aggregation and filtering: ") // + clickStream.count())
-    //    clickStream.printSchema()
-    //    clickStream.show(10)
+    // clickStream.printSchema()
+    // clickStream.show(10)
 
     // outerjoin with customer table one day increment on userid = email
     // id_customer, email, browser_id, domain
@@ -57,21 +57,22 @@ object CustomerDeviceMapping extends Logging {
       )
 
     println("After outer join with customer table: ") // + joinedDf.count())
-    //    joinedDf.printSchema()
-    //    joinedDf.show(10)
+    // joinedDf.printSchema()
+    // joinedDf.show(10)
 
     val joined = joinedDf.join(cmr, cmr(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), "outer")
       .select(
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
-        cmr(CustomerVariables.ID_CUSTOMER),
+        coalesce(joinedDf(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         coalesce(joinedDf(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
         coalesce(joinedDf(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
       )
 
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
-    joined.printSchema()
-    //    joined.show(10)
+    // joined.printSchema()
+    // joined.show(10)
+
     println("Distinct email count for device Mapping: " + joined.select(CustomerVariables.EMAIL).distinct.count())
 
     val result = joined.na
@@ -109,7 +110,7 @@ object CustomerDeviceMapping extends Logging {
   def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
     val df1 = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
     var df2: DataFrame = null
-    //    val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
+    // val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
     if (null != path) {
       df2 = getDataFrameCsv4mDCF(path)
     } else {
@@ -140,6 +141,7 @@ object CustomerDeviceMapping extends Logging {
           when(col("APPTYPE").contains("ios"), lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
       println("Total recs in DCF file initially: ") // + df.count())
+
       // df.printSchema()
       // df.show(9)
 
