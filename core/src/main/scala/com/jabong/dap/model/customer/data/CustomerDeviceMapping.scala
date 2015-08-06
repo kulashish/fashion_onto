@@ -72,15 +72,20 @@ object CustomerDeviceMapping extends Logging {
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
     joined.printSchema()
     //    joined.show(10)
-    println("Distinct email count for device Mapping: " + joined.select("email").distinct.count())
+    println("Distinct email count for device Mapping: " + joined.select(CustomerVariables.EMAIL).distinct.count())
 
-    joined.na
+    val result = joined.na
       .fill(
         Map(
           CustomerVariables.ID_CUSTOMER -> 0,
           PageVisitVariables.BROWSER_ID -> ""
         )
       ).dropDuplicates()
+    val resWithout0 = result.filter(col(CustomerVariables.ID_CUSTOMER) > 0)
+    println("Total count with id_customer > 0: " + resWithout0.count())
+    println("Distinct id_customer count for device Mapping: " + resWithout0.select(CustomerVariables.ID_CUSTOMER).distinct.count())
+
+    return result
   }
 
   /**
