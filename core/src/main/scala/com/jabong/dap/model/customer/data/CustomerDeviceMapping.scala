@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.data
 
-import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -137,15 +137,15 @@ object CustomerDeviceMapping extends Logging {
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
           col("BID") as PageVisitVariables.BROWSER_ID,
-          when(col("APPTYPE").contains("ios"),lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
+          when(col("APPTYPE").contains("ios"), lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
-      println("Total recs in DCF file initially: ")// + df.count())
+      println("Total recs in DCF file initially: ") // + df.count())
       // df.printSchema()
       // df.show(9)
 
       val dupFile = "/data/output/extras/duplicate/cust_email.csv"
       val duplicate = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ",").load(dupFile)
-      println("Total recs in duplicate file: ")// + duplicate.count())
+      println("Total recs in duplicate file: ") // + duplicate.count())
       // duplicate.printSchema()
       // duplicate.show(9)
 
@@ -156,27 +156,27 @@ object CustomerDeviceMapping extends Logging {
       val NEW_DOMAIN = MergeUtils.NEW_ + PageVisitVariables.DOMAIN
 
       val correctRecs = df.join(duplicate, df(CustomerVariables.ID_CUSTOMER) === duplicate(CustomerVariables.ID_CUSTOMER) && df(CustomerVariables.EMAIL) === duplicate(CustomerVariables.EMAIL))
-      .select(
+        .select(
           df(CustomerVariables.RESPONSYS_ID) as NEW_RESPONSYS_ID,
           df(CustomerVariables.ID_CUSTOMER) as NEW_ID_CUSTOMER,
           df(CustomerVariables.EMAIL) as NEW_EMAIL,
           df(PageVisitVariables.BROWSER_ID) as NEW_BROWSER_ID,
           df(PageVisitVariables.DOMAIN) as NEW_DOMAIN
         )
-      println("Total recs corrected: ")// + correctRecs.count())
+      println("Total recs corrected: ") // + correctRecs.count())
       // correctRecs.printSchema()
       // correctRecs.show(9)
 
       val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), "leftouter")
         .select(
-          coalesce(correctRecs(NEW_RESPONSYS_ID),df(CustomerVariables.RESPONSYS_ID)) as CustomerVariables.RESPONSYS_ID,
-          coalesce(correctRecs(NEW_ID_CUSTOMER),df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
-          coalesce(correctRecs(NEW_EMAIL),df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+          coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as CustomerVariables.RESPONSYS_ID,
+          coalesce(correctRecs(NEW_ID_CUSTOMER), df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+          coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
         ).dropDuplicates()
 
-      println("Total recs after correction: ")// + res.count())
+      println("Total recs after correction: ") // + res.count())
       // res.printSchema()
       // res.show(9)
 
