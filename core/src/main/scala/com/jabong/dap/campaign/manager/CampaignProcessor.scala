@@ -62,9 +62,9 @@ object CampaignProcessor {
         bcCampaign(CampaignMergedFields.REF_SKU1),
         bcCampaign(CampaignCommon.PRIORITY),
         /*  Other logic if UDF not required
-        when(bcCampaign(CampaignMergedFields.DOMAIN).contains("windows") ||
-          bcCampaign(CampaignMergedFields.DOMAIN).contains("android") ||
-          bcCampaign(CampaignMergedFields.DOMAIN).contains("ios"), bcCampaign(CampaignMergedFields.DEVICE_ID).
+        when(bcCampaign(CampaignMergedFields.DOMAIN).contains(DataSets.WINDOWS) ||
+          bcCampaign(CampaignMergedFields.DOMAIN).contains(DataSets.ANDROID) ||
+          bcCampaign(CampaignMergedFields.DOMAIN).contains(DataSets.IOS), bcCampaign(CampaignMergedFields.DEVICE_ID).
         otherwise(cmrn(CampaignMergedFields.DEVICE_ID))
         ) as CampaignMergedFields.DEVICE_ID,
         when(bcCampaign(CampaignMergedFields.EMAIL) === null ||
