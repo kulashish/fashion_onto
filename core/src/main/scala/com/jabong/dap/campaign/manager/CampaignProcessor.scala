@@ -159,7 +159,7 @@ object CampaignProcessor {
         itr(ITR.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
         itr(ITR.BRAND_NAME) as CampaignMergedFields.LIVE_BRAND,
         itr(ITR.BRICK) as CampaignMergedFields.LIVE_BRICK,
-        lit("www.jabong.com/cart/addmulti?skus=" + camp(CampaignMergedFields.REF_SKU1)).cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
+        lit("").cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
     println("Final Campaign after join with ITR: ")// + finalCampaign.count())
