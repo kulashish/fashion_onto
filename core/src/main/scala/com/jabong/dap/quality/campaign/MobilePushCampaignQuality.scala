@@ -3,7 +3,7 @@ package com.jabong.dap.quality.campaign
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
@@ -87,16 +87,16 @@ object MobilePushCampaignQuality extends Logging {
           row = Row(campaignName + "_" + campaignDetails.campaignName, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countAndroid = dataFrame.filter("domain" + " = " + "'android'").count()
-          row = Row(campaignDetails.campaignName + "_" + "android", countAndroid)
+          val countAndroid = dataFrame.filter(CampaignMergedFields.DOMAIN + " = '" + CampaignMergedFields.ANDROID + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.ANDROID, countAndroid)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countIos = dataFrame.filter("domain" + " = " + "'ios'").count()
-          row = Row(campaignDetails.campaignName + "_" + "ios", countIos)
+          val countIos = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + CampaignMergedFields.IOS + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.IOS, countIos)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countWindows = dataFrame.filter("domain" + " = " + "'windows'").count()
-          row = Row(campaignDetails.campaignName + "_" + "windows", countWindows)
+          val countWindows = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + CampaignMergedFields.WINDOWS + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.WINDOWS, countWindows)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
@@ -132,13 +132,13 @@ object MobilePushCampaignQuality extends Logging {
           row = Row(campaignName + "_" + campaignDetails.campaignName, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          row = Row(campaignDetails.campaignName + "_" + "android", count)
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.ANDROID, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          row = Row(campaignDetails.campaignName + "_" + "ios", count)
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.IOS, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          row = Row(campaignDetails.campaignName + "_" + "windows", count)
+          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.WINDOWS, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
