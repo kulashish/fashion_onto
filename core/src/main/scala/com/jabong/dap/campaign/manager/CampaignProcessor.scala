@@ -1,9 +1,9 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
-import com.jabong.dap.common.constants.variables.{CustomerVariables, PageVisitVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -17,18 +17,18 @@ import org.apache.spark.sql.types.StringType
  */
 object CampaignProcessor {
 
-  val email = udf((s : String, s1: String) => if(null == s || s.equals("")) s1 else s)
-  val device = udf((s : String, s1: String, s2: String) => if(null != s && (s.contains("windows") || s.contains("android")| s.contains("ios"))) s1 else s2)
-  val domain = udf((s : String, s1: String) => if(null != s && (s.contains("windows") || s.contains("android")| s.contains("ios"))) s else s1)
+  val email = udf((s: String, s1: String) => if (null == s || s.equals("")) s1 else s)
+  val device = udf((s: String, s1: String, s2: String) => if (null != s && (s.contains("windows") || s.contains("android") | s.contains("ios"))) s1 else s2)
+  val domain = udf((s: String, s1: String) => if (null != s && (s.contains("windows") || s.contains("android") | s.contains("ios"))) s else s1)
 
   def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
-    println("Starting the device mapping after dropping duplicates: ")// + campaign.count())
+    println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
 
     val notNullCampaign = campaign.filter(!(col(CampaignMergedFields.CUSTOMER_ID) === 0 && col(CampaignMergedFields.DEVICE_ID) === ""))
 
-    println("After dropping empty customer and device ids: ")// + notNullCampaign.count())
+    println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
 
-    println("Starting the CMR: ")// + cmr.count())
+    println("Starting the CMR: ") // + cmr.count())
     //println("printing customer id = 0 records:")
     //cmr.filter(col(CustomerVariables.ID_CUSTOMER) === 0).show(10)
 
@@ -88,12 +88,12 @@ object CampaignProcessor {
    */
   def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
     if (inputCampaignsData == null) {
-//      logger.error("inputCampaignData is null")
+      //      logger.error("inputCampaignData is null")
       return null
     }
 
     if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
-//      logger.error("Keys doesn't Exists")
+      //      logger.error("Keys doesn't Exists")
       return null
     }
 
@@ -122,7 +122,7 @@ object CampaignProcessor {
     println("Inside priority based merge")
 
     val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
-    println("After campaign filtering on not null CustomerId ")// + custIdNotNUll.count())
+    println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
     //custIdNotNUll.printSchema()
     //custIdNotNUll.show(10)
 
@@ -132,7 +132,7 @@ object CampaignProcessor {
     //custId.show(10)
 
     val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    println("After campaign filtering on null CustomerId ")// + custIdNUll.count())
+    println("After campaign filtering on null CustomerId ") // + custIdNUll.count())
     //custIdNUll.printSchema()
     //custIdNUll.show(10)
 
@@ -142,7 +142,7 @@ object CampaignProcessor {
     //DeviceId.show(10)
 
     val camp = custId.unionAll(DeviceId)
-    println("After unionAll count = ")// + camp.count())
+    println("After unionAll count = ") // + camp.count())
     //camp.printSchema()
     //camp.show(10)
 
@@ -162,7 +162,7 @@ object CampaignProcessor {
         lit("").cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
-    println("Final Campaign after join with ITR: ")// + finalCampaign.count())
+    println("Final Campaign after join with ITR: ") // + finalCampaign.count())
     //finalCampaign.printSchema()
     //finalCampaign.show(10)
 

@@ -3,7 +3,7 @@ package com.jabong.dap.quality.campaign
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
@@ -91,11 +91,11 @@ object MobilePushCampaignQuality extends Logging {
           row = Row(campaignDetails.campaignName + "_" + DataSets.ANDROID, countAndroid)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countIos = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + DataSets.IOS + "'").count()
+          val countIos = dataFrame.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.IOS + "'").count()
           row = Row(campaignDetails.campaignName + "_" + DataSets.IOS, countIos)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countWindows = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + DataSets.WINDOWS + "'").count()
+          val countWindows = dataFrame.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.WINDOWS + "'").count()
           row = Row(campaignDetails.campaignName + "_" + DataSets.WINDOWS, countWindows)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
