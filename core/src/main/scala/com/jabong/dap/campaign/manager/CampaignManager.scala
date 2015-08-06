@@ -272,4 +272,32 @@ object CampaignManager extends Serializable with Logging {
       CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
     }
   }
+
+  def initCampaignsConfigJson(campaignJsonPath: String): Boolean = {
+    var json: JValue = null
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(campaignJsonPath)
+      json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      CampaignInfo.campaigns = json.extract[CampaignConfig]
+      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+    return validated
+  }
 }
