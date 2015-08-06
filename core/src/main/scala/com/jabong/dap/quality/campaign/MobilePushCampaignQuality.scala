@@ -87,15 +87,15 @@ object MobilePushCampaignQuality extends Logging {
           row = Row(campaignName + "_" + campaignDetails.campaignName, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countAndroid = dataFrame.filter("domain" + " = " + "android").count()
+          val countAndroid = dataFrame.filter("domain" + " = " + "'android'").count()
           row = Row(campaignDetails.campaignName + "_" + "android", countAndroid)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countIos = dataFrame.filter("domain" + " = " + "ios").count()
+          val countIos = dataFrame.filter("domain" + " = " + "'ios'").count()
           row = Row(campaignDetails.campaignName + "_" + "ios", countIos)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countWindows = dataFrame.filter("domain" + " = " + "windows").count()
+          val countWindows = dataFrame.filter("domain" + " = " + "'windows'").count()
           row = Row(campaignDetails.campaignName + "_" + "windows", countWindows)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
