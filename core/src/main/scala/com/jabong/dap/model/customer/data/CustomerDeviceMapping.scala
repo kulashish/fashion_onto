@@ -32,7 +32,7 @@ object CustomerDeviceMapping extends Logging {
     //    clickStreamInc.printSchema()
     //    clickStreamInc.show(10)
 
-    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('ios', 'android', 'windows')")
+    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.USER_ID)
       .agg(
