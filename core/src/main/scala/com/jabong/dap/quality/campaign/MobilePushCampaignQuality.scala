@@ -87,16 +87,16 @@ object MobilePushCampaignQuality extends Logging {
           row = Row(campaignName + "_" + campaignDetails.campaignName, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countAndroid = dataFrame.filter(CampaignMergedFields.DOMAIN + " = '" + CampaignMergedFields.ANDROID + "'").count()
-          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.ANDROID, countAndroid)
+          val countAndroid = dataFrame.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.ANDROID + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + DataSets.ANDROID, countAndroid)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countIos = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + CampaignMergedFields.IOS + "'").count()
-          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.IOS, countIos)
+          val countIos = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + DataSets.IOS + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + DataSets.IOS, countIos)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          val countWindows = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + CampaignMergedFields.WINDOWS + "'").count()
-          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.WINDOWS, countWindows)
+          val countWindows = dataFrame.filter(CampaignMergedFields.DOMAIN  + " = '" + DataSets.WINDOWS + "'").count()
+          row = Row(campaignDetails.campaignName + "_" + DataSets.WINDOWS, countWindows)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
@@ -132,13 +132,13 @@ object MobilePushCampaignQuality extends Logging {
           row = Row(campaignName + "_" + campaignDetails.campaignName, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.ANDROID, count)
+          row = Row(campaignDetails.campaignName + "_" + DataSets.ANDROID, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.IOS, count)
+          row = Row(campaignDetails.campaignName + "_" + DataSets.IOS, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
-          row = Row(campaignDetails.campaignName + "_" + CampaignMergedFields.WINDOWS, count)
+          row = Row(campaignDetails.campaignName + "_" + DataSets.WINDOWS, count)
           dfCampaignQuality = dfCampaignQuality.unionAll(getDataFrameFromRow(row))
 
         }
