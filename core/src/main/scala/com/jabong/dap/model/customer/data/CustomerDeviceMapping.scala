@@ -134,13 +134,13 @@ object CustomerDeviceMapping extends Logging {
           col("BID") as PageVisitVariables.BROWSER_ID,
           when(col("APPTYPE").contains("ios"),lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
-      // println("Total recs in DCF file initially: " + df.count())
+      println("Total recs in DCF file initially: ")// + df.count())
       // df.printSchema()
       // df.show(9)
 
       val dupFile = "/data/output/extras/duplicate/cust_email.csv"
       val duplicate = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ",").load(dupFile)
-      // println("Total recs in duplicate file: " + duplicate.count())
+      println("Total recs in duplicate file: ")// + duplicate.count())
       // duplicate.printSchema()
       // duplicate.show(9)
 
@@ -158,7 +158,7 @@ object CustomerDeviceMapping extends Logging {
           df(PageVisitVariables.BROWSER_ID) as NEW_BROWSER_ID,
           df(PageVisitVariables.DOMAIN) as NEW_DOMAIN
         )
-      // println("Total recs corrected: " + correctRecs.count())
+      println("Total recs corrected: ")// + correctRecs.count())
       // correctRecs.printSchema()
       // correctRecs.show(9)
 
@@ -171,7 +171,7 @@ object CustomerDeviceMapping extends Logging {
           coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
         ).dropDuplicates()
 
-      // println("Total recs after correction: " + res.count())
+      println("Total recs after correction: ")// + res.count())
       // res.printSchema()
       // res.show(9)
 
