@@ -5,12 +5,12 @@ import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
-import com.jabong.dap.data.read.{DataReader, PathBuilder}
+import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.schema.Schema
@@ -262,7 +262,7 @@ object CampaignInput extends Logging {
           throw new SparkException("Data not available ?", th)
         }
       }
-      println("Before replacing null customer id with 0 and device_id with empty string: ")// + result.count())
+      println("Before replacing null customer id with 0 and device_id with empty string: ") // + result.count())
       //campaignData.printSchema()
       //campaignData.show(9)
       val finalRes = result.na.fill(
@@ -271,7 +271,7 @@ object CampaignInput extends Logging {
           CampaignMergedFields.DEVICE_ID -> ""
         )
       )
-      println("After replacing: ")// + finalRes.count())
+      println("After replacing: ") // + finalRes.count())
 
       //println("printing customer id = 0 records:")
       //finalRes.filter(col(CampaignMergedFields.CUSTOMER_ID) === 0).show(10)

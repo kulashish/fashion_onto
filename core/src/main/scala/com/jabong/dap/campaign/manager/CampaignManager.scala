@@ -3,8 +3,8 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -12,7 +12,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import scala.collection.mutable.HashMap
 
 /**
@@ -23,8 +23,8 @@ import scala.collection.mutable.HashMap
 
 object CampaignManager extends Serializable with Logging {
 
-//  var campaignPriorityMap = new HashMap[String, Int]
-//  var campaignMailTypeMap = new HashMap[String, Int]
+  // var campaignPriorityMap = new HashMap[String, Int]
+  // var campaignMailTypeMap = new HashMap[String, Int]
   var mailTypePriorityMap = new HashMap[Int, Int]
 
   def createCampaignMaps(parsedJson: JValue): Boolean = {
@@ -145,7 +145,7 @@ object CampaignManager extends Serializable with Logging {
     acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
   }
 
-//  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
+  //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
   def startWishlistCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
@@ -158,12 +158,12 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-   def initCampaignsConfig(campaignJsonPath: String) = {
+  def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
       val conf = new Configuration()
       val fileSystem = FileSystem.get(conf)
-//      implicit val formats = net.liftweb.json.DefaultFormats
+      //      implicit val formats = net.liftweb.json.DefaultFormats
       val path = new Path(campaignJsonPath)
       json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
       // CampaignInfo.campaigns = json.extract[CampaignConfig]
@@ -223,7 +223,7 @@ object CampaignManager extends Serializable with Logging {
    */
   def startPushCampaignMerge(campaignJsonPath: String) = {
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
-//      createCampaignMaps(json)
+      //      createCampaignMaps(json)
       val saveMode = DataSets.OVERWRITE_SAVEMODE
       val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)

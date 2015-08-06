@@ -5,15 +5,15 @@ import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.CustomerVariables
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
-import com.jabong.dap.data.read.{DataReader, PathBuilder}
+import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 3/8/15.
