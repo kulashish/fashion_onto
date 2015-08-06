@@ -40,22 +40,22 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
     val res = CustomerDeviceMapping.getLatestDevice(click1, dcf, cus1)
 
-//    click1.collect().foreach(println)
-//    dcf.collect().foreach(println)
-//    cus1.collect().foreach(println)
+    //    click1.collect().foreach(println)
+    //    dcf.collect().foreach(println)
+    //    cus1.collect().foreach(println)
     res.collect().foreach(println)
-//    assert(res.collect().toSet.equals(res.collect().toSet))
+    //    assert(res.collect().toSet.equals(res.collect().toSet))
   }
 
-//  "Testing getLatestDevice method" should " match the output dataframe" in {
-//
-//    val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
-//    click2.collect().foreach(println)
-//    dcf.collect().foreach(println)
-//    cus2.collect().foreach(println)
-//    res.collect().foreach(println)
-//
-//    assert(res.collect().toSet.equals(res.collect().toSet))
-//  }
+  //  "Testing getLatestDevice method" should " match the output dataframe" in {
+  //
+  //    val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
+  //    click2.collect().foreach(println)
+  //    dcf.collect().foreach(println)
+  //    cus2.collect().foreach(println)
+  //    res.collect().foreach(println)
+  //
+  //    assert(res.collect().toSet.equals(res.collect().toSet))
+  //  }
 
 }
