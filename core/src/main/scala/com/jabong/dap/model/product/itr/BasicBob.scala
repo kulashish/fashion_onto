@@ -14,10 +14,12 @@ object BasicBob {
    * Prepare data frame of bob related columns
    * Note: All column names are following camel casing
    * pattern
-   * @param date //YYYY-MM-DD
+   * @param inputDate //YYYY/MM/DD
    * @return
    */
-  def getBobColumns(date: String): DataFrame = {
+  def getBobColumns(inputDate: String): DataFrame = {
+
+    val date = TimeUtils.changeDateFormat(inputDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
 
     val dateTime = Timestamp.valueOf(date + " " + TimeConstants.END_TIME_MS) //yyyy-mm-dd hh:MM:ss.S
 
