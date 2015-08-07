@@ -15,6 +15,7 @@ import org.apache.spark.sql.functions._
 object BasicITR {
 
   def start(vars: VarInfo, isHistory: Boolean) = {
+    println("start  BasicITR")
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
     if (isHistory) {
