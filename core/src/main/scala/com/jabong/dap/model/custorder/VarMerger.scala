@@ -43,7 +43,7 @@ class VarMerger extends Serializable with Logging {
     }
 
     if (validated) {
-      val isHistory = OptionUtils.getOptBoolVal(MergeJobConfig.mergeJobInfo.isHistory)
+      val isHistory = OptionUtils.getOptBoolVal(VarJobConfig.varJobInfo.isHistory)
       for (varJob <- VarJobConfig.varJobInfo.vars) {
         VarJobConfig.varInfo = varJob
         varJob.source match {
