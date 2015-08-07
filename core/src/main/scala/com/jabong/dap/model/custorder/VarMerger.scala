@@ -4,6 +4,7 @@ import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
+import com.jabong.dap.model.product.itr.BasicITR
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
@@ -46,6 +47,7 @@ class VarMerger extends Serializable with Logging {
         varJob.source match {
           case DataSets.AD4PUSH => DevicesReactions.start(varJob)
           case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(varJob)
+          case DataSets.BASIC_ITR => BasicITR.start(varJob)
           case _ => logger.error("Unknown source.")
         }
       }

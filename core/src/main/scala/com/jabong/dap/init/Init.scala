@@ -115,7 +115,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
-      case "basicItr" => BasicITR.start()
+      case "basicItr" => new VarMerger().start(params.varJson)
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
       case "deviceMapping" => new VarMerger().start(params.varJson)

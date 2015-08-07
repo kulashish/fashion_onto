@@ -14,24 +14,25 @@ object BasicBob {
    * Prepare data frame of bob related columns
    * Note: All column names are following camel casing
    * pattern
-   *
-   * @return DataFrame
+   * @param date //YYYY-MM-DD
+   * @return
    */
-  def getBobColumns(): DataFrame = {
-    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
-    val yesterdayTimeStamp = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS)
-    val yesterdayTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayTimeStamp))
+  def getBobColumns(date: String): DataFrame = {
+
+    val dateTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(date))
+
+    Model.getItrInputs(date)
 
     val simpleDF = Model.simple.select(
       Model.simple("id_catalog_simple"),
-      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date"), lit(yesterdayTime)) as (ITR.PRICE_ON_SITE),
+      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date"), lit(dateTime)) as (ITR.PRICE_ON_SITE),
       Model.simple("special_price"),
       Model.simple("special_to_date"),
       Model.simple("special_from_date"),
       Model.simple("sku"),
       Model.simple("fk_catalog_config"),
       Model.simple("barcode_ean"),
-      lit(yesterdayDate) as ITR.ITR_DATE
+      lit(date) as ITR.ITR_DATE
     ).withColumnRenamed("id_catalog_simple", ITR.ID_CATALOG_SIMPLE).
       withColumnRenamed("special_price", ITR.SPECIAL_PRICE).
       withColumnRenamed("special_to_date", ITR.SPECIAL_TO_DATE).
