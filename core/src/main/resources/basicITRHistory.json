@@ -1,0 +1,12 @@
+{
+  "isHistory": "true",
+  "vars": [
+    {
+      "source": "basicITR",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
+

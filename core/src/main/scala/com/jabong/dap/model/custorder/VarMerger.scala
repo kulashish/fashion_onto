@@ -1,5 +1,6 @@
 package com.jabong.dap.model.custorder
 
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
@@ -42,12 +43,13 @@ class VarMerger extends Serializable with Logging {
     }
 
     if (validated) {
+      val isHistory = OptionUtils.getOptBoolVal(MergeJobConfig.mergeJobInfo.isHistory)
       for (varJob <- VarJobConfig.varJobInfo.vars) {
         VarJobConfig.varInfo = varJob
         varJob.source match {
           case DataSets.AD4PUSH => DevicesReactions.start(varJob)
           case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(varJob)
-          case DataSets.BASIC_ITR => BasicITR.start(varJob)
+          case DataSets.BASIC_ITR => BasicITR.start(varJob, isHistory)
           case _ => logger.error("Unknown source.")
         }
       }

@@ -1,8 +1,11 @@
 package com.jabong.dap.model.product.itr
 
+import java.io.File
+import java.util.Date
+
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
-import com.jabong.dap.data.acq.common.VarInfo
+import com.jabong.dap.data.acq.common.{ MergeInfo, VarInfo }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
@@ -11,11 +14,30 @@ import org.apache.spark.sql.functions._
 
 object BasicITR {
 
-  def start(vars: VarInfo) = {
+  def start(vars: VarInfo, isHistory: Boolean) = {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
+    if (isHistory) {
+      generateHistoricalITR(incrDate, saveMode)
+    } else {
+      generateITR(incrDate, saveMode)
+    }
 
-    //    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
+  }
+
+  def generateHistoricalITR(startDate: String, saveMode: String) = {
+    var count = 30
+    if (null != startDate) {
+      val minDate = TimeUtils.getDate(startDate, TimeConstants.DATE_FORMAT_FOLDER)
+      count = TimeUtils.daysFromToday(minDate).toInt
+    }
+    for (i <- count to 1) {
+      val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
+      generateITR(date, saveMode)
+    }
+  }
+
+  def generateITR(incrDate: String, saveMode: String) = {
     val bobDF = BasicBob.getBobColumns(incrDate)
 
     val erpDF = ERP.getERPColumns()

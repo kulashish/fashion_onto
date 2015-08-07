@@ -112,6 +112,7 @@ case class MergeJobInfo(
  * @param vars List[COVarInfo] List of variables to run the customer and order variables job on.
  */
 case class VarJobInfo(
+  isHistory: Option[Boolean],
   vars: List[VarInfo]) extends EmptyClass
 
 /**
