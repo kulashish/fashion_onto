@@ -9,10 +9,11 @@ import com.jabong.dap.data.acq.common.{ MergeInfo, VarInfo }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ DataFrame, SaveMode }
 import org.apache.spark.sql.functions._
 
-object BasicITR {
+object BasicITR extends Logging {
 
   def start(vars: VarInfo, isHistory: Boolean) = {
     println("start  BasicITR")
@@ -39,6 +40,9 @@ object BasicITR {
   }
 
   def generateITR(incrDate: String, saveMode: String) = {
+
+    logger.info("generateITR data for Date:" + incrDate)
+
     val bobDF = BasicBob.getBobColumns(incrDate)
 
     val erpDF = ERP.getERPColumns()
