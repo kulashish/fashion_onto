@@ -19,7 +19,7 @@ object BasicBob {
    */
   def getBobColumns(date: String): DataFrame = {
 
-    val dateTime = TimeUtils.getEndTimestampMS(Timestamp.valueOf(date))
+    val dateTime = Timestamp.valueOf(date + " " + TimeConstants.END_TIME_MS) //yyyy-mm-dd hh:MM:ss.S
 
     Model.getItrInputs(date)
 
