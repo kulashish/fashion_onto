@@ -55,7 +55,7 @@ object MobilePushCampaignQuality extends Logging {
       val dfCampaignQuality = Spark.getSqlContext().createDataFrame(rdd, schema)
 
       val cachedfCampaignQuality = dfCampaignQuality.groupBy("CampaignName")
-        .agg(sum("TotalCount"), sum("PriorityMerge"), sum("Android"), sum("IOS"), sum("Windows"))
+        .agg(sum("TotalCount") as "TotalCount", sum("PriorityMerge") as "PriorityMerge", sum("Android") as "Android", sum("IOS") as "IOS", sum("Windows") as "Windows")
         .sort("CampaignName").cache()
 
       CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
@@ -85,7 +85,8 @@ object MobilePushCampaignQuality extends Logging {
 
     val list: ListBuffer[Row] = new ListBuffer()
 
-    if (dataExits) { //if data frame is not null
+    if (dataExits) {
+      //if data frame is not null
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
@@ -105,21 +106,23 @@ object MobilePushCampaignQuality extends Logging {
 
         }
 
-      } else if (campaignName.equals(CampaignCommon.SURF1_CAMPAIGN)
-        || campaignName.equals(CampaignCommon.SURF2_CAMPAIGN)
-        || campaignName.equals(CampaignCommon.SURF3_CAMPAIGN)
-        || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
+      } else {
+        if (campaignName.equals(CampaignCommon.SURF1_CAMPAIGN)
+          || campaignName.equals(CampaignCommon.SURF2_CAMPAIGN)
+          || campaignName.equals(CampaignCommon.SURF3_CAMPAIGN)
+          || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
 
-        val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null").count()
-        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", countNonZeroFkCustomer, zero, zero, zero, zero)
-        list += row
+          val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null").count()
+          row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", countNonZeroFkCustomer, zero, zero, zero, zero)
+          list += row
 
-        val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null").count()
-        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", countZeroFkCustomer, zero, zero, zero, zero)
+          val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null").count()
+          row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", countZeroFkCustomer, zero, zero, zero, zero)
+          list += row
+        }
+        row = Row(campaignName, dataFrame.count(), zero, zero, zero, zero)
         list += row
       }
-      row = Row(campaignName, dataFrame.count(), zero, zero, zero, zero)
-      list += row
     } else { //if data frame is null
 
       logger.info("Data Frame of: " + campaignName + " is null")
