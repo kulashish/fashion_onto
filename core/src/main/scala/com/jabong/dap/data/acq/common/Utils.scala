@@ -112,6 +112,7 @@ case class MergeJobInfo(
  * @param params List[ParamInfo] List of parameters to execute different jobs.
  */
 case class ParamJobInfo(
+  isHistory: Option[Boolean],
   params: List[ParamInfo]) extends EmptyClass
 
 /**

@@ -1,23 +1,52 @@
 package com.jabong.dap.model.product.itr
 
-import java.io.File
-
-import com.jabong.dap.common.AppConfig
-import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
+import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
-import org.apache.spark.sql.SaveMode
+import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-object BasicITR {
+object BasicITR extends Logging {
 
-  def start() = {
+  def start(paramInfo: ParamInfo, isHistory: Boolean) = {
+    logger.info("start  BasicITR")
+    val incrDate = OptionUtils.getOptValue(paramInfo.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = paramInfo.saveMode
+    if (isHistory) {
+      generateHistoricalITR(incrDate, saveMode)
+    } else {
+      generateITR(incrDate, saveMode)
+    }
 
-    val bobDF = BasicBob.getBobColumns()
+  }
+
+  def generateHistoricalITR(startDate: String, saveMode: String) = {
+    var count = 30
+    if (null != startDate) {
+      val minDate = TimeUtils.getDate(startDate, TimeConstants.DATE_FORMAT_FOLDER)
+      count = TimeUtils.daysFromToday(minDate).toInt
+    }
+    for (i <- count to 1) {
+      val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
+      generateITR(date, saveMode)
+    }
+  }
+
+  def generateITR(incrDate: String, saveMode: String) = {
+
+    logger.info("generateITR data for Date:" + incrDate)
+
+    val bobDF = BasicBob.getBobColumns(incrDate)
 
     val erpDF = ERP.getERPColumns()
-    val itr = erpDF.join(
+
+    var itr: DataFrame = null
+
+    itr = erpDF.join(
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
       "left_outer"
@@ -30,7 +59,7 @@ object BasicITR {
         ITR.QUANTITY -> 0
       ))
 
-    itr.write.mode(SaveMode.Overwrite).format(DataSets.ORC).save(getPath(false))
+    itr.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
 
     itr.
       groupBy(ITR.CONFIG_SKU).
@@ -46,7 +75,7 @@ object BasicITR {
         first(ITR.BRICK) as ITR.BRICK,
         //first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
         sum(ITR.QUANTITY) as ITR.QUANTITY
-      ).write.mode(SaveMode.Overwrite).format(DataSets.ORC).save(getPath(true))
+      ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
   }
 
@@ -54,11 +83,11 @@ object BasicITR {
    *  Return save path for ITR
    * @return String
    */
-  def getPath(skuLevel: Boolean): String = {
+  def getPath(skuLevel: Boolean, incrDate: String): String = {
     if (skuLevel) {
-      return PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic-sku", "daily", TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic-sku", "daily", incrDate)
     } else {
-      return PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", "daily", TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", "daily", incrDate)
     }
   }
 
