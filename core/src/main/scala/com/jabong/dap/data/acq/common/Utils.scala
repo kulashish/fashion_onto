@@ -147,7 +147,7 @@ case class CampaignDetail(
   mailType: Int)
 
 //case class CampaignList (
-  //pushCampaignList: List[CampaignDetail]) extends EmptyClass
+//pushCampaignList: List[CampaignDetail]) extends EmptyClass
 
 /**
  *
