@@ -120,8 +120,8 @@ object CampaignProcessor {
   def mergeCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
 
-    // filtering based on domain as this is only for push campaigns.
-    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('windows', 'ios', 'android')")
+    // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
+    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('ios', 'android')")
 
     val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
     println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
