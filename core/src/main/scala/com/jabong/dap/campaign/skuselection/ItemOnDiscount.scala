@@ -40,13 +40,18 @@ class ItemOnDiscount extends SkuSelector with Logging {
       Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
     )
 
+    logger.info("Last 30 days itr data"+itr30dayData.count())
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
+
+    logger.info("Last days itr data"+dfYesterdayItrData.count())
 
     // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = itr30dayData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
 
     val join30DaysDf = getJoinDF(customerSelected, irt30Day)
+
+    logger.info("joined customer selected with 30 days itr data"+join30DaysDf.count())
 
     //join yesterdayItrData and joinDf on the basis of SKU
     //filter on the basis of SPECIAL_PRICE
@@ -58,8 +63,12 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(ItrVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
+    logger.info("After sku filter based on special price "+dfResult.count())
     // FIXME: generate ref skus
     val refSkus = CampaignUtils.generateReferenceSku(dfResult, CampaignCommon.NUMBER_REF_SKUS)
+
+    logger.info("After reference sku generation"+refSkus.count())
+
 
     return refSkus
   }
