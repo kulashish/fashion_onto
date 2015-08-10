@@ -5,7 +5,7 @@ import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.VarInfo
+import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
@@ -23,9 +23,9 @@ object DevicesReactions extends Logging {
 
   val new_reaction = MergeUtils.NEW_ + DevicesReactionsVariables.REACTION
 
-  def start(vars: VarInfo) = {
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val saveMode = vars.saveMode
+  def start(params: ParamInfo) = {
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
     customerResponse(incrDate, saveMode)
   }
   /**

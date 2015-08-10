@@ -1,5 +1,5 @@
 {
-  "vars": [
+  "params": [
     {
       "source": "ad4push",
       "saveMode": "Ignore",
