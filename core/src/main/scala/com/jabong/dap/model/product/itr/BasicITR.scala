@@ -13,7 +13,7 @@ import org.apache.spark.sql.functions._
 object BasicITR extends Logging {
 
   def start(paramInfo: ParamInfo, isHistory: Boolean) = {
-    println("start  BasicITR")
+    logger.info("start  BasicITR")
     val incrDate = OptionUtils.getOptValue(paramInfo.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = paramInfo.saveMode
     if (isHistory) {
@@ -46,40 +46,37 @@ object BasicITR extends Logging {
 
     var itr: DataFrame = null
 
-    if (erpDF != null) {
+    itr = erpDF.join(
+      bobDF,
+      erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
+      "left_outer"
+    ).
+      na.fill(Map(
+        ITR.SPECIAL_MARGIN -> 0.00,
+        ITR.MARGIN -> 0.00,
+        ITR.SPECIAL_PRICE -> 0.00,
+        ITR.PRICE_ON_SITE -> 0.00,
+        ITR.QUANTITY -> 0
+      ))
 
-      itr = erpDF.join(
-        bobDF,
-        erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
-        "left_outer"
-      ).
-        na.fill(Map(
-          ITR.SPECIAL_MARGIN -> 0.00,
-          ITR.MARGIN -> 0.00,
-          ITR.SPECIAL_PRICE -> 0.00,
-          ITR.PRICE_ON_SITE -> 0.00,
-          ITR.QUANTITY -> 0
-        ))
+    itr.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
 
-      itr.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
+    itr.
+      groupBy(ITR.CONFIG_SKU).
+      agg(
+        first(ITR.BRAND_NAME) as ITR.BRAND_NAME,
+        first(ITR.PRODUCT_NAME) as ITR.PRODUCT_NAME,
+        avg(ITR.PRICE_ON_SITE) as ITR.PRICE_ON_SITE,
+        avg(ITR.SPECIAL_PRICE) as ITR.SPECIAL_PRICE,
+        first(ITR.ITR_DATE) as ITR.ITR_DATE,
+        //first(ITR.PRICE_BAND) as ITR.PRICE_BAND,
+        //first(ITR.GENDER) as ITR.GENDER,
+        //first(ITR.MVP) as ITR.MVP,
+        first(ITR.BRICK) as ITR.BRICK,
+        //first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
+        sum(ITR.QUANTITY) as ITR.QUANTITY
+      ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
-      itr.
-        groupBy(ITR.CONFIG_SKU).
-        agg(
-          first(ITR.BRAND_NAME) as ITR.BRAND_NAME,
-          first(ITR.PRODUCT_NAME) as ITR.PRODUCT_NAME,
-          avg(ITR.PRICE_ON_SITE) as ITR.PRICE_ON_SITE,
-          avg(ITR.SPECIAL_PRICE) as ITR.SPECIAL_PRICE,
-          first(ITR.ITR_DATE) as ITR.ITR_DATE,
-          //first(ITR.PRICE_BAND) as ITR.PRICE_BAND,
-          //first(ITR.GENDER) as ITR.GENDER,
-          //first(ITR.MVP) as ITR.MVP,
-          first(ITR.BRICK) as ITR.BRICK,
-          //first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
-          sum(ITR.QUANTITY) as ITR.QUANTITY
-        ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
-
-    }
   }
 
   /**
