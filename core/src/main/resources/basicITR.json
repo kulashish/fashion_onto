@@ -1,6 +1,6 @@
 {
   "isHistory": false,
-  "vars": [
+  "params": [
     {
       "source": "basicITR",
       "incrMode": "daily",
