@@ -1,19 +1,19 @@
 package com.jabong.dap.init
 
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.{ Config, AppConfig, Spark }
+import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.custorder.ComponentExecutor
-import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
+import com.jabong.dap.model.product.itr.Itr
 import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
 import net.liftweb.json.JsonParser.ParseException
-import org.apache.spark.SparkConf
-import scopt.OptionParser
+import net.liftweb.json._
 import org.apache.hadoop.conf._
 import org.apache.hadoop.fs._
-import net.liftweb.json._
+import org.apache.spark.SparkConf
+import scopt.OptionParser
 
 object Init {
 
@@ -115,7 +115,7 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
-      case "basicItr" => new VarMerger().start(params.varJson)
+      case "basicItr" => new ComponentExecutor().start(params.paramJson)
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
       case "deviceMapping" => new ComponentExecutor().start(params.paramJson)
