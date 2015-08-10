@@ -65,7 +65,7 @@ object Init {
         .required()
         .action((x, c) => c.copy(config = x))
 
-      opt[String]("varJson")
+      opt[String]("paramJson")
         .text("Path to customer and Order variables merge job json config file.")
         .action((x, c) => c.copy(paramJson = x))
 
