@@ -362,15 +362,19 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
+    println("ITR first count "+itr30Day.count())
+
+
     for (i <- 2 to 30) {
 
       date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
-      logger.info("Reading last " + i + " day basic itr sku data from hdfs")
+      logger.info("Reading last " + i + " day basic itr sku simple data from hdfs")
 
       val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       val itrExits = DataVerifier.dataExists(path)
 
       if (itrExits) {
+        logger.info("Adding last " + i + " day basic itr sku simple data from hdfs")
         val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
         itr30Day.unionAll(itrData.select(
           col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
@@ -378,7 +382,7 @@ object CampaignInput extends Logging {
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
-
+    println("ITR count "+itr30Day.count())
     itr30Day
   }
 
