@@ -13,17 +13,17 @@ import org.apache.hadoop.fs.{ FileSystem, Path }
 /**
  * Created by pooja on 9/7/15.
  */
-class VarMerger extends Serializable with Logging {
+class ComponentExecutor extends Serializable with Logging {
 
-  def start(VarJsonPath: String) = {
+  def start(paramJsonPath: String) = {
     val validated = try {
       val conf = new Configuration()
       val fileSystem = FileSystem.get(conf)
       implicit val formats = net.liftweb.json.DefaultFormats
-      val path = new Path(VarJsonPath)
+      val path = new Path(paramJsonPath)
       val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      VarJobConfig.varJobInfo = json.extract[VarJobInfo]
-      VarJsonValidator.validate(VarJobConfig.varJobInfo)
+      ParamJobConfig.paramJobInfo = json.extract[ParamJobInfo]
+      ParamJsonValidator.validate(ParamJobConfig.paramJobInfo)
       true
     } catch {
       case e: ParseException =>
@@ -41,11 +41,11 @@ class VarMerger extends Serializable with Logging {
     }
 
     if (validated) {
-      for (varJob <- VarJobConfig.varJobInfo.vars) {
-        VarJobConfig.varInfo = varJob
-        varJob.source match {
-          case DataSets.AD4PUSH => DevicesReactions.start(varJob)
-          case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(varJob)
+      for (paramJob <- ParamJobConfig.paramJobInfo.params) {
+        ParamJobConfig.paramInfo = paramJob
+        paramJob.source match {
+          case DataSets.AD4PUSH => DevicesReactions.start(paramJob)
+          case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(paramJob)
           case _ => logger.error("Unknown source.")
         }
       }

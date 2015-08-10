@@ -167,7 +167,6 @@ object CampaignManager extends Serializable with Logging {
       val path = new Path(campaignJsonPath)
       json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
       // CampaignInfo.campaigns = json.extract[CampaignConfig]
-      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
       true
     } catch {
       case e: ParseException =>
@@ -198,7 +197,6 @@ object CampaignManager extends Serializable with Logging {
       val path = new Path(campaignJsonPath)
       json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
       CampaignInfo.campaigns = json.extract[CampaignConfig]
-      // COVarJsonValidator.validate(COVarJobConfig.coVarJobInfo)
       true
     } catch {
       case e: ParseException =>
