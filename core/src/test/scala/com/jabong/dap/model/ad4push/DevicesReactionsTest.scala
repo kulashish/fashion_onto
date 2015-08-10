@@ -19,10 +19,6 @@ import scala.collection.mutable.ListBuffer
  */
 class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
 
-  "customerResponse : DataFrame" should "match with expected DF" in {
-    //DevicesReactions.customerResponse("20150722", DAILY_MODE)
-  }
-
   "dfCorrectSchema" should "filter and give correct count" in {
     val incIStringSchema = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/27", "exportMessagesReactions_517_20150727.csv", "true", ",")
     val incI = DevicesReactions.dfCorrectSchema(incIStringSchema)
