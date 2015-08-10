@@ -1,24 +1,21 @@
 package com.jabong.dap.model.product.itr
 
-import java.io.File
-import java.util.Date
-
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
-import com.jabong.dap.data.acq.common.{ MergeInfo, VarInfo }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ DataFrame, SaveMode }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 object BasicITR extends Logging {
 
-  def start(vars: VarInfo, isHistory: Boolean) = {
+  def start(paramInfo: ParamInfo, isHistory: Boolean) = {
     println("start  BasicITR")
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val saveMode = vars.saveMode
+    val incrDate = OptionUtils.getOptValue(paramInfo.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = paramInfo.saveMode
     if (isHistory) {
       generateHistoricalITR(incrDate, saveMode)
     } else {

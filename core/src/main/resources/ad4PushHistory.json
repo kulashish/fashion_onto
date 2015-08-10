@@ -1,5 +1,5 @@
 {
-  "vars": [
+  "params": [
     {
       "source": "ad4push",
       "incrDate": "2015/07/11",

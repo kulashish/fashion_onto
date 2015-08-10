@@ -51,8 +51,7 @@ object CampaignProcessor {
         cmr(PageVisitVariables.DOMAIN)
       )
 
-    println("After removing customer id = 0 or null: " + cmrn.count())
-    println("Total distinct id_customer: " + cmrn.select(CustomerVariables.ID_CUSTOMER).distinct.count())
+    println("After removing customer id = 0 or null ") // + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
     val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), "rightouter")
@@ -88,16 +87,16 @@ object CampaignProcessor {
    */
   def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
     if (inputCampaignsData == null) {
-      //      logger.error("inputCampaignData is null")
+      // logger.error("inputCampaignData is null")
       return null
     }
 
     if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
-      //      logger.error("Keys doesn't Exists")
+      // logger.error("Keys doesn't Exists")
       return null
     }
 
-    val campaignMerged = inputCampaignsData.na.drop("all", Array(CampaignMergedFields.DEVICE_ID, CampaignMergedFields.DOMAIN))
+    val campaignMerged = inputCampaignsData
       .orderBy(CampaignCommon.PRIORITY)
       .groupBy(key)
       .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
@@ -118,8 +117,11 @@ object CampaignProcessor {
       )
   }
 
-  def mergeCampaigns(campaign: DataFrame, itr: DataFrame): DataFrame = {
+  def mergeCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
+
+    // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
+    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('ios', 'android')")
 
     val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
     println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
@@ -142,7 +144,7 @@ object CampaignProcessor {
     //DeviceId.show(10)
 
     val camp = custId.unionAll(DeviceId)
-    println("After unionAll count = ") // + camp.count())
+    println("After unionAll ") // + camp.count())
     //camp.printSchema()
     //camp.show(10)
 
@@ -162,7 +164,7 @@ object CampaignProcessor {
         lit("").cast(StringType) as CampaignMergedFields.LIVE_CART_URL,
         lit(yesterdayDate).cast(StringType) as CampaignMergedFields.END_OF_DATE
       )
-    println("Final Campaign after join with ITR: ") // + finalCampaign.count())
+    println("Final Campaign after join with ITR ") // + finalCampaign.count())
     //finalCampaign.printSchema()
     //finalCampaign.show(10)
 
