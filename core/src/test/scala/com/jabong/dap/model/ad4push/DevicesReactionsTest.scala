@@ -32,7 +32,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
   "reduce" should "match with the expected Data" in {
     val inputDF = JsonUtils.readFromJson(DataSets.AD4PUSH, "CorrectedSchema20150727", dfFromCsv)
     val result = DevicesReactions.reduce(inputDF)
-    assert(result.count() == 108915)
+    assert(result.count() == 91)
   }
 
   "reduce: dataFrame" should "match with expected data" in {
@@ -51,7 +51,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     val reduced15 = JsonUtils.readFromJson(AD4PUSH, "Incr20150712", reducedDF)
     val reduced30 = null
     val effectiveDFFull = DevicesReactions.effectiveDFFull(incremental, reduced7, reduced15, reduced30)
-    assert(effectiveDFFull.count() == 134230)
+    assert(effectiveDFFull.count() == 25406)
   }
 
   "effectiveDFFull: DataFrame" should "match with expected data" in {
