@@ -123,30 +123,34 @@ object CampaignProcessor {
     // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
     val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('ios', 'android')")
 
-    val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
-    println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
-    //custIdNotNUll.printSchema()
-    //custIdNotNUll.show(10)
+    // removing as this is not needed in case of ad4push campaigns. We are getting multiple customers with same deviceIds
+    // with the below logic.
+    // val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
+    // println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
+    // //custIdNotNUll.printSchema()
+    // //custIdNotNUll.show(10)
+    //
+    // val custId = campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
+    // println("After campaign merger on CustomerId")
+    // //custId.printSchema()
+    // //custId.show(10)
+    //
+    // val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
+    // println("After campaign filtering on null CustomerId ") // + custIdNUll.count())
+    // //custIdNUll.printSchema()
+    // //custIdNUll.show(10)
+    //
+    // val DeviceId = campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
+    // println("After campaign merger on DeviceId")
+    // //DeviceId.printSchema()
+    // //DeviceId.show(10)
+    //
+    // val camp = custId.unionAll(DeviceId)
+    // println("After unionAll ") // + camp.count())
+    // //camp.printSchema()
+    // //camp.show(10)
 
-    val custId = campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-    println("After campaign merger on CustomerId")
-    //custId.printSchema()
-    //custId.show(10)
-
-    val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    println("After campaign filtering on null CustomerId ") // + custIdNUll.count())
-    //custIdNUll.printSchema()
-    //custIdNUll.show(10)
-
-    val DeviceId = campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
-    println("After campaign merger on DeviceId")
-    //DeviceId.printSchema()
-    //DeviceId.show(10)
-
-    val camp = custId.unionAll(DeviceId)
-    println("After unionAll ") // + camp.count())
-    //camp.printSchema()
-    //camp.show(10)
+    val camp = campaignMerger(campaign, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
 
