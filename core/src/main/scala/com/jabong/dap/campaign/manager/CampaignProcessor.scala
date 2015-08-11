@@ -124,12 +124,12 @@ object CampaignProcessor {
   }
 
   /**
-   *
+   * Priority based merge for push campaigns.
    * @param allCampaign
    * @param itr
    * @return
    */
-  def mergeAd4pushCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
+  def mergepushCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
 
     // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
