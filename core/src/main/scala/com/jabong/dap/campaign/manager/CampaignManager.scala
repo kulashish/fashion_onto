@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
@@ -226,14 +227,14 @@ object CampaignManager extends Serializable with Logging {
       val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
-      val cmr = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
       val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
 
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
       val mergedData = CampaignProcessor.mergeAd4pushCampaigns(allCamp, itr).coalesce(1).cache()
 
       println("Starting write parquet after repartitioning and caching")
-      val writePath = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
         DataWriter.writeParquet(mergedData, writePath, saveMode)
 
