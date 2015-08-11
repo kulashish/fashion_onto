@@ -96,6 +96,9 @@ class ItemOnDiscount extends SkuSelector with Logging {
    * @param itr30dayData
    */
   def getJoinDF(cpsl: DataFrame, itr30dayData: DataFrame): DataFrame = {
+    println("Customer Selected"+cpsl.show(10))
+    
+    println("Itr 30 days data"+ itr30dayData.show(10))
 
     val joinDf = cpsl.join(itr30dayData, cpsl(CustomerProductShortlistVariables.SKU_SIMPLE) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE)
       &&
