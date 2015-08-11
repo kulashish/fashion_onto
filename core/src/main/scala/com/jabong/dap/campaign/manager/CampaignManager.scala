@@ -131,7 +131,7 @@ object CampaignManager extends Serializable with Logging {
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
     val acartLowStock = new AcartLowStockCampaign()
-   // acartLowStock.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
+    // acartLowStock.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData)
 
     // item on discount
     // last30DayAcartData

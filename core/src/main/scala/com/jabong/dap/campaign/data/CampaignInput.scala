@@ -362,8 +362,7 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
-    println("ITR first count "+itr30Day.count())
-
+    println("ITR first count " + itr30Day.count())
 
     for (i <- 2 to 30) {
 
@@ -382,7 +381,7 @@ object CampaignInput extends Logging {
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
-    println("ITR count "+itr30Day.count())
+    println("ITR count " + itr30Day.count())
     itr30Day
   }
 
@@ -404,7 +403,7 @@ object CampaignInput extends Logging {
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
-          campaignMerged30Day= campaignMerged30Day.unionAll(mergedCampaignData)
+          campaignMerged30Day = campaignMerged30Day.unionAll(mergedCampaignData)
         }
       }
     }
