@@ -326,7 +326,7 @@ object CampaignInput extends Logging {
 
     var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+    var itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -342,7 +342,7 @@ object CampaignInput extends Logging {
 
       if (itrExits) {
         val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
-        itr30Day.unionAll(itrData.select(
+        itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.CONFIG_SKU) as ProductVariables.SKU,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
@@ -356,7 +356,7 @@ object CampaignInput extends Logging {
 
     var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+    var itr30Day = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -376,7 +376,7 @@ object CampaignInput extends Logging {
       if (itrExits) {
         logger.info("Adding last " + i + " day basic itr sku simple data from hdfs")
         val itrData = DataReader.getDataFrame(DataSets.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
-        itr30Day.unionAll(itrData.select(
+        itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
@@ -404,7 +404,7 @@ object CampaignInput extends Logging {
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
-          campaignMerged30Day.unionAll(mergedCampaignData)
+          campaignMerged30Day= campaignMerged30Day.unionAll(mergedCampaignData)
         }
       }
     }

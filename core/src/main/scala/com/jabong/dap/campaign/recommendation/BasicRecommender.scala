@@ -258,7 +258,8 @@ class BasicRecommender extends Recommender {
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
 
-    return filteredStock1.unionAll(filteredStock2)
+    val outStock = filteredStock1.unionAll(filteredStock2)
+    return outStock
 
   }
 
