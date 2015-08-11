@@ -1,22 +1,9 @@
 package com.jabong.dap.data.storage
 
-import java.io.File
-
-import com.jabong.dap.common.AppConfig
-
 /**
  * Created by jabong on 28/5/15.
  */
 object DataSets {
-
-  val basePath = AppConfig.config.basePath
-
-  val INPUT_PATH = basePath + File.separator + "input"
-
-  val TMP_PATH = basePath + File.separator + "tmp"
-
-  val OUTPUT_PATH = AppConfig.config.outputPath
-  //  val OUTPUT_PATH = OUTPUT_PATH = basePath + File.separator + "output"
 
   val EXTRAS = "extras"
 

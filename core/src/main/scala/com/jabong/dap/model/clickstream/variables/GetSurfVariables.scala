@@ -4,16 +4,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.PathBuilder
-import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
-import com.jabong.dap.model.clickstream.schema.PagevisitSchema
-import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
+import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ SQLContext, DataFrame, Row }
 import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -127,8 +126,8 @@ object GetSurfVariables extends java.io.Serializable {
           val yesterdayDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT)
           val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT)
 
-          val currentMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
-          var oldMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
+          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
+          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists
@@ -152,8 +151,8 @@ object GetSurfVariables extends java.io.Serializable {
           val yesterdayDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT)
           val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT)
 
-          val currentMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
-          var oldMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
+          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
+          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists

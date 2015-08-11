@@ -2,17 +2,17 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import javax.xml.crypto.Data
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.clickstream.utils.{ UserAttribution, GetMergedClickstreamData, GroupData }
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.model.clickstream.utils.{GetMergedClickstreamData, GroupData}
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by Divya on 13/7/15.
@@ -93,8 +93,8 @@ object SurfVariablesMain extends java.io.Serializable {
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
 
-    val userDeviceMapPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", DataSets.USER_DEVICE_MAP_APP, "daily", yesterdayDate)
-    var surf1VariablePath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", "daily", yesterdayDate)
+    val userDeviceMapPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", DataSets.USER_DEVICE_MAP_APP, "daily", yesterdayDate)
+    var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", "daily", yesterdayDate)
 
     var useridDeviceidFrame = getAppIdUserIdData(cal, tablename)
     var UserObj = new GroupData()
@@ -126,10 +126,10 @@ object SurfVariablesMain extends java.io.Serializable {
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT)
 
-    val currentMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData", "daily", yesterdayDate)
-    var processedVariablePath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3ProcessedVariable", "daily", yesterdayDate)
+    val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData", "daily", yesterdayDate)
+    var processedVariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3ProcessedVariable", "daily", yesterdayDate)
 
-    var oldMergedDataPath = PathBuilder.buildPath(DataSets.OUTPUT_PATH, "clickstream", "Surf3mergedData", "daily", dayBeforeYesterdayDate)
+    var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData", "daily", dayBeforeYesterdayDate)
 
     var oldMergedData: DataFrame = null
 
