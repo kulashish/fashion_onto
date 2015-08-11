@@ -18,8 +18,8 @@ import org.apache.spark.sql.types.StringType
 object CampaignProcessor {
 
   val email = udf((s: String, s1: String) => if (null == s || s.equals("")) s1 else s)
-  val device = udf((s: String, s1: String, s2: String) => if (null != s && (s.contains("windows") || s.contains("android") | s.contains("ios"))) s1 else s2)
-  val domain = udf((s: String, s1: String) => if (null != s && (s.contains("windows") || s.contains("android") | s.contains("ios"))) s else s1)
+  val device = udf((s: String, s1: String, s2: String) => if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s1 else s2)
+  val domain = udf((s: String, s1: String) => if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s else s1)
 
   def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
@@ -121,7 +121,7 @@ object CampaignProcessor {
     println("Inside priority based merge")
 
     // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
-    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('ios', 'android')")
+    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "')")
 
     // removing as this is not needed in case of ad4push campaigns. We are getting multiple customers with same deviceIds
     // with the below logic.
