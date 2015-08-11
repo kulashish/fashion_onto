@@ -31,51 +31,10 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
     val status = CampaignManager.createCampaignMaps(null)
     assert(status == false)
   }
-  /*
-
-  "Correct json String" should "return true" in {
-    val status = CampaignManager.createCampaignMaps(json)
-    assert(CampaignManager.campaignPriorityMap.contains(CampaignCommon.CANCEL_RETARGET_CAMPAIGN) == true)
-    assert(status == true)
-  }
-
-  "Correct json String with wrong campaign Name" should "return false" in {
-    val status = CampaignManager.createCampaignMaps(json)
-    assert(CampaignManager.campaignPriorityMap.contains("cancelReTarge") != true)
-    assert(status == true)
-  }
 
   "Correct json String with correct campaign Mail Type" should "return true" in {
     val status = CampaignManager.createCampaignMaps(json)
     assert(CampaignManager.mailTypePriorityMap.contains(55) == true)
     assert(status == true)
   }
-
-  "No Input Campaigns Data" should "return null" in {
-    val status = CampaignManager.createCampaignMaps(json)
-    val expectedData = CampaignManager.campaignMerger(null, null, null)
-    assert(expectedData == null)
-  }
-
-  "Input Campaigns Data but no priority map loaded" should "return null" in {
-    CampaignManager.mailTypePriorityMap.clear()
-    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-    assert(mergedCampaignData == null)
-  }
-
-  "Input Campaigns Data with priority map loaded" should "return two " in {
-    val status = CampaignManager.createCampaignMaps(json)
-    val mergedCampaignData = CampaignManager.campaignMerger(campaignsOutData, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-    assert(mergedCampaignData.count() == 2)
-  }
-
-  "Test add Priority" should "add one more column" in {
-    val status = CampaignManager.createCampaignMaps(json)
-    val mergedCampaignData = CampaignUtils.addPriority(campaignsOutData.select(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-      CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKU1))
-    mergedCampaignData.show(5)
-    assert(mergedCampaignData.columns.length == 4)
-
-  }
-*/
 }
