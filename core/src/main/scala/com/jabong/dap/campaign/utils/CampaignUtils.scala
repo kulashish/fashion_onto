@@ -101,7 +101,7 @@ object CampaignUtils extends Logging {
         ProductVariables.SKU_SIMPLE,
         ProductVariables.SPECIAL_PRICE)
 
-    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
+    // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData","daily", "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr

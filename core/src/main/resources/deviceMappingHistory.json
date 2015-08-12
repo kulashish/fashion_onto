@@ -1,5 +1,5 @@
 {
-  "vars": [
+  "params": [
     {
       "source": "customerDeviceMapping",
       "incrMode": "daily",

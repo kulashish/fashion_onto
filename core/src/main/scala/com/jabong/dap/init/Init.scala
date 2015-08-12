@@ -5,7 +5,7 @@ import com.jabong.dap.common.{ Config, AppConfig, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
-import com.jabong.dap.model.custorder.VarMerger
+import com.jabong.dap.model.custorder.ComponentExecutor
 import com.jabong.dap.model.product.itr.{ BasicITR, Itr }
 import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
 import net.liftweb.json.JsonParser.ParseException
@@ -29,7 +29,7 @@ object Init {
     component: String = null,
     tableJson: String = null,
     mergeJson: String = null,
-    varJson: String = null,
+    paramJson: String = null,
     pushCampaignsJson: String = null,
     config: String = null)
 
@@ -65,9 +65,9 @@ object Init {
         .required()
         .action((x, c) => c.copy(config = x))
 
-      opt[String]("varJson")
+      opt[String]("paramJson")
         .text("Path to customer and Order variables merge job json config file.")
-        .action((x, c) => c.copy(varJson = x))
+        .action((x, c) => c.copy(paramJson = x))
 
       opt[String]("pushCampaignsJson")
         .text("Path to push Campaigns priority config file.")
@@ -118,8 +118,8 @@ object Init {
       case "basicItr" => BasicITR.start()
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
       case "merge" => new MergeDelegator().start(params.mergeJson)
-      case "deviceMapping" => new VarMerger().start(params.varJson)
-      case "Ad4pushCustReact" => new VarMerger().start(params.varJson)
+      case "deviceMapping" => new ComponentExecutor().start(params.paramJson)
+      case "Ad4pushCustReact" => new ComponentExecutor().start(params.paramJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.pushCampaignsJson)
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.pushCampaignsJson)
