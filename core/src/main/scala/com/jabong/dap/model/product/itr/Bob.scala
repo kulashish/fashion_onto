@@ -43,7 +43,7 @@ object Bob {
     val visibilityDaFr = simpleDF.join(
       vDF,
       vDF.col("vIdCatalogSimple") === simpleDF.col(ITR.ID_CATALOG_SIMPLE),
-      SQL.LEFT
+      SQL.LEFT_OUTER
     )
 
     val stockDataFrame = stockDF()
@@ -59,7 +59,7 @@ object Bob {
     val quantityDF = visibilityDaFr.join(
       sDF,
       sDF.col("stockIdCatalogSimple") === simpleDF.col(ITR.ID_CATALOG_SIMPLE),
-      SQL.LEFT
+      SQL.LEFT_OUTER
     )
 
     val config = Model.config.select(
@@ -137,7 +137,7 @@ object Bob {
     ).join(
         Model.catalogStock.select("fk_catalog_simple", "quantity"),
         Model.simple.col("id_catalog_simple") === Model.catalogStock.col("fk_catalog_simple"),
-        SQL.LEFT
+        SQL.LEFT_OUTER
       ).join(
           reservedDF,
           Model.simple.col("sku") === reservedDF.col("simpleSku")
@@ -215,7 +215,7 @@ object Bob {
             Model.brand.value.select("status", "id_catalog_brand")
               .withColumnRenamed("status", "brandStatus"),
             Model.brand.value.col("id_catalog_brand") === configDF.col("fk_catalog_brand"),
-        SQL.LEFT
+        SQL.LEFT_OUTER
           ).select(
               "idCatalogConfig",
               "configStatus",
@@ -244,14 +244,14 @@ object Bob {
       join(
         categoryStatus,
         categoryStatus.col("fkCatalogConfig") === sConfigDF.col("idCatalogConfig"),
-        SQL.LEFT
+        SQL.LEFT_OUTER
       ).join(
           reservedDF,
-          sConfigDF.col("simpleSku") === reservedDF.col("simpleSku"), SQL.LEFT
+          sConfigDF.col("simpleSku") === reservedDF.col("simpleSku"), SQL.LEFT_OUTER
         ).join(
             Model.catalogStock.select("fk_catalog_simple", "quantity"),
             Model.catalogStock.col("fk_catalog_simple") === sConfigDF.col("idCatalogSimple"),
-            SQL.LEFT
+            SQL.LEFT_OUTER
           )
 
     val visibilityUDF = udf(simpleVisibility)

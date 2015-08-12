@@ -47,7 +47,7 @@ object BasicBob {
     val quantityDF = simpleDF.join(
       Model.catalogStock.select("fk_catalog_simple", "quantity"),
       simpleDF.col(ITR.ID_CATALOG_SIMPLE) === Model.catalogStock.col("fk_catalog_simple"),
-      SQL.LEFT
+      SQL.LEFT_OUTER
     )
 
     val config = Model.config.select(

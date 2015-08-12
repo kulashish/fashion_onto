@@ -89,7 +89,7 @@ class Itr extends Serializable with Logging {
     val itr = erpDF.join(
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
-      SQL.LEFT
+      SQL.LEFT_OUTER
     ).
       na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,
@@ -105,7 +105,7 @@ class Itr extends Serializable with Logging {
     val priceBandMVPDF = itr.join(
       priceBandDF,
       itr.col(ITR.REPORTING_CATEGORY) === priceBandDF.col("bandCategory"),
-      SQL.LEFT
+      SQL.LEFT_OUTER
     ).
       where(itr.col(ITR.BRICK) === priceBandDF.col("bandBrick")).
       withColumn(ITR.MVP, mvpUDF(

@@ -7,8 +7,8 @@ object SQL {
 
   val INNER = "inner"
   val OUTER = "outer"
-  val LEFT = "left"
-  val RIGHT = "right"
+  val LEFT_OUTER = "leftouter"
+  val RIGHT_OUTER = "rightouter"
 
   val LT = " < "
   val GT = " > "

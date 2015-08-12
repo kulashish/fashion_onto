@@ -51,7 +51,7 @@ object BasicITR extends Logging {
     itr = erpDF.join(
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
-      SQL.LEFT
+      SQL.LEFT_OUTER
     ).
       na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,

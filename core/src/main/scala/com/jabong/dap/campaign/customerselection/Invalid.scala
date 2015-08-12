@@ -69,7 +69,7 @@ class Invalid extends LiveCustomerSelector with Logging {
     // FIXME: change invalid names back to normal
 
     val customerSelected = customerInValidItemsData.join(customerSuccessfulItemsData, customerInValidItemsData("invalid_" + SalesOrderVariables.FK_CUSTOMER) === customerSuccessfulItemsData("success_" + SalesOrderVariables.FK_CUSTOMER)
-      && customerInValidItemsData("invalid_" + ProductVariables.SKU) === customerSuccessfulItemsData("success_" + ProductVariables.SKU), SQL.LEFT)
+      && customerInValidItemsData("invalid_" + ProductVariables.SKU) === customerSuccessfulItemsData("success_" + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter("success_" + SalesOrderItemVariables.FK_SALES_ORDER + " is null or invalid_" + SalesOrderItemVariables.UPDATED_AT + " > " + "success_" + SalesOrderItemVariables.UPDATED_AT)
       .select(
         customerInValidItemsData("invalid_" + SalesOrderVariables.FK_SALES_ORDER) as (SalesOrderVariables.FK_SALES_ORDER),
