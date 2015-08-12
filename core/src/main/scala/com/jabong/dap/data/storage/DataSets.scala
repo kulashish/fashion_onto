@@ -122,4 +122,7 @@ object DataSets {
   val CUSTOMER_SELECTION = "customer_selection"
   val CUSTOMER_PAGE_VISIT = "customer_page_visit"
   val SURF = "surf"
+
+  //item master
+  val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
 }
