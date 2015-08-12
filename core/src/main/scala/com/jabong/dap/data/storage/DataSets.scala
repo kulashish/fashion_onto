@@ -30,6 +30,12 @@ object DataSets {
   //catalog
   val CATALOG_CONFIG = "catalog_config"
   val CATALOG_BRAND = "catalog_brand"
+  val CATALOG_SIMPLE = "catalog_simple"
+  val CATALOG_SUPPLIER = "catalog_supplier"
+  val CATALOG_STOCK = "catalog_stock"
+  val CATALOG_PRODUCT_IMAGE = "catalog_product_image"
+  val CATALOG_CATEGORY = "catalog_category"
+  val CATALOG_CONFIG_HAS_CATALOG_CATEGORY = "catalog_config_has_catalog_category"
 
   //PaybackCustomer
   val PAYBACK_CUSTOMER = "payback_customer"
