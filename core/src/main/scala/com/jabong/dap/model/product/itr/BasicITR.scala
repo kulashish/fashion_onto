@@ -41,7 +41,7 @@ object BasicITR extends Logging {
 
     var incrDate = startDate
 
-    if(null == incrDate){
+    if (null == incrDate) {
       incrDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD  By Default yesterdays date
     }
     logger.info("generateITR data for Date:" + incrDate)
