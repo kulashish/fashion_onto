@@ -1,9 +1,9 @@
 package com.jabong.dap.model.product.itr
 
-import java.sql.{ Timestamp, Date }
-import java.util.Calendar
+import java.sql.{Date, Timestamp}
 
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -47,7 +47,7 @@ object BasicBob {
     val quantityDF = simpleDF.join(
       Model.catalogStock.select("fk_catalog_simple", "quantity"),
       simpleDF.col(ITR.ID_CATALOG_SIMPLE) === Model.catalogStock.col("fk_catalog_simple"),
-      "left_outer"
+      SQL.LEFT_OUTER
     )
 
     val config = Model.config.select(

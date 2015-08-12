@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.skuselection
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import grizzled.slf4j.Logging
@@ -81,7 +82,7 @@ class SkuLowStock extends SkuSelector with Logging {
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       itrData,
       skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
-      "inner"
+      SQL.INNER
     )
 
     val dfFilter = dfJoin.filter(ItrVariables.AVERAGE_STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
@@ -127,7 +128,7 @@ class SkuLowStock extends SkuSelector with Logging {
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       itrData,
       skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
-      "inner"
+      SQL.INNER
     )
 
     val dfFilter = dfJoin.filter(ItrVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
