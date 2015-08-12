@@ -327,7 +327,7 @@ object CampaignInput extends Logging {
 
     var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+    var itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -343,13 +343,12 @@ object CampaignInput extends Logging {
 
       if (itrExits) {
         val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
-        itr30Day.unionAll(itrData.select(
+        itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.CONFIG_SKU) as ProductVariables.SKU,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
-
     itr30Day
   }
 
@@ -357,7 +356,7 @@ object CampaignInput extends Logging {
 
     var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+    var itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -366,20 +365,20 @@ object CampaignInput extends Logging {
     for (i <- 2 to 30) {
 
       date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
-      logger.info("Reading last " + i + " day basic itr sku data from hdfs")
+      logger.info("Reading last " + i + " day basic itr sku simple data from hdfs")
 
       val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       val itrExits = DataVerifier.dataExists(path)
 
       if (itrExits) {
+        logger.info("Adding last " + i + " day basic itr sku simple data from hdfs")
         val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
-        itr30Day.unionAll(itrData.select(
+        itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
-
     itr30Day
   }
 
@@ -401,7 +400,7 @@ object CampaignInput extends Logging {
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
-          campaignMerged30Day.unionAll(mergedCampaignData)
+          campaignMerged30Day = campaignMerged30Day.unionAll(mergedCampaignData)
         }
       }
     }

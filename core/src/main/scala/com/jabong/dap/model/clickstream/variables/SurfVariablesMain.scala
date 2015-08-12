@@ -5,14 +5,14 @@ import java.util.Calendar
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
-import com.jabong.dap.model.clickstream.utils.{GetMergedClickstreamData, GroupData}
+import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by Divya on 13/7/15.

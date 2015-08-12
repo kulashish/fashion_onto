@@ -3,14 +3,14 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -307,7 +307,7 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT))
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT)).dropDuplicates()
 
     logger.info("Filtered all the sku simple which has been bought")
 

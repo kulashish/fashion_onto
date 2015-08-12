@@ -26,36 +26,29 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
     cus1 = JsonUtils.readFromJson(DataSets.EXTRAS, "customer1")
 
-    //cus2 = JsonUtils.readFromJson(DataSets.EXTRAS, "customer2")
+    cus2 = JsonUtils.readFromJson(DataSets.EXTRAS, "customer2")
 
     click1 = JsonUtils.readFromJson(DataSets.EXTRAS, "clickstream")
 
-    //click2 = JsonUtils.readFromJson(DataSets.EXTRAS, "clickstream1")
+    click2 = JsonUtils.readFromJson(DataSets.EXTRAS, "clickstream1")
 
     dcf = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping", Schema.customerDeviceMapping)
 
-  }
+    res1 = JsonUtils.readFromJson(DataSets.EXTRAS, "res1", Schema.customerDeviceMapping)
 
-  "Testing getLatestDevice method" should " return size 27" in {
+    res2 = JsonUtils.readFromJson(DataSets.EXTRAS, "res2", Schema.customerDeviceMapping)
+
+}
+
+  "Testing getLatestDevice method 1" should "match the output dataframe" in {
 
     val res = CustomerDeviceMapping.getLatestDevice(click1, dcf, cus1)
-
-    //    click1.collect().foreach(println)
-    //    dcf.collect().foreach(println)
-    //    cus1.collect().foreach(println)
-    res.collect().foreach(println)
-    //    assert(res.collect().toSet.equals(res.collect().toSet))
+    assert(res.collect().toSet.equals(res1.collect().toSet))
   }
 
-  //  "Testing getLatestDevice method" should " match the output dataframe" in {
-  //
-  //    val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
-  //    click2.collect().foreach(println)
-  //    dcf.collect().foreach(println)
-  //    cus2.collect().foreach(println)
-  //    res.collect().foreach(println)
-  //
-  //    assert(res.collect().toSet.equals(res.collect().toSet))
-  //  }
+   "Testing getLatestDevice method" should " match the output dataframe" in {
 
+      val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
+      assert(res.collect().toSet.equals(res2.collect().toSet))
+   }
 }
