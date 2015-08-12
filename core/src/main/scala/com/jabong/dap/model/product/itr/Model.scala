@@ -15,7 +15,6 @@ object Model {
   var config, simple, salesOrderItem, catalogStock, productImage, categoryMapping, itemMaster: DataFrame = null
   var supplier, brand, category: Broadcast[DataFrame] = null
 
-
   def getItrInputs(date: String) {
 
     config = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CONFIG, DataSets.FULL_MERGE_MODE)
@@ -36,7 +35,7 @@ object Model {
 
     categoryMapping = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CONFIG_HAS_CATALOG_CATEGORY, DataSets.FULL_FETCH_MODE)
 
-    itemMaster: DataFrame = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.ERP, DataSets.ITEM_MASTER_COMPLETE_DUMP, DataSets.FULL_MERGE_MODE)
+    itemMaster = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.ERP, DataSets.ITEM_MASTER_COMPLETE_DUMP, DataSets.FULL_MERGE_MODE)
 
   }
 }

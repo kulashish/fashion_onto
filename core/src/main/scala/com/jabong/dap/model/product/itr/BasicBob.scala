@@ -132,7 +132,7 @@ object BasicBob {
    */
   def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date, reqTimeStamp: Timestamp): java.math.BigDecimal = {
     val zero = new java.math.BigDecimal(0.0)
-    
+
     if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == zero) {
       return price
     }

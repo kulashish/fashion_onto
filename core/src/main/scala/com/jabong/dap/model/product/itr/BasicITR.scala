@@ -53,12 +53,12 @@ object BasicITR extends Logging {
       "left_outer"
     ).
       na.fill(Map(
-      ITR.SPECIAL_MARGIN -> 0.00,
-      ITR.MARGIN -> 0.00,
-      ITR.SPECIAL_PRICE -> 0.00,
-      ITR.PRICE_ON_SITE -> 0.00,
-      ITR.QUANTITY -> 0
-    ))
+        ITR.SPECIAL_MARGIN -> 0.00,
+        ITR.MARGIN -> 0.00,
+        ITR.SPECIAL_PRICE -> 0.00,
+        ITR.PRICE_ON_SITE -> 0.00,
+        ITR.QUANTITY -> 0
+      ))
 
     itr.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
 
