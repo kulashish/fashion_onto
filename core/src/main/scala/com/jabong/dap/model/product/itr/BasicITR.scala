@@ -38,7 +38,7 @@ object BasicITR extends Logging {
   }
 
   def generateITR(incrDate: String, saveMode: String) = {
-    
+
     logger.info("generateITR data for Date:" + incrDate)
 
     val bobDF = BasicBob.getBobColumns(incrDate)
