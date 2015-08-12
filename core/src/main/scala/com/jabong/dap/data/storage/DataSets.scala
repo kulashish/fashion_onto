@@ -1,22 +1,9 @@
 package com.jabong.dap.data.storage
 
-import java.io.File
-
-import com.jabong.dap.common.AppConfig
-
 /**
  * Created by jabong on 28/5/15.
  */
 object DataSets {
-
-  val basePath = AppConfig.config.basePath
-
-  val INPUT_PATH = basePath + File.separator + "input"
-
-  val TMP_PATH = basePath + File.separator + "tmp"
-
-  val OUTPUT_PATH = AppConfig.config.outputPath
-  //  val OUTPUT_PATH = OUTPUT_PATH = basePath + File.separator + "output"
 
   val EXTRAS = "extras"
 
@@ -43,6 +30,12 @@ object DataSets {
   //catalog
   val CATALOG_CONFIG = "catalog_config"
   val CATALOG_BRAND = "catalog_brand"
+  val CATALOG_SIMPLE = "catalog_simple"
+  val CATALOG_SUPPLIER = "catalog_supplier"
+  val CATALOG_STOCK = "catalog_stock"
+  val CATALOG_PRODUCT_IMAGE = "catalog_product_image"
+  val CATALOG_CATEGORY = "catalog_category"
+  val CATALOG_CONFIG_HAS_CATALOG_CATEGORY = "catalog_config_has_catalog_category"
 
   //PaybackCustomer
   val PAYBACK_CUSTOMER = "payback_customer"

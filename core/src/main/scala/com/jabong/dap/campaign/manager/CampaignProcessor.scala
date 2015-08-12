@@ -4,6 +4,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.CampaignInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -17,10 +18,12 @@ import org.apache.spark.sql.types.StringType
  */
 object CampaignProcessor {
 
-  val email = udf((s: String, s1: String) => if (null == s || s.equals("")) s1 else s)
-  val device = udf((s: String, s1: String, s2: String) => if (null != s && (s.contains("windows") || s.contains("android") | s.contains("ios"))) s1 else s2)
-  val domain = udf((s: String, s1: String) => if (null != s && (s.contains("windows") || s.contains("android") | s.contains("ios"))) s else s1)
-
+  /**
+   *
+   * @param cmr
+   * @param campaign
+   * @return
+   */
   def mapDeviceFromCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
 
@@ -72,9 +75,9 @@ object CampaignProcessor {
           otherwise(bcCampaign(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
         coalesce(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
         */
-        device(bcCampaign(CampaignMergedFields.DOMAIN), bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(PageVisitVariables.BROWSER_ID)) as CampaignMergedFields.DEVICE_ID,
-        email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
-        domain(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
+        Udf.device(bcCampaign(CampaignMergedFields.DOMAIN), bcCampaign(CampaignMergedFields.DEVICE_ID), cmrn(PageVisitVariables.BROWSER_ID)) as CampaignMergedFields.DEVICE_ID,
+        Udf.email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
+        Udf.domain(bcCampaign(CampaignMergedFields.DOMAIN), cmrn(CampaignMergedFields.DOMAIN)) as CampaignMergedFields.DOMAIN
       )
     println("After joining campaigns with the cmr: " + campaignDevice.count())
     campaignDevice
@@ -83,6 +86,8 @@ object CampaignProcessor {
   /**
    * takes union input of all campaigns and return merged campaign list
    * @param inputCampaignsData
+   * @param key
+   * @param key1
    * @return
    */
   def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
@@ -117,36 +122,49 @@ object CampaignProcessor {
       )
   }
 
-  def mergeCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
+  /**
+   * Priority based merge for push campaigns.
+   * @param allCampaign
+   * @param itr
+   * @return
+   */
+  def mergepushCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
 
     // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
-    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('ios', 'android')")
+    val campaign = allCampaign.filter(CampaignMergedFields.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "')")
 
-    val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
-    println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
-    //custIdNotNUll.printSchema()
-    //custIdNotNUll.show(10)
+    // removing as this is not needed in case of ad4push campaigns. We are getting multiple customers with same deviceIds
+    // with the below logic.
+    // val custIdNotNUll = campaign.filter(!(campaign(CampaignMergedFields.CUSTOMER_ID) === 0))
+    // println("After campaign filtering on not null CustomerId ") // + custIdNotNUll.count())
+    // //custIdNotNUll.printSchema()
+    // //custIdNotNUll.show(10)
+    //
+    // val custId = campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
+    // println("After campaign merger on CustomerId")
+    // //custId.printSchema()
+    // //custId.show(10)
+    //
+    // val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
+    // println("After campaign filtering on null CustomerId ") // + custIdNUll.count())
+    // //custIdNUll.printSchema()
+    // //custIdNUll.show(10)
+    //
+    // val DeviceId = campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
+    // println("After campaign merger on DeviceId")
+    // //DeviceId.printSchema()
+    // //DeviceId.show(10)
+    //
+    // val camp = custId.unionAll(DeviceId)
+    // println("After unionAll ") // + camp.count())
+    // //camp.printSchema()
+    // //camp.show(10)
 
-    val custId = campaignMerger(custIdNotNUll, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-    println("After campaign merger on CustomerId")
-    //custId.printSchema()
-    //custId.show(10)
-
-    val custIdNUll = campaign.filter(campaign(CampaignMergedFields.CUSTOMER_ID) === 0)
-    println("After campaign filtering on null CustomerId ") // + custIdNUll.count())
-    //custIdNUll.printSchema()
-    //custIdNUll.show(10)
-
-    val DeviceId = campaignMerger(custIdNUll, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
+    val camp = campaignMerger(campaign, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
     println("After campaign merger on DeviceId")
     //DeviceId.printSchema()
     //DeviceId.show(10)
-
-    val camp = custId.unionAll(DeviceId)
-    println("After unionAll ") // + camp.count())
-    //camp.printSchema()
-    //camp.show(10)
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD
 
@@ -171,6 +189,12 @@ object CampaignProcessor {
     finalCampaign
   }
 
+  /**
+   *
+   * @param df
+   * @param date
+   * @param saveMode
+   */
   def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
     val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
     val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
@@ -193,6 +217,13 @@ object CampaignProcessor {
     }
   }
 
+  /**
+   *
+   * @param df
+   * @param date
+   * @param domain
+   * @param saveMode
+   */
   def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String, saveMode: String) {
     val dfResult = df.select(
       CampaignMergedFields.deviceId,
@@ -214,7 +245,7 @@ object CampaignProcessor {
     //    dfResult.printSchema()
     //    dfResult.show(10)
 
-    //    val path = DataWriter.getWritePath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
+    //    val path = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
     //    val csvFullPath = path + "/" + fileName
 
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")

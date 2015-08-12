@@ -4,6 +4,7 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
@@ -63,7 +64,7 @@ object MobilePushCampaignQuality extends Logging {
       DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "_csv", DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
       logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
-        + DataSets.OUTPUT_PATH + "/"
+        + ConfigConstants.OUTPUT_PATH + "/"
         + DataSets.CAMPAIGN + "/"
         + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "/"
         + DataSets.DAILY_MODE + "/"
@@ -77,7 +78,7 @@ object MobilePushCampaignQuality extends Logging {
 
     logger.info("Calling method getCampaignQuality........")
 
-    val path = PathBuilder.buildPath(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
+    val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
     val dataExits = DataVerifier.dataExists(path)
 
@@ -90,7 +91,7 @@ object MobilePushCampaignQuality extends Logging {
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
-      val dataFrame = DataReader.getDataFrame(DataSets.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
+      val dataFrame = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
