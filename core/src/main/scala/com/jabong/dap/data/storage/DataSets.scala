@@ -105,6 +105,7 @@ object DataSets {
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
   val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
+  val BASIC_ITR = "basicITR"
 
   val CAMPAIGN = "campaigns"
 
