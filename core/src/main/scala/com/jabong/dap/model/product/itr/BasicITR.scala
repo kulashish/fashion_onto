@@ -37,13 +37,8 @@ object BasicITR extends Logging {
     }
   }
 
-  def generateITR(startDate: String, saveMode: String) = {
-
-    var incrDate = startDate
-
-    if (null == incrDate) {
-      incrDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT) //YYYY-MM-DD  By Default yesterdays date
-    }
+  def generateITR(incrDate: String, saveMode: String) = {
+    
     logger.info("generateITR data for Date:" + incrDate)
 
     val bobDF = BasicBob.getBobColumns(incrDate)
