@@ -64,10 +64,11 @@ object CampaignInput extends Logging {
     customerMasterData
   }
 
-  def loadYesterdayOrderItemData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last day order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, dateYesterday)
+  def loadYesterdayOrderItemData = loadOrderItemData()
+
+  def loadOrderItemData(date:String = TimeUtils.YESTERDAY_FOLDER): DataFrame ={
+    logger.info("Reading order item data from hdfs for "+date)
+    val orderItemData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, date)
     orderItemData
   }
 
@@ -91,21 +92,22 @@ object CampaignInput extends Logging {
     lastNdaysOrderItemData
   }
 
-  def loadFullOrderData(): DataFrame = {
+  def loadFullOrderData(date:String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading full order data from hdfs")
     val orderData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
     orderData
   }
 
-  def loadLastNdaysOrderData(n: Int, fullOrderData: DataFrame): DataFrame = {
-    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS))
+  def loadLastNdaysOrderData(n: Int, fullOrderData: DataFrame, date:String= TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    val dateTimeMs = TimeUtils.changeDateFormat(date,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
 
-    val yesterdayTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS))
-    val yesterdayEndTime = TimeUtils.getEndTimestampMS(yesterdayTime)
+    val dateTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
+    val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
-    val lastNdaysOrderData = CampaignUtils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, yesterdayEndTime.toString)
+    val lastNdaysOrderData = CampaignUtils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
     lastNdaysOrderData
   }
 
@@ -233,7 +235,7 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
-  def getCampaignData(name: String, date: String, priority: Int): DataFrame = {
+  def getCampaignData(name: String, date: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
     val path: String = ConfigConstants.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
     if (DataVerifier.dataExists(path)) {
       var result: DataFrame = null
