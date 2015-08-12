@@ -17,6 +17,7 @@ class ACart extends LiveCustomerSelector with Logging {
       logger.error("sales cart data is null ")
       return null
     }
+    //FIXME:Removed null customers, need to check for email also in future
     val acartCustomers = salesCartData.na.drop(Array(ACartVariables.FK_CUSTOMER)).filter(ACartVariables.ACART_STATUS + " = 'active'")
       .select(salesCartData(ACartVariables.FK_CUSTOMER),
         salesCartData(ACartVariables.SKU_SIMPLE) as (ProductVariables.SKU_SIMPLE),
