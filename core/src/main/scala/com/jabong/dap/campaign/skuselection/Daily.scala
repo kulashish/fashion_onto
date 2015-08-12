@@ -1,8 +1,9 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -18,7 +19,7 @@ class Daily extends SkuSelector with Logging {
       return null
     }
 
-    val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), "inner")
+    val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         yesterdayItrData(ProductVariables.SPECIAL_PRICE))

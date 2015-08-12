@@ -1,6 +1,7 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -60,7 +61,7 @@ object SalesOrderItem {
     val bcapp = Spark.getContext().broadcast(app).value
     val bcweb = Spark.getContext().broadcast(web).value
     val bcmweb = Spark.getContext().broadcast(mWeb).value
-    val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), "outer").
+    val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER).
       select(
         coalesce(
           bcapp(SalesOrderVariables.FK_CUSTOMER),
@@ -73,7 +74,7 @@ object SalesOrderItem {
       )
     appJoined.printSchema()
     appJoined.show(5)
-    val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), "outer").
+    val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER).
       select(
         coalesce(
           bcmweb(SalesOrderVariables.FK_CUSTOMER),
@@ -113,7 +114,7 @@ object SalesOrderItem {
    */
   def merge(inc: DataFrame, full: DataFrame): DataFrame = {
     val bcInc = Spark.getContext().broadcast(inc)
-    val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), "outer")
+    val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER)
     val res = joinedData.select(
       coalesce(
         full(SalesOrderVariables.FK_CUSTOMER),
@@ -188,7 +189,7 @@ object SalesOrderItem {
 
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
     val bcCurr = Spark.getContext().broadcast(prev)
-    val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), "outer")
+    val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER)
     val res = joinedData.select(
       coalesce(
         prev(SalesOrderVariables.FK_CUSTOMER),

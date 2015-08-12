@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.skuselection
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -101,7 +102,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val joinDf = cpsl.join(itr30dayData, cpsl(CustomerProductShortlistVariables.SKU_SIMPLE) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE)
       &&
-      cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
+      cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
 
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
@@ -180,7 +181,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
       &&
-      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
+      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
       .select(
         CustomerProductShortlistVariables.FK_CUSTOMER,
         CustomerProductShortlistVariables.EMAIL,
@@ -227,7 +228,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       yesterdayItrData,
       skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
-      "inner"
+      SQL.INNER
     )
 
     val dfFilter = dfJoin.filter(CustomerProductShortlistVariables.PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)

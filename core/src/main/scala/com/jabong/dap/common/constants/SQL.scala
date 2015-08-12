@@ -20,7 +20,7 @@ object SQL {
   val OPEN_CURLY = " ( "
   val CLOSE_CURLY = " ) "
 
-  val IS_NULL = " is null "
-  val IS_NOT_NULL = " is not null "
+  val IS_NULL = " IS null "
+  val IS_NOT_NULL = " IS NOT null "
 
 }

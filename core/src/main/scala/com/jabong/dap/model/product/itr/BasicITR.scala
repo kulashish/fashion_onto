@@ -1,5 +1,6 @@
 package com.jabong.dap.model.product.itr
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.PathBuilder
@@ -18,7 +19,7 @@ object BasicITR {
     val itr = erpDF.join(
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
-      "left_outer"
+      SQL.LEFT
     ).
       na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,
