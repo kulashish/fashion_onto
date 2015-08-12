@@ -327,7 +327,6 @@ object CampaignInput extends Logging {
 
     var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-
     var itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
@@ -356,7 +355,6 @@ object CampaignInput extends Logging {
   def load30DayItrSkuSimpleData() = {
 
     var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-
 
     var itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       .select(
