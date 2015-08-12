@@ -44,7 +44,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
     val updatedCustomerSelected = customerSelected.select(
       Udf.yyyymmdd(customerSelected(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
-      col(CustomerVariables.FK_CUSTOMER) ,
+      col(CustomerVariables.FK_CUSTOMER),
       col (ProductVariables.SKU_SIMPLE)
     )
 
@@ -74,7 +74,6 @@ class ItemOnDiscount extends SkuSelector with Logging {
     return refSkus
   }
 
-
   /**
    *
    * @param itr30dayData
@@ -98,7 +97,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
    * @param cpsl
    * @param itr30dayData
    */
-  def   getJoinDF(cpsl: DataFrame, itr30dayData: DataFrame): DataFrame = {
+  def getJoinDF(cpsl: DataFrame, itr30dayData: DataFrame): DataFrame = {
 
     val joinDf = cpsl.join(itr30dayData, cpsl(CustomerProductShortlistVariables.SKU_SIMPLE) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE)
       &&

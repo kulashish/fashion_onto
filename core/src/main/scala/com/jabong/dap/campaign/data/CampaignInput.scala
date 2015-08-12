@@ -361,7 +361,6 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
-
     for (i <- 2 to 30) {
 
       date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
