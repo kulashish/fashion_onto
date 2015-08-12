@@ -348,7 +348,6 @@ object CampaignInput extends Logging {
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
-
     itr30Day
   }
 
@@ -362,7 +361,6 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
-    println("ITR first count " + itr30Day.count())
 
     for (i <- 2 to 30) {
 
@@ -381,7 +379,6 @@ object CampaignInput extends Logging {
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }
-    println("ITR count " + itr30Day.count())
     itr30Day
   }
 
