@@ -105,6 +105,7 @@ object DataSets {
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
   val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
+  val BASIC_ITR = "basicITR"
 
   val CAMPAIGN = "campaigns"
 
@@ -121,4 +122,7 @@ object DataSets {
   val CUSTOMER_SELECTION = "customer_selection"
   val CUSTOMER_PAGE_VISIT = "customer_page_visit"
   val SURF = "surf"
+
+  //item master
+  val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
 }
