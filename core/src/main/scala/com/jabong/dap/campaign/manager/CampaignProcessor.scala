@@ -83,7 +83,6 @@ object CampaignProcessor {
     campaignDevice
   }
 
-
   /**
    * takes union input of all campaigns and return merged campaign list
    * @param inputCampaignsData

@@ -1,7 +1,7 @@
 package com.jabong.dap.model.product.itr
 
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.product.itr.variables.ITR
