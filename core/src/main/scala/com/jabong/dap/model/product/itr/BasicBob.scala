@@ -27,7 +27,7 @@ object BasicBob {
 
     val simpleDF = Model.simple.select(
       Model.simple("id_catalog_simple"),
-      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_to_date"), Model.simple("special_from_date"), lit(dateTime)) as (ITR.PRICE_ON_SITE),
+      priceOnSite(Model.simple("special_price"), Model.simple("price"), Model.simple("special_from_date"), Model.simple("special_to_date"), lit(dateTime)) as (ITR.PRICE_ON_SITE),
       Model.simple("special_price"),
       Model.simple("special_to_date"),
       Model.simple("special_from_date"),
@@ -131,11 +131,13 @@ object BasicBob {
    * @return
    */
   def correctPrice(specialPrice: java.math.BigDecimal, price: java.math.BigDecimal, specialFromDate: Date, specialToDate: Date, reqTimeStamp: Timestamp): java.math.BigDecimal = {
-    if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == 0.0) {
+    val zero = new java.math.BigDecimal(0.0)
+    
+    if (specialFromDate == null || specialToDate == null || specialPrice == null || specialPrice == zero) {
       return price
     }
 
-    if (price == null || price == 0.0) {
+    if (price == null || price == zero) {
       return specialPrice
     }
 
