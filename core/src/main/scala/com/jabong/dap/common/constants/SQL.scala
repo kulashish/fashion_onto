@@ -6,7 +6,7 @@ package com.jabong.dap.common.constants
 object SQL {
 
   val INNER = "inner"
-  val OUTER = "outer"
+  val FULL_OUTER = "full_outer"
   val LEFT_OUTER = "left_outer"
   val RIGHT_OUTER = "right_outer"
 
