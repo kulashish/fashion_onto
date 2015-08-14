@@ -88,7 +88,7 @@ class ReturnCancel extends LiveCustomerSelector {
         first(SalesOrderVariables.CREATED_AT) as "last_order_time")
 
     // 3. join it with rdf data and then filter by where item_updated_at < last_order_time
-    val joinedData = customerLatestItemsData.join(latestCustomerOrders, latestCustomerOrders(SalesOrderVariables.FK_CUSTOMER) === customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER)
+    val joinedData = customerLatestItemsData.join(latestCustomerOrders, latestCustomerOrders(SalesOrderVariables.FK_CUSTOMER) === customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
     //or "+customerLatestItemsData(SalesOrderItemVariables.UPDATED_AT)<latestCustomerOrders( "last_order_time")
     val filteredSku = joinedData.filter("updated_at is not null and (last_order_time  is null or last_order_time <= updated_at)")
       .select(customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER),

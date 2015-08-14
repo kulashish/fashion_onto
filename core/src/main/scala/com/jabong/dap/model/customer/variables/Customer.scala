@@ -76,7 +76,7 @@ object Customer {
       CustomerVariables.CITY,
       CustomerVariables.IS_CONFIRMED
     )
-      .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), SQL.OUTER)
+      .join(NLS, dfCustomer(CustomerVariables.EMAIL) === NLS(NewsletterVariables.NLS_EMAIL), SQL.FULL_OUTER)
 
       .join(
         dfSalesOrder.select(
@@ -84,9 +84,9 @@ object Customer {
           col(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.SO_CREATED_AT,
           col(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.SO_UPDATED_AT
         ),
-        dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER
+        dfCustomer(CustomerVariables.ID_CUSTOMER) === dfSalesOrder(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER
       )
-      .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), SQL.OUTER)
+      .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), SQL.FULL_OUTER)
 
     //Name of variable: EMAIL_OPT_IN_STATUS
     val udfEmailOptInStatus = udf((nls_email: String, status: String) => getEmailOptInStatus(nls_email: String, status: String))
