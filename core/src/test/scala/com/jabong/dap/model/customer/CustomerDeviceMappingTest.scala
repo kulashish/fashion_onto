@@ -38,7 +38,7 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
     res2 = JsonUtils.readFromJson(DataSets.EXTRAS, "res2", Schema.customerDeviceMapping)
 
-}
+  }
 
   "Testing getLatestDevice method 1" should "match the output dataframe" in {
 
@@ -46,9 +46,9 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
     assert(res.collect().toSet.equals(res1.collect().toSet))
   }
 
-   "Testing getLatestDevice method" should " match the output dataframe" in {
+  "Testing getLatestDevice method" should " match the output dataframe" in {
 
-      val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
-      assert(res.collect().toSet.equals(res2.collect().toSet))
-   }
+    val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
+    assert(res.collect().toSet.equals(res2.collect().toSet))
+  }
 }

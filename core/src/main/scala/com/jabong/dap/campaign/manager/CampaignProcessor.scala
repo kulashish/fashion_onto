@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -57,7 +58,7 @@ object CampaignProcessor {
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), "rightouter")
+    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
       .select(
         bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),

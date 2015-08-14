@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ ItrVariables, CustomerPageVisitVariables }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
@@ -72,7 +73,7 @@ class YesterdaySession extends CustomerSelector with Logging {
     val dfJoin = dfDistinctSku.join(
       yesterdayItrData,
       dfDistinctSku(CustomerPageVisitVariables.SKU) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU),
-      "inner"
+      SQL.INNER
     )
       .select(
         col(CustomerPageVisitVariables.USER_ID),

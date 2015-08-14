@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.recommendation
 import java.{ lang, util }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, ProductVariables }
 import com.jabong.dap.common.Spark
 import org.apache.hadoop.hdfs.util.Diff.ListType
@@ -61,7 +62,7 @@ class BasicRecommender extends Recommender {
       return null
     }
     import sqlContext.implicits._
-    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), "inner")
+    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), SQL.INNER)
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
 
@@ -253,7 +254,7 @@ class BasicRecommender extends Recommender {
     val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.STOCK + ">2*" + ProductVariables.WEEKLY_AVERAGE_SALE)
 
     val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock, filteredBeforeSevenDaysData(ProductVariables.BRAND).equalTo(brickBrandStock("brands"))
-      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")), "inner")
+      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")), SQL.INNER)
       .withColumn("stockAvailable", inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.CATEGORY), filteredBeforeSevenDaysData(ProductVariables.STOCK), brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")

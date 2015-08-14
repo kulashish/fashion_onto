@@ -6,9 +6,9 @@ package com.jabong.dap.common.constants
 object SQL {
 
   val INNER = "inner"
-  val OUTER = "outer"
-  val LEFT = "left"
-  val RIGHT = "right"
+  val FULL_OUTER = "full_outer"
+  val LEFT_OUTER = "left_outer"
+  val RIGHT_OUTER = "right_outer"
 
   val LT = " < "
   val GT = " > "
@@ -20,7 +20,7 @@ object SQL {
   val OPEN_CURLY = " ( "
   val CLOSE_CURLY = " ) "
 
-  val IS_NULL = " is null "
-  val IS_NOT_NULL = " is not null "
+  val IS_NULL = " IS null "
+  val IS_NOT_NULL = " IS NOT null "
 
 }

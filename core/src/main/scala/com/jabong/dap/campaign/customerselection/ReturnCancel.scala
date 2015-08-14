@@ -1,11 +1,10 @@
 package com.jabong.dap.campaign.customerselection
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -64,7 +63,7 @@ class ReturnCancel extends LiveCustomerSelector {
     // call it customerLatestItemsData
     val customerLatestItemsData = customerOrderData.join(
       returnCancelSku,
-      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner"
+      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(returnCancelSku(SalesOrderItemVariables.FK_SALES_ORDER)), SQL.INNER
     )
       .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER),
         customerOrderData(SalesOrderVariables.ID_SALES_ORDER),
@@ -89,7 +88,7 @@ class ReturnCancel extends LiveCustomerSelector {
         first(SalesOrderVariables.CREATED_AT) as "last_order_time")
 
     // 3. join it with rdf data and then filter by where item_updated_at < last_order_time
-    val joinedData = customerLatestItemsData.join(latestCustomerOrders, latestCustomerOrders(SalesOrderVariables.FK_CUSTOMER) === customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER), "full_outer")
+    val joinedData = customerLatestItemsData.join(latestCustomerOrders, latestCustomerOrders(SalesOrderVariables.FK_CUSTOMER) === customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
     //or "+customerLatestItemsData(SalesOrderItemVariables.UPDATED_AT)<latestCustomerOrders( "last_order_time")
     val filteredSku = joinedData.filter("updated_at is not null and (last_order_time  is null or last_order_time <= updated_at)")
       .select(customerLatestItemsData(SalesOrderVariables.FK_CUSTOMER),

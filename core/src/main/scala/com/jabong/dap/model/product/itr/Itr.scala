@@ -3,6 +3,7 @@ package com.jabong.dap.model.product.itr
 import java.io.File
 import java.math
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.AppConfig
 import grizzled.slf4j.Logging
@@ -88,7 +89,7 @@ class Itr extends Serializable with Logging {
     val itr = erpDF.join(
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
-      "left_outer"
+      SQL.LEFT_OUTER
     ).
       na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,
@@ -104,7 +105,7 @@ class Itr extends Serializable with Logging {
     val priceBandMVPDF = itr.join(
       priceBandDF,
       itr.col(ITR.REPORTING_CATEGORY) === priceBandDF.col("bandCategory"),
-      "left_outer"
+      SQL.LEFT_OUTER
     ).
       where(itr.col(ITR.BRICK) === priceBandDF.col("bandBrick")).
       withColumn(ITR.MVP, mvpUDF(

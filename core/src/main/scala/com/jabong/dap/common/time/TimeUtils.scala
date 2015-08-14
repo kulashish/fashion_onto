@@ -154,6 +154,11 @@ object TimeUtils extends Logging {
     ts
   }
 
+  def getDate(dt: String, dateFormat: String): Date = {
+    val sdf = new SimpleDateFormat(dateFormat)
+    return sdf.parse(dt)
+  }
+
   /**
    * Return today's date as a string in the given date format.
    * @param dateFormat

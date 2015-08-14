@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, CustomerPageVisitVariables, ItrVariables }
 import com.jabong.dap.model.product.itr.variables.ITR
@@ -60,7 +61,7 @@ class Surf extends SkuSelector with Logging {
     val dfJoin = skusFiltered.join(
       itrData,
       skusFiltered(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
-      "inner"
+      SQL.INNER
     )
       .select(
         col(CustomerVariables.FK_CUSTOMER),
