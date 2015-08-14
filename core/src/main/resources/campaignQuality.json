@@ -1,0 +1,8 @@
+{
+  "params": [
+    {
+      "source": "campaign_quality",
+      "fraction": ".15"
+    }
+  ]
+}
