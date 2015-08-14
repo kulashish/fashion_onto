@@ -215,7 +215,7 @@ object Bob {
             Model.brand.value.select("status", "id_catalog_brand")
               .withColumnRenamed("status", "brandStatus"),
             Model.brand.value.col("id_catalog_brand") === configDF.col("fk_catalog_brand"),
-        SQL.LEFT_OUTER
+            SQL.LEFT_OUTER
           ).select(
               "idCatalogConfig",
               "configStatus",
