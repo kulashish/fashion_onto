@@ -24,7 +24,7 @@ class InvalidFollowUpCampaign {
     if (past30DayCampaignMergedData != null) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
       val pastCampaignCheck = new PastCampaignCheck()
-      custFiltered = pastCampaignCheck.campaignCheck(past30DayCampaignMergedData, selectedCustomers,
+      custFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
         CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, 1000), 30)
 
     }
