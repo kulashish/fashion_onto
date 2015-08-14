@@ -64,7 +64,7 @@ object CampaignInput extends Logging {
     customerMasterData
   }
 
-  def loadYesterdayOrderItemData = loadOrderItemData()
+  def loadYesterdayOrderItemData() = loadOrderItemData()
 
   def loadOrderItemData(date:String = TimeUtils.YESTERDAY_FOLDER): DataFrame ={
     logger.info("Reading order item data from hdfs for "+date)
