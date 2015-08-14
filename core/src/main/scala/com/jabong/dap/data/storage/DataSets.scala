@@ -125,4 +125,6 @@ object DataSets {
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
+
+  val CAMPAIGN_QUALITY = "campaign_quality"
 }
