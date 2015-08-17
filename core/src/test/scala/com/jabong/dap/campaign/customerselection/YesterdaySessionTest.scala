@@ -21,7 +21,6 @@ class YesterdaySessionTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
     yesterdaySession = new YesterdaySession()
-    //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_surf_data")
     dfCustomerSurfData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_SELECTION, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuListLevel)
     dfItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_SELECTION, DataSets.ITR_30_DAY_DATA, Schema.itr)
 
