@@ -134,6 +134,7 @@ object Init {
 
       //campaign quality check
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.startMobilePushCampaignQuality(params.pushCampaignsJson)
+      case "campaignQuality" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }
