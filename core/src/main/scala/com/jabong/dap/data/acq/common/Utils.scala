@@ -87,7 +87,7 @@ case class ParamInfo(
   incrMode: Option[String],
   saveFormat: String,
   saveMode: String,
-  fraction: String)
+  fraction: Option[String])
 
 /**
  * Case class for storing the information for the data acquisition.
