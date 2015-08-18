@@ -39,15 +39,15 @@ object CampaignQualityEntry extends Logging {
       logger.info("WishlistCampaignQuality failed for:-" + incrDate)
       status = false
     }
-    if(!InvalidFollowupQuality.backwardTest(incrDate,fraction)){
-      logger.info("InvalidFollowupQuality failed for "+incrDate)
+    if (!InvalidFollowupQuality.backwardTest(incrDate, fraction)) {
+      logger.info("InvalidFollowupQuality failed for " + incrDate)
     }
 
-    if(!InvalidLowStockQuality.backwardTest(incrDate,fraction)) {
+    if (!InvalidLowStockQuality.backwardTest(incrDate, fraction)) {
       logger.info("InvalidLowStockQuality failed for " + incrDate)
     }
-    
-      if (status == false) {
+
+    if (status == false) {
       throw new FailedStatusException
     }
   }

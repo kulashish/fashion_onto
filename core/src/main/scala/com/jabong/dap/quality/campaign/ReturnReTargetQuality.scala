@@ -1,7 +1,7 @@
 package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderVariables, SalesOrderItemVariables }
 import com.jabong.dap.common.time.TimeUtils

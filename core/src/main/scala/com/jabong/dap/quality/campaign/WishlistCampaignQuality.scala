@@ -2,7 +2,7 @@ package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
-import com.jabong.dap.common.constants.campaign.{CustomerSelection, CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.time.TimeUtils
 import grizzled.slf4j.Logging
@@ -64,12 +64,11 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
 
     val last30DaysCustomerShortlistData = wishListCustomerSelector.customerSelection(fullShortlistData, 30)
 
-
     val wishlistFollowupCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, date)
     val wishlistIODCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_IOD_CAMPAIGN, date)
     val wishlistLowStockCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, date)
 
-    return (last30DaysCustomerShortlistData, lastDayCustomerShortlistData , wishlistFollowupCampaignDF, wishlistIODCampaignDF, wishlistLowStockCampaignDF)
+    return (last30DaysCustomerShortlistData, lastDayCustomerShortlistData, wishlistFollowupCampaignDF, wishlistIODCampaignDF, wishlistLowStockCampaignDF)
 
   }
 
@@ -83,7 +82,7 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
    */
   def backwardTest(date: String, fraction: Double): Boolean = {
 
-    val (last30DaysCustomerShortlistData, lastDayCustomerShortlistData , wishlistFllowupCampaignDF, wishlistIODCampaignDF, wishlistLowStockCampaignDF) = getInputOutput(date)
+    val (last30DaysCustomerShortlistData, lastDayCustomerShortlistData, wishlistFllowupCampaignDF, wishlistIODCampaignDF, wishlistLowStockCampaignDF) = getInputOutput(date)
 
     val samplewishlistFllowupCampaignDF = getSample(wishlistFllowupCampaignDF, fraction)
     val samplewishlistIODCampaignDF = getSample(wishlistIODCampaignDF, fraction)
