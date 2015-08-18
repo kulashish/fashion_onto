@@ -111,11 +111,10 @@ object CampaignInput extends Logging {
     lastNdaysOrderData
   }
 
-  def loadLast30daysAcartData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  def loadLast30daysAcartData(date:String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     logger.info("Reading last 30 days acart item data from hdfs")
 
-    val acartData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_CART, DataSets.MONTHLY_MODE, dateYesterday)
+    val acartData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_CART, DataSets.MONTHLY_MODE, date)
     acartData
   }
 
