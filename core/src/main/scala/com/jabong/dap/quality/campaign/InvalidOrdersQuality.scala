@@ -10,7 +10,7 @@ import org.apache.spark.sql.functions._
 /**
  * Created by jabong on 12/8/15.
  */
-object LiveInvalid {
+object InvalidOrdersQuality {
 
 
   /**
