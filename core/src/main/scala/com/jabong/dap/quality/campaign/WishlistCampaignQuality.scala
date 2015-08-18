@@ -1,7 +1,7 @@
 package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import com.jabong.dap.common.time.TimeUtils
 import grizzled.slf4j.Logging
@@ -42,8 +42,8 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
     ).dropDuplicates()
 
     val wishlistCampaignDF = sampleCampaignDF.select(
-      col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.SKU)
+      col(CampaignMergedFields.CUSTOMER_ID),
+      col(CampaignMergedFields.REF_SKU1)
     ).dropDuplicates()
 
     lastDayCustomerSelected.intersect(wishlistCampaignDF).count() == wishlistCampaignDF.count()
@@ -56,7 +56,7 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
    */
   def getInputOutput(date: String = TimeUtils.YESTERDAY_FOLDER): (DataFrame, DataFrame, DataFrame, DataFrame) = {
 
-    val fullShortlistData = CampaignInput.loadFullShortlistData()
+    val fullShortlistData = CampaignInput.loadFullShortlistData(date)
 
     val wishlistFllowupCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, date)
     val wishlistIODCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_IOD_CAMPAIGN, date)
