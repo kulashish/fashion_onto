@@ -48,7 +48,8 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
     */
   def validateAbandonedCart(salesCartDF:DataFrame,sampleCampaignOutput:DataFrame): Boolean = {
     val updatedSalesCart = salesCartDF.select(salesCartDF(ACartVariables.FK_CUSTOMER),
-      Udf.skuFromSimpleSku(salesCartDF(ACartVariables.SKU_SIMPLE)) as ACartVariables.SKU_SIMPLE)
+      Udf.skuFromSimpleSku(salesCartDF(ACartVariables.SKU_SIMPLE)) as ACartVariables.SKU_SIMPLE,
+      salesCartDF(ACartVariables.ACART_STATUS))
 
     val abandaonedCartCustomers = updatedSalesCart.join(sampleCampaignOutput,updatedSalesCart(SalesOrderVariables.FK_CUSTOMER)===sampleCampaignOutput(CampaignMergedFields.CUSTOMER_ID)
       && sampleCampaignOutput(CampaignMergedFields.REF_SKU1)=== (updatedSalesCart(ACartVariables.SKU_SIMPLE)) ,SQL.INNER)
