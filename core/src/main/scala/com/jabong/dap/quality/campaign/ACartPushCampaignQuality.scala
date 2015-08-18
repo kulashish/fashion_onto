@@ -62,14 +62,15 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
    * @param date in 2015/08/01 format
    * @return
    */
-  def getInputOutput(date:String):(DataFrame,DataFrame,DataFrame,DataFrame)={
+  def getInputOutput(date:String):(DataFrame,DataFrame,DataFrame,DataFrame,DataFrame)={
     val salesCart30Days = CampaignQualityEntry.salesCart30DaysData
+    val salesCart3rdDay = CampaignQualityEntry.salesCart3rdDayData
    // val yesterDayItr30Days = CampaignInput.load30DayItrSkuSimpleData()
    // val yesterDayItrData = CampaignInput.loadYesterdayItrSimpleData()
     val acartFollowUp = CampaignInput.getCampaignData(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
     val acartIOD = CampaignInput.getCampaignData(CampaignCommon.ACART_IOD_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
     val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
-    return(salesCart30Days,acartFollowUp,acartIOD,acartLowStock)
+    return(salesCart30Days,salesCart3rdDay,,acartFollowUp,acartIOD,acartLowStock)
   }
 
   /**Entry point
@@ -80,12 +81,12 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
     * @return
     */
   def backwardTest(date:String, fraction:Double):Boolean = {
-    val (salesCart30DaysDF,acartFollowUp,acartIOD,acartLowStock) = getInputOutput(date)
-    val sampleAcart = getSample(acartFollowUp,fraction)
+    val (salesCart30DaysDF,salesCart3rdDayDF,acartFollowUp,acartIOD,acartLowStock) = getInputOutput(date)
+    val sampleAcartFollowUp = getSample(acartFollowUp,fraction)
     val sampleAcartIOD = getSample(acartIOD,fraction)
     val sampleAcartLowStock = getSample(acartLowStock,fraction)
 
-    val acartFollowUpStatus  = validateAcartFollowup(salesCart30DaysDF,sampleAcart)
+    val acartFollowUpStatus  = validateAcartFollowup(salesCart3rdDayDF,sampleAcartFollowUp)
     val acartLowStockStatus = validateAcartLowStock(salesCart30DaysDF,sampleAcartLowStock)
     val acartIODStatus = validateAcartIOD(salesCart30DaysDF,sampleAcartIOD)
     logger.info("acartFollowUpStatus:-"+ acartFollowUpStatus +"acartIODStatus:-"+acartIODStatus+"acartLowStockStatus:-"+acartLowStockStatus)
