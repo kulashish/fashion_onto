@@ -72,30 +72,33 @@ object CampaignInput extends Logging {
     orderItemData
   }
 
-  def loadFullOrderItemData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  def loadFullOrderItemData(date:String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+  //  val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading full order item data from hdfs")
-    val orderItemData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val orderItemData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, date)
     orderItemData
   }
 
   // based on updated_at
-  def loadLastNdaysOrderItemData(n: Int, fullOrderItemData: DataFrame): DataFrame = {
+  def loadLastNdaysOrderItemData(n: Int, fullOrderItemData: DataFrame, date:String= TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    val dateTimeMs = TimeUtils.changeDateFormat(date,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
+
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS))
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
 
-    val yesterdayTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS))
-    val yesterdayEndTime = TimeUtils.getEndTimestampMS(yesterdayTime)
+    val dateTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
+    val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
-    val lastNdaysOrderItemData = CampaignUtils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, yesterdayEndTime.toString)
+
+    val lastNdaysOrderItemData = CampaignUtils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
 
     lastNdaysOrderItemData
   }
 
   def loadFullOrderData(date:String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading full order data from hdfs")
-    val orderData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val orderData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, date)
     orderData
   }
 
@@ -193,10 +196,10 @@ object CampaignInput extends Logging {
     filteredItr
   }*/
 
-  def loadFullShortlistData() = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
+  def loadFullShortlistData(date:String = TimeUtils.YESTERDAY_FOLDER) = {
+    //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     logger.info("Reading full fetch shortlist data from hdfs")
-    val shortlistData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, dateYesterday)
+    val shortlistData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, date)
     shortlistData
   }
 
