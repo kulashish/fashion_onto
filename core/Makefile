@@ -6,7 +6,7 @@ PKGNAME = $(BASE).tar.gz
 package:
 	rm -rf $(BASE)
 	rm -f $(PKGNAME)
-	sbt assembly
+	sbt clean assembly
 	mkdir -p $(BASE)/bin
 	mkdir -p $(BASE)/jar
 	mkdir -p $(BASE)/conf
