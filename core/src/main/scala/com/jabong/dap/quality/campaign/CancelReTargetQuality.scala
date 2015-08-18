@@ -1,10 +1,11 @@
 package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -43,9 +44,9 @@ object CancelReTargetQuality extends BaseCampaignQuality{
                       orderDF(SalesOrderVariables.ID_SALES_ORDER).equalTo(cancelOrderItemDF(SalesOrderItemVariables.FK_SALES_ORDER)),
                       "inner")
                         .select(orderDF(SalesOrderVariables.FK_CUSTOMER),
-                        cancelOrderItemDF(ProductVariables.SKU)).dropDuplicates()
+                        Udf.skuFromSimpleSku(cancelOrderItemDF(ProductVariables.SKU))).dropDuplicates()
 
-    val cancelDF = cancelRetargetDF.select(SalesOrderVariables.FK_CUSTOMER,ProductVariables.SKU).dropDuplicates()
+    val cancelDF = cancelRetargetDF.select(CampaignMergedFields.CUSTOMER_ID,CampaignMergedFields.REF_SKU1).dropDuplicates()
     joinedOrder.intersect(cancelDF).count() == cancelDF.count()
   }
 
