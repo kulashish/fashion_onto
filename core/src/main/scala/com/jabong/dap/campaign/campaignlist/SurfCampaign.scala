@@ -21,7 +21,7 @@ object SurfCampaign extends Logging {
     val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData()
 
     // not bought for last day
-    val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData
+    val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val yestOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
 

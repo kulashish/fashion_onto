@@ -91,11 +91,7 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
     val statusLowStock = validateWishlistCampaign(fullShortlistData, samplewishlistLowStockCampaignDF)
     logger.info("Status of Wishlist Low Stock: " + statusLowStock)
 
-    if (statusFolloup && statusIOD && statusLowStock) {
-      return true
-    } else {
-      return false
-    }
+    return (statusFolloup && statusIOD && statusLowStock)
 
   }
 

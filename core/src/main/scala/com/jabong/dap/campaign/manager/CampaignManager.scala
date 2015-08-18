@@ -58,7 +58,7 @@ object CampaignManager extends Serializable with Logging {
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
 
-    val orderItemData = CampaignInput.loadYesterdayOrderItemData
+    val orderItemData = CampaignInput.loadYesterdayOrderItemData()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
@@ -111,7 +111,7 @@ object CampaignManager extends Serializable with Logging {
     // no previous campaign check
     // FIXME: search for email
     val yesterdayAcartData = CampaignInput.loadNthdayAcartData(1, last30DayAcartData)
-    val yesterdaySalesOrderItemData = CampaignInput.loadYesterdayOrderItemData // created_at
+    val yesterdaySalesOrderItemData = CampaignInput.loadYesterdayOrderItemData() // created_at
     val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
     val acartDaily = new AcartDailyCampaign()
     acartDaily.runCampaign(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, yesterdayItrData)
