@@ -23,7 +23,7 @@ object CustVarSchema {
   ))
 
   val customersPreferredOrderTimeslot = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER_CPOT, IntegerType, true),
+    StructField(CustomerVariables.FK_CUSTOMER_CPOT, LongType, true),
     StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
     StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true)
   ))
@@ -58,7 +58,7 @@ object CustVarSchema {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   val mvp_seg = StructType(Array(
-    StructField(CustomerSegmentsVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerSegmentsVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerSegmentsVariables.MVP_SCORE, IntegerType, true),
     StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true)
   ))
@@ -68,7 +68,7 @@ object CustVarSchema {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   val last_jr_covert_date = StructType(Array(
-    StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerStoreVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true)
   ))
 }

@@ -125,4 +125,9 @@ object DataSets {
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
+
+  val VARIABLES = "variables"
+  val CUSTOMER_FULL = "customer_full"
+  val SALES_ORDER_FULL = "sales_order"
+  val CONTACT_LIST_MOBILE = "contact_list_mobile"
 }

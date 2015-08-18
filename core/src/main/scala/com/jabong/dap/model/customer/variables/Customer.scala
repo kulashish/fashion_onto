@@ -217,6 +217,7 @@ object Customer {
   }
 
   /**
+   * EMAIL_SUBSCRIPTION_STATUS
    * iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
    * @param nls_email
    * @param status
