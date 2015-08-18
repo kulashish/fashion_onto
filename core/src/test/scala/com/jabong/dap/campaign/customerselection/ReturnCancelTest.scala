@@ -21,8 +21,8 @@ class ReturnCancelTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     returnCancel = new ReturnCancel()
-    orderItemDataFrame = JsonUtils.readFromJson("campaign", "sales_item_cancel_return", Schema.salesOrderItem)
-    orderData = JsonUtils.readFromJson("campaign", "sales_order_cancel_return", Schema.salesOrder)
+    orderItemDataFrame = JsonUtils.readFromJson("campaigns", "sales_item_cancel_return", Schema.salesOrderItem)
+    orderData = JsonUtils.readFromJson("campaigns", "sales_order_cancel_return", Schema.salesOrder)
   }
 
   "No order data" should "return no data" in {

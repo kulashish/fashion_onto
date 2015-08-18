@@ -39,12 +39,12 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    refSkuInput = sqlContext.read.json("src/test/resources/campaign/ref_sku_input.json")
-    customerSelected = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected.json")
-    customerSelectedShortlist = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_selected_shortlist.json")
-    salesOrder = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_order_placed.json")
-    salesOrderItem = sqlContext.read.json("src/test/resources/campaign/campaign_utils/sales_item_bought.json")
-    customerSelectedTime = sqlContext.read.json("src/test/resources/campaign/campaign_utils/customer_filtered_time.json")
+    refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGN, "ref_sku_input")
+    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "customer_selected")
+    customerSelectedShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "customer_selected_shortlist")
+    salesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "sales_order_placed")
+    salesOrderItem = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "sales_item_bought")
+    customerSelectedTime = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "customer_filtered_time")
 
     dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
     dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER, Schema.customer)
