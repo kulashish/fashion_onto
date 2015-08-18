@@ -1,9 +1,9 @@
 package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
