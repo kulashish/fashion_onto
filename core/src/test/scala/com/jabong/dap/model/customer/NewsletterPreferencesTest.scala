@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{TestConstants, SharedSparkContext}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -20,8 +20,8 @@ class NewsletterPreferencesTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    newsletterSubscription = JsonUtils.readFromJson(DataSets.NEWSLETTER_PREFERENCES, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
-    expectedNewsletterPreferences = JsonUtils.readFromJson(DataSets.NEWSLETTER_PREFERENCES, DataSets.NEWSLETTER_PREFERENCES, NewsletterPrefSchema.newsletterPreferences)
+    newsletterSubscription = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
+    expectedNewsletterPreferences = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, TestConstants.NEWSLETTER_PREFERENCES, NewsletterPrefSchema.newsletterPreferences)
   }
   "getIncrementalNewsletterPreferences: Data Frame" should "match with expected output" in {
     //      val parquetFilePathLocal = "/home/jabong/work/parquetFile/newsletter_subscription"
@@ -33,9 +33,9 @@ class NewsletterPreferencesTest extends FlatSpec with SharedSparkContext {
     newsletterPreferences.collect().toSet.equals(expectedNewsletterPreferences.collect().toSet)
   }
   "getMergedNewsletterPref: Data Frame" should "match with expected output" in {
-    val df = JsonUtils.readFromJson(DataSets.NEWSLETTER_PREFERENCES, DataSets.NEWSLETTER_PREFERENCES, NewsletterPrefSchema.newsletterPreferences)
-    val updatedDF = JsonUtils.readFromJson(DataSets.NEWSLETTER_PREFERENCES, "newsletter_pref_updated", NewsletterPrefSchema.newsletterPreferences)
-    val expectedResult = JsonUtils.readFromJson(DataSets.NEWSLETTER_PREFERENCES, "expected_merged_df", NewsletterPrefSchema.newsletterPreferences)
+    val df = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, TestConstants.NEWSLETTER_PREFERENCES, NewsletterPrefSchema.newsletterPreferences)
+    val updatedDF = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, "newsletter_pref_updated", NewsletterPrefSchema.newsletterPreferences)
+    val expectedResult = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, "expected_merged_df", NewsletterPrefSchema.newsletterPreferences)
     val merged = NewsletterPreferences.getMergedNewsletterPref(updatedDF, df)
     assert(merged.collect().toSet.equals(expectedResult.collect().toSet))
   }

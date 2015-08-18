@@ -16,9 +16,7 @@ object ConfigJsonValidator {
 
   def validateCredentials(credentials: Credentials) = {
     val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.UNICOMMERCE, DataSets.NEXTBEE)
-    // val possibleSources = Array("bob", "erp", "unicommerce", "nextbee")
     val possibleDrivers = Array(DataSets.MYSQL, DataSets.SQLSERVER)
-    // val possibleDrivers = Array("mysql", "sqlserver")
 
     require(credentials.source != null && credentials.source != "", "Credential source cannot be null or empty")
     require(credentials.driver != null && credentials.driver != "", "Credential driver cannot be null or empty")

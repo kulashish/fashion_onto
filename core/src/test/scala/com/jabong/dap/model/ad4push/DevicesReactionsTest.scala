@@ -36,12 +36,9 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     val result = DevicesReactions.reduce(reduceInDF)
     val expectedResult = JsonUtils.readFromJson(AD4PUSH, "reduceOut", reducedDF)
     assert(result.collect().toSet.equals(expectedResult.collect().toSet))
-    //result.limit(10).write.json(TEST_RESOURCES + "ad4push" + ".json")
   }
 
   "effectiveDFFull" should "match with expected data" in {
-    //    val srcFile = DataWriter.getWritePath(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/20")
-    //    result.select("*").coalesce(1).write.format("json").json(srcFile)
     val incremental = JsonUtils.readFromJson(AD4PUSH, "Reduced20150727", reducedDF)
     val reduced7 = JsonUtils.readFromJson(AD4PUSH, "Incr20150720", reducedDF)
     val reduced15 = JsonUtils.readFromJson(AD4PUSH, "Incr20150712", reducedDF)
@@ -56,7 +53,6 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     val effective15 = JsonUtils.readFromJson(AD4PUSH, "effectiveDFFull_effective15", reducedDF)
     val effective30 = JsonUtils.readFromJson(AD4PUSH, "effectiveDFFull_effective30", reducedDF)
     val effectiveDFFull = DevicesReactions.effectiveDFFull(DevicesReactions.reduce(incremental), DevicesReactions.reduce(effective7), DevicesReactions.reduce(effective15), DevicesReactions.reduce(effective30))
-    //effectiveDFFull.limit(30).write.json(JsonUtils.TEST_RESOURCES + "ad4push" + ".json")
     val expectedDF = JsonUtils.readFromJson(AD4PUSH, "effectiveDFFull_result", effectiveDF)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
@@ -87,13 +83,10 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
 
     //incrementalDF = null
     val (f_7_15_30, _) = DevicesReactions.fullSummary(null, toDay, full, null, null, null)
-    //f_7_15_30.limit(12).write.json(JsonUtils.TEST_RESOURCES + "ad4pushF" + ".json")
     assert(full.collect().toSet.equals(f_7_15_30.collect().toSet))
 
     val (i_f_7_15_30, _) = DevicesReactions.fullSummary(incrementalDF, toDay, full, before7days, before15days, before30days)
-    //i_f_7_15_30.limit(30).write.json(JsonUtils.TEST_RESOURCES + "ad4push" + ".json")
     val expected_i_f_7_15_30 = JsonUtils.readFromJson(AD4PUSH, "i_f_7_15_30", deviceReaction)
-    //:TODO check test files-data need to be verified
     assert(i_f_7_15_30.collect().toSet.equals(expected_i_f_7_15_30.collect().toSet))
 
     //validating data with JSON read

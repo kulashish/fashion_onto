@@ -1,6 +1,8 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.SharedSparkContext
+import java.io.File
+
+import com.jabong.dap.common.{TestConstants, SharedSparkContext}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -21,8 +23,8 @@ class YesterdaySessionTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
     yesterdaySession = new YesterdaySession()
-    dfCustomerSurfData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_SELECTION, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuListLevel)
-    dfItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_SELECTION, DataSets.ITR_30_DAY_DATA, Schema.itr)
+    dfCustomerSurfData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.CUSTOMER_SELECTION, TestConstants.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuListLevel)
+    dfItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.CUSTOMER_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
 
   }
 

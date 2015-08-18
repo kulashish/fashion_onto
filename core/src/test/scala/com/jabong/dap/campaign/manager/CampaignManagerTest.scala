@@ -24,7 +24,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
 
   override def beforeAll() {
     super.beforeAll()
-    campaignsOutData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/manager", "campaign_output", Schema.campaignOutput)
+    campaignsOutData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/manager", "campaign_output", Schema.campaignOutput)
   }
 
   "empty json String" should "return false" in {

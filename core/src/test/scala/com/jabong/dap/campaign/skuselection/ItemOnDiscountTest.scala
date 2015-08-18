@@ -1,6 +1,9 @@
 package com.jabong.dap.campaign.skuselection
 
-import com.jabong.dap.common.SharedSparkContext
+import java.io.File
+
+import com.jabong.dap.common.{TestConstants, SharedSparkContext}
+import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.constants.variables.ItrVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
@@ -25,9 +28,9 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     itemOnDiscount = new ItemOnDiscount()
     //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_product_shortlist")
-    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
-    dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.ITR_30_DAY_DATA, Schema.itr)
-    dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.YESTERDAY_ITR_DATA, Schema.itr)
+    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
+    dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
   }
 
   //==================================getJoinDF()=======================================================================
@@ -45,7 +48,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
     //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_get_join_df" + ".json")
 
-    val dfJoin = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_get_join_df", Schema.resultGetJoin)
+    val dfJoin = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.ITEM_ON_DISCOUNT, "result_get_join_df", Schema.resultGetJoin)
       .collect().toSet
 
     assert(result.equals(dfJoin) == true)
@@ -76,7 +79,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
     //    result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")
 
-    //    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" +  DataSets.ITEM_ON_DISCOUNT, "result_sku_filter", Schema.resultSkuSimpleFilter)
+    //    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + File.separator + DataSets.SKU_SELECTION + File.separator +  DataSets.ITEM_ON_DISCOUNT, "result_sku_filter", Schema.resultSkuSimpleFilter)
     //      .collect().toSet
 
     assert(result != null)

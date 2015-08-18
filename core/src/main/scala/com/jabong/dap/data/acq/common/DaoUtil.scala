@@ -2,6 +2,7 @@ package com.jabong.dap.data.acq.common
 
 import java.sql.{ Connection, DriverManager }
 
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 
 /**
@@ -9,17 +10,17 @@ import grizzled.slf4j.Logging
  */
 object DaoUtil extends Logging {
 
-  private val driverLoaded = scala.collection.mutable.Map("mysql" -> false, "sqlserver" -> false)
+  private val driverLoaded = scala.collection.mutable.Map(DataSets.MYSQL -> false, DataSets.SQLSERVER -> false)
 
   private def loadDriver(dbc: DbConnection) {
     try {
       dbc.driver match {
-        case "mysql" =>
+        case DataSets.MYSQL =>
           Class.forName ("com.mysql.jdbc.Driver").newInstance
-          driverLoaded ("mysql") = true
-        case "sqlserver" =>
+          driverLoaded (DataSets.MYSQL) = true
+        case DataSets.SQLSERVER =>
           Class.forName ("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance
-          driverLoaded ("sqlserver") = true
+          driverLoaded (DataSets.SQLSERVER) = true
       }
     } catch {
       case e: Exception => {

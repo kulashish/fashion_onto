@@ -1,12 +1,12 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{ Config, Spark, SharedSparkContext }
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.schema.CustVarSchema
-import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
-import org.apache.spark.sql.{ DataFrame, Row }
+import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments, CustomerStorecreditsHistory}
+import org.apache.spark.sql.{DataFrame, Row}
 import org.scalatest.FlatSpec
 
 /**
@@ -81,7 +81,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getCustomer: Data Frame" should "match to resultant Data Frame, If dfFull is Not NULL" in {
 
-    var dfFull: DataFrame = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.RESULT_CUSTOMER_OLD, CustVarSchema.resultCustomer)
+    var dfFull: DataFrame = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_old", CustVarSchema.resultCustomer)
 
     val result = Customer.getCustomer(
       dfCustomer: DataFrame,
@@ -96,7 +96,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
       CustVarSchema.resultCustomer)
       .collect().toSet
 
-    val dfResultIncremental = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.RESULT_CUSTOMER_INCREMENTAL,
+    val dfResultIncremental = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_incremental",
       CustVarSchema.resultCustomer)
       .collect().toSet
 

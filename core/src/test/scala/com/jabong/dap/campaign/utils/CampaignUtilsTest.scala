@@ -1,12 +1,14 @@
 package com.jabong.dap.campaign.utils
 
+import java.io.File
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.constants.variables.{ ItrVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.common.{TestConstants, SharedSparkContext, Spark}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
@@ -39,19 +41,19 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGN, "ref_sku_input")
-    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "customer_selected")
-    customerSelectedShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "customer_selected_shortlist")
-    salesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "sales_order_placed")
-    salesOrderItem = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "sales_item_bought")
-    customerSelectedTime = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/campaign_utils", "customer_filtered_time")
+    refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input")
+    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected")
+    customerSelectedShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected_shortlist")
+    salesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "sales_order_placed")
+    salesOrderItem = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "sales_item_bought")
+    customerSelectedTime = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_filtered_time")
 
-    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
-    dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER, Schema.customer)
+    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, TestConstants.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
+    dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, DataSets.CUSTOMER, Schema.customer)
 
-    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
-    dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.ITR_30_DAY_DATA, Schema.itr)
-    dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.YESTERDAY_ITR_DATA, Schema.itr)
+    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
+    dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
 
   }
 
@@ -215,7 +217,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     //
     //    //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_filter" + ".json")
     //
-    //    val dfShortListSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_filter", Schema.resultSkuFilter)
+    //    val dfShortListSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + File.separator + DataSets.SKU_SELECTION + File.separator + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_filter", Schema.resultSkuFilter)
     //      .collect().toSet
 
     assert(result.count() == 2)
@@ -238,7 +240,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
 
     //                   result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_simple_filter" + ".json")
 
-    //    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_simple_filter", Schema.resultSkuSimpleFilter)
+    //    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + File.separator + DataSets.SKU_SELECTION + File.separator + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_simple_filter", Schema.resultSkuSimpleFilter)
     //      .collect().toSet
 
     assert(result.count() == 4)

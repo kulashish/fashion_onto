@@ -21,10 +21,10 @@ class InvalidTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     invalidCustomerSelection = new Invalid()
-    salesOrderItemDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/invalid_campaigns", "sales_item_invalid")
-    orderDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/invalid_campaigns", "sales_order_invalid")
-    salesOrderItemDataFrame1 = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/invalid_campaigns", "sales_item_invalid1")
-    orderDataFrame1 = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/invalid_campaigns", "sales_order_invalid1")
+    salesOrderItemDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_item_invalid")
+    orderDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_order_invalid")
+    salesOrderItemDataFrame1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_item_invalid1")
+    orderDataFrame1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_order_invalid1")
   }
 
   "No orders data" should "return null successful orders" in {

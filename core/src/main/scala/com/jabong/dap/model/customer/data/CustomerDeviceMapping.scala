@@ -140,6 +140,7 @@ object CustomerDeviceMapping extends Logging {
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
           col("BID") as PageVisitVariables.BROWSER_ID,
+          // Not using constant IOS as in literal its better if it is local and not any global variable.
           when(col("APPTYPE").contains("ios"), lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
       println("Total recs in DCF file initially: ") // + df.count())

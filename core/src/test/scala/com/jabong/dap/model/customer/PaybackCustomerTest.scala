@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{TestConstants, SharedSparkContext}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -20,16 +20,16 @@ class PaybackCustomerTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    dfSalesOrder = JsonUtils.readFromJson(DataSets.PAYBACK_CUSTOMER, DataSets.SALES_ORDER, Schema.salesOrder)
-    dfPaybackEarn = JsonUtils.readFromJson(DataSets.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_EARN, Schema.salesOrderPaybackEarn)
-    dfPaybackRedeem = JsonUtils.readFromJson(DataSets.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_REDEEM, Schema.salesOrderPaybackRedeem)
-    expectedPaybackCustomers = JsonUtils.readFromJson(DataSets.PAYBACK_CUSTOMER, DataSets.PAYBACK_CUSTOMER, Schema.paybackCustomer)
+    dfSalesOrder = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER, Schema.salesOrder)
+    dfPaybackEarn = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_EARN, Schema.salesOrderPaybackEarn)
+    dfPaybackRedeem = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_REDEEM, Schema.salesOrderPaybackRedeem)
+    expectedPaybackCustomers = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, TestConstants.PAYBACK_CUSTOMER, Schema.paybackCustomer)
   }
 
   "getPaybackCustomer: Data Frame" should "match with expected output" in {
     val dfPaybackCustomerResult = PaybackCustomer.getIncrementalPaybackCustomer(dfSalesOrder, dfPaybackEarn, dfPaybackRedeem)
     //dfPaybackCustomerResult.limit(30).write.json(DataSets.TEST_RESOURCES + DataSets.PAYBACK_CUSTOMER + ".json")
-    assert(dfPaybackCustomerResult.collect().toSet.equals(expectedPaybackCustomers.collect().toSet));
+    assert(dfPaybackCustomerResult.collect().toSet.equals(expectedPaybackCustomers.collect().toSet))
   }
 
 }

@@ -23,8 +23,8 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     pastCampaignCheck = new PastCampaignCheck()
-    pastCampaignData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/traceability", "merged_campaign")
-    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/traceability", "customer_selected")
+    pastCampaignData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/traceability", "merged_campaign")
+    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/traceability", "customer_selected")
   }
 
   "No past campaign Data" should "return no customer whom we have sent the campaign" in {
