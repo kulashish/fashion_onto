@@ -1,7 +1,7 @@
 package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderVariables, SalesOrderItemVariables }
 import com.jabong.dap.common.time.TimeUtils
@@ -42,7 +42,7 @@ object ReturnReTargetQuality extends BaseCampaignQuality {
       .select(orderDF(SalesOrderVariables.FK_CUSTOMER),
         Udf.skuFromSimpleSku(returnOrderItemDF(ProductVariables.SKU))).dropDuplicates()
 
-    val returnDF = returnRetargetDF.select(SalesOrderVariables.FK_CUSTOMER, ProductVariables.SKU).dropDuplicates()
+    val returnDF = returnRetargetDF.select(CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKU1).dropDuplicates()
     joinedOrder.intersect(returnDF).count() == returnDF.count()
   }
 
