@@ -35,10 +35,10 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
   }
 
 
-  def validateAcartDaily(salesCartDF:DataFrame,sampleAcartDaily:DataFrame): Boolean = {
-    if((salesCartDF==null) || sampleAcartDaily == null)
-      return sampleAcartDaily == null
-    return validateAbandonedCart(salesCartDF,sampleAcartDaily)
+  def validateAcartIOD(salesCartDF:DataFrame,sampleAcartIOD:DataFrame): Boolean = {
+    if((salesCartDF==null) || sampleAcartIOD == null)
+      return sampleAcartIOD == null
+    return validateAbandonedCart(salesCartDF,sampleAcartIOD)
   }
 
   /** One component checking if the data in sample output is present in orderItemDF with expected "Sales Order Item Status"
@@ -63,13 +63,13 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
    * @return
    */
   def getInputOutput(date:String):(DataFrame,DataFrame,DataFrame,DataFrame)={
-    val salesCart30Days = CampaignInput.loadLast30daysAcartData()
+    val salesCart30Days = CampaignQualityEntry.salesCart30DaysData
    // val yesterDayItr30Days = CampaignInput.load30DayItrSkuSimpleData()
    // val yesterDayItrData = CampaignInput.loadYesterdayItrSimpleData()
-    val acartFollowUp = CampaignInput.getCampaignData(CampaignCommon.ACART_DAILY_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
-    val acartDaily = CampaignInput.getCampaignData(CampaignCommon.ACART_DAILY_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
-    val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_DAILY_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
-    return(salesCart30Days,acartFollowUp,acartDaily,acartLowStock)
+    val acartFollowUp = CampaignInput.getCampaignData(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
+    val acartIOD = CampaignInput.getCampaignData(CampaignCommon.ACART_IOD_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
+    val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN,date,CampaignCommon.VERY_LOW_PRIORITY)
+    return(salesCart30Days,acartFollowUp,acartIOD,acartLowStock)
   }
 
   /**Entry point
@@ -80,15 +80,15 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
     * @return
     */
   def backwardTest(date:String, fraction:Double):Boolean = {
-    val (salesCartDF,acartFollowUp,acartDaily,acartLowStock) = getInputOutput(date)
+    val (salesCart30DaysDF,acartFollowUp,acartIOD,acartLowStock) = getInputOutput(date)
     val sampleAcart = getSample(acartFollowUp,fraction)
-    val sampleAcartDaily = getSample(acartDaily,fraction)
+    val sampleAcartIOD = getSample(acartIOD,fraction)
     val sampleAcartLowStock = getSample(acartLowStock,fraction)
 
-    val acartFollowUpStatus  = validateAcartFollowup(salesCartDF,sampleAcart)
-    val acartDailyStatus = validateAcartLowStock(salesCartDF,sampleAcartDaily)
-    val acartLowStockStatus = validateAcartDaily(salesCartDF,sampleAcartLowStock)
-    logger.info("acartFollowUpStatus:-"+ acartFollowUpStatus +"acartDailyStatus:-"+acartDailyStatus+"acartLowStockStatus:-"+acartLowStockStatus)
-    return acartFollowUpStatus && acartDailyStatus && acartLowStockStatus
+    val acartFollowUpStatus  = validateAcartFollowup(salesCart30DaysDF,sampleAcart)
+    val acartLowStockStatus = validateAcartLowStock(salesCart30DaysDF,sampleAcartLowStock)
+    val acartIODStatus = validateAcartIOD(salesCart30DaysDF,sampleAcartIOD)
+    logger.info("acartFollowUpStatus:-"+ acartFollowUpStatus +"acartIODStatus:-"+acartIODStatus+"acartLowStockStatus:-"+acartLowStockStatus)
+    return acartFollowUpStatus && acartIODStatus && acartLowStockStatus
   }
 }
