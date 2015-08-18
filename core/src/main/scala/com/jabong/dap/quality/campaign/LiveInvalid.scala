@@ -1,13 +1,9 @@
 package com.jabong.dap.quality.campaign
 
 
-import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.product.itr.variables.ITR
-import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
