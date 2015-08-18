@@ -43,9 +43,10 @@ object CampaignQualityEntry extends Logging {
       logger.info("InvalidFollowupQuality failed for "+incrDate)
     }
 
-    if(!InvalidLowStockQuality.backwardTest(incrDate,fraction)){
-      logger.info("InvalidLowStockQuality failed for "+incrDate)
-
+    if(!InvalidLowStockQuality.backwardTest(incrDate,fraction)) {
+      logger.info("InvalidLowStockQuality failed for " + incrDate)
+    }
+    
       if (status == false) {
       throw new FailedStatusException
     }
