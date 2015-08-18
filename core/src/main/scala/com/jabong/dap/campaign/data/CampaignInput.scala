@@ -86,7 +86,7 @@ object CampaignInput extends Logging {
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS))
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
 
-    val dateTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
+    val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
 
@@ -107,7 +107,7 @@ object CampaignInput extends Logging {
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
 
-    val dateTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
+    val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
     val lastNdaysOrderData = CampaignUtils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
@@ -239,6 +239,7 @@ object CampaignInput extends Logging {
 
   def getCampaignData(name: String, date: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
     val path: String = ConfigConstants.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
+    logger.info(" Reading "+name+" campaign data from path:- "+ path)
     if (DataVerifier.dataExists(path)) {
       var result: DataFrame = null
       try {

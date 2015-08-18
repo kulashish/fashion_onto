@@ -463,7 +463,7 @@ object CampaignUtils extends Logging {
     }
 
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
-    logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
+    logger.info("Input Data Frame has been filtered before" + before + " after '" + after)
     return filteredData
   }
 
