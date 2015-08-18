@@ -50,10 +50,9 @@ object ReturnReTargetQuality extends BaseCampaignQuality{
    * @return
    */
   def getInputOutput(date:String=TimeUtils.YESTERDAY_FOLDER):(DataFrame,DataFrame,DataFrame)={
-    val orderItemDF = CampaignInput.loadOrderItemData(date)
+    val orderItemDF = CampaignQualityEntry.orderItemData
 
-    val fullOrderData = CampaignInput.loadFullOrderData(date)
-    val orderDF = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, date)
+    val orderDF = CampaignQualityEntry.last30DaysOrderData
 
     val returnRetargetDF = CampaignInput.getCampaignData(CampaignCommon.CANCEL_RETARGET_CAMPAIGN,date)
     return(orderItemDF,orderDF,returnRetargetDF)

@@ -11,7 +11,7 @@ import org.apache.spark.sql.DataFrame
  * Created by Mubarak on 12/8/15.
  *
  */
-object InvalidFollowupQuality extends BaseCampaignQuality{
+object InvalidLowStockQuality extends BaseCampaignQuality{
 
   /** Consists of all the validation components for Backward test
     * @param orderItemDF
@@ -33,14 +33,13 @@ object InvalidFollowupQuality extends BaseCampaignQuality{
    * @return
    */
   def getInputOutput(date:String=TimeUtils.YESTERDAY_FOLDER):(DataFrame, DataFrame, DataFrame)={
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val orderItemDF = CampaignInput.loadLastNdaysOrderItemData(1,fullOrderItemData)
+    val orderItemDF = CampaignQualityEntry.orderItem30DaysData
 
-    val fullOrderData = CampaignInput.loadFullOrderData(date)
+    val fullOrderData = CampaignQualityEntry.last30DaysOrderData
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 
-    val invalidLow = CampaignInput.getCampaignData(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN,date)
+    val invalidLow = CampaignInput.getCampaignData(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN,date)
 
     val itr = CampaignInput.loadYesterdayItrSkuData()
 

@@ -34,9 +34,9 @@ object InvalidFollowupQuality extends BaseCampaignQuality{
    */
   def getInputOutput(date:String=TimeUtils.YESTERDAY_FOLDER):(DataFrame, DataFrame, DataFrame)={
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val orderItemDF = CampaignInput.loadLastNdaysOrderItemData(1,fullOrderItemData)
+    val orderItemDF = CampaignQualityEntry.orderItem3DaysData
 
-    val fullOrderData = CampaignInput.loadFullOrderData(date)
+    val fullOrderData = CampaignQualityEntry.last30DaysOrderData
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 
