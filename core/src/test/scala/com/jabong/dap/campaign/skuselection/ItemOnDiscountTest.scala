@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.skuselection
 
 import java.io.File
 
-import com.jabong.dap.common.{TestConstants, SharedSparkContext}
+import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
 import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.constants.variables.ItrVariables
 import com.jabong.dap.common.json.JsonUtils

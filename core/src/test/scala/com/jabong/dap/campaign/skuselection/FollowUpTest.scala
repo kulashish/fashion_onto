@@ -2,10 +2,10 @@ package com.jabong.dap.campaign.skuselection
 
 import java.io.File
 
-import com.jabong.dap.common.constants.campaign.{SkuSelection, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{TestConstants, SharedSparkContext, Spark}
+import com.jabong.dap.common.{ TestConstants, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, SQLContext }

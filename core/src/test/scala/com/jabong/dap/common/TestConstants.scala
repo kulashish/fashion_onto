@@ -18,5 +18,4 @@ object TestConstants {
 
   val YESTERDAY_ITR_DATA = "yesterday_itr_data"
 
-
 }
