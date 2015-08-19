@@ -53,8 +53,8 @@ object Surf3Quality {
     */
   def backwardTest(date:String, fraction:Double):Boolean = {
     val (surf3Data, surf3Campaign, itr) = getInputOutput(date)
-    val sampleCancelRetargetDF = getSample(surf3Campaign, fraction)
-    validate(surf3Data, surf3Campaign, itr)
+    val surf3DataRetargetDF = getSample(surf3Campaign, fraction)
+    validate(surf3Data, surf3DataRetargetDF, itr)
   }
 
 
