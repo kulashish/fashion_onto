@@ -1,19 +1,16 @@
 package com.jabong.dap.campaign.utils
 
 import java.io.File
-import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 import com.jabong.dap.common.constants.campaign.SkuSelection
-import com.jabong.dap.common.constants.variables.{ ItrVariables, ProductVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ItrVariables, ProductVariables, SalesOrderVariables}
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext, Spark }
+import com.jabong.dap.common.{SharedSparkContext, Spark, TestConstants}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
-import org.scalatest.FlatSpec
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.scalatest.FlatSpec
 
 /**
  * Utilities test class
@@ -33,11 +30,6 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var dfItr30DayData: DataFrame = _
   @transient var dfYesterdayItrData: DataFrame = _
 
-  val calendar = Calendar.getInstance()
-  calendar.add(Calendar.DATE, -1)
-  val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-  val testDate = Timestamp.valueOf(dateFormat.format(calendar.getTime))
-
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
@@ -55,21 +47,6 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
     dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
 
-  }
-
-  "Yesterdays date " should "return 1 in day diff" in {
-    val diff = CampaignUtils.currentTimeDiff(testDate, "days")
-    assert(diff == 1)
-  }
-
-  "Yesterdays date " should "return number of hours in time diff" in {
-    val diff = CampaignUtils.currentTimeDiff(testDate, "hours")
-    assert(diff >= 23 && diff <= 24)
-  }
-
-  "Yesterdays date " should "return number of minutes in time diff" in {
-    val diff = CampaignUtils.currentTimeDiff(testDate, "minutes")
-    assert(diff <= 1441)
   }
 
   "Generate reference skus with input null data " should "no reference skus" in {
@@ -94,7 +71,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
     val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=5242607").select(ProductVariables.SKU_LIST).collect()(0)(0).asInstanceOf[List[(Double, String)]]
     val expectedData = Row(200.0, "VA613SH24VHFINDFAS-3716539")
-    assert(refSkuFirst.head === (expectedData))
+    assert(refSkuFirst.head === expectedData)
     //  assert(refSkuFirst.head._2 == "VA613SH24VHFINDFAS-3716539")
   }
 

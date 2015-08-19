@@ -17,6 +17,11 @@ class TimeTest extends FlatSpec with Matchers {
   val today = new Date
   val numDaysFromToday = Math.abs(today.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS
 
+  val calendar = Calendar.getInstance()
+  calendar.add(Calendar.DATE, -1)
+  val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+  val testDate = Timestamp.valueOf(dateFormat.format(calendar.getTime))
+
   "withLeadingZeros" should "add a zero if input is less than 10" in {
     val input = 7
     val output = "07"
@@ -53,6 +58,21 @@ class TimeTest extends FlatSpec with Matchers {
   "getTodayDate2" should "return correct value" in {
     val sdf = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
     TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER) should be (sdf.format(today))
+  }
+
+  "Yesterdays date " should "return 1 in day diff" in {
+    val diff = TimeUtils.currentTimeDiff(testDate, "days")
+    assert(diff == 1)
+  }
+
+  "Yesterdays date " should "return number of hours in time diff" in {
+    val diff = TimeUtils.currentTimeDiff(testDate, "hours")
+    assert(diff >= 23 && diff <= 24)
+  }
+
+  "Yesterdays date " should "return number of minutes in time diff" in {
+    val diff = TimeUtils.currentTimeDiff(testDate, "minutes")
+    assert(diff <= 1441)
   }
 
   "isStrictlyLessThan" should "return true" in {
