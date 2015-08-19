@@ -43,6 +43,8 @@ object DataSets {
   //Ad4Push customer response
   val AD4PUSH = "ad4push"
 
+  val SKU_DATA = "sku_data"
+  val PRICING = "pricing"
   //non schema constants for ad4push
   val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
   val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
@@ -54,6 +56,9 @@ object DataSets {
   val IOS = "ios"
   val WINDOWS = "windows"
   val ANDROID = "android"
+  val DESKTOP = "w"
+  val MOBILEWEB = "m"
+  val WSOA = "wsoa"
 
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"

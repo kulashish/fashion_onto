@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "pricing",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
