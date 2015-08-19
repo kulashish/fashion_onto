@@ -101,7 +101,7 @@ object Udf {
   /**
    * distinctSku will return list of distinct Sku
    */
-  val distinctSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getDistinctSku(skuArrayBuffer: ArrayBuffer[String]))
+  val distinctList = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getDistinctList(skuArrayBuffer: ArrayBuffer[String]))
 
   /**
    * repeatedSku will return list of repeated Sku

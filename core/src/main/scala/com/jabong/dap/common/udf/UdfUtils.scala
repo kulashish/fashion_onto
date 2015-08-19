@@ -358,19 +358,19 @@ object UdfUtils {
 
   /**
    *
-   * @param skuArray
+   * @param array
    * @tparam T
    * @return
    */
-  def getDistinctSku[T](skuArray: ArrayBuffer[T]): List[T] = {
+  def getDistinctList[T](array: ArrayBuffer[T]): List[T] = {
 
-    if (skuArray == null || skuArray.isEmpty) {
+    if (array == null || array.isEmpty) {
       return null
     }
 
-    val skuList = skuArray.toList.distinct
+    val list = array.toList.distinct
 
-    return skuList
+    return list
 
   }
 
