@@ -2,7 +2,9 @@
   "params": [
     {
       "source": "campaign_quality",
-      "fraction": ".15"
+      "fraction": ".15",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
     }
   ]
 }
