@@ -5,12 +5,19 @@ import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.quality.campaign.InvalidFollowupQuality._
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
 /**
  * Created by jabong on 18/8/15.
  */
-object Surf3Quality {
+object Surf3Quality extends BaseCampaignQuality with Logging{
+
+  val campaignName = "Surf3Quality"
+
+  def getName(): String = {
+    campaignName
+  }
 
   /** Consists of all the validation components for Backward test
     * @param surf3Data

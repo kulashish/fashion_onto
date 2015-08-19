@@ -13,7 +13,7 @@ import org.apache.spark.sql.DataFrame
  */
 object CampaignQualityEntry extends Logging {
 
-  var orderItemFullData, orderItemData, orderItem30DaysData, orderItem3DaysData, fullOrderData, last30DaysOrderData, salesCart30DaysData, salesCart3rdDayData: DataFrame = null
+  var orderItemFullData, orderItemData, orderItem30DaysData, orderItem3DaysData, fullOrderData, last30DaysOrderData, salesCart30DaysData, salesCart3rdDayData, yestSessionData: DataFrame = null
 
   def start(paramInfo: ParamInfo) = {
     val DEFAULT_FRACTION = ".15"
@@ -23,7 +23,7 @@ object CampaignQualityEntry extends Logging {
     val fraction = OptionUtils.getOptValue(paramInfo.fraction, DEFAULT_FRACTION).toDouble
     var status: Boolean = true
     // first load Common data sets
-    val campaignList: List[BaseCampaignQuality] = List(ReturnReTargetQuality, CancelReTargetQuality, ACartPushCampaignQuality, WishlistCampaignQuality, InvalidFollowupQuality, InvalidLowStockQuality)
+    val campaignList: List[BaseCampaignQuality] = List(ReturnReTargetQuality, CancelReTargetQuality, ACartPushCampaignQuality, WishlistCampaignQuality, InvalidFollowupQuality, InvalidLowStockQuality, Surf6Quality)
     loadCommonDataSets(incrDate)
     for (campaign <- campaignList) {
       if (!campaign.backwardTest(incrDate, fraction)) {
@@ -71,6 +71,7 @@ object CampaignQualityEntry extends Logging {
     last30DaysOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, date).cache()
     salesCart30DaysData = CampaignInput.loadLast30daysAcartData(date).cache()
     salesCart3rdDayData = CampaignInput.loadNthdayAcartData(3, salesCart30DaysData)
+    yestSessionData = CampaignInput.loadYesterdaySurfSessionData()
   }
 
 }

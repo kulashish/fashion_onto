@@ -5,25 +5,31 @@ import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignC
 import com.jabong.dap.common.constants.variables.{CustomerPageVisitVariables, SalesOrderItemVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.quality.campaign.InvalidFollowupQuality._
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
  * Created by jabong on 18/8/15.
  */
-object Surf6Quality {
+object Surf6Quality  extends BaseCampaignQuality with Logging{
+
+  val campaignName = "Surf6Quality"
+
+  def getName(): String = {
+    campaignName
+  }
 
   /** Consists of all the validation components for Backward test
     * @param surf6Data
     * @param surf6Campaign
     * @return
     */
-  def validate(surf6Data: DataFrame, surf6Campaign: DataFrame, itr: DataFrame): Boolean = {
-    if((surf6Data==null) || surf6Campaign == null || itr == null)
+  def validate(surf6Data: DataFrame, surf6Campaign: DataFrame): Boolean = {
+    if((surf6Data==null) || surf6Campaign == null)
       return surf6Data == null
     checkCustomerSelection(surf6Data, surf6Campaign)
-    checkSkuSelection(surf6Campaign, itr)
+   // checkSkuSelection(surf6Campaign, itr)
 
   }
 
@@ -69,13 +75,13 @@ object Surf6Quality {
    * @param date in YYYY/MM/DD format
    * @return
    */
-  def getInputOutput(date:String=TimeUtils.YESTERDAY_FOLDER):(DataFrame, DataFrame, DataFrame)={
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val surf6Data = CampaignInput.loadYesterdaySurfSessionData()
+  def getInputOutput(date:String=TimeUtils.YESTERDAY_FOLDER):(DataFrame, DataFrame)={
+
+    val surf6Data = CampaignQualityEntry.yestSessionData
+
     val surf6Campaign = CampaignInput.getCampaignData(CampaignCommon.SURF6_CAMPAIGN,date)
 
-    val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData()
-    return (surf6Data, surf6Campaign, yestItrSkuData)
+    return (surf6Data, surf6Campaign)
   }
 
   /**Entry point
@@ -88,7 +94,7 @@ object Surf6Quality {
   def backwardTest(date:String, fraction:Double):Boolean = {
     val (surf6Data, surf6Campaign, itr) = getInputOutput(date)
     val surf6CampaignRetargetDF = getSample(surf6Campaign, fraction)
-    validate(surf6Data, surf6CampaignRetargetDF, itr)
+    validate(surf6Data, surf6CampaignRetargetDF)
   }
 
 
