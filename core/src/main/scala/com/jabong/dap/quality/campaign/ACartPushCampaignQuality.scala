@@ -16,6 +16,12 @@ import org.apache.spark.sql.DataFrame
 object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
 
   val campaignName = "ACartPushCampaignQuality"
+
+
+  def getName(): String ={
+    campaignName
+  }
+
   /**
    * Consists of all the validation components for Backward test
    * @param salesCartDF
