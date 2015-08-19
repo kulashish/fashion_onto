@@ -3,6 +3,7 @@ package com.jabong.dap.model.custorder
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.export.SkuData
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
@@ -52,6 +53,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(paramJob)
           case DataSets.BASIC_ITR => BasicITR.start(paramJob, isHistory)
           case DataSets.CAMPAIGN_QUALITY => CampaignQualityEntry.start(paramJob)
+          case DataSets.PRICING => SkuData.start(paramJob)
           case _ => logger.error("Unknown source.")
         }
       }

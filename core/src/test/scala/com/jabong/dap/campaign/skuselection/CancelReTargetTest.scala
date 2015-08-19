@@ -23,8 +23,8 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
     cancelRetarget = new CancelReTarget()
 
     orderItemDataFrame = JsonUtils.readFromJson("sales_order", "sales_order_with_item", Schema.salesOrderItem)
-    orderItemDataFrame1 = JsonUtils.readFromJson("campaign", "sales_item_cancel_return", Schema.salesOrderItem)
-    orderData = JsonUtils.readFromJson("campaign", "sales_order_cancel_return", Schema.salesOrder)
+    orderItemDataFrame1 = JsonUtils.readFromJson("campaigns", "sales_item_cancel_return", Schema.salesOrderItem)
+    orderData = JsonUtils.readFromJson("campaigns", "sales_order_cancel_return", Schema.salesOrder)
     //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
   }
 

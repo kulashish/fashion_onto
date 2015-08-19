@@ -22,7 +22,6 @@ class DataReaderTest extends FlatSpec with SharedSparkContext with Matchers {
       dfReaction(DevicesReactionsVariables.CAMPAIGN_ID) as DevicesReactionsVariables.CAMPAIGN_ID,
       dfReaction(DevicesReactionsVariables.BOUNCE).cast(IntegerType) as DevicesReactionsVariables.BOUNCE,
       dfReaction(DevicesReactionsVariables.REACTION).cast(IntegerType) as DevicesReactionsVariables.REACTION)
-    //dfReaction.limit(10).write.json(DataSets.TEST_RESOURCES + "ad4push" + ".json")
     val dfExpected = JsonUtils.readFromJson(DataSets.AD4PUSH, "testDF", DevicesReactionsSchema.schemaCsv)
     assert(dfExpected.collect().toSet.equals(dfReactionCast.collect().toSet))
   }

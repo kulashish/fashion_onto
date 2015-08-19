@@ -3,8 +3,10 @@ package com.jabong.dap.campaign.traceablility
 import java.text.SimpleDateFormat
 
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ Spark, SharedSparkContext }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
@@ -21,8 +23,8 @@ class PastCampaignCheckTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     pastCampaignCheck = new PastCampaignCheck()
-    pastCampaignData = sqlContext.read.json("src/test/resources/campaign/traceability/merged_campaign.json")
-    customerSelected = sqlContext.read.json("src/test/resources/campaign/traceability/customer_selected.json")
+    pastCampaignData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/traceability", "merged_campaign")
+    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/traceability", "customer_selected")
   }
 
   "No past campaign Data" should "return no customer whom we have sent the campaign" in {

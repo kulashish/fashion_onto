@@ -1,6 +1,8 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
@@ -23,13 +25,13 @@ class ACartTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     cartCampaign = new ACart()
-    salesCartOld = sqlContext.read.json("src/test/resources/salescart/CustomerOrderHistory.json")
-    salesCartData = sqlContext.read.json("src/test/resources/campaign/acart_campaigns/sales_cart.json")
-    orderData = sqlContext.read.json("src/test/resources/campaign/acart_campaigns/sales_order.json")
-    orderItemData = sqlContext.read.json("src/test/resources/campaign/acart_campaigns/sales_order_item.json")
-    orderData1 = sqlContext.read.json("src/test/resources/campaign/acart_campaigns/sales_order1.json")
-    orderItemData1 = sqlContext.read.json("src/test/resources/campaign/acart_campaigns/sales_order_item1.json")
-    //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
+    salesCartOld = JsonUtils.readFromJson(DataSets.SALES_CART, "CustomerOrderHistory")
+    salesCartData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_cart")
+    orderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order")
+    orderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order_item")
+    orderData1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order1")
+    orderItemData1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order_item1")
+    testDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "SalesCartFilteredSku")
   }
 
   //  "Null DataFrame" should "return null" in {
@@ -81,7 +83,6 @@ class ACartTest extends FlatSpec with SharedSparkContext {
   //  }
 
   "null order Data" should "return null DataFrame" in {
-    testDataFrame = sqlContext.read.json("src/test/resources/salescart/SalesCartFilteredSku.json")
     val filteredOrderData = cartCampaign.customerOrderFilter(testDataFrame, null)
     assert(filteredOrderData == null)
   }
