@@ -7,7 +7,11 @@ import org.apache.spark.sql.DataFrame
  */
 abstract class  BaseCampaignQuality {
 
-  val name:String= "campaign"
+  /**
+   *
+   * @return campaign name
+   */
+  def getName() :String
   /**
    * gives random selected rows from DataFrame
    * @param df
