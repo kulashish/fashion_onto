@@ -13,5 +13,5 @@ object SkuDataConst {
   val PAGEVISIT_ANDROID = "pagevisit_android"
   val PAGEVISIT_WINDOWS = "pagevisit_windows"
 
-  val FOLDER="export"
+  val FOLDER = "export"
 }

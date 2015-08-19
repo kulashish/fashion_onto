@@ -60,6 +60,9 @@ object DataSets {
   val MOBILEWEB = "m"
   val WSOA = "wsoa"
 
+  val WEB = "web"
+  val APP = "app"
+
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"
   val FULL_FETCH_MODE = "full_fetch"
