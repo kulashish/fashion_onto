@@ -1,5 +1,7 @@
 package com.jabong.dap.quality.campaign
 
+import java.io.File
+
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
@@ -25,14 +27,20 @@ import scala.collection.mutable.ListBuffer
 object MobilePushCampaignQuality extends Logging {
   val TRUE = true
   val zero: Long = 0
+  val ANDROID = "Android"
+  val IOS = "IOS"
+  val WINDOWS = "Windows"
+  val PRIORITYMERGE = "PriorityMerge"
+  val TOTALCOUNT = "TotalCount"
+  val CAMPAIGNNAME = "CampaignName"
 
   val schema = StructType(Array(
-    StructField("CampaignName", StringType, TRUE),
-    StructField("TotalCount", LongType, TRUE),
-    StructField("PriorityMerge", LongType, TRUE),
-    StructField("Android", LongType, TRUE),
-    StructField("IOS", LongType, TRUE),
-    StructField("Windows", LongType, TRUE)
+    StructField(CAMPAIGNNAME, StringType, TRUE),
+    StructField(TOTALCOUNT, LongType, TRUE),
+    StructField(PRIORITYMERGE, LongType, TRUE),
+    StructField(ANDROID, LongType, TRUE),
+    StructField(IOS, LongType, TRUE),
+    StructField(WINDOWS, LongType, TRUE)
   ))
 
   def startMobilePushCampaignQuality(campaignsConfig: String) = {
@@ -55,19 +63,19 @@ object MobilePushCampaignQuality extends Logging {
       val rdd = Spark.getContext().parallelize[Row](list.toSeq)
       val dfCampaignQuality = Spark.getSqlContext().createDataFrame(rdd, schema)
 
-      val cachedfCampaignQuality = dfCampaignQuality.groupBy("CampaignName")
-        .agg(sum("TotalCount") as "TotalCount", sum("PriorityMerge") as "PriorityMerge", sum("Android") as "Android", sum("IOS") as "IOS", sum("Windows") as "Windows")
-        .sort("CampaignName").cache()
+      val cachedfCampaignQuality = dfCampaignQuality.groupBy(CAMPAIGNNAME)
+        .agg(sum(TOTALCOUNT) as TOTALCOUNT, sum(PRIORITYMERGE) as PRIORITYMERGE, sum(ANDROID) as ANDROID, sum(IOS) as IOS, sum(WINDOWS) as WINDOWS)
+        .sort(CAMPAIGNNAME).cache()
 
       CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
 
-      DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "_csv", DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+      DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
       logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
-        + ConfigConstants.OUTPUT_PATH + "/"
-        + DataSets.CAMPAIGN + "/"
-        + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + "/"
-        + DataSets.DAILY_MODE + "/"
+        + ConfigConstants.OUTPUT_PATH + File.separator
+        + DataSets.CAMPAIGNS + File.separator
+        + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + File.separator
+        + DataSets.DAILY_MODE + File.separator
         + dateYesterday
       )
     }
@@ -78,7 +86,7 @@ object MobilePushCampaignQuality extends Logging {
 
     logger.info("Calling method getCampaignQuality........")
 
-    val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
+    val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
     val dataExits = DataVerifier.dataExists(path)
 
@@ -91,7 +99,7 @@ object MobilePushCampaignQuality extends Logging {
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
-      val dataFrame = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, campaignName, DataSets.DAILY_MODE, dateYesterday)
+      val dataFrame = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 

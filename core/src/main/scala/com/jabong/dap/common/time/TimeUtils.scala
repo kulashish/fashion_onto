@@ -14,6 +14,7 @@ import scala.collection.immutable.HashMap
 object TimeUtils extends Logging {
 
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
   /**
    * Returns the total number of days between two given date inputs
    * @param date1
@@ -168,6 +169,95 @@ object TimeUtils extends Logging {
   def getTodayDate(dateFormat: String): String = {
     val sdf = new SimpleDateFormat(dateFormat)
     sdf.format(new Date())
+  }
+
+  /**
+   * get start time of the day
+   * @param time
+   * @return
+   */
+  def startOfDay(time: Date): Long = {
+    val cal = Calendar.getInstance()
+    cal.setTimeInMillis(time.getTime())
+    cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to 0
+    cal.set(Calendar.MINUTE, 0); // set minutes to 0
+    cal.set(Calendar.SECOND, 0); //set seconds to 0
+    cal.getTime.getTime
+  }
+
+  /**
+   * To calculate difference between current time and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def currentTimeDiff(date: Timestamp, diffType: String): Double = {
+    val cal = Calendar.getInstance()
+
+    val diff = cal.getTime().getTime - date.getTime
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    diffTime
+  }
+
+  /**
+   * To calculate difference between start time of previous day and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance()
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - date.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    diffTime
+  }
+
+  /**
+   * Input date is string
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: String, diffType: String): Double = {
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance()
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - prodDate.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    diffTime
   }
 
   /**
