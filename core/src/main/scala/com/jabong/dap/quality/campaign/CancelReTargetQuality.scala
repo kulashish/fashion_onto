@@ -19,7 +19,7 @@ object CancelReTargetQuality extends BaseCampaignQuality {
 
   val campaignName = "CancelReTargetQuality"
 
-  def getName(): String ={
+  def getName(): String = {
     campaignName
   }
 

@@ -16,7 +16,7 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
 
   val campaignName = "WishlistCampaignQuality"
 
-  def getName(): String ={
+  def getName(): String = {
     campaignName
   }
 

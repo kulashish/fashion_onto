@@ -16,7 +16,7 @@ object ReturnReTargetQuality extends BaseCampaignQuality {
 
   val campaignName = "ReturnReTargetQuality"
 
-  def getName(): String ={
+  def getName(): String = {
     campaignName
   }
   /**

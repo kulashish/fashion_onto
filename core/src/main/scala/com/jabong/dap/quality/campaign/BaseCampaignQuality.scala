@@ -5,13 +5,13 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by Kapil.Rajak on 14/8/15.
  */
-abstract class  BaseCampaignQuality {
+abstract class BaseCampaignQuality {
 
   /**
    *
    * @return campaign name
    */
-  def getName() :String
+  def getName(): String
   /**
    * gives random selected rows from DataFrame
    * @param df

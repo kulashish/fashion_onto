@@ -17,8 +17,7 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
 
   val campaignName = "ACartPushCampaignQuality"
 
-
-  def getName(): String ={
+  def getName(): String = {
     campaignName
   }
 

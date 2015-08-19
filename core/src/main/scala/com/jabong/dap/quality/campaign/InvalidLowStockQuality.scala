@@ -15,7 +15,7 @@ object InvalidLowStockQuality extends BaseCampaignQuality {
 
   val campaignName = "InvalidLowStockQuality"
 
-  def getName(): String ={
+  def getName(): String = {
     campaignName
   }
 
@@ -40,7 +40,7 @@ object InvalidLowStockQuality extends BaseCampaignQuality {
   def getInputOutput(date: String = TimeUtils.YESTERDAY_FOLDER): (DataFrame, DataFrame, DataFrame) = {
     val orderItemDF = CampaignQualityEntry.orderItem30DaysData
 
-    val fullOrderData = CampaignQualityEntry.last30DaysOrderData.select(SalesOrderVariables.ID_SALES_ORDER,SalesOrderVariables.FK_CUSTOMER)
+    val fullOrderData = CampaignQualityEntry.last30DaysOrderData.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 
