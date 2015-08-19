@@ -13,6 +13,7 @@ import scala.collection.immutable.HashMap
  */
 object TimeUtils extends Logging {
 
+  val yesterday = TimeUtils.getDateAfterNDays(-1, _:String)
   /**
    * Returns the total number of days between two given date inputs
    * @param date1
