@@ -21,12 +21,9 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   @transient var dfItr30DayData: DataFrame = _
   @transient var dfYesterdayItrData: DataFrame = _
 
-  var itemOnDiscount: ItemOnDiscount = _
-
   override def beforeAll() {
 
     super.beforeAll()
-    itemOnDiscount = new ItemOnDiscount()
     //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_product_shortlist")
     dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
     dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
@@ -43,7 +40,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
       col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT,
       col(ItrVariables.SPECIAL_PRICE))
 
-    val result = itemOnDiscount.getJoinDF(dfCustomerProductShortlist, itr)
+    val result = ItemOnDiscount.getJoinDF(dfCustomerProductShortlist, itr)
       .limit(30).collect().toSet
 
     //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_get_join_df" + ".json")
@@ -58,7 +55,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
   //=====================================skuFilter()=====================================================
   "skuFilter: Data Frame dfCustomerProductShortlist and dfItr30DayData" should "null" in {
 
-    val result = itemOnDiscount.skuFilter(null, null)
+    val result = ItemOnDiscount.skuFilter(null, null)
 
     assert(result == null)
 
@@ -74,7 +71,7 @@ class ItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
   "skuFilter: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = itemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData)
+    val result = ItemOnDiscount.skuFilter(dfCustomerProductShortlist, dfItr30DayData)
     //        .limit(30).collect().toSet
 
     //    result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_sku_filter" + ".json")

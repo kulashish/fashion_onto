@@ -23,6 +23,7 @@ class SkuLowStockTest extends FlatSpec with SharedSparkContext {
   @transient var dfItr30DayData: DataFrame = _
   @transient var dfYesterdayItrData: DataFrame = _
 
+  /* FIXME
   var skuLowStock: SkuLowStock = _
 
   override def beforeAll() {
@@ -96,5 +97,6 @@ class SkuLowStockTest extends FlatSpec with SharedSparkContext {
     assert(result.equals(dfShortListSkuSimpleFilter) == true)
 
   }
+  */
 
 }

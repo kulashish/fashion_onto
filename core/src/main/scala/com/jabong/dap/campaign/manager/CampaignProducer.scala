@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.skuselection.SkuSelectorFactory
 import com.jabong.dap.campaign.customerselection.{ CustomerSelectorFactory, CustomerSelector }
 import com.jabong.dap.campaign.recommendation.RecommenderFactory
 import com.jabong.dap.common.constants.campaign.CampaignCommon
@@ -16,8 +15,6 @@ object CampaignProducer {
     }
     if (factoryType.equalsIgnoreCase(CampaignCommon.CUSTOMER_SELECTOR)) {
       return new CustomerSelectorFactory()
-    } else if (factoryType.equalsIgnoreCase(CampaignCommon.SKU_SELECTOR)) {
-      return new SkuSelectorFactory()
     } else if (factoryType.equalsIgnoreCase(CampaignCommon.RECOMMENDER)) {
       return new RecommenderFactory()
     }

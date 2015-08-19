@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.LowStock
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
@@ -36,8 +37,7 @@ class InvalidLowStockCampaign {
     }
 
     //sku selection
-    val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = lowStock.skuFilter(custFiltered, itrData)
+    val refSkus = LowStock.skuFilter(custFiltered, itrData)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
 

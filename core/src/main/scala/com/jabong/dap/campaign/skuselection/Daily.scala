@@ -7,13 +7,13 @@ import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVar
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
-class Daily extends SkuSelector with Logging {
+object Daily extends Logging {
 
   // 1. pick based on special price (descending)
   // 1 day data
   // inDataFrame =  [(id_customer, sku simple)]
   // itrData = [(skusimple, date, stock, special price)]
-  override def skuFilter(customerSkuData: DataFrame, yesterdayItrData: DataFrame): DataFrame = {
+  def skuFilter(customerSkuData: DataFrame, yesterdayItrData: DataFrame): DataFrame = {
     if (customerSkuData == null || yesterdayItrData == null) {
       logger.error("either customer selected skus are null or itrData is null")
       return null
@@ -30,15 +30,4 @@ class Daily extends SkuSelector with Logging {
 
     return refSkus
   }
-
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
-
-  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
-
 }

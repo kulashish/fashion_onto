@@ -9,27 +9,14 @@ import org.apache.spark.sql.DataFrame
 /**
  * Target customers who have returned the items
  */
-class ReturnReTarget extends SkuSelector {
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-
-  //  // val hiveContext = Spark.getHiveContext()
-  //  def execute(orderItemDataFrame: DataFrame): DataFrame = {
-  //
-  //    if (orderItemDataFrame == null) {
-  //      return null
-  //    }
-  //    val filteredSku = skuFilter(orderItemDataFrame)
-  //    refSku.foreach(println)
-  //    return refSku
-  //
-  //  }
+object ReturnReTarget {
 
   /**
    *  Override sku Filter method to filter skus based on different order return statuses
    * @param orderItemDataFrame
    * @return
    */
-  override def skuFilter(orderItemDataFrame: DataFrame): DataFrame = {
+  def skuFilter(orderItemDataFrame: DataFrame): DataFrame = {
     if (orderItemDataFrame == null) {
       return null
     }
@@ -46,13 +33,4 @@ class ReturnReTarget extends SkuSelector {
 
     return refSku
   }
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
-
-  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
-
 }

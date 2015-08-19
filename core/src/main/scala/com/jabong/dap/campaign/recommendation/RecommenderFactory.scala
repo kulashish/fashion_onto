@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.recommendation
 
-import com.jabong.dap.campaign.skuselection.SkuSelector
 import com.jabong.dap.campaign.customerselection.CustomerSelector
 import com.jabong.dap.campaign.manager.CampaignFactory
 
@@ -10,10 +9,6 @@ import com.jabong.dap.campaign.manager.CampaignFactory
 class RecommenderFactory extends CampaignFactory {
 
   override def getCustomerSelector(customerType: String): CustomerSelector = {
-    null
-  }
-
-  override def getSkuSelector(action: String): SkuSelector = {
     null
   }
 
