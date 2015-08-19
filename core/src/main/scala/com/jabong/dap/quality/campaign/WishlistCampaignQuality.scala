@@ -14,6 +14,12 @@ import org.apache.spark.sql.functions._
  */
 object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
 
+  val campaignName = "WishlistCampaignQuality"
+
+  def getName(): String = {
+    campaignName
+  }
+
   /**
    * Consists of all the validation components for Backward test
    * @param fullShortlistData
