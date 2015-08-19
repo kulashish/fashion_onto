@@ -1,6 +1,9 @@
 package com.jabong.dap.model.clickstream.variables
 
 import java.text.SimpleDateFormat
+
+import com.jabong.dap.common.time.TimeConstants
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
@@ -22,9 +25,9 @@ object VariableMethods extends java.io.Serializable {
     val domain = UserObj.domain
     val userDomain = GroupedData.mapValues(x => scala.collection.mutable.Set(x(domain).toString))
     val appcheck = userDomain.reduceByKey((x, y) => appCheckReducer(x, y))
-    val result = appcheck.mapValues(x => x("w"))
+    val result = appcheck.mapValues(x => x(DataSets.DESKTOP))
     //  result.saveAsTextFile(ClickstreamConstants.appcheckOutputPath)
-    println(result.count());
+    println(result.count())
   }
 
   def appCheckReducer(x: Set[String], y: Set[String]): Set[String] = {
@@ -50,7 +53,7 @@ object VariableMethods extends java.io.Serializable {
 
   def lastDeviceReducer(x: (String, Any), y: (String, Any)): (String, Any) = {
 
-    val format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS")
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT_MS)
     val date1 = format.parse(x._1)
     val date2 = format.parse(y._1)
     if (date1 after date2) {
@@ -68,30 +71,31 @@ object VariableMethods extends java.io.Serializable {
         cnt += 1
         arr(cnt) = br._2(1).toString
       }
-      return arr
+      arr
     }
 
   def comparePagets(a: TimeBasedSorter, b: TimeBasedSorter): Boolean = {
     val a1: String = a.pagets.toString
     val b1: String = b.pagets.toString
-    val format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS")
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT_MS)
     val date1 = format.parse(a1)
     val date2 = format.parse(b1)
     if (date1 after date2) {
-      return true
+      true
     } else
-      return false
+      false
   }
+
   def comparePagetsInDescending(a: TimeBasedSorter, b: TimeBasedSorter): Boolean = {
     val a1: String = a.pagets.toString
     val b1: String = b.pagets.toString
-    val format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS")
+    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT_MS)
     val date1 = format.parse(a1)
     val date2 = format.parse(b1)
     if (date1 before date2) {
-      return true
+      true
     } else
-      return false
+      false
   }
 
   def returnLast3Reducer(x: List[(Any, Array[Any])], y: List[(Any, Array[Any])]): List[(Any, Array[Any])] = {
@@ -102,7 +106,7 @@ object VariableMethods extends java.io.Serializable {
     // Get last three brands
     var cnt = 0
     var list: List[(Any, Array[Any])] = List()
-    val loop = new Breaks;
+    val loop = new Breaks
     var previousBrand1 = ""
     var previousBrand2 = ""
     loop.breakable {
@@ -120,7 +124,7 @@ object VariableMethods extends java.io.Serializable {
         if (cnt == 3) loop.break()
       }
     }
-    return list
+    list
   }
 
   def lastBrandsViewed(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, UserObj: GroupData): RDD[(String, String, String, String)] = {
@@ -158,18 +162,18 @@ object VariableMethods extends java.io.Serializable {
 
   def maxByDate(x: Map[String, String], y: Map[String, String]): Map[String, String] = {
     val xy: Map[String, String] = x ++ y
-    return (Map(xy.maxBy(_._2)));
+    (Map(xy.maxBy(_._2)))
     // keysIterator.reduceLeft((x,y) => if (x > y) x else y)
   }
 
   def getDomain(x: String): String = {
-    var domain: String = "";
-    if (x == "w" || x == "m") {
-      domain = "web";
+    var domain: String = ""
+    if (x == DataSets.DESKTOP || x == DataSets.MOBILEWEB) {
+      domain = DataSets.WEB
     } else {
-      domain = "app";
+      domain = DataSets.APP
     }
-    return domain
+    domain
   }
 
   class TimeBasedSorter(

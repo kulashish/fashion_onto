@@ -3,7 +3,11 @@ package com.jabong.dap.campaign.skuselection
 /**
  * Created by raghu on 18/7/15.
  */
-import com.jabong.dap.common.SharedSparkContext
+
+import java.io.File
+
+import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
+import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -25,10 +29,9 @@ class SkuLowStockTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
     skuLowStock = new SkuLowStock()
-    //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_product_shortlist")
-    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
-    dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.ITR_30_DAY_DATA, Schema.itr)
-    dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION, DataSets.YESTERDAY_ITR_DATA, Schema.itr)
+    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
+    dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
   }
 
   //=====================================shortListSkuFilter()=====================================================
@@ -55,7 +58,7 @@ class SkuLowStockTest extends FlatSpec with SharedSparkContext {
 
     //                           result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_filter" + ".json")
 
-    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.LOW_STOCK, "result_shortlist_sku_filter", Schema.resultSkuFilter)
+    val dfSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.LOW_STOCK, "result_shortlist_sku_filter", Schema.resultSkuFilter)
       .collect().toSet
 
     assert(result != null)
@@ -71,7 +74,7 @@ class SkuLowStockTest extends FlatSpec with SharedSparkContext {
 
     //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_sku_simple_filter" + ".json")
 
-    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.LOW_STOCK, "result_shortlist_sku_simple_filter", Schema.resultSkuSimpleFilter)
+    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.LOW_STOCK, "result_shortlist_sku_simple_filter", Schema.resultSkuSimpleFilter)
       .collect().toSet
 
     assert(result.equals(dfShortListSkuSimpleFilter) == true)
@@ -87,7 +90,7 @@ class SkuLowStockTest extends FlatSpec with SharedSparkContext {
 
     //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_full_sku_filter" + ".json")
 
-    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.LOW_STOCK, "result_shortlist_full_sku_filter", Schema.resultFullSkuFilter)
+    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.LOW_STOCK, "result_shortlist_full_sku_filter", Schema.resultFullSkuFilter)
       .collect().toSet
 
     assert(result.equals(dfShortListSkuSimpleFilter) == true)

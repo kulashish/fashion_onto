@@ -55,7 +55,7 @@ object InvalidLowStockQuality extends BaseCampaignQuality {
    */
   def backwardTest(date: String, fraction: Double): Boolean = {
     val (orderItem, invalidLow, itr) = getInputOutput(date)
-    val sampleCancelRetargetDF = getSample(orderItem, fraction)
-    validate(orderItem, invalidLow, itr)
+    val sampleInvalidLowDF = getSample(invalidLow, fraction)
+    validate(orderItem, sampleInvalidLowDF, itr)
   }
 }

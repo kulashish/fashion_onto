@@ -40,7 +40,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day surf session data from hdfs")
 
-    val surfSessionData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+    val surfSessionData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
     surfSessionData
   }
 
@@ -177,8 +177,8 @@ object CampaignInput extends Logging {
     val monthPrevStr = TimeUtils.withLeadingZeros(monthYear.month)
 
     var itrData: DataFrame = null
-    val currentMonthItrData = getCampaignInputDataFrame("orc", ConfigConstants.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthStr)
-    val previousMonthItrData = getCampaignInputDataFrame("orc", ConfigConstants.OUTPUT_PATH, "itr", "basic", "", monthYear.year + "/" + monthPrevStr)
+    val currentMonthItrData = getCampaignInputDataFrame(DataSets.ORC, ConfigConstants.OUTPUT_PATH, "itr", "basic", "", monthYear.year + File.separator + monthStr)
+    val previousMonthItrData = getCampaignInputDataFrame(DataSets.ORC, ConfigConstants.OUTPUT_PATH, "itr", "basic", "", monthYear.year + File.separator + monthPrevStr)
     if (previousMonthItrData != null) {
       itrData = currentMonthItrData.unionAll(previousMonthItrData)
     } else {
@@ -240,12 +240,12 @@ object CampaignInput extends Logging {
   }
 
   def getCampaignData(name: String, date: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
-    val path: String = ConfigConstants.OUTPUT_PATH + "/" + DataSets.CAMPAIGN + "/" + name + "/" + DataSets.DAILY_MODE + "/" + date
+    val path: String = ConfigConstants.OUTPUT_PATH + File.separator + DataSets.CAMPAIGNS + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading "+name+" campaign data from path:- "+ path)
     if (DataVerifier.dataExists(path)) {
       var result: DataFrame = null
       try {
-        val campaignData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, name, DataSets.DAILY_MODE, date)
+        val campaignData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, name, DataSets.DAILY_MODE, date)
           .withColumn(CampaignCommon.PRIORITY, lit(priority))
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
           val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
@@ -302,7 +302,7 @@ object CampaignInput extends Logging {
     var loadedDataframe: DataFrame = null
     logger.info(" orc data loaded from filepath" + filePath)
     //FIXME Compress the below if else loop.
-    if (fileFormat == "orc") {
+    if (fileFormat == DataSets.ORC) {
 
       if (DataVerifier.dirExists(filePath)) {
         loadedDataframe = Spark.getHiveContext().read.format(fileFormat).load(filePath + "/*")
@@ -311,7 +311,7 @@ object CampaignInput extends Logging {
         return null
       }
     }
-    if (fileFormat == "parquet") {
+    if (fileFormat == DataSets.PARQUET) {
       if (DataVerifier.dirExists(filePath)) {
         loadedDataframe = Spark.getSqlContext().read.format(fileFormat).load(filePath + "/*")
         logger.info(" parquet data loaded from filepath" + filePath)
@@ -417,7 +417,7 @@ object CampaignInput extends Logging {
   def loadYesterdayMobilePushCampaignQualityData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day Mobile Push Campaign Quality data from hdfs")
-    val mobilePushCampaignQuality = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday)
+    val mobilePushCampaignQuality = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday)
     mobilePushCampaignQuality
   }
 

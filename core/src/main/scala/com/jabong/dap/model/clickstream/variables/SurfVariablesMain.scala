@@ -1,5 +1,6 @@
 package com.jabong.dap.model.clickstream.variables
 
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -36,10 +37,12 @@ object SurfVariablesMain extends java.io.Serializable {
     val tablename = args(0)
     val finalTempTable = "finalpagevisit"
 
-    val currentMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
-    var processedVariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf3ProcessedVariable"
-    val userDeviceMapPath = args(2) + "/" + year + "/" + month + "/" + day + "/userDeviceMap"
-    var surf1VariablePath = args(2) + "/" + year + "/" + month + "/" + day + "/Surf1ProcessedVariable"
+    val dateFolder = File.separator + year + File.separator + month + File.separator + day + File.separator
+
+    val currentMergedDataPath = args(1) + dateFolder + "Surf3mergedData"
+    var processedVariablePath = args(2) + dateFolder + "Surf3ProcessedVariable"
+    val userDeviceMapPath = args(2) + dateFolder + "userDeviceMap"
+    var surf1VariablePath = args(2) + dateFolder + "Surf1ProcessedVariable"
 
     var useridDeviceidFrame = getAppIdUserIdData(cal, tablename)
     var UserObj = new GroupData()
@@ -50,7 +53,7 @@ object SurfVariablesMain extends java.io.Serializable {
     year = cal.get(Calendar.YEAR)
     day = cal.get(Calendar.DAY_OF_MONTH)
     month = mFormat.format(cal.getTime())
-    var oldMergedDataPath = args(1) + "/" + year + "/" + month + "/" + day + "/Surf3mergedData"
+    var oldMergedDataPath = args(1) + File.separator + year + File.separator + month + File.separator + day + File.separator + "Surf3mergedData"
     var oldMergedData: DataFrame = null
     if (DataVerifier.dataExists(oldMergedDataPath)) {
       oldMergedData = sqlContext.read.load(oldMergedDataPath)
@@ -93,8 +96,8 @@ object SurfVariablesMain extends java.io.Serializable {
 
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
 
-    val userDeviceMapPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", DataSets.USER_DEVICE_MAP_APP, "daily", yesterdayDate)
-    var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf1ProcessedVariable", "daily", yesterdayDate)
+    val userDeviceMapPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, yesterdayDate)
+    var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, yesterdayDate)
 
     var useridDeviceidFrame = getAppIdUserIdData(cal, tablename)
     var UserObj = new GroupData()
@@ -126,10 +129,10 @@ object SurfVariablesMain extends java.io.Serializable {
     val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT)
 
-    val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData", "daily", yesterdayDate)
-    var processedVariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3ProcessedVariable", "daily", yesterdayDate)
+    val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, yesterdayDate)
+    var processedVariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, yesterdayDate)
 
-    var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData", "daily", dayBeforeYesterdayDate)
+    var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, dayBeforeYesterdayDate)
 
     var oldMergedData: DataFrame = null
 

@@ -26,11 +26,11 @@ class ACartTest extends FlatSpec with SharedSparkContext {
     sqlContext = Spark.getSqlContext()
     cartCampaign = new ACart()
     salesCartOld = JsonUtils.readFromJson(DataSets.SALES_CART, "CustomerOrderHistory")
-    salesCartData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/acart_campaigns", "sales_cart")
-    orderData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/acart_campaigns", "sales_order")
-    orderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/acart_campaigns", "sales_order_item")
-    orderData1 = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/acart_campaigns", "sales_order1")
-    orderItemData1 = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/acart_campaigns", "sales_order_item1")
+    salesCartData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_cart")
+    orderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order")
+    orderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order_item")
+    orderData1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order1")
+    orderItemData1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_order_item1")
     testDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "SalesCartFilteredSku")
   }
 

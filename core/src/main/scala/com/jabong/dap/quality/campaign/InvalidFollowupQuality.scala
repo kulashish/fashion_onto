@@ -56,7 +56,7 @@ object InvalidFollowupQuality extends BaseCampaignQuality {
    */
   def backwardTest(date: String, fraction: Double): Boolean = {
     val (orderItem, invalidFollow, itr) = getInputOutput(date)
-    val sampleCancelRetargetDF = getSample(orderItem, fraction)
-    validate(orderItem, invalidFollow, itr)
+    val sampleInvalidFollowDF = getSample(invalidFollow, fraction)
+    validate(orderItem, sampleInvalidFollowDF, itr)
   }
 }
