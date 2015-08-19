@@ -27,7 +27,7 @@ object CampaignQualityEntry extends Logging {
     loadCommonDataSets(incrDate)
     for (campaign <- campaignList){
       if (!campaign.backwardTest(incrDate, fraction)) {
-        logger.info(campaign.name+" failed for:-" + incrDate)
+        logger.info(campaign.getName()+" failed for:-" + incrDate)
         status = false
       }
     }
