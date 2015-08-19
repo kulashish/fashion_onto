@@ -49,12 +49,12 @@ object Surf6Quality {
                             .select(CampaignMergedFields.DEVICE_ID,
         CustomerPageVisitVariables.COUNT_SKU)
 
-    var temp = true
+    var temp: Int = 0
     joined.rdd.foreach(e => (if(Integer.parseInt(e(1).toString) < 5){
-      temp = false
+      temp = temp + 1
     }))
-
-    return (temp && joined.count() == surf6Campaign.count())
+    println("Count < 5 = "+temp)
+    return (temp ==0 && joined.count() == surf6Campaign.count())
   }
 
   def checkSkuSelection(surf6Campaign: DataFrame, itr: DataFrame): Boolean={
