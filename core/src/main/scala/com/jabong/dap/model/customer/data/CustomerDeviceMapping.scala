@@ -1,6 +1,5 @@
 package com.jabong.dap.model.customer.data
 
-import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -36,9 +35,9 @@ object CustomerDeviceMapping extends Logging {
 
     val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
-      .groupBy(PageVisitVariables.USERID)
+      .groupBy(PageVisitVariables.USER_ID)
       .agg(
-        first(PageVisitVariables.BROWSERID) as PageVisitVariables.BROWSERID,
+        first(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
         first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       )
 
@@ -50,11 +49,11 @@ object CustomerDeviceMapping extends Logging {
     // id_customer, email, browser_id, domain
     val custUnq = customer.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
     val broCust = Spark.getContext().broadcast(custUnq).value
-    val joinedDf = clickStream.join(broCust, broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USERID), SQL.FULL_OUTER)
+    val joinedDf = clickStream.join(broCust, broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), "outer")
       .select(
-        coalesce(broCust(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USERID)) as CustomerVariables.EMAIL,
+        coalesce(broCust(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
         broCust(CustomerVariables.ID_CUSTOMER),
-        clickStream(PageVisitVariables.BROWSERID),
+        clickStream(PageVisitVariables.BROWSER_ID),
         clickStream(PageVisitVariables.DOMAIN)
       )
 
@@ -62,12 +61,12 @@ object CustomerDeviceMapping extends Logging {
     // joinedDf.printSchema()
     // joinedDf.show(10)
 
-    val joined = joinedDf.join(cmr, cmr(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), SQL.FULL_OUTER)
+    val joined = joinedDf.join(cmr, cmr(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), "outer")
       .select(
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
         coalesce(joinedDf(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
-        coalesce(joinedDf(PageVisitVariables.BROWSERID), cmr(PageVisitVariables.BROWSERID)) as PageVisitVariables.BROWSERID,
+        coalesce(joinedDf(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
         coalesce(joinedDf(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
       )
 
@@ -81,7 +80,7 @@ object CustomerDeviceMapping extends Logging {
       .fill(
         Map(
           CustomerVariables.ID_CUSTOMER -> 0,
-          PageVisitVariables.BROWSERID -> ""
+          PageVisitVariables.BROWSER_ID -> ""
         )
       ).dropDuplicates()
     val resWithout0 = result.filter(col(CustomerVariables.ID_CUSTOMER) > 0)
@@ -139,8 +138,7 @@ object CustomerDeviceMapping extends Logging {
           col("RESPONSYS_ID") as CustomerVariables.RESPONSYS_ID,
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
-          col("BID") as PageVisitVariables.BROWSERID,
-          // Not using constant IOS as in literal its better if it is local and not any global variable.
+          col("BID") as PageVisitVariables.BROWSER_ID,
           when(col("APPTYPE").contains("ios"), lit("ios")).otherwise(col("APPTYPE")) as PageVisitVariables.DOMAIN
         )
       println("Total recs in DCF file initially: ") // + df.count())
@@ -157,7 +155,7 @@ object CustomerDeviceMapping extends Logging {
       val NEW_RESPONSYS_ID = MergeUtils.NEW_ + CustomerVariables.RESPONSYS_ID
       val NEW_ID_CUSTOMER = MergeUtils.NEW_ + CustomerVariables.ID_CUSTOMER
       val NEW_EMAIL = MergeUtils.NEW_ + CustomerVariables.EMAIL
-      val NEW_BROWSER_ID = MergeUtils.NEW_ + PageVisitVariables.BROWSERID
+      val NEW_BROWSER_ID = MergeUtils.NEW_ + PageVisitVariables.BROWSER_ID
       val NEW_DOMAIN = MergeUtils.NEW_ + PageVisitVariables.DOMAIN
 
       val correctRecs = df.join(duplicate, df(CustomerVariables.ID_CUSTOMER) === duplicate(CustomerVariables.ID_CUSTOMER) && df(CustomerVariables.EMAIL) === duplicate(CustomerVariables.EMAIL))
@@ -165,19 +163,19 @@ object CustomerDeviceMapping extends Logging {
           df(CustomerVariables.RESPONSYS_ID) as NEW_RESPONSYS_ID,
           df(CustomerVariables.ID_CUSTOMER) as NEW_ID_CUSTOMER,
           df(CustomerVariables.EMAIL) as NEW_EMAIL,
-          df(PageVisitVariables.BROWSERID) as NEW_BROWSER_ID,
+          df(PageVisitVariables.BROWSER_ID) as NEW_BROWSER_ID,
           df(PageVisitVariables.DOMAIN) as NEW_DOMAIN
         )
       println("Total recs corrected: ") // + correctRecs.count())
       // correctRecs.printSchema()
       // correctRecs.show(9)
 
-      val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), SQL.LEFT_OUTER)
+      val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), "leftouter")
         .select(
           coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as CustomerVariables.RESPONSYS_ID,
           coalesce(correctRecs(NEW_ID_CUSTOMER), df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
-          coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSERID)) as PageVisitVariables.BROWSERID,
+          coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
         ).dropDuplicates()
 
