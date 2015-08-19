@@ -5,7 +5,9 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by Kapil.Rajak on 14/8/15.
  */
-class BaseCampaignQuality {
+abstract class  BaseCampaignQuality {
+
+  val name:String
   /**
    * gives random selected rows from DataFrame
    * @param df
@@ -15,5 +17,7 @@ class BaseCampaignQuality {
   def getSample(df: DataFrame, fraction: Double): DataFrame = {
     df.sample(false, fraction)
   }
+
+  def backwardTest(date: String, fraction: Double): Boolean
 
 }

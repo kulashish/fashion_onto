@@ -13,6 +13,8 @@ import org.apache.spark.sql.DataFrame
  */
 object InvalidLowStockQuality extends BaseCampaignQuality {
 
+  val campaignName = "InvalidLowStockQuality"
+
   /**
    * Consists of all the validation components for Backward test
    * @param orderItemDF

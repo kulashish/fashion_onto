@@ -2,6 +2,7 @@ package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import grizzled.slf4j.Logging
@@ -22,30 +23,39 @@ object CampaignQualityEntry extends Logging {
     val fraction = OptionUtils.getOptValue(paramInfo.fraction, DEFAULT_FRACTION).toDouble
     var status: Boolean = true
     // first load Common data sets
+    val campaignList:List[BaseCampaignQuality] = List(ReturnReTargetQuality,CancelReTargetQuality,ACartPushCampaignQuality,WishlistCampaignQuality,InvalidFollowupQuality,InvalidLowStockQuality)
     loadCommonDataSets(incrDate)
-    if (!ReturnReTargetQuality.backwardTest(incrDate, fraction)) {
-      logger.info("ReturnReTargetQuality failed for:-" + incrDate)
-      status = false
+    for (campaign <- campaignList){
+      if (!campaign.backwardTest(incrDate, fraction)) {
+        logger.info(campaign.name+" failed for:-" + incrDate)
+        status = false
+      }
     }
-    if (!CancelReTargetQuality.backwardTest(incrDate, fraction)) {
-      logger.info("CancelReTargetQuality failed for:-" + incrDate)
-      status = false
-    }
-    if (!ACartPushCampaignQuality.backwardTest(incrDate, fraction)) {
-      logger.info("ACartPushCampaignQuality failed for:-" + incrDate)
-      status = false
-    }
-    if (!WishlistCampaignQuality.backwardTest(incrDate, fraction)) {
-      logger.info("WishlistCampaignQuality failed for:-" + incrDate)
-      status = false
-    }
-    if (!InvalidFollowupQuality.backwardTest(incrDate, fraction)) {
-      logger.info("InvalidFollowupQuality failed for " + incrDate)
-    }
-
-    if (!InvalidLowStockQuality.backwardTest(incrDate, fraction)) {
-      logger.info("InvalidLowStockQuality failed for " + incrDate)
-    }
+//    if (!ReturnReTargetQuality.backwardTest(incrDate, fraction)) {
+//      logger.info("ReturnReTargetQuality failed for:-" + incrDate)
+//      status = false
+//    }
+//    if (!CancelReTargetQuality.backwardTest(incrDate, fraction)) {
+//      logger.info("CancelReTargetQuality failed for:-" + incrDate)
+//      status = false
+//    }
+//    if (!ACartPushCampaignQuality.backwardTest(incrDate, fraction)) {
+//      logger.info("ACartPushCampaignQuality failed for:-" + incrDate)
+//      status = false
+//    }
+//    if (!WishlistCampaignQuality.backwardTest(incrDate, fraction)) {
+//      logger.info("WishlistCampaignQuality failed for:-" + incrDate)
+//      status = false
+//    }
+//    if (!InvalidFollowupQuality.backwardTest(incrDate, fraction)) {
+//      logger.info("InvalidFollowupQuality failed for " + incrDate)
+//      status = false
+//    }
+//
+//    if (!InvalidLowStockQuality.backwardTest(incrDate, fraction)) {
+//      logger.info("InvalidLowStockQuality failed for " + incrDate)
+//      status = false
+//    }
 
     if (status == false) {
       throw new FailedStatusException
