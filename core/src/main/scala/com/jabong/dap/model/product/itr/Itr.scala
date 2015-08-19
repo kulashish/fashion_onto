@@ -4,8 +4,9 @@ import java.io.File
 import java.math
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.AppConfig
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions._
@@ -174,7 +175,7 @@ class Itr extends Serializable with Logging {
       ITR.BRAND_NAME
     ).cache()
 
-    itrDF.write.mode(SaveMode.Overwrite).format("orc").save(getPath(false))
+    itrDF.write.mode(SaveMode.Overwrite).format(DataSets.ORC).save(getPath(false))
 
     itrDF.
       groupBy(ITR.CONFIG_SKU).
@@ -186,7 +187,7 @@ class Itr extends Serializable with Logging {
         first(ITR.BRICK) as ITR.BRICK,
         first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
         sum(ITR.QUANTITY) as ITR.QUANTITY
-      ).write.mode(SaveMode.Overwrite).format("orc").save(getPath(true))
+      ).write.mode(SaveMode.Overwrite).format(DataSets.ORC).save(getPath(true))
   }
 
   /**
@@ -198,13 +199,13 @@ class Itr extends Serializable with Logging {
       return "%s/".
         format(
           AppConfig.config.basePath +
-            File.separator + "itr" + File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+            File.separator + "itr" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         )
     }
     return "%s/".
       format(
         AppConfig.config.basePath +
-          File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+          File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
       )
   }
 }

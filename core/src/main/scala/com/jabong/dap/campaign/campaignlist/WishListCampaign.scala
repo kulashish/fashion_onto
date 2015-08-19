@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
+import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon, CustomerSelection }
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
@@ -14,9 +14,6 @@ import org.apache.spark.sql.functions._
  * Created by rahul for com.jabong.dap.campaign.campaignlist on 27/7/15.
  */
 object WishListCampaign {
-  val IOD = "iod"
-  val LOW_STOCK = "lowstock"
-  val FOLLOW_UP = "followup"
 
   def runCampaign(): Unit = {
 
@@ -99,12 +96,12 @@ object WishListCampaign {
 
     var skuList = joinDf
 
-    if (cType.equals(LOW_STOCK)) {
+    if (cType.equals(SkuSelection.LOW_STOCK)) {
       // FIXME: stock variable name
       skuList = joinDf.filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
     }
 
-    if (cType.equals(IOD)) {
+    if (cType.equals(SkuSelection.ITEM_ON_DISCOUNT)) {
       skuList = shortListSkuIODFilter(joinDf, last30daySkuItrData)
     }
 
@@ -127,7 +124,7 @@ object WishListCampaign {
     val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is not null and " + CustomerProductShortlistVariables.PRICE + " is not null ")
     var skuSimpleList = skuSimpleCustomerProductShortlist
 
-    if (cType.equals(IOD) || cType.equals(LOW_STOCK)) {
+    if (cType.equals(SkuSelection.ITEM_ON_DISCOUNT) || cType.equals(SkuSelection.LOW_STOCK)) {
       // join it with last day itr
 
       val yesterdayItrData = lastDayItrSimpleData.select(
@@ -138,7 +135,7 @@ object WishListCampaign {
       val joinDF = skuSimpleCustomerProductShortlist.join(yesterdayItrData, skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE), "inner")
       var filteredDF: DataFrame = null
 
-      if (cType.equals(LOW_STOCK)) {
+      if (cType.equals(SkuSelection.LOW_STOCK)) {
         filteredDF = joinDF.filter(ItrVariables.ITR_ + ItrVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
       } else {
         // iod

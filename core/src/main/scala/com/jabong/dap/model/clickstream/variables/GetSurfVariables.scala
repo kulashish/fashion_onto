@@ -1,5 +1,6 @@
 package com.jabong.dap.model.clickstream.variables
 
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -7,6 +8,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.SparkConf
@@ -111,7 +113,7 @@ object GetSurfVariables extends java.io.Serializable {
         var year = cal.get(Calendar.YEAR);
         var day = cal.get(Calendar.DAY_OF_MONTH);
         var month = cal.get(Calendar.MONTH);
-        var dataPath = "/data/clickstream/merge" + "/" + year + "/" + month.toInt + 1 + "/" + day
+        var dataPath = "/data/clickstream/merge" + File.separator + year + File.separator + month.toInt + 1 + File.separator + day
 
         val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
         Spark.init(conf)
@@ -126,8 +128,8 @@ object GetSurfVariables extends java.io.Serializable {
           val yesterdayDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT)
           val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT)
 
-          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
-          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
+          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, yesterdayDate)
+          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDate)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists
@@ -151,8 +153,8 @@ object GetSurfVariables extends java.io.Serializable {
           val yesterdayDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT)
           val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT)
 
-          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", yesterdayDate)
-          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "clickstream", "Surf3mergedData30", "daily", dayBeforeYesterdayDate)
+          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, yesterdayDate)
+          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDate)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists

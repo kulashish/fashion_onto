@@ -7,8 +7,8 @@ import com.jabong.dap.common.constants.SkuDataConst._
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
-import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
-import org.scalatest.{Matchers, FlatSpec}
+import org.apache.spark.sql.types.{ LongType, StringType, StructField, StructType }
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by Kapil.Rajak on 18/8/15.
@@ -37,7 +37,7 @@ class SkuDataTest extends FlatSpec with SharedSparkContext with Matchers {
     val result = SkuData.skuBasedProcess(inputDF, yesterday)
     result.printSchema()
 
-    val expectedResult = JsonUtils.readFromJson(FOLDER,"skuDataProcessed", schemaE)
+    val expectedResult = JsonUtils.readFromJson(FOLDER, "skuDataProcessed", schemaE)
     assert(expectedResult.collect().toSet.equals(result.collect().toSet))
     //result.limit(10).write.json(TEST_RESOURCES + "ad4push" + ".json")
   }
