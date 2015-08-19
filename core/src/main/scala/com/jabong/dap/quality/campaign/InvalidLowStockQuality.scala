@@ -15,6 +15,10 @@ object InvalidLowStockQuality extends BaseCampaignQuality {
 
   val campaignName = "InvalidLowStockQuality"
 
+  def getName(): String ={
+    campaignName
+  }
+
   /**
    * Consists of all the validation components for Backward test
    * @param orderItemDF

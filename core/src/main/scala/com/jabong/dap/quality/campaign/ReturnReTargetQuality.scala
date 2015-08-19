@@ -16,6 +16,9 @@ object ReturnReTargetQuality extends BaseCampaignQuality {
 
   val campaignName = "ReturnReTargetQuality"
 
+  def getName(): String ={
+    campaignName
+  }
   /**
    * Consists of all the validation components for Backward test
    * @param orderItemDF

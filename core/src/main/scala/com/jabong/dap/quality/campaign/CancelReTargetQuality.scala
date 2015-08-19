@@ -19,6 +19,10 @@ object CancelReTargetQuality extends BaseCampaignQuality {
 
   val campaignName = "CancelReTargetQuality"
 
+  def getName(): String ={
+    campaignName
+  }
+
   /**
    * Consists of all the validation components for Backward test
    * @param orderItemDF
