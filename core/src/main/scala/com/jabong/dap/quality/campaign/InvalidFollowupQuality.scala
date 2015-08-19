@@ -13,6 +13,12 @@ import org.apache.spark.sql.DataFrame
  */
 object InvalidFollowupQuality extends BaseCampaignQuality {
 
+  val campaignName = "InvalidFollowupQuality"
+
+  def getName(): String = {
+    campaignName
+  }
+
   /**
    * Consists of all the validation components for Backward test
    * @param orderItemDF
@@ -32,10 +38,9 @@ object InvalidFollowupQuality extends BaseCampaignQuality {
    * @return
    */
   def getInputOutput(date: String = TimeUtils.YESTERDAY_FOLDER): (DataFrame, DataFrame, DataFrame) = {
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     val orderItemDF = CampaignQualityEntry.orderItem3DaysData
 
-    val fullOrderData = CampaignQualityEntry.last30DaysOrderData
+    val fullOrderData = CampaignQualityEntry.last30DaysOrderData.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 

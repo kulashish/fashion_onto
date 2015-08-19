@@ -13,6 +13,12 @@ import org.apache.spark.sql.DataFrame
  * Created by Kapil.Rajak on 14/8/15.
  */
 object ReturnReTargetQuality extends BaseCampaignQuality {
+
+  val campaignName = "ReturnReTargetQuality"
+
+  def getName(): String = {
+    campaignName
+  }
   /**
    * Consists of all the validation components for Backward test
    * @param orderItemDF
