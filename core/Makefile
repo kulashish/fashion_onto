@@ -15,6 +15,7 @@ package:
 	cp scripts/confInit.sh $(BASE)/bin/
 	cp scripts/run.pl $(BASE)/bin/
 	cp scripts/ftp_upload.pl $(BASE)/bin/
+	cp scripts/dcf_feed_upload.sh $(BASE)/bin/
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/
 	mkdir -p $(BASE)/bin/clickstream
 	cp scripts/clickstream/* $(BASE)/bin/clickstream/
