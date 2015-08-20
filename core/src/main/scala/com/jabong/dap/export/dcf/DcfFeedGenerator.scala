@@ -30,7 +30,6 @@ object DcfFeedGenerator extends Logging {
     val month = monthYear.month + 1
     val date = monthYear.day
     val year = monthYear.year
-    val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
 
@@ -46,7 +45,7 @@ object DcfFeedGenerator extends Logging {
     val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.DAILY_MODE, executeDate)
     DataWriter.writeParquet(joinedData, writePath, saveMode)
 
-    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.DAILY_MODE, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL_FETCH_MODE, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ",")
 
     logger.info("dcf feed generation process ended")
   }
@@ -61,13 +60,12 @@ object DcfFeedGenerator extends Logging {
 
     logger.info("joining started :- pagevisit with deviceMapping to get customerId")
 
-    val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), "inner")
+    val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), "left_outer")
       .select(
-        deviceMapping("id_customer"),
-        pageVisitData("productsku"),
-        changeDateFormatValue(pageVisitData("pagets"), lit("yyyy-MM-dd HH:mm:ss.SSS"), lit("yyyy-MM-dd'T' HH:mm:ss'Z'")) as "pagets",
-        pageVisitData("sessionid"),
-        pageVisitData("productsku")
+        deviceMapping("id_customer") as "uid",
+        pageVisitData("productsku")  as "sku" ,
+        changeDateFormatValue(pageVisitData("pagets"), lit("yyyy-MM-dd HH:mm:ss.SSS"), lit("yyyy-MM-dd'T' HH:mm:ss'Z'")) as "date_created",
+        pageVisitData("sessionid") as "sessionId"
       )
     logger.info("joining ended :- pagevisit with deviceMapping to get customerId")
 
