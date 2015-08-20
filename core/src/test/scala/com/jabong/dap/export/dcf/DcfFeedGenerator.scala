@@ -54,7 +54,8 @@ object DcfFeedGenerator extends Logging {
     println("pageVisitCount"+pageVisitData.count)
 
     val joinedData = convertFeedFormat(pageVisitData,outPath,cmr)
-    DataWriter.writeCsv(joinedData,"dcffeed","clickstream_merged_feed",DataSets.DAILY_MODE, executeDate, "dcffeed_merged", "Ignore", "true", ";")
+    val changedDateFormat = TimeUtils.changeDateFormat(executeDate,TimeConstants.DATE_FORMAT_FOLDER,TimeConstants.DATE_FORMAT)
+    DataWriter.writeCsv(joinedData,DataSets.DCF_FEED,DataSets.CLICKSTREAM_MERGED_FEED,DataSets.DAILY_MODE, executeDate, DataSets.DCF_FEED_FILENAME+changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ";")
   }
 
 
