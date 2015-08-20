@@ -13,7 +13,7 @@ import org.scalatest.FlatSpec
  * Created by rahul for com.jabong.dap.campaign.manager on 21/7/15.
  */
 class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkContext {
-  val jsonPath: String = "src/test/resources/campaigns/campaign_config/push_campaign_conf.json"
+  val jsonPath: String = JsonUtils.TEST_RESOURCES + "/campaigns/campaign_config/push_campaign_conf.json"
 
   val conf1 = new Configuration()
   val fileSystem = FileSystem.get(conf1)

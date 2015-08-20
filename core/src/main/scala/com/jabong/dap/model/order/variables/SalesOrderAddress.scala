@@ -68,7 +68,7 @@ object SalesOrderAddress {
    * def main(args: Array[String]) {
    * val conf = new SparkConf().setAppName("SparkExamples")
    * Spark.init(conf)
-   * val df1 = Spark.getSqlContext().read.json("src/test/resources/sales_order_address/sales_address.json").select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE,SalesAddressVariables.FIRST_NAME,SalesAddressVariables.LAST_NAME)
+   * val df1 = JsonUtils.readFromJson("sales_order_address", "sales_address").select(SalesOrderVariables.FK_CUSTOMER, SalesAddressVariables.CITY, SalesAddressVariables.PHONE,SalesAddressVariables.FIRST_NAME,SalesAddressVariables.LAST_NAME)
    * df1.collect().foreach(println)
    * val res = getFav(df1)
    * res.collect().foreach(println)

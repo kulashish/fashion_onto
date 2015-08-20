@@ -22,7 +22,7 @@
 
 30 5 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushCampaignMerge >>/opt/alchemy-core/logs/pushCampaignMerge_logs.txt
 
-30 6 * * * perl /opt/alchemy-core/base/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
+30 6 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
 
 30 7 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c mobilePushCampaignQuality >>/opt/alchemy-core/logs/mobilePushCampaignQuality_logs.txt
 

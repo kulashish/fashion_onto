@@ -16,7 +16,7 @@ my $component;
 GetOptions (
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed\n";
+) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed | pricing_sku_data\n";
 
 
 use POSIX qw(strftime);
@@ -36,6 +36,8 @@ if ($component eq "campaigns") {
     upload_ad4push_customer_response();
 } elsif ($component eq "dcf_feed") {
     upload_dcf_feed();
+} elsif ($component eq "pricing_sku_data") {
+      upload_pricing_sku_data();
 }
 
 
@@ -184,3 +186,22 @@ sub dcf_file_format_change{
         }
     }
  }
+
+sub upload_pricing_sku_data {
+    my $base = "/data/export/$date_with_zero/pricing_sku_data";
+    print "pricing sku data directory is $base\n";
+    system("mkdir -p $base");
+
+   # /data/tmp/sku_data/pricing/daily/2015/08/19/part-00000
+   print "hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/sku_data/pricing/daily/2015/08/19/part-00000
+   system("hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/");
+
+   # gzipping the file
+   system("gzip -c /data/export/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/data/export/$date_with_zero/pricing_sku_data/$date_with_zero");
+
+   # copying to slave location
+   system("scp /data/export/$date_with_zero/pricing_sku_data/$date_with_zero dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero");
+}
+

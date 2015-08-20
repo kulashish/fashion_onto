@@ -40,13 +40,13 @@ class ACartTest extends FlatSpec with SharedSparkContext {
   //  }
   //
   //  "Customer Data with no Abundant Cart Customers" should "return dataframe with no records" in {
-  //    testDataFrame = sqlContext.read.json("src/test/resources/salescart/SalesCartEmpty.json")
+  //    testDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "SalesCartEmpty")
   //    val customerSelected = cartCampaign.customerSelection(testDataFrame)
   //    assert(customerSelected.count() == 0)
   //  }
   //
   //  "Customer Data with  total 4 Customers" should "return dataframe of 2 customers having abundantCart" in {
-  //    testDataFrame = sqlContext.read.json("src/test/resources/salescart/SalesCartBasic.json")
+  //    testDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "SalesCartBasic")
   //    val customerSelected = cartCampaign.customerSelection(testDataFrame)
   //    assert(customerSelected.count() == 2)
   //  }
@@ -77,7 +77,7 @@ class ACartTest extends FlatSpec with SharedSparkContext {
   }
 
   //  "Out of 5 records " should "return 2 records" in {
-  //    testDataFrame = sqlContext.read.json("src/test/resources/salescart/SalesCartBasic.json")
+  //    testDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "SalesCartBasic")
   //    val filteredCustomerData = cartCampaign.customerSkuFilter(testDataFrame)
   //    assert(filteredCustomerData.count == 3)
   //  }
@@ -93,7 +93,7 @@ class ACartTest extends FlatSpec with SharedSparkContext {
   }
 
   //  "skuData check wth last 30 order data " should "return skus which are not ordered" in {
-  //    testDataFrame = sqlContext.read.json("src/test/resources/salescart/SalesCartFilteredSku.json")
+  //    testDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "SalesCartFilteredSku")
   //    val filteredOrderData = cartCampaign.customerOrderFilter(testDataFrame, cartCampaign.groupCustomerData(salesCartOld))
   //    filteredOrderData.collect().foreach(println)
   //    assert(filteredOrderData != null)
