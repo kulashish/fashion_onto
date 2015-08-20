@@ -111,6 +111,7 @@ object DataSets {
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
 
   //DCF FEEDS
+  val DCF_INPUT_MERGED_HIVE_TABLE = "merge.merge_pagevisit"
   val DCF_FEED = "dcffeed"
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"

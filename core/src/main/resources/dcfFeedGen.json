@@ -2,6 +2,7 @@
   "params": [
     {
       "source": "dcffeed",
+      "input" : "merge.merge_pagevisit",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
