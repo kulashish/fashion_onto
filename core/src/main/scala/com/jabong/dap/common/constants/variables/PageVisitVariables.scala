@@ -13,7 +13,6 @@ object PageVisitVariables {
   val DEVICE = "device"
   // val SKU_LIST = "_c4"
   val SKU_LIST = "skuList"
-  // val ADD4PUSH = "add4push"
   val SKU = "sku"
   val CHANNEL = "channel"
   val DERIVED_CATEGORY = "derivedcategory"

@@ -59,7 +59,6 @@ object GetSurfVariables extends java.io.Serializable {
         .select(PageVisitVariables.USER_ID, PageVisitVariables.SKU, PageVisitVariables.DEVICE + today, PageVisitVariables.DOMAIN + today)
         .withColumnRenamed(PageVisitVariables.DEVICE + today, PageVisitVariables.DEVICE)
         .withColumnRenamed(PageVisitVariables.DOMAIN + today, PageVisitVariables.DOMAIN)
-        // .withColumnRenamed(PageVisitVariables.ADD4PUSH + today, PageVisitVariables.ADD4PUSH)
         .distinct
       return joinResult
     } else {
@@ -68,7 +67,6 @@ object GetSurfVariables extends java.io.Serializable {
         .withColumnRenamed(PageVisitVariables.SKU + today, PageVisitVariables.SKU)
         .withColumnRenamed(PageVisitVariables.DEVICE + today, PageVisitVariables.DEVICE)
         .withColumnRenamed(PageVisitVariables.DOMAIN + today, PageVisitVariables.DOMAIN)
-        // .withColumnRenamed(PageVisitVariables.ADD4PUSH + today, PageVisitVariables.ADD4PUSH)
         .distinct
       return joinResult
     }
