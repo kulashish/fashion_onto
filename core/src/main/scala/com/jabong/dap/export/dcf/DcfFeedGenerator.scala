@@ -65,7 +65,7 @@ object DcfFeedGenerator extends Logging {
     val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), SQL.LEFT_OUTER)
       .select(
         deviceMapping("id_customer") as "uid",
-        pageVisitData("productsku")  as "sku" ,
+        pageVisitData("productsku") as "sku",
         changeDateFormatValue(pageVisitData("pagets"), lit("yyyy-MM-dd HH:mm:ss.SSS"), lit("yyyy-MM-dd'T' HH:mm:ss'Z'")) as "date_created",
         pageVisitData("sessionid") as "sessionId"
       )

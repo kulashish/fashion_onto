@@ -1,9 +1,11 @@
 package com.jabong.dap.model.clickstream
 
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
-import com.jabong.dap.model.clickstream.utils.{ UserAttribution, GroupData }
+import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.clickstream.utils.UserAttribution
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -19,7 +21,7 @@ class UserAttributionTestCases extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     hiveContext = Spark.getHiveContext()
     sqlContext = Spark.getSqlContext()
-    pagevisitDataFrame = sqlContext.read.json("src/test/resources/clickstream/UserNullAttribution.json")
+    pagevisitDataFrame = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "UserNullAttribution")
     pagevisitDataFrame.show()
   }
 

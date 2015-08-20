@@ -440,7 +440,7 @@ class UdfUtilsTest extends FlatSpec {
 
     val skuArray = null
 
-    val result = UdfUtils.getDistinctSku(skuArray)
+    val result = UdfUtils.getDistinctList(skuArray)
 
     assert(result == null)
 
