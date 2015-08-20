@@ -41,12 +41,13 @@ object DcfFeedGenerator extends Logging {
 
     val pageVisitData = hiveContext.sql(hiveQuery)
 
-    val joinedData = convertFeedFormat(pageVisitData, cmr)
+    val joinedData = convertFeedFormat(pageVisitData, cmr).cache()
     val changedDateFormat = TimeUtils.changeDateFormat(executeDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
     val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.DAILY_MODE, executeDate)
+
     DataWriter.writeParquet(joinedData, writePath, saveMode)
 
-    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL_FETCH_MODE, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ",")
+    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ",")
 
     logger.info("dcf feed generation process ended")
   }

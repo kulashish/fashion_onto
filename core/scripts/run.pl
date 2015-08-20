@@ -149,6 +149,7 @@ if ($component eq "bob") {
  } elsif ($component eq "dcfFeedGenerate") {
        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGen.json";
        run_component($component, $command);
+       system("perl $BASE_PATH/bin/ftp_upload.pl -c dcf_feed");
    }else {
     print "not a valid component\n";
 }
