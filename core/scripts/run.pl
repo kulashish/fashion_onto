@@ -146,7 +146,10 @@ if ($component eq "bob") {
 } elsif ($component eq "mobilePushCampaignQuality") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
- } else {
+ } elsif ($component eq "dcfFeedGenerate") {
+       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGen.json";
+       run_component($component, $command);
+   }else {
     print "not a valid component\n";
 }
 

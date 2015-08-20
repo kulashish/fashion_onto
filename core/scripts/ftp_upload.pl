@@ -16,7 +16,7 @@ my $component;
 GetOptions (
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response\n";
+) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed\n";
 
 
 use POSIX qw(strftime);
@@ -27,10 +27,15 @@ print $date . "\n";
 my $date_with_zero = strftime "%Y%m%d", localtime(time() - 60*60*24);
 print $date_with_zero . "\n";
 
+my $date_with_hiphen = strftime "%Y-%m-%d", localtime(time() - 60*60*24);
+print $date_with_hiphen . "\n";
+
 if ($component eq "campaigns") {
     uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
     upload_ad4push_customer_response();
+} elsif ($component eq "dcf_feed") {
+    upload_dcf_feed();
 }
 
 
@@ -145,4 +150,19 @@ sub upload_ad4push_customer_response {
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
    system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
 
+}
+
+sub upload_dcf_feed {
+     my $base = "/data/export/$date_with_zero/dcf_feed/clickstream_merged_feed";
+     print "dcf feed directory is $base\n";
+     system("mkdir -p $base");
+
+     print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen.csv $base/\n";
+
+     system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen.csv $base/)";
+
+     print("gzip $base/webhistory_$date_with_hiphen.csv/\n")
+     system("gzip $base/webhistory_$date_with_hiphen.csv");
+
+     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
 }
