@@ -18,6 +18,21 @@ class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
     dfOutputUserDeviceMap = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingOutput")
   }
 
+  "getUserDeviceMap: (null)" should " be null " in {
+    var udMap = UserDeviceMapping.getUserDeviceMap(null)
+    assert(udMap == null)
+  }
+
+  "getUserDeviceMap: (DF)" should "have 16 records only " in {
+    var udMap = UserDeviceMapping.getUserDeviceMap(dfInputUserDeviceMap)
+    assert(udMap.collect.size == 16)
+  }
+
+  "getUserDeviceMap: (DF)" should " match the output DF" in {
+    var udMap = UserDeviceMapping.getUserDeviceMap(dfInputUserDeviceMap).collect().toSet()
+    assert(udMap.equals(dfOutputUserDeviceMap.collect().toSet()) == true)
+  }
+
   "getUserDeviceMapApp: (null)" should " be null " in {
     var udMap = UserDeviceMapping.getUserDeviceMapApp(null)
     assert(udMap == null)
