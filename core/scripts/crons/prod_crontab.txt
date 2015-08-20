@@ -27,3 +27,5 @@
 30 7 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c mobilePushCampaignQuality >>/opt/alchemy-core/logs/mobilePushCampaignQuality_logs.txt
 
 0 11 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
+
+0 5 * * * sh /opt/alchemy-core/current/bin/dcf_feed_upload.sh >>/opt/alchemy-core/logs/dcf_feed.txt

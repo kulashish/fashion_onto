@@ -159,15 +159,33 @@ sub upload_dcf_feed {
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 
-     print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen.csv $base/\n";
+     print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen_1.csv $base/\n";
 
-     system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen.csv $base/");
+     system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen_1.csv $base/");
 
+     dcf_file_format_change("webhistory_$date_with_hiphen_1.csv","webhistory_$date_with_hiphen.csv");
      print("gzip $base/webhistory_$date_with_hiphen.csv/\n");
      system("gzip $base/webhistory_$date_with_hiphen.csv");
 
      system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
 }
+
+sub dcf_file_format_change{
+    my ($file_input,$file_output) = (shift,shift);
+    open(my $dcf_output, '>>', $file_output);
+    print  $dcf_output "uid,sku,date_created,sessionId\n";
+    open(my $fh, '<:encoding(UTF-8)', $file_input);
+    while( my $line = <$fh>)  {
+        chomp($line);
+        my @words = split /,/, $line;
+        if(length($words[0]) == 0){
+            print $dcf_output ",\"$words[1]\",$words[2],\"$words[3]\"\n";
+        }
+        else{
+                print $dcf_output "\"$words[0]\",\"$words[1]\",$words[2],\"$words[3]\"\n";
+        }
+    }
+ }
 
 sub upload_pricing_sku_data {
     my $base = "/data/export/$date_with_zero/pricing_sku_data";
