@@ -178,7 +178,7 @@ sub dcf_file_format_change{
     while( my $line = <$fh>)  {
         chomp($line);
         my @words = split /,/, $line;
-        if(length($words[0]) == 0){
+        if($words[0] == "0"){
             print $dcf_output ",\"$words[1]\",$words[2],\"$words[3]\"\n";
         }
         else{
