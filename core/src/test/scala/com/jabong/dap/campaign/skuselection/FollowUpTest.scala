@@ -29,9 +29,8 @@ class FollowUpTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     followUp = new FollowUp()
-    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "invalid_followup_customer_select")
-    itrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "itr_followup")
-    //sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/itr_followup.json")
+    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "invalid_campaigns/invalid_followup_customer_select")
+    itrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "invalid_campaigns/itr_followup")
 
     dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
     dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)

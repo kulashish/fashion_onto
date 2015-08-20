@@ -76,10 +76,10 @@ object GetSurfVariables extends java.io.Serializable {
    * List of [user, date, List[Sku]] of last 29 days
    * @param mergedData
    * @param incremental
-   * @param yesterDate
+   * @param date
    * @return (DataFrame)
    */
-  def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, yesterDate: String): DataFrame = {
+  def mergeSurf3Variable(hiveContext: HiveContext, mergedData: DataFrame, incremental: DataFrame, date: String): DataFrame = {
     import hiveContext.implicits._
 
     val sqlContext = Spark.getSqlContext()
@@ -88,12 +88,12 @@ object GetSurfVariables extends java.io.Serializable {
     // cal.setTime(yesterDate)
     // cal.add(Calendar.DATE, -29)
     // var filterDate = dateFormat.format(cal.getTime())
-    val filterDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(-29, TimeConstants.DATE_FORMAT_FOLDER, yesterDate), TimeConstants.DATE_FORMAT_FOLDER, "dd/MM/yyyy")
+    val filterDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(-29, TimeConstants.DATE_FORMAT_FOLDER, date), TimeConstants.DATE_FORMAT_FOLDER, "dd/MM/yyyy")
 
     incremental.select("userid_daily", "sku_daily").registerTempTable("tempincremental")
 
     var IncrementalMerge = hiveContext.sql("select userid_daily as userid,collect_list(sku_daily) as skuList from tempincremental group by userid_daily")
-      .map(x => (x(0).toString, yesterDate.toString, x(1).asInstanceOf[ArrayBuffer[String]])).toDF(PageVisitVariables.USER_ID, "dt", PageVisitVariables.SKU_LIST)
+      .map(x => (x(0).toString, date.toString, x(1).asInstanceOf[ArrayBuffer[String]])).toDF(PageVisitVariables.USER_ID, "dt", PageVisitVariables.SKU_LIST)
 
     if (mergedData != null) {
       val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")

@@ -58,8 +58,7 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
   }
 
   "Validation" should "be done" in {
-    val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources"
-    val file = TEST_RESOURCES + File.separator + AD4PUSH + File.separator + "fullSummary_full" + ".json"
+    val file = JsonUtils.TEST_RESOURCES + File.separator + AD4PUSH + File.separator + "fullSummary_full" + ".json"
     val lines = scala.io.Source.fromFile(file).mkString
     val arrayJson = lines.split("\n")
     var listMaps: ListBuffer[Map[String, Any]] = ListBuffer()

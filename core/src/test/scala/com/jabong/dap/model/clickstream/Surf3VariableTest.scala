@@ -1,14 +1,14 @@
 package com.jabong.dap.model.clickstream
 
-import java.util.Calendar
-
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
-import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, VariableMethods }
-import org.apache.spark.sql.{ DataFrame, SQLContext, Row }
-import org.scalatest.FlatSpec
-import com.jabong.dap.model.clickstream.utils.{ UserAttribution, GroupData }
+import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.clickstream.utils.{GroupData, UserAttribution}
+import com.jabong.dap.model.clickstream.variables.GetSurfVariables
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.scalatest.FlatSpec
 
 /**
  * Created by Divya on 14/7/15.
@@ -27,10 +27,10 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     hiveContext = Spark.getHiveContext()
     sqlContext = Spark.getSqlContext()
-    pagevisitDataFrame = sqlContext.read.json("src/test/resources/clickstream/pagevisitSingleUser.json")
-    pagevisitDataFrame2 = sqlContext.read.json("src/test/resources/clickstream/pagevisitMultiUser.json")
 
-    YesterMergedData = sqlContext.read.json("src/test/resources/clickstream/Surf3MergedData")
+    pagevisitDataFrame = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "pagevisitSingleUser")
+    pagevisitDataFrame2 = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "pagevisitMultiUser")
+    YesterMergedData = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "Surf3MergedData")
   }
 
   "DailyIncremetal for surf3" should "assert to given no of unique PDP records for given user" in {
@@ -69,7 +69,7 @@ class Surf3VariableTest extends FlatSpec with SharedSparkContext {
    * Today's merge should only have the data for last 29 days and should filyet out the data before that
    */
   "Today's merge" should "have 6 rows" in {
-    var mergeForTom = GetSurfVariables.mergeSurf3Variable(hiveContext, YesterMergedData, dailyIncrementalSKUs, "18/07/2015")
+    var mergeForTom = GetSurfVariables.mergeSurf3Variable(hiveContext, YesterMergedData, dailyIncrementalSKUs, "2015/07/18")
     assert(mergeForTom.count() == 6)
   }
 

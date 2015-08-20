@@ -14,7 +14,7 @@ import org.scalatest.{ FlatSpec, Matchers }
  * Created by pooja on 28/7/15.
  */
 class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with SharedSparkContext {
-  val jsonPath: String = "src/test/resources/campaigns/campaign_config/push_campaign_conf.json"
+  val jsonPath: String = JsonUtils.TEST_RESOURCES + "/campaigns/campaign_config/push_campaign_conf.json"
   val conf1 = new Configuration()
   val fileSystem = FileSystem.get(conf1)
   implicit val formats = net.liftweb.json.DefaultFormats

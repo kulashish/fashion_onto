@@ -237,8 +237,7 @@ object SalesOrderItem {
    * def main(args: Array[String]) {
    * val conf = new SparkConf().setAppName("SparkExamples")
    * Spark.init(conf)
-   * val df1 =Spark.getSqlContext().read.schema(OrderVarSchema.salesOrderItem).format(DataSets.JSON)
-   * .load("src/test/resources/sales_order_item/sales_order_item1.json")
+   * val df1 = JsonUtils.readFromJson("sales_order_item", "sales_order_item1", OrderVarSchema.salesOrderItem)
    * df1.collect.foreach(println)
    * val  x = getSucessfulOrders(df1)
    * df1.collect().foreach(println)
