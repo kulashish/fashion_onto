@@ -55,7 +55,9 @@ object DcfFeedGenerator extends Logging {
 
     val joinedData = convertFeedFormat(pageVisitData,outPath,cmr)
     val changedDateFormat = TimeUtils.changeDateFormat(executeDate,TimeConstants.DATE_FORMAT_FOLDER,TimeConstants.DATE_FORMAT)
-    DataWriter.writeCsv(joinedData,DataSets.DCF_FEED,DataSets.CLICKSTREAM_MERGED_FEED,DataSets.DAILY_MODE, executeDate, DataSets.DCF_FEED_FILENAME+changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ";")
+    val writePath =  DataWriter.getWritePath("/user/rahulaneja/AlchemyTest",DataSets.DCF_FEED,DataSets.CLICKSTREAM_MERGED_FEED,DataSets.DAILY_MODE,executeDate)
+    DataWriter.writeParquet(joinedData,writePath,DataSets.ERROR_SAVEMODE)
+  //  DataWriter.writeCsv(joinedData,DataSets.DCF_FEED,DataSets.CLICKSTREAM_MERGED_FEED,DataSets.DAILY_MODE, executeDate, DataSets.DCF_FEED_FILENAME+changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ";")
   }
 
 
