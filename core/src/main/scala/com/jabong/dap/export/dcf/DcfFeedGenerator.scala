@@ -21,10 +21,11 @@ import org.apache.spark.sql.hive.HiveContext
 object DcfFeedGenerator extends Logging {
 
   def start(params: ParamInfo) {
+    logger.info("dcf feed generation process started")
     val hiveContext = Spark.getHiveContext()
     val executeDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    val clickstreamTable =  OptionUtils.getOptValue(params.input,DataSets.DCF_INPUT_MERGED_HIVE_TABLE)
+    val clickstreamTable = OptionUtils.getOptValue(params.input, DataSets.DCF_INPUT_MERGED_HIVE_TABLE)
     val monthYear = TimeUtils.getMonthAndYear(executeDate, TimeConstants.DATE_FORMAT_FOLDER)
     val month = monthYear.month + 1
     val date = monthYear.day
@@ -32,28 +33,34 @@ object DcfFeedGenerator extends Logging {
     val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
-    //    val monthWithZero = withLeadingZeros(month)
-    //    val dateWithZero = withLeadingZeros(date)
-    //    println("/data/output/extras/device_mapping/full/"+year+"/"+monthWithZero+"/"+dateWithZero)
-    //    val deviceMapping = hiveContext.read.parquet("/data/output/extras/device_mapping/full/"+year+"/"+monthWithZero+"/"+dateWithZero+"/*/")
-    println("deviceMapping" + cmr.count())
 
-    println("SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
-      " where pagetype in ('CPD','QPD','DPD') and date1 = " + date + " and month1 = " + month + " and year1=" + year)
+    val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
+      " where pagetype in ('CPD','QPD','DPD') and userid is not null and date1 = " + date + " and month1 = " + month + " and year1=" + year
 
-    val pageVisitData = hiveContext.sql("SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
-      " where pagetype in ('CPD','QPD','DPD') and userid is not null and date1 = " + date + " and month1 = " + month + " and year1=" + year)
+    logger.info("Running hive query :- " + hiveContext)
 
-    println("pageVisitCount" + pageVisitData.count)
+    val pageVisitData = hiveContext.sql(hiveQuery)
 
     val joinedData = convertFeedFormat(pageVisitData, cmr)
     val changedDateFormat = TimeUtils.changeDateFormat(executeDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
     val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.DAILY_MODE, executeDate)
     DataWriter.writeParquet(joinedData, writePath, saveMode)
-    DataWriter.writeCsv(joinedData,DataSets.DCF_FEED,DataSets.CLICKSTREAM_MERGED_FEED,DataSets.DAILY_MODE, executeDate, DataSets.DCF_FEED_FILENAME+changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ";")
+
+    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.DAILY_MODE, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ";")
+
+    logger.info("dcf feed generation process ended")
   }
 
+  /**
+   * Converts feed into format required by DCF
+   * @param pageVisitData
+   * @param deviceMapping
+   * @return
+   */
   def convertFeedFormat(pageVisitData: DataFrame, deviceMapping: DataFrame): DataFrame = {
+
+    logger.info("joining started :- pagevisit with deviceMapping to get customerId")
+
     val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), "inner")
       .select(
         deviceMapping("id_customer"),
@@ -62,9 +69,12 @@ object DcfFeedGenerator extends Logging {
         pageVisitData("sessionid"),
         pageVisitData("productsku")
       )
+    logger.info("joining ended :- pagevisit with deviceMapping to get customerId")
+
     return joinedData
   }
 
+  // Udf to change date format
   val changeDateFormatValue = udf((date: Timestamp, initialFormat: String, expectedFormat: String) => TimeUtils.changeDateFormat(date: Timestamp, initialFormat: String, expectedFormat: String))
 
 }
