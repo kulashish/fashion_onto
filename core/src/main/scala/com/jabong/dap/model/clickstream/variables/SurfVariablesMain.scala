@@ -4,14 +4,14 @@ import java.io.File
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
-import com.jabong.dap.model.clickstream.utils.{GetMergedClickstreamData, GroupData}
+import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by Divya on 13/7/15.
@@ -112,7 +112,7 @@ object SurfVariablesMain extends java.io.Serializable {
     // variable 1
     var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
     val dMY = TimeUtils.getMonthAndYear(yesterdayDateFolder, TimeConstants.DATE_FORMAT_FOLDER)
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename, dMY.year, dMY.day, dMY.month+1)
+    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename, dMY.year, dMY.day, dMY.month + 1)
     variableSurf1.write.save(surf1VariablePath)
   }
 
@@ -168,7 +168,7 @@ object SurfVariablesMain extends java.io.Serializable {
     // val month = mFormat.format(cal.getTime())
     val dMY = TimeUtils.getMonthAndYear(date, TimeConstants.DATE_FORMAT_FOLDER)
 
-    var pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, dMY.year, dMY.day, dMY.month+1)
+    var pagevisit: DataFrame = GetMergedClickstreamData.mergeAppsWeb(hiveContext, tablename, dMY.year, dMY.day, dMY.month + 1)
 
     //var attributeObj: UserAttribution = new UserAttribution(hiveContext, sqlContext, pagevisit)
     //var userAttributedData: DataFrame = attributeObj.attribute()

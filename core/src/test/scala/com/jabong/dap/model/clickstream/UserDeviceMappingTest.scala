@@ -18,7 +18,7 @@ class UserDeviceMappingTest extends FlatSpec with SharedSparkContext {
     dfOutputUserDeviceMap = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingOutput")
   }
 
- "getUserDeviceMapApp: (null)" should " be null " in {
+  "getUserDeviceMapApp: (null)" should " be null " in {
     var udMap = UserDeviceMapping.getUserDeviceMapApp(null)
     assert(udMap == null)
   }

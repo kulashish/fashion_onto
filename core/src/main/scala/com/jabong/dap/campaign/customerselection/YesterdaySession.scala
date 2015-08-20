@@ -2,12 +2,12 @@ package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ItrVariables, PageVisitVariables}
+import com.jabong.dap.common.constants.variables.{ ItrVariables, PageVisitVariables }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 /**
  * Surf1 - viewed same sku in the actual_visit_id
  * Surf2 - viewed 3 products from same brick in the actual_visit_id
