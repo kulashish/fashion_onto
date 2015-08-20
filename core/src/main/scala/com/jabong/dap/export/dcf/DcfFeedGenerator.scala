@@ -24,7 +24,7 @@ object DcfFeedGenerator extends Logging {
     val hiveContext = Spark.getHiveContext()
     val executeDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    val clickstreamTable = params.source
+    val clickstreamTable = "merge.merge_pagevisit"
     val monthYear = TimeUtils.getMonthAndYear(executeDate, TimeConstants.DATE_FORMAT_FOLDER)
     val month = monthYear.month + 1
     val date = monthYear.day

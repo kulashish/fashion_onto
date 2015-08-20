@@ -140,7 +140,7 @@ object Init {
 
         // dcf feed
 
-      case "dcfFeenGenerate" => new ComponentExecutor().start(params.paramJson)
+      case "dcfFeedGenerate" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }

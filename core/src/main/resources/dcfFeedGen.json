@@ -1,7 +1,7 @@
 {
   "params": [
     {
-      "source": "pricing",
+      "source": "dcffeed",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
