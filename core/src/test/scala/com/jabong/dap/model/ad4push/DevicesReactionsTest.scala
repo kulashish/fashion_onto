@@ -1,7 +1,5 @@
 package com.jabong.dap.model.ad4push
 
-import java.io.File
-
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables._
 import com.jabong.dap.common.json.JsonUtils
@@ -11,8 +9,6 @@ import com.jabong.dap.data.storage.DataSets._
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import org.scalatest.FlatSpec
-
-import scala.collection.mutable.ListBuffer
 
 /**
  * Created by Kapil.Rajak on 13/7/15.
@@ -55,21 +51,6 @@ class DevicesReactionsTest extends FlatSpec with SharedSparkContext {
     val effectiveDFFull = DevicesReactions.effectiveDFFull(DevicesReactions.reduce(incremental), DevicesReactions.reduce(effective7), DevicesReactions.reduce(effective15), DevicesReactions.reduce(effective30))
     val expectedDF = JsonUtils.readFromJson(AD4PUSH, "effectiveDFFull_result", effectiveDF)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
-  }
-
-  "Validation" should "be done" in {
-    val file = JsonUtils.TEST_RESOURCES + File.separator + AD4PUSH + File.separator + "fullSummary_full" + ".json"
-    val lines = scala.io.Source.fromFile(file).mkString
-    val arrayJson = lines.split("\n")
-    var listMaps: ListBuffer[Map[String, Any]] = ListBuffer()
-    for (json <- arrayJson) {
-      val map = json.trim.substring(1, json.length - 1)
-        .split(",")
-        .map(_.split(":"))
-        .map { case Array(k, v) => (k.dropRight(1).drop(1), v filterNot ("\"" contains _)) }
-        .toMap
-      listMaps += map
-    }
   }
 
   "fullSummary: DataFrame" should "match with expected data" in {
