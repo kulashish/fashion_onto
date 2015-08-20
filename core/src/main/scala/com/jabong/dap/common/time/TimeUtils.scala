@@ -354,6 +354,26 @@ object TimeUtils extends Logging {
   }
 
   /**
+   * Overloaded same function with date coming as time stamp
+   * @param dateStamp
+   * @param initialFormat
+   * @param expectedFormat
+   * @return
+   */
+  def changeDateFormat(dateStamp: Timestamp, initialFormat: String, expectedFormat: String): String = {
+    if (dateStamp == null) {
+      return ""
+    } else {
+      val format = new java.text.SimpleDateFormat(initialFormat)
+      //format.setLenient(false)
+      val date = format.parse(dateStamp.toString)
+      val readableDf = new SimpleDateFormat(expectedFormat);
+      //we want to parse date strictly
+      return readableDf.format(date)
+    }
+  }
+
+  /**
    * @param ipDate
    * @param DateFormat
    * @return Weekday Name

@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "dcf_feed",
+      "input" : "merge.merge_pagevisit",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

@@ -137,6 +137,9 @@ object Init {
 
       //pricing sku data
       case "pricingSKUData" => new ComponentExecutor().start(params.paramJson)
+
+        // dcf feed
+      case "dcfFeedGenerate" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }
