@@ -153,7 +153,7 @@ sub upload_ad4push_customer_response {
 }
 
 sub upload_dcf_feed {
-     my $base = "/data/tmp/$date_with_zero/dcf_feed/clickstream_merged_feed";
+     my $base = "/data/export/$date_with_zero/dcf_feed/clickstream_merged_feed";
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 

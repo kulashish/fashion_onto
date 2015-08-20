@@ -2,6 +2,7 @@ package com.jabong.dap.export.dcf
 
 import java.sql.Timestamp
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.{ Spark, OptionUtils }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -60,7 +61,7 @@ object DcfFeedGenerator extends Logging {
 
     logger.info("joining started :- pagevisit with deviceMapping to get customerId")
 
-    val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), "left_outer")
+    val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), SQL.LEFT_OUTER)
       .select(
         deviceMapping("id_customer") as "uid",
         pageVisitData("productsku")  as "sku" ,
