@@ -6,14 +6,12 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.clickstream.utils.GroupData
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.{DataFrame, Row}
 
@@ -34,11 +32,11 @@ object GetSurfVariables extends java.io.Serializable {
   def Surf3Incremental(GroupedData: RDD[(String, Row)], UserObj: GroupData, hiveContext: HiveContext): DataFrame = {
     import hiveContext.implicits._
     val dailyIncremental = GroupedData.filter(v => v._2(UserObj.pagetype) == "CPD" || v._2(UserObj.pagetype) == "DPD" || v._2(UserObj.pagetype) == "QPD")
-      .mapValues(x => (x(UserObj.productsku), x(UserObj.browserid), x(UserObj.domain), x(UserObj.add4push)))
+      .mapValues(x => (x(UserObj.productsku), x(UserObj.browserid), x(UserObj.domain)))
     var today = "_daily"
     var incremental = dailyIncremental.distinct()
       .map(x => (x._1.toString, x._2._1.toString, x._2._2.toString, x._2._3.toString))
-      .toDF(PageVisitVariables.USER_ID + today, PageVisitVariables.SKU + today, PageVisitVariables.DEVICE + today, PageVisitVariables.DOMAIN + today, PageVisitVariables.ADD4PUSH + today)
+      .toDF(PageVisitVariables.USER_ID + today, PageVisitVariables.SKU + today, PageVisitVariables.DEVICE + today, PageVisitVariables.DOMAIN + today)
     return incremental
   }
 
@@ -61,7 +59,7 @@ object GetSurfVariables extends java.io.Serializable {
         .select(PageVisitVariables.USER_ID, PageVisitVariables.SKU, PageVisitVariables.DEVICE + today, PageVisitVariables.DOMAIN + today)
         .withColumnRenamed(PageVisitVariables.DEVICE + today, PageVisitVariables.DEVICE)
         .withColumnRenamed(PageVisitVariables.DOMAIN + today, PageVisitVariables.DOMAIN)
-        .withColumnRenamed(PageVisitVariables.ADD4PUSH + today, PageVisitVariables.ADD4PUSH)
+        // .withColumnRenamed(PageVisitVariables.ADD4PUSH + today, PageVisitVariables.ADD4PUSH)
         .distinct
       return joinResult
     } else {
@@ -70,7 +68,7 @@ object GetSurfVariables extends java.io.Serializable {
         .withColumnRenamed(PageVisitVariables.SKU + today, PageVisitVariables.SKU)
         .withColumnRenamed(PageVisitVariables.DEVICE + today, PageVisitVariables.DEVICE)
         .withColumnRenamed(PageVisitVariables.DOMAIN + today, PageVisitVariables.DOMAIN)
-        .withColumnRenamed(PageVisitVariables.ADD4PUSH + today, PageVisitVariables.ADD4PUSH)
+        // .withColumnRenamed(PageVisitVariables.ADD4PUSH + today, PageVisitVariables.ADD4PUSH)
         .distinct
       return joinResult
     }
@@ -182,17 +180,11 @@ object GetSurfVariables extends java.io.Serializable {
   def listOfProductsViewedInSession(hiveContext: HiveContext, tablename: String, year: Int, day: Int, month: Int): DataFrame = {
     val query = "select " +
       "case when (domain in('android','ios','windows') and userid is null) then concat('_app_',browserid) else userid end as userid, " +
-      "browserid, actualvisitid, domain, collect_list(productsku) as skuList, collect_list(add4push) as add4push_list from " + tablename +
+      "browserid, actualvisitid, domain, collect_list(productsku) as skuList from " + tablename +
       " where year1=" + year + " and month1=" + month + " and date1=" + day + " and browserid is not null and productsku is not null and pagetype in ('CPD','DPD','QPD') and (userid is not null and domain in ('w','m') or domain in ('android','ios','windows'))" +
       "group by userid, browserid, actualvisitid, domain"
     val surf1Variables = hiveContext.sql(query)
-    surf1Variables.select(
-      col(PageVisitVariables.USER_ID),
-      col(PageVisitVariables.ACTUAL_VISIT_ID),
-      col(PageVisitVariables.BROWSER_ID),
-      col(PageVisitVariables.DOMAIN),
-      col(PageVisitVariables.SKU_LIST),
-      explode(Udf.distinctList(col("add4push_list"))) as PageVisitVariables.ADD4PUSH)
+    surf1Variables
   }
 
 }

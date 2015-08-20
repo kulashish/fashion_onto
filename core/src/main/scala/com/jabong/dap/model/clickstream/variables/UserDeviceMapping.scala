@@ -27,7 +27,7 @@ object UserDeviceMapping {
       col(PageVisitVariables.USER_ID), // Taken care in input DF
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
-      col(PageVisitVariables.ADD4PUSH),
+      // col(PageVisitVariables.ADD4PUSH),
       col(PageVisitVariables.PAGE_TIMESTAMP)
     )
       //.filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL") Taken care in input DF
@@ -40,15 +40,15 @@ object UserDeviceMapping {
       .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
       .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
       .agg(
-        max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP,
-        last(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH
+        // last(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
+        max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
       )
 
     return dfuserDeviceMap.select(
       col(PageVisitVariables.USER_ID),
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
-      col(PageVisitVariables.ADD4PUSH),
+      // col(PageVisitVariables.ADD4PUSH),
       col(PageVisitVariables.PAGE_TIMESTAMP)
     )
   }

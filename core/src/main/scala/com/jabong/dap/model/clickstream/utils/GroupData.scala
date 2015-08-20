@@ -19,7 +19,7 @@ class GroupData() extends java.io.Serializable {
   var pagets = 0
   var pagetype = 0
   var brand = 0
-  var add4push = 0
+  // var add4push = 0
   var domain = 0
   var actualvisitid, visitts, uid, browserid, productsku, device, appuid = 0
 
@@ -39,8 +39,8 @@ class GroupData() extends java.io.Serializable {
       col(PageVisitVariables.BRAND),
       col(PageVisitVariables.VISIT_TIMESTAMP),
       col(PageVisitVariables.ACTUAL_VISIT_ID),
-      col(PageVisitVariables.PRODUCT_SKU),
-      col(PageVisitVariables.ADD4PUSH)
+      col(PageVisitVariables.PRODUCT_SKU)
+      // col(PageVisitVariables.ADD4PUSH)
     ).filter("userid is not null")
     //  var useridDeviceidFrame = pagevisit.selectExpr("case when userid is null and domain!='w' and domain!='m' then concat('_app_',browserid) else userid end as appuserid", "*")
 
@@ -80,8 +80,8 @@ class GroupData() extends java.io.Serializable {
         appuid = i
       else if (res(i) == "device")
         device = i
-      else if (res(i) == "add4push")
-        add4push = i
+      // else if (res(i) == "add4push")
+      //   add4push = i
     }
   }
 }
