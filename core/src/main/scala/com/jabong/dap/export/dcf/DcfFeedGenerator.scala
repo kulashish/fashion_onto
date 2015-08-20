@@ -35,7 +35,7 @@ object DcfFeedGenerator extends Logging {
     val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
 
     val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
-      " where pagetype in ('CPD','QPD','DPD') and userid is not null and date1 = " + date + " and month1 = " + month + " and year1=" + year
+      " where pagetype in ('CPD','QPD','DPD') and date1 = " + date + " and month1 = " + month + " and year1=" + year
 
     logger.info("Running hive query :- " + hiveContext)
 
@@ -47,7 +47,7 @@ object DcfFeedGenerator extends Logging {
 
     DataWriter.writeParquet(joinedData, writePath, saveMode)
 
-    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat, DataSets.ERROR_SAVEMODE, "true", ",")
+    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat+"_1", DataSets.ERROR_SAVEMODE, "true", ",")
 
     logger.info("dcf feed generation process ended")
   }
@@ -66,7 +66,7 @@ object DcfFeedGenerator extends Logging {
       .select(
         deviceMapping("id_customer") as "uid",
         pageVisitData("productsku")  as "sku" ,
-        changeDateFormatValue(pageVisitData("pagets"), lit("yyyy-MM-dd HH:mm:ss.SSS"), lit("yyyy-MM-dd'T' HH:mm:ss'Z'")) as "date_created",
+        changeDateFormatValue(pageVisitData("pagets"), lit("yyyy-MM-dd HH:mm:ss.SSS"), lit("yyyy-MM-dd'T'HH:mm:ss'Z'")) as "date_created",
         pageVisitData("sessionid") as "sessionId"
       )
     logger.info("joining ended :- pagevisit with deviceMapping to get customerId")
