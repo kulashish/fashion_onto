@@ -1,11 +1,11 @@
 package com.jabong.dap.model.clickstream
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.clickstream.utils.UserAttribution
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**

@@ -1,9 +1,9 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -20,7 +20,7 @@ class ReturnReTargetTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     returnReTarget = new ReturnReTarget()
-    orderItemDataFrame = JsonUtils.readFromJson(DataSets.SALES_ORDER,"sales_order_with_item")
+    orderItemDataFrame = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order_with_item")
     // testDataFrame = JsonUtils.readFromJson("sales_cart", "SalesCartEmpty")
   }
 

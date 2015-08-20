@@ -1,13 +1,13 @@
 package com.jabong.dap.model.clickstream
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.clickstream.utils.{GroupData, UserAttribution}
+import com.jabong.dap.model.clickstream.utils.{ GroupData, UserAttribution }
 import com.jabong.dap.model.clickstream.variables.GetSurfVariables
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
