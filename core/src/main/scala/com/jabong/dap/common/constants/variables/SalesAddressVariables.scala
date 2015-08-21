@@ -11,7 +11,7 @@ object SalesAddressVariables {
   val COUNTRY = "country"
   val PHONE = "phone"
   val MOBILE = "mobile"
-  val FIRST_NAME = "first_name"
-  val LAST_NAME = "last_name"
+  val SOA_FIRST_NAME = "soa_first_name"
+  val SOA_LAST_NAME = "soa_last_name"
 
 }
