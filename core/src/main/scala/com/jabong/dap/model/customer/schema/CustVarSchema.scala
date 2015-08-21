@@ -18,7 +18,7 @@ object CustVarSchema {
 
   val accRegDateAndUpdatedAt = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
+    StructField(CustomerVariables.REG_DATE, TimestampType, true),
     StructField(CustomerVariables.UPDATED_AT, TimestampType, true)
   ))
 
@@ -48,9 +48,9 @@ object CustVarSchema {
     StructField(NewsletterVariables.NL_SUB_DATE, TimestampType, true),
     StructField(NewsletterVariables.UNSUB_KEY, StringType, true),
     StructField(CustomerVariables.AGE, IntegerType, true),
-    StructField(CustomerVariables.ACC_REG_DATE, TimestampType, true),
-    StructField(CustomerVariables.MAX_UPDATED_AT, TimestampType, true),
-    StructField(CustomerVariables.EMAIL_OPT_IN_STATUS, StringType, true)
+    StructField(CustomerVariables.REG_DATE, TimestampType, true),
+    StructField(CustomerVariables.LAST_UPDATED_AT, TimestampType, true),
+    StructField(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS, StringType, true)
   ))
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

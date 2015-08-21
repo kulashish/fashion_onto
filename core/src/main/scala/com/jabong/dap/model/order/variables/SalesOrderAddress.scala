@@ -24,8 +24,8 @@ object SalesOrderAddress {
       SalesOrderVariables.FK_CUSTOMER,
       SalesAddressVariables.CITY,
       SalesAddressVariables.PHONE,
-      SalesAddressVariables.FIRST_NAME,
-      SalesAddressVariables.LAST_NAME
+      SalesAddressVariables.SOA_FIRST_NAME,
+      SalesAddressVariables.SOA_LAST_NAME
     )
       .withColumnRenamed(SalesAddressVariables.PHONE, SalesAddressVariables.MOBILE)
 

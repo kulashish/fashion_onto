@@ -11,8 +11,11 @@ object DataSets {
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
   val SALES_ORDER_ADDRESS = "sales_order_address"
+  val SALES_ORDER_ADDRESS_FULL = "sales_order_address_full"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
+  val ZONE_CITY = "zone_city"
+  val DCF = "dcf"
 
   //customer
   val RESULT_CUSTOMER_INCREMENTAL = "result_customer_incremental"
@@ -21,6 +24,7 @@ object DataSets {
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
   val CUSTOMER_SEGMENTS = "customer_segments"
+  val CUSTOMER_SEGMENTS_FULL = "customer_segments_full"
   val CUSTOMER_PRODUCT_SHORTLIST = "customer_product_shortlist"
   val RESULT_CUSTOMER_PRODUCT_SHORTLIST = "result_customer_product_shortlist"
 
@@ -130,4 +134,6 @@ object DataSets {
   val CUSTOMER_FULL = "customer_full"
   val SALES_ORDER_FULL = "sales_order"
   val CONTACT_LIST_MOBILE = "contact_list_mobile"
+  val CUSTOMER_LIST_MOBILE_FULL = "customer_list_mobile_full"
+  val CUSTOMER_LIST_MOBILE = "customer_list_mobile"
 }
