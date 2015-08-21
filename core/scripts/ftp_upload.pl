@@ -163,8 +163,8 @@ sub upload_dcf_feed {
 
      system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen_1.csv $base/");
 
-     dcf_file_format_change("webhistory_$date_with_hiphen_1.csv","webhistory_$date_with_hiphen.csv");
-     print("gzip $base/webhistory_$date_with_hiphen.csv/\n");
+     dcf_file_format_change("$base/webhistory_$date_with_hiphen_1.csv","$base/webhistory_$date_with_hiphen.csv");
+     print("gzip $base/webhistory_$date_with_hiphen.csv\n");
      system("gzip $base/webhistory_$date_with_hiphen.csv");
 
      system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
