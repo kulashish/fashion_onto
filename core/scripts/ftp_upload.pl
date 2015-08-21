@@ -159,9 +159,9 @@ sub upload_dcf_feed {
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 
-     print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen_1.csv $base/\n";
+     print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/\n";
 
-     system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen_1.csv $base/");
+     system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/");
 
      dcf_file_format_change("$base/webhistory_$date_with_hiphen_1.csv","$base/webhistory_$date_with_hiphen.csv");
      print("gzip $base/webhistory_$date_with_hiphen.csv\n");
