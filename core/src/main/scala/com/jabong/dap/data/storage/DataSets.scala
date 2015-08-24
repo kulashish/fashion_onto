@@ -115,4 +115,7 @@ object DataSets {
   val DCF_FEED = "dcf_feed"
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"
+  
+  //Campaign Quality
+  val CAMPAIGN_QUALITY = "campaign_quality"
 }
