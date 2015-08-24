@@ -31,32 +31,7 @@ object CampaignQualityEntry extends Logging {
         status = false
       }
     }
-    //    if (!ReturnReTargetQuality.backwardTest(incrDate, fraction)) {
-    //      logger.info("ReturnReTargetQuality failed for:-" + incrDate)
-    //      status = false
-    //    }
-    //    if (!CancelReTargetQuality.backwardTest(incrDate, fraction)) {
-    //      logger.info("CancelReTargetQuality failed for:-" + incrDate)
-    //      status = false
-    //    }
-    //    if (!ACartPushCampaignQuality.backwardTest(incrDate, fraction)) {
-    //      logger.info("ACartPushCampaignQuality failed for:-" + incrDate)
-    //      status = false
-    //    }
-    //    if (!WishlistCampaignQuality.backwardTest(incrDate, fraction)) {
-    //      logger.info("WishlistCampaignQuality failed for:-" + incrDate)
-    //      status = false
-    //    }
-    //    if (!InvalidFollowupQuality.backwardTest(incrDate, fraction)) {
-    //      logger.info("InvalidFollowupQuality failed for " + incrDate)
-    //      status = false
-    //    }
-    //
-    //    if (!InvalidLowStockQuality.backwardTest(incrDate, fraction)) {
-    //      logger.info("InvalidLowStockQuality failed for " + incrDate)
-    //      status = false
-    //    }
-
+   // if status is false means :- at least one of the campaign quality check has failed, Please check the log to actually see which campaign has failed
     if (status == false) {
       throw new FailedStatusException
     }
