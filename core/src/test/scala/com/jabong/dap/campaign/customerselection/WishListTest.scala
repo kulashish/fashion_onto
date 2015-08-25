@@ -1,9 +1,10 @@
 package com.jabong.dap.campaign.customerselection
 
+import java.io.File
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -24,8 +25,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
     wishlist = new WishList()
-    //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_product_shortlist")
-    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.CUSTOMER_PRODUCT_SHORTLIST, Schema.customerProductShortlist)
+    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.CUSTOMER_PRODUCT_SHORTLIST, Schema.customerProductShortlist)
 
   }
 
@@ -70,9 +70,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
       .limit(30).collect().toSet
 
-    //                                      result.limit(30).write.json(DataSets.TEST_RESOURCES + DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST + ".json")
-
-    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
       .limit(30).collect().toSet
 
     assert(result.equals(dfCustomerProductShortlistResult))

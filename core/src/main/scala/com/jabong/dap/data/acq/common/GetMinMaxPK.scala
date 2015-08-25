@@ -26,11 +26,11 @@ object GetMinMaxPK extends Logging {
       "SELECT MIN(%s), MAX(%s) FROM %s AS t1 %s".format(tablePrimaryKey, tablePrimaryKey, tableName, condition)
     } else {
       dbc.driver match {
-        case "mysql" => {
+        case DataSets.MYSQL => {
           "SELECT MIN(t.%s), MAX(t.%s) FROM (SELECT * FROM %s AS t1 %s ORDER BY %s desc LIMIT %s ) AS t".
             format(tablePrimaryKey, tablePrimaryKey, tableName, condition, tablePrimaryKey, limit)
         }
-        case "sqlserver" => {
+        case DataSets.SQLSERVER => {
           "SELECT MIN(t.%s), MAX(t.%s) FROM (SELECT TOP %s * FROM %s AS t1 %s ORDER BY %s desc) AS t".
             format(tablePrimaryKey, tablePrimaryKey, limit, tableName, condition, tablePrimaryKey)
         }

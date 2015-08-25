@@ -134,6 +134,12 @@ object Init {
 
       //campaign quality check
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.startMobilePushCampaignQuality(params.pushCampaignsJson)
+
+      //pricing sku data
+      case "pricingSKUData" => new ComponentExecutor().start(params.paramJson)
+
+      // dcf feed
+      case "dcfFeedGenerate" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }

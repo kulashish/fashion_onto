@@ -81,6 +81,7 @@ case class MergeInfo(
 
 case class ParamInfo(
   source: String,
+  input: Option[String],
   fullDate: Option[String],
   incrDate: Option[String],
   path: Option[String],

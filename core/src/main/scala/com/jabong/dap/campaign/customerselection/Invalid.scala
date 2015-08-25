@@ -32,7 +32,7 @@ class Invalid extends LiveCustomerSelector with Logging {
     }
     // FIXME: need to for last day 0 to 24
     // FIXME: filter need to also have <=
-    // val daysAfter = TimeUtils.getDateAfterNDays(-ndays,"yyyy-MM-dd HH:mm:ss.S")
+    // val daysAfter = TimeUtils.getDateAfterNDays(-ndays,TimeConstants.DATE_TIME_FORMAT)
     //val lastDaysSalesItemData = salesOrderItemData.filter(SalesOrderItemVariables.UPDATED_AT + " >= '" + daysAfter+"'")
 
     //val lastDaysSalesItemData = salesOrderItemData

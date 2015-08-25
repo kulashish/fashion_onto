@@ -3,6 +3,8 @@ package com.jabong.dap.model.custorder
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.export.SkuData
+import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.customer.ContactListMobile
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
@@ -51,6 +53,8 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.AD4PUSH => DevicesReactions.start(paramJob)
           case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(paramJob)
           case DataSets.BASIC_ITR => BasicITR.start(paramJob, isHistory)
+          case DataSets.PRICING => SkuData.start(paramJob)
+          case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
           case "contactListMobileCSV" => ContactListMobile.start(paramJob)
           case _ => logger.error("Unknown source.")
         }

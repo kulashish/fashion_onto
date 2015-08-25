@@ -213,8 +213,8 @@ object CampaignProcessor {
       val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGN, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
-      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGN, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
+      DataWriter.writeCsv(iosSplitDF, DataSets.CAMPAIGNS, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
+      DataWriter.writeCsv(androidSplitDF, DataSets.CAMPAIGNS, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
     }
   }
 
@@ -247,9 +247,9 @@ object CampaignProcessor {
     //    dfResult.show(10)
 
     //    val path = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date)
-    //    val csvFullPath = path + "/" + fileName
+    //    val csvFullPath = path + File.separator + fileName
 
-    DataWriter.writeCsv(dfResult, DataSets.CAMPAIGN, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
+    DataWriter.writeCsv(dfResult, DataSets.CAMPAIGNS, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
   }
 
 }

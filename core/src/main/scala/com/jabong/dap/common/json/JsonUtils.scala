@@ -3,6 +3,7 @@ package com.jabong.dap.common.json
 import java.io.File
 
 import com.jabong.dap.common.Spark
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
@@ -21,7 +22,7 @@ object JsonUtils {
     val df = Spark.getSqlContext().read.parquet(parquetFilePath + File.separator)
 
     val srcFile = TEST_RESOURCES + File.separator + fileName + ".json"
-    df.select("*").coalesce(1).write.format("json").json(srcFile)
+    df.select("*").coalesce(1).write.format(DataSets.JSON).json(srcFile)
 
     val destFile = TEST_RESOURCES + File.separator + jsonFilePath + File.separator + fileName + ".json"
     DataVerifier.rename(srcFile + "/part-00000", destFile)
@@ -34,7 +35,7 @@ object JsonUtils {
     val df = Spark.getSqlContext().read.parquet(parquetFilePath + File.separator + fileName + File.separator)
 
     val srcFile = TEST_RESOURCES + File.separator + fileName + ".json"
-    df.filter(filterCond).select("*").coalesce(1).write.format("json").json(srcFile)
+    df.filter(filterCond).select("*").coalesce(1).write.format(DataSets.JSON).json(srcFile)
 
     val destFile = jsonFilePath + File.separator + fileName + ".json"
     DataVerifier.rename(srcFile + "/part-00000", destFile)
@@ -42,7 +43,7 @@ object JsonUtils {
 
   //read Json file
   def readFromJson(directoryName: String, fileName: String, schema: StructType): DataFrame = {
-    val df = Spark.getSqlContext().read.schema(schema).format("json")
+    val df = Spark.getSqlContext().read.schema(schema).format(DataSets.JSON)
       .load(TEST_RESOURCES + File.separator + directoryName + File.separator + fileName + ".json")
     df
   }
@@ -54,7 +55,6 @@ object JsonUtils {
   }
 
   def jsonsFile2ArrayOfMap(directoryName: String, fileName: String): List[Map[String, String]] = {
-    val TEST_RESOURCES = "src" + File.separator + "test" + File.separator + "resources"
     val file = TEST_RESOURCES + File.separator + directoryName + File.separator + fileName + ".json"
     val lines = scala.io.Source.fromFile(file).mkString
     val arrayJson = lines.split("\n")

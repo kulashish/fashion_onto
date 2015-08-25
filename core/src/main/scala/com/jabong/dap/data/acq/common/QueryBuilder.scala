@@ -43,7 +43,7 @@ object QueryBuilder {
     val primaryKey = tableInfo.primaryKey
 
     driver match {
-      case "sqlserver" =>
+      case DataSets.SQLSERVER =>
         val limitString = if (limit != null && primaryKey != null) {
           ("TOP %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
         } else if (limit != null && primaryKey == null) {
@@ -53,7 +53,7 @@ object QueryBuilder {
         }
         "(SELECT %s t1.* %s FROM %s AS t1 %s %s %s) AS t".format(limitString._1, joinSelect, tableName, joinFrom,
           condition, limitString._2)
-      case "mysql" =>
+      case DataSets.MYSQL =>
         val limitString = if (limit != null) {
           ("LIMIT %s".format(limit), "ORDER BY %s DESC".format(primaryKey))
         } else {

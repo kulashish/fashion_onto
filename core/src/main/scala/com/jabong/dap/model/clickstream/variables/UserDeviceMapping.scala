@@ -1,10 +1,9 @@
 package com.jabong.dap.model.clickstream.variables
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.variables.PageVisitVariables
+import com.jabong.dap.common.udf.Udf
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import com.jabong.dap.common.udf.{ Udf, UdfUtils }
-import org.apache.spark.sql.{ DataFrame, Row }
-import com.jabong.dap.common.constants.variables.{ PageVisitVariables }
 
 object UserDeviceMapping {
 
