@@ -88,7 +88,7 @@ object Customer {
       )
       .join(udfCPOT, dfCustomer(CustomerVariables.ID_CUSTOMER) === udfCPOT(CustomerVariables.FK_CUSTOMER_CPOT), SQL.FULL_OUTER)
 
-    //Name of variable: EMAIL_OPT_IN_STATUS
+    //Name of variable: EMAIL_SUBSCRIPTION_STATUS
     val udfEmailOptInStatus = udf((nls_email: String, status: String) => getEmailOptInStatus(nls_email: String, status: String))
 
     /*        Name of variables:
@@ -114,9 +114,9 @@ object Customer {
                                AGE,
                                ACC_REG_DATE,
                                MAX_UPDATED_AT,
-                               EMAIL_OPT_IN_STATUS,
+                               EMAIL_SUBSCRIPTION_STATUS,
                                */
-    val dfResult = dfJoin.select(
+    val dfInc = dfJoin.select(
       col(CustomerVariables.ID_CUSTOMER),
       col(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE),
       col(CustomerVariables.STORE_CREDITS_AVAILABLE),
@@ -141,7 +141,7 @@ object Customer {
       Udf.minTimestamp(
         dfJoin(CustomerVariables.CREATED_AT),
         dfJoin(NewsletterVariables.NLS_CREATED_AT)
-      ) as CustomerVariables.ACC_REG_DATE,
+      ) as CustomerVariables.REG_DATE,
 
       Udf.maxTimestamp(
         dfJoin(CustomerVariables.UPDATED_AT),
@@ -150,20 +150,20 @@ object Customer {
           dfJoin(SalesOrderVariables.SO_UPDATED_AT)
         )
       )
-        as CustomerVariables.MAX_UPDATED_AT,
+        as CustomerVariables.LAST_UPDATED_AT,
 
       udfEmailOptInStatus(
         dfJoin(NewsletterVariables.NLS_EMAIL),
         dfJoin(NewsletterVariables.STATUS)
-      ) as CustomerVariables.EMAIL_OPT_IN_STATUS
+      ) as CustomerVariables.EMAIL_SUBSCRIPTION_STATUS
     )
 
-    var dfFull: DataFrame = null
+    var dfFull: DataFrame = dfInc
 
     if (null != dfPrevVarFull) {
 
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfResult, dfPrevVarFull, CustomerVariables.ID_CUSTOMER)
+      val joinDF = MergeUtils.joinOldAndNewDF(dfInc, dfPrevVarFull, CustomerVariables.ID_CUSTOMER)
 
       //merge old and new data frame
       dfFull = joinDF.select(
@@ -205,18 +205,19 @@ object Customer {
 
         Udf.latestInt(joinDF(CustomerVariables.AGE), joinDF(CustomerVariables.NEW_ + CustomerVariables.AGE)) as CustomerVariables.AGE,
 
-        Udf.minTimestamp(joinDF(CustomerVariables.ACC_REG_DATE), joinDF(CustomerVariables.NEW_ + CustomerVariables.ACC_REG_DATE)) as CustomerVariables.ACC_REG_DATE,
+        Udf.minTimestamp(joinDF(CustomerVariables.REG_DATE), joinDF(CustomerVariables.NEW_ + CustomerVariables.REG_DATE)) as CustomerVariables.REG_DATE,
 
-        Udf.maxTimestamp(joinDF(CustomerVariables.MAX_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.MAX_UPDATED_AT)) as CustomerVariables.MAX_UPDATED_AT,
+        Udf.maxTimestamp(joinDF(CustomerVariables.LAST_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
 
-        Udf.latestString(joinDF(CustomerVariables.EMAIL_OPT_IN_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_OPT_IN_STATUS)) as CustomerVariables.EMAIL_OPT_IN_STATUS
+        Udf.latestString(joinDF(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_SUBSCRIPTION_STATUS)) as CustomerVariables.EMAIL_SUBSCRIPTION_STATUS
       )
     }
 
-    (dfResult, dfFull)
+    (dfInc, dfFull)
   }
 
   /**
+   * EMAIL_SUBSCRIPTION_STATUS
    * iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
    * @param nls_email
    * @param status

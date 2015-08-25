@@ -199,7 +199,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getMvpAndSeg: Data Frame dfCustomerSegments" should "null" in {
 
-    val result = CustomerSegments.getMvpAndSeg(null)
+    val result = CustomerSegments.getCustomerSegments(null)
 
     assert(result == null)
 
@@ -208,7 +208,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   "getMvpAndSeg: schema attributes and data type" should
     "match into DataFrame(dfCSH)" in {
 
-      val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
+      val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
 
       assert(result != null)
 
@@ -216,7 +216,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
+    val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
       .limit(30).collect().toSet
 
     //                        result.limit(30).write.json(DataSets.TEST_RESOURCES + "mvp_seg" + ".json")

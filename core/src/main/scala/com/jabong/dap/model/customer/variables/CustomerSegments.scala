@@ -5,8 +5,8 @@ import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ IntegerType, StringType, StructField, StructType }
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by raghu on 25/6/15.
@@ -19,7 +19,7 @@ object CustomerSegments {
 
   //Name of variable: fk_customer, MVP, Segment0, Segment1,Segment2, Segment3, Segment4, Segment5, Segment6
   //calculate mvp_score and  latest updated value of mvp_score from customer_segments
-  def getMvpAndSeg(dfCustomerSegments: DataFrame): DataFrame = {
+  def getCustomerSegments(dfCustomerSegments: DataFrame): (DataFrame) = {
 
     if (dfCustomerSegments == null) {
 
@@ -37,25 +37,24 @@ object CustomerSegments {
 
     }
 
-    val dfCustSegVars = dfCustomerSegments.select(
+    val dfInc = dfCustomerSegments.select(
       CustomerSegmentsVariables.FK_CUSTOMER,
       CustomerSegmentsVariables.UPDATED_AT,
       CustomerSegmentsVariables.MVP_SCORE,
-      CustomerSegmentsVariables.SEGMENT
+      CustomerSegmentsVariables.SEGMENT,
+      CustomerSegmentsVariables.DISCOUNT_SCORE
     )
-      .sort(
-        col(CustomerSegmentsVariables.FK_CUSTOMER),
-        desc(CustomerSegmentsVariables.FK_CUSTOMER)
-      )
+      .sort(desc(CustomerSegmentsVariables.UPDATED_AT))
       .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
-        first(CustomerSegmentsVariables.MVP_SCORE),
-        first(CustomerSegmentsVariables.SEGMENT)
+        first(CustomerSegmentsVariables.MVP_SCORE) as CustomerSegmentsVariables.MVP_TYPE,
+        first(CustomerSegmentsVariables.SEGMENT),
+        first(CustomerSegmentsVariables.DISCOUNT_SCORE)
       )
 
     //    val segments = getSeg(dfCustSegVars)
 
-    dfCustSegVars
+    (dfInc)
   }
 
   def getSeg(dfCustSegVars: DataFrame): DataFrame = {

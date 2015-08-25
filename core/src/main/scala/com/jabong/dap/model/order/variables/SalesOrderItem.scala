@@ -163,11 +163,13 @@ object SalesOrderItem {
    * @param salesOrderItem
    * @return
    */
-  def getSucessfulOrders(salesOrderItem: DataFrame): DataFrame = {
-    val sucessOrders = salesOrderItem.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+  def getSucessfullOrders(salesOrderFull: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+
+    val dfJoin = salesOrderFull.join(salesOrderItem, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER))
+
+    val sucessOrders = dfJoin.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
     val res = sucessOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
-    res.printSchema()
-    res.show(5)
+
     res
   }
 
@@ -240,6 +242,7 @@ object SalesOrderItem {
    * val df1 = JsonUtils.readFromJson("sales_order_item", "sales_order_item1", OrderVarSchema.salesOrderItem)
    * df1.collect.foreach(println)
    * val  x = getSucessfulOrders(df1)
+   *
    * df1.collect().foreach(println)
    *
    * }
