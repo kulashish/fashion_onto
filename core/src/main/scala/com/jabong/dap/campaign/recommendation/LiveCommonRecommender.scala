@@ -5,13 +5,14 @@ import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.{DataFrame}
 import org.apache.spark.sql.types._
 
 /**
  * Created by jabong1145 on 21/8/15.
  */
-class LiveCommonRecommender extends BasicRecommender {
+class LiveCommonRecommender extends BasicRecommender with Logging {
 
   override def generateRecommendation(orderItemFullData: DataFrame,yesterdayItr: DataFrame): DataFrame = {
     val dataFrameSchema = StructType(Array(
@@ -22,8 +23,11 @@ class LiveCommonRecommender extends BasicRecommender {
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
     val topProducts = topProductsSold(orderItemFullData, 30)
+    println("top products count:-" +topProducts.count)
     val skuData = skuCompleteData(topProducts,yesterdayItr)
+    println("sku complete data:-" +skuData.count)
     val recommendedSkus = genRecommend(skuData,pivotKeys,dataFrameSchema)
+    println("rec skus data:-" +recommendedSkus.count)
     val outPath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH,DataSets.RECOMMENDATIONS,DataSets.BRICK_MVP_RECOMMENDATIONS,DataSets.DAILY_MODE,TimeUtils.YESTERDAY_FOLDER)
     DataWriter.writeParquet(recommendedSkus,outPath,DataSets.ERROR_SAVEMODE)
     return recommendedSkus
