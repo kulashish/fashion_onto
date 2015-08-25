@@ -31,7 +31,9 @@ object CampaignUtils extends Logging {
         skuData(CustomerVariables.FK_CUSTOMER),
         skuData(ProductVariables.SPECIAL_PRICE)
       )
-    val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+    val customerRefSku = customerFilteredData
+      //.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1))
 
@@ -51,7 +53,8 @@ object CampaignUtils extends Logging {
 
     // null or 0 FK_CUSTOMER
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
-      .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(PageVisitVariables.BROWSER_ID).agg(
         first(ProductVariables.SKU) as (CampaignMergedFields.REF_SKU1),
         first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
@@ -66,7 +69,8 @@ object CampaignUtils extends Logging {
     // non zero FK_CUSTOMER
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
-      .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1),
         first(PageVisitVariables.BROWSER_ID) as "device_id",
@@ -86,7 +90,7 @@ object CampaignUtils extends Logging {
 
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
-    import sqlContext.implicits._
+    //    import sqlContext.implicits._
 
     if (refSkuData == null || NumberSku <= 0) {
       return null
