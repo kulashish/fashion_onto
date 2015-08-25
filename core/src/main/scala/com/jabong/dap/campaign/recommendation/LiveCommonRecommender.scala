@@ -22,8 +22,8 @@ class LiveCommonRecommender extends BasicRecommender {
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
     val topProducts = topProductsSold(orderItemFullData, 30)
-    val skuCompleteData = skuCompleteData(topProducts,yesterdayItr)
-    val recommendedSkus = genRecommend(skuCompleteData,pivotKeys,dataFrameSchema)
+    val skuData = skuCompleteData(topProducts,yesterdayItr)
+    val recommendedSkus = genRecommend(skuData,pivotKeys,dataFrameSchema)
     val outPath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH,DataSets.RECOMMENDATIONS,DataSets.BRICK_MVP_RECOMMENDATIONS,DataSets.DAILY_MODE,TimeUtils.YESTERDAY_FOLDER)
     DataWriter.writeParquet(recommendedSkus,outPath,DataSets.ERROR_SAVEMODE)
     return recommendedSkus
