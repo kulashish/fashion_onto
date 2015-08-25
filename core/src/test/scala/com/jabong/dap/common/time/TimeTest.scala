@@ -174,7 +174,7 @@ class TimeTest extends FlatSpec with Matchers {
   }
 
   "changeDateFormat" should "return empty string" in {
-    val ts:String = null
+    val ts: String = null
     TimeUtils.changeDateFormat(ts, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER) should be ("")
   }
 
