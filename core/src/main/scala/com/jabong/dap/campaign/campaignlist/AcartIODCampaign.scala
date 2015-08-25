@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.campaignlist
 
-import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -34,7 +34,8 @@ class AcartIODCampaign {
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_IOD_CAMPAIGN)
     val commonRecommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
-    commonRecommender.generateRecommendation(last30DaySalesOrderItemData,last30daysItrData)
+    val yesterdaySkuData = CampaignInput.loadYesterdayItrSkuData()
+    commonRecommender.generateRecommendation(last30DaySalesOrderItemData,yesterdaySkuData)
     //save campaign Output
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_IOD_CAMPAIGN)
 
