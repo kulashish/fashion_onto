@@ -93,7 +93,7 @@ object Surf6Quality extends BaseCampaignQuality with Logging {
    * @return
    */
   def backwardTest(date: String, fraction: Double): Boolean = {
-    val (surf6Data, surf6Campaign, itr) = getInputOutput(date)
+    val (surf6Data, surf6Campaign) = getInputOutput(date)
     val surf6CampaignRetargetDF = getSample(surf6Campaign, fraction)
     validate(surf6Data, surf6CampaignRetargetDF)
   }
