@@ -1,14 +1,12 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, CustomerSegmentsVariables }
+import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ IntegerType, StringType, StructField, StructType }
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by raghu on 25/6/15.
@@ -46,7 +44,7 @@ object CustomerSegments {
       CustomerSegmentsVariables.SEGMENT,
       CustomerSegmentsVariables.DISCOUNT_SCORE
     )
-      .sort(desc(CustomerSegmentsVariables.FK_CUSTOMER))
+      .sort(desc(CustomerSegmentsVariables.UPDATED_AT))
       .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
         first(CustomerSegmentsVariables.MVP_SCORE) as CustomerSegmentsVariables.MVP_TYPE,

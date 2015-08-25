@@ -163,7 +163,7 @@ object SalesOrderItem {
    * @param salesOrderItem
    * @return
    */
-  def getSucessfulOrders(salesOrderFull: DataFrame, salesOrderItem: DataFrame): DataFrame = {
+  def getSucessfullOrders(salesOrderFull: DataFrame, salesOrderItem: DataFrame): DataFrame = {
 
     val dfJoin = salesOrderFull.join(salesOrderItem, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER))
 
@@ -242,6 +242,7 @@ object SalesOrderItem {
    * val df1 = JsonUtils.readFromJson("sales_order_item", "sales_order_item1", OrderVarSchema.salesOrderItem)
    * df1.collect.foreach(println)
    * val  x = getSucessfulOrders(df1)
+   *
    * df1.collect().foreach(println)
    *
    * }

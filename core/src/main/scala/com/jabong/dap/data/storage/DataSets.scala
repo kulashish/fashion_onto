@@ -5,8 +5,6 @@ package com.jabong.dap.data.storage
  */
 object DataSets {
 
-  val EXTRAS = "extras"
-
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
@@ -38,12 +36,6 @@ object DataSets {
   //PaybackCustomer
   val SALES_ORDER_PAYBACK_EARN = "sales_order_payback_earn"
   val SALES_ORDER_PAYBACK_REDEEM = "sales_order_payback_redeem"
-
-  //Clickstream
-  val CLICKSTREAM = "clickstream"
-
-  //Ad4Push customer response
-  val AD4PUSH = "ad4push"
 
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
@@ -102,23 +94,29 @@ object DataSets {
   val NEXTBEE = "nextbee"
 
   val DEVICE_MAPPING = "device_mapping"
-  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
+  // Data Outputs
+  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
   val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
   val BASIC_ITR = "basicITR"
-
+  //Ad4Push customer response
+  val AD4PUSH = "ad4push"
+  //Clickstream
+  val CLICKSTREAM = "clickstream"
   val CAMPAIGNS = "campaigns"
+  val DCF_FEED = "dcf_feed"
+  val EXTRAS = "extras"
+
+  val VARIABLES = "variables"
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
 
   //DCF FEEDS
   val DCF_INPUT_MERGED_HIVE_TABLE = "merge.merge_pagevisit"
-  val DCF_FEED = "dcf_feed"
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"
+  val DND = "DND"
 
-  val VARIABLES = "variables"
-  // val CONTACT_LIST_MOBILE = "contact_list_mobile"
-  val CUSTOMER_LIST_MOBILE = "customer_list_mobile"
+  val CONTACT_LIST_MOBILE = "contact_list_mobile"
 }
