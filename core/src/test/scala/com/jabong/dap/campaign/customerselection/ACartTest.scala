@@ -1,9 +1,9 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{ DataFrame, SQLContext }
+import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
 /**
@@ -11,7 +11,7 @@ import org.scalatest.FlatSpec
  */
 class ACartTest extends FlatSpec with SharedSparkContext {
 
-  @transient var sqlContext: SQLContext = _
+  //  @transient var sqlContext: SQLContext = _
   @transient var testDataFrame: DataFrame = _
   @transient var salesCartOld: DataFrame = _
   @transient var salesCartData: DataFrame = _
@@ -23,7 +23,7 @@ class ACartTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    sqlContext = Spark.getSqlContext()
+    // sqlContext = Spark.getSqlContext()
     cartCampaign = new ACart()
     salesCartOld = JsonUtils.readFromJson(DataSets.SALES_CART, "CustomerOrderHistory")
     salesCartData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/acart_campaigns", "sales_cart")
