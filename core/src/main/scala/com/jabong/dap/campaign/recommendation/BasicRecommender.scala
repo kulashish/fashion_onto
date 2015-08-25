@@ -56,7 +56,7 @@ class BasicRecommender extends Recommender {
     if (lastDaysData.count() == 0) {
       return null
     }
-    val groupedSku = lastDaysData.withColumn(SalesOrderItemVariables.SKU, Udf.skuFromSimpleSku(lastDaysData(SalesOrderItemVariables.SKU))).groupBy(SalesOrderItemVariables.SKU)
+    val groupedSku = lastDaysData.withColumn("actual_sku", Udf.skuFromSimpleSku(lastDaysData(SalesOrderItemVariables.SKU))).groupBy("actual_sku")
       //.agg($"actual_sku", count("created_at") as "quantity", max("created_at") as "last_sold_date")
       .agg(count(SalesOrderItemVariables.CREATED_AT) as "quantity", max(SalesOrderItemVariables.CREATED_AT) as "last_sold_date")
 
@@ -68,7 +68,7 @@ class BasicRecommender extends Recommender {
       return null
     }
     // import sqlContext.implicits._
-    val RecommendationInput = topSku.join(SkuCompleteData, topSku(SalesOrderItemVariables.SKU).equalTo(SkuCompleteData(ProductVariables.SKU)), SQL.INNER)
+    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData(ProductVariables.SKU)), SQL.INNER)
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, "quantity", "last_sold_date")
 
