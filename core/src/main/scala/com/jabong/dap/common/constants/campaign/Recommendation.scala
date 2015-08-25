@@ -5,4 +5,6 @@ package com.jabong.dap.common.constants.campaign
  */
 object Recommendation {
 
+
+  val  LIVE_COMMON_RECOMMENDER = "live_common_recommender"
 }

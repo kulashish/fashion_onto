@@ -8,7 +8,7 @@ class NullRecommender extends Recommender {
     return refSkus
   }
 
-  override def generateRecommendation(orderData: DataFrame): DataFrame = {
+  override def generateRecommendation(orderData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
     return null
   }
 

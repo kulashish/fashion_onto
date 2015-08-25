@@ -118,4 +118,8 @@ object DataSets {
 
   //Campaign Quality
   val CAMPAIGN_QUALITY = "campaign_quality"
+
+  //recommendations
+  val RECOMMENDATIONS = "recommendations"
+  val BRICK_MVP_RECOMMENDATIONS = "brick_mvp"
 }

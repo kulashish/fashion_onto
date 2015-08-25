@@ -1,9 +1,13 @@
 package com.jabong.dap.campaign.recommendation
 
+import java.sql.Timestamp
+
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, ProductVariables, SalesOrderVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -14,7 +18,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 class BasicRecommender extends Recommender {
   val sqlContext = Spark.getSqlContext()
 
-  override def generateRecommendation(orderData: DataFrame): DataFrame = {
+  override def generateRecommendation(orderData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
 
     return null
 
@@ -39,15 +43,22 @@ class BasicRecommender extends Recommender {
     }
     // import sqlContext.implicits._
     // FIXME:Cross check whether lastDayTimeDifference udf is working fine
-    val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.lastDayTimeDifferenceString(orderItemData(SalesOrderVariables.CREATED_AT)))
-      .filter("daysPresent<=" + days)
+    val ndaysOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-days, TimeConstants.DATE_TIME_FORMAT_MS))
+    val yesterdayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS))
+    val ndaysOldStartTime = TimeUtils.getStartTimestampMS(ndaysOldTime)
+    val yesterdayOldEndTime = TimeUtils.getEndTimestampMS(yesterdayOldTime)
+
+    val lastDaysData = CampaignUtils.getTimeBasedDataFrame(orderItemData, SalesOrderVariables.CREATED_AT, ndaysOldStartTime.toString, yesterdayOldEndTime.toString)
+
+    //    val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.lastDayTimeDifferenceString(orderItemData(SalesOrderVariables.CREATED_AT)))
+//      .filter("daysPresent<=" + days)
 
     if (lastDaysData.count() == 0) {
       return null
     }
-    val groupedSku = lastDaysData.withColumn("actual_sku", skuSimpleToSku(lastDaysData("sku"))).groupBy("actual_sku")
+    val groupedSku = lastDaysData.withColumn("actual_sku", Udf.skuFromSimpleSku(lastDaysData(SalesOrderItemVariables.SKU))).groupBy("actual_sku")
       //.agg($"actual_sku", count("created_at") as "quantity", max("created_at") as "last_sold_date")
-      .agg(count("created_at") as "quantity", max("created_at") as "last_sold_date")
+      .agg(count(SalesOrderItemVariables.CREATED_AT) as "quantity", max(SalesOrderItemVariables.CREATED_AT) as "last_sold_date")
 
     return groupedSku
   }
@@ -57,7 +68,7 @@ class BasicRecommender extends Recommender {
       return null
     }
     // import sqlContext.implicits._
-    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), SQL.INNER)
+    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData(SalesOrderItemVariables.SKU)), SQL.INNER)
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
 
@@ -123,9 +134,12 @@ class BasicRecommender extends Recommender {
     // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
+   // val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
+    recommendationOutput.toDebugString
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
     val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1)))) }
+    recommendations.toDebugString
     val recommendDataFrame = sqlContext.createDataFrame(recommendations, dataFrameSchema)
     return recommendDataFrame
   }

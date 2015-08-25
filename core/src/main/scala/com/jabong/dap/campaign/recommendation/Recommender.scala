@@ -11,7 +11,7 @@ trait Recommender extends java.io.Serializable {
 
   // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
   // 8 recommendations
-  def recommend(refSkus: DataFrame): DataFrame
+  def generateRecommendation(orderData: DataFrame, yesterdayItr: DataFrame): DataFrame
 
   var RecommendationGenderMap = new HashMap[String, String]
   RecommendationGenderMap += (
@@ -45,7 +45,6 @@ trait Recommender extends java.io.Serializable {
     "TOYS" -> 2
   )
 
-  def generateRecommendation(orderData: DataFrame): DataFrame
 
   def getRecommendationGender(gender: Any): String = {
     if (gender == null) {
