@@ -283,8 +283,6 @@ class BasicRecommender extends Recommender {
     }
     return false
   }
-
-  // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
-  override def recommend(refSkus: DataFrame): DataFrame = ???
+  
 }
 
