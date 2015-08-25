@@ -22,7 +22,7 @@ object CampaignUtils extends Logging {
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
-  // import sqlContext.implicits._
+  import sqlContext.implicits._
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")

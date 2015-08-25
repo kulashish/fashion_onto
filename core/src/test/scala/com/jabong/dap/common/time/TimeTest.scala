@@ -22,6 +22,9 @@ class TimeTest extends FlatSpec with Matchers {
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
   val testDate = Timestamp.valueOf(dateFormat.format(calendar.getTime))
 
+  val TRUE = true
+  val FALSE = false
+
   "withLeadingZeros" should "add a zero if input is less than 10" in {
     val input = 7
     val output = "07"
@@ -76,39 +79,39 @@ class TimeTest extends FlatSpec with Matchers {
   }
 
   "isStrictlyLessThan" should "return true" in {
-    TimeUtils.isStrictlyLessThan("2015-05-19 00:00:00", "2015-06-19 00:00:00") should be (true)
+    TimeUtils.isStrictlyLessThan("2015-05-19 00:00:00", "2015-06-19 00:00:00") should be (TRUE)
   }
 
   "isStrictlyLessThan" should "return false" in {
-    TimeUtils.isStrictlyLessThan("2015-07-19 00:00:00", "2015-06-19 00:00:00") should be (false)
+    TimeUtils.isStrictlyLessThan("2015-07-19 00:00:00", "2015-06-19 00:00:00") should be (FALSE)
   }
 
   "isSameYear" should "return true" in {
-    TimeUtils.isSameYear("2015-06-19 00:00:00", "2015-06-20 00:00:00") should be (true)
+    TimeUtils.isSameYear("2015-06-19 00:00:00", "2015-06-20 00:00:00") should be (TRUE)
   }
 
   "isSameYear" should "return false" in {
-    TimeUtils.isSameYear("2014-06-19 00:00:00", "2015-05-19 00:00:00") should be (false)
+    TimeUtils.isSameYear("2014-06-19 00:00:00", "2015-05-19 00:00:00") should be (FALSE)
   }
 
   "isSameMonth" should "return true" in {
-    TimeUtils.isSameMonth("2015-06-19 00:00:00", "2015-06-20 00:00:00") should be (true)
+    TimeUtils.isSameMonth("2015-06-19 00:00:00", "2015-06-20 00:00:00") should be (TRUE)
   }
 
   "isSameMonth" should "return false" in {
-    TimeUtils.isSameMonth("2015-06-19 00:00:00", "2015-05-19 00:00:00") should be (false)
+    TimeUtils.isSameMonth("2015-06-19 00:00:00", "2015-05-19 00:00:00") should be (FALSE)
   }
 
   "isSameDay" should "return true" in {
-    TimeUtils.isSameDay("2015-06-19 00:00:00", "2015-06-19 00:00:00") should be (true)
+    TimeUtils.isSameDay("2015-06-19 00:00:00", "2015-06-19 00:00:00") should be (TRUE)
   }
 
   "isSameDay" should "return false" in {
-    TimeUtils.isSameDay("2015-06-19 00:00:00", "2015-05-19 00:00:00") should be (false)
+    TimeUtils.isSameDay("2015-06-19 00:00:00", "2015-05-19 00:00:00") should be (FALSE)
   }
 
   "dayName: String" should "match with expected data" in {
-    val text = "20150712";
+    val text = "20150712"
     val result = TimeUtils.dayName(text, TimeConstants.YYYYMMDD)
     assert(result.toLowerCase.equals("sunday"))
   }
@@ -171,7 +174,8 @@ class TimeTest extends FlatSpec with Matchers {
   }
 
   "changeDateFormat" should "return empty string" in {
-    TimeUtils.changeDateFormat(null, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER) should be ("")
+    val ts:String = null
+    TimeUtils.changeDateFormat(ts, TimeConstants.DATE_FORMAT, TimeConstants.DATE_FORMAT_FOLDER) should be ("")
   }
 
 }
