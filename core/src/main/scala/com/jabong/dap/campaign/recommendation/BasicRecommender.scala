@@ -169,7 +169,7 @@ class BasicRecommender extends Recommender {
       val sku = row(0)
       if (gender != null) {
         val recommendedGenderList = getRecommendationGender(gender)
-        val recommendGenderArray = recommendedGenderList.split(",")
+        val recommendGenderArray = recommendedGenderList.split("!")
         for (recGender <- recommendGenderArray) {
           skuList = genderSkuMap.getOrElse(recGender, null)
           if (skuList != null) {

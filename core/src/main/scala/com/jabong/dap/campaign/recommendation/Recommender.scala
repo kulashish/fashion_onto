@@ -15,14 +15,15 @@ trait Recommender extends java.io.Serializable {
 
   var RecommendationGenderMap = new HashMap[String, String]
   RecommendationGenderMap += (
-    "WOMEN" -> "WOMEN,UNISEX",
-    "MEN" -> "MEN,UNISEX",
-    "GIRLS" -> "GIRLS,BOYS GIRLS",
-    "UNISEX" -> "UNISEX,MEN,WOMEN",
-    "BOYS GIRLS" -> "WOMEN,UNISEX",
-    "BOYS" -> "BOYS,BOYS GIRLS",
-    "Infant" -> "Infant",
-    "Blank" -> "Blank"
+    "WOMEN" -> "WOMEN!UNISEX",
+    "MEN" -> "MEN!UNISEX",
+    "GIRLS" -> "GIRLS!BOYS,GIRLS",
+    "UNISEX" -> "UNISEX!MEN!WOMEN",
+    "MEN,WOMEN" -> "UNISEX!MEN,WOMEN",
+    "BOYS,GIRLS" -> "BOYS!GIRLS!BOYS,GIRLS",
+    "BOYS" -> "BOYS!BOYS,GIRLS",
+    "INFANTS" -> "INFANTS",
+    "BLANK" -> "BLANK"
   )
 
   var DesiredInventoryLevel = new HashMap[String, Int]
@@ -50,7 +51,7 @@ trait Recommender extends java.io.Serializable {
     if (gender == null) {
       return null
     }
-    return RecommendationGenderMap.getOrElse(gender.toString, null)
+    return RecommendationGenderMap.getOrElse(gender.toString, "BLANK")
   }
 
   def inventoryWeekNotSold(category: String, stock: Int, weeklyAverage: Int): Boolean = {
