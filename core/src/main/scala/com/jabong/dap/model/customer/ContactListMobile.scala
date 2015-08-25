@@ -2,6 +2,7 @@ package com.jabong.dap.model.customer
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -29,8 +30,7 @@ object ContactListMobile extends Logging {
   def start(vars: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
-    val path = OptionUtils.getOptValue(vars.path)
+//    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
 
     //read Data Frames
@@ -43,19 +43,19 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemInc,
       dfSalesOrderCalculatedPrevFull,
       dfDCF,
-      dfZoneCity) = readDf(path, saveMode, prevDate)
+      dfZoneCity) = readDf(incrDate)
 
     //get  Customer CustomerSegments.getCustomerSegments
     val dfCustomerSegmentsInc = CustomerSegments.getCustomerSegments(dfCustomerSegments)
 
     //call SalesOrderAddress.processVariable
     val (dfSalesOrderAddressCalculated, dfSalesOrderAddressFull) = SalesOrderAddress.processVariable(dfSalesOrderInc, dfSalesOrderAddressInc, dfSalesOrderPrevFull)
-    val pathSalesOrderAddress = PathBuilder.buildPath(path, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS_FULL, saveMode, incrDate)
+    val pathSalesOrderAddress = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, saveMode, incrDate)
     dfSalesOrderAddressFull.write.parquet(pathSalesOrderAddress)
 
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
     val dfSalesOrderCalculated = SalesOrder.processVariables(dfSalesOrderCalculatedPrevFull, dfSalesOrderInc)
-    val pathSalesOrderCalculated = PathBuilder.buildPath(path, DataSets.VARIABLES, DataSets.SALES_ORDER_FULL, saveMode, incrDate)
+    val pathSalesOrderCalculated = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, saveMode, incrDate)
     dfSalesOrderCalculated.write.parquet(pathSalesOrderCalculated)
 
     //SalesOrderItem.getSucessfulOrders for NET_ORDERS for variable
@@ -73,10 +73,10 @@ object ContactListMobile extends Logging {
       dfDCF,
       dfZoneCity)
 
-    val pathContactListMobileFull = PathBuilder.buildPath(path, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE_FULL, saveMode, incrDate)
+    val pathContactListMobileFull = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE, DataSets.FULL, incrDate)
     dfContactListMobileFull.write.parquet(pathContactListMobileFull)
 
-    val pathContactListMobile = PathBuilder.buildPath(path, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE, saveMode, incrDate)
+    val pathContactListMobile = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE, saveMode, incrDate)
     dfContactListMobileInc.write.parquet(pathContactListMobile)
 
   }
@@ -242,27 +242,26 @@ object ContactListMobile extends Logging {
 
   /**
    * read Data Frames
-   * @param path
-   * @param saveMode
-   * @param prevDate
+   * @param incrDate
    * @return
    */
-  def readDf(path: String, saveMode: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+    val prevDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-    val dfCustomerListMobile = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE, saveMode, prevDate)
-    val dfCustomerListMobilePrevFull = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE_FULL, saveMode, prevDate)
+    val dfCustomerListMobile = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
+    val dfCustomerListMobilePrevFull = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_LIST_MOBILE, DataSets.FULL, prevDate)
 
-    val dfCustomerSegments = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.CUSTOMER_SEGMENTS, saveMode, prevDate)
-    val dfNLS = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.NEWSLETTER_SUBSCRIPTION, saveMode, prevDate)
-    val dfSalesOrder = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.SALES_ORDER, saveMode, prevDate)
+    val dfCustomerSegments = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_SEGMENTS, DataSets.DAILY_MODE, incrDate)
+    val dfNLS = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, incrDate)
+    val dfSalesOrder = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
 
-    val dfSalesOrderAddress = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, saveMode, prevDate)
-    val dfSalesOrderPrevFull = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.SALES_ORDER_FULL, saveMode, prevDate)
+    val dfSalesOrderAddress = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.DAILY_MODE, incrDate)
+    val dfSalesOrderPrevFull = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL, incrDate)
 
-    val dfSalesOrderItem = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.SALES_ORDER_ITEM, saveMode, prevDate)
-    val dfSalesOrderCalculated = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.SALES_ORDER_FULL, saveMode, prevDate)
-    val dfDCF = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.DCF, saveMode, prevDate)
-    val dfZoneCity = DataReader.getDataFrame(path, DataSets.VARIABLES, DataSets.ZONE_CITY, saveMode, prevDate)
+    val dfSalesOrderItem = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
+    val dfSalesOrderCalculated = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL, incrDate)
+    val dfDCF = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.DCF, DataSets.DAILY_MODE, incrDate)
+    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
     (dfCustomerListMobile,
       dfCustomerListMobilePrevFull,
