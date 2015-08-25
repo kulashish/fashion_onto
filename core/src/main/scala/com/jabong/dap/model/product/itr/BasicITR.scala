@@ -62,7 +62,7 @@ object BasicITR extends Logging {
         ITR.PRICE_ON_SITE -> 0.00,
         ITR.QUANTITY -> 0
       ))
-
+    itr.explain(true)
     val mvpUDF = udf(mvp)
     val priceBandUDF = udf(priceBandFunc)
 
@@ -136,7 +136,8 @@ object BasicITR extends Logging {
       ITR.PRICE_ON_SITE,
       ITR.PRICE_BAND,
       ITR.SUPPLIER_STATUS,
-      ITR.BRAND_NAME
+      ITR.BRAND_NAME,
+      ITR.ITR_DATE
     ).cache()
 
     itrDF.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
