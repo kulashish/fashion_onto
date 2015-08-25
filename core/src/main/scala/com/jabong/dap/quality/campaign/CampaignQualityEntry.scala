@@ -31,7 +31,7 @@ object CampaignQualityEntry extends Logging {
         status = false
       }
     }
-   // if status is false means :- at least one of the campaign quality check has failed, Please check the log to actually see which campaign has failed
+    // if status is false means :- at least one of the campaign quality check has failed, Please check the log to actually see which campaign has failed
     if (status == false) {
       throw new FailedStatusException
     }

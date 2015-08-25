@@ -74,21 +74,21 @@ object BasicITR extends Logging {
     ).
       where(itr.col(ITR.BRICK) === priceBandDF.col("bandBrick")).
       withColumn(ITR.MVP, mvpUDF(
-      col("priceBandA"),
-      col("priceBandB"),
-      col("priceBandC"),
-      col("priceBandD"),
-      col("priceBandE"),
-      col(ITR.SPECIAL_PRICE)
-    )).
+        col("priceBandA"),
+        col("priceBandB"),
+        col("priceBandC"),
+        col("priceBandD"),
+        col("priceBandE"),
+        col(ITR.SPECIAL_PRICE)
+      )).
       withColumn(ITR.PRICE_BAND, priceBandUDF(
-      col("priceBandA"),
-      col("priceBandB"),
-      col("priceBandC"),
-      col("priceBandD"),
-      col("priceBandE"),
-      col(ITR.SPECIAL_PRICE)
-    ))
+        col("priceBandA"),
+        col("priceBandB"),
+        col("priceBandC"),
+        col("priceBandD"),
+        col("priceBandE"),
+        col(ITR.SPECIAL_PRICE)
+      ))
 
     val itrDF = priceBandMVPDF.select(
       ITR.JABONG_CODE,
@@ -187,11 +187,11 @@ object BasicITR extends Logging {
    * @return String
    */
   val mvp = (priceBandA: String,
-             priceBandB: String,
-             priceBandC: String,
-             priceBandD: String,
-             priceBandE: String,
-             specialPrice: java.math.BigDecimal) => {
+    priceBandB: String,
+    priceBandC: String,
+    priceBandD: String,
+    priceBandE: String,
+    specialPrice: java.math.BigDecimal) => {
     val aRange = getRange(priceBandA)
     val bRange = getRange(priceBandB)
     val cRange = getRange(priceBandC)
@@ -213,11 +213,11 @@ object BasicITR extends Logging {
    * @return String
    */
   val priceBandFunc = (priceBandA: String,
-                       priceBandB: String,
-                       priceBandC: String,
-                       priceBandD: String,
-                       priceBandE: String,
-                       specialPrice: math.BigDecimal) => {
+    priceBandB: String,
+    priceBandC: String,
+    priceBandD: String,
+    priceBandE: String,
+    specialPrice: math.BigDecimal) => {
 
     val aRange = getRange(priceBandA)
     val bRange = getRange(priceBandB)
