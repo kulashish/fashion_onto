@@ -165,7 +165,7 @@ class BasicRecommender extends Recommender {
     var skuList: scala.collection.mutable.MutableList[(Long, String)] = scala.collection.mutable.MutableList()
     for (row <- iterable) {
       val gender = row(4)
-      val quantity = row(7)
+      val quantity = row(6)
       val sku = row(0)
       if (gender != null) {
         val recommendedGenderList = getRecommendationGender(gender)
