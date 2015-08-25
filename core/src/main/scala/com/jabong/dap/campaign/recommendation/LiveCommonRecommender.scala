@@ -10,7 +10,7 @@ import org.apache.spark.sql.{DataFrame}
 import org.apache.spark.sql.types._
 
 /**
- * Created by jabong1145 on 21/8/15.
+ * Created by rahul aneja on 21/8/15.
  */
 class LiveCommonRecommender extends BasicRecommender with Logging {
 
@@ -29,7 +29,7 @@ class LiveCommonRecommender extends BasicRecommender with Logging {
     val recommendedSkus = genRecommend(skuData,pivotKeys,dataFrameSchema)
     println("rec skus data:-" +recommendedSkus.count)
     val outPath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH,DataSets.RECOMMENDATIONS,DataSets.BRICK_MVP_RECOMMENDATIONS,DataSets.DAILY_MODE,TimeUtils.YESTERDAY_FOLDER)
-    DataWriter.writeParquet(recommendedSkus,outPath,DataSets.ERROR_SAVEMODE)
+    DataWriter.writeParquet(recommendedSkus,outPath,DataSets.IGNORE_SAVEMODE)
     return recommendedSkus
   }
 }
