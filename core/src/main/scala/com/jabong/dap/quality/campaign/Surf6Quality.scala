@@ -2,7 +2,7 @@ package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
-import com.jabong.dap.common.constants.variables.{ CustomerPageVisitVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ PageVisitVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
@@ -37,30 +37,30 @@ object Surf6Quality extends BaseCampaignQuality with Logging {
   def checkCustomerSelection(surf6Data: DataFrame, surf6Campaign: DataFrame): Boolean = {
 
     val dfDistinctSku = surf6Data.select(
-      col(CustomerPageVisitVariables.USER_ID),
-      col(CustomerPageVisitVariables.ACTUAL_VISIT_ID),
-      col(CustomerPageVisitVariables.BROWER_ID),
-      col(CustomerPageVisitVariables.DOMAIN),
-      Udf.distinctSku(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.SKU_LIST
+      col(PageVisitVariables.USER_ID),
+      col(PageVisitVariables.ACTUAL_VISIT_ID),
+      col(PageVisitVariables.BROWSER_ID),
+      col(PageVisitVariables.DOMAIN),
+      Udf.distinctList(col(PageVisitVariables.SKU_LIST)) as PageVisitVariables.SKU_LIST
     )
 
     val dfCountSku = dfDistinctSku.select(
-      col(CustomerPageVisitVariables.USER_ID),
-      col(CustomerPageVisitVariables.ACTUAL_VISIT_ID),
-      col(CustomerPageVisitVariables.BROWER_ID),
-      col(CustomerPageVisitVariables.DOMAIN),
-      col(CustomerPageVisitVariables.SKU_LIST),
-      Udf.countSku(dfDistinctSku(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.COUNT_SKU
+      col(PageVisitVariables.USER_ID),
+      col(PageVisitVariables.ACTUAL_VISIT_ID),
+      col(PageVisitVariables.BROWSER_ID),
+      col(PageVisitVariables.DOMAIN),
+      col(PageVisitVariables.SKU_LIST),
+      Udf.countSku(dfDistinctSku(PageVisitVariables.SKU_LIST)) as "count_sku"
     )
-    val joined = dfCountSku.join(surf6Campaign, dfCountSku(CustomerPageVisitVariables.BROWER_ID) === surf6Campaign(CampaignMergedFields.DEVICE_ID))
+    val joined = dfCountSku.join(surf6Campaign, dfCountSku(PageVisitVariables.BROWSER_ID) === surf6Campaign(CampaignMergedFields.DEVICE_ID))
       .select(CampaignMergedFields.DEVICE_ID,
-        CustomerPageVisitVariables.COUNT_SKU)
+        "count_sku")
 
     var temp: Int = 0
     joined.rdd.foreach(e => (if (Integer.parseInt(e(1).toString) < 5) {
       temp = temp + 1
     }))
-    println("Count < 5 = " + temp)
+
     return (temp == 0 && joined.count() == surf6Campaign.count())
   }
 
