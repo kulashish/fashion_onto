@@ -115,4 +115,5 @@ object DataSets {
   val DCF_FEED = "dcf_feed"
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"
+  val EXPORT_DEVICE = "exportDevice_"
 }
