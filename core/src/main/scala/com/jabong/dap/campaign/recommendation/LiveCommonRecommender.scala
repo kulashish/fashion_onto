@@ -17,7 +17,7 @@ class LiveCommonRecommender extends BasicRecommender with Logging {
   override def generateRecommendation(orderItemFullData: DataFrame,yesterdayItr: DataFrame): DataFrame = {
     val dataFrameSchema = StructType(Array(
       StructField(ProductVariables.BRICK, StringType, false),
-      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
       StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
     ))
