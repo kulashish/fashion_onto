@@ -362,8 +362,8 @@ object CampaignUtils extends Logging {
     }
 
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
-    logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
-    filteredData
+    logger.info("Input Data Frame has been filtered before" + before + " after '" + after)
+    return filteredData
   }
 
   def getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]): Int = {
@@ -387,8 +387,7 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
-    campaignOutputWithMailType
+    campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
   }
 
   /**

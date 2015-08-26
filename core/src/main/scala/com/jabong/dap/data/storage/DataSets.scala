@@ -116,6 +116,9 @@ object DataSets {
   val DCF_INPUT_MERGED_HIVE_TABLE = "merge.merge_pagevisit"
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"
+  
+  //Campaign Quality
+  val CAMPAIGN_QUALITY = "campaign_quality"
   val DND = "DND"
 
   val CONTACT_LIST_MOBILE = "contact_list_mobile"
