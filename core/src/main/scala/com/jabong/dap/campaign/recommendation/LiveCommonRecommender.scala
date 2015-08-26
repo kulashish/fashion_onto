@@ -27,9 +27,10 @@ class LiveCommonRecommender extends BasicRecommender with Logging {
     val skuData = skuCompleteData(topProducts,yesterdayItr)
     println("sku complete data:-" +skuData.count)
     val recommendedSkus = genRecommend(skuData,pivotKeys,dataFrameSchema)
-    println("rec skus data:-" +recommendedSkus.count)
+    println("rec skus data:-" +recommendedSkus.count+"\t"+recommendedSkus.show(100))
     val outPath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH,DataSets.RECOMMENDATIONS,DataSets.BRICK_MVP_RECOMMENDATIONS,DataSets.DAILY_MODE,TimeUtils.YESTERDAY_FOLDER)
-    DataWriter.writeParquet(recommendedSkus,outPath,DataSets.IGNORE_SAVEMODE)
+    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, outPath))
+      DataWriter.writeParquet(recommendedSkus,outPath,DataSets.IGNORE_SAVEMODE)
     return recommendedSkus
   }
 }
