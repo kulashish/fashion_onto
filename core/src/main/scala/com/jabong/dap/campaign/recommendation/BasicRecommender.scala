@@ -138,7 +138,7 @@ class BasicRecommender extends Recommender {
     println(recommendationOutput.toDebugString)
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
-    val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1)))) }
+    val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1).take(10)))) }
     println(recommendations.toDebugString)
     val recommendDataFrame = sqlContext.createDataFrame(recommendations, dataFrameSchema)
     return recommendDataFrame
