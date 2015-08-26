@@ -43,11 +43,11 @@ object DcfFeedGenerator extends Logging {
 
     val joinedData = convertFeedFormat(pageVisitData, cmr).cache()
     val changedDateFormat = TimeUtils.changeDateFormat(executeDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
-    val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.DAILY_MODE, executeDate)
+    val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate)
 
     DataWriter.writeParquet(joinedData, writePath, saveMode)
 
-    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat+"_1", DataSets.ERROR_SAVEMODE, "false", ",")
+    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat + "_1", DataSets.ERROR_SAVEMODE, "false", ",")
 
     logger.info("dcf feed generation process ended")
   }
@@ -65,7 +65,7 @@ object DcfFeedGenerator extends Logging {
     val joinedData = pageVisitData.join(deviceMapping, pageVisitData("userid") === deviceMapping("email"), SQL.LEFT_OUTER)
       .select(
         deviceMapping("id_customer") as "uid",
-        pageVisitData("productsku")  as "sku" ,
+        pageVisitData("productsku") as "sku",
         changeDateFormatValue(pageVisitData("pagets"), lit("yyyy-MM-dd HH:mm:ss.SSS"), lit("yyyy-MM-dd'T'HH:mm:ss'Z'")) as "date_created",
         pageVisitData("sessionid") as "sessionId"
       )

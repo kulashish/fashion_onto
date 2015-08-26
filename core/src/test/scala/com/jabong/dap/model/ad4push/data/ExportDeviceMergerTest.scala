@@ -43,7 +43,7 @@ class ExportDeviceMergerTest extends FlatSpec with SharedSparkContext {
     assert(res.collect().length == 14)
   }
 
-  "Testing merging 515" should "have 17 recs" in {
+  "Testing merging 515" should "have 17 recs" in {src/test/scala/com/jabong/dap/model/ad4push/data/
     val t0 = System.nanoTime()
     var res = ExportDeviceMerger.mergeExportData(df4, df5)
     val t1 = System.nanoTime()

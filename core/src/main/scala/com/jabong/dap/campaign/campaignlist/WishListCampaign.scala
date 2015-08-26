@@ -45,13 +45,13 @@ object WishListCampaign {
     val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     val wishListLowStockCampaign = new WishlistLowStockCampaign()
-    wishListLowStockCampaign.runCampaign(past30DayCampaignMergedData, fullShortlistData, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    wishListLowStockCampaign.runCampaign(past30DayCampaignMergedData, last30DaysCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
     // call iod campaign
     val itrSku30DayData = CampaignInput.load30DayItrSkuData()
 
     val wishListIODCampaign = new WishlistIODCampaign()
-    wishListIODCampaign.runCampaign(past30DayCampaignMergedData, fullShortlistData, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    wishListIODCampaign.runCampaign(past30DayCampaignMergedData, last30DaysCustomerSelected, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
   }
 
