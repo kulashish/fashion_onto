@@ -19,7 +19,7 @@ object CustomerSegments {
 
   //Name of variable: fk_customer, MVP, Segment0, Segment1,Segment2, Segment3, Segment4, Segment5, Segment6
   //calculate mvp_score and  latest updated value of mvp_score from customer_segments
-  def getCustomerSegments(dfCustomerSegments: DataFrame): (DataFrame) = {
+  def getCustomerSegments(dfCustomerSegments: DataFrame): DataFrame = {
 
     if (dfCustomerSegments == null) {
 
@@ -43,7 +43,7 @@ object CustomerSegments {
       CustomerSegmentsVariables.MVP_SCORE,
       CustomerSegmentsVariables.SEGMENT,
       CustomerSegmentsVariables.DISCOUNT_SCORE
-    )
+      )
       .sort(desc(CustomerSegmentsVariables.UPDATED_AT))
       .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
@@ -54,7 +54,7 @@ object CustomerSegments {
 
     //    val segments = getSeg(dfCustSegVars)
 
-    (dfInc)
+    dfInc
   }
 
   def getSeg(dfCustSegVars: DataFrame): DataFrame = {

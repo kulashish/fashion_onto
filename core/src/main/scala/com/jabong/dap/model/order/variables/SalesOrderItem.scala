@@ -160,17 +160,18 @@ object SalesOrderItem {
 
   /**
    *
-   * @param salesOrderItem
+   * @param salesOrderItemFull
    * @return
    */
-  def getSucessfullOrders(salesOrderFull: DataFrame, salesOrderItem: DataFrame): DataFrame = {
-
-    val dfJoin = salesOrderFull.join(salesOrderItem, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER))
-
-    val sucessOrders = dfJoin.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
-    val res = sucessOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
-
-    res
+  def getSucessfullOrders(salesOrderItemFull: DataFrame, salesOrderFull: DataFrame): DataFrame = {
+    val sucessOrders = salesOrderItemFull
+      .select(SalesOrderItemVariables.FK_SALES_ORDER, SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)
+      .dropDuplicates()
+      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+    val dfJoin = salesOrderFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
+      .join(sucessOrders, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === sucessOrders(SalesOrderItemVariables.FK_SALES_ORDER))
+      .groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+    dfJoin
   }
 
   /**

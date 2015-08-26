@@ -30,7 +30,7 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
 
     df4 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item1", OrderVarSchema.salesOrderItem)
 
-    df5 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order")
+//    df5 = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order")
 
   }
 
@@ -39,9 +39,9 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
     assert(ordersCount.collect.size == 148)
   }
 
-//  "Testing Successful orders Count" should "have size 3" in {
-//    var ordersCount = SalesOrderItem.getSucessfullOrders(df5, df4)
-//    assert(ordersCount.collect.size == 3)
-//  }
+  "Testing Successful orders Count" should "have size 3" in {
+    var ordersCount = SalesOrderItem.getSucessfullOrders(df4)
+    assert(ordersCount.collect.size == 3)
+  }
 
 }

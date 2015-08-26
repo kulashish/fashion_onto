@@ -1,10 +1,9 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesAddressVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderVariables}
 import com.jabong.dap.model.order.schema.OrderVarSchema
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by mubarak on 24/6/15.
@@ -13,23 +12,26 @@ object SalesOrderAddress {
 
   /**
    *
-   * @param salesOrderInc
+   * @param salesOrderIncr
    * @param salesAddressfull
    * @param prevFav Dataframe with the previous joined data from sales_order, sales_order_address
    * @return
    */
-  def processVariable(salesOrderInc: DataFrame, salesAddressfull: DataFrame, prevFav: DataFrame): (DataFrame, DataFrame) = {
-    val salesOrderAddress = salesAddressfull.join(salesOrderInc, salesAddressfull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrderInc(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
-    val curFav = salesOrderAddress.select(
+  def processVariable(salesOrderIncr: DataFrame, salesAddressfull: DataFrame, prevFav: DataFrame): (DataFrame, DataFrame) = {
+    val salesOrderAddressIncr = salesAddressfull.join(salesOrderIncr, salesAddressfull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS) === salesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING))
+    val curFav = salesOrderAddressIncr.select(
       SalesOrderVariables.FK_CUSTOMER,
       SalesAddressVariables.CITY,
       SalesAddressVariables.PHONE,
       SalesAddressVariables.SOA_FIRST_NAME,
-      SalesAddressVariables.SOA_LAST_NAME
-    )
+      SalesAddressVariables.SOA_LAST_NAME)
       .withColumnRenamed(SalesAddressVariables.PHONE, SalesAddressVariables.MOBILE)
-
-    val jData = prevFav.unionAll(curFav)
+    var jData:DataFrame = null
+    if (null == prevFav) {
+      jData = curFav
+    } else {
+      jData = prevFav.unionAll(curFav)
+    }
     (getFav(jData), jData)
   }
 
