@@ -8,6 +8,10 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("public")
 )
 
+libraryDependencies += "com.sun.mail" % "javax.mail" % "1.5.3"
+
+libraryDependencies += "javax.mail" % "javax.mail-api" % "1.5.3"
+
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "1.2.1"  % "provided"
 
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
@@ -38,3 +42,6 @@ assemblyJarName in assembly := "Alchemy-assembly.jar"
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")
+
+
+//seq(lsSettings :_*)
