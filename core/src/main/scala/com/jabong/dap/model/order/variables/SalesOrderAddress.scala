@@ -1,9 +1,9 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderVariables }
 import com.jabong.dap.model.order.schema.OrderVarSchema
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by mubarak on 24/6/15.
@@ -26,7 +26,7 @@ object SalesOrderAddress {
       SalesAddressVariables.SOA_FIRST_NAME,
       SalesAddressVariables.SOA_LAST_NAME)
       .withColumnRenamed(SalesAddressVariables.PHONE, SalesAddressVariables.MOBILE)
-    var jData:DataFrame = null
+    var jData: DataFrame = null
     if (null == prevFav) {
       jData = curFav
     } else {

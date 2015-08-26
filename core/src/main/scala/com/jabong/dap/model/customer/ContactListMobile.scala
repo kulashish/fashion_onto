@@ -5,7 +5,7 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -13,8 +13,8 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments}
-import com.jabong.dap.model.order.variables.{SalesOrder, SalesOrderAddress, SalesOrderItem}
+import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments }
+import com.jabong.dap.model.order.variables.{ SalesOrder, SalesOrderAddress, SalesOrderItem }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -48,7 +48,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderCalcPrevFull,
       dfDND,
       dfZoneCity
-    ) = readDf(incrDate)
+      ) = readDf(incrDate)
 
     //get  Customer CustomerSegments.getCustomerSegments
     val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(dfCustomerSegmentsIncr)
@@ -81,7 +81,6 @@ object ContactListMobile extends Logging {
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(dfContactListMobileFull, pathContactListMobileFull, saveMode)
 
-
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
 
@@ -100,15 +99,15 @@ object ContactListMobile extends Logging {
    * @return
    */
   def getContactListMobileDF(
-                             dfCustomerIncr: DataFrame,
-                             dfCustomerListMobilePrevFull: DataFrame,
-                             dfCustomerSegmentsIncr: DataFrame,
-                             dfNLSIncr: DataFrame,
-                             dfSalesOrderAddressIncr: DataFrame,
-                             dfSalesOrder: DataFrame,
-                             dfSuccessfulOrders: DataFrame,
-                             dfDND: DataFrame,
-                             dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
+    dfCustomerIncr: DataFrame,
+    dfCustomerListMobilePrevFull: DataFrame,
+    dfCustomerSegmentsIncr: DataFrame,
+    dfNLSIncr: DataFrame,
+    dfSalesOrderAddressIncr: DataFrame,
+    dfSalesOrder: DataFrame,
+    dfSuccessfulOrders: DataFrame,
+    dfDND: DataFrame,
+    dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomerIncr == null || dfCustomerSegmentsIncr == null || dfNLSIncr == null || dfSalesOrderAddressIncr == null) {
 
