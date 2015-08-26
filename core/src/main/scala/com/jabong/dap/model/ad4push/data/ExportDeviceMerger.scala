@@ -59,25 +59,6 @@ object ExportDeviceMerger extends Logging   {
     }
   }
 
-  def readFromCSV(path: String): DataFrame={
-    require(path != null, "Path is null")
-
-    try {
-      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").
-        option("delimiter", ",").
-        load(path)
-      println("Total recs in Export file initially: " + df.count())
-      return df
-
-    } catch {
-      case e: DataNotFound =>
-        logger.error("Data not found for the given path ")
-        throw new DataNotFound
-      case e: ValidFormatNotFound =>
-        logger.error("Format could not be resolved for the given files in directory")
-        throw new ValidFormatNotFound
-    }
-  }
 
 
   def mergeExportData(full: DataFrame, newdf: DataFrame): DataFrame = {
@@ -136,20 +117,6 @@ object ExportDeviceMerger extends Logging   {
     return joined
   }
 
-
-   def main(args: Array[String]) {
-     val conf = new SparkConf().setAppName("SparkExamples")
-     Spark.init(conf)
-     val df1 = readFromCSV("/home/jabong/bobdata/devices/exportDevices_515_20150821.csv")
-     val df2 = readFromCSV("/home/jabong/bobdata/devices/exportDevices_515_20150822.csv")
-     df1.limit(10).coalesce(1).write.format(DataSets.JSON).json("/home/jabong/bobdata/devices/exportDevices_515_1")
-     df2.limit(10).coalesce(1).write.format(DataSets.JSON).json("/home/jabong/bobdata/devices/exportDevices_515_2")
-
-     val t0 = System.nanoTime()
-     val merged = mergeExportData(df1.limit(10), df2.limit(10))
-
-       merged.coalesce(1).write.format(DataSets.JSON).json("/home/jabong/bobdata/devices/merged")
-
-   }
+  
 
 }
