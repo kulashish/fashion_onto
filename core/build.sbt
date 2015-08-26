@@ -18,6 +18,8 @@ libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.4.1" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.4.1" % "provided"
 
+libraryDependencies += "org.apache.spark" % "spark-launcher_2.10" % "1.4.1" % "provided"
+
 libraryDependencies += "net.liftweb" %% "lift-json" % "2.6"
 
 libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.35"
