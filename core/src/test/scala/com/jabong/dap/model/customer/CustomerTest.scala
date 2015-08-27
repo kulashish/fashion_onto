@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{TestSchema, SharedSparkContext}
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -72,7 +72,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_new",
       CustVarSchema.resultCustomer)
     dfResultCustomer.show()
-      //.collect().toSet
+    //.collect().toSet
 
     result._1.show()
     assert(result._1.limit(30).collect().toSet.equals(dfResultCustomer) == true)

@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.{CustomerVariables, NewsletterVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables }
 import org.apache.spark.sql.types._
 
 /**

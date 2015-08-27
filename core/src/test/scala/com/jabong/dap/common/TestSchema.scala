@@ -46,6 +46,4 @@ object TestSchema {
     StructField(NewsletterVariables.STATUS, StringType, true)
   ))
 
-
-
 }
