@@ -262,8 +262,8 @@ object ContactListMobile extends Logging {
 
     val dfSalesOrderCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.DCF, DataSets.DND, DataSets.DAILY_MODE, incrDate)
-    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.DCF, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
+    val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
+    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
     (
       dfCustomerIncr,

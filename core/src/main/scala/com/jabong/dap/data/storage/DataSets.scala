@@ -11,8 +11,6 @@ object DataSets {
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
-  val ZONE_CITY = "zone_city"
-  val DCF = "dcf"
 
   //customer
   val CUSTOMER = "customer"
@@ -94,6 +92,7 @@ object DataSets {
   val ERP = "erp"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
+  val RESPONSYS = "responsys"
 
   val DEVICE_MAPPING = "device_mapping"
 
@@ -122,6 +121,8 @@ object DataSets {
   //Campaign Quality
   val CAMPAIGN_QUALITY = "campaign_quality"
 
-  val DND = "DND"
   val CONTACT_LIST_MOBILE = "contact_list_mobile"
+  val DND = "DND"
+  val ZONE_CITY = "zone_city"
+
 }
