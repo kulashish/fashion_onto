@@ -1,16 +1,14 @@
 package com.jabong.dap.model.customer.variables
 
-import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.schema.CustVarSchema
+import com.jabong.dap.model.order.variables.SalesOrder
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 27/5/15.
@@ -58,7 +56,7 @@ object Customer {
     )
 
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
-    val udfCPOT = getCPOT(dfSalesOrder: DataFrame)
+    val udfCPOT = SalesOrder.getCPOT(dfSalesOrder: DataFrame)
 
     val dfJoin = dfCustomer.select(
       CustomerVariables.ID_CUSTOMER,

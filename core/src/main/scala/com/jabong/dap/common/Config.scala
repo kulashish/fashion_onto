@@ -37,8 +37,8 @@ case class Credentials(
 case class Config(
   applicationName: String = null,
   basePath: String = null,
-  readOutputPath: Option[String],
-  writeOutputPath: Option[String],
+  readOutputPath: Option[String] = null,
+  writeOutputPath: Option[String] = null,
   credentials: List[Credentials] = null) extends EmptyClass
 
 /**

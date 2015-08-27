@@ -9,6 +9,8 @@ import org.scalatest.{ Matchers, FlatSpec }
 
 class ConfigJsonValidatorTest extends FlatSpec with Matchers {
 
+  val outputPath = Option.apply("outputPath")
+
   // Unit tests for required values.
 
   "Config Json Validator" should "throw IllegalArgumentException for null application name" in {
@@ -40,14 +42,14 @@ class ConfigJsonValidatorTest extends FlatSpec with Matchers {
   }
 
   "Config Json Validator" should "throw IllegalArgumentException for null base path" in {
-    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = "outputPath", basePath = null, credentials = null)
+    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = outputPath, basePath = null, credentials = null)
     a[IllegalArgumentException] should be thrownBy {
       ConfigJsonValidator.validateRequiredValues(config)
     }
   }
 
   "Config Json Validator" should "throw IllegalArgumentException for empty base path" in {
-    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = "outputPath", basePath = "", credentials = null)
+    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = outputPath, basePath = "", credentials = null)
     a[IllegalArgumentException] should be thrownBy {
       ConfigJsonValidator.validateRequiredValues(config)
     }
@@ -186,13 +188,13 @@ class ConfigJsonValidatorTest extends FlatSpec with Matchers {
   "Config Json Validator" should "not throw any exception if everything is validated (with credentials)" in {
     val credentials = new Credentials(source = "bob", driver = "mysql", server = "127.0.0.1", port = "3306",
       dbName = "test", userName = "user", password = "password")
-    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = "outputPath", basePath = "/test/",
+    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = outputPath, basePath = "/test/",
       credentials = List(credentials))
     ConfigJsonValidator.validate(config)
   }
 
   "Config Json Validator" should "not throw any exception if everything is validated (without credentials)" in {
-    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = "outputPath", basePath = "/test/", credentials = List())
+    val config = new Config(applicationName = "Alchemy Test", readOutputPath = null, writeOutputPath = outputPath, basePath = "/test/", credentials = List())
     ConfigJsonValidator.validate(config)
   }
 }
