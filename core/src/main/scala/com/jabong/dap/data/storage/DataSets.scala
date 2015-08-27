@@ -118,6 +118,8 @@ object DataSets {
   val DCF_FEED_FILENAME = "webhistory_"
 
   //Campaign Quality
+  val EXPORT_DEVICE = "exportDevice_"
+
   val CAMPAIGN_QUALITY = "campaign_quality"
   val DND = "DND"
 

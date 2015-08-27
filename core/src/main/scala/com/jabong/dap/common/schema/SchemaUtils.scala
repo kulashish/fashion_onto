@@ -32,6 +32,21 @@ object SchemaUtils {
     }
   }
 
+  def dropColumns(df: DataFrame, schema: StructType): DataFrame = {
+    var res: DataFrame = df
+    var sec = df.schema
+    sec.foreach(e => (res = dropColumn(res, e.name, schema)))
+    return res
+  }
+
+  def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
+    if (schema.contains(key)) {
+      return df
+    } else {
+      return df.drop(key)
+    }
+  }
+
   /**
    *
    * @param df
