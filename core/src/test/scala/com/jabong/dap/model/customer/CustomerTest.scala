@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{TestSchema, SharedSparkContext}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -71,8 +71,10 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     val dfResultCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, "result_customer_new",
       CustVarSchema.resultCustomer)
-      .collect().toSet
+    dfResultCustomer.show()
+      //.collect().toSet
 
+    result._1.show()
     assert(result._1.limit(30).collect().toSet.equals(dfResultCustomer) == true)
 
     assert(result._2 == null)
@@ -167,7 +169,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
     //                result.limit(30).write.json(DataSets.TEST_RESOURCES + "last_jr_covert_date" + ".json")
 
     val dfLastJrCovertDate = JsonUtils.readFromJson(DataSets.CUSTOMER, "last_jr_covert_date",
-      CustVarSchema.last_jr_covert_date)
+      TestSchema.last_jr_covert_date)
       .collect().toSet
 
     assert(result.equals(dfLastJrCovertDate) == true)
@@ -197,15 +199,11 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
-      .limit(30).collect().toSet
+    val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame).collect().toSet
 
-    //                        result.limit(30).write.json(DataSets.TEST_RESOURCES + "mvp_seg" + ".json")
+    val dfMvpSeg = JsonUtils.readFromJson(DataSets.CUSTOMER_SEGMENTS, "mvp_seg", TestSchema.mvp_seg).collect().toSet
 
-    val dfMvpSeg = JsonUtils.readFromJson(DataSets.CUSTOMER, "mvp_seg", CustVarSchema.mvp_seg)
-      .collect().toSet
-
-    assert(result.equals(dfMvpSeg) == true)
+    assert(result.equals(dfMvpSeg))
 
   }
 

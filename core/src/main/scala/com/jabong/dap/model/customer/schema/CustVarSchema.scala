@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.{ CustomerSegmentsVariables, CustomerStoreVariables, CustomerVariables, NewsletterVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, NewsletterVariables}
 import org.apache.spark.sql.types._
 
 /**
@@ -11,17 +11,6 @@ object CustVarSchema {
   //customer variable schemas
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  val emailOptInStatus = StructType(Array(
-    StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
-    StructField(NewsletterVariables.STATUS, StringType, true)
-  ))
-
-  val accRegDateAndUpdatedAt = StructType(Array(
-    StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.REG_DATE, TimestampType, true),
-    StructField(CustomerVariables.UPDATED_AT, TimestampType, true)
-  ))
-
   val customersPreferredOrderTimeslot = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER_CPOT, LongType, true),
     StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
@@ -29,7 +18,7 @@ object CustVarSchema {
   ))
 
   val resultCustomer = StructType(Array(
-    StructField(CustomerVariables.ID_CUSTOMER, IntegerType, true),
+    StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE, DecimalType(10, 2), true),
     StructField(CustomerVariables.STORE_CREDITS_AVAILABLE, DecimalType(10, 2), true),
     StructField(CustomerVariables.BIRTHDAY, DateType, true),
@@ -53,22 +42,4 @@ object CustVarSchema {
     StructField(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS, StringType, true)
   ))
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer_segments variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  val mvp_seg = StructType(Array(
-    StructField(CustomerSegmentsVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerSegmentsVariables.MVP_SCORE, IntegerType, true),
-    StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true)
-  ))
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //customer_storecredits_history variable schemas
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  val last_jr_covert_date = StructType(Array(
-    StructField(CustomerStoreVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerStoreVariables.LAST_JR_COVERT_DATE, TimestampType, true)
-  ))
 }

@@ -5,7 +5,7 @@ import java.io.File
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext, Spark }
+import com.jabong.dap.common.{TestSchema, TestConstants, SharedSparkContext, Spark}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, SQLContext }
@@ -67,7 +67,7 @@ class FollowUpTest extends FlatSpec with SharedSparkContext {
 
     //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_full_sku_filter" + ".json")
 
-    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.ITEM_ON_DISCOUNT, "result_shortlist_full_sku_filter", Schema.resultFullSkuFilter)
+    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.ITEM_ON_DISCOUNT, "result_shortlist_full_sku_filter", TestSchema.resultFullSkuFilter)
       .collect().toSet
 
     assert(result.equals(dfShortListSkuSimpleFilter) == true)

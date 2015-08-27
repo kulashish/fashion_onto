@@ -42,7 +42,7 @@ object Schema {
     StructField(CustomerVariables.API_TOKEN, StringType, true),
     StructField(CustomerVariables.APP_LOGGED_IN, TimestampType, true),
     StructField(CustomerVariables.ID_CUSTOMER_ADDITIONAL_INFO, IntegerType, true),
-    StructField(CustomerVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerVariables.SOURCE, StringType, true),
     StructField(CustomerVariables.CITY, StringType, true),
     StructField(CustomerVariables.RELATIONSHIP_STATUS, StringType, true),
@@ -66,7 +66,7 @@ object Schema {
 
   val nls = StructType(Array(
     StructField(NewsletterVariables.ID_NEWSLETTER_SUBSCRIPTION, IntegerType, true),
-    StructField(NewsletterVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(NewsletterVariables.FK_CUSTOMER, LongType, true),
     StructField(NewsletterVariables.EMAIL, StringType, true),
     StructField(NewsletterVariables.UNSUBSCRIBE_KEY, StringType, true),
     StructField(NewsletterVariables.IP, StringType, true),
@@ -86,7 +86,7 @@ object Schema {
     StructField(SalesOrderVariables.ID_SALES_ORDER, IntegerType, true),
     StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_BILLING, IntegerType, true),
     StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING, IntegerType, true),
-    StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesOrderVariables.CUSTOMER_FIRST_NAME, StringType, true),
     StructField(SalesOrderVariables.CUSTOMER_LAST_NAME, StringType, true),
     StructField(SalesOrderVariables.CUSTOMER_EMAIL, StringType, true),
@@ -135,7 +135,7 @@ object Schema {
 
   val csh = StructType(Array(
     StructField(CustomerStoreVariables.ID_CUSTOMER_STORECREDITS_HISTORY, IntegerType, true),
-    StructField(CustomerStoreVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerStoreVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerStoreVariables.CREATED_AT, TimestampType, true),
     StructField(CustomerStoreVariables.OPERATION_TYPE, StringType, true),
     StructField(CustomerStoreVariables.FK_OPERATION, IntegerType, true),
@@ -151,20 +151,20 @@ object Schema {
   ))
 
   val customerSegments = StructType(Array(
-    StructField(CustomerSegmentsVariables.ID_CUSTOMER_SEGMENTS, IntegerType, true),
+    StructField(CustomerSegmentsVariables.ID_CUSTOMER_SEGMENTS, LongType, true),
     StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true),
-    StructField(CustomerSegmentsVariables.FREQUENCY, IntegerType, true),
-    StructField(CustomerSegmentsVariables.RECENCY, IntegerType, true),
+    StructField(CustomerSegmentsVariables.FREQUENCY, LongType, true),
+    StructField(CustomerSegmentsVariables.RECENCY, LongType, true),
     StructField(CustomerSegmentsVariables.MVP_SCORE, IntegerType, true),
     StructField(CustomerSegmentsVariables.DISCOUNT_SCORE, IntegerType, true),
-    StructField(CustomerSegmentsVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerSegmentsVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerSegmentsVariables.CREATED_AT, TimestampType, true),
     StructField(CustomerSegmentsVariables.UPDATED_AT, TimestampType, true)
   ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
-  val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true)))
-  val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, IntegerType, true),
+  val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true)))
+  val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
 
   val customerProductShortlist = StructType(Array(
@@ -184,7 +184,7 @@ object Schema {
 
   val salesCart = StructType(Array(
     StructField(SalesCartVariables.ID_SALES_CART, IntegerType, true),
-    StructField(SalesCartVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesCartVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesCartVariables.USER_CART_KEY, StringType, true),
     StructField(SalesCartVariables.SKU, StringType, true),
     StructField(SalesCartVariables.QUANTITY, IntegerType, true),
@@ -198,7 +198,7 @@ object Schema {
   ))
 
   val resultCustomerProductShortlist = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
     StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
@@ -224,31 +224,24 @@ object Schema {
   ))
 
   val resultGetJoin = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
     StructField(ItrVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuSimpleFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
     StructField(CustomerProductShortlistVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
     StructField(CustomerProductShortlistVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
-  ))
-
-  val resultFullSkuFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, IntegerType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
-    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val campaignOutput = StructType(Array(
@@ -382,12 +375,6 @@ object Schema {
     StructField(SalesOrderItemVariables.EXPECTED_SHIPPING_PARTNER, StringType, true),
     StructField(SalesOrderItemVariables.IS_MULTIPLE_SHIPMENTS, IntegerType, true),
     StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true)
-  ))
-
-  val refSkuInput = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, IntegerType, true),
-    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
-    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val customerDeviceMapping = StructType(Array(
