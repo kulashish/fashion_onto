@@ -57,7 +57,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CAMPAIGN_QUALITY => CampaignQualityEntry.start(paramJob)
           case DataSets.PRICING => SkuData.start(paramJob)
           case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
-          case "contactListMobileCSV" => ContactListMobile.start(paramJob)
+          case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case _ => logger.error("Unknown source.")
         }
       }
