@@ -7,7 +7,7 @@
       "primaryKey": "id_sales_order",
       "mergeMode": "full",
       "incrDate": "2013-10-31",
-      "fullDate": "2012/08/31/24",
+      "fullDate": "2012/08/31",
       "saveMode": "Ignore"
     },
     {
@@ -16,7 +16,7 @@
       "primaryKey": "id_sales_order_item",
       "mergeMode": "full",
       "incrDate": "2012-06-30",
-      "fullDate": "2012/05/31/24",
+      "fullDate": "2012/05/31",
       "saveMode": "Ignore"
     },
     {
@@ -25,7 +25,7 @@
       "primaryKey": "id_catalog_config",
       "mergeMode": "full",
       "incrDate": "2015-02-28",
-      "fullDate": "2014/11/30/24",
+      "fullDate": "2014/11/30",
       "saveMode": "Ignore"
     },
     {
@@ -34,7 +34,7 @@
       "primaryKey": "id_catalog_simple",
       "mergeMode": "full",
       "incrDate": "2012-06-30",
-      "fullDate": "2012/05/31/24",
+      "fullDate": "2012/05/31",
       "saveMode": "Ignore"
     },
     {
@@ -53,7 +53,7 @@
       "primaryKey": "id_sales_order_address",
       "mergeMode": "full",
       "incrDate": "2012-01-31",
-      "fullDate": "2011/12/31/24",
+      "fullDate": "2011/12/31",
       "saveMode": "Ignore"
     }
   ]
