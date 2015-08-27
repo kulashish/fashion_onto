@@ -207,6 +207,6 @@ class Itr extends Serializable with Logging {
           File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
       )
   */
-  return ""
+    return ""
   }
 }
