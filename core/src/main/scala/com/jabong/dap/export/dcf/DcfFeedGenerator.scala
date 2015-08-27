@@ -35,7 +35,7 @@ object DcfFeedGenerator extends Logging {
     val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
 
     val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
-      " where pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and " +
+      " where pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and sessionid != '(null)' and " +
       "date1 = " + date + " and month1 = " + month + " and year1=" + year
 
     logger.info("Running hive query :- " + hiveContext)
