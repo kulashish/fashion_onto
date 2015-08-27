@@ -197,10 +197,10 @@ object CampaignInput extends Logging {
 
   def loadFullShortlistData(date: String = TimeUtils.YESTERDAY_FOLDER) = {
     //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
-    val dateDiffFormat = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+    // val dateDiffFormat = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
 
     logger.info("Reading full fetch shortlist data from hdfs")
-    val shortlistData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, dateDiffFormat)
+    val shortlistData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_PRODUCT_SHORTLIST, DataSets.FULL_FETCH_MODE, date)
     shortlistData
   }
 

@@ -1,10 +1,9 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
-import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon, CustomerSelection }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -12,7 +11,7 @@ import org.apache.spark.sql.functions._
 class WishlistLowStockCampaign {
 
   // wishlist low stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr
-  def runCampaign(past30DayCampaignMergedData: DataFrame, shortListFullData: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
+  def runCampaign(past30DayCampaignMergedData: DataFrame, customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
     // select customers who have added one or more items to wishlist during 30 days
 
     // sku filter
@@ -23,9 +22,9 @@ class WishlistLowStockCampaign {
 
     // null recommendation
 
-    val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
-      .getCustomerSelector(CustomerSelection.WISH_LIST)
-    val customerSelected = wishListCustomerSelector.customerSelection(shortListFullData, 30)
+    // val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
+    // .getCustomerSelector(CustomerSelection.WISH_LIST)
+    // val customerSelected = wishListCustomerSelector.customerSelection(shortListFullData, 30)
 
     // data will contain both sku and sku simple records
 
