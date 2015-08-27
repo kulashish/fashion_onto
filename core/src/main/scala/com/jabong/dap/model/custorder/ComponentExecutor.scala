@@ -6,6 +6,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
+import com.jabong.dap.model.customer.ContactListMobile
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.quality.campaign.CampaignQualityEntry
@@ -56,6 +57,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CAMPAIGN_QUALITY => CampaignQualityEntry.start(paramJob)
           case DataSets.PRICING => SkuData.start(paramJob)
           case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
+          case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case _ => logger.error("Unknown source.")
         }
       }

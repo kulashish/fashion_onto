@@ -10,7 +10,6 @@ object ConfigJsonValidator {
 
   def validateRequiredValues(config: Config) = {
     require(config.applicationName != null && config.applicationName != "", "Application name cannot be null or empty")
-    require(config.outputPath != null && config.outputPath != "", "Output Path cannot be null or empty")
     require(config.basePath != null && config.basePath != "", "Base path cannot be null or empty")
   }
 

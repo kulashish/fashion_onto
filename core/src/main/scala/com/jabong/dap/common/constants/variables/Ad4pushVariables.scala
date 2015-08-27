@@ -9,7 +9,7 @@ object Ad4pushVariables {
   var TOKEN = "token"
   var OPENCOUNT = "opencount"
   var FIRSTOPEN = "firstopen"
-  var LASTOPEN ="lastopen"
+  var LASTOPEN = "lastopen"
   var MODEL = "model"
   var VERSION = "version"
   var LANGUAGE = "language"
@@ -54,10 +54,9 @@ object Ad4pushVariables {
 
   //Extra fields for 515
   var IDFA = "IDFA"
-  var LAST_ORDER_DATE= "last_order_date" //for 515 lastOrderDate coming 0000-00-00 00:00:00
+  var LAST_ORDER_DATE = "last_order_date" //for 515 lastOrderDate coming 0000-00-00 00:00:00
   var SEARCH_DATE = "search_date" //search_date coming as 0000-00-00 00:00:00 where as lastSearchDate coming as 2020-07-27 00:00:00
-  var WISHLIST_PRODUCTS_COUNT= "wishlist_products_count"
+  var WISHLIST_PRODUCTS_COUNT = "wishlist_products_count"
   var RATED = "rated"
-
 
 }

@@ -23,7 +23,7 @@ object SchemaUtils {
     return true
   }
 
-  def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
+  private def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
     //TODO Add check for datatype as well.
     if (df.columns.contains(key)) {
       return df

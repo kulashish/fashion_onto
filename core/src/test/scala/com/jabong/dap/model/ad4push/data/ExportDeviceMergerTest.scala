@@ -1,14 +1,10 @@
 package com.jabong.dap.model.ad4push.data
 
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{Spark, SharedSparkContext}
-import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
-import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
@@ -43,7 +39,7 @@ class ExportDeviceMergerTest extends FlatSpec with SharedSparkContext {
     assert(res.collect().length == 14)
   }
 
-  "Testing merging 515" should "have 17 recs" in {src/test/scala/com/jabong/dap/model/ad4push/data/
+  "Testing merging 515" should "have 17 recs" in {
     val t0 = System.nanoTime()
     var res = ExportDeviceMerger.mergeExportData(df4, df5)
     val t1 = System.nanoTime()
@@ -51,6 +47,5 @@ class ExportDeviceMergerTest extends FlatSpec with SharedSparkContext {
     //assert(res.collect().toSet.equals(df6.collect().toSet))
     assert(res.collect().length == 17)
   }
-
 
 }

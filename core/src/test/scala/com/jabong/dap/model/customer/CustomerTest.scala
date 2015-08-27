@@ -139,25 +139,6 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Name of variable: id_customer, CUSTOMERS PREFERRED ORDER TIMESLOT
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getCustomersPreferredOrderTimeslot: Data Frame" should "match to resultant Data Frame" in {
-
-    val result = Customer.getCPOT(dfSalesOrder: DataFrame)
-      .limit(30).collect().toSet
-
-    //            result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
-
-    val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-      CustVarSchema.customersPreferredOrderTimeslot)
-      .collect().toSet
-
-    assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
-
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Name of variable: fk_customer, LAST_JR_COVERT_DATE
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -199,7 +180,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getMvpAndSeg: Data Frame dfCustomerSegments" should "null" in {
 
-    val result = CustomerSegments.getMvpAndSeg(null)
+    val result = CustomerSegments.getCustomerSegments(null)
 
     assert(result == null)
 
@@ -208,7 +189,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
   "getMvpAndSeg: schema attributes and data type" should
     "match into DataFrame(dfCSH)" in {
 
-      val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
+      val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
 
       assert(result != null)
 
@@ -216,7 +197,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = CustomerSegments.getMvpAndSeg(dfCustomerSegments: DataFrame)
+    val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
       .limit(30).collect().toSet
 
     //                        result.limit(30).write.json(DataSets.TEST_RESOURCES + "mvp_seg" + ".json")

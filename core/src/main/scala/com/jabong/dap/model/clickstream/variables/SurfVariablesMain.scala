@@ -97,7 +97,7 @@ object SurfVariablesMain extends java.io.Serializable {
 
     val yesterdayDateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val userDeviceMapPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, yesterdayDateFolder)
+    val userDeviceMapPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, yesterdayDateFolder)
 
     var useridDeviceidFrame = getAppIdUserIdData(yesterdayDateFolder, tablename)
     var UserObj = new GroupData()
@@ -110,7 +110,7 @@ object SurfVariablesMain extends java.io.Serializable {
       .save(userDeviceMapPath)
 
     // variable 1
-    var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
+    var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
     val dMY = TimeUtils.getMonthAndYear(yesterdayDateFolder, TimeConstants.DATE_FORMAT_FOLDER)
     val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename, dMY.year, dMY.day, dMY.month + 1)
     variableSurf1.write.save(surf1VariablePath)
@@ -131,10 +131,10 @@ object SurfVariablesMain extends java.io.Serializable {
     val yesterdayDateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT)
 
-    val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, yesterdayDateFolder)
-    var processedVariablePath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
+    val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, yesterdayDateFolder)
+    var processedVariablePath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
 
-    var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, dayBeforeYesterdayDate)
+    var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, dayBeforeYesterdayDate)
 
     var oldMergedData: DataFrame = null
 
