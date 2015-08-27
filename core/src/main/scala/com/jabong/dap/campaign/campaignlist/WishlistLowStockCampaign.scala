@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, SkuSelection}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -23,7 +23,7 @@ class WishlistLowStockCampaign {
     // null recommendation
 
     // val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
-      // .getCustomerSelector(CustomerSelection.WISH_LIST)
+    // .getCustomerSelector(CustomerSelection.WISH_LIST)
     // val customerSelected = wishListCustomerSelector.customerSelection(shortListFullData, 30)
 
     // data will contain both sku and sku simple records
