@@ -57,6 +57,7 @@ object CustomerVariables {
   val FK_CORPORATE_CUSTOMER = "fk_corporate_customer"
   val FK_REFERRAL_CODE = "fk_referral_code"
   val SMS_OPT = "sms_opt"
+  val IS_PAYBACK_EARN = "is_payback_earn"
 
   //variables name
   val CUSTOMER_ALL_ORDER_TIMESLOT = "customer_all_order_timeslot"
