@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.skuselection
 
 import java.io.File
 
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
+import com.jabong.dap.common.{ TestSchema, TestConstants, SharedSparkContext }
 import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
@@ -40,7 +40,7 @@ class SkuItemOnDiscountTest extends FlatSpec with SharedSparkContext {
 
     //                       result.limit(30).write.json(DataSets.TEST_RESOURCES + "result_shortlist_full_sku_filter" + ".json")
 
-    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.ITEM_ON_DISCOUNT, "result_shortlist_full_sku_filter", Schema.resultFullSkuFilter)
+    val dfShortListSkuSimpleFilter = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.ITEM_ON_DISCOUNT, "result_shortlist_full_sku_filter", TestSchema.resultFullSkuFilter)
       .collect().toSet
 
     assert(result.equals(dfShortListSkuSimpleFilter) == true)

@@ -48,8 +48,8 @@ object CustomerSegments {
       .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
         first(CustomerSegmentsVariables.MVP_SCORE) as CustomerSegmentsVariables.MVP_TYPE,
-        first(CustomerSegmentsVariables.SEGMENT),
-        first(CustomerSegmentsVariables.DISCOUNT_SCORE)
+        first(CustomerSegmentsVariables.SEGMENT) as CustomerSegmentsVariables.SEGMENT,
+        first(CustomerSegmentsVariables.DISCOUNT_SCORE) as CustomerSegmentsVariables.DISCOUNT_SCORE
       )
 
     //    val segments = getSeg(dfCustSegVars)
