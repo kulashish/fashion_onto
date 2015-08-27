@@ -15,7 +15,7 @@ object ConfigConstants {
 
   val TMP_PATH = basePath + File.separator + "tmp"
 
-  private val OUTPUT_PATH = AppConfig.config.basePath + File.separator + "OUTPUT"
+  private val OUTPUT_PATH = AppConfig.config.basePath + File.separator + "output"
 
   val WRITE_OUTPUT_PATH = OptionUtils.getOptValue(AppConfig.config.writeOutputPath, OUTPUT_PATH)
 
