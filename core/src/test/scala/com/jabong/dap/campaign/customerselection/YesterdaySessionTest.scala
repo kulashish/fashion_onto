@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import java.io.File
 
-import com.jabong.dap.common.{TestSchema, TestConstants, SharedSparkContext}
+import com.jabong.dap.common.{ TestSchema, TestConstants, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema

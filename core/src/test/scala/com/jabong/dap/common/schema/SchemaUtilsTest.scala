@@ -1,6 +1,6 @@
 package com.jabong.dap.common.schema
 
-import com.jabong.dap.common.{TestSchema, SharedSparkContext}
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext }
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.schema.Schema

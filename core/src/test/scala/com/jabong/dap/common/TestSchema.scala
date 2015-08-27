@@ -1,6 +1,6 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -126,6 +126,5 @@ object TestSchema {
 
   val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
-
 
 }

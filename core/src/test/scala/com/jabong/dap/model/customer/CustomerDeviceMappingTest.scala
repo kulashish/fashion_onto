@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, TestSchema}
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import org.apache.spark.sql.DataFrame

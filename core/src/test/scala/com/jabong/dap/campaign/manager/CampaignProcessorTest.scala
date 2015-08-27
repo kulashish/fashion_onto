@@ -2,11 +2,11 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, TestSchema}
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 

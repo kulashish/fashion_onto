@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.customerselection
 import java.io.File
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, TestConstants, TestSchema}
+import com.jabong.dap.common.{ SharedSparkContext, TestConstants, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
