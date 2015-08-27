@@ -1,7 +1,11 @@
 package com.jabong.dap.model.order.variables
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
-import org.apache.spark.sql.DataFrame
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.UdfUtils
+import com.jabong.dap.model.customer.schema.CustVarSchema
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 
 /**
@@ -39,5 +43,31 @@ object SalesOrder {
       )
       salesOrderCalcNewFull
     }
+  }
+
+  /**
+   * CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
+   * @param dfSalesOrder
+   * @return DataFrame
+   */
+  def getCPOT(dfSalesOrder: DataFrame): DataFrame = {
+
+    val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
+      .sort(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
+
+    val soMapReduce = salesOrder.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
+
+    val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
+
+    val soGrouped = soNewMap.groupByKey()
+
+    val finalData = soGrouped.map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
+
+    val rowRDD = finalData.map({ case (key, value) => Row(key.toInt, value._1, value._2) })
+
+    // Apply the schema to the RDD.
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslot)
+
+    df
   }
 }

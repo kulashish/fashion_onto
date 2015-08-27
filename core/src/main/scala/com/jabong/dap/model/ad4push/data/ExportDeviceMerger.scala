@@ -1,26 +1,20 @@
 package com.jabong.dap.model.ad4push.data
 
-import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{Ad4pushVariables}
+import com.jabong.dap.common.constants.variables.Ad4pushVariables
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.data.read.{ValidFormatNotFound, DataNotFound, DataReader}
+import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.DataFrame
-import grizzled.slf4j.Logging
-import org.apache.spark.sql.functions._
 import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
-
+import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 21/8/15.
  */
-object ExportDeviceMerger extends Logging   {
-
-
+object ExportDeviceMerger extends Logging {
 
   /**
    *
@@ -31,7 +25,7 @@ object ExportDeviceMerger extends Logging   {
   def processData(prevDate: String, fullcsv: String, curDate: String, saveMode: String, deviceType: String) {
     val filename = ".csv"
     var newDF: DataFrame = null
-    newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE+deviceType, DataSets.DAILY_MODE, curDate, filename, "true", ",")
+    newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE + deviceType, DataSets.DAILY_MODE, curDate, filename, "true", ",")
     if (deviceType.equalsIgnoreCase("517")) {
       if (deviceType.equalsIgnoreCase("517")) {
         newDF = SchemaUtils.changeSchema(newDF, DevicesReactionsSchema.Ad4pushDevice515)
@@ -40,31 +34,29 @@ object ExportDeviceMerger extends Logging   {
 
     var full: DataFrame = null
     if (null != fullcsv) {
-      full = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE+deviceType, DataSets.DAILY_MODE, curDate, fullcsv, "true", ",")
+      full = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE + deviceType, DataSets.DAILY_MODE, curDate, fullcsv, "true", ",")
       if (deviceType.equalsIgnoreCase("517")) {
-          full = SchemaUtils.changeSchema(full, DevicesReactionsSchema.Ad4pushDevice515)
+        full = SchemaUtils.changeSchema(full, DevicesReactionsSchema.Ad4pushDevice515)
       }
     } else {
-      full = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE+deviceType, DataSets.FULL_MERGE_MODE, prevDate)
+      full = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE + deviceType, DataSets.FULL_MERGE_MODE, prevDate)
     }
 
     val res = mergeExportData(full, newDF)
-    val savePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE+deviceType, DataSets.FULL_MERGE_MODE, curDate)
+    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.EXPORT_DEVICE + deviceType, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
-    if (deviceType.equalsIgnoreCase("517")){
-      DataWriter.writeCsv(SchemaUtils.dropColumns(res, DevicesReactionsSchema.Ad4pushDevice517), ConfigConstants.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, DataSets.EXPORT_DEVICE+deviceType, DataSets.OVERWRITE_SAVEMODE, "true", ",")
+    if (deviceType.equalsIgnoreCase("517")) {
+      DataWriter.writeCsv(SchemaUtils.dropColumns(res, DevicesReactionsSchema.Ad4pushDevice517), ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, DataSets.EXPORT_DEVICE + deviceType, DataSets.OVERWRITE_SAVEMODE, "true", ",")
     } else {
-      DataWriter.writeCsv(res, ConfigConstants.OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, DataSets.EXPORT_DEVICE+deviceType, DataSets.OVERWRITE_SAVEMODE, "true", ",")
+      DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, DataSets.EXPORT_DEVICE + deviceType, DataSets.OVERWRITE_SAVEMODE, "true", ",")
     }
   }
-
-
 
   def mergeExportData(full: DataFrame, newdf: DataFrame): DataFrame = {
 
     val joined = full.join(newdf, full(Ad4pushVariables.UDID) === newdf(Ad4pushVariables.UDID), "outer")
-                      .select(coalesce(full(Ad4pushVariables.UDID),newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.UDID,
+      .select(coalesce(full(Ad4pushVariables.UDID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.UDID,
         coalesce(newdf(Ad4pushVariables.TOKEN), full(Ad4pushVariables.TOKEN)) as Ad4pushVariables.TOKEN,
         coalesce(newdf(Ad4pushVariables.OPENCOUNT), full(Ad4pushVariables.OPENCOUNT)) as Ad4pushVariables.OPENCOUNT,
         coalesce(newdf(Ad4pushVariables.FIRSTOPEN), full(Ad4pushVariables.FIRSTOPEN)) as Ad4pushVariables.FIRSTOPEN,
@@ -116,7 +108,5 @@ object ExportDeviceMerger extends Logging   {
       )
     return joined
   }
-
-  
 
 }

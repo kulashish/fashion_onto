@@ -3,9 +3,9 @@ package com.jabong.dap.export.dcf
 import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.{ Spark, OptionUtils }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -13,8 +13,6 @@ import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.{ SparkConf, SparkContext }
-import org.apache.spark.sql.hive.HiveContext
 
 /**
  * Created by rahul on 20/8/15.
@@ -32,7 +30,7 @@ object DcfFeedGenerator extends Logging {
     val date = monthYear.day
     val year = monthYear.year
 
-    val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
+    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
 
     val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
       " where pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and sessionid != '(null)' and " +
@@ -44,7 +42,7 @@ object DcfFeedGenerator extends Logging {
 
     val joinedData = convertFeedFormat(pageVisitData, cmr).cache()
     val changedDateFormat = TimeUtils.changeDateFormat(executeDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
-    val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate)
+    val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate)
 
     DataWriter.writeParquet(joinedData, writePath, saveMode)
 

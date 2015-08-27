@@ -39,9 +39,11 @@ object DataSets {
 
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
+
   //non schema constants for ad4push
   val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
   val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
+  val EXPORT_DEVICE = "exportDevice_"
 
   val REACTIONS_IOS = "reactions_ios"
   val REACTIONS_ANDROID = "reactions_android"
@@ -118,10 +120,8 @@ object DataSets {
   val DCF_FEED_FILENAME = "webhistory_"
 
   //Campaign Quality
-  val EXPORT_DEVICE = "exportDevice_"
-
   val CAMPAIGN_QUALITY = "campaign_quality"
-  val DND = "DND"
 
+  val DND = "DND"
   val CONTACT_LIST_MOBILE = "contact_list_mobile"
 }

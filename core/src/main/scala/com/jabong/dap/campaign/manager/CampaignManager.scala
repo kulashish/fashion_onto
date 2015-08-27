@@ -227,14 +227,14 @@ object CampaignManager extends Serializable with Logging {
       val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
 
-      val cmr = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
       val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
 
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
       val mergedData = CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
 
       println("Starting write parquet after repartitioning and caching")
-      val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
         DataWriter.writeParquet(mergedData, writePath, saveMode)
 

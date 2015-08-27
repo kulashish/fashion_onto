@@ -46,6 +46,15 @@
       "incrDate": "2015-07-01",
       "fullDate": "2015/06/30",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_address",
+      "primaryKey": "id_sales_order_address",
+      "mergeMode": "full",
+      "incrDate": "2012-01-31",
+      "fullDate": "2011/12/31/24",
+      "saveMode": "Ignore"
     }
   ]
 }

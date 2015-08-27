@@ -1,19 +1,18 @@
 package com.jabong.dap.export
 
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.common.constants.SkuDataConst._
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import org.apache.spark.sql.types.IntegerType
-import org.apache.spark.sql.{ SaveMode, DataFrame }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import com.jabong.dap.common.constants.SkuDataConst._
+import org.apache.spark.sql.types.IntegerType
 
 /**
  * Created by Kapil.Rajak on 17/8/15.
@@ -36,7 +35,7 @@ object SkuData {
     val result = skuBasedProcess(rawDF, date)
 
     val filename = DataSets.SKU_DATA + "_" + DataSets.PRICING + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    val writePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.SKU_DATA, DataSets.PRICING, DataSets.DAILY_MODE, date)
+    val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.SKU_DATA, DataSets.PRICING, DataSets.DAILY_MODE, date)
     if (DataWriter.canWrite(writePath, saveMode)) {
       DataWriter.writeParquet(result, writePath, saveMode)
     }

@@ -1,6 +1,6 @@
 package com.jabong.dap.model.ad4push.schema
 
-import com.jabong.dap.common.constants.variables.{Ad4pushVariables, DevicesReactionsVariables}
+import com.jabong.dap.common.constants.variables.{ Ad4pushVariables, DevicesReactionsVariables }
 import org.apache.spark.sql.types._
 
 /**
@@ -78,7 +78,7 @@ object DevicesReactionsSchema {
     StructField(DevicesReactionsVariables.CLICKED_TWICE, IntegerType, false),
     StructField(DevicesReactionsVariables.MOST_CLICK_DAY, StringType, true)
   ))
-  
+
   val Ad4pushDevice517 = StructType(Array(
     StructField(Ad4pushVariables.UDID, StringType, true),
     StructField(Ad4pushVariables.TOKEN, StringType, true),
@@ -106,7 +106,7 @@ object DevicesReactionsSchema {
     StructField(Ad4pushVariables.HAS_SHARED_PRODUCT, StringType, true),
     StructField(Ad4pushVariables.LAST_ABANDONED_CART_DATE, StringType, true),
     StructField(Ad4pushVariables.LAST_ABANDONED_CART_PRODUCT, StringType, true),
-    StructField(Ad4pushVariables.LASTORDERDATE , StringType, true),
+    StructField(Ad4pushVariables.LASTORDERDATE, StringType, true),
     StructField(Ad4pushVariables.LAST_SEARCH, StringType, true),
     StructField(Ad4pushVariables.LAST_SEARCH_DATE, StringType, true),
     StructField(Ad4pushVariables.LEAD, StringType, true),
@@ -155,7 +155,7 @@ object DevicesReactionsSchema {
     StructField(Ad4pushVariables.HAS_SHARED_PRODUCT, StringType, true),
     StructField(Ad4pushVariables.LAST_ABANDONED_CART_DATE, StringType, true),
     StructField(Ad4pushVariables.LAST_ABANDONED_CART_PRODUCT, StringType, true),
-    StructField(Ad4pushVariables.LASTORDERDATE , StringType, true),
+    StructField(Ad4pushVariables.LASTORDERDATE, StringType, true),
     StructField(Ad4pushVariables.LAST_SEARCH, StringType, true),
     StructField(Ad4pushVariables.LAST_SEARCH_DATE, StringType, true),
     StructField(Ad4pushVariables.LEAD, StringType, true),

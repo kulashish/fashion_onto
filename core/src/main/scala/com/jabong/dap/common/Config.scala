@@ -28,14 +28,17 @@ case class Credentials(
  * parameters which matches to the keys in config.json.template
  *
  * @param applicationName String Set a name for your application. Shown in the Spark web UI
- * @param outputPath String The output path for the location where the data will be saved.
+ * @param readOutputPath String The output path for the location where the data will be read from.
+ *                       The data here is the putput of some previous job.
+ * @param writeOutputPath String The output path for the location where the data will be saved.
  * @param basePath String The base path for the location where the data will be read and written.
  * @param credentials List[Credentials] List of credentials.
  */
 case class Config(
   applicationName: String = null,
-  outputPath: String = null,
   basePath: String = null,
+  readOutputPath: Option[String],
+  writeOutputPath: Option[String],
   credentials: List[Credentials] = null) extends EmptyClass
 
 /**
