@@ -16,7 +16,7 @@ import org.scalatest.{ FlatSpec, Matchers }
 class DataReaderTest extends FlatSpec with SharedSparkContext with Matchers {
 
   "getDataFrame4mCsv: Data Frame" should "match with expected data" in {
-    val dfReaction = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/22", "test.csv", "true", ",")
+    val dfReaction = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/22", "test.csv", "true", ",")
     val dfReactionCast = dfReaction.select(dfReaction(DevicesReactionsVariables.LOGIN_USER_ID) as DevicesReactionsVariables.LOGIN_USER_ID,
       dfReaction(DevicesReactionsVariables.DEVICE_ID) as DevicesReactionsVariables.DEVICE_ID,
       dfReaction(DevicesReactionsVariables.MESSAGE_ID) as DevicesReactionsVariables.MESSAGE_ID,

@@ -1,16 +1,13 @@
 package com.jabong.dap.model.product.itr
 
-import java.io.File
 import java.math
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.AppConfig
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions._
-import com.jabong.dap.model.product.itr.variables.ITR
 
 class Itr extends Serializable with Logging {
 
@@ -195,17 +192,21 @@ class Itr extends Serializable with Logging {
    * @return String
    */
   def getPath(skuLevel: Boolean): String = {
+    // FIXME
+    /*
     if (skuLevel) {
       return "%s/".
         format(
-          AppConfig.config.basePath +
+          ConfigConstants.WRITE_OUTPUT_PATH +
             File.separator + "itr" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         )
     }
     return "%s/".
       format(
-        AppConfig.config.basePath +
+        ConfigConstants.WRITE_OUTPUT_PATH +
           File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
       )
+  */
+  return ""
   }
 }
