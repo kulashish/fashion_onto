@@ -131,10 +131,8 @@ object CustomerDeviceMapping extends Logging {
    * @return DataFrame
    */
   def getDataFrameCsv4mDCF(path: String): DataFrame = {
-    require(path != null, "Path is null")
-
     try {
-      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(path)
+      val df = DataReader.getDataFrame4mCsv(path, "true", ";")
         .select(
           col("RESPONSYS_ID") as CustomerVariables.RESPONSYS_ID,
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
@@ -149,7 +147,7 @@ object CustomerDeviceMapping extends Logging {
       // df.show(9)
 
       val dupFile = "/data/output/extras/duplicate/cust_email.csv"
-      val duplicate = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ",").load(dupFile)
+      val duplicate = DataReader.getDataFrame4mCsv(dupFile, "true", ";")
       println("Total recs in duplicate file: ") // + duplicate.count())
       // duplicate.printSchema()
       // duplicate.show(9)

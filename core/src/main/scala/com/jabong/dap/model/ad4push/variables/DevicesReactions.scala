@@ -1,10 +1,9 @@
 package com.jabong.dap.model.ad4push.variables
 
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.DevicesReactionsVariables
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -51,7 +50,7 @@ object DevicesReactions extends Logging {
     var unionFinalDF: DataFrame = null
 
     if (DataWriter.canWrite(savePathI, saveMode)) {
-      val fName = "exportMessagesReactions_" + CampaignMergedFields.IOS_CODE + "_" + incrDateInFileFormat + ".csv"
+      val fName = "exportMessagesReactions_" + DataSets.IOS_CODE + "_" + incrDateInFileFormat + ".csv"
       val incIStringSchema = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_IOS, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
       val incI = dfCorrectSchema(incIStringSchema)
 
@@ -80,7 +79,7 @@ object DevicesReactions extends Logging {
 
     val savePathA = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(savePathA, saveMode)) {
-      val fName = "exportMessagesReactions_" + CampaignMergedFields.ANDROID_CODE + "_" + incrDateInFileFormat + ".csv"
+      val fName = "exportMessagesReactions_" + DataSets.ANDROID_CODE + "_" + incrDateInFileFormat + ".csv"
       val incAStringSchema = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, DataSets.REACTIONS_ANDROID, DataSets.DAILY_MODE, incrDate, fName, "true", ",")
       val incA = dfCorrectSchema(incAStringSchema)
 

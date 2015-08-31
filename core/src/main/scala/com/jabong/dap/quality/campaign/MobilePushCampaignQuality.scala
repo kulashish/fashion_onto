@@ -47,9 +47,9 @@ object MobilePushCampaignQuality extends Logging {
     StructField(WINDOWS, LongType, TRUE)
   ))
 
-  def startMobilePushCampaignQuality(campaignsConfig: String) = {
+  def start(campaignsConfig: String) = {
 
-    logger.info("Calling method startMobilePushCampaignQuality........")
+    logger.info("Calling method start inside MobilePushCampaignQuality........")
 
     if (CampaignManager.initCampaignsConfigJson(campaignsConfig)) {
 

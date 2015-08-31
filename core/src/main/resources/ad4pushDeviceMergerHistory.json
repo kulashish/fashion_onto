@@ -1,0 +1,12 @@
+{
+  "isHistory": true,
+  "params": [
+    {
+      "source": "ad4pushDeviceMerger",
+      "path": "/data/input/ad4push/devices_ios/full/2015/07/09/24/exportDevices_515_20150709.csv;/data/input/ad4push/devices_android/full/2015/07/09/24/exportDevices_517_20150709.csv",
+      "incrDate": "2015/07/10",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}

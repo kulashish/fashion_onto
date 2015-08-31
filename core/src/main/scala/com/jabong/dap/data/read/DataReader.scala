@@ -135,4 +135,17 @@ object DataReader extends Logging {
     }
   }
 
+  def getDataFrame4mCsv(fullCSVPath: String, header: String, delimiter: String): DataFrame = {
+    require(fullCSVPath != null, "Path is null")
+
+    logger.info("Reading data from hdfs: " + fullCSVPath + " in csv format")
+    // used dir exists as the path itself contains the filename as well.
+    if (DataVerifier.dirExists(fullCSVPath))
+      Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fullCSVPath)
+    else {
+      logger.error("Data not found for " + fullCSVPath)
+      throw new DataNotFound
+    }
+  }
+
 }

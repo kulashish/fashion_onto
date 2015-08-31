@@ -38,14 +38,17 @@ object DataSets {
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
 
-  //non schema constants for ad4push
-  val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
-  val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
-  val EXPORT_DEVICE = "exportDevice_"
+  val DEVICES_IOS = "devices_ios"
+  val DEVICES_ANDROID = "devices_android"
+  val AD4PUSH_DEVICE_MERGER = "ad4pushDeviceMerger"
 
   val REACTIONS_IOS = "reactions_ios"
   val REACTIONS_ANDROID = "reactions_android"
   val CUSTOMER_RESPONSE = "customer_response"
+  val AD4PUSH_CUSTOMER_RESPONSE = "ad4pushCustomerResponse"
+
+  val IOS_CODE = "515"
+  val ANDROID_CODE = "517"
 
   val IOS = "ios"
   val WINDOWS = "windows"
