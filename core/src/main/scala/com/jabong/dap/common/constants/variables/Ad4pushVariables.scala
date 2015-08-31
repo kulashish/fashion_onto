@@ -5,6 +5,7 @@ package com.jabong.dap.common.constants.variables
  */
 object Ad4pushVariables {
 
+  var DEVICE_ID = "device_id"
   var UDID = "UDID"
   var TOKEN = "token"
   var OPENCOUNT = "opencount"
