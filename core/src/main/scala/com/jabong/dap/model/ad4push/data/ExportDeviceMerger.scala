@@ -55,8 +55,8 @@ object ExportDeviceMerger extends Logging {
 
   def mergeExportData(full: DataFrame, newdf: DataFrame): DataFrame = {
 
-    val joined = full.join(newdf, full(Ad4pushVariables.UDID) === newdf(Ad4pushVariables.UDID), "outer")
-      .select(coalesce(full(Ad4pushVariables.UDID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.UDID,
+    val joined = full.join(newdf, full(Ad4pushVariables.DEVICE_ID) === newdf(Ad4pushVariables.UDID), "outer")
+      .select(coalesce(full(Ad4pushVariables.DEVICE_ID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.DEVICE_ID,
         coalesce(newdf(Ad4pushVariables.TOKEN), full(Ad4pushVariables.TOKEN)) as Ad4pushVariables.TOKEN,
         coalesce(newdf(Ad4pushVariables.OPENCOUNT), full(Ad4pushVariables.OPENCOUNT)) as Ad4pushVariables.OPENCOUNT,
         coalesce(newdf(Ad4pushVariables.FIRSTOPEN), full(Ad4pushVariables.FIRSTOPEN)) as Ad4pushVariables.FIRSTOPEN,
