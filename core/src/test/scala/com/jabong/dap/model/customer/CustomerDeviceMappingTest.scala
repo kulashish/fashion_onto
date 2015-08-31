@@ -1,9 +1,8 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
@@ -32,11 +31,11 @@ class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
     click2 = JsonUtils.readFromJson(DataSets.EXTRAS, "clickstream1")
 
-    dcf = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping", Schema.customerDeviceMapping)
+    dcf = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping", TestSchema.customerDeviceMapping)
 
-    res1 = JsonUtils.readFromJson(DataSets.EXTRAS, "res1", Schema.customerDeviceMapping)
+    res1 = JsonUtils.readFromJson(DataSets.EXTRAS, "res1", TestSchema.customerDeviceMapping)
 
-    res2 = JsonUtils.readFromJson(DataSets.EXTRAS, "res2", Schema.customerDeviceMapping)
+    res2 = JsonUtils.readFromJson(DataSets.EXTRAS, "res2", TestSchema.customerDeviceMapping)
 
   }
 

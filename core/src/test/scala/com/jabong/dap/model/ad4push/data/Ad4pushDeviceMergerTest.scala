@@ -11,7 +11,7 @@ import org.scalatest.FlatSpec
 /**
  * Created by jabong on 25/8/15.
  */
-class ExportDeviceMergerTest extends FlatSpec with SharedSparkContext {
+class Ad4pushDeviceMergerTest extends FlatSpec with SharedSparkContext {
 
   @transient var df1: DataFrame = _
   @transient var df2: DataFrame = _
@@ -32,7 +32,7 @@ class ExportDeviceMergerTest extends FlatSpec with SharedSparkContext {
 
   "Testing merging 517" should "have 14 recs" in {
     val t0 = System.nanoTime()
-    var res = ExportDeviceMerger.mergeExportData(SchemaUtils.changeSchema(df1, DevicesReactionsSchema.Ad4pushDevice515), SchemaUtils.changeSchema(df2, DevicesReactionsSchema.Ad4pushDevice515))
+    var res = Ad4pushDeviceMerger.mergeExportData(SchemaUtils.changeSchema(df1, DevicesReactionsSchema.Ad4pushDeviceIOS), SchemaUtils.changeSchema(df2, DevicesReactionsSchema.Ad4pushDeviceIOS))
     val t1 = System.nanoTime()
     println("Normal time: " + (t1 - t0) + "ns")
     //assert(res.collect().toSet.equals(df3.collect().toSet))
@@ -41,7 +41,7 @@ class ExportDeviceMergerTest extends FlatSpec with SharedSparkContext {
 
   "Testing merging 515" should "have 17 recs" in {
     val t0 = System.nanoTime()
-    var res = ExportDeviceMerger.mergeExportData(df4, df5)
+    var res = Ad4pushDeviceMerger.mergeExportData(df4, df5)
     val t1 = System.nanoTime()
     println("Normal time: " + (t1 - t0) + "ns")
     //assert(res.collect().toSet.equals(df6.collect().toSet))

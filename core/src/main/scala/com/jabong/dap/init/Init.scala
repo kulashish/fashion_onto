@@ -120,6 +120,7 @@ object Init {
       case "merge" => new MergeDelegator().start(params.mergeJson)
       case "deviceMapping" => new ComponentExecutor().start(params.paramJson)
       case "Ad4pushCustReact" => new ComponentExecutor().start(params.paramJson)
+      case "Ad4pushDeviceMerger" => new ComponentExecutor().start(params.paramJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.pushCampaignsJson)
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.pushCampaignsJson)
@@ -133,7 +134,7 @@ object Init {
       case "clickstreamSurf3MergeData30" => GetSurfVariables.getSurf3mergedForLast30Days()
 
       //campaign quality check
-      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.startMobilePushCampaignQuality(params.pushCampaignsJson)
+      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)
       // all pushCampaign quality checks
       case "campaignQuality" => new ComponentExecutor().start(params.paramJson)
       //pricing sku data

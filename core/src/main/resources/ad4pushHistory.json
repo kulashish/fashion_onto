@@ -1,103 +1,103 @@
 {
   "params": [
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/11",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/12",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/13",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/14",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/15",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/16",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/17",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/18",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/19",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/20",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/21",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/22",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/23",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/24",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/25",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/26",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
-      "source": "ad4push",
+      "source": "ad4pushDeviceMerger",
       "incrDate": "2015/07/27",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"

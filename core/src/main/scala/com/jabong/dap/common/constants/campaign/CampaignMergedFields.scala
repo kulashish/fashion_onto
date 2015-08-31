@@ -13,10 +13,6 @@ object CampaignMergedFields {
   val EMAIL = "email"
   val DOMAIN = "domain"
 
-  //Working fields
-  val IOS_CODE = "515"
-  val ANDROID_CODE = "517"
-
   val deviceId = "deviceId"
   val LIVE_MAIL_TYPE = "LIVE_MAIL_TYPE"
   val LIVE_BRAND = "LIVE_BRAND"

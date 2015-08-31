@@ -1,7 +1,7 @@
 {
   "params": [
     {
-      "source": "ad4pushCustomerResponse",
+      "source": "ad4pushDeviceMerger",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
