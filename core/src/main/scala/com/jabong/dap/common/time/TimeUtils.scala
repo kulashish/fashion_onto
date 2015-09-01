@@ -36,6 +36,14 @@ object TimeUtils extends Logging {
     daysBetweenTwoDates(today, date)
   }
 
+  def daysFromToday(date: String, dateFormat: String): Int = {
+    val format = new SimpleDateFormat(dateFormat)
+    val dt = Calendar.getInstance()
+    dt.setTime(format.parse(date))
+    val today = new Date
+    daysBetweenTwoDates(today, dt.getTime).toInt
+  }
+
   /**
    * Given two input date strings in the format yyyy-MM-dd, tells whether the first date is less than the second
    * date or not.

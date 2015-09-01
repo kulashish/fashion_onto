@@ -5,7 +5,7 @@ import java.io.File
 import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.constants.variables.{ ItrVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark, TestConstants }
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark, TestConstants }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
@@ -40,10 +40,10 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     salesOrderItem = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "sales_item_bought")
     customerSelectedTime = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_filtered_time")
 
-    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, TestConstants.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
+    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, TestConstants.CUSTOMER_PAGE_VISIT, TestSchema.customerPageVisitSkuLevel)
     dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, DataSets.CUSTOMER, Schema.customer)
 
-    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
     dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
     dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
 

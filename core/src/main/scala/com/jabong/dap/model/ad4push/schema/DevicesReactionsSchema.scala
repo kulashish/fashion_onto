@@ -79,7 +79,7 @@ object DevicesReactionsSchema {
     StructField(DevicesReactionsVariables.MOST_CLICK_DAY, StringType, true)
   ))
 
-  val Ad4pushDevice517 = StructType(Array(
+  val Ad4pushDeviceAndroid = StructType(Array(
     StructField(Ad4pushVariables.UDID, StringType, true),
     StructField(Ad4pushVariables.TOKEN, StringType, true),
     StructField(Ad4pushVariables.OPENCOUNT, StringType, true),
@@ -128,7 +128,7 @@ object DevicesReactionsSchema {
     StructField(Ad4pushVariables.MOST_VISITED_COUNTS, StringType, true)
   ))
 
-  val Ad4pushDevice515 = StructType(Array(
+  val Ad4pushDeviceIOS = StructType(Array(
     StructField(Ad4pushVariables.UDID, StringType, true),
     StructField(Ad4pushVariables.TOKEN, StringType, true),
     StructField(Ad4pushVariables.OPENCOUNT, StringType, true),

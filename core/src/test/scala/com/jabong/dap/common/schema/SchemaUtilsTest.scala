@@ -1,6 +1,6 @@
 package com.jabong.dap.common.schema
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext }
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.schema.Schema
@@ -24,7 +24,7 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
 
   override def beforeAll() {
     super.beforeAll()
-    campaignsOutData = JsonUtils.readFromJson("campaigns/manager", "campaign_output", Schema.campaignOutput)
+    campaignsOutData = JsonUtils.readFromJson("campaigns/manager", "campaign_output", TestSchema.campaignOutput)
       .select(
         CampaignMergedFields.CUSTOMER_ID,
         CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
@@ -46,11 +46,11 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
   }
 
   "changeSchemaWithInteger" should "add columns" in {
-    val res = SchemaUtils.changeSchema(campaignsOutData, Schema.campaignPriorityOutput)
+    val res = SchemaUtils.changeSchema(campaignsOutData, TestSchema.campaignPriorityOutput)
     res.printSchema()
     res.collect().foreach(println)
     assert(res.columns.length == 7)
-    assert(SchemaUtils.isSchemaEqual(res.schema, Schema.campaignPriorityOutput))
+    assert(SchemaUtils.isSchemaEqual(res.schema, TestSchema.campaignPriorityOutput))
   }
 
 }
