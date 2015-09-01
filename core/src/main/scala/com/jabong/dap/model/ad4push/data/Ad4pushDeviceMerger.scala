@@ -10,7 +10,7 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
+import com.jabong.dap.model.ad4push.schema.Ad4pushSchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -60,7 +60,7 @@ object Ad4pushDeviceMerger extends Logging {
     newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ",")
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
       if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-        newDF = SchemaUtils.changeSchema(newDF, DevicesReactionsSchema.Ad4pushDeviceIOS)
+        newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
       }
     }
 
@@ -68,7 +68,7 @@ object Ad4pushDeviceMerger extends Logging {
     if (null != fullcsv) {
       full = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
       if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-        full = SchemaUtils.changeSchema(full, DevicesReactionsSchema.Ad4pushDeviceIOS)
+        full = SchemaUtils.changeSchema(full, Ad4pushSchema.Ad4pushDeviceIOS)
       }
     } else {
       full = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, prevDate)
@@ -79,7 +79,7 @@ object Ad4pushDeviceMerger extends Logging {
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      DataWriter.writeCsv(SchemaUtils.dropColumns(res, DevicesReactionsSchema.Ad4pushDeviceAndroid), ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, tablename, saveMode, "true", ",")
+      DataWriter.writeCsv(SchemaUtils.dropColumns(res, Ad4pushSchema.Ad4pushDeviceAndroid), ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, tablename, saveMode, "true", ",")
     } else {
       DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, tablename, saveMode, "true", ",")
     }

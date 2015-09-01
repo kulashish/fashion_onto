@@ -4,7 +4,7 @@ import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
+import com.jabong.dap.model.ad4push.schema.Ad4pushSchema
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
@@ -32,7 +32,7 @@ class Ad4pushDeviceMergerTest extends FlatSpec with SharedSparkContext {
 
   "Testing merging 517" should "have 14 recs" in {
     val t0 = System.nanoTime()
-    var res = Ad4pushDeviceMerger.mergeExportData(SchemaUtils.changeSchema(df1, DevicesReactionsSchema.Ad4pushDeviceIOS), SchemaUtils.changeSchema(df2, DevicesReactionsSchema.Ad4pushDeviceIOS))
+    var res = Ad4pushDeviceMerger.mergeExportData(SchemaUtils.changeSchema(df1, Ad4pushSchema.Ad4pushDeviceIOS), SchemaUtils.changeSchema(df2, Ad4pushSchema.Ad4pushDeviceIOS))
     val t1 = System.nanoTime()
     println("Normal time: " + (t1 - t0) + "ns")
     //assert(res.collect().toSet.equals(df3.collect().toSet))

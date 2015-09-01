@@ -3,7 +3,7 @@ package com.jabong.dap.quality
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets._
-import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
+import com.jabong.dap.model.ad4push.schema.Ad4pushSchema._
 import com.jabong.dap.quality.campaign.CancelReTargetQuality
 import org.scalatest.FlatSpec
 
