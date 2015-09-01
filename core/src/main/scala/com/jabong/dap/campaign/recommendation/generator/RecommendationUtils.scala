@@ -8,7 +8,7 @@ import scala.collection.immutable.HashMap
 /**
  * Created by rahul aneja on 27/8/15.
  */
-object RecommendationUtils {
+object RecommendationUtils extends Serializable {
 
   var recommendationType = new HashMap[String, Array[Array[String]]]
   recommendationType += (
@@ -92,7 +92,7 @@ object RecommendationUtils {
    * @param weeklyAverage
    * @return
    */
-  def inventoryFilter(category: String, numberSkus: Int, stock: Int, weeklyAverage: Integer): Boolean = {
+  def inventoryFilter(category: String, numberSkus: Int, stock: Int, weeklyAverage: java.lang.Double): Boolean = {
     //    if (category == null || stock == 0 || weeklyAverage == 0 || stock < weeklyAverage) {
     //      return false
     //    }

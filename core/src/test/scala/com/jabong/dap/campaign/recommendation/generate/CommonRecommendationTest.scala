@@ -1,14 +1,13 @@
 package com.jabong.dap.campaign.recommendation.generate
 
-import com.jabong.dap.campaign.recommendation.BasicRecommender
 import com.jabong.dap.campaign.recommendation.generator.CommonRecommendation
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ NullInputException, Spark, SharedSparkContext }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{NullInputException, SharedSparkContext, Spark, TestSchema}
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{ DataFrame, SQLContext }
-import org.scalatest.{ Matchers, FlatSpec }
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Created by rahul aneja  on 28/8/15.
@@ -28,7 +27,7 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     days = TimeUtils.daysFromToday(TimeUtils.getDate("2015-08-27", TimeConstants.DATE_FORMAT))
     commonRecommendation = new CommonRecommendation()
     orderItemDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "sales_order_item_weekly_average_sales")
-    inventoryCheckInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "inventory_check_input")
+    inventoryCheckInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "inventory_check_input",TestSchema.inventoryCheckInput)
     itrDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "basic_sku_itr")
   }
 
@@ -71,7 +70,10 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
 
   "input dataframe in inventory check " should " return skus with desired inventory" in {
     val expectedValue = commonRecommendation.inventoryCheck(inventoryCheckInput)
-    assert(expectedValue == null)
-
+    val expectedSku = expectedValue.filter(Recommendation.SALES_ORDER_ITEM_SKU + " = 'ES418WA79UAUINDFAS'")
+    assert(expectedSku.count() == 1)
   }
+
+
 }
+

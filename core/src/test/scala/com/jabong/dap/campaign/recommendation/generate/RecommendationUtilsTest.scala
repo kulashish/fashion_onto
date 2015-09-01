@@ -9,12 +9,12 @@ import org.scalatest.FlatSpec
 class RecommendationUtilsTest extends FlatSpec {
 
   "No category  but stock is less than weekly average " should "return false means should  be removed" in {
-    val inventorySoldStatus = RecommendationUtils.inventoryFilter(null, 5, 20, 40)
+    val inventorySoldStatus = RecommendationUtils.inventoryFilter(null, 5, 20, 40.0)
     assert(inventorySoldStatus == false)
   }
 
   "No category  but stock is equal than weekly average " should "return true means should not be filtered" in {
-    val inventorySoldStatus = RecommendationUtils.inventoryFilter(null, 5, 40, 40)
+    val inventorySoldStatus = RecommendationUtils.inventoryFilter(null, 5, 40, 40.0)
     assert(inventorySoldStatus == true)
   }
 
