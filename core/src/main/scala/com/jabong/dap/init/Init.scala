@@ -142,6 +142,9 @@ object Init {
 
       // dcf feed
       case "dcfFeedGenerate" => new ComponentExecutor().start(params.paramJson)
+      // generate recommendations
+      case "recommendations" => new ComponentExecutor().start(params.paramJson)
+
     }
   }
 }
