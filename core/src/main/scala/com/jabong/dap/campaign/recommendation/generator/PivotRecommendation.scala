@@ -29,7 +29,7 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     val last7DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, 7, incrDate)
 
     val topProducts = topProductsSold(last30DaysOrderItemData)
-    println("top products count:-" + topProducts.count)
+    //println("top products count:-" + topProducts.count)
 
     val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemData)
 
@@ -38,10 +38,10 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     val completeSkuData = skuCompleteData(weeklySaleData, yesterdayItrData)
 
     val skuDataAfterInventoryFilter = inventoryCheck(completeSkuData)
-    println("sku complete data:-" + skuDataAfterInventoryFilter.count + "\t" + skuDataAfterInventoryFilter.printSchema() + "\n")
+    //println("sku complete data:-" + skuDataAfterInventoryFilter.count + "\t" + skuDataAfterInventoryFilter.printSchema() + "\n")
     val pivotKeyArray = RecommendationUtils.getPivotArray(pivotKey)(0)
     val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, Schema.recommendationOutput, numRecs)
-    println("rec skus data:-" + recommendedSkus.count + "\t Values :-" + recommendedSkus.show(100))
+    //println("rec skus data:-" + recommendedSkus.count + "\t Values :-" + recommendedSkus.show(100))
 
     RecommendationOutput.writeRecommendation(recommendedSkus)
   }

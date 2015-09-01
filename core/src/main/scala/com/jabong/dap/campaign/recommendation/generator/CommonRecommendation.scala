@@ -181,13 +181,13 @@ class CommonRecommendation extends Logging {
 
     // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
-    //val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
-    val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
-    println(recommendationOutput.toDebugString)
+    val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
+    //val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
+    //println(recommendationOutput.toDebugString)
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
     val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1).take(numRecs)))) }
-    println(recommendations.toDebugString)
+    //println(recommendations.toDebugString)
     val recommendDataFrame = sqlContext.createDataFrame(recommendations, dataFrameSchema)
     return recommendDataFrame
   }
@@ -330,8 +330,9 @@ class CommonRecommendation extends Logging {
   }
 
   def inventoryCheck(inputData: DataFrame): DataFrame = {
+    logger.info("inventory check started")
     if (inputData == null) {
-      logger.info(" inputData is null")
+      logger.error(" inputData is null")
       throw new NullInputException("inventoryCheck:- inputData is null")
     }
     val inventoryFiltered = inputData.
@@ -351,6 +352,8 @@ class CommonRecommendation extends Logging {
         inputData(ProductVariables.SPECIAL_PRICE)
       )
       .filter(Recommendation.INVENTORY_FILTER + " = true")
+
+    logger.info("inventory check ended")
 
     return inventoryFiltered
   }
