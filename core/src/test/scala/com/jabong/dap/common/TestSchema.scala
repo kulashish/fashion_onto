@@ -1,6 +1,6 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{Recommendation, CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -118,6 +118,34 @@ object TestSchema {
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
+
+  val inventoryCheckInput = StructType(Array(
+    StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.CATEGORY, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, IntegerType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, StringType, true),
+    StructField(ProductVariables.STOCK, IntegerType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, IntegerType, true),
+    StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
+    StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
+  ))
+
+  val basicItr =  StructType(Array(
+    StructField(ProductVariables.SKU, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.CATEGORY, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, IntegerType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, StringType, true),
+    StructField(ProductVariables.STOCK, IntegerType, true)
+
   ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
