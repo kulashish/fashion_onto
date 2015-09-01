@@ -127,9 +127,9 @@ object TestSchema {
     StructField(ProductVariables.BRAND, StringType, true),
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
-    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, IntegerType, true),
-    StructField(ProductVariables.SPECIAL_PRICE, StringType, true),
-    StructField(ProductVariables.STOCK, IntegerType, true),
+    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.STOCK, LongType, true),
     StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, IntegerType, true),
     StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
     StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
@@ -142,9 +142,9 @@ object TestSchema {
     StructField(ProductVariables.BRAND, StringType, true),
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
-    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, IntegerType, true),
-    StructField(ProductVariables.SPECIAL_PRICE, StringType, true),
-    StructField(ProductVariables.STOCK, IntegerType, true)
+    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.STOCK, LongType, true)
 
   ))
 

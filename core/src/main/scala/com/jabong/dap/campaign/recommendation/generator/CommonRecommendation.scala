@@ -355,7 +355,7 @@ class CommonRecommendation extends Logging {
     return inventoryFiltered
   }
 
-  val inventoryChecked = udf((category: String, numberSkus: Int, stock: Long, weeklyAverage: Double) => RecommendationUtils.inventoryFilter(category, numberSkus, stock, weeklyAverage))
+  val inventoryChecked = udf((category: String, numberSkus: Long, stock: Long, weeklyAverage: java.lang.Double) => RecommendationUtils.inventoryFilter(category, numberSkus, stock, weeklyAverage))
 
   val inventoryNotSoldLastWeek = udf((category: String, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryWeekNotSold(category, stock, weeklyAverage))
 

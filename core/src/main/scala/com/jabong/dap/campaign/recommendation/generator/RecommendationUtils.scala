@@ -92,7 +92,7 @@ object RecommendationUtils extends Serializable {
    * @param weeklyAverage
    * @return
    */
-  def inventoryFilter(category: String, numberSkus: Int, stock: Long, weeklyAverage: java.lang.Double): Boolean = {
+  def inventoryFilter(category: String, numberSkus: Long, stock: Long, weeklyAverage: java.lang.Double): Boolean = {
     //    if (category == null || stock == 0 || weeklyAverage == 0 || stock < weeklyAverage) {
     //      return false
     //    }
