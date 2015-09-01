@@ -30,9 +30,9 @@ object TimeUtils extends Logging {
    * @param date
    * @return
    */
-  def daysFromToday(date: Date): BigInt = {
+  def daysFromToday(date: Date): Int = {
     val today = new Date
-    daysBetweenTwoDates(today, date)
+    daysBetweenTwoDates(today, date).toInt
   }
 
   /**

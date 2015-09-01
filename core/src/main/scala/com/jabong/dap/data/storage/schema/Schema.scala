@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{Recommendation, CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -413,6 +413,13 @@ object Schema {
     StructField(PageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true),
     StructField(PageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
+  val recommendationOutput = StructType(Array(
+    StructField(ProductVariables.BRICK, StringType, false),
+    StructField(ProductVariables.MVP, StringType, false),
+    StructField(ProductVariables.GENDER, StringType, false),
+    StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU_LIST, StringType))), false))
   ))
 
 }
