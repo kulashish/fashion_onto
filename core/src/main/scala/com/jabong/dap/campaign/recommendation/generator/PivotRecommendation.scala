@@ -24,9 +24,9 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
       logger.info(("Invalid pivotKey:- %d", pivotKey))
       throw new WrongInputException(("Invalid pivotKey:" + pivotKey))
     }
-    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, Recommendation.ORDER_ITEM_DAYS, incrDate)
+    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, Recommendation.ORDER_ITEM_DAYS, incrDate).repartition(200)
 
-    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, 7, incrDate)
+    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, 7, incrDate).repartition(200)
 
     val topProducts = topProductsSold(last30DaysOrderItemData)
     //println("top products count:-" + topProducts.count)
