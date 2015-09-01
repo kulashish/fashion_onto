@@ -15,7 +15,7 @@ class TimeTest extends FlatSpec with Matchers {
   val date1 = format.parse("2015-06-19 18:00:00")
   val date2 = format.parse("2015-05-19 18:00:00")
   val today = new Date
-  val numDaysFromToday = Math.abs(today.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS
+  val numDaysFromToday = (Math.abs(today.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS).toInt
 
   val calendar = Calendar.getInstance()
   calendar.add(Calendar.DATE, -1)

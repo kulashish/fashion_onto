@@ -36,7 +36,7 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
 
   "MEN gender value" should "return MEN,UNISEX recommended gender" in {
     val recommendedGender = basicRecommender.getRecommendationGender("MEN")
-    assert(recommendedGender == "MEN,UNISEX")
+    assert(recommendedGender == "MEN!UNISEX")
   }
 
   "Null order data" should "return null dataframe" in {
