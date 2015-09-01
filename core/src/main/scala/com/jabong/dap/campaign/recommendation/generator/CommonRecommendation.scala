@@ -215,10 +215,14 @@ class CommonRecommendation extends Logging {
   def genSku(iterable: Iterable[Row]): Map[String, scala.collection.mutable.MutableList[(Long, String)]] = {
     var genderSkuMap: Map[String, scala.collection.mutable.MutableList[(Long, String)]] = Map()
     var skuList: scala.collection.mutable.MutableList[(Long, String)] = scala.collection.mutable.MutableList()
+    val topRow =  iterable.head
+    val genderIndex = topRow.fieldIndex(ProductVariables.GENDER)
+    val numberSoldIndex = topRow.fieldIndex(Recommendation.NUMBER_LAST_30_DAYS_ORDERED)
+    val skuIndex = topRow.fieldIndex(Recommendation.SALES_ORDER_ITEM_SKU)
     for (row <- iterable) {
-      val gender = row(4)
-      val quantity = row(6)
-      val sku = row(0)
+      val gender = row(genderIndex)
+      val quantity = row(numberSoldIndex)
+      val sku = row(skuIndex)
       if (gender != null) {
         val recommendedGenderList = RecommendationUtils.getRecommendationGender(gender)
         val recommendGenderArray = recommendedGenderList.split("!")
@@ -334,15 +338,24 @@ class CommonRecommendation extends Logging {
       select(
         inventoryChecked(inputData(ProductVariables.CATEGORY), inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU), inputData(ProductVariables.STOCK),
           inputData(Recommendation.WEEKLY_AVERAGE_SALE)) as Recommendation.INVENTORY_FILTER,
-        inputData(Recommendation.SALES_ORDER_ITEM_SKU),
-        inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
-        inputData(Recommendation.LAST_SOLD_DATE))
+          inputData(Recommendation.SALES_ORDER_ITEM_SKU),
+          inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
+          inputData(Recommendation.LAST_SOLD_DATE),
+          inputData(ProductVariables.CATEGORY),
+          inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
+          inputData(ProductVariables.STOCK),
+          inputData(ProductVariables.BRAND),
+          inputData(ProductVariables.BRICK),
+          inputData(ProductVariables.MVP),
+          inputData(ProductVariables.GENDER),
+          inputData(ProductVariables.SPECIAL_PRICE)
+      )
       .filter(Recommendation.INVENTORY_FILTER + " = true")
 
     return inventoryFiltered
   }
 
-  val inventoryChecked = udf((category: String, numberSkus: Int, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryFilter(category, numberSkus, stock, weeklyAverage))
+  val inventoryChecked = udf((category: String, numberSkus: Int, stock: Int, weeklyAverage: Double) => RecommendationUtils.inventoryFilter(category, numberSkus, stock, weeklyAverage))
 
   val inventoryNotSoldLastWeek = udf((category: String, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryWeekNotSold(category, stock, weeklyAverage))
 
