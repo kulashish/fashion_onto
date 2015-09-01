@@ -215,7 +215,7 @@ class CommonRecommendation extends Logging {
   def genSku(iterable: Iterable[Row]): Map[String, scala.collection.mutable.MutableList[(Long, String)]] = {
     var genderSkuMap: Map[String, scala.collection.mutable.MutableList[(Long, String)]] = Map()
     var skuList: scala.collection.mutable.MutableList[(Long, String)] = scala.collection.mutable.MutableList()
-    val topRow =  iterable.head
+    val topRow = iterable.head
     val genderIndex = topRow.fieldIndex(ProductVariables.GENDER)
     val numberSoldIndex = topRow.fieldIndex(Recommendation.NUMBER_LAST_30_DAYS_ORDERED)
     val skuIndex = topRow.fieldIndex(Recommendation.SALES_ORDER_ITEM_SKU)
@@ -338,17 +338,17 @@ class CommonRecommendation extends Logging {
       select(
         inventoryChecked(inputData(ProductVariables.CATEGORY), inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU), inputData(ProductVariables.STOCK),
           inputData(Recommendation.WEEKLY_AVERAGE_SALE)) as Recommendation.INVENTORY_FILTER,
-          inputData(Recommendation.SALES_ORDER_ITEM_SKU),
-          inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
-          inputData(Recommendation.LAST_SOLD_DATE),
-          inputData(ProductVariables.CATEGORY),
-          inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
-          inputData(ProductVariables.STOCK),
-          inputData(ProductVariables.BRAND),
-          inputData(ProductVariables.BRICK),
-          inputData(ProductVariables.MVP),
-          inputData(ProductVariables.GENDER),
-          inputData(ProductVariables.SPECIAL_PRICE)
+        inputData(Recommendation.SALES_ORDER_ITEM_SKU),
+        inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
+        inputData(Recommendation.LAST_SOLD_DATE),
+        inputData(ProductVariables.CATEGORY),
+        inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
+        inputData(ProductVariables.STOCK),
+        inputData(ProductVariables.BRAND),
+        inputData(ProductVariables.BRICK),
+        inputData(ProductVariables.MVP),
+        inputData(ProductVariables.GENDER),
+        inputData(ProductVariables.SPECIAL_PRICE)
       )
       .filter(Recommendation.INVENTORY_FILTER + " = true")
 

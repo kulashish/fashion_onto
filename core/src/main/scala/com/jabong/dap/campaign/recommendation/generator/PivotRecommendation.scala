@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.recommendation.generator
 
-import com.jabong.dap.common.{NullInputException, WrongInputException}
+import com.jabong.dap.common.{ NullInputException, WrongInputException }
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
@@ -14,11 +14,11 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
   @throws(classOf[NullInputException])
   @throws(classOf[WrongInputException])
   def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String) {
-    require(orderItemFullData!=null,"order item full data cannot be null ")
-    require(yesterdayItrData!=null,"yesterdayItrData  cannot be null ")
-    require(pivotKey!=null,"pivotKey cannot be null ")
-    require(numRecs!=0,"numRecs cannot be zero ")
-    require(incrDate!=null,"incrDate cannot be null ")
+    require(orderItemFullData != null, "order item full data cannot be null ")
+    require(yesterdayItrData != null, "yesterdayItrData  cannot be null ")
+    require(pivotKey != null, "pivotKey cannot be null ")
+    require(numRecs != 0, "numRecs cannot be zero ")
+    require(incrDate != null, "incrDate cannot be null ")
 
     if (RecommendationUtils.getPivotArray(pivotKey) == null) {
       logger.info(("Invalid pivotKey:- %d", pivotKey))
@@ -33,12 +33,12 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
 
     val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemData)
 
-    val weeklySaleData = addWeeklyAverageSales(orderItem7DaysWithWeeklySale,topProducts)
+    val weeklySaleData = addWeeklyAverageSales(orderItem7DaysWithWeeklySale, topProducts)
 
-    val completeSkuData = skuCompleteData(weeklySaleData , yesterdayItrData)
+    val completeSkuData = skuCompleteData(weeklySaleData, yesterdayItrData)
 
     val skuDataAfterInventoryFilter = inventoryCheck(completeSkuData)
-    println("sku complete data:-" + skuDataAfterInventoryFilter.count+"\t"+skuDataAfterInventoryFilter.printSchema()+"\n")
+    println("sku complete data:-" + skuDataAfterInventoryFilter.count + "\t" + skuDataAfterInventoryFilter.printSchema() + "\n")
     val pivotKeyArray = RecommendationUtils.getPivotArray(pivotKey)(0)
     val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, Schema.recommendationOutput, numRecs)
     println("rec skus data:-" + recommendedSkus.count + "\t Values :-" + recommendedSkus.show(100))

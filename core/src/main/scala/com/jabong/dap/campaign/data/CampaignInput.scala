@@ -165,7 +165,7 @@ object CampaignInput extends Logging {
       itrData(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
       itrData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
-      filteredItr
+    filteredItr
   }
 
   def loadYesterdayItrSkuDataForCampaignMerge(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
