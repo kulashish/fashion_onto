@@ -18,7 +18,7 @@ object RecommendationInput {
    *
    */
   def loadCommonDataSets(date: String) {
-    orderItemFullData = CampaignInput.loadFullOrderItemData(date).persist(StorageLevel.MEMORY_ONLY_SER)
+    orderItemFullData = CampaignInput.loadFullOrderItemData(date)
     lastdayItrData = CampaignInput.loadYesterdayItrSkuData(date).cache()
   }
 

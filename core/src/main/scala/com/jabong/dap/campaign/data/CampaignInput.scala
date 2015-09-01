@@ -161,8 +161,11 @@ object CampaignInput extends Logging {
       itrData(ITR.BRAND_NAME) as ProductVariables.BRAND,
       itrData(ITR.PRICE_BAND),
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
-      itrData(ITR.BRICK))
-    filteredItr
+      itrData(ITR.BRICK),
+      itrData(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
+      itrData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
+
+      filteredItr
   }
 
   def loadYesterdayItrSkuDataForCampaignMerge(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
@@ -349,7 +352,15 @@ object CampaignInput extends Logging {
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
+        col(ITR.QUANTITY) as ProductVariables.STOCK,
+        col(ITR.MVP) as ProductVariables.MVP,
+        col(ITR.GENDER) as ProductVariables.GENDER,
+        col(ITR.BRAND_NAME) as ProductVariables.BRAND,
+        col(ITR.PRICE_BAND),
+        col(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+        col(ITR.BRICK),
+        col(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
+        col(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
     for (i <- 2 to 30) {
 
@@ -364,7 +375,15 @@ object CampaignInput extends Logging {
         itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.CONFIG_SKU) as ProductVariables.SKU,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
+          col(ITR.QUANTITY) as ProductVariables.STOCK,
+          col(ITR.MVP) as ProductVariables.MVP,
+          col(ITR.GENDER) as ProductVariables.GENDER,
+          col(ITR.BRAND_NAME) as ProductVariables.BRAND,
+          col(ITR.PRICE_BAND),
+          col(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+          col(ITR.BRICK),
+          col(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
+          col(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY))
       }
     }
     itr30Day
