@@ -174,7 +174,7 @@ object SalesOrderItem {
         col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
         col("STATUS")
       ).filter("STATUS = 1").
-      dropDuplicates()
+        dropDuplicates()
 
     val newOrders = successOrdersJoined.except(salesPrev)
 
