@@ -78,9 +78,8 @@ object ContactListMobile extends Logging {
       dfSalesOrderFull,
       dfSalesOrderAddrFull,
       dfSalesOrderAddrFavPrevFull,
-      dfSalesOrderItemIncr,
+      dfSalesOrderItemInc,
       dfSalesOrderCalcPrevFull,
-      dfSalesOrderItemCalcPrevFull,
       dfDND,
       dfZoneCity
       ) = readDf(incrDate)
