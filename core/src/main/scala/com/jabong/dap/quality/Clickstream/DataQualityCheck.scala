@@ -11,7 +11,6 @@ import com.jabong.dap.common.Spark
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.hive.HiveContext
 
 
 /**
@@ -36,11 +35,12 @@ object DataQualityCheck extends java.io.Serializable {
     val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     var dt = dateFormat.format(cal.getTime())
     //var res1 = DataQualityMethods.Artemisdaily(hiveContext, day, month, year, tablename)
-    val a = DataQualityMethods.Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String)
-    write("hdfs://172.16.84.37:8020", "./Automation1/",a.getBytes())
+    val output = DataQualityMethods.Artemisdaily(hiveContext, day: String, month: String, year: String, tablename: String)
+    write("hdfs://172.16.84.37:8020", "./Automation1/",output.getBytes())
 
-    ScalaMail.sendMessage("tejas.jain@jabong.com","","","tejas.jain@jabong.com",a,"Quality Report","")
-    println("ScalaMailMain")
+    ScalaMail.sendMessage("tejas.jain@jabong.com","","","tejas.jain@jabong.com",output,"Quality Report","")
+
+    //println("ScalaMailMain")
   }
 
 
