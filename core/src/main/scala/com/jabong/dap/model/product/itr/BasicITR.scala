@@ -32,7 +32,7 @@ object BasicITR extends Logging {
     var count = 30
     if (null != startDate) {
       val minDate = TimeUtils.getDate(startDate, TimeConstants.DATE_FORMAT_FOLDER)
-      count = TimeUtils.daysFromToday(minDate).toInt
+      count = TimeUtils.daysFromToday(minDate)
     }
     for (i <- count to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
@@ -155,6 +155,7 @@ object BasicITR extends Logging {
         first(ITR.MVP) as ITR.MVP,
         first(ITR.BRICK) as ITR.BRICK,
         first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
+        count(ITR.SIMPLE_SKU) as ITR.NUMBER_SIMPLE_PER_SKU,
         sum(ITR.QUANTITY) as ITR.QUANTITY
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
