@@ -155,6 +155,7 @@ object BasicITR extends Logging {
         first(ITR.MVP) as ITR.MVP,
         first(ITR.BRICK) as ITR.BRICK,
         first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
+        first(ITR.REPORTING_CATEGORY) as ITR.REPORTING_CATEGORY,
         count(ITR.SIMPLE_SKU) as ITR.NUMBER_SIMPLE_PER_SKU,
         sum(ITR.QUANTITY) as ITR.QUANTITY
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
