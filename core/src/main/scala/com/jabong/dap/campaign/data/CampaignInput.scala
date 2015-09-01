@@ -40,7 +40,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day surf session data from hdfs")
 
-    val surfSessionData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+    val surfSessionData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
     surfSessionData
   }
 
@@ -48,7 +48,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day surf 3 data from hdfs")
 
-    val surf3Data = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+    val surf3Data = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
     surf3Data
   }
 
@@ -60,7 +60,7 @@ object CampaignInput extends Logging {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day customer master data from hdfs")
 
-    val customerMasterData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
+    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
     customerMasterData
   }
 
@@ -133,7 +133,8 @@ object CampaignInput extends Logging {
   def loadYesterdayItrSimpleData(date: String = TimeUtils.YESTERDAY_FOLDER) = {
     //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day basic itr simple data from hdfs")
-    val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+    val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+
     val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
       itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK,
@@ -150,7 +151,8 @@ object CampaignInput extends Logging {
   def loadYesterdayItrSkuData(date: String = TimeUtils.YESTERDAY_FOLDER) = {
     //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day basic itr sku data from hdfs")
-    val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+    val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+
     val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU) as ProductVariables.SKU,
       itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
       itrData(ITR.QUANTITY) as ProductVariables.STOCK,
@@ -166,7 +168,8 @@ object CampaignInput extends Logging {
   def loadYesterdayItrSkuDataForCampaignMerge(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day basic itr sku data from hdfs")
-    val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+    val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+
     val filteredItr = itrData.select(itrData(ITR.CONFIG_SKU),
       itrData(ITR.BRAND_NAME),
       itrData(ITR.PRODUCT_NAME),
@@ -248,12 +251,12 @@ object CampaignInput extends Logging {
   }
 
   def getCampaignData(name: String, date: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
-    val path: String = ConfigConstants.OUTPUT_PATH + File.separator + DataSets.CAMPAIGNS + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
+    val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.CAMPAIGNS + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading " + name + " campaign data from path:- " + path)
     if (DataVerifier.dataExists(path)) {
       var result: DataFrame = null
       try {
-        val campaignData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, name, DataSets.DAILY_MODE, date)
+        val campaignData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, name, DataSets.DAILY_MODE, date)
           .withColumn(CampaignCommon.PRIORITY, lit(priority))
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
           val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
@@ -342,7 +345,7 @@ object CampaignInput extends Logging {
 
     //var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    var itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+    var itr30Day = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.CONFIG_SKU) as ProductVariables.SKU,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -353,11 +356,11 @@ object CampaignInput extends Logging {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       logger.info("Reading last " + i + " day basic itr sku data from hdfs")
 
-      val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+      val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
       val itrExits = DataVerifier.dataExists(path)
 
       if (itrExits) {
-        val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
+        val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, date)
         itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.CONFIG_SKU) as ProductVariables.SKU,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -371,7 +374,7 @@ object CampaignInput extends Logging {
 
     //var date = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    var itr30Day = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+    var itr30Day = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       .select(
         col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
         col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -387,12 +390,12 @@ object CampaignInput extends Logging {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       logger.info("Reading last " + i + " day basic itr sku simple data from hdfs")
 
-      val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+      val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
       val itrExits = DataVerifier.dataExists(path)
 
       if (itrExits) {
         logger.info("Adding last " + i + " day basic itr sku simple data from hdfs")
-        val itrData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+        val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
         itr30Day = itr30Day.unionAll(itrData.select(
           col(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
           col(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
@@ -417,11 +420,11 @@ object CampaignInput extends Logging {
 
       logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
 
-      val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+      val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
       val campaignMergedExits = DataVerifier.dataExists(path)
 
       if (campaignMergedExits) {
-        val mergedCampaignData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+        val mergedCampaignData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
@@ -435,7 +438,7 @@ object CampaignInput extends Logging {
   def loadYesterdayMobilePushCampaignQualityData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day Mobile Push Campaign Quality data from hdfs")
-    val mobilePushCampaignQuality = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday)
+    val mobilePushCampaignQuality = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday)
     mobilePushCampaignQuality
   }
 

@@ -15,6 +15,7 @@ object TimeUtils extends Logging {
 
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
+
   /**
    * Returns the total number of days between two given date inputs
    * @param date1
@@ -33,6 +34,14 @@ object TimeUtils extends Logging {
   def daysFromToday(date: Date): Int = {
     val today = new Date
     daysBetweenTwoDates(today, date).toInt
+  }
+
+  def daysFromToday(date: String, dateFormat: String): Int = {
+    val format = new SimpleDateFormat(dateFormat)
+    val dt = Calendar.getInstance()
+    dt.setTime(format.parse(date))
+    val today = new Date
+    daysBetweenTwoDates(today, dt.getTime).toInt
   }
 
   /**

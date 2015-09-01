@@ -33,19 +33,23 @@ object MobilePushCampaignQuality extends Logging {
   val PRIORITYMERGE = "PriorityMerge"
   val TOTALCOUNT = "TotalCount"
   val CAMPAIGNNAME = "CampaignName"
+  val CUSTID_ZERO = "CustIdZero"
+  val CUSTID_NONZERO = "CustIdNonZero"
 
   val schema = StructType(Array(
     StructField(CAMPAIGNNAME, StringType, TRUE),
     StructField(TOTALCOUNT, LongType, TRUE),
+    StructField(CUSTID_ZERO, LongType, TRUE),
+    StructField(CUSTID_NONZERO, LongType, TRUE),
     StructField(PRIORITYMERGE, LongType, TRUE),
     StructField(ANDROID, LongType, TRUE),
     StructField(IOS, LongType, TRUE),
     StructField(WINDOWS, LongType, TRUE)
   ))
 
-  def startMobilePushCampaignQuality(campaignsConfig: String) = {
+  def start(campaignsConfig: String) = {
 
-    logger.info("Calling method startMobilePushCampaignQuality........")
+    logger.info("Calling method start inside MobilePushCampaignQuality........")
 
     if (CampaignManager.initCampaignsConfigJson(campaignsConfig)) {
 
@@ -64,7 +68,7 @@ object MobilePushCampaignQuality extends Logging {
       val dfCampaignQuality = Spark.getSqlContext().createDataFrame(rdd, schema)
 
       val cachedfCampaignQuality = dfCampaignQuality.groupBy(CAMPAIGNNAME)
-        .agg(sum(TOTALCOUNT) as TOTALCOUNT, sum(PRIORITYMERGE) as PRIORITYMERGE, sum(ANDROID) as ANDROID, sum(IOS) as IOS, sum(WINDOWS) as WINDOWS)
+        .agg(sum(TOTALCOUNT) as TOTALCOUNT, sum(CUSTID_ZERO) as CUSTID_ZERO, sum(CUSTID_NONZERO) as CUSTID_NONZERO, sum(PRIORITYMERGE) as PRIORITYMERGE, sum(ANDROID) as ANDROID, sum(IOS) as IOS, sum(WINDOWS) as WINDOWS)
         .sort(CAMPAIGNNAME).cache()
 
       CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
@@ -72,7 +76,7 @@ object MobilePushCampaignQuality extends Logging {
       DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
       logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
-        + ConfigConstants.OUTPUT_PATH + File.separator
+        + ConfigConstants.WRITE_OUTPUT_PATH + File.separator
         + DataSets.CAMPAIGNS + File.separator
         + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + File.separator
         + DataSets.DAILY_MODE + File.separator
@@ -86,7 +90,7 @@ object MobilePushCampaignQuality extends Logging {
 
     logger.info("Calling method getCampaignQuality........")
 
-    val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+    val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
     val dataExits = DataVerifier.dataExists(path)
 
@@ -99,7 +103,7 @@ object MobilePushCampaignQuality extends Logging {
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
-      val dataFrame = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+      val dataFrame = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
@@ -110,26 +114,17 @@ object MobilePushCampaignQuality extends Logging {
           val countIos = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.IOS + "'").count()
           val countWindows = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.WINDOWS + "'").count()
 
-          row = Row(campaignDetails.campaignName, zero, count, countAndroid, countIos, countWindows)
+          row = Row(campaignDetails.campaignName, zero, zero, zero, count, countAndroid, countIos, countWindows)
           list += row
 
         }
 
       } else {
-        if (campaignName.equals(CampaignCommon.SURF1_CAMPAIGN)
-          || campaignName.equals(CampaignCommon.SURF2_CAMPAIGN)
-          || campaignName.equals(CampaignCommon.SURF3_CAMPAIGN)
-          || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
 
-          val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null").count()
-          row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", countNonZeroFkCustomer, zero, zero, zero, zero)
-          list += row
+        val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null").count()
+        val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null").count()
 
-          val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null").count()
-          row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", countZeroFkCustomer, zero, zero, zero, zero)
-          list += row
-        }
-        row = Row(campaignName, dataFrame.count(), zero, zero, zero, zero)
+        row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
         list += row
       }
     } else { //if data frame is null
@@ -138,22 +133,13 @@ object MobilePushCampaignQuality extends Logging {
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
         for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-          row = Row(campaignDetails.campaignName, zero, zero, zero, zero, zero)
+          row = Row(campaignDetails.campaignName, zero, zero, zero, zero, zero, zero, zero)
           list += row
         }
-      } else if (campaignName.equals(CampaignCommon.SURF1_CAMPAIGN)
-        || campaignName.equals(CampaignCommon.SURF2_CAMPAIGN)
-        || campaignName.equals(CampaignCommon.SURF3_CAMPAIGN)
-        || campaignName.equals(CampaignCommon.SURF6_CAMPAIGN)) {
-
-        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_non_zero", zero, zero, zero, zero, zero)
-        list += row
-
-        row = Row(campaignName + "_" + CustomerVariables.FK_CUSTOMER + "_is_zero", zero, zero, zero, zero, zero)
+      } else {
+        row = Row(campaignName, zero, zero, zero, zero, zero, zero, zero)
         list += row
       }
-      row = Row(campaignName, zero, zero, zero, zero, zero)
-      list += row
     }
     return list
   }

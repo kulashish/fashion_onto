@@ -129,8 +129,8 @@ object GetSurfVariables extends java.io.Serializable {
 
         if (DataVerifier.dataExists(dataPath)) {
 
-          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
-          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
+          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
+          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists
@@ -149,8 +149,8 @@ object GetSurfVariables extends java.io.Serializable {
 
         } else {
 
-          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
-          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
+          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
+          var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists

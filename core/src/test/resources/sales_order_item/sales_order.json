@@ -1,0 +1,10 @@
+{"fk_customer":1, "id_sales_order":2}
+{"fk_customer":1, "id_sales_order":2}
+{"fk_customer":1, "id_sales_order":3}
+{"fk_customer":2, "id_sales_order":4}
+{"fk_customer":2, "id_sales_order":5}
+{"fk_customer":2, "id_sales_order":6}
+{"fk_customer":3, "id_sales_order":7}
+{"fk_customer":3, "id_sales_order":7}
+{"fk_customer":4, "id_sales_order":8}
+{"fk_customer":4, "id_sales_order":9}

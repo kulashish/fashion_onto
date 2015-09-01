@@ -200,16 +200,16 @@ object CampaignProcessor {
     val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
     val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
 
-    exportCampaignCSV(iosDF, date, CampaignMergedFields.IOS_CODE, saveMode)
-    exportCampaignCSV(androidDF, date, CampaignMergedFields.ANDROID_CODE, saveMode)
+    exportCampaignCSV(iosDF, date, DataSets.IOS_CODE, saveMode)
+    exportCampaignCSV(androidDF, date, DataSets.ANDROID_CODE, saveMode)
 
     for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
       val mailType = campaignDetails.mailType
       val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
       val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
 
-      val fileI = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.IOS_CODE
-      val fileA = campaignDetails.campaignName + mailType + "_" + CampaignMergedFields.ANDROID_CODE
+      val fileI = campaignDetails.campaignName + mailType + "_" + DataSets.IOS_CODE
+      val fileA = campaignDetails.campaignName + mailType + "_" + DataSets.ANDROID_CODE
       val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
@@ -237,8 +237,8 @@ object CampaignProcessor {
     )
     val tablename =
       domain match {
-        case CampaignMergedFields.IOS_CODE => DataSets.IOS
-        case CampaignMergedFields.ANDROID_CODE => DataSets.ANDROID
+        case DataSets.IOS_CODE => DataSets.IOS
+        case DataSets.ANDROID_CODE => DataSets.ANDROID
       }
 
     val fileName = "updateDevices" + "_" + domain + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)

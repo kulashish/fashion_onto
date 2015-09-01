@@ -110,17 +110,17 @@ object CustomerDeviceMapping extends Logging {
    * @param curDate
    */
   def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
-    val df1 = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
+    val df1 = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
     var df2: DataFrame = null
     // val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
     if (null != path) {
       df2 = getDataFrameCsv4mDCF(path)
     } else {
-      df2 = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+      df2 = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
     }
     val df3 = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
     val res = getLatestDevice(df1, df2, df3)
-    val savePath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
+    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
   }
@@ -131,10 +131,8 @@ object CustomerDeviceMapping extends Logging {
    * @return DataFrame
    */
   def getDataFrameCsv4mDCF(path: String): DataFrame = {
-    require(path != null, "Path is null")
-
     try {
-      val df = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(path)
+      val df = DataReader.getDataFrame4mCsv(path, "true", ";")
         .select(
           col("RESPONSYS_ID") as CustomerVariables.RESPONSYS_ID,
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
@@ -149,7 +147,7 @@ object CustomerDeviceMapping extends Logging {
       // df.show(9)
 
       val dupFile = "/data/output/extras/duplicate/cust_email.csv"
-      val duplicate = Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ",").load(dupFile)
+      val duplicate = DataReader.getDataFrame4mCsv(dupFile, "true", ";")
       println("Total recs in duplicate file: ") // + duplicate.count())
       // duplicate.printSchema()
       // duplicate.show(9)

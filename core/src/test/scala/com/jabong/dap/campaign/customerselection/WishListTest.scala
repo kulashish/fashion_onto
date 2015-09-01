@@ -4,7 +4,7 @@ import java.io.File
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
+import com.jabong.dap.common.{ TestSchema, TestConstants, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -70,7 +70,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
       .limit(30).collect().toSet
 
-    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
       .limit(30).collect().toSet
 
     assert(result.equals(dfCustomerProductShortlistResult))

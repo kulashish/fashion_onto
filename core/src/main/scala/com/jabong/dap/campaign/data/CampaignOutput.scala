@@ -21,7 +21,7 @@ object CampaignOutput {
 
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
-    val path = PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+    val path = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
     val dataExits = DataVerifier.dataExists(path)
 
