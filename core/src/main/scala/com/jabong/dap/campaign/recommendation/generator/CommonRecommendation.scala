@@ -1,21 +1,21 @@
 package com.jabong.dap.campaign.recommendation.generator
 
-import com.jabong.dap.common.{NullInputException, Spark}
+import com.jabong.dap.common.{ NullInputException, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.constants.status.OrderStatus
-import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables}
+import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by rahul (first version of basic recommender) on 23/6/15.
  */
-class CommonRecommendation extends Logging{
+class CommonRecommendation extends Logging {
   val sqlContext = Spark.getSqlContext()
 
   def generateRecommendation(orderData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
@@ -24,25 +24,25 @@ class CommonRecommendation extends Logging{
 
   }
 
-//  val skuSimpleToSku = udf((skuSimple: String) => simpleToSku(skuSimple: String))
-//
-//  //Converts Sku Simple to Sku
-//  //Input skuSimple:String e.g GE160BG56HMHINDFAS-2211538
-//  //Output GE160BG56HMHINDFAS
-//  def simpleToSku(skuSimple: String): String = {
-//    if (skuSimple == null) {
-//      return null
-//    }
-//    val skuData = skuSimple.split("-")
-//    return skuData(0)
-//  }
+  //  val skuSimpleToSku = udf((skuSimple: String) => simpleToSku(skuSimple: String))
+  //
+  //  //Converts Sku Simple to Sku
+  //  //Input skuSimple:String e.g GE160BG56HMHINDFAS-2211538
+  //  //Output GE160BG56HMHINDFAS
+  //  def simpleToSku(skuSimple: String): String = {
+  //    if (skuSimple == null) {
+  //      return null
+  //    }
+  //    val skuData = skuSimple.split("-")
+  //    return skuData(0)
+  //  }
   /**
    * top product sold in last 30days
    * @param last30DaysOrderItemData
    * @return
    */
-   def topProductsSold(last30DaysOrderItemData: DataFrame): DataFrame = {
-    if (last30DaysOrderItemData == null ) {
+  def topProductsSold(last30DaysOrderItemData: DataFrame): DataFrame = {
+    if (last30DaysOrderItemData == null) {
       return null
     }
 
@@ -59,19 +59,18 @@ class CommonRecommendation extends Logging{
    * @param lastSevenDaysOrderItemsData
    * @return
    */
-  def createWeeklyAverageSales(lastSevenDaysOrderItemsData: DataFrame): DataFrame ={
-    if(lastSevenDaysOrderItemsData == null) {
+  def createWeeklyAverageSales(lastSevenDaysOrderItemsData: DataFrame): DataFrame = {
+    if (lastSevenDaysOrderItemsData == null) {
       logger.info("order item  dataframe is null")
       return null
     }
 
-   val orderPlacedData = lastSevenDaysOrderItemsData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS+" not in ( "+OrderStatus.CANCEL_PAYMENT_ERROR +" , " +
-      OrderStatus.CANCELLED + " , "  + OrderStatus.INVALID +" , " + OrderStatus.EXPORTABLE_CANCEL_CUST + " , " + OrderStatus.CANCELLED_CC_ITEM +" ) " )
-
+    val orderPlacedData = lastSevenDaysOrderItemsData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " not in ( " + OrderStatus.CANCEL_PAYMENT_ERROR + " , " +
+      OrderStatus.CANCELLED + " , " + OrderStatus.INVALID + " , " + OrderStatus.EXPORTABLE_CANCEL_CUST + " , " + OrderStatus.CANCELLED_CC_ITEM + " ) ")
 
     val orderItemswithWeeklyAverage = orderPlacedData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(orderPlacedData(SalesOrderItemVariables.SKU)))
       .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)
-      .agg(count(Recommendation.SALES_ORDER_ITEM_SKU)/7 as Recommendation.WEEKLY_AVERAGE_SALE)
+      .agg(count(Recommendation.SALES_ORDER_ITEM_SKU) / 7 as Recommendation.WEEKLY_AVERAGE_SALE)
 
     return orderItemswithWeeklyAverage
   }
@@ -82,15 +81,15 @@ class CommonRecommendation extends Logging{
    * @param last30OrderItemData
    * @return
    */
-  def addWeeklyAverageSales(weeklyAverageData: DataFrame, last30OrderItemData : DataFrame): DataFrame = {
-    if(weeklyAverageData ==null || last30OrderItemData == null) {
+  def addWeeklyAverageSales(weeklyAverageData: DataFrame, last30OrderItemData: DataFrame): DataFrame = {
+    if (weeklyAverageData == null || last30OrderItemData == null) {
       logger.info("Either weeklyAverageData or last30OrderItemData is null")
       throw new NullInputException("Either weeklyAverageData or last30OrderItemData is null ")
     }
 
-    val updatedWeeklyAverageData = weeklyAverageData.withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU,"NEW_"+Recommendation.SALES_ORDER_ITEM_SKU)
+    val updatedWeeklyAverageData = weeklyAverageData.withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU, "NEW_" + Recommendation.SALES_ORDER_ITEM_SKU)
     val joinedWeeklyAverageData = last30OrderItemData.join(updatedWeeklyAverageData,
-       last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_"+Recommendation.SALES_ORDER_ITEM_SKU), SQL.LEFT_OUTER)
+      last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_" + Recommendation.SALES_ORDER_ITEM_SKU), SQL.LEFT_OUTER)
 
     return joinedWeeklyAverageData
   }
@@ -169,7 +168,7 @@ class CommonRecommendation extends Logging{
   //        schema: {sku, brick, mvp, brand, gender, sp, weeklyAverage of number sold}
   // Ouput: (mvp, brick, gender) and its sorted list of recommendations
 
-  def genRecommend(recommendationInput: DataFrame, pivotArray: Array[String], dataFrameSchema: StructType,numRecs:Int): DataFrame = {
+  def genRecommend(recommendationInput: DataFrame, pivotArray: Array[String], dataFrameSchema: StructType, numRecs: Int): DataFrame = {
     if (recommendationInput == null || pivotArray == null || dataFrameSchema == null) {
       return null
     }
@@ -183,7 +182,7 @@ class CommonRecommendation extends Logging{
     // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
-   // val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
+    // val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
     println(recommendationOutput.toDebugString)
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
@@ -326,25 +325,24 @@ class CommonRecommendation extends Logging{
 
   }
 
-  def inventoryCheck(inputData : DataFrame): DataFrame ={
-   if(inputData ==null){
-     logger.info(" inputData is null")
-     throw new NullInputException("inventoryCheck:- inputData is null")
-   }
+  def inventoryCheck(inputData: DataFrame): DataFrame = {
+    if (inputData == null) {
+      logger.info(" inputData is null")
+      throw new NullInputException("inventoryCheck:- inputData is null")
+    }
     val inventoryFiltered = inputData.
       select(
         inventoryChecked(inputData(ProductVariables.CATEGORY), inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU), inputData(ProductVariables.STOCK),
           inputData(Recommendation.WEEKLY_AVERAGE_SALE)) as Recommendation.INVENTORY_FILTER,
-          inputData(Recommendation.SALES_ORDER_ITEM_SKU),
-          inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
-          inputData(Recommendation.LAST_SOLD_DATE))
-      .filter(Recommendation.INVENTORY_FILTER+" = true")
+        inputData(Recommendation.SALES_ORDER_ITEM_SKU),
+        inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
+        inputData(Recommendation.LAST_SOLD_DATE))
+      .filter(Recommendation.INVENTORY_FILTER + " = true")
 
     return inventoryFiltered
   }
 
   val inventoryChecked = udf((category: String, numberSkus: Int, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryFilter(category, numberSkus, stock, weeklyAverage))
-
 
   val inventoryNotSoldLastWeek = udf((category: String, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryWeekNotSold(category, stock, weeklyAverage))
 

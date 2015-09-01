@@ -4,16 +4,16 @@ import com.jabong.dap.campaign.recommendation.BasicRecommender
 import com.jabong.dap.campaign.recommendation.generator.CommonRecommendation
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{NullInputException, Spark, SharedSparkContext}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ NullInputException, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{DataFrame, SQLContext}
-import org.scalatest.{Matchers, FlatSpec}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
+import org.scalatest.{ Matchers, FlatSpec }
 
 /**
  * Created by rahul aneja  on 28/8/15.
  */
-class CommonRecommendationTest  extends FlatSpec with SharedSparkContext with Matchers {
+class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Matchers {
 
   @transient var sqlContext: SQLContext = _
   @transient var itrDataFrame: DataFrame = _

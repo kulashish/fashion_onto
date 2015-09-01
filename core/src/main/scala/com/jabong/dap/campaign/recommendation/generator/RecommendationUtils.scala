@@ -10,7 +10,7 @@ import scala.collection.immutable.HashMap
  */
 object RecommendationUtils {
 
-  var recommendationType = new HashMap[String,Array[Array[String]]]
+  var recommendationType = new HashMap[String, Array[Array[String]]]
   recommendationType += (
     "brick_mvp" -> Array(Recommendation.BRICK_MVP_PIVOT),
     "brand_mvp" -> Array(Recommendation.BRAND_MVP_PIVOT)
@@ -27,7 +27,7 @@ object RecommendationUtils {
     "BOYS" -> "BOYS!BOYS,GIRLS",
     "INFANTS" -> "INFANTS",
     "BLANK" -> "BLANK"
-    )
+  )
 
   var DesiredInventoryLevel = new HashMap[String, Int]
   DesiredInventoryLevel += (
@@ -47,13 +47,13 @@ object RecommendationUtils {
     "KIDS FOOTWEAR" -> 3,
     "BAGS" -> 2,
     "TOYS" -> 2
-    )
+  )
 
-  def getPivotArray(pivotKey:String): Array[Array[String]] ={
-    if(pivotKey == null){
+  def getPivotArray(pivotKey: String): Array[Array[String]] = {
+    if (pivotKey == null) {
       return null
     }
-    return recommendationType.getOrElse(pivotKey , null)
+    return recommendationType.getOrElse(pivotKey, null)
   }
   /**
    * get recommended  gender
@@ -85,7 +85,6 @@ object RecommendationUtils {
     return stock >= stockMultiplier.asInstanceOf[Int] * weeklyAverage
   }
 
-
   /**
    * Inventory week not sold
    * @param category
@@ -93,12 +92,12 @@ object RecommendationUtils {
    * @param weeklyAverage
    * @return
    */
-  def inventoryFilter(category: String, numberSkus : Int , stock: Int, weeklyAverage: Integer): Boolean = {
-//    if (category == null || stock == 0 || weeklyAverage == 0 || stock < weeklyAverage) {
-//      return false
-//    }
-    if(weeklyAverage ==0 || weeklyAverage == null){
-      if(category == null){
+  def inventoryFilter(category: String, numberSkus: Int, stock: Int, weeklyAverage: Integer): Boolean = {
+    //    if (category == null || stock == 0 || weeklyAverage == 0 || stock < weeklyAverage) {
+    //      return false
+    //    }
+    if (weeklyAverage == 0 || weeklyAverage == null) {
+      if (category == null) {
         return false
       }
       val stockMultiplier = DesiredInventoryLevel.getOrElse(category, null)
@@ -106,8 +105,7 @@ object RecommendationUtils {
         return false
       }
       return stock >= numberSkus * stockMultiplier.asInstanceOf[Int]
-    }
-    else {
+    } else {
       return stock >= weeklyAverage
     }
   }

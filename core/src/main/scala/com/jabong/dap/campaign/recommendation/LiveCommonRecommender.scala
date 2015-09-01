@@ -6,7 +6,7 @@ import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{DataFrame}
+import org.apache.spark.sql.{ DataFrame }
 import org.apache.spark.sql.types._
 
 /**
@@ -14,7 +14,7 @@ import org.apache.spark.sql.types._
  */
 class LiveCommonRecommender extends BasicRecommender with Logging {
 
-  override def generateRecommendation(orderItemFullData: DataFrame,yesterdayItr: DataFrame): DataFrame = {
+  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
     val dataFrameSchema = StructType(Array(
       StructField(ProductVariables.BRICK, StringType, false),
       StructField(ProductVariables.MVP, StringType, false),
@@ -23,14 +23,14 @@ class LiveCommonRecommender extends BasicRecommender with Logging {
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
     val topProducts = topProductsSold(orderItemFullData, 30)
-    println("top products count:-" +topProducts.count)
-    val skuData = skuCompleteData(topProducts,yesterdayItr)
-    println("sku complete data:-" +skuData.count)
-    val recommendedSkus = genRecommend(skuData,pivotKeys,dataFrameSchema)
-    println("rec skus data:-" +recommendedSkus.count+"\t Values :-"+recommendedSkus.show(100))
-    val outPath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH,DataSets.RECOMMENDATIONS,DataSets.BRICK_MVP_RECOMMENDATIONS,DataSets.DAILY_MODE,TimeUtils.YESTERDAY_FOLDER)
+    println("top products count:-" + topProducts.count)
+    val skuData = skuCompleteData(topProducts, yesterdayItr)
+    println("sku complete data:-" + skuData.count)
+    val recommendedSkus = genRecommend(skuData, pivotKeys, dataFrameSchema)
+    println("rec skus data:-" + recommendedSkus.count + "\t Values :-" + recommendedSkus.show(100))
+    val outPath = DataWriter.getWritePath(ConfigConstants.OUTPUT_PATH, DataSets.RECOMMENDATIONS, DataSets.BRICK_MVP_RECOMMENDATIONS, DataSets.DAILY_MODE, TimeUtils.YESTERDAY_FOLDER)
     if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, outPath))
-      DataWriter.writeParquet(recommendedSkus,outPath,DataSets.IGNORE_SAVEMODE)
+      DataWriter.writeParquet(recommendedSkus, outPath, DataSets.IGNORE_SAVEMODE)
     return recommendedSkus
   }
 }

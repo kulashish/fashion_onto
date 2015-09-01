@@ -21,7 +21,7 @@ class RecommenderFactory extends CampaignFactory {
   override def getRecommender(recType: String): Recommender = {
     if (recType == null) {
       return null
-    }else if(recType.equalsIgnoreCase(Recommendation.LIVE_COMMON_RECOMMENDER)) {
+    } else if (recType.equalsIgnoreCase(Recommendation.LIVE_COMMON_RECOMMENDER)) {
       return new LiveCommonRecommender()
     } else if (recType.equalsIgnoreCase("Null")) {
       return new NullRecommender()

@@ -5,8 +5,8 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, ProductVariables, SalesOrderVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ProductVariables, SalesOrderVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -51,7 +51,7 @@ class BasicRecommender extends Recommender {
     val lastDaysData = CampaignUtils.getTimeBasedDataFrame(orderItemData, SalesOrderVariables.CREATED_AT, ndaysOldStartTime.toString, yesterdayOldEndTime.toString)
 
     //    val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.lastDayTimeDifferenceString(orderItemData(SalesOrderVariables.CREATED_AT)))
-//      .filter("daysPresent<=" + days)
+    //      .filter("daysPresent<=" + days)
 
     if (lastDaysData.count() == 0) {
       return null
@@ -134,7 +134,7 @@ class BasicRecommender extends Recommender {
     // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
-   // val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
+    // val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
     println(recommendationOutput.toDebugString)
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
