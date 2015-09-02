@@ -130,10 +130,19 @@ object TestSchema {
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
-    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, IntegerType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
     StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
     StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
   ))
+
+
+  val skuCompleteInput = StructType(Array(
+    StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
+    StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
+    StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
+  ))
+
 
   val basicItr =  StructType(Array(
     StructField(ProductVariables.SKU, StringType, true),
