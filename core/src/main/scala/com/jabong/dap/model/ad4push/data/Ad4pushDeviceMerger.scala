@@ -90,9 +90,7 @@ object Ad4pushDeviceMerger extends Logging {
     newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
       .dropDuplicates()
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-        newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
-      }
+      newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
     }
 
     var full: DataFrame = null
