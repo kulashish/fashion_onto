@@ -1,15 +1,15 @@
 package com.jabong.dap.campaign.recommendation.generate
 
-import com.jabong.dap.campaign.recommendation.generator.{PivotRecommendation, CommonRecommendation}
+import com.jabong.dap.campaign.recommendation.generator.{ PivotRecommendation, CommonRecommendation }
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{NullInputException, SharedSparkContext, Spark, TestSchema}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ NullInputException, SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, SQLContext}
-import org.scalatest.{FlatSpec, Matchers}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
+import org.scalatest.{ FlatSpec, Matchers }
 
 import scala.collection.mutable
 
@@ -80,7 +80,6 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     assert(expectedSku.count() == 1)
   }
 
-
   "Null order data" should "return null dataframe" in {
     a[NullInputException] should be thrownBy {
       commonRecommendation.topProductsSold(null)
@@ -137,7 +136,7 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
 
-    val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema,8)
+    val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema, 8)
 
     val recommendations = recOut.filter(ProductVariables.GENDER + "='WOMEN'")
       .select(ProductVariables.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
@@ -154,7 +153,7 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND)
 
-    val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema,8)
+    val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema, 8)
 
     val recommendations = recOut.filter(ProductVariables.GENDER + "='UNISEX'")
       .select(ProductVariables.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
@@ -162,32 +161,31 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
   }
 
   "Given a row and array of keys" should "create a dynamic row with those keys" in {
-  val keys = Array(ProductVariables.BRICK, ProductVariables.MVP)
-  val expectedRow: Seq[Any] = Seq("test", "mass")
-  val row = commonRecommendation.createKey(inventoryCheckInput.head(), keys)
+    val keys = Array(ProductVariables.BRICK, ProductVariables.MVP)
+    val expectedRow: Seq[Any] = Seq("test", "mass")
+    val row = commonRecommendation.createKey(inventoryCheckInput.head(), keys)
     row.toSeq.foreach(println)
-  assert((row.toSeq).equals(expectedRow))
-}
+    assert((row.toSeq).equals(expectedRow))
+  }
 
-"Given a null row and array of keys" should "return null row" in {
-val keys = Array(ProductVariables.BRICK, ProductVariables.MVP)
-val row = commonRecommendation.createKey(null, keys)
-assert(row == null)
-}
+  "Given a null row and array of keys" should "return null row" in {
+    val keys = Array(ProductVariables.BRICK, ProductVariables.MVP)
+    val row = commonRecommendation.createKey(null, keys)
+    assert(row == null)
+  }
 
-"Given a  row and  no keys" should "return null row" in {
-val keys: Array[String] = Array()
-val row = commonRecommendation.createKey(inventoryCheckInput.head(), keys)
-assert(row == null)
-}
+  "Given a  row and  no keys" should "return null row" in {
+    val keys: Array[String] = Array()
+    val row = commonRecommendation.createKey(inventoryCheckInput.head(), keys)
+    assert(row == null)
+  }
 
-"Given a row and array of keys with one Bad key" should "null row" in {
-val keys = Array(ProductVariables.BRICK, "Bad")
-val expectedRow: Seq[Any] = Seq("test", "mass")
-val row = commonRecommendation.createKey(inventoryCheckInput.head(), keys)
-assert(row == null)
-}
+  "Given a row and array of keys with one Bad key" should "null row" in {
+    val keys = Array(ProductVariables.BRICK, "Bad")
+    val expectedRow: Seq[Any] = Seq("test", "mass")
+    val row = commonRecommendation.createKey(inventoryCheckInput.head(), keys)
+    assert(row == null)
+  }
 
 }
-
 

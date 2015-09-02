@@ -1,6 +1,6 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.campaign.{Recommendation, CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -135,7 +135,6 @@ object TestSchema {
     StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
   ))
 
-
   val skuCompleteInput = StructType(Array(
     StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
     StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
@@ -143,8 +142,7 @@ object TestSchema {
     StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
   ))
 
-
-  val basicItr =  StructType(Array(
+  val basicItr = StructType(Array(
     StructField(ProductVariables.SKU, StringType, true),
     StructField(ProductVariables.BRICK, StringType, true),
     StructField(ProductVariables.MVP, StringType, true),
