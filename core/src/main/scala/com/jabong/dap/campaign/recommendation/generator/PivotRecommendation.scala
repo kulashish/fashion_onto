@@ -10,10 +10,18 @@ import org.apache.spark.sql.DataFrame
  */
 object PivotRecommendation extends CommonRecommendation with Serializable {
 
+  /**
+   *  Actual method which generates recommendations based on pivotKey e.g brick mvp , brand mvp etc
+   * @param orderItemFullData
+   * @param yesterdayItrData
+   * @param pivotKey
+   * @param numRecs
+   * @param incrDate
+   */
   @throws(classOf[IllegalArgumentException])
   @throws(classOf[NullInputException])
   @throws(classOf[WrongInputException])
-  def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String) {
+  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String) {
     require(orderItemFullData != null, "order item full data cannot be null ")
     require(yesterdayItrData != null, "yesterdayItrData  cannot be null ")
     require(pivotKey != null, "pivotKey cannot be null ")
@@ -29,19 +37,20 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     val last7DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, 7, incrDate)
 
     val topProducts = topProductsSold(last30DaysOrderItemData)
-    //println("top products count:-" + topProducts.count)
 
     val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemData)
 
     val weeklySaleData = addWeeklyAverageSales(orderItem7DaysWithWeeklySale, topProducts)
 
+    // Join with itr data to get field like mvp , price band ,category , gender etc
     val completeSkuData = skuCompleteData(weeklySaleData, yesterdayItrData)
 
+    // Filter skus which has less stock than desired inventory level
     val skuDataAfterInventoryFilter = inventoryCheck(completeSkuData)
-    //println("sku complete data:-" + skuDataAfterInventoryFilter.count + "\t" + skuDataAfterInventoryFilter.printSchema() + "\n")
+
     val pivotKeyArray = RecommendationUtils.getPivotArray(pivotKey)(0)
+    // function which generates recommendations
     val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, Schema.recommendationOutput, numRecs)
-    //println("rec skus data:-" + recommendedSkus.count + "\t Values :-" + recommendedSkus.show(100))
 
     RecommendationOutput.writeRecommendation(recommendedSkus)
   }
