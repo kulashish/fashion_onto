@@ -50,7 +50,8 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
 
     val pivotKeyArray = RecommendationUtils.getPivotArray(pivotKey)(0)
     // function which generates recommendations
-    val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, Schema.recommendationOutput, numRecs)
+    //FIXME: change fixed brickMvpRecommendationOutput  to mapping based
+    val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, Schema.brickMvpRecommendationOutput, numRecs)
 
     RecommendationOutput.writeRecommendation(recommendedSkus)
   }
