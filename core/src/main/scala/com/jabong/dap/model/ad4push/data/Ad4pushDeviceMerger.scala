@@ -50,7 +50,7 @@ object Ad4pushDeviceMerger extends Logging {
     println("End Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
   }
 
-  def processData1(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
+  def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
     //Using MergeUtils function
     val newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
       .dropDuplicates()
@@ -84,7 +84,7 @@ object Ad4pushDeviceMerger extends Logging {
    * @param fullcsv
    * @param curDate
    */
-  def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
+  def processData1(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
     // Using Select Coalesce function
     var newDF: DataFrame = null
     newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
@@ -97,7 +97,7 @@ object Ad4pushDeviceMerger extends Logging {
 
     var full: DataFrame = null
     if (null != fullcsv) {
-      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";")
+      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.UDID)
       if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
         full = SchemaUtils.changeSchema(full, Ad4pushSchema.Ad4pushDeviceIOS)
       }
@@ -118,8 +118,8 @@ object Ad4pushDeviceMerger extends Logging {
 
   def mergeExportData(full: DataFrame, newdf: DataFrame): DataFrame = {
 
-    val joined = full.join(newdf, full(Ad4pushVariables.DEVICE_ID) === newdf(Ad4pushVariables.UDID), SQL.FULL_OUTER)
-      .select(coalesce(full(Ad4pushVariables.DEVICE_ID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.DEVICE_ID,
+    val joined = full.join(newdf, full(Ad4pushVariables.UDID) === newdf(Ad4pushVariables.UDID), SQL.FULL_OUTER)
+      .select(coalesce(full(Ad4pushVariables.UDID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.UDID,
         coalesce(newdf(Ad4pushVariables.TOKEN), full(Ad4pushVariables.TOKEN)) as Ad4pushVariables.TOKEN,
         coalesce(newdf(Ad4pushVariables.OPENCOUNT), full(Ad4pushVariables.OPENCOUNT)) as Ad4pushVariables.OPENCOUNT,
         coalesce(newdf(Ad4pushVariables.FIRSTOPEN), full(Ad4pushVariables.FIRSTOPEN)) as Ad4pushVariables.FIRSTOPEN,
