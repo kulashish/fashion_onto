@@ -70,7 +70,6 @@ object BasicBob {
       config(ITR.ID_CATALOG_CONFIG) === simpleDF("fk_catalog_config")
     )
 
-    configDF.explain(true)
     val supplierDF = configDF.join(
       Model.supplier.value.select("status", "id_catalog_supplier").withColumnRenamed("status", "supplierStatus"),
       Model.config("fk_catalog_supplier") === Model.supplier.value("id_catalog_supplier")
@@ -88,7 +87,6 @@ object BasicBob {
         productUrl(col(ITR.ID_CATALOG_CONFIG), col("brandUrlKey"), col(ITR.PRODUCT_NAME))
       )
 
-    brandDF.explain(true)
     brandDF.
       select(
         ITR.ID_CATALOG_SIMPLE,

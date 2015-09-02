@@ -62,7 +62,6 @@ object BasicITR extends Logging {
         ITR.PRICE_ON_SITE -> 0.00,
         ITR.QUANTITY -> 0
       ))
-    itr.explain(true)
     val mvpUDF = udf(mvp)
     val priceBandUDF = udf(priceBandFunc)
 
