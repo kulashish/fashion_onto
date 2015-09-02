@@ -13,24 +13,13 @@ import org.apache.spark.sql.types._
  * Created by rahul aneja on 21/8/15.
  */
 class LiveCommonRecommender extends BasicRecommender with Logging {
-
-  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
-    val dataFrameSchema = StructType(Array(
-      StructField(ProductVariables.BRICK, StringType, false),
-      StructField(ProductVariables.MVP, StringType, false),
-      StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
-    ))
-    val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
-    val topProducts = topProductsSold(orderItemFullData, 30)
-    println("top products count:-" + topProducts.count)
-    val skuData = skuCompleteData(topProducts, yesterdayItr)
-    println("sku complete data:-" + skuData.count)
-    val recommendedSkus = genRecommend(skuData, pivotKeys, dataFrameSchema)
-    println("rec skus data:-" + recommendedSkus.count + "\t Values :-" + recommendedSkus.show(100))
-    val outPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RECOMMENDATIONS, DataSets.BRICK_MVP_RECOMMENDATIONS, DataSets.DAILY_MODE, TimeUtils.YESTERDAY_FOLDER)
-    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, outPath))
-      DataWriter.writeParquet(recommendedSkus, outPath, DataSets.IGNORE_SAVEMODE)
-    return recommendedSkus
+  /**
+   * Place holder function which will get recommended skus
+   * @param refSkus
+   * @param yesterdayItr
+   * @return
+   */
+  override def generateRecommendation(refSkus: DataFrame, yesterdayItr: DataFrame): DataFrame = {
+    return null
   }
 }

@@ -5,7 +5,7 @@ import org.apache.spark.sql.DataFrame
 class NullRecommender extends Recommender {
   // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
 
-  override def generateRecommendation(orderData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
+  override def generateRecommendation(refSkus: DataFrame, yesterdayItr: DataFrame): DataFrame = {
     return null
   }
 

@@ -15,27 +15,21 @@ import org.apache.spark.sql.{ DataFrame, Row }
 /**
  * Created by rahul (first version of basic recommender) on 23/6/15.
  */
-class CommonRecommendation extends Logging {
+abstract class CommonRecommendation extends Logging {
   val sqlContext = Spark.getSqlContext()
 
-  def generateRecommendation(orderData: DataFrame, yesterdayItr: DataFrame): DataFrame = {
+  /**
+   * Abstract method to generate recommendations
+   * @param orderItemFullData
+   * @param yesterdayItrData
+   * @param pivotKey
+   * @param numRecs
+   * @param incrDate
+   * @return
+   */
+  def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String)
 
-    return null
 
-  }
-
-  //  val skuSimpleToSku = udf((skuSimple: String) => simpleToSku(skuSimple: String))
-  //
-  //  //Converts Sku Simple to Sku
-  //  //Input skuSimple:String e.g GE160BG56HMHINDFAS-2211538
-  //  //Output GE160BG56HMHINDFAS
-  //  def simpleToSku(skuSimple: String): String = {
-  //    if (skuSimple == null) {
-  //      return null
-  //    }
-  //    val skuData = skuSimple.split("-")
-  //    return skuData(0)
-  //  }
   /**
    * top product sold in last 30days
    * @param last30DaysOrderItemData
@@ -49,7 +43,6 @@ class CommonRecommendation extends Logging {
 
     val groupedSku = last30DaysOrderItemData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(last30DaysOrderItemData(SalesOrderItemVariables.SKU)))
       .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)
-      //.agg($"actual_sku", count("created_at") as "quantity", max("created_at") as "last_sold_date")
       .agg(count(SalesOrderItemVariables.CREATED_AT) as Recommendation.NUMBER_LAST_30_DAYS_ORDERED, max(SalesOrderItemVariables.CREATED_AT) as Recommendation.LAST_SOLD_DATE)
 
     return groupedSku
@@ -97,16 +90,15 @@ class CommonRecommendation extends Logging {
 
   /**
    *
-   * @param topSku
+   * @param orderItemWithWeeklySale
    * @param yesterdayItrData
    * @return
    */
-  def skuCompleteData(topSku: DataFrame, yesterdayItrData: DataFrame): DataFrame = {
-    if (topSku == null || yesterdayItrData == null) {
-      return null
-    }
+  def skuCompleteData(orderItemWithWeeklySale: DataFrame, yesterdayItrData: DataFrame): DataFrame = {
+    require(orderItemWithWeeklySale != null, "topSku data cannot be null ")
+    require(yesterdayItrData != null, "yesterdayItrData  cannot be null ")
     // import sqlContext.implicits._
-    val RecommendationInput = topSku.join(yesterdayItrData, topSku(Recommendation.SALES_ORDER_ITEM_SKU).equalTo(yesterdayItrData(ProductVariables.SKU)), SQL.INNER)
+    val RecommendationInput = orderItemWithWeeklySale.join(yesterdayItrData, orderItemWithWeeklySale(Recommendation.SALES_ORDER_ITEM_SKU).equalTo(yesterdayItrData(ProductVariables.SKU)), SQL.INNER)
       .select(
         Recommendation.SALES_ORDER_ITEM_SKU,
         ProductVariables.BRICK,
@@ -177,9 +169,11 @@ class CommonRecommendation extends Logging {
    * @return
    */
   def genRecommend(recommendationInput: DataFrame, pivotArray: Array[String], dataFrameSchema: StructType, numRecs: Int): DataFrame = {
-    if (recommendationInput == null || pivotArray == null || dataFrameSchema == null) {
-      return null
-    }
+    require(recommendationInput != null, "recommendationInput data cannot be null ")
+    require(pivotArray != null, "pivotArray  cannot be null ")
+    require(dataFrameSchema != null, "dataFrameSchema cannot be null ")
+    require(numRecs != 0, "numRecs cannot be zero ")
+
     val mappedRecommendationInput = recommendationInput.rdd.keyBy(row => createKey(row, pivotArray))
     if (mappedRecommendationInput == null || mappedRecommendationInput.keys == null) {
       return null
