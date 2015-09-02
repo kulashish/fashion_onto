@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.recommendation.generate
 
 import com.jabong.dap.campaign.recommendation.generator.CommonRecommendation
 import com.jabong.dap.common.constants.campaign.Recommendation
+import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.{NullInputException, SharedSparkContext, Spark, TestSchema}
@@ -27,7 +28,7 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     days = TimeUtils.daysFromToday(TimeUtils.getDate("2015-08-27", TimeConstants.DATE_FORMAT))
     commonRecommendation = new CommonRecommendation()
     orderItemDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "sales_order_item_weekly_average_sales")
-    inventoryCheckInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "inventory_check_input",TestSchema.inventoryCheckInput)
+    inventoryCheckInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "inventory_check_input", TestSchema.inventoryCheckInput)
     itrDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/recommendation/", "basic_sku_itr")
   }
 
@@ -75,5 +76,35 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
   }
 
 
+  "Null order data" should "return null dataframe" in {
+    a[NullInputException] should be thrownBy {
+      commonRecommendation.topProductsSold(null)
+    }
+  }
+
+  "Order Items data input  " should "return sku and sorted by quantity dataframe" in {
+    val topSkus = commonRecommendation.topProductsSold(orderItemDataFrame)
+    assert(topSkus.count() == 2)
+  }
+
+  "top skus  input and itr" should "return sku complete data" in {
+    val recInput = commonRecommendation.skuCompleteData(commonRecommendation.topProductsSold(orderItemDataFrame), itrDataFrame)
+    val recInputbrand = recInput.filter(ProductVariables.SKU + "='ES418WA79UAUINDFAS'").select(ProductVariables.BRAND).collect()(0)(0).toString()
+    assert(recInputbrand == "adidas")
+  }
+
+  " skus BR828MA28TMPINDFAS input and itr" should "return WOMEN GENDER" in {
+    val recInput = commonRecommendation.skuCompleteData(commonRecommendation.topProductsSold(orderItemDataFrame), itrDataFrame)
+    val recInputbrand = recInput.filter(ProductVariables.SKU + "='SO596WA65JLIINDFAS'").select(ProductVariables.GENDER).collect()(0)(0).toString()
+    assert(recInputbrand == "MEN")
+  }
+
+  "No top skus input and itr" should "return null data" in {
+    val recInput = commonRecommendation.skuCompleteData(null, itrDataFrame)
+    assert(recInput == null)
+  }
+
+
 }
+
 

@@ -28,4 +28,14 @@ class RecommendationUtilsTest extends FlatSpec {
     assert(inventorySoldStatus == false)
   }
 
+  "No gender value" should "return NO recommended gender" in {
+    val recommendedGender = RecommendationUtils.getRecommendationGender(null)
+    assert(recommendedGender == null)
+  }
+
+  "MEN gender value" should "return MEN,UNISEX recommended gender" in {
+    val recommendedGender = RecommendationUtils.getRecommendationGender("MEN")
+    assert(recommendedGender == "MEN!UNISEX")
+  }
+
 }

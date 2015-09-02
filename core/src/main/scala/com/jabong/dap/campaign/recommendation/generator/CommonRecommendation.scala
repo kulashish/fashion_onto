@@ -43,7 +43,8 @@ class CommonRecommendation extends Logging {
    */
   def topProductsSold(last30DaysOrderItemData: DataFrame): DataFrame = {
     if (last30DaysOrderItemData == null) {
-      return null
+      logger.error("last30DaysOrderItemData is null")
+      throw new NullInputException("last30DaysOrderItemData is null")
     }
 
     val groupedSku = last30DaysOrderItemData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(last30DaysOrderItemData(SalesOrderItemVariables.SKU)))
@@ -167,13 +168,19 @@ class CommonRecommendation extends Logging {
   // Input: recommendationInput: contains sorted list of all skus sold in last x days
   //        schema: {sku, brick, mvp, brand, gender, sp, weeklyAverage of number sold}
   // Ouput: (mvp, brick, gender) and its sorted list of recommendations
-
+  /**
+   *
+   * @param recommendationInput
+   * @param pivotArray
+   * @param dataFrameSchema
+   * @param numRecs
+   * @return
+   */
   def genRecommend(recommendationInput: DataFrame, pivotArray: Array[String], dataFrameSchema: StructType, numRecs: Int): DataFrame = {
     if (recommendationInput == null || pivotArray == null || dataFrameSchema == null) {
       return null
     }
     val mappedRecommendationInput = recommendationInput.rdd.keyBy(row => createKey(row, pivotArray))
-    //val mappedRecommendationInput = recommendationInput.map(row => ((row(1),row(2)),row))
     if (mappedRecommendationInput == null || mappedRecommendationInput.keys == null) {
       return null
     }
@@ -247,87 +254,87 @@ class CommonRecommendation extends Logging {
     return genderSkuMap
   }
 
-  def generateSku(x: Row, y: Row): Row = {
-    if (x == null || y == null || x(4) == null || y(4) == null) {
-      return null
-    }
-
-    var genderSkuMap: Map[String, Set[String]] = Map()
-    var skuList: Set[String] = Set()
-    var recommendedRow = Row()
-    if (x(4).equals(y(4))) {
-      skuList += (x(0).toString)
-      skuList += (y(0).toString)
-      genderSkuMap += (x(4).toString -> skuList)
-      recommendedRow = Row(x(4), y(4), genderSkuMap)
-      return recommendedRow
-    }
-
-    val recommendGenderX = RecommendationUtils.getRecommendationGender(x(4))
-    val recommendGenderY = RecommendationUtils.getRecommendationGender(y(4))
-    if (recommendGenderX != null) {
-      val recommendGenderArray = recommendGenderX.split(",")
-
-      val genderMatches = existsInArray(y(4).toString, recommendGenderArray)
-      var skuList = genderSkuMap.getOrElse(x(4).toString, null)
-      if (skuList == null) {
-        skuList = Set()
-      }
-      if (genderMatches) {
-
-        skuList += (x(0).toString)
-        skuList += (y(0).toString)
-        println(skuList)
-        genderSkuMap += (x(4).toString -> skuList)
-      } else {
-        skuList += (x(0).toString)
-        genderSkuMap += (x(4).toString -> skuList)
-      }
-    }
-
-    if (recommendGenderY != null) {
-      val recommendGenderArray = recommendGenderY.split(",")
-
-      val genderMatches = existsInArray(x(4).toString, recommendGenderArray)
-      var skuList = genderSkuMap.getOrElse(y(4).toString, null)
-      if (skuList == null) {
-        skuList = Set()
-      }
-
-      if (genderMatches) {
-
-        skuList += (x(0).toString)
-        skuList += (y(0).toString)
-        println(skuList)
-        genderSkuMap += (y(4).toString -> skuList)
-      } else {
-        skuList += (y(0).toString)
-        genderSkuMap += (y(4).toString -> skuList)
-      }
-    }
-    recommendedRow = Row(x(4), y(4), genderSkuMap)
-
-    return recommendedRow
-  }
-
-  def inventoryFilter(inputDataFrame: DataFrame, timeFrameDays: Int, brickBrandStock: DataFrame): DataFrame = {
-    if (inputDataFrame == null || timeFrameDays < 0) {
-      return null
-    }
-    val filteredLastSevenDaysData = RecommendationUtils.daysData(inputDataFrame, timeFrameDays, "last", "last_sold_date")
-    val filteredBeforeSevenDaysData = RecommendationUtils.daysData(inputDataFrame, timeFrameDays, "before", "last_sold_date")
-    val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.STOCK + ">2*" + ProductVariables.WEEKLY_AVERAGE_SALE)
-
-    val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock, filteredBeforeSevenDaysData(ProductVariables.BRAND).equalTo(brickBrandStock("brands"))
-      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")), SQL.INNER)
-      .withColumn("stockAvailable", inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.CATEGORY), filteredBeforeSevenDaysData(ProductVariables.STOCK), brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
-      .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
-        ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
-
-    val outStock = filteredStock1.unionAll(filteredStock2)
-    return outStock
-
-  }
+//  def generateSku(x: Row, y: Row): Row = {
+//    if (x == null || y == null || x(4) == null || y(4) == null) {
+//      return null
+//    }
+//
+//    var genderSkuMap: Map[String, Set[String]] = Map()
+//    var skuList: Set[String] = Set()
+//    var recommendedRow = Row()
+//    if (x(4).equals(y(4))) {
+//      skuList += (x(0).toString)
+//      skuList += (y(0).toString)
+//      genderSkuMap += (x(4).toString -> skuList)
+//      recommendedRow = Row(x(4), y(4), genderSkuMap)
+//      return recommendedRow
+//    }
+//
+//    val recommendGenderX = RecommendationUtils.getRecommendationGender(x(4))
+//    val recommendGenderY = RecommendationUtils.getRecommendationGender(y(4))
+//    if (recommendGenderX != null) {
+//      val recommendGenderArray = recommendGenderX.split(",")
+//
+//      val genderMatches = existsInArray(y(4).toString, recommendGenderArray)
+//      var skuList = genderSkuMap.getOrElse(x(4).toString, null)
+//      if (skuList == null) {
+//        skuList = Set()
+//      }
+//      if (genderMatches) {
+//
+//        skuList += (x(0).toString)
+//        skuList += (y(0).toString)
+//        println(skuList)
+//        genderSkuMap += (x(4).toString -> skuList)
+//      } else {
+//        skuList += (x(0).toString)
+//        genderSkuMap += (x(4).toString -> skuList)
+//      }
+//    }
+//
+//    if (recommendGenderY != null) {
+//      val recommendGenderArray = recommendGenderY.split(",")
+//
+//      val genderMatches = existsInArray(x(4).toString, recommendGenderArray)
+//      var skuList = genderSkuMap.getOrElse(y(4).toString, null)
+//      if (skuList == null) {
+//        skuList = Set()
+//      }
+//
+//      if (genderMatches) {
+//
+//        skuList += (x(0).toString)
+//        skuList += (y(0).toString)
+//        println(skuList)
+//        genderSkuMap += (y(4).toString -> skuList)
+//      } else {
+//        skuList += (y(0).toString)
+//        genderSkuMap += (y(4).toString -> skuList)
+//      }
+//    }
+//    recommendedRow = Row(x(4), y(4), genderSkuMap)
+//
+//    return recommendedRow
+//  }
+//
+//  def inventoryFilter(inputDataFrame: DataFrame, timeFrameDays: Int, brickBrandStock: DataFrame): DataFrame = {
+//    if (inputDataFrame == null || timeFrameDays < 0) {
+//      return null
+//    }
+//    val filteredLastSevenDaysData = RecommendationUtils.daysData(inputDataFrame, timeFrameDays, "last", "last_sold_date")
+//    val filteredBeforeSevenDaysData = RecommendationUtils.daysData(inputDataFrame, timeFrameDays, "before", "last_sold_date")
+//    val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.STOCK + ">2*" + ProductVariables.WEEKLY_AVERAGE_SALE)
+//
+//    val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock, filteredBeforeSevenDaysData(ProductVariables.BRAND).equalTo(brickBrandStock("brands"))
+//      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")), SQL.INNER)
+//      .withColumn("stockAvailable", inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.CATEGORY), filteredBeforeSevenDaysData(ProductVariables.STOCK), brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
+//      .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
+//        ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
+//
+//    val outStock = filteredStock1.unionAll(filteredStock2)
+//    return outStock
+//
+//  }
 
   def inventoryCheck(inputData: DataFrame): DataFrame = {
     logger.info("inventory check started")
@@ -360,7 +367,7 @@ class CommonRecommendation extends Logging {
 
   val inventoryChecked = udf((category: String, numberSkus: Long, stock: Long, weeklyAverage: java.lang.Double) => RecommendationUtils.inventoryFilter(category, numberSkus, stock, weeklyAverage))
 
-  val inventoryNotSoldLastWeek = udf((category: String, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryWeekNotSold(category, stock, weeklyAverage))
+//  val inventoryNotSoldLastWeek = udf((category: String, stock: Int, weeklyAverage: Int) => RecommendationUtils.inventoryWeekNotSold(category, stock, weeklyAverage))
 
   def existsInArray(value: String, array: Array[String]): Boolean = {
     for (arrayVal <- array) {
