@@ -1,10 +1,10 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, CustomerVariables }
+import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderItemVariables }
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ SQLContext, DataFrame }
+import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
 /**
@@ -12,17 +12,17 @@ import org.scalatest.FlatSpec
  */
 class ReturnCancelTest extends FlatSpec with SharedSparkContext {
 
-  @transient var sqlContext: SQLContext = _
+  //  @transient var sqlContext: SQLContext = _
   @transient var orderData: DataFrame = _
   @transient var orderItemDataFrame: DataFrame = _
   var returnCancel: ReturnCancel = _
 
   override def beforeAll() {
     super.beforeAll()
-    sqlContext = Spark.getSqlContext()
+    //    sqlContext = Spark.getSqlContext()
     returnCancel = new ReturnCancel()
-    orderItemDataFrame = JsonUtils.readFromJson("campaign", "sales_item_cancel_return", Schema.salesOrderItem)
-    orderData = JsonUtils.readFromJson("campaign", "sales_order_cancel_return", Schema.salesOrder)
+    orderItemDataFrame = JsonUtils.readFromJson("campaigns", "sales_item_cancel_return", Schema.salesOrderItem)
+    orderData = JsonUtils.readFromJson("campaigns", "sales_order_cancel_return", Schema.salesOrder)
   }
 
   "No order data" should "return no data" in {

@@ -1,8 +1,9 @@
 package com.jabong.dap.campaign.recommendation
 
 import com.jabong.dap.common.constants.variables.ProductVariables
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
-import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
@@ -24,10 +25,8 @@ class BasicRecommenderTest extends FlatSpec with SharedSparkContext {
     sqlContext = Spark.getSqlContext()
 
     basicRecommender = new BasicRecommender()
-    orderItemDataFrame = sqlContext.read.json("src/test/resources/salescart/OrderItemHistory.json")
-    itrDataFrame = sqlContext.read.json("src/test/resources/salescart/itrData.json")
-
-    //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
+    orderItemDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "OrderItemHistory")
+    itrDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "itrData")
   }
 
   "No gender value" should "return NO recommended gender" in {

@@ -54,7 +54,17 @@ object SalesOrderVariables {
   val CORPORATE_CURRENCY_VALUE = "corporate_currency_value"
   val CORPORATE_TRANSACTION_ID = "corporate_transaction_id"
   val DEVICE_ID = "device_id"
+  val ID_SALES_ORDER_GIFT_WRAP = "id_sales_order_gift_wrap"
+  val GW_RECIPIENT_EMAIL = "gw_recipient_email"
+  val GW_RECIPIENT_NAME = "gw_recipient_name"
+  val GW_MESSAGE = "gw_message"
+  val GW_SENDER_NAME = "gw_sender_name"
   val GW_AMOUNT = "gw_amount"
+  val GW_GIFTCARD_CREDIT = "gw_giftcard_credit"
+  val GW_STORE_CREDIT = "gw_store_credit"
+  val GW_PAID_PRICE = "gw_paid_price"
+  val GW_PAYBACK_CREDIT = "gw_payback_credit"
+  val OCCASION = "occasion"
 
   //variables name
   val SO_CREATED_AT = "so_created_at"

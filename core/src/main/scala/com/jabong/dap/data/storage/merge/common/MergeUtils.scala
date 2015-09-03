@@ -91,7 +91,7 @@ object MergeUtils extends MergeData {
     dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
 
     // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.OUTER)
+    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
 
     joinedDF
   }
@@ -115,7 +115,7 @@ object MergeUtils extends MergeData {
     dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
 
     // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), SQL.OUTER)
+    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), SQL.FULL_OUTER)
 
     joinedDF
   }

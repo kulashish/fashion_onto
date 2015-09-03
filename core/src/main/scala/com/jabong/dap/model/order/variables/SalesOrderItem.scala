@@ -61,7 +61,7 @@ object SalesOrderItem {
     val bcapp = Spark.getContext().broadcast(app).value
     val bcweb = Spark.getContext().broadcast(web).value
     val bcmweb = Spark.getContext().broadcast(mWeb).value
-    val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER).
+    val appJoined = bcweb.join(bcapp, bcapp(SalesOrderVariables.FK_CUSTOMER) === bcweb(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
       select(
         coalesce(
           bcapp(SalesOrderVariables.FK_CUSTOMER),
@@ -74,7 +74,7 @@ object SalesOrderItem {
       )
     appJoined.printSchema()
     appJoined.show(5)
-    val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER).
+    val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
       select(
         coalesce(
           bcmweb(SalesOrderVariables.FK_CUSTOMER),
@@ -114,7 +114,7 @@ object SalesOrderItem {
    */
   def merge(inc: DataFrame, full: DataFrame): DataFrame = {
     val bcInc = Spark.getContext().broadcast(inc)
-    val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER)
+    val joinedData = full.join(bcInc.value, bcInc.value(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
     val res = joinedData.select(
       coalesce(
         full(SalesOrderVariables.FK_CUSTOMER),
@@ -160,15 +160,18 @@ object SalesOrderItem {
 
   /**
    *
-   * @param salesOrderItem
+   * @param salesOrderItemFull
    * @return
    */
-  def getSucessfulOrders(salesOrderItem: DataFrame): DataFrame = {
-    val sucessOrders = salesOrderItem.filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
-    val res = sucessOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
-    res.printSchema()
-    res.show(5)
-    res
+  def getSucessfullOrders(salesOrderItemFull: DataFrame, salesOrderFull: DataFrame): DataFrame = {
+    val sucessOrders = salesOrderItemFull
+      .select(SalesOrderItemVariables.FK_SALES_ORDER, SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)
+      .dropDuplicates()
+      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
+    val dfJoin = salesOrderFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
+      .join(sucessOrders, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === sucessOrders(SalesOrderItemVariables.FK_SALES_ORDER))
+      .groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+    dfJoin
   }
 
   /**
@@ -189,7 +192,7 @@ object SalesOrderItem {
 
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
     val bcCurr = Spark.getContext().broadcast(prev)
-    val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), SQL.OUTER)
+    val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
     val res = joinedData.select(
       coalesce(
         prev(SalesOrderVariables.FK_CUSTOMER),
@@ -237,10 +240,10 @@ object SalesOrderItem {
    * def main(args: Array[String]) {
    * val conf = new SparkConf().setAppName("SparkExamples")
    * Spark.init(conf)
-   * val df1 =Spark.getSqlContext().read.schema(OrderVarSchema.salesOrderItem).format("json")
-   * .load("src/test/resources/sales_order_item/sales_order_item1.json")
+   * val df1 = JsonUtils.readFromJson("sales_order_item", "sales_order_item1", OrderVarSchema.salesOrderItem)
    * df1.collect.foreach(println)
    * val  x = getSucessfulOrders(df1)
+   *
    * df1.collect().foreach(println)
    *
    * }

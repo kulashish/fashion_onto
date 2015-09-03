@@ -5,8 +5,6 @@ package com.jabong.dap.data.storage
  */
 object DataSets {
 
-  val EXTRAS = "extras"
-
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
@@ -15,14 +13,10 @@ object DataSets {
   val SALES_CART = "sales_cart"
 
   //customer
-  val RESULT_CUSTOMER_INCREMENTAL = "result_customer_incremental"
-  val RESULT_CUSTOMER_OLD = "result_customer_old"
-
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
   val CUSTOMER_SEGMENTS = "customer_segments"
   val CUSTOMER_PRODUCT_SHORTLIST = "customer_product_shortlist"
-  val RESULT_CUSTOMER_PRODUCT_SHORTLIST = "result_customer_product_shortlist"
 
   //newsletter
   val NEWSLETTER_SUBSCRIPTION = "newsletter_subscription"
@@ -38,32 +32,33 @@ object DataSets {
   val CATALOG_CONFIG_HAS_CATALOG_CATEGORY = "catalog_config_has_catalog_category"
 
   //PaybackCustomer
-  val PAYBACK_CUSTOMER = "payback_customer"
   val SALES_ORDER_PAYBACK_EARN = "sales_order_payback_earn"
   val SALES_ORDER_PAYBACK_REDEEM = "sales_order_payback_redeem"
 
-  //Newsletter Preferences
-  val NEWSLETTER_PREFERENCES = "newsletter_preferences"
+  val SKU_DATA = "sku_data"
+  val PRICING = "pricing"
 
-  //Clickstream
-  val CLICKSTREAM = "clickstream"
-
-  //Ad4Push customer response
-  val AD4PUSH = "ad4push"
-
-  //non schema constants for ad4push
-  val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
-  val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
+  val DEVICES_IOS = "devices_ios"
+  val DEVICES_ANDROID = "devices_android"
+  val AD4PUSH_DEVICE_MERGER = "ad4pushDeviceMerger"
 
   val REACTIONS_IOS = "reactions_ios"
   val REACTIONS_ANDROID = "reactions_android"
-  val REACTIONS_IOS_CSV = "reactions_ios_csv"
-  val REACTIONS_ANDROID_CSV = "reactions_android_csv"
   val CUSTOMER_RESPONSE = "customer_response"
+  val AD4PUSH_CUSTOMER_RESPONSE = "ad4pushCustomerResponse"
+
+  val IOS_CODE = "515"
+  val ANDROID_CODE = "517"
 
   val IOS = "ios"
   val WINDOWS = "windows"
   val ANDROID = "android"
+  val DESKTOP = "w"
+  val MOBILEWEB = "m"
+  val WSOA = "wsoa"
+
+  val WEB = "web"
+  val APP = "app"
 
   // modes for reading data
   val FULL_MERGE_MODE = "full_merge"
@@ -100,29 +95,37 @@ object DataSets {
   val ERP = "erp"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
+  val RESPONSYS = "responsys"
 
   val DEVICE_MAPPING = "device_mapping"
-  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
+  // Data Outputs
+  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
   val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
   val BASIC_ITR = "basicITR"
+  //Ad4Push customer response
+  val AD4PUSH = "ad4push"
+  //Clickstream
+  val CLICKSTREAM = "clickstream"
+  val CAMPAIGNS = "campaigns"
+  val DCF_FEED = "dcf_feed"
+  val EXTRAS = "extras"
 
-  val CAMPAIGN = "campaigns"
-
-  val ITEM_ON_DISCOUNT = "item_on_discount"
-
-  val LOW_STOCK = "low_stock"
-
-  val SKU_SELECTION = "sku_selection"
-
-  val ITR_30_DAY_DATA = "itr_30_day_data"
-
-  val YESTERDAY_ITR_DATA = "yesterday_itr_data"
-
-  val CUSTOMER_SELECTION = "customer_selection"
-  val CUSTOMER_PAGE_VISIT = "customer_page_visit"
-  val SURF = "surf"
+  val VARIABLES = "variables"
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
+
+  //DCF FEEDS
+  val DCF_INPUT_MERGED_HIVE_TABLE = "merge.merge_pagevisit"
+  val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
+  val DCF_FEED_FILENAME = "webhistory_"
+
+  //Campaign Quality
+  val CAMPAIGN_QUALITY = "campaign_quality"
+
+  val CONTACT_LIST_MOBILE = "contactListMobile"
+  val DND = "DND"
+  val ZONE_CITY = "zone_city"
+
 }

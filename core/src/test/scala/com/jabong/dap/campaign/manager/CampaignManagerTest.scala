@@ -1,10 +1,8 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.SharedSparkContext
-import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
+import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
@@ -14,7 +12,8 @@ import org.scalatest.FlatSpec
  * Created by rahul for com.jabong.dap.campaign.manager on 21/7/15.
  */
 class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkContext {
-  val jsonPath: String = "src/test/resources/campaign/campaign_config/push_campaign_conf.json"
+  val jsonPath: String = JsonUtils.TEST_RESOURCES + "/campaigns/campaign_config/push_campaign_conf.json"
+
   val conf1 = new Configuration()
   val fileSystem = FileSystem.get(conf1)
   implicit val formats = net.liftweb.json.DefaultFormats
@@ -24,7 +23,7 @@ class CampaignManagerTest extends FlatSpec with Serializable with SharedSparkCon
 
   override def beforeAll() {
     super.beforeAll()
-    campaignsOutData = JsonUtils.readFromJson("campaign/manager", "campaign_output", Schema.campaignOutput)
+    campaignsOutData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/manager", "campaign_output", TestSchema.campaignOutput)
   }
 
   "empty json String" should "return false" in {

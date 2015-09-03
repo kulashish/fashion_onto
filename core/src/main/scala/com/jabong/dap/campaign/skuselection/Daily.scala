@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.skuselection
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 

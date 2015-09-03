@@ -13,6 +13,9 @@ import scala.collection.immutable.HashMap
  */
 object TimeUtils extends Logging {
 
+  val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
+
   /**
    * Returns the total number of days between two given date inputs
    * @param date1
@@ -31,6 +34,14 @@ object TimeUtils extends Logging {
   def daysFromToday(date: Date): BigInt = {
     val today = new Date
     daysBetweenTwoDates(today, date)
+  }
+
+  def daysFromToday(date: String, dateFormat: String): Int = {
+    val format = new SimpleDateFormat(dateFormat)
+    val dt = Calendar.getInstance()
+    dt.setTime(format.parse(date))
+    val today = new Date
+    daysBetweenTwoDates(today, dt.getTime).toInt
   }
 
   /**
@@ -170,6 +181,95 @@ object TimeUtils extends Logging {
   }
 
   /**
+   * get start time of the day
+   * @param time
+   * @return
+   */
+  def startOfDay(time: Date): Long = {
+    val cal = Calendar.getInstance()
+    cal.setTimeInMillis(time.getTime())
+    cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to 0
+    cal.set(Calendar.MINUTE, 0); // set minutes to 0
+    cal.set(Calendar.SECOND, 0); //set seconds to 0
+    cal.getTime.getTime
+  }
+
+  /**
+   * To calculate difference between current time and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def currentTimeDiff(date: Timestamp, diffType: String): Double = {
+    val cal = Calendar.getInstance()
+
+    val diff = cal.getTime().getTime - date.getTime
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    diffTime
+  }
+
+  /**
+   * To calculate difference between start time of previous day and date provided as argument either in days, minutes hours
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: Timestamp, diffType: String): Double = {
+    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    //val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance()
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - date.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    diffTime
+  }
+
+  /**
+   * Input date is string
+   * @param date
+   * @param diffType
+   * @return
+   */
+  def lastDayTimeDiff(date: String, diffType: String): Double = {
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+    val prodDate = dateFormat.parse(date)
+
+    val cal = Calendar.getInstance()
+    cal.add(Calendar.DATE, -1)
+    val diff = startOfDay(cal.getTime) - prodDate.getTime()
+
+    var diffTime: Double = 0
+
+    diffType match {
+      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
+      case "hours" => diffTime = diff / (60 * 60 * 1000)
+      case "seconds" => diffTime = diff / 1000
+      case "minutes" => diffTime = diff / (60 * 1000)
+    }
+
+    diffTime
+  }
+
+  /**
    *
    * @param dt
    * @param dateFormat
@@ -257,6 +357,26 @@ object TimeUtils extends Logging {
       val format = new java.text.SimpleDateFormat(initialFormat)
       format.setLenient(false)
       val date = format.parse(dateString)
+      val readableDf = new SimpleDateFormat(expectedFormat);
+      //we want to parse date strictly
+      return readableDf.format(date)
+    }
+  }
+
+  /**
+   * Overloaded same function with date coming as time stamp
+   * @param dateStamp
+   * @param initialFormat
+   * @param expectedFormat
+   * @return
+   */
+  def changeDateFormat(dateStamp: Timestamp, initialFormat: String, expectedFormat: String): String = {
+    if (dateStamp == null) {
+      return ""
+    } else {
+      val format = new java.text.SimpleDateFormat(initialFormat)
+      //format.setLenient(false)
+      val date = format.parse(dateStamp.toString)
       val readableDf = new SimpleDateFormat(expectedFormat);
       //we want to parse date strictly
       return readableDf.format(date)

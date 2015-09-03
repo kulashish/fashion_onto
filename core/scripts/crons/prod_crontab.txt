@@ -20,9 +20,13 @@
 
 30 4 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushSurfCampaign >>/opt/alchemy-core/logs/pushSurfCampaign_logs.txt
 
+30 4 * * * sh /opt/alchemy-core/current/bin/dcf_feed_upload.sh >>/opt/alchemy-core/logs/dcf_feed.txt
+
+0 5 * * * sh /opt/alchemy-core/current/bin/pricing_sku_data.sh >>/opt/alchemy-core/logs/pricing_sku_data.txt
+
 30 5 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushCampaignMerge >>/opt/alchemy-core/logs/pushCampaignMerge_logs.txt
 
-30 6 * * * perl /opt/alchemy-core/base/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
+30 6 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
 
 30 7 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c mobilePushCampaignQuality >>/opt/alchemy-core/logs/mobilePushCampaignQuality_logs.txt
 

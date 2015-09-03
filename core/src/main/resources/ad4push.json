@@ -1,9 +1,0 @@
-{
-  "params": [
-    {
-      "source": "ad4push",
-      "saveMode": "Ignore",
-      "saveFormat": "parquet"
-    }
-  ]
-}

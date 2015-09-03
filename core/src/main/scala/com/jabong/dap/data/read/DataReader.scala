@@ -118,7 +118,7 @@ object DataReader extends Logging {
     }
   }
 
-  def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, filename: String, header: String, delimeter: String): DataFrame = {
+  def getDataFrame4mCsv(basePath: String, source: String, tableName: String, mode: String, date: String, filename: String, header: String, delimiter: String): DataFrame = {
     require(basePath != null, "Base Path is null")
     require(source != null, "Source Type is null")
     require(tableName != null, "Table Name is null")
@@ -128,9 +128,22 @@ object DataReader extends Logging {
     val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
     logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
     if (DataVerifier.dataExists(fetchPath, filename))
-      Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).load(fetchPath)
+      Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fetchPath)
     else {
       logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
+      throw new DataNotFound
+    }
+  }
+
+  def getDataFrame4mCsv(fullCSVPath: String, header: String, delimiter: String): DataFrame = {
+    require(fullCSVPath != null, "Path is null")
+
+    logger.info("Reading data from hdfs: " + fullCSVPath + " in csv format")
+    // used dir exists as the path itself contains the filename as well.
+    if (DataVerifier.dirExists(fullCSVPath))
+      Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fullCSVPath)
+    else {
+      logger.error("Data not found for " + fullCSVPath)
       throw new DataNotFound
     }
   }

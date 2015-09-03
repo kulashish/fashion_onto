@@ -14,7 +14,8 @@ object ParamJsonValidator {
   }
 
   private def validatePossibleValues(paramInfo: ParamInfo) = {
-    val possibleSourceFormats = Array(DataSets.AD4PUSH, DataSets.CUSTOMER_DEVICE_MAPPING, DataSets.BASIC_ITR)
+    val possibleSourceFormats = Array(DataSets.AD4PUSH_CUSTOMER_RESPONSE, DataSets.CUSTOMER_DEVICE_MAPPING, DataSets.BASIC_ITR,
+      DataSets.PRICING, DataSets.DCF_FEED, DataSets.CAMPAIGN_QUALITY, DataSets.AD4PUSH_DEVICE_MERGER)
     val possibleSaveFormats = Array(DataSets.ORC, DataSets.PARQUET)
     val possibleSaveModes = Array(DataSets.OVERWRITE_SAVEMODE, DataSets.APPEND_SAVEMODE, DataSets.IGNORE_SAVEMODE, DataSets.ERROR_SAVEMODE)
 

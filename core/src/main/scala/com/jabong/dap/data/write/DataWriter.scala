@@ -24,7 +24,7 @@ object DataWriter extends Logging {
   def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, saveMode: String, header: String, delimeter: String) {
     val writePath = DataWriter.getWritePath(ConfigConstants.TMP_PATH, source, tableName, mode, date)
     if (DataWriter.canWrite(saveMode, writePath)) {
-      DataWriter.writeCsv(df, writePath, saveMode, "true", ";")
+      DataWriter.writeCsv(df, writePath, saveMode, header, delimeter)
       val csvSrcFile = writePath + File.separator + "part-00000"
       val csvdestFile = writePath + File.separator + csvFileName + ".csv"
       DataVerifier.rename(csvSrcFile, csvdestFile)
