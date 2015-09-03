@@ -50,7 +50,7 @@ object Ad4pushDeviceMerger extends Logging {
     println("End Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
   }
 
-  def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
+  def processData1(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
     //Using MergeUtils function
     val newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
       .dropDuplicates()
@@ -84,7 +84,7 @@ object Ad4pushDeviceMerger extends Logging {
    * @param fullcsv
    * @param curDate
    */
-  def processData1(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
+  def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
     // Using Select Coalesce function
     var newDF: DataFrame = null
     newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
