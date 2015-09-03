@@ -1,11 +1,11 @@
 package com.jabong.dap.model.ad4push
 
 import com.jabong.dap.common.SharedSparkContext
-import com.jabong.dap.common.constants.variables.DevicesReactionsVariables._
+import com.jabong.dap.common.constants.variables.Ad4pushVariables._
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema._
+import com.jabong.dap.model.ad4push.schema.Ad4pushSchema._
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import org.scalatest.FlatSpec
 

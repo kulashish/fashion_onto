@@ -3,6 +3,7 @@ package com.jabong.dap.model.order.variables
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -160,18 +161,27 @@ object SalesOrderItem {
 
   /**
    *
-   * @param salesOrderItemFull
+   * @param salesOrderItemInc
    * @return
    */
-  def getSucessfullOrders(salesOrderItemFull: DataFrame, salesOrderFull: DataFrame): DataFrame = {
-    val sucessOrders = salesOrderItemFull
-      .select(SalesOrderItemVariables.FK_SALES_ORDER, SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)
-      .dropDuplicates()
-      .filter(SalesOrderItemVariables.FILTER_SUCCESSFUL_ORDERS)
-    val dfJoin = salesOrderFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
-      .join(sucessOrders, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === sucessOrders(SalesOrderItemVariables.FK_SALES_ORDER))
-      .groupBy(SalesOrderVariables.FK_CUSTOMER).agg(countDistinct(SalesOrderVariables.FK_SALES_ORDER) as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
-    dfJoin
+  def getSuccessfullOrders(salesOrderItemInc: DataFrame, salesOrderFull: DataFrame, salesPrev: DataFrame): (DataFrame, DataFrame) = {
+    val successOrders = salesOrderItemInc
+      .select(salesOrderItemInc(SalesOrderItemVariables.FK_SALES_ORDER), Udf.successOrder(salesOrderItemInc(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)) as "STATUS")
+
+    val successOrdersJoined = successOrders.join(salesOrderFull, successOrders(SalesOrderItemVariables.FK_SALES_ORDER) === salesOrderFull(SalesOrderVariables.ID_SALES_ORDER)).
+      select(
+        col(SalesOrderVariables.FK_CUSTOMER),
+        col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
+        col("STATUS")
+      ).filter("STATUS = 1").
+        dropDuplicates()
+
+    val newOrders = successOrdersJoined.except(salesPrev)
+
+    val salesUnion = salesPrev.unionAll(successOrdersJoined)
+
+    val ordersCount = newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+    (ordersCount, salesUnion)
   }
 
   /**
