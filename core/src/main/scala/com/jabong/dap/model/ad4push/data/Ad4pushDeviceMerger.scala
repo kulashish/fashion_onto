@@ -5,13 +5,12 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.ad4push.schema.Ad4pushSchema
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -22,7 +21,6 @@ import org.apache.spark.sql.functions._
 object Ad4pushDeviceMerger extends Logging {
 
   def start(params: ParamInfo, isHistory: Boolean) = {
-    println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
@@ -46,35 +44,6 @@ object Ad4pushDeviceMerger extends Logging {
 
     if (isHistory) {
       processHistoricalData(incrDate, saveMode)
-    }
-    println("End Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
-  }
-
-  def processData1(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
-    //Using MergeUtils function
-    val newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
-      .dropDuplicates()
-
-    var full: DataFrame = null
-    if (null != fullcsv) {
-      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.UDID)
-      if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-        full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceAndroid).dropDuplicates()
-      } else {
-        full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceIOS).dropDuplicates()
-      }
-    } else {
-      full = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, prevDate)
-    }
-
-    val res = MergeUtils.InsertUpdateMerge(full, newDF, Ad4pushVariables.UDID).dropDuplicates()
-    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate)
-    if (DataWriter.canWrite(saveMode, savePath))
-      DataWriter.writeParquet(res, savePath, saveMode)
-    if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      DataWriter.writeCsv(SchemaUtils.dropColumns(res, Ad4pushSchema.Ad4pushDeviceAndroid), DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", ";")
-    } else {
-      DataWriter.writeCsv(res, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", ";")
     }
   }
 
