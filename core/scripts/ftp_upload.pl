@@ -34,7 +34,7 @@ if ($component eq "campaigns") {
     uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
     upload_ad4push_customer_response();
-} elsif ($component eq "upload_ad4push_device_merger") {
+} elsif ($component eq "ad4push_device_merger") {
     upload_ad4push_device_merger();
 } elsif ($component eq "dcf_feed") {
     upload_dcf_feed();
