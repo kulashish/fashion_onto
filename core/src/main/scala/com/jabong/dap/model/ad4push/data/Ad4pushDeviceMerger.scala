@@ -174,7 +174,7 @@ object Ad4pushDeviceMerger extends Logging {
   def processHistoricalData(minDate: String, saveMode: String) {
     println("Inside Historical Data merge Code")
 
-    val noOfDays = TimeUtils.daysFromToday(minDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val noOfDays = TimeUtils.daysFromToday(minDate, TimeConstants.DATE_FORMAT_FOLDER) - 1
     var prevFullDate: String = null
     var incrDate: String = minDate
     for (i <- 1 to noOfDays) {

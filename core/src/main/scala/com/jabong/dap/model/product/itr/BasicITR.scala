@@ -30,7 +30,7 @@ object BasicITR extends Logging {
     var count = 30
     if (null != startDate) {
       val minDate = TimeUtils.getDate(startDate, TimeConstants.DATE_FORMAT_FOLDER)
-      count = TimeUtils.daysFromToday(minDate).toInt
+      count = TimeUtils.daysFromToday(minDate)
     }
     for (i <- count to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
