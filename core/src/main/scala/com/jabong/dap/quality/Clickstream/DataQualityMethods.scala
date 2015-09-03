@@ -1,5 +1,6 @@
 package com.jabong.dap.quality.Clickstream
 
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.hive.HiveContext
 
 /**
@@ -7,31 +8,100 @@ import org.apache.spark.sql.hive.HiveContext
  */
 object DataQualityMethods {
 
-  def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String): String = {
+  def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
 
-    var message: String = ""
 
     val data = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    val clickstreamapps = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from clickstream_apps.apps where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val clickstreamapps = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename1 + "  where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    val clickstreampagevisit = hiveContext.sql("select id, browserid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from clickstream.pagevisit where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val clickstreampagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename2 + "  where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    val mergepagevisit = hiveContext.sql("select id, browserid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from merge.merge_pagevisit where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val mergepagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename3 + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
     //val datacount = hiveContext.sql("select count(*) from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year)
 
     //val a :Long= datacount.collect()(0).getLong(0)
 
-    /**************************************************************************************************/
+    /** ************************************************************************************************/
     //clickstream_desktop//
-    /**************************************************************************************************/
+    /** ************************************************************************************************/
+    var msg = qualityCount(data, "Clickstream_Desktop", "")
+    msg = qualityCount(clickstreamapps, "Clickstream_apps", msg)
+    msg = qualityCount(clickstreampagevisit, "Clickstream_pagevisit", msg)
+    msg = qualityCount(mergepagevisit, "merge_pagevisit", msg)
+    return msg
+  }
 
-    val datacount = data.count()
+  def qualityCount(resultSet: DataFrame, processName: String, oldMessage: String): String = {
+    var message: String = oldMessage
+    val datacount = resultSet.count()
+    if (datacount == 0) {
+      message += "There is no data available in " + processName
+    }
+    else {
+
+      message += processName + "details" + "\n"
+
+      message += "Count of records :" + datacount.toString() + "\n"
+
+      message += "Count of Null ID :" + resultSet.filter(resultSet("id") isNull).count() + "\n"
+
+      message += "Count of Null browserid :" + resultSet.filter(resultSet("bid") isNull).count() + "\n"
+
+      message += "Count of Null visitid :" + resultSet.filter(resultSet("visitid") isNull).count() + "\n"
+
+      message += "Count of Null pagets :" + resultSet.filter(resultSet("pagets") isNull).count() + "\n"
+
+      message += "Count of Null actualvisitid :" + resultSet.filter(resultSet("actualvisitid") isNull).count() + "\n"
+
+      message += "Count of Null channel :" + resultSet.filter(resultSet("channel") isNull).count() + "\n"
+
+      message += "Count of Null ip :" + resultSet.filter(resultSet("ip") isNull).count() + "\n"
+
+      message += "Count of Null url :" + resultSet.filter(resultSet("url") isNull).count() + "\n"
+
+      message += "Count of Null pagetype :" + resultSet.filter(resultSet("pagetype") isNull).count() + "\n"
+
+      message += "Count of Null domain :" + resultSet.filter(resultSet("domain") isNull).count() + "\n"
+
+      message += "Count of m domain :" + resultSet.filter(resultSet("domain") equalTo ("m")).count() + "\n"
+
+      message += "Count of w domain :" + resultSet.filter(resultSet("domain") equalTo ("w")).count() + "\n"
+
+      message += "Count of windows domain :" + resultSet.filter(resultSet("domain") equalTo ("windows")).count() + "\n"
+
+      message += "Count of android domain :" + resultSet.filter(resultSet("domain") equalTo ("android")).count() + "\n"
+
+      message += "Count of ios domain :" + resultSet.filter(resultSet("domain") equalTo ("ios")).count() + "\n"
+
+      message += "Count of Null device :" + resultSet.filter(resultSet("device") isNull).count() + "\n"
+
+      message += "Count of Mobile device :" + resultSet.filter(resultSet("device") equalTo ("mobile")).count() + "\n"
+
+      message += "Count of Tablet device :" + resultSet.filter(resultSet("device") equalTo ("tablet")).count() + "\n"
+
+      message += "Count of desktop device :" + resultSet.filter(resultSet("device") equalTo ("desktop")).count() + "\n"
+
+      message += "Count of Null useragent :" + resultSet.filter(resultSet("useragent") isNull).count() + "\n"
+
+      message += "Count of Null year1 :" + resultSet.filter(resultSet("year1") isNull).count() + "\n"
+
+      message += "Count of Null month1 :" + resultSet.filter(resultSet("month1") isNull).count() + "\n"
+
+      message += "Count of Null date1 :" + resultSet.filter(resultSet("date1") isNull).count() + "\n"
+
+    }
+
+    return message
+
+  }
+}
+   /* var datacount = data.count()
 
 
     if(datacount==0){
-      message="There is no data available in clickstream_desktop"
+      message="There is no data available in "+processName
     }
     else {
 
@@ -238,4 +308,4 @@ object DataQualityMethods {
     return message
   }
 
-}
+}*/
