@@ -5,7 +5,7 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -137,7 +137,7 @@ object Ad4pushDeviceMerger extends Logging {
         coalesce(newdf(Ad4pushVariables.WISHLIST_PRODUCTS_COUNT), full(Ad4pushVariables.WISHLIST_PRODUCTS_COUNT)) as Ad4pushVariables.WISHLIST_PRODUCTS_COUNT,
         coalesce(newdf(Ad4pushVariables.RATED), full(Ad4pushVariables.RATED)) as Ad4pushVariables.RATED
       )
-    return joined
+    joined
   }
 
   def processHistoricalData(minDate: String, saveMode: String) {
