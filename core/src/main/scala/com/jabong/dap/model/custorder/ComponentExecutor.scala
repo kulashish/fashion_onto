@@ -10,6 +10,7 @@ import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.customer.ContactListMobile
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
+import com.jabong.dap.quality.Clickstream.DataQualityMethods
 import com.jabong.dap.quality.campaign.CampaignQualityEntry
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -60,7 +61,9 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
+          case DataSets.DATA_QUALITY => DataQualityMethods.start(paramJob)
           case _ => logger.error("Unknown source.")
+
         }
       }
     }

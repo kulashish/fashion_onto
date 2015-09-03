@@ -1,14 +1,77 @@
 package com.jabong.dap.quality.Clickstream
 
+import java.util.Calendar
+
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.data.storage.DataSets
+import grizzled.slf4j.Logging
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.hive.HiveContext
 
 /**
  * Created by tejas on 13/8/15.
  */
-object DataQualityMethods {
+object DataQualityMethods extends Logging {
 
-  def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
+
+  def start(params: ParamInfo): Unit = {
+
+    logger.info("dcf feed generation process started")
+    val hiveContext = Spark.getHiveContext()
+    val executeDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
+    val clickstreamTable = OptionUtils.getOptValue(params.input, DataSets.DCF_INPUT_MERGED_HIVE_TABLE)
+    val monthYear = TimeUtils.getMonthAndYear(executeDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val month = (monthYear.month + 1).toString
+    val date = monthYear.day.toString
+    val year = monthYear.year.toString
+
+    //Spark.getContext()
+    //val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
+    //Spark.init(conf)
+
+    //val hiveContext = Spark.getHiveContext()
+    //val sqlContext = Spark.getSqlContext()
+    //var gap = args(0).toInt
+    var tablename = DataSets.CLICKSTREAM_DESKTOP_TABLE
+    var tablename1 = DataSets.CLICKSTREAM_APPS_TABLE
+    var tablename2= DataSets.CLICKSTREAM_PAGEVISIT_TABLE
+    var tablename3 = DataSets.MERGE_PAGEVISIT
+    val cal = Calendar.getInstance()
+    //cal.add(Calendar.DATE, -gap)
+    //val mFormat = new SimpleDateFormat("MM")
+    //var year = cal.get(Calendar.YEAR).toString
+    //var day = cal.get(Calendar.DAY_OF_MONTH).toString
+    //var month = mFormat.format(cal.getTime())
+    //val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
+    //var dt = dateFormat.format(cal.getTime())
+    //var res1 = DataQualityMethods.Artemisdaily(hiveContext, day, month, year, tablename)
+
+    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, tablename, tablename1, tablename2,tablename3)
+    var path= "./"+year+"/"+month+"/"+date
+    write("hdfs://172.16.84.37:8020", path,output.getBytes())
+    //write(ConfigConstants.OUTPUT_PATH, "./Automation1/",output.getBytes())
+    //ScalaMail.sendMessage("tejas.jain@jabong.com","","","tejas.jain@jabong.com",output,"Quality Report","")
+
+    //println("ScalaMailMain")
+  }
+
+  def write(uri: String, filePath: String,data: Array[Byte]) = {
+    System.setProperty("HADOOP_USER_NAME", "tjain")
+    val path = new Path(filePath)
+    val conf = new Configuration()
+    conf.set("fs.defaultFS", uri)
+    val fs = FileSystem.get(conf)
+    val os = fs.create(path)
+    os.write(data)
+    fs.close()
+  }
+
+def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
 
 
     val data = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
@@ -97,215 +160,3 @@ object DataQualityMethods {
 
   }
 }
-   /* var datacount = data.count()
-
-
-    if(datacount==0){
-      message="There is no data available in "+processName
-    }
-    else {
-
-      message = "clickstream_desktop details" + "\n"
-
-      message += "Count of records :" + datacount.toString() + "\n"
-
-      message += "Count of Null ID :" + data.filter(data("id") isNull).count() + "\n"
-
-      message += "Count of Null bid :" + data.filter(data("bid") isNull).count() + "\n"
-
-      message += "Count of Null visitid :" + data.filter(data("visitid") isNull).count() + "\n"
-
-      message += "Count of Null pagets :" + data.filter(data("pagets") isNull).count() + "\n"
-
-      message += "Count of Null actualvisitid :" + data.filter(data("actualvisitid") isNull).count() + "\n"
-
-      message += "Count of Null channel :" + data.filter(data("channel") isNull).count() + "\n"
-
-      message += "Count of Null ip :" + data.filter(data("ip") isNull).count() + "\n"
-
-      message += "Count of Null url :" + data.filter(data("url") isNull).count() + "\n"
-
-      message += "Count of Null pagetype :" + data.filter(data("pagetype") isNull).count() + "\n"
-
-      message += "Count of Null domain :" + data.filter(data("domain") isNull).count() + "\n"
-
-      message += "Count of Null device :" + data.filter(data("device") isNull).count() + "\n"
-
-      message += "Count of Null useragent :" + data.filter(data("useragent") isNull).count() + "\n"
-
-      message += "Count of Null year1 :" + data.filter(data("year1") isNull).count() + "\n"
-
-      message += "Count of Null month1 :" + data.filter(data("month1") isNull).count() + "\n"
-
-      message += "Count of Null date1 :" + data.filter(data("date1") isNull).count() + "\n"
-
-
-      /** *************************************************************************************/
-      //clickstream_apps//
-      /** ************************************************************************************/
-
-
-      val appsdatacount = clickstreamapps.count()
-
-
-      if (appsdatacount == 0) {
-        message = "There is no data available in clickstream_apps"
-      }
-      else {
-
-        message += "clickstream_apps details" + "\n"
-
-        message += "Count of records :" + appsdatacount.toString() + "\n"
-
-        message += "Count of Null ID :" + clickstreamapps.filter(clickstreamapps("id") isNull).count() + "\n"
-
-        message += "Count of Null bid :" + clickstreamapps.filter(clickstreamapps("bid") isNull).count() + "\n"
-
-        message += "Count of Null visitid :" + clickstreamapps.filter(clickstreamapps("visitid") isNull).count() + "\n"
-
-        message += "Count of Null pagets :" + clickstreamapps.filter(clickstreamapps("pagets") isNull).count() + "\n"
-
-        message += "Count of Null actualvisitid :" + clickstreamapps.filter(clickstreamapps("actualvisitid") isNull).count() + "\n"
-
-        message += "Count of Null channel :" + clickstreamapps.filter(clickstreamapps("channel") isNull).count() + "\n"
-
-        message += "Count of Null ip :" + clickstreamapps.filter(clickstreamapps("ip") isNull).count() + "\n"
-
-        message += "Count of Null url :" + clickstreamapps.filter(clickstreamapps("url") isNull).count() + "\n"
-
-        message += "Count of Null pagetype :" + clickstreamapps.filter(clickstreamapps("pagetype") isNull).count() + "\n"
-
-        message += "Count of Null domain :" + clickstreamapps.filter(clickstreamapps("domain") isNull).count() + "\n"
-
-        message += "Count of Null device :" + clickstreamapps.filter(clickstreamapps("device") isNull).count() + "\n"
-
-        message += "Count of Null useragent :" + clickstreamapps.filter(clickstreamapps("useragent") isNull).count() + "\n"
-
-        message += "Count of Null year1 :" + clickstreamapps.filter(clickstreamapps("year1") isNull).count() + "\n"
-
-        message += "Count of Null month1 :" + clickstreamapps.filter(clickstreamapps("month1") isNull).count() + "\n"
-
-        message += "Count of Null date1 :" + clickstreamapps.filter(clickstreamapps("date1") isNull).count() + "\n"
-
-      }
-
-      /** *************************************************************************************/
-      //clickstream_pagevisit//
-      /** *************************************************************************************/
-
-
-     val pgdatacount = clickstreampagevisit.count()
-
-
-      if (pgdatacount == 0) {
-        message = "There is no data available in clickstream_pagevisit"
-      }
-      else {
-
-        message += "clickstream_pagevisit details" + "\n"
-
-        message += "Count of records :" + pgdatacount.toString() + "\n"
-
-        message += "Count of Null ID :" + clickstreampagevisit.filter(clickstreampagevisit("id") isNull).count() + "\n"
-
-        message += "Count of Null browserid :" + clickstreampagevisit.filter(clickstreampagevisit("browserid") isNull).count() + "\n"
-
-        message += "Count of Null visitid :" + clickstreampagevisit.filter(clickstreampagevisit("visitid") isNull).count() + "\n"
-
-        message += "Count of Null pagets :" + clickstreampagevisit.filter(clickstreampagevisit("pagets") isNull).count() + "\n"
-
-        message += "Count of Null actualvisitid :" + clickstreampagevisit.filter(clickstreampagevisit("actualvisitid") isNull).count() + "\n"
-
-        message += "Count of Null channel :" + clickstreampagevisit.filter(clickstreampagevisit("channel") isNull).count() + "\n"
-
-        message += "Count of Null ip :" + clickstreampagevisit.filter(clickstreampagevisit("ip") isNull).count() + "\n"
-
-        message += "Count of Null url :" + clickstreampagevisit.filter(clickstreampagevisit("url") isNull).count() + "\n"
-
-        message += "Count of Null pagetype :" + clickstreampagevisit.filter(clickstreampagevisit("pagetype") isNull).count() + "\n"
-
-        message += "Count of Null domain :" + clickstreampagevisit.filter(clickstreampagevisit("domain") isNull).count() + "\n"
-
-        message += "Count of Null device :" + clickstreampagevisit.filter(clickstreampagevisit("device") isNull).count() + "\n"
-
-        message += "Count of Null useragent :" + clickstreampagevisit.filter(clickstreampagevisit("useragent") isNull).count() + "\n"
-
-        message += "Count of Null year1 :" + clickstreampagevisit.filter(clickstreampagevisit("year1") isNull).count() + "\n"
-
-        message += "Count of Null month1 :" + clickstreampagevisit.filter(clickstreampagevisit("month1") isNull).count() + "\n"
-
-        message += "Count of Null date1 :" + clickstreampagevisit.filter(clickstreampagevisit("date1") isNull).count() + "\n"
-
-      }
-
-
-      /** ********************************************************************************/
-      //merge_pagevisit//
-      /** ********************************************************************************/
-
-      val mergedatacount = mergepagevisit.count()
-
-
-      if (mergedatacount == 0) {
-        message = "There is no data available in merge_pagevisit"
-      }
-      else {
-
-        message += "merge_pagevisit details" + "\n"
-
-        message += "Count of records :" + mergedatacount.toString() + "\n"
-
-        message += "Count of Null ID :" + mergepagevisit.filter(mergepagevisit("id") isNull).count() + "\n"
-
-        message += "Count of Null browserid :" + mergepagevisit.filter(mergepagevisit("browserid") isNull).count() + "\n"
-
-        message += "Count of Null visitid :" + mergepagevisit.filter(mergepagevisit("visitid") isNull).count() + "\n"
-
-        message += "Count of Null pagets :" + mergepagevisit.filter(mergepagevisit("pagets") isNull).count() + "\n"
-
-        message += "Count of Null actualvisitid :" + mergepagevisit.filter(mergepagevisit("actualvisitid") isNull).count() + "\n"
-
-        message += "Count of Null channel :" + mergepagevisit.filter(mergepagevisit("channel") isNull).count() + "\n"
-
-        message += "Count of Null ip :" + mergepagevisit.filter(mergepagevisit("ip") isNull).count() + "\n"
-
-        message += "Count of Null url :" + mergepagevisit.filter(mergepagevisit("url") isNull).count() + "\n"
-
-        message += "Count of Null pagetype :" + mergepagevisit.filter(mergepagevisit("pagetype") isNull).count() + "\n"
-
-        message += "Count of Null domain :" + mergepagevisit.filter(mergepagevisit("domain") isNull).count() + "\n"
-
-        message += "Count of m domain :" + mergepagevisit.filter(mergepagevisit("domain") equalTo("m")).count() + "\n"
-
-        message += "Count of w domain :" + mergepagevisit.filter(mergepagevisit("domain") equalTo("w")).count() + "\n"
-
-        message += "Count of windows domain :" + mergepagevisit.filter(mergepagevisit("domain") equalTo("windows")).count() + "\n"
-
-        message += "Count of android domain :" + mergepagevisit.filter(mergepagevisit("domain") equalTo("android")).count() + "\n"
-
-        message += "Count of ios domain :" + mergepagevisit.filter(mergepagevisit("domain") equalTo("ios")).count() + "\n"
-
-        message += "Count of Null device :" + mergepagevisit.filter(mergepagevisit("device") isNull).count() + "\n"
-
-        message += "Count of Mobile device :" + mergepagevisit.filter(mergepagevisit("device") equalTo("mobile")).count() + "\n"
-
-        message += "Count of Tablet device :" + mergepagevisit.filter(mergepagevisit("device") equalTo("tablet")).count() + "\n"
-
-        message += "Count of desktop device :" + mergepagevisit.filter(mergepagevisit("device") equalTo("desktop")).count() + "\n"
-
-        message += "Count of Null useragent :" + mergepagevisit.filter(mergepagevisit("useragent") isNull).count() + "\n"
-
-        message += "Count of Null year1 :" + mergepagevisit.filter(mergepagevisit("year1") isNull).count() + "\n"
-
-        message += "Count of Null month1 :" + mergepagevisit.filter(mergepagevisit("month1") isNull).count() + "\n"
-
-        message += "Count of Null date1 :" + mergepagevisit.filter(mergepagevisit("date1") isNull).count() + "\n"
-
-      }
-
-    }
-
-    return message
-  }
-
-}*/

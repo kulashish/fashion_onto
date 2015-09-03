@@ -1,0 +1,11 @@
+{
+  "params": [
+    {
+      "source": "dataqualitycheck",
+      //"input" : "merge.merge_pagevisit",
+      "path" : "hdfs://172.16.84.37:8020",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

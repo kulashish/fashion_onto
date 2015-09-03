@@ -142,6 +142,8 @@ object Init {
 
       // dcf feed
       case "dcfFeedGenerate" => new ComponentExecutor().start(params.paramJson)
+
+      case "dataqualitycheck" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }
