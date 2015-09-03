@@ -185,9 +185,9 @@ object Ad4pushDeviceMerger extends Logging {
       println("Increment Date: " + incrDate)
       println("prevDate: " + prevFullDate)
       //exportDevices_517_20150822.csv
-      val filenameIos = "exportDevices_" + DataSets.IOS_CODE + "_" + newDate + ".csv"
+      val filenameIos = "exportDevices_" + DataSets.IOS_CODE + "_" + newDate
       processData(DataSets.DEVICES_IOS, prevFullDate, incrDate, filenameIos, saveMode, DataSets.IOS, null)
-      val filenameAndroid = "exportDevices_" + DataSets.ANDROID_CODE + "_" + newDate + ".csv"
+      val filenameAndroid = "exportDevices_" + DataSets.ANDROID_CODE + "_" + newDate
       processData(DataSets.DEVICES_ANDROID, prevFullDate, incrDate, filenameAndroid, saveMode, DataSets.ANDROID, null)
 
       println("successfully done merge")
