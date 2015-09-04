@@ -1,20 +1,20 @@
-package com.jabong.dap.model.customer
+package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments }
-import com.jabong.dap.model.order.variables.{ SalesOrder, SalesOrderAddress, SalesOrderItem }
+import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments}
+import com.jabong.dap.model.order.variables.{SalesOrder, SalesOrderAddress, SalesOrderItem}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -57,6 +57,7 @@ import org.apache.spark.sql.functions._
 object ContactListMobile extends Logging {
 
   val udfEmailOptInStatus = udf((nls_email: String, status: String) => Customer.getEmailOptInStatus(nls_email: String, status: String))
+
 
 
   /**
@@ -177,7 +178,9 @@ object ContactListMobile extends Logging {
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
 
-    val dfMergedInc = mergeIncData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders )
+    val dfMergedInc = mergeIncData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND )
+
+    //ZIPCODE	STATE	CITY	TIER1	ZONE
 
     var dfFull: DataFrame = dfMergedInc
 
@@ -249,7 +252,7 @@ object ContactListMobile extends Logging {
 
 
 
-  def mergeIncData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame): DataFrame={
+  def mergeIncData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame): DataFrame={
 
    val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
                        .select(
@@ -334,13 +337,39 @@ object ContactListMobile extends Logging {
                               coalesce(customerMerged(CustomerVariables.FIRST_NAME), salesMerged(SalesAddressVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
                               coalesce(customerMerged(CustomerVariables.LAST_NAME), salesMerged(SalesAddressVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
                               coalesce(customerMerged(CustomerVariables.PHONE), salesMerged(SalesAddressVariables.MOBILE)) as SalesAddressVariables.MOBILE,
-                              col(SalesAddressVariables.CITY),
                               salesMerged(SalesOrderVariables.LAST_ORDER_DATE),
                               Udf.maxTimestamp(salesMerged(SalesOrderVariables.UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
                               salesMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as SalesOrderItemVariables.NET_ORDERS
       )
 
-     return mergedIncr
+    val cityBc = Spark.getContext().broadcast(cityZone).value
+
+    val res = mergedIncr.join(cityBc, cityBc(SalesAddressVariables.CITY) === mergedIncr(SalesAddressVariables.CITY), SQL.LEFT_OUTER).select(
+      mergedIncr(SalesOrderVariables.FK_CUSTOMER),
+      mergedIncr(CustomerVariables.EMAIL),
+      mergedIncr(CustomerVariables.DOB),
+      mergedIncr(CustomerVariables.GENDER),
+      mergedIncr(CustomerVariables.REG_DATE),
+      mergedIncr(CustomerVariables.VERIFICATION_STATUS),
+      mergedIncr(CustomerVariables.AGE),
+      mergedIncr(CustomerVariables.PLATINUM_STATUS),
+      mergedIncr(CustomerSegmentsVariables.MVP_TYPE),
+      mergedIncr(CustomerSegmentsVariables.SEGMENT),
+      mergedIncr(CustomerSegmentsVariables.DISCOUNT_SCORE),
+      mergedIncr(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS),
+      mergedIncr(NewsletterVariables.NL_SUB_DATE),
+      mergedIncr(NewsletterVariables.UNSUB_KEY),
+      mergedIncr(SalesAddressVariables.CITY),
+      mergedIncr(SalesAddressVariables.FIRST_NAME),
+      mergedIncr(CustomerVariables.LAST_NAME),
+      mergedIncr(CustomerVariables.PHONE),
+      mergedIncr(SalesOrderVariables.LAST_ORDER_DATE),
+      mergedIncr(CustomerVariables.LAST_UPDATED_AT),
+      mergedIncr(SalesOrderItemVariables.NET_ORDERS),
+      cityBc("zone") as "state_zone",
+      cityBc("tier1") as "city_tier"
+    )
+     return res
   }
 
 
@@ -375,7 +404,7 @@ object ContactListMobile extends Logging {
     val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
-
+      //TODO store the city names in lower case, all data coming as Upper case
     (
       dfCustomerIncr,
       dfCustomerListMobilePrevFull,

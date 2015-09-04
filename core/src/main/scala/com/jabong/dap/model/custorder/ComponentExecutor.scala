@@ -7,7 +7,7 @@ import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
-import com.jabong.dap.model.customer.ContactListMobile
+import com.jabong.dap.model.customer.campaigndata.ContactListMobile
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.quality.campaign.CampaignQualityEntry
