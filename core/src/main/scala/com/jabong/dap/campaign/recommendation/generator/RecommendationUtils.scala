@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.recommendation.generator
 import java.sql.Struct
 
 import com.jabong.dap.common.constants.campaign.Recommendation
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
@@ -14,11 +15,11 @@ import scala.collection.immutable.HashMap
  */
 object RecommendationUtils extends Serializable {
 
-  var recommendationType = new HashMap[String, Array[(Array[String], StructType)]]
+  var recommendationType = new HashMap[String, Array[(Array[String], StructType,String)]]
   recommendationType += (
-    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput)),
-    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput)),
-    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput))
+    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS)),
+    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS)),
+    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS))
   )
 
   var RecommendationGenderMap = new HashMap[String, String]
@@ -54,7 +55,7 @@ object RecommendationUtils extends Serializable {
     "TOYS" -> 2
   )
 
-  def getPivotArray(pivotKey: String): Array[(Array[String], StructType)] = {
+  def getPivotArray(pivotKey: String): Array[(Array[String], StructType,String)] = {
     if (pivotKey == null) {
       return null
     }
