@@ -1,14 +1,13 @@
 package com.jabong.dap.quality.Clickstream
 
-import java.util.Calendar
-
+import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import grizzled.slf4j.Logging
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.hive.HiveContext
 
@@ -30,45 +29,14 @@ object DataQualityMethods extends Logging {
     val date = monthYear.day.toString
     val year = monthYear.year.toString
 
-    //Spark.getContext()
-    //val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
-    //Spark.init(conf)
-
-    //val hiveContext = Spark.getHiveContext()
-    //val sqlContext = Spark.getSqlContext()
-    //var gap = args(0).toInt
-    var tablename = DataSets.CLICKSTREAM_DESKTOP_TABLE
-    var tablename1 = DataSets.CLICKSTREAM_APPS_TABLE
-    var tablename2= DataSets.CLICKSTREAM_PAGEVISIT_TABLE
-    var tablename3 = DataSets.MERGE_PAGEVISIT
-    val cal = Calendar.getInstance()
-    //cal.add(Calendar.DATE, -gap)
-    //val mFormat = new SimpleDateFormat("MM")
-    //var year = cal.get(Calendar.YEAR).toString
-    //var day = cal.get(Calendar.DAY_OF_MONTH).toString
-    //var month = mFormat.format(cal.getTime())
-    //val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
-    //var dt = dateFormat.format(cal.getTime())
-    //var res1 = DataQualityMethods.Artemisdaily(hiveContext, day, month, year, tablename)
-
-    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, tablename, tablename1, tablename2,tablename3)
-    var path= "./"+year+"/"+month+"/"+date
-    write("hdfs://172.16.84.37:8020", path,output.getBytes())
+    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_PAGEVISIT_TABLE,ClickStreamConstant.MERGE_PAGEVISIT)
+    //var path= "./"+year+"/"+month+"/"+date
+    val finaloutput = Spark.getContext().parallelize(output)
+    finaloutput.coalesce(1,true).saveAsTextFile(PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, ClickStreamConstant.CLICKSTREAM_DATA_QUALITY, "CLICKSTREAM_QUALITY", DataSets.DAILY_MODE, date))
     //write(ConfigConstants.OUTPUT_PATH, "./Automation1/",output.getBytes())
     //ScalaMail.sendMessage("tejas.jain@jabong.com","","","tejas.jain@jabong.com",output,"Quality Report","")
 
     //println("ScalaMailMain")
-  }
-
-  def write(uri: String, filePath: String,data: Array[Byte]) = {
-    System.setProperty("HADOOP_USER_NAME", "tjain")
-    val path = new Path(filePath)
-    val conf = new Configuration()
-    conf.set("fs.defaultFS", uri)
-    val fs = FileSystem.get(conf)
-    val os = fs.create(path)
-    os.write(data)
-    fs.close()
   }
 
 def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
@@ -82,13 +50,6 @@ def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: Str
 
     val mergepagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename3 + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    //val datacount = hiveContext.sql("select count(*) from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year)
-
-    //val a :Long= datacount.collect()(0).getLong(0)
-
-    /** ************************************************************************************************/
-    //clickstream_desktop//
-    /** ************************************************************************************************/
     var msg = qualityCount(data, "Clickstream_Desktop", "")
     msg = qualityCount(clickstreamapps, "Clickstream_apps", msg)
     msg = qualityCount(clickstreampagevisit, "Clickstream_pagevisit", msg)

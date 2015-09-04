@@ -7,6 +7,7 @@ import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import com.jabong.dap.model.customer.ContactListMobile
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
@@ -61,7 +62,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
-          case DataSets.DATA_QUALITY => DataQualityMethods.start(paramJob)
+          case ClickStreamConstant.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
           case _ => logger.error("Unknown source.")
 
         }

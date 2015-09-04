@@ -130,10 +130,6 @@ object DataSets {
 
   //Clickstream Data Quality
 
-  val DATA_QUALITY = "dataqualitycheck"
-  val CLICKSTREAM_DESKTOP_TABLE = "clickstream_artemis.clickstream_desktop"
-  val CLICKSTREAM_APPS_TABLE = "clickstream_apps.apps"
-  val CLICKSTREAM_PAGEVISIT_TABLE = "clickstream.pagevisit"
-  val MERGE_PAGEVISIT = "merge.merge_pagevisit"
+
 
 }
