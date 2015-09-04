@@ -34,7 +34,7 @@ abstract class CommonRecommendation extends Logging {
    * @param last30DaysOrderItemData
    * @return
    */
-  def topProductsSold(last30DaysOrderItemData: DataFrame): DataFrame = {
+  def productsWithCountSold(last30DaysOrderItemData: DataFrame): DataFrame = {
     if (last30DaysOrderItemData == null) {
       logger.error("last30DaysOrderItemData is null")
       throw new NullInputException("last30DaysOrderItemData is null")
@@ -213,6 +213,9 @@ abstract class CommonRecommendation extends Logging {
    * @return
    */
   def genSku(iterable: Iterable[Row]): Map[String, scala.collection.mutable.MutableList[(Long, String)]] = {
+    require(iterable!=null ,"iterable array cannot be null")
+    require(iterable.size > 0 ,"iterable array length cannot be zero")
+
     var genderSkuMap: Map[String, scala.collection.mutable.MutableList[(Long, String)]] = Map()
     var skuList: scala.collection.mutable.MutableList[(Long, String)] = scala.collection.mutable.MutableList()
     val topRow = iterable.head
@@ -230,7 +233,7 @@ abstract class CommonRecommendation extends Logging {
           skuList = genderSkuMap.getOrElse(recGender, null)
           if (skuList != null) {
             skuList.+=((quantity.asInstanceOf[Long], sku.toString))
-            genderSkuMap += (recGender.toString -> skuList)
+       //     genderSkuMap += (recGender.toString -> skuList)
 
           } else {
             skuList = scala.collection.mutable.MutableList()
