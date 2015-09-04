@@ -60,7 +60,7 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
       val recommedationType = pivot._3
       // function which generates recommendations
       val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, pivotBasedOutputSchema, numRecs)
-      RecommendationOutput.writeRecommendation(recommendedSkus,recommedationType)
+      RecommendationOutput.writeRecommendation(recommendedSkus, recommedationType)
     }
 
   }

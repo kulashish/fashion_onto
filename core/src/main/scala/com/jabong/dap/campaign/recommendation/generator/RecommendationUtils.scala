@@ -15,11 +15,11 @@ import scala.collection.immutable.HashMap
  */
 object RecommendationUtils extends Serializable {
 
-  var recommendationType = new HashMap[String, Array[(Array[String], StructType,String)]]
+  var recommendationType = new HashMap[String, Array[(Array[String], StructType, String)]]
   recommendationType += (
-    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS)),
-    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS)),
-    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput,DataSets.BRICK_MVP_RECOMMENDATIONS))
+    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS)),
+    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS)),
+    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS))
   )
 
   var RecommendationGenderMap = new HashMap[String, String]
@@ -55,7 +55,7 @@ object RecommendationUtils extends Serializable {
     "TOYS" -> 2
   )
 
-  def getPivotArray(pivotKey: String): Array[(Array[String], StructType,String)] = {
+  def getPivotArray(pivotKey: String): Array[(Array[String], StructType, String)] = {
     if (pivotKey == null) {
       return null
     }
@@ -72,7 +72,6 @@ object RecommendationUtils extends Serializable {
     }
     return RecommendationGenderMap.getOrElse(gender.toString, "BLANK")
   }
-
 
   /**
    * Inventory Filter
