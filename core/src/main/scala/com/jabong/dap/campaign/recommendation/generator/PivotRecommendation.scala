@@ -34,13 +34,18 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     }
     val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, Recommendation.ORDER_ITEM_DAYS, incrDate)
 
-    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, 7, incrDate)
+    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(last30DaysOrderItemData, 7, incrDate)
 
-    val topProducts = topProductsSold(last30DaysOrderItemData)
+    // FIXME: optimize logic for next 3 steps
 
+    // create list of (sku, count sold in last 30 days)
+    val varProductsWithCountSold = productsWithCountSold(last30DaysOrderItemData)
+
+    // create list of (sku, avg count sold in last 7 days) : only for skus sold in last 7 days
     val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemData)
 
-    val weeklySaleData = addWeeklyAverageSales(orderItem7DaysWithWeeklySale, topProducts)
+    // merge to product (sku, count sold in last 30 days, avg count sold in last 7 days or NULL)
+    val weeklySaleData = addWeeklyAverageSales(orderItem7DaysWithWeeklySale, varProductsWithCountSold)
 
     // Join with itr data to get field like mvp , price band ,category , gender etc
     val completeSkuData = skuCompleteData(weeklySaleData, yesterdayItrData)
@@ -48,11 +53,15 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     // Filter skus which has less stock than desired inventory level
     val skuDataAfterInventoryFilter = inventoryCheck(completeSkuData)
 
-    val pivotKeyArray = RecommendationUtils.getPivotArray(pivotKey)(0)
-    // function which generates recommendations
-    //FIXME: change fixed brickMvpRecommendationOutput  to mapping based
-    val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, Schema.brickMvpRecommendationOutput, numRecs)
+    val pivotArray = RecommendationUtils.getPivotArray(pivotKey)
+    for (pivot <- pivotArray){
+      val pivotKeyArray = pivot._1
+      val pivotBasedOutputSchema = pivot._2
+      // function which generates recommendations
+      val recommendedSkus = genRecommend(skuDataAfterInventoryFilter, pivotKeyArray, pivotBasedOutputSchema, numRecs)
+      RecommendationOutput.writeRecommendation(recommendedSkus)
+    }
 
-    RecommendationOutput.writeRecommendation(recommendedSkus)
   }
+
 }
