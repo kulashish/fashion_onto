@@ -9,7 +9,7 @@ import com.jabong.dap.common._
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Row, DataFrame, SQLContext}
+import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
 import org.scalatest.{ FlatSpec, Matchers }
 
 import scala.collection.mutable
@@ -17,7 +17,7 @@ import scala.collection.mutable
 /**
  * Created by rahul aneja  on 28/8/15.
  */
-class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Matchers  {
+class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Matchers {
 
   @transient var sqlContext: SQLContext = _
   @transient var itrDataFrame: DataFrame = _
@@ -190,7 +190,6 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     assert(row == null)
   }
 
-
   "Given iterable array as null" should "illegal arguument exception" in {
     a[IllegalArgumentException] should be thrownBy {
       commonRecommendation.genSku(null)
@@ -198,23 +197,23 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
   }
 
   "Given iterable array as empty " should "illegal argument exception" in {
-    val iterableInput:mutable.Iterable[Row] = mutable.Iterable()
+    val iterableInput: mutable.Iterable[Row] = mutable.Iterable()
     a[IllegalArgumentException] should be thrownBy {
       commonRecommendation.genSku(iterableInput)
     }
   }
 
   "Given iterable array for case 1  " should "return key value pairs" in {
-    val recommendationOutput = generateRecommendedSkuInput.filter(TestConstants.TEST_CASE_FILTER+"= 1").map(row => ((row(row.fieldIndex(ProductVariables.BRICK)),row(row.fieldIndex(ProductVariables.MVP))),row))
+    val recommendationOutput = generateRecommendedSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 1").map(row => ((row(row.fieldIndex(ProductVariables.BRICK)), row(row.fieldIndex(ProductVariables.MVP))), row))
       .groupByKey()
     val recOut = commonRecommendation.genSku(recommendationOutput.first()._2).get("WOMEN")
     val recSku = recOut.get(0)._2
     assert(recSku == "ES418WA79UAUINDFAS")
-    assert(recOut.get.count(_._1!=0) == 2)
+    assert(recOut.get.count(_._1 != 0) == 2)
   }
 
   "Given iterable array for case 2 " should "return sku for BOYS gender SO596WA65JLIINDFAS and for BLANK ES418WA79UAUINDFAS if the gender is not valid " in {
-    val recommendationOutput = generateRecommendedSkuInput.filter(TestConstants.TEST_CASE_FILTER+"= 2").map(row => ((row(row.fieldIndex(ProductVariables.BRICK)),row(row.fieldIndex(ProductVariables.MVP))),row))
+    val recommendationOutput = generateRecommendedSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 2").map(row => ((row(row.fieldIndex(ProductVariables.BRICK)), row(row.fieldIndex(ProductVariables.MVP))), row))
       .groupByKey()
     val recOut = commonRecommendation.genSku(recommendationOutput.take(2)(1)._2).get("BOYS")
     val recOut1 = commonRecommendation.genSku(recommendationOutput.take(2)(1)._2).get("BLANK")
@@ -222,8 +221,8 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     val recSku1 = recOut1.get(0)._2
     assert(recSku == "SO596WA65JLIINDFAS")
     assert(recSku1 == "ES418WA79UAUINDFAS")
-    assert(recOut.get.count(_._1!=0) == 1)
-    assert(recOut1.get.count(_._1!=0) == 1)
+    assert(recOut.get.count(_._1 != 0) == 1)
+    assert(recOut1.get.count(_._1 != 0) == 1)
   }
 
 }

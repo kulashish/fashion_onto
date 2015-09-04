@@ -164,7 +164,6 @@ object TestSchema {
     StructField(TestConstants.TEST_CASE_FILTER, LongType, true)
   ))
 
-
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
 
   val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true)))

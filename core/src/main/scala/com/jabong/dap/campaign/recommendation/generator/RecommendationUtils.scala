@@ -14,11 +14,11 @@ import scala.collection.immutable.HashMap
  */
 object RecommendationUtils extends Serializable {
 
-  var recommendationType = new HashMap[String, Array[(Array[String],StructType)]]
+  var recommendationType = new HashMap[String, Array[(Array[String], StructType)]]
   recommendationType += (
-    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT,Schema.brickMvpRecommendationOutput)),
-    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT,Schema.brandMvpRecommendationOutput)),
-    "all" -> Array((Recommendation.BRICK_MVP_PIVOT,Schema.brickMvpRecommendationOutput),(Recommendation.BRAND_MVP_PIVOT,Schema.brandMvpRecommendationOutput))
+    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput)),
+    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput)),
+    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput))
   )
 
   var RecommendationGenderMap = new HashMap[String, String]
@@ -54,7 +54,7 @@ object RecommendationUtils extends Serializable {
     "TOYS" -> 2
   )
 
-  def getPivotArray(pivotKey: String): Array[(Array[String],StructType)] = {
+  def getPivotArray(pivotKey: String): Array[(Array[String], StructType)] = {
     if (pivotKey == null) {
       return null
     }

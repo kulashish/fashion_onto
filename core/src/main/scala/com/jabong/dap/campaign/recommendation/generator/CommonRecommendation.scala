@@ -213,8 +213,8 @@ abstract class CommonRecommendation extends Logging {
    * @return
    */
   def genSku(iterable: Iterable[Row]): Map[String, scala.collection.mutable.MutableList[(Long, String)]] = {
-    require(iterable!=null ,"iterable array cannot be null")
-    require(iterable.size > 0 ,"iterable array length cannot be zero")
+    require(iterable != null, "iterable array cannot be null")
+    require(iterable.size > 0, "iterable array length cannot be zero")
 
     var genderSkuMap: Map[String, scala.collection.mutable.MutableList[(Long, String)]] = Map()
     var skuList: scala.collection.mutable.MutableList[(Long, String)] = scala.collection.mutable.MutableList()
@@ -233,7 +233,7 @@ abstract class CommonRecommendation extends Logging {
           skuList = genderSkuMap.getOrElse(recGender, null)
           if (skuList != null) {
             skuList.+=((quantity.asInstanceOf[Long], sku.toString))
-       //     genderSkuMap += (recGender.toString -> skuList)
+            //     genderSkuMap += (recGender.toString -> skuList)
 
           } else {
             skuList = scala.collection.mutable.MutableList()

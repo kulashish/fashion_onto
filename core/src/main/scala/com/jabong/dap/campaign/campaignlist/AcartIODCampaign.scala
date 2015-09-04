@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CustomerSelection, SkuSelection}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection, SkuSelection }
 import org.apache.spark.sql.DataFrame
 
 /**
