@@ -1,7 +1,11 @@
 package com.jabong.dap.campaign.recommendation.generator
 
+import java.sql.Struct
+
 import com.jabong.dap.common.constants.campaign.Recommendation
+import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.types.StructType
 
 import scala.collection.immutable.HashMap
 
@@ -10,10 +14,11 @@ import scala.collection.immutable.HashMap
  */
 object RecommendationUtils extends Serializable {
 
-  var recommendationType = new HashMap[String, Array[Array[String]]]
+  var recommendationType = new HashMap[String, Array[(Array[String],StructType)]]
   recommendationType += (
-    "brick_mvp" -> Array(Recommendation.BRICK_MVP_PIVOT),
-    "brand_mvp" -> Array(Recommendation.BRAND_MVP_PIVOT)
+    "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT,Schema.brickMvpRecommendationOutput)),
+    "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT,Schema.brandMvpRecommendationOutput)),
+    "all" -> Array((Recommendation.BRICK_MVP_PIVOT,Schema.brickMvpRecommendationOutput),(Recommendation.BRAND_MVP_PIVOT,Schema.brandMvpRecommendationOutput))
   )
 
   var RecommendationGenderMap = new HashMap[String, String]
@@ -49,7 +54,7 @@ object RecommendationUtils extends Serializable {
     "TOYS" -> 2
   )
 
-  def getPivotArray(pivotKey: String): Array[Array[String]] = {
+  def getPivotArray(pivotKey: String): Array[(Array[String],StructType)] = {
     if (pivotKey == null) {
       return null
     }
@@ -92,7 +97,7 @@ object RecommendationUtils extends Serializable {
    * @param weeklyAverage
    * @return
    */
-  def inventoryFilter(category: String, numberSkus: Long, stock: Long, weeklyAverage: java.lang.Double): Boolean = {
+  def inventoryFilter(category: String, numberSkuSimples: Long, stock: Long, weeklyAverage: java.lang.Double): Boolean = {
     //    if (category == null || stock == 0 || weeklyAverage == 0 || stock < weeklyAverage) {
     //      return false
     //    }
@@ -104,9 +109,9 @@ object RecommendationUtils extends Serializable {
       if (stockMultiplier == null) {
         return false
       }
-      return stock >= numberSkus * stockMultiplier.asInstanceOf[Int]
+      return stock >= numberSkuSimples * stockMultiplier.asInstanceOf[Int]
     } else {
-      return stock >= weeklyAverage
+      return stock >= 2 * weeklyAverage
     }
   }
 
