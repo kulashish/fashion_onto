@@ -152,8 +152,18 @@ object TestSchema {
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true)
-
   ))
+
+  val recommendationSku = StructType(Array(
+    StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
+    StructField(TestConstants.TEST_CASE_FILTER, LongType, true)
+  ))
+
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
 
