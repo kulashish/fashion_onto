@@ -72,26 +72,9 @@ object RecommendationUtils extends Serializable {
     return RecommendationGenderMap.getOrElse(gender.toString, "BLANK")
   }
 
-  /**
-   * Inventory week not sold
-   * @param category
-   * @param stock
-   * @param weeklyAverage
-   * @return
-   */
-  def inventoryWeekNotSold(category: String, stock: Int, weeklyAverage: Int): Boolean = {
-    if (category == null || stock == 0 || weeklyAverage == 0 || stock < weeklyAverage) {
-      return false
-    }
-    val stockMultiplier = DesiredInventoryLevel.getOrElse(category, null)
-    if (stockMultiplier == null) {
-      return false
-    }
-    return stock >= stockMultiplier.asInstanceOf[Int] * weeklyAverage
-  }
 
   /**
-   * Inventory week not sold
+   * Inventory Filter
    * @param category
    * @param stock
    * @param weeklyAverage
