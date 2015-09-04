@@ -12,7 +12,7 @@ import org.apache.spark.sql.types._
 /**
  * Created by rahul aneja on 21/8/15.
  */
-class LiveCommonRecommender extends BasicRecommender with Logging {
+class LiveCommonRecommender extends Recommender with Logging {
   /**
    * Place holder function which will get recommended skus
    * @param refSkus

@@ -51,10 +51,11 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     val completeSkuData = skuCompleteData(weeklySaleData, yesterdayItrData)
 
     // Filter skus which has less stock than desired inventory level
-    val skuDataAfterInventoryFilter = inventoryCheck(completeSkuData)
+    val skuDataAfterInventoryFilter = inventoryCheck(completeSkuData).cache()
 
     val pivotArray = RecommendationUtils.getPivotArray(pivotKey)
     for (pivot <- pivotArray) {
+      println("PIVOT"+ pivot._3+"\t"+pivotKey)
       val pivotKeyArray = pivot._1
       val pivotBasedOutputSchema = pivot._2
       val recommedationType = pivot._3
