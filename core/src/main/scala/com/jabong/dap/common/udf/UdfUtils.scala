@@ -522,11 +522,11 @@ object UdfUtils {
     if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s else s1
   }
 
-  def successOrder(i :Int): Int={
-    val successCodes = Array(3,4,5,6,7,11,17,24,33,34)
-    if(successCodes.contains(i)){
+  def successOrder(i: Int): Int = {
+    val successCodes = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
+    if (successCodes.contains(i)) {
       return 1
-    } else{
+    } else {
       return 0
     }
   }

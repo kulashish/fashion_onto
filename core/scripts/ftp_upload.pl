@@ -34,11 +34,14 @@ if ($component eq "campaigns") {
     uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
     upload_ad4push_customer_response();
+} elsif ($component eq "ad4push_device_merger") {
+    upload_ad4push_device_merger();
 } elsif ($component eq "dcf_feed") {
     upload_dcf_feed();
 } elsif ($component eq "pricing_sku_data") {
       upload_pricing_sku_data();
 }
+
 
 
 # upload ad4push customer response files
@@ -154,6 +157,27 @@ sub upload_ad4push_customer_response {
 
 }
 
+sub upload_ad4push_device_merger {
+    my $base = "/data/export/$date_with_zero/ad4push_devices";
+    print "ad4push devices directory is $base\n";
+    system("mkdir -p $base");
+
+   # /data/tmp/ad4push/devices_android/daily/2015/09/02/exportDevices_517_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_android/daily/$date/exportDevices_517_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/ad4push/devices_android/daily/2015/09/02/exportDevices_517_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_android/daily/$date/exportDevices_517_$date_with_zero.csv $base/");
+
+   # /data/tmp/ad4push/devices_ios/daily/2015/09/02/exportDevices_515_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_ios/daily/$date/exportDevices_515_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/ad4push/devices_ios/daily/2015/09/02/exportDevices_515_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_ios/daily/$date/exportDevices_515_$date_with_zero.csv $base/");
+
+   system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
+
+}
+
 sub upload_dcf_feed {
      my $base = "/data/export/$date_with_zero/dcf_feed/clickstream_merged_feed";
      print "dcf feed directory is $base\n";
@@ -168,6 +192,7 @@ sub upload_dcf_feed {
      system("gzip $base/webhistory_$date_with_hiphen.csv");
 
      system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
+     system("lftp -c \"open -u shortlistdump,dumpshortlist 54.254.101.71 ;  mput -O webhistory_data/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
 }
 
 sub dcf_file_format_change{

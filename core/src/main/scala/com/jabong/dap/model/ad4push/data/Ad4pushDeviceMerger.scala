@@ -10,7 +10,7 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.ad4push.schema.DevicesReactionsSchema
+import com.jabong.dap.model.ad4push.schema.Ad4pushSchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -21,7 +21,6 @@ import org.apache.spark.sql.functions._
 object Ad4pushDeviceMerger extends Logging {
 
   def start(params: ParamInfo, isHistory: Boolean) = {
-    println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
@@ -32,21 +31,20 @@ object Ad4pushDeviceMerger extends Logging {
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
     if (isHistory && null == path && null == OptionUtils.getOptValue(params.fullDate)) {
-      println("First full csv path and prev full date both cannot be empty")
+      logger.error("First full csv path and prev full date both cannot be empty")
     } else {
       val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-      val filenameIos = "exportDevices_" + DataSets.IOS_CODE + "_" + newDate + ".csv"
+      val filenameIos = "exportDevices_" + DataSets.IOS_CODE + "_" + newDate
       processData(DataSets.DEVICES_IOS, prevDate, incrDate, filenameIos, saveMode, DataSets.IOS, paths(0))
 
-      val filenameAndroid = "exportDevices_" + DataSets.ANDROID_CODE + "_" + newDate + ".csv"
+      val filenameAndroid = "exportDevices_" + DataSets.ANDROID_CODE + "_" + newDate
       processData(DataSets.DEVICES_ANDROID, prevDate, incrDate, filenameAndroid, saveMode, DataSets.ANDROID, paths(1))
     }
 
     if (isHistory) {
       processHistoricalData(incrDate, saveMode)
     }
-    println("End Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
   }
 
   /**
@@ -56,39 +54,38 @@ object Ad4pushDeviceMerger extends Logging {
    * @param curDate
    */
   def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, deviceType: String, fullcsv: String) {
+    // Using Select Coalesce function
     var newDF: DataFrame = null
-    newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ",")
+    newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
+      .dropDuplicates()
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-        newDF = SchemaUtils.changeSchema(newDF, DevicesReactionsSchema.Ad4pushDeviceIOS)
-      }
+      newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
     }
 
     var full: DataFrame = null
     if (null != fullcsv) {
-      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
-      if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-        full = SchemaUtils.changeSchema(full, DevicesReactionsSchema.Ad4pushDeviceIOS)
-      }
+      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.UDID)
+      full = SchemaUtils.changeSchema(full, Ad4pushSchema.Ad4pushDeviceIOS)
+      full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceIOS).dropDuplicates()
     } else {
       full = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, prevDate)
     }
 
-    val res = mergeExportData(full, newDF)
+    val res = mergeExportData(full, newDF).dropDuplicates()
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      DataWriter.writeCsv(SchemaUtils.dropColumns(res, DevicesReactionsSchema.Ad4pushDeviceAndroid), ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, tablename, saveMode, "true", ",")
+      DataWriter.writeCsv(SchemaUtils.dropColumns(res, Ad4pushSchema.Ad4pushDeviceAndroid), DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", ";")
     } else {
-      DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.AD4PUSH, DataSets.FULL_MERGE_MODE, curDate, tablename, saveMode, "true", ",")
+      DataWriter.writeCsv(res, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", ";")
     }
   }
 
   def mergeExportData(full: DataFrame, newdf: DataFrame): DataFrame = {
 
-    val joined = full.join(newdf, full(Ad4pushVariables.DEVICE_ID) === newdf(Ad4pushVariables.UDID), SQL.FULL_OUTER)
-      .select(coalesce(full(Ad4pushVariables.DEVICE_ID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.DEVICE_ID,
+    val joined = full.join(newdf, full(Ad4pushVariables.UDID) === newdf(Ad4pushVariables.UDID), SQL.FULL_OUTER)
+      .select(coalesce(full(Ad4pushVariables.UDID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.UDID,
         coalesce(newdf(Ad4pushVariables.TOKEN), full(Ad4pushVariables.TOKEN)) as Ad4pushVariables.TOKEN,
         coalesce(newdf(Ad4pushVariables.OPENCOUNT), full(Ad4pushVariables.OPENCOUNT)) as Ad4pushVariables.OPENCOUNT,
         coalesce(newdf(Ad4pushVariables.FIRSTOPEN), full(Ad4pushVariables.FIRSTOPEN)) as Ad4pushVariables.FIRSTOPEN,
@@ -118,12 +115,14 @@ object Ad4pushDeviceMerger extends Logging {
         coalesce(newdf(Ad4pushVariables.LAST_SEARCH), full(Ad4pushVariables.LAST_SEARCH)) as Ad4pushVariables.LAST_SEARCH,
         coalesce(newdf(Ad4pushVariables.LAST_SEARCH_DATE), full(Ad4pushVariables.LAST_SEARCH_DATE)) as Ad4pushVariables.LAST_SEARCH_DATE,
         coalesce(newdf(Ad4pushVariables.LEAD), full(Ad4pushVariables.LEAD)) as Ad4pushVariables.LEAD,
+        coalesce(newdf(Ad4pushVariables.LOGIN_USER_ID), full(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
         coalesce(newdf(Ad4pushVariables.MOST_VISITED_CATEGORY), full(Ad4pushVariables.MOST_VISITED_CATEGORY)) as Ad4pushVariables.MOST_VISITED_CATEGORY,
         coalesce(newdf(Ad4pushVariables.ORDER_STATUS), full(Ad4pushVariables.ORDER_STATUS)) as Ad4pushVariables.ORDER_STATUS,
         coalesce(newdf(Ad4pushVariables.PURCHASE), full(Ad4pushVariables.PURCHASE)) as Ad4pushVariables.PURCHASE,
         coalesce(newdf(Ad4pushVariables.REGISTRATION), full(Ad4pushVariables.REGISTRATION)) as Ad4pushVariables.REGISTRATION,
         coalesce(newdf(Ad4pushVariables.STATUS_IN_APP), full(Ad4pushVariables.STATUS_IN_APP)) as Ad4pushVariables.STATUS_IN_APP,
         coalesce(newdf(Ad4pushVariables.WISHLIST_STATUS), full(Ad4pushVariables.WISHLIST_STATUS)) as Ad4pushVariables.WISHLIST_STATUS,
+        coalesce(newdf(Ad4pushVariables.WISHLIST_ADD), full(Ad4pushVariables.WISHLIST_ADD)) as Ad4pushVariables.WISHLIST_ADD,
         coalesce(newdf(Ad4pushVariables.SHOP_COUNTRY), full(Ad4pushVariables.SHOP_COUNTRY)) as Ad4pushVariables.SHOP_COUNTRY,
         coalesce(newdf(Ad4pushVariables.AMOUNT_BASKET), full(Ad4pushVariables.AMOUNT_BASKET)) as Ad4pushVariables.AMOUNT_BASKET,
         coalesce(newdf(Ad4pushVariables.CART), full(Ad4pushVariables.CART)) as Ad4pushVariables.CART,
@@ -138,13 +137,13 @@ object Ad4pushDeviceMerger extends Logging {
         coalesce(newdf(Ad4pushVariables.WISHLIST_PRODUCTS_COUNT), full(Ad4pushVariables.WISHLIST_PRODUCTS_COUNT)) as Ad4pushVariables.WISHLIST_PRODUCTS_COUNT,
         coalesce(newdf(Ad4pushVariables.RATED), full(Ad4pushVariables.RATED)) as Ad4pushVariables.RATED
       )
-    return joined
+    joined
   }
 
   def processHistoricalData(minDate: String, saveMode: String) {
     println("Inside Historical Data merge Code")
 
-    val noOfDays = TimeUtils.daysFromToday(minDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val noOfDays = TimeUtils.daysFromToday(minDate, TimeConstants.DATE_FORMAT_FOLDER) - 1
     var prevFullDate: String = null
     var incrDate: String = minDate
     for (i <- 1 to noOfDays) {
@@ -155,9 +154,9 @@ object Ad4pushDeviceMerger extends Logging {
       println("Increment Date: " + incrDate)
       println("prevDate: " + prevFullDate)
       //exportDevices_517_20150822.csv
-      val filenameIos = "exportDevices_" + DataSets.IOS_CODE + "_" + newDate + ".csv"
+      val filenameIos = "exportDevices_" + DataSets.IOS_CODE + "_" + newDate
       processData(DataSets.DEVICES_IOS, prevFullDate, incrDate, filenameIos, saveMode, DataSets.IOS, null)
-      val filenameAndroid = "exportDevices_" + DataSets.ANDROID_CODE + "_" + newDate + ".csv"
+      val filenameAndroid = "exportDevices_" + DataSets.ANDROID_CODE + "_" + newDate
       processData(DataSets.DEVICES_ANDROID, prevFullDate, incrDate, filenameAndroid, saveMode, DataSets.ANDROID, null)
 
       println("successfully done merge")
