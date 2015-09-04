@@ -40,7 +40,7 @@ object SchemaUtils {
   }
 
   def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
-    if (schema.contains(key)) {
+    if (schema.fieldNames.contains(key)) {
       return df
     } else {
       return df.drop(key)

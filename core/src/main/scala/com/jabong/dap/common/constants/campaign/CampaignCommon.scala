@@ -41,6 +41,9 @@ object CampaignCommon {
 
   val PRIORITY = "priority"
 
+  //add following source name with other params in AppConfig.config.credentials
+  val J_DARE_SOURCE = "jDaReSource"
+
   val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
 
   val campaignMailTypeMap = collection.immutable.HashMap(

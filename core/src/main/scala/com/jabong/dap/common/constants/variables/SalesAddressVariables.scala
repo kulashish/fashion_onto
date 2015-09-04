@@ -1,7 +1,7 @@
 package com.jabong.dap.common.constants.variables
 
 /**
- * Created by jabong on 6/7/15.
+ * Created by mubarak on 6/7/15.
  */
 object SalesAddressVariables {
 
@@ -11,7 +11,7 @@ object SalesAddressVariables {
   val COUNTRY = "country"
   val PHONE = "phone"
   val MOBILE = "mobile"
-  val SOA_FIRST_NAME = "soa_first_name"
-  val SOA_LAST_NAME = "soa_last_name"
+  val FIRST_NAME = "first_name"
+  val LAST_NAME = "last_name"
 
 }
