@@ -24,11 +24,11 @@ system("hadoop fs -mkdir -p /data/input/ad4push/reactions_ios/daily/$date/");
 system("hadoop fs -copyFromLocal exportMessagesReactions_515_$date_with_zero.csv /data/input/ad4push/reactions_ios/daily/$date/.");
 
 system("hadoop fs -mkdir -p /data/input/ad4push/devices_android/daily/$date/");
-system("sed '/^$/d' exportDevices_517_$date_with_zero.csv | sed -n 'H;g;/^[^\"]*\"[^\"]*\(\"[^\"]*\"[^\"]*\)*$/d; s/^\\n//; y/\\n/ /; p; s/.*//; h' >./cleaned/exportDevices_517_$date_with_zero.csv")
+system("sed '/^$/d' exportDevices_517_$date_with_zero.csv | sed -n 'H;g;/^[^\"]*\"[^\"]*\(\"[^\"]*\"[^\"]*\)*$/d; s/^\\n//; y/\\n/ /; p; s/.*//; h' >./cleaned/exportDevices_517_$date_with_zero.csv");
 system("hadoop fs -copyFromLocal ./cleaned/exportDevices_517_$date_with_zero.csv /data/input/ad4push/devices_android/daily/$date/.");
 
 system("hadoop fs -mkdir -p /data/input/ad4push/devices_ios/daily/$date/");
-system("sed '/^$/d' /exportDevices_515_$date_with_zero.csv | sed -n 'H;g;/^[^\"]*\"[^\"]*\(\"[^\"]*\"[^\"]*\)*$/d; s/^\\n//; y/\\n/ /; p; s/.*//; h' >./cleaned/exportDevices_515_$date_with_zero.csv")
+system("sed '/^$/d' /exportDevices_515_$date_with_zero.csv | sed -n 'H;g;/^[^\"]*\"[^\"]*\(\"[^\"]*\"[^\"]*\)*$/d; s/^\\n//; y/\\n/ /; p; s/.*//; h' >./cleaned/exportDevices_515_$date_with_zero.csv");
 system("hadoop fs -copyFromLocal ./cleaned/exportDevices_515_$date_with_zero.csv /data/input/ad4push/devices_ios/daily/$date/.");
 
 # call ad4push pipeline
