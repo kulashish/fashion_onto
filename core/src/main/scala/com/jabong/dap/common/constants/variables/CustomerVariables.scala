@@ -77,4 +77,12 @@ object CustomerVariables {
   val APP_TYPE = "app_type"
   val RESPONSYS_ID = "responsys_id"
 
+  val CITY_TIER = "city_tier"
+  val STATE_ZONE = "state_zone"
+  val DND = "dnd"
+  val ZONE = "zone"
+  val TIER1 = "tier1"
+  val MOBILE_PERMISSION_STATUS = "mobile_permission_status"
+  val IS_REFERRED = "is_referred"
+
 }
