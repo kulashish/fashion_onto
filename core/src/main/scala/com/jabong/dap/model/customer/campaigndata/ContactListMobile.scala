@@ -261,7 +261,7 @@ object ContactListMobile extends Logging {
       // DND
 
       ).na.fill(Map(
-        CustomerVariables.MOBILE_PERMISSION_STATUS -> 0
+        CustomerVariables.MOBILE_PERMISSION_STATUS -> "0"
       )).withColumn(CustomerVariables.DND, when(col(CustomerVariables.MOBILE_PERMISSION_STATUS).===("15"), "1").otherwise("0"))
     }
 
