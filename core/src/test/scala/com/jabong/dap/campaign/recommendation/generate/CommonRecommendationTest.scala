@@ -1,16 +1,15 @@
 package com.jabong.dap.campaign.recommendation.generate
 
-import com.jabong.dap.campaign.recommendation.generator.{ PivotRecommendation, CommonRecommendation }
+import com.jabong.dap.campaign.recommendation.generator.{CommonRecommendation, PivotRecommendation}
+import com.jabong.dap.common._
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common._
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
-import org.scalatest.{ FlatSpec, Matchers }
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.mutable
 
@@ -121,9 +120,9 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
   "5 recommendation input skus and pivot keys is null" should " return IllegalArgumentException" in {
     val dataFrameSchema = StructType(Array(
       StructField(ProductVariables.BRICK, StringType, false),
-      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
+      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
     ))
     a[IllegalArgumentException] should be thrownBy {
       commonRecommendation.genRecommend(inventoryCheckInput, null, dataFrameSchema, 8)
@@ -133,9 +132,9 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
   "5 recommendation input skus" should "create recommendation based on brick mvp and gender" in {
     val dataFrameSchema = StructType(Array(
       StructField(ProductVariables.BRICK, StringType, false),
-      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
+      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
 
@@ -149,10 +148,10 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
   "5 recommendation input skus" should "create recommendation based on brick,brand mvp and gender" in {
     val dataFrameSchema = StructType(Array(
       StructField(ProductVariables.BRICK, StringType, false),
-      StructField(ProductVariables.MVP, LongType, false),
+      StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.BRAND, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU_LIST, StringType))), true))
+      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND)
 

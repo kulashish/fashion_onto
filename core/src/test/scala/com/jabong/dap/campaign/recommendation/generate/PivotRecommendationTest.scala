@@ -1,13 +1,12 @@
 package com.jabong.dap.campaign.recommendation.generate
 
-import com.jabong.dap.campaign.recommendation.generator.{ CommonRecommendation, PivotRecommendation }
+import com.jabong.dap.campaign.recommendation.generator.CommonRecommendation
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
+import com.jabong.dap.common.{SharedSparkContext, Spark, TestSchema}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ DataFrame, SQLContext }
-import org.scalatest.{ GivenWhenThen, FeatureSpec }
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 /**
  * Created by rahul on 1/9/15.
