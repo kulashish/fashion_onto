@@ -18,6 +18,7 @@ class NewArrivalsBrandCampaign {
 
     val customerSelected = newArivalsBrandCustomerSelector.customerSelection(salesCart30Day)
 
+    //TODO: make itr data for NewArrivalsBrand
     val itrData = CampaignInput.loadYesterdayItrSkuData()
 
     val skus = NewArrivalsBrand.skuFilter(itrData)
