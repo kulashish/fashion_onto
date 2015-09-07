@@ -68,21 +68,21 @@ object ContactListMobile extends Logging {
     val saveMode = params.saveMode
     val paths = OptionUtils.getOptValue(params.path)
 
-      //read Data Frames
-      val (
-        dfCustomerIncr,
-        dfCustomerListMobilePrevFull,
-        dfCustomerSegmentsIncr,
-        dfNLSIncr,
-        dfSalesOrderIncr,
-        dfSalesOrderFull,
-        dfSalesOrderAddrFull,
-        dfSalesOrderAddrFavPrevFull,
-        dfSalesOrderItemIncr,
-        dfSalesOrderCalcPrevFull,
-        dfSalesOrderItemCalcPrevFull,
-        dfDND,
-        dfZoneCity
+    //read Data Frames
+    val (
+      dfCustomerIncr,
+      dfCustomerListMobilePrevFull,
+      dfCustomerSegmentsIncr,
+      dfNLSIncr,
+      dfSalesOrderIncr,
+      dfSalesOrderFull,
+      dfSalesOrderAddrFull,
+      dfSalesOrderAddrFavPrevFull,
+      dfSalesOrderItemIncr,
+      dfSalesOrderCalcPrevFull,
+      dfSalesOrderItemCalcPrevFull,
+      dfDND,
+      dfZoneCity
       ) = readDf(paths, incrDate)
 
     //get  Customer CustomerSegments.getCustomerSegments
@@ -421,7 +421,7 @@ object ContactListMobile extends Logging {
         null,
         dfDND,
         dfZoneCity
-        )
+      )
     } else {
       readDf(incrDate)
     }
