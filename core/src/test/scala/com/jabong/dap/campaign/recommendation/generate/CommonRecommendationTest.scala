@@ -1,15 +1,15 @@
 package com.jabong.dap.campaign.recommendation.generate
 
-import com.jabong.dap.campaign.recommendation.generator.{CommonRecommendation, PivotRecommendation}
+import com.jabong.dap.campaign.recommendation.generator.{ CommonRecommendation, PivotRecommendation }
 import com.jabong.dap.common._
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
-import org.scalatest.{FlatSpec, Matchers}
+import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
+import org.scalatest.{ FlatSpec, Matchers }
 
 import scala.collection.mutable
 

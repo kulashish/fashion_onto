@@ -13,5 +13,4 @@ trait Recommender extends java.io.Serializable {
   // 8 recommendations
   def generateRecommendation(orderData: DataFrame, recommendations: DataFrame): DataFrame
 
-
 }
