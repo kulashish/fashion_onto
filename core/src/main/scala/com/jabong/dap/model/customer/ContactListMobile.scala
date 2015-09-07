@@ -68,20 +68,7 @@ object ContactListMobile extends Logging {
     val saveMode = params.saveMode
 
     val paths = OptionUtils.getOptValue(params.path)
-    var dfCustomerIncr,
-      dfCustomerListMobilePrevFull,
-      dfCustomerSegmentsIncr,
-      dfNLSIncr,
-      dfSalesOrderIncr,
-      dfSalesOrderFull,
-      dfSalesOrderAddrFull,
-      dfSalesOrderAddrFavPrevFull,
-      dfSalesOrderItemIncr,
-      dfSalesOrderCalcPrevFull,
-      dfSalesOrderItemCalcPrevFull,
-      dfDND,
-      dfZoneCity
-      :DataFrame = null
+    var dfCustomerIncr, dfCustomerListMobilePrevFull, dfCustomerSegmentsIncr, dfNLSIncr, dfSalesOrderIncr, dfSalesOrderFull, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull, dfSalesOrderItemIncr, dfSalesOrderCalcPrevFull, dfSalesOrderItemCalcPrevFull, dfDND, dfZoneCity: DataFrame = null
 
     if (null != paths) {
       (
@@ -94,7 +81,7 @@ object ContactListMobile extends Logging {
         dfSalesOrderItemIncr,
         dfDND,
         dfZoneCity
-        ) = readDf(paths, incrDate)
+      ) = readDf(paths, incrDate)
     } else {
       //read Data Frames
       (
@@ -111,7 +98,7 @@ object ContactListMobile extends Logging {
         dfSalesOrderItemCalcPrevFull,
         dfDND,
         dfZoneCity
-        ) = readDf(incrDate)
+      ) = readDf(incrDate)
     }
 
     //get  Customer CustomerSegments.getCustomerSegments
@@ -415,8 +402,7 @@ object ContactListMobile extends Logging {
     )
   }
 
-  def readDf(paths: String, incrDate: String):
-    (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     val pathList = paths.split(";")
     val custPath = pathList(0)
     val custSegPath = pathList(1)
