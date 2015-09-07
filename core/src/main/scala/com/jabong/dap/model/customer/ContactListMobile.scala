@@ -60,16 +60,15 @@ object ContactListMobile extends Logging {
 
   /**
    * Start Method for the contact_list_mobile.csv generation for email campaigns.
-   * @param vars Input parameters like for which date to do and saveMode, Etc.
+   * @param params Input parameters like for which date to do and saveMode, Etc.
    */
-  def start(vars: ParamInfo) = {
+  def start(params: ParamInfo) = {
 
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val saveMode = vars.saveMode
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
 
-    //read Data Frames
-    val (
-      dfCustomerIncr,
+    val paths = OptionUtils.getOptValue(params.path)
+    var dfCustomerIncr,
       dfCustomerListMobilePrevFull,
       dfCustomerSegmentsIncr,
       dfNLSIncr,
@@ -82,7 +81,38 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemCalcPrevFull,
       dfDND,
       dfZoneCity
-      ) = readDf(incrDate)
+      :DataFrame = null
+
+    if (null != paths) {
+      (
+        dfCustomerIncr,
+        dfCustomerSegmentsIncr,
+        dfNLSIncr,
+        dfSalesOrderIncr,
+        dfSalesOrderFull,
+        dfSalesOrderAddrFull,
+        dfSalesOrderItemIncr,
+        dfDND,
+        dfZoneCity
+        ) = readDf(paths, incrDate)
+    } else {
+      //read Data Frames
+      (
+        dfCustomerIncr,
+        dfCustomerListMobilePrevFull,
+        dfCustomerSegmentsIncr,
+        dfNLSIncr,
+        dfSalesOrderIncr,
+        dfSalesOrderFull,
+        dfSalesOrderAddrFull,
+        dfSalesOrderAddrFavPrevFull,
+        dfSalesOrderItemIncr,
+        dfSalesOrderCalcPrevFull,
+        dfSalesOrderItemCalcPrevFull,
+        dfDND,
+        dfZoneCity
+        ) = readDf(incrDate)
+    }
 
     //get  Customer CustomerSegments.getCustomerSegments
     val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(dfCustomerSegmentsIncr)
@@ -175,14 +205,14 @@ object ContactListMobile extends Logging {
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
 
-    val dfMergedInc = mergeIncData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders)
 
-    var dfFull: DataFrame = dfMergedInc
+    var dfFull: DataFrame = dfMergedIncr
 
     if (null != dfCustomerListMobilePrevFull) {
 
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfMergedInc, dfCustomerListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
+      val joinDF = MergeUtils.joinOldAndNewDF(dfMergedIncr, dfCustomerListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
 
       //merge old and new data frame
       dfFull = joinDF.select(
@@ -242,10 +272,10 @@ object ContactListMobile extends Logging {
       )
     }
 
-    (dfMergedInc, dfFull)
+    (dfMergedIncr, dfFull)
   }
 
-  def mergeIncData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame): DataFrame = {
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame): DataFrame = {
 
     val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -358,7 +388,7 @@ object ContactListMobile extends Logging {
 
     val dfSalesOrderAddrFavPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val dfSalesOrderItemInc = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
+    val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
 
     val dfSalesOrderCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, prevDate)
 
@@ -377,12 +407,46 @@ object ContactListMobile extends Logging {
       dfSalesOrderFull,
       dfSalesOrderAddrFull,
       dfSalesOrderAddrFavPrevFull,
-      dfSalesOrderItemInc,
+      dfSalesOrderItemIncr,
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
       dfDND,
       dfZoneCity
     )
+  }
+
+  def readDf(paths: String, incrDate: String):
+    (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+    val pathList = paths.split(";")
+    val custPath = pathList(0)
+    val custSegPath = pathList(1)
+    val nlsPath = pathList(2)
+    val salesOrderItemPath = pathList(3)
+
+    val dfCustomerIncr = DataReader.getDataFrame4mFullPath(custPath, DataSets.PARQUET)
+    val dfCustomerSegmentsIncr = DataReader.getDataFrame4mFullPath(custSegPath, DataSets.PARQUET)
+    val dfNLSIncr = DataReader.getDataFrame4mFullPath(nlsPath, DataSets.PARQUET)
+    val dfSalesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
+    val dfSalesOrderIncr = dfSalesOrderFull
+    val dfSalesOrderAddrFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+
+    val dfSalesOrderItemIncr = DataReader.getDataFrame4mFullPath(salesOrderItemPath, DataSets.PARQUET)
+
+    val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
+
+    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
+    (
+      dfCustomerIncr,
+      dfCustomerSegmentsIncr,
+      dfNLSIncr,
+      dfSalesOrderIncr,
+      dfSalesOrderFull,
+      dfSalesOrderAddrFull,
+      dfSalesOrderItemIncr,
+      dfDND,
+      dfZoneCity
+    )
+
   }
 
 }

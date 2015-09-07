@@ -176,10 +176,12 @@ object SalesOrderItem {
       ).filter("STATUS = 1").
         dropDuplicates()
 
-    val newOrders = successOrdersJoined.except(salesPrev)
-
-    val salesUnion = salesPrev.unionAll(successOrdersJoined)
-
+    var newOrders = successOrdersJoined
+    var salesUnion = successOrdersJoined
+    if (null != salesPrev) {
+      newOrders = successOrdersJoined.except(salesPrev)
+      salesUnion = salesPrev.unionAll(successOrdersJoined)
+    }
     val ordersCount = newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
     (ordersCount, salesUnion)
   }
