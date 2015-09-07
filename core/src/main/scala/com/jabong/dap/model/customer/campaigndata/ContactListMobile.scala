@@ -195,14 +195,14 @@ object ContactListMobile extends Logging {
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
 
-    val dfMergedInc = mergeIncData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND )
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND )
 
-    var dfFull: DataFrame = dfMergedInc
+    var dfFull: DataFrame = dfMergedIncr
 
     if (null != dfCustomerListMobilePrevFull) {
 
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfMergedInc, dfCustomerListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
+      val joinDF = MergeUtils.joinOldAndNewDF(dfMergedIncr, dfCustomerListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
 
       //merge old and new data frame
       dfFull = joinDF.select(
@@ -265,12 +265,12 @@ object ContactListMobile extends Logging {
       )).withColumn(CustomerVariables.DND, when(col(CustomerVariables.MOBILE_PERMISSION_STATUS).===("15"), "1").otherwise("0"))
     }
 
-    (dfMergedInc, dfFull)
+    (dfMergedIncr, dfFull)
   }
 
 
 
-  def mergeIncData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame): DataFrame={
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame): DataFrame={
 
     val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -444,7 +444,7 @@ object ContactListMobile extends Logging {
 
     val dfSalesOrderAddrFavPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val dfSalesOrderItemInc = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
+    val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
 
     val dfSalesOrderCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, prevDate)
 
@@ -463,7 +463,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderFull,
       dfSalesOrderAddrFull,
       dfSalesOrderAddrFavPrevFull,
-      dfSalesOrderItemInc,
+      dfSalesOrderItemIncr,
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
       dfDND,
