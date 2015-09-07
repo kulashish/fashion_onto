@@ -31,7 +31,9 @@ object CampaignUtils extends Logging {
         skuData(CustomerVariables.FK_CUSTOMER),
         skuData(ProductVariables.SPECIAL_PRICE)
       )
-    val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+    val customerRefSku = customerFilteredData
+      //.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1))
 
@@ -45,37 +47,39 @@ object CampaignUtils extends Logging {
         Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
         skuData(CustomerVariables.FK_CUSTOMER),
         skuData(ProductVariables.SPECIAL_PRICE),
-        skuData(CustomerPageVisitVariables.BROWER_ID),
-        skuData(CustomerPageVisitVariables.DOMAIN)
+        skuData(PageVisitVariables.BROWSER_ID),
+        skuData(PageVisitVariables.DOMAIN)
       )
 
     // null or 0 FK_CUSTOMER
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
-      .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
-      .groupBy(CustomerPageVisitVariables.BROWER_ID).agg(
+      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
+      .groupBy(PageVisitVariables.BROWSER_ID).agg(
         first(ProductVariables.SKU) as (CampaignMergedFields.REF_SKU1),
         first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
-        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
+        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       ).select(
           col(CampaignMergedFields.REF_SKU1),
           col(CustomerVariables.FK_CUSTOMER),
-          col(CustomerPageVisitVariables.BROWER_ID) as "device_id",
-          col(CustomerPageVisitVariables.DOMAIN)
+          col(PageVisitVariables.BROWSER_ID) as "device_id",
+          col(PageVisitVariables.DOMAIN)
         )
 
     // non zero FK_CUSTOMER
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
-      .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1),
-        first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
-        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
+        first(PageVisitVariables.BROWSER_ID) as "device_id",
+        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       ).select(
           col(CampaignMergedFields.REF_SKU1),
           col(CustomerVariables.FK_CUSTOMER),
           col("device_id"),
-          col(CustomerPageVisitVariables.DOMAIN)
+          col(PageVisitVariables.DOMAIN)
         )
 
     val customerRefSku = deviceOnlyCustomerRefSku.unionAll(registeredCustomerRefSku)
@@ -86,7 +90,7 @@ object CampaignUtils extends Logging {
 
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
-    import sqlContext.implicits._
+    //    import sqlContext.implicits._
 
     if (refSkuData == null || NumberSku <= 0) {
       return null
@@ -322,8 +326,8 @@ object CampaignUtils extends Logging {
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
-        inputData(CustomerPageVisitVariables.BROWER_ID),
-        inputData(CustomerPageVisitVariables.DOMAIN)
+        inputData(PageVisitVariables.BROWSER_ID),
+        inputData(PageVisitVariables.DOMAIN)
       //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
@@ -358,8 +362,8 @@ object CampaignUtils extends Logging {
     }
 
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
-    logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
-    filteredData
+    logger.info("Input Data Frame has been filtered before" + before + " after '" + after)
+    return filteredData
   }
 
   def getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]): Int = {
@@ -383,8 +387,7 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
-    campaignOutputWithMailType
+    campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
   }
 
   /**
@@ -520,16 +523,16 @@ object CampaignUtils extends Logging {
     //======= join data frame customer from skuCustomerPageVisit for mapping EMAIL to FK_CUSTOMER========
     val dfJoinCustomerToCustomerPageVisit = dfCustomerPageVisit.join(
       customer,
-      dfCustomerPageVisit(CustomerPageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
+      dfCustomerPageVisit(PageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
       SQL.LEFT_OUTER
     )
       .select(
         //        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
         col(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
-        col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
-        col(CustomerPageVisitVariables.SKU),
-        col(CustomerPageVisitVariables.BROWER_ID),
-        col(CustomerPageVisitVariables.DOMAIN)
+        col(PageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
+        col(PageVisitVariables.SKU),
+        col(PageVisitVariables.BROWSER_ID),
+        col(PageVisitVariables.DOMAIN)
       )
 
     dfJoinCustomerToCustomerPageVisit

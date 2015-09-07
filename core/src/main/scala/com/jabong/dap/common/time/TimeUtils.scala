@@ -13,15 +13,17 @@ import scala.collection.immutable.HashMap
  */
 object TimeUtils extends Logging {
 
+  val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
+
   /**
    * Returns the total number of days between two given date inputs
    * @param date1
    * @param date2
    * @return
    */
-  def daysBetweenTwoDates(date1: Date, date2: Date): BigInt = {
-    Math.abs(date1.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS
+  def daysBetweenTwoDates(date1: Date, date2: Date): Int = {
+    (Math.abs(date1.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS).toInt
   }
 
   /**
@@ -29,9 +31,17 @@ object TimeUtils extends Logging {
    * @param date
    * @return
    */
-  def daysFromToday(date: Date): BigInt = {
+  def daysFromToday(date: Date): Int = {
     val today = new Date
     daysBetweenTwoDates(today, date)
+  }
+
+  def daysFromToday(date: String, dateFormat: String): Int = {
+    val format = new SimpleDateFormat(dateFormat)
+    val dt = Calendar.getInstance()
+    dt.setTime(format.parse(date))
+    val today = new Date
+    daysBetweenTwoDates(today, dt.getTime)
   }
 
   /**
@@ -347,6 +357,26 @@ object TimeUtils extends Logging {
       val format = new java.text.SimpleDateFormat(initialFormat)
       format.setLenient(false)
       val date = format.parse(dateString)
+      val readableDf = new SimpleDateFormat(expectedFormat);
+      //we want to parse date strictly
+      return readableDf.format(date)
+    }
+  }
+
+  /**
+   * Overloaded same function with date coming as time stamp
+   * @param dateStamp
+   * @param initialFormat
+   * @param expectedFormat
+   * @return
+   */
+  def changeDateFormat(dateStamp: Timestamp, initialFormat: String, expectedFormat: String): String = {
+    if (dateStamp == null) {
+      return ""
+    } else {
+      val format = new java.text.SimpleDateFormat(initialFormat)
+      //format.setLenient(false)
+      val date = format.parse(dateStamp.toString)
       val readableDf = new SimpleDateFormat(expectedFormat);
       //we want to parse date strictly
       return readableDf.format(date)

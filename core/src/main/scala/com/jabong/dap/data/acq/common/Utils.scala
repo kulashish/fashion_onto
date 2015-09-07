@@ -81,12 +81,14 @@ case class MergeInfo(
 
 case class ParamInfo(
   source: String,
+  input: Option[String],
   fullDate: Option[String],
   incrDate: Option[String],
   path: Option[String],
   incrMode: Option[String],
   saveFormat: String,
-  saveMode: String)
+  saveMode: String,
+  fraction: Option[String])
 
 /**
  * Case class for storing the information for the data acquisition.

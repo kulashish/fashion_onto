@@ -1,6 +1,6 @@
 name := "Alchemy"
 
-version := "0.1.6"
+version := "0.1.9"
 
 scalaVersion := "2.10.5"
 
@@ -17,6 +17,8 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "1.4.1" % "provided"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.4.1" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.4.1" % "provided"
+
+libraryDependencies += "org.apache.spark" % "spark-launcher_2.10" % "1.4.1" % "provided"
 
 libraryDependencies += "net.liftweb" %% "lift-json" % "2.6"
 

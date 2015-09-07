@@ -4,7 +4,7 @@ import java.io.File
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
+import com.jabong.dap.common.{ TestSchema, TestConstants, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -51,7 +51,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = format.parse("2015-07-09 00:00:08.0")
 
-    val ndays = TimeUtils.daysFromToday(date).toInt
+    val ndays = TimeUtils.daysFromToday(date)
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
 
@@ -65,12 +65,12 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = format.parse("2015-07-09 00:00:08.0")
 
-    val ndays = TimeUtils.daysFromToday(date).toInt
+    val ndays = TimeUtils.daysFromToday(date)
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
       .limit(30).collect().toSet
 
-    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, Schema.resultCustomerProductShortlist)
+    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
       .limit(30).collect().toSet
 
     assert(result.equals(dfCustomerProductShortlistResult))
@@ -82,7 +82,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
 
-    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date)).toInt
+    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date))
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
 
@@ -96,7 +96,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = format.parse("2015-07-10 00:00:00.0")
 
-    val ndays = TimeUtils.daysFromToday(date).toInt
+    val ndays = TimeUtils.daysFromToday(date)
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
     //      .limit(30).collect().toSet

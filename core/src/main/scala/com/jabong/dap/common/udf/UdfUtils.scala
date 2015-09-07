@@ -358,19 +358,19 @@ object UdfUtils {
 
   /**
    *
-   * @param skuArray
+   * @param array
    * @tparam T
    * @return
    */
-  def getDistinctSku[T](skuArray: ArrayBuffer[T]): List[T] = {
+  def getDistinctList[T](array: ArrayBuffer[T]): List[T] = {
 
-    if (skuArray == null || skuArray.isEmpty) {
+    if (array == null || array.isEmpty) {
       return null
     }
 
-    val skuList = skuArray.toList.distinct
+    val list = array.toList.distinct
 
-    return skuList
+    return list
 
   }
 
@@ -520,6 +520,15 @@ object UdfUtils {
 
   def domain(s: String, s1: String): String = {
     if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s else s1
+  }
+
+  def successOrder(i: Int): Int = {
+    val successCodes = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
+    if (successCodes.contains(i)) {
+      return 1
+    } else {
+      return 0
+    }
   }
 
 }

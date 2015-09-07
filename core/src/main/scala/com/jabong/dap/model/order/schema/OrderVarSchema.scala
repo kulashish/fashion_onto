@@ -22,9 +22,9 @@ object OrderVarSchema {
   ))
 
   val salesOrderAddress = StructType(Array(
-    StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesAddressVariables.CITY, StringType, true),
-    StructField(SalesAddressVariables.PHONE, StringType, true),
+    StructField(SalesAddressVariables.MOBILE, StringType, true),
     StructField(SalesAddressVariables.FIRST_NAME, StringType, true),
     StructField(SalesAddressVariables.LAST_NAME, StringType, true)
   ))

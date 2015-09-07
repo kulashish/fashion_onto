@@ -5,11 +5,10 @@ package com.jabong.dap.data.storage
  */
 object DataSets {
 
-  val EXTRAS = "extras"
-
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
+  val SALES_ORDER_ITEM_ORDERS_COUNT = "sales_order_item/ordersCount"
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
@@ -37,21 +36,20 @@ object DataSets {
   val SALES_ORDER_PAYBACK_EARN = "sales_order_payback_earn"
   val SALES_ORDER_PAYBACK_REDEEM = "sales_order_payback_redeem"
 
-  //Clickstream
-  val CLICKSTREAM = "clickstream"
-
-  //Ad4Push customer response
-  val AD4PUSH = "ad4push"
-
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
-  //non schema constants for ad4push
-  val ANDROID_CSV_PREFIX = "exportMessagesReactions_517_"
-  val IPHONE_CSV_PREFIX = "exportMessagesReactions_515_"
+
+  val DEVICES_IOS = "devices_ios"
+  val DEVICES_ANDROID = "devices_android"
+  val AD4PUSH_DEVICE_MERGER = "ad4pushDeviceMerger"
 
   val REACTIONS_IOS = "reactions_ios"
   val REACTIONS_ANDROID = "reactions_android"
   val CUSTOMER_RESPONSE = "customer_response"
+  val AD4PUSH_CUSTOMER_RESPONSE = "ad4pushCustomerResponse"
+
+  val IOS_CODE = "515"
+  val ANDROID_CODE = "517"
 
   val IOS = "ios"
   val WINDOWS = "windows"
@@ -98,15 +96,37 @@ object DataSets {
   val ERP = "erp"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
+  val RESPONSYS = "responsys"
 
   val DEVICE_MAPPING = "device_mapping"
-  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
 
+  // Data Outputs
+  val USER_DEVICE_MAP_APP = "userDeviceMapApp"
   val CUSTOMER_DEVICE_MAPPING = "customerDeviceMapping"
   val BASIC_ITR = "basicITR"
-
+  //Ad4Push customer response
+  val AD4PUSH = "ad4push"
+  //Clickstream
+  val CLICKSTREAM = "clickstream"
   val CAMPAIGNS = "campaigns"
+  val DCF_FEED = "dcf_feed"
+  val EXTRAS = "extras"
+
+  val VARIABLES = "variables"
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
+
+  //DCF FEEDS
+  val DCF_INPUT_MERGED_HIVE_TABLE = "merge.merge_pagevisit"
+  val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
+  val DCF_FEED_FILENAME = "webhistory_"
+
+  //Campaign Quality
+  val CAMPAIGN_QUALITY = "campaign_quality"
+
+  val CONTACT_LIST_MOBILE = "contactListMobile"
+  val DND = "DND"
+  val ZONE_CITY = "zone_city"
+
 }

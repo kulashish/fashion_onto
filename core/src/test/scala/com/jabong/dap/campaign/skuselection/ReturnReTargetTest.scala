@@ -1,8 +1,9 @@
 package com.jabong.dap.campaign.skuselection
 
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
-import org.apache.spark.sql.{ SQLContext, DataFrame }
-import org.apache.spark.sql.hive.HiveContext
+import com.jabong.dap.data.storage.DataSets
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -17,8 +18,8 @@ class ReturnReTargetTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    orderItemDataFrame = sqlContext.read.json("src/test/resources/sales_order/sales_order_with_item.json")
-    //testDataFrame = sqlContext.read.json("src/test/resources/SalesCartEmpty.json")
+    orderItemDataFrame = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order_with_item")
+    // testDataFrame = JsonUtils.readFromJson("sales_cart", "SalesCartEmpty")
   }
 
   "empty order data " should "return empty data from execute function of return re-target " in {

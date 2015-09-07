@@ -23,12 +23,27 @@ object SchemaUtils {
     return true
   }
 
-  def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
+  private def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
     //TODO Add check for datatype as well.
     if (df.columns.contains(key)) {
       return df
     } else {
       return df.withColumn(key, lit(null).cast(dataType))
+    }
+  }
+
+  def dropColumns(df: DataFrame, schema: StructType): DataFrame = {
+    var res: DataFrame = df
+    var sec = df.schema
+    sec.foreach(e => (res = dropColumn(res, e.name, schema)))
+    return res
+  }
+
+  def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
+    if (schema.fieldNames.contains(key)) {
+      return df
+    } else {
+      return df.drop(key)
     }
   }
 

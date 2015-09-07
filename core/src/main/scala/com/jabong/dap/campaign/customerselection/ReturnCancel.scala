@@ -3,7 +3,6 @@ package com.jabong.dap.campaign.customerselection
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
@@ -23,12 +22,12 @@ import org.apache.spark.sql.functions._
  */
 class ReturnCancel extends LiveCustomerSelector {
 
-  val sqlContext = Spark.getSqlContext()
+  // val sqlContext = Spark.getSqlContext()
   override def customerSelection(customerData: DataFrame): DataFrame = {
     return null
   }
 
-  import sqlContext.implicits._
+  //  import sqlContext.implicits._
 
   /**
    * Sample usecase:
@@ -83,8 +82,9 @@ class ReturnCancel extends LiveCustomerSelector {
     val yesterdayCustomerOrderData = CampaignUtils.getTimeBasedDataFrame(customerOrderData, SalesOrderVariables.CREATED_AT, yesterdayOldStartTime.toString, yesterdayOldEndTime.toString)
 
     val latestCustomerOrders = yesterdayCustomerOrderData
-      .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER).agg($"${SalesOrderVariables.FK_CUSTOMER}",
-        first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.FK_SALES_ORDER,
+      // .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER).agg($"${SalesOrderVariables.FK_CUSTOMER}",
+      .orderBy(desc(SalesOrderVariables.CREATED_AT)).groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(first(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.FK_SALES_ORDER,
         first(SalesOrderVariables.CREATED_AT) as "last_order_time")
 
     // 3. join it with rdf data and then filter by where item_updated_at < last_order_time

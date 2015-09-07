@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext }
+import com.jabong.dap.common.{ TestSchema, TestConstants, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -21,9 +21,9 @@ class PaybackCustomerTest extends FlatSpec with SharedSparkContext {
   override def beforeAll(): Unit = {
     super.beforeAll()
     dfSalesOrder = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER, Schema.salesOrder)
-    dfPaybackEarn = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_EARN, Schema.salesOrderPaybackEarn)
-    dfPaybackRedeem = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_REDEEM, Schema.salesOrderPaybackRedeem)
-    expectedPaybackCustomers = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, TestConstants.PAYBACK_CUSTOMER, Schema.paybackCustomer)
+    dfPaybackEarn = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_EARN, TestSchema.salesOrderPaybackEarn)
+    dfPaybackRedeem = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_REDEEM, TestSchema.salesOrderPaybackRedeem)
+    expectedPaybackCustomers = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, TestConstants.PAYBACK_CUSTOMER, TestSchema.paybackCustomer)
   }
 
   "getPaybackCustomer: Data Frame" should "match with expected output" in {

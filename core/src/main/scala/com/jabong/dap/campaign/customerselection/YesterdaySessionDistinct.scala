@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.constants.variables.CustomerPageVisitVariables
+import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -29,28 +29,28 @@ class YesterdaySessionDistinct extends CustomerSelector with Logging {
     }
 
     val dfDistinctSku = customerSurfData.select(
-      col(CustomerPageVisitVariables.USER_ID),
-      col(CustomerPageVisitVariables.ACTUAL_VISIT_ID),
-      col(CustomerPageVisitVariables.BROWER_ID),
-      col(CustomerPageVisitVariables.DOMAIN),
-      Udf.distinctSku(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.SKU_LIST
+      col(PageVisitVariables.USER_ID),
+      col(PageVisitVariables.ACTUAL_VISIT_ID),
+      col(PageVisitVariables.BROWSER_ID),
+      col(PageVisitVariables.DOMAIN),
+      Udf.distinctList(col(PageVisitVariables.SKU_LIST)) as PageVisitVariables.SKU_LIST
     )
 
     val dfCountSku = dfDistinctSku.select(
-      col(CustomerPageVisitVariables.USER_ID),
-      col(CustomerPageVisitVariables.ACTUAL_VISIT_ID),
-      col(CustomerPageVisitVariables.BROWER_ID),
-      col(CustomerPageVisitVariables.DOMAIN),
-      col(CustomerPageVisitVariables.SKU_LIST),
-      Udf.countSku(dfDistinctSku(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.COUNT_SKU
+      col(PageVisitVariables.USER_ID),
+      col(PageVisitVariables.ACTUAL_VISIT_ID),
+      col(PageVisitVariables.BROWSER_ID),
+      col(PageVisitVariables.DOMAIN),
+      col(PageVisitVariables.SKU_LIST),
+      Udf.countSku(dfDistinctSku(PageVisitVariables.SKU_LIST)) as "count_sku"
     )
 
-    val dfResult = dfCountSku.filter(CustomerPageVisitVariables.COUNT_SKU + " >= " + 5)
+    val dfResult = dfCountSku.filter("count_sku >= " + 5)
       .select(
-        col(CustomerPageVisitVariables.USER_ID),
-        col(CustomerPageVisitVariables.BROWER_ID),
-        col(CustomerPageVisitVariables.DOMAIN),
-        explode(col(CustomerPageVisitVariables.SKU_LIST)) as CustomerPageVisitVariables.SKU
+        col(PageVisitVariables.USER_ID),
+        col(PageVisitVariables.BROWSER_ID),
+        col(PageVisitVariables.DOMAIN),
+        explode(col(PageVisitVariables.SKU_LIST)) as PageVisitVariables.SKU
       )
 
     return dfResult

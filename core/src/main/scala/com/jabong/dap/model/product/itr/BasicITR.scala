@@ -30,7 +30,7 @@ object BasicITR extends Logging {
     var count = 30
     if (null != startDate) {
       val minDate = TimeUtils.getDate(startDate, TimeConstants.DATE_FORMAT_FOLDER)
-      count = TimeUtils.daysFromToday(minDate).toInt
+      count = TimeUtils.daysFromToday(minDate)
     }
     for (i <- count to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
@@ -87,9 +87,9 @@ object BasicITR extends Logging {
    */
   def getPath(skuLevel: Boolean, incrDate: String): String = {
     if (skuLevel) {
-      return PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
     } else {
-      return PathBuilder.buildPath(ConfigConstants.OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
     }
 
   }

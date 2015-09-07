@@ -1,10 +1,9 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
@@ -16,7 +15,7 @@ import org.scalatest.FlatSpec
  */
 class CampaignProcessorTest extends FlatSpec with Serializable with SharedSparkContext {
 
-  val jsonPath: String = "src/test/resources/campaigns/campaign_config/push_campaign_conf.json"
+  val jsonPath: String = JsonUtils.TEST_RESOURCES + "/campaigns/campaign_config/push_campaign_conf.json"
   val conf1 = new Configuration()
   val fileSystem = FileSystem.get(conf1)
   implicit val formats = net.liftweb.json.DefaultFormats
@@ -30,7 +29,7 @@ class CampaignProcessorTest extends FlatSpec with Serializable with SharedSparkC
 
   override def beforeAll() {
     super.beforeAll()
-    campaignsData = JsonUtils.readFromJson("campaigns/processor", "campaignInput", Schema.campaignPriorityOutput)
+    campaignsData = JsonUtils.readFromJson("campaigns/processor", "campaignInput", TestSchema.campaignPriorityOutput)
     cmr = JsonUtils.readFromJson(DataSets.EXTRAS, "res1")
     itr = JsonUtils.readFromJson("campaigns/processor", "itr")
     val status = CampaignManager.createCampaignMaps(json)

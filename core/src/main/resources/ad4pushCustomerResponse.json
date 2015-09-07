@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "ad4pushCustomerResponse",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
