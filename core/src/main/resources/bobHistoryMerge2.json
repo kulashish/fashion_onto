@@ -60,7 +60,7 @@
       "source": "bob",
       "tableName": "customer",
       "primaryKey": "id_customer",
-      "mode": "full",
+      "mergeMode": "full",
       "incrDate": "2013-11-30",
       "fullDate": "2013/10/31",
       "saveMode": "Ignore"
