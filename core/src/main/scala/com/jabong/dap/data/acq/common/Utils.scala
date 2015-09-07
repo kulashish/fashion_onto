@@ -85,6 +85,7 @@ case class ParamInfo(
   fullDate: Option[String],
   incrDate: Option[String],
   path: Option[String],
+  subType: Option[String],
   incrMode: Option[String],
   saveFormat: String,
   saveMode: String,

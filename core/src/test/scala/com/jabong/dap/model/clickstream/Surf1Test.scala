@@ -30,7 +30,6 @@ class Surf1Test extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
 
-    //basicRecommender = new BasicRecommender()
     // orderItemDataFrame = JsonUtils.readFromJson(DataSets.SALES_CART, "OrderItemHistory")
     pagevisitDataFrame = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "SurfVariables/surf1")
     //    println("After Json Read")
