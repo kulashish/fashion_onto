@@ -17,5 +17,7 @@ object SalesCartVariables {
   val UPDATED_AT = "updated_at"
   val DOMAIN = "domain"
   val USER_DEVICE_TYPE = "user_device_type"
+  val ACTIVE = "active"
+  val PURCHASED = "purchased"
 
 }
