@@ -51,7 +51,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = format.parse("2015-07-09 00:00:08.0")
 
-    val ndays = TimeUtils.daysFromToday(date).toInt
+    val ndays = TimeUtils.daysFromToday(date)
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
 
@@ -65,7 +65,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = format.parse("2015-07-09 00:00:08.0")
 
-    val ndays = TimeUtils.daysFromToday(date).toInt
+    val ndays = TimeUtils.daysFromToday(date)
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
       .limit(30).collect().toSet
@@ -82,7 +82,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
 
-    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date)).toInt
+    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date))
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
 
@@ -96,7 +96,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val date = format.parse("2015-07-10 00:00:00.0")
 
-    val ndays = TimeUtils.daysFromToday(date).toInt
+    val ndays = TimeUtils.daysFromToday(date)
 
     val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
     //      .limit(30).collect().toSet
