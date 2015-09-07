@@ -277,9 +277,10 @@ object ContactListMobile extends Logging {
         custSegCalcIncr(CustomerSegmentsVariables.MVP_TYPE),
         custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
         custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE))
-    val customerMerged = customerSeg.join(nls, nls(NewsletterVariables.FK_CUSTOMER) === customerSeg(CustomerVariables.ID_CUSTOMER), SQL.FULL_OUTER)
+
+    val customerMerged = customerSeg.join(nls, nls(NewsletterVariables.EMAIL) === customerSeg(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        coalesce(customerSeg(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        customerSeg(CustomerVariables.ID_CUSTOMER),
         customerSeg(CustomerVariables.EMAIL),
         customerSeg(CustomerVariables.DOB),
         customerSeg(CustomerVariables.GENDER),
