@@ -18,4 +18,6 @@ object TestConstants {
 
   val YESTERDAY_ITR_DATA = "yesterday_itr_data"
 
+  val TEST_CASE_FILTER = "test_case_filter"
+
 }

@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "recommendations",
+      "subType":"brick_mvp",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}

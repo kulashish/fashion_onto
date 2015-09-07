@@ -33,7 +33,7 @@ object TimeUtils extends Logging {
    */
   def daysFromToday(date: Date): Int = {
     val today = new Date
-    daysBetweenTwoDates(today, date)
+    daysBetweenTwoDates(today, date).toInt
   }
 
   def daysFromToday(date: String, dateFormat: String): Int = {

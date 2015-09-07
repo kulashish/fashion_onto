@@ -125,6 +125,13 @@ object DataSets {
   //Campaign Quality
   val CAMPAIGN_QUALITY = "campaign_quality"
 
+  //recommendations
+  val RECOMMENDATIONS = "recommendations"
+  val BRICK_MVP_RECOMMENDATIONS = "brick_mvp"
+  val BRAND_MVP_RECOMMENDATIONS = "brand_mvp"
+
+
+  // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val DND = "DND"
   val ZONE_CITY = "zone_city"

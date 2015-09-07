@@ -5,7 +5,7 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.ItemOnDiscount
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection, SkuSelection }
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -33,7 +33,6 @@ class AcartIODCampaign {
     val refSkus = ItemOnDiscount.skuFilter(custFiltered, last30daysItrData)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_IOD_CAMPAIGN)
-
     //save campaign Output
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_IOD_CAMPAIGN)
 
