@@ -461,4 +461,15 @@ object CampaignInput extends Logging {
     mobilePushCampaignQuality
   }
 
+  /**
+   * Load recommendation Data
+   * @param recommendationType
+   * @param date
+   * @return
+   */
+  def loadRecommendationData(recommendationType:String , date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame ={
+    logger.info("Reading recommendation for recommendation type %s and for date %s",recommendationType,date)
+    val recommendations = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RECOMMENDATIONS, recommendationType, DataSets.DAILY_MODE, date)
+    recommendations
+  }
 }
