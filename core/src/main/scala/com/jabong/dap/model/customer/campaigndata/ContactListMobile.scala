@@ -280,7 +280,7 @@ object ContactListMobile extends Logging {
 
     val customerMerged = customerSeg.join(nls, nls(NewsletterVariables.EMAIL) === customerSeg(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        customerSeg(CustomerVariables.ID_CUSTOMER),
+        coalesce(customerSeg(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         customerSeg(CustomerVariables.EMAIL),
         customerSeg(CustomerVariables.DOB),
         customerSeg(CustomerVariables.GENDER),
