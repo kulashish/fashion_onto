@@ -23,7 +23,7 @@ import org.apache.spark.sql.functions._
  * This File generates the conatct_list_mobile.csv for email campaigns.
  * Created by raghu on 17/8/15.
  *
-UID - DCF
+    UID - DCF
     COUNTRY - "IN"
     EMAIL - Customer
     DOB - Customer
@@ -83,7 +83,7 @@ object ContactListMobile extends Logging {
         dfSalesOrderItemIncr,
         dfDND,
         dfZoneCity
-      ) = readDf(paths, incrDate)
+        ) = readDf(paths, incrDate)
     } else {
       //read Data Frames
       (
@@ -100,7 +100,7 @@ object ContactListMobile extends Logging {
         dfSalesOrderItemCalcPrevFull,
         dfDND,
         dfZoneCity
-      ) = readDf(incrDate)
+        ) = readDf(incrDate)
     }
 
     //get  Customer CustomerSegments.getCustomerSegments
@@ -195,18 +195,18 @@ object ContactListMobile extends Logging {
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
 
-    val dfMergedIncr = mergeIncData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND )
+    val dfMergedInc = mergeIncData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND )
 
-    var dfFull: DataFrame = dfMergedIncr
+    var dfFull: DataFrame = dfMergedInc
 
     if (null != dfCustomerListMobilePrevFull) {
 
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfMergedIncr, dfCustomerListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
+      val joinDF = MergeUtils.joinOldAndNewDF(dfMergedInc, dfCustomerListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
 
       //merge old and new data frame
       dfFull = joinDF.select(
-        Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.UID,
 
         Udf.latestString(joinDF(CustomerVariables.EMAIL), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
 
@@ -214,7 +214,7 @@ object ContactListMobile extends Logging {
 
         Udf.latestString(joinDF(CustomerVariables.PHONE), joinDF(CustomerVariables.NEW_ + CustomerVariables.PHONE)) as CustomerVariables.PHONE,
 
-        // Mobile Permission Status
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.MOBILE_PERMISSION_STATUS), joinDF(CustomerVariables.MOBILE_PERMISSION_STATUS)) as CustomerVariables.MOBILE_PERMISSION_STATUS, // Mobile Permission Status
 
         Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
@@ -228,7 +228,7 @@ object ContactListMobile extends Logging {
 
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.MVP_TYPE), joinDF(CustomerSegmentsVariables.MVP_TYPE)) as CustomerSegmentsVariables.MVP_TYPE,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + SalesOrderItemVariables.NET_ORDERS), joinDF(SalesOrderItemVariables.NET_ORDERS)) as SalesOrderItemVariables.NET_ORDERS,
+        joinDF(CustomerVariables.NEW_ + SalesOrderItemVariables.NET_ORDERS) + joinDF(SalesOrderItemVariables.NET_ORDERS) as SalesOrderItemVariables.NET_ORDERS,
 
         coalesce(joinDF(CustomerVariables.NEW_ + SalesOrderVariables.LAST_ORDER_DATE), joinDF(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE,
 
@@ -242,7 +242,7 @@ object ContactListMobile extends Logging {
 
         Udf.latestString(joinDF(CustomerVariables.REWARD_TYPE), joinDF(CustomerVariables.NEW_ + CustomerVariables.REWARD_TYPE)) as CustomerVariables.REWARD_TYPE,
 
-        //IS_REFERRED
+        lit("") as CustomerVariables.IS_REFERRED, //IS_REFERRED
 
         Udf.latestTimestamp(joinDF(NewsletterVariables.NL_SUB_DATE), joinDF(CustomerVariables.NEW_ + NewsletterVariables.NL_SUB_DATE)) as NewsletterVariables.NL_SUB_DATE,
 
@@ -252,18 +252,23 @@ object ContactListMobile extends Logging {
 
         Udf.latestString(joinDF(NewsletterVariables.UNSUB_KEY), joinDF(CustomerVariables.NEW_ + NewsletterVariables.UNSUB_KEY)) as NewsletterVariables.UNSUB_KEY,
 
-        //CITY_TIER
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY_TIER), joinDF(CustomerVariables.CITY_TIER)) as CustomerVariables.CITY_TIER,
 
-        //STATE_ZONE
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.STATE_ZONE), joinDF(CustomerVariables.STATE_ZONE)) as CustomerVariables.STATE_ZONE,
+
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE
 
-        // DND
+      // DND
 
-      )
+      ).na.fill(Map(
+        CustomerVariables.MOBILE_PERMISSION_STATUS -> 0
+      )).withColumn(CustomerVariables.DND, when(col(CustomerVariables.MOBILE_PERMISSION_STATUS).===("15"), "1").otherwise("0"))
     }
 
-    (dfMergedIncr, dfFull)
+    (dfMergedInc, dfFull)
   }
+
+
 
   def mergeIncData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame): DataFrame={
 
@@ -357,7 +362,7 @@ object ContactListMobile extends Logging {
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
 
-    val res = mergedIncr.join(cityBc, cityBc(SalesAddressVariables.CITY) === mergedIncr(SalesAddressVariables.CITY), SQL.LEFT_OUTER).select(
+    val cityJoined = mergedIncr.join(cityBc, cityBc(SalesAddressVariables.CITY) === mergedIncr(SalesAddressVariables.CITY), SQL.LEFT_OUTER).select(
       mergedIncr(SalesOrderVariables.FK_CUSTOMER),
       mergedIncr(CustomerVariables.EMAIL),
       mergedIncr(CustomerVariables.DOB),
@@ -379,10 +384,41 @@ object ContactListMobile extends Logging {
       mergedIncr(SalesOrderVariables.LAST_ORDER_DATE),
       mergedIncr(CustomerVariables.LAST_UPDATED_AT),
       mergedIncr(SalesOrderItemVariables.NET_ORDERS),
-      cityBc("zone") as "state_zone",
-      cityBc("tier1") as "city_tier"
+      cityBc(CustomerVariables.ZONE) as CustomerVariables.STATE_ZONE,
+      cityBc(CustomerVariables.TIER1) as CustomerVariables.CITY_TIER
     )
-    return res
+    val dndBc = Spark.getContext().broadcast(dnd).value
+
+    val res = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) ===  cityJoined(CustomerVariables.PHONE), SQL.LEFT_OUTER )
+              .select(
+
+        cityJoined(SalesOrderVariables.FK_CUSTOMER),
+        cityJoined(CustomerVariables.EMAIL),
+        cityJoined(CustomerVariables.DOB),
+        cityJoined(CustomerVariables.GENDER),
+        cityJoined(CustomerVariables.REG_DATE),
+        cityJoined(CustomerVariables.VERIFICATION_STATUS),
+        cityJoined(CustomerVariables.AGE),
+        cityJoined(CustomerVariables.PLATINUM_STATUS),
+        cityJoined(CustomerSegmentsVariables.MVP_TYPE),
+        cityJoined(CustomerSegmentsVariables.SEGMENT),
+        cityJoined(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        cityJoined(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS),
+        cityJoined(NewsletterVariables.NL_SUB_DATE),
+        cityJoined(NewsletterVariables.UNSUB_KEY),
+        cityJoined(SalesAddressVariables.CITY),
+        cityJoined(SalesAddressVariables.FIRST_NAME),
+        cityJoined(CustomerVariables.LAST_NAME),
+        cityJoined(CustomerVariables.PHONE),
+        cityJoined(SalesOrderVariables.LAST_ORDER_DATE),
+        cityJoined(CustomerVariables.LAST_UPDATED_AT),
+        cityJoined(SalesOrderItemVariables.NET_ORDERS),
+        cityJoined(CustomerVariables.STATE_ZONE),
+        cityJoined(CustomerVariables.CITY_TIER),
+        dndBc(DNDVariables.AGGREGATOR_STATUS_CODE) as CustomerVariables.MOBILE_PERMISSION_STATUS
+      )
+
+    return cityJoined
   }
 
 
@@ -408,7 +444,7 @@ object ContactListMobile extends Logging {
 
     val dfSalesOrderAddrFavPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
+    val dfSalesOrderItemInc = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
 
     val dfSalesOrderCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, prevDate)
 
@@ -427,7 +463,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderFull,
       dfSalesOrderAddrFull,
       dfSalesOrderAddrFavPrevFull,
-      dfSalesOrderItemIncr,
+      dfSalesOrderItemInc,
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
       dfDND,
@@ -435,7 +471,7 @@ object ContactListMobile extends Logging {
       )
   }
 
- def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     val pathList = paths.split(";")
     val custPath = pathList(0)
     val custSegPath = pathList(1)
@@ -464,7 +500,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemIncr,
       dfDND,
       dfZoneCity
-    )
+      )
 
   }
 

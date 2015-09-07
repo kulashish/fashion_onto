@@ -84,5 +84,6 @@ object CustomerVariables {
   val TIER1 = "tier1"
   val MOBILE_PERMISSION_STATUS = "mobile_permission_status"
   val IS_REFERRED = "is_referred"
+  val UID = "uid"
 
 }
