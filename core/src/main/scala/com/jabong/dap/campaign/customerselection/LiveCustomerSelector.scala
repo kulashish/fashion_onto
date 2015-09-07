@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ ACartVariables, CustomerVariables }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -20,7 +21,7 @@ abstract class LiveCustomerSelector extends CustomerSelector {
       return null
     }
 
-    val customerFilteredData = skuFilteredData.join(orderData, skuFilteredData.col(ACartVariables.UID).equalTo(orderData.col(CustomerVariables.FK_CUSTOMER)), "left")
+    val customerFilteredData = skuFilteredData.join(orderData, skuFilteredData.col(ACartVariables.UID).equalTo(orderData.col(CustomerVariables.FK_CUSTOMER)), SQL.LEFT_OUTER)
       .withColumn("sku1", skuOrdered(skuFilteredData(ACartVariables.ACART_SKU1), orderData("sku_list")))
       .withColumn("sku2", skuOrdered(skuFilteredData(ACartVariables.ACART_SKU2), orderData("sku_list")))
       .select(ACartVariables.UID, "sku1", "sku2")

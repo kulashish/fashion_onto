@@ -42,6 +42,8 @@ object CampaignCommon {
   val PRIORITY = "priority"
 
   val ACART_BASE_URL = "www.jabong.com/cart/addmulti?skus="
+  //add following source name with other params in AppConfig.config.credentials
+  val J_DARE_SOURCE = "jDaReSource"
 
   val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
 

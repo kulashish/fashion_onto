@@ -16,7 +16,7 @@ my $component;
 GetOptions (
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response\n";
+) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed | pricing_sku_data\n";
 
 
 use POSIX qw(strftime);
@@ -27,11 +27,21 @@ print $date . "\n";
 my $date_with_zero = strftime "%Y%m%d", localtime(time() - 60*60*24);
 print $date_with_zero . "\n";
 
+my $date_with_hiphen = strftime "%Y-%m-%d", localtime(time() - 60*60*24);
+print $date_with_hiphen . "\n";
+
 if ($component eq "campaigns") {
     uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
     upload_ad4push_customer_response();
+} elsif ($component eq "ad4push_device_merger") {
+    upload_ad4push_device_merger();
+} elsif ($component eq "dcf_feed") {
+    upload_dcf_feed();
+} elsif ($component eq "pricing_sku_data") {
+      upload_pricing_sku_data();
 }
+
 
 
 # upload ad4push customer response files
@@ -128,6 +138,7 @@ sub uploadCampaign {
     }
        
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_campaigns/ $base/*; bye\"");
+    system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
 }
 
 sub upload_ad4push_customer_response {
@@ -142,5 +153,80 @@ sub upload_ad4push_customer_response {
    system("hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/ad4push_customer_response_$date_with_zero.csv $base/");
 
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
+   system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
 
 }
+
+sub upload_ad4push_device_merger {
+    my $base = "/data/export/$date_with_zero/ad4push_devices";
+    print "ad4push devices directory is $base\n";
+    system("mkdir -p $base");
+
+   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/");
+
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/");
+
+   system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
+
+}
+
+sub upload_dcf_feed {
+     my $base = "/data/export/$date_with_zero/dcf_feed/clickstream_merged_feed";
+     print "dcf feed directory is $base\n";
+     system("mkdir -p $base");
+
+     print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/\n";
+
+     system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/");
+
+     dcf_file_format_change("$base/webhistory_$date_with_hiphen"."_1.csv","$base/webhistory_$date_with_hiphen.csv");
+     print("gzip $base/webhistory_$date_with_hiphen.csv\n");
+     system("gzip $base/webhistory_$date_with_hiphen.csv");
+
+     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
+     system("lftp -c \"open -u shortlistdump,dumpshortlist 54.254.101.71 ;  mput -O webhistory_data/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
+}
+
+sub dcf_file_format_change{
+    my ($file_input,$file_output) = (shift,shift);
+    open(my $dcf_output, '>>', $file_output);
+    print  $dcf_output "uid,sku,date_created,sessionId\n";
+    open(my $fh, '<:encoding(UTF-8)', $file_input);
+    while( my $line = <$fh>)  {
+        chomp($line);
+        my @words = split /,/, $line;
+        if($words[0] eq "0" or $words[0] eq "null"){
+            print $dcf_output ",\"$words[1]\",$words[2],\"$words[3]\"\n";
+        }
+        else{
+            print $dcf_output "\"$words[0]\",\"$words[1]\",$words[2],\"$words[3]\"\n";
+        }
+    }
+ }
+
+sub upload_pricing_sku_data {
+    my $base = "/data/export/$date_with_zero/pricing_sku_data";
+    print "pricing sku data directory is $base\n";
+    system("mkdir -p $base");
+
+   # /data/tmp/sku_data/pricing/daily/2015/08/19/part-00000
+   print "hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/sku_data/pricing/daily/2015/08/19/part-00000
+   system("hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/");
+
+   # gzipping the file
+   system("gzip -c /data/export/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/data/export/$date_with_zero/pricing_sku_data/$date_with_zero");
+
+   # copying to slave location
+   system("scp /data/export/$date_with_zero/pricing_sku_data/$date_with_zero dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero");
+}
+

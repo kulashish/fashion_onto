@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "ad4pushDeviceMerger",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

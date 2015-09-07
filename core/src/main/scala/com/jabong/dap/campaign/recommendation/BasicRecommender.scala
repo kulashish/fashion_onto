@@ -1,17 +1,12 @@
 package com.jabong.dap.campaign.recommendation
 
-import java.{ lang, util }
-
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, NewsletterVariables, ProductVariables }
 import com.jabong.dap.common.Spark
-import org.apache.hadoop.hdfs.util.Diff.ListType
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ Row, DataFrame }
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderVariables }
 import org.apache.spark.sql.functions._
-
-import scala.collection.{ mutable, SortedSet }
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by rahul (first version of basic recommender) on 23/6/15.
@@ -42,7 +37,7 @@ class BasicRecommender extends Recommender {
     if (orderItemData == null || days <= 0) {
       return null
     }
-    import sqlContext.implicits._
+    // import sqlContext.implicits._
     // FIXME:Cross check whether lastDayTimeDifference udf is working fine
     val lastDaysData = orderItemData.withColumn("daysPresent", CampaignUtils.lastDayTimeDifferenceString(orderItemData(SalesOrderVariables.CREATED_AT)))
       .filter("daysPresent<=" + days)
@@ -51,7 +46,8 @@ class BasicRecommender extends Recommender {
       return null
     }
     val groupedSku = lastDaysData.withColumn("actual_sku", skuSimpleToSku(lastDaysData("sku"))).groupBy("actual_sku")
-      .agg($"actual_sku", count("created_at") as "quantity", max("created_at") as "last_sold_date")
+      //.agg($"actual_sku", count("created_at") as "quantity", max("created_at") as "last_sold_date")
+      .agg(count("created_at") as "quantity", max("created_at") as "last_sold_date")
 
     return groupedSku
   }
@@ -60,8 +56,8 @@ class BasicRecommender extends Recommender {
     if (topSku == null || SkuCompleteData == null) {
       return null
     }
-    import sqlContext.implicits._
-    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), "inner")
+    // import sqlContext.implicits._
+    val RecommendationInput = topSku.join(SkuCompleteData, topSku("actual_sku").equalTo(SkuCompleteData("sku")), SQL.INNER)
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
 
@@ -124,7 +120,7 @@ class BasicRecommender extends Recommender {
     }
     //mappedRecommendationInput.collect().foreach(println)
 
-    import sqlContext.implicits._
+    // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
@@ -253,12 +249,13 @@ class BasicRecommender extends Recommender {
     val filteredStock1 = filteredLastSevenDaysData.filter(ProductVariables.STOCK + ">2*" + ProductVariables.WEEKLY_AVERAGE_SALE)
 
     val filteredStock2 = filteredBeforeSevenDaysData.join(brickBrandStock, filteredBeforeSevenDaysData(ProductVariables.BRAND).equalTo(brickBrandStock("brands"))
-      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")), "inner")
+      && filteredBeforeSevenDaysData(ProductVariables.BRICK).equalTo(brickBrandStock("bricks")), SQL.INNER)
       .withColumn("stockAvailable", inventoryNotSoldLastWeek(filteredBeforeSevenDaysData(ProductVariables.CATEGORY), filteredBeforeSevenDaysData(ProductVariables.STOCK), brickBrandStock("brickBrandAverage"))).filter("stockAvailable==true")
       .select(ProductVariables.SKU, ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND,
         ProductVariables.GENDER, ProductVariables.SPECIAL_PRICE, ProductVariables.WEEKLY_AVERAGE_SALE, "quantity", "last_sold_date")
 
-    return filteredStock1.unionAll(filteredStock2)
+    val outStock = filteredStock1.unionAll(filteredStock2)
+    return outStock
 
   }
 

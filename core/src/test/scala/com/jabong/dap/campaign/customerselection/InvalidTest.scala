@@ -1,14 +1,16 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
-import org.apache.spark.sql.{ DataFrame, SQLContext }
+import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.data.storage.DataSets
+import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
 /**
  * Created by rahul for invalid customer selection test cases on 14/7/15.
  */
 class InvalidTest extends FlatSpec with SharedSparkContext {
-  @transient var sqlContext: SQLContext = _
+  // @transient var sqlContext: SQLContext = _
   @transient var salesOrderItemDataFrame: DataFrame = _
   @transient var orderDataFrame: DataFrame = _
   @transient var salesOrderItemDataFrame1: DataFrame = _
@@ -17,12 +19,12 @@ class InvalidTest extends FlatSpec with SharedSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    sqlContext = Spark.getSqlContext()
+    // sqlContext = Spark.getSqlContext()
     invalidCustomerSelection = new Invalid()
-    salesOrderItemDataFrame = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_item_invalid.json")
-    orderDataFrame = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_order_invalid.json")
-    salesOrderItemDataFrame1 = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_item_invalid1.json")
-    orderDataFrame1 = sqlContext.read.json("src/test/resources/campaign/invalid_campaigns/sales_order_invalid1.json")
+    salesOrderItemDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_item_invalid")
+    orderDataFrame = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_order_invalid")
+    salesOrderItemDataFrame1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_item_invalid1")
+    orderDataFrame1 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/invalid_campaigns", "sales_order_invalid1")
   }
 
   "No orders data" should "return null successful orders" in {

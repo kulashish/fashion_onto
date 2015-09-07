@@ -3,8 +3,9 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.util.Date
 
-import com.jabong.dap.common.{ StringUtils, ArrayUtils }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ ArrayUtils, StringUtils }
+import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
@@ -234,7 +235,7 @@ object UdfUtils {
    */
   def getAppUserId(userid: String, domain: String, browserid: String): String = {
     var app_user_id = userid
-    if (app_user_id == null && (domain == "ios" || domain == "android" || domain == "windows")) {
+    if (app_user_id == null && (domain == DataSets.IOS || domain == DataSets.ANDROID || domain == DataSets.WINDOWS)) {
       app_user_id = "_app_" + browserid
     }
     return app_user_id
@@ -357,19 +358,19 @@ object UdfUtils {
 
   /**
    *
-   * @param skuArray
+   * @param array
    * @tparam T
    * @return
    */
-  def getDistinctSku[T](skuArray: ArrayBuffer[T]): List[T] = {
+  def getDistinctList[T](array: ArrayBuffer[T]): List[T] = {
 
-    if (skuArray == null || skuArray.isEmpty) {
+    if (array == null || array.isEmpty) {
       return null
     }
 
-    val skuList = skuArray.toList.distinct
+    val list = array.toList.distinct
 
-    return skuList
+    return list
 
   }
 
@@ -504,6 +505,30 @@ object UdfUtils {
     if (StringUtils.isEmpty(email))
       return "_app_" + deviceid
     return email
+  }
+
+  def email(s: String, s1: String): String = {
+    if (null == s || s.equals(""))
+      s1
+    else
+      s
+  }
+
+  def device(s: String, s1: String, s2: String): String = {
+    if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s1 else s2
+  }
+
+  def domain(s: String, s1: String): String = {
+    if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s else s1
+  }
+
+  def successOrder(i: Int): Int = {
+    val successCodes = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
+    if (successCodes.contains(i)) {
+      return 1
+    } else {
+      return 0
+    }
   }
 
 }

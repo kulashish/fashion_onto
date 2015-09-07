@@ -1,14 +1,13 @@
 package com.jabong.dap.model.product.itr
 
-import java.io.File
 import java.math
 
-import com.jabong.dap.common.time.TimeUtils
-import com.jabong.dap.common.AppConfig
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions._
-import com.jabong.dap.model.product.itr.variables.ITR
 
 class Itr extends Serializable with Logging {
 
@@ -88,7 +87,7 @@ class Itr extends Serializable with Logging {
     val itr = erpDF.join(
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
-      "left_outer"
+      SQL.LEFT_OUTER
     ).
       na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,
@@ -104,7 +103,7 @@ class Itr extends Serializable with Logging {
     val priceBandMVPDF = itr.join(
       priceBandDF,
       itr.col(ITR.REPORTING_CATEGORY) === priceBandDF.col("bandCategory"),
-      "left_outer"
+      SQL.LEFT_OUTER
     ).
       where(itr.col(ITR.BRICK) === priceBandDF.col("bandBrick")).
       withColumn(ITR.MVP, mvpUDF(
@@ -173,7 +172,7 @@ class Itr extends Serializable with Logging {
       ITR.BRAND_NAME
     ).cache()
 
-    itrDF.write.mode(SaveMode.Overwrite).format("orc").save(getPath(false))
+    itrDF.write.mode(SaveMode.Overwrite).format(DataSets.ORC).save(getPath(false))
 
     itrDF.
       groupBy(ITR.CONFIG_SKU).
@@ -185,7 +184,7 @@ class Itr extends Serializable with Logging {
         first(ITR.BRICK) as ITR.BRICK,
         first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
         sum(ITR.QUANTITY) as ITR.QUANTITY
-      ).write.mode(SaveMode.Overwrite).format("orc").save(getPath(true))
+      ).write.mode(SaveMode.Overwrite).format(DataSets.ORC).save(getPath(true))
   }
 
   /**
@@ -193,17 +192,21 @@ class Itr extends Serializable with Logging {
    * @return String
    */
   def getPath(skuLevel: Boolean): String = {
+    // FIXME
+    /*
     if (skuLevel) {
       return "%s/".
         format(
-          AppConfig.config.basePath +
-            File.separator + "itr" + File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+          ConfigConstants.WRITE_OUTPUT_PATH +
+            File.separator + "itr" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         )
     }
     return "%s/".
       format(
-        AppConfig.config.basePath +
-          File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate("yyyy/MM/dd/HH")
+        ConfigConstants.WRITE_OUTPUT_PATH +
+          File.separator + "itr-sku-level" + File.separator + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
       )
+  */
+    return ""
   }
 }

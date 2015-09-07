@@ -5,8 +5,9 @@
 
 {
     "applicationName": "<Name of your application>",
-    "outputPath": "hdfs path of the location where the data will be saved"
     "basePath": "hdfs path of the location where the data will be read and written",
+    "readOutputPath": "hdfs path of the location where the data output from another job to be read"
+    "writeOutputPath": "hdfs path of the location where the data will be saved",
     "credentials": [
         {
         "source": "source of the data",

@@ -101,7 +101,7 @@ object Udf {
   /**
    * distinctSku will return list of distinct Sku
    */
-  val distinctSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getDistinctSku(skuArrayBuffer: ArrayBuffer[String]))
+  val distinctList = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getDistinctList(skuArrayBuffer: ArrayBuffer[String]))
 
   /**
    * repeatedSku will return list of repeated Sku
@@ -127,5 +127,16 @@ object Udf {
    * toLong will convert String data to Long data
    */
   val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
+
+  /**
+   * email will return s1 if either s is empty or null
+   */
+  val email = udf((s: String, s1: String) => UdfUtils.email(s: String, s1: String))
+
+  val device = udf((s: String, s1: String, s2: String) => UdfUtils.device(s: String, s1: String, s2: String))
+
+  val domain = udf((s: String, s1: String) => UdfUtils.domain(s: String, s1: String))
+
+  val successOrder = udf((i: Int) => UdfUtils.successOrder(i: Int))
 
 }

@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import grizzled.slf4j.Logging
@@ -31,7 +32,7 @@ class Invalid extends LiveCustomerSelector with Logging {
     }
     // FIXME: need to for last day 0 to 24
     // FIXME: filter need to also have <=
-    // val daysAfter = TimeUtils.getDateAfterNDays(-ndays,"yyyy-MM-dd HH:mm:ss.S")
+    // val daysAfter = TimeUtils.getDateAfterNDays(-ndays,TimeConstants.DATE_TIME_FORMAT)
     //val lastDaysSalesItemData = salesOrderItemData.filter(SalesOrderItemVariables.UPDATED_AT + " >= '" + daysAfter+"'")
 
     //val lastDaysSalesItemData = salesOrderItemData
@@ -45,7 +46,7 @@ class Invalid extends LiveCustomerSelector with Logging {
     // 2. inner join it with sales_order: short data
     // Now we have customers with invalid orders in last n days
     var customerInValidItemsData = customerOrderData.join(inValidSku,
-      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(inValidSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner")
+      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(inValidSku(SalesOrderItemVariables.FK_SALES_ORDER)), SQL.INNER)
       .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER), customerOrderData(SalesOrderVariables.ID_SALES_ORDER), inValidSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), inValidSku(SalesOrderItemVariables.UNIT_PRICE), inValidSku(SalesOrderItemVariables.UPDATED_AT), inValidSku(ProductVariables.SKU), inValidSku(SalesOrderItemVariables.FK_SALES_ORDER))
 
     val customerInValidItemsSchema = customerInValidItemsData.schema
@@ -57,7 +58,7 @@ class Invalid extends LiveCustomerSelector with Logging {
     // 2. inner join it with sales_order: short data
     // Now we have customers with successful orders in last n days
     var customerSuccessfulItemsData = customerOrderData.join(successfulSku,
-      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(successfulSku(SalesOrderItemVariables.FK_SALES_ORDER)), "inner")
+      customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(successfulSku(SalesOrderItemVariables.FK_SALES_ORDER)), SQL.INNER)
       .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER), customerOrderData(SalesOrderVariables.ID_SALES_ORDER), successfulSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), successfulSku(SalesOrderItemVariables.UNIT_PRICE), successfulSku(SalesOrderItemVariables.UPDATED_AT), successfulSku(ProductVariables.SKU), successfulSku(SalesOrderItemVariables.FK_SALES_ORDER))
 
     val customerSuccessfulItemsSchema = customerSuccessfulItemsData.schema
@@ -68,7 +69,7 @@ class Invalid extends LiveCustomerSelector with Logging {
     // FIXME: change invalid names back to normal
 
     val customerSelected = customerInValidItemsData.join(customerSuccessfulItemsData, customerInValidItemsData("invalid_" + SalesOrderVariables.FK_CUSTOMER) === customerSuccessfulItemsData("success_" + SalesOrderVariables.FK_CUSTOMER)
-      && customerInValidItemsData("invalid_" + ProductVariables.SKU) === customerSuccessfulItemsData("success_" + ProductVariables.SKU), "left_outer")
+      && customerInValidItemsData("invalid_" + ProductVariables.SKU) === customerSuccessfulItemsData("success_" + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter("success_" + SalesOrderItemVariables.FK_SALES_ORDER + " is null or invalid_" + SalesOrderItemVariables.UPDATED_AT + " > " + "success_" + SalesOrderItemVariables.UPDATED_AT)
       .select(
         customerInValidItemsData("invalid_" + SalesOrderVariables.FK_SALES_ORDER) as (SalesOrderVariables.FK_SALES_ORDER),

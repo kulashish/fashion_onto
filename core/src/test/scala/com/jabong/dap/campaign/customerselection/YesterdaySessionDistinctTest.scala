@@ -1,9 +1,10 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.SharedSparkContext
+import java.io.File
+
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ SharedSparkContext, TestConstants, TestSchema }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
@@ -21,7 +22,7 @@ class YesterdaySessionDistinctTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     yesterdaySessionDistinct = new YesterdaySessionDistinct()
     //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_surf_data")
-    dfCustomerSurfData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.CUSTOMER_SELECTION, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuListLevel)
+    dfCustomerSurfData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.CUSTOMER_SELECTION, TestConstants.CUSTOMER_PAGE_VISIT, TestSchema.customerPageVisitSkuListLevel)
 
   }
 

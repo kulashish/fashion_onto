@@ -2,20 +2,17 @@ package com.jabong.dap.campaign.utils
 
 import java.math.BigDecimal
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
 
-import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.{Udf, UdfUtils}
-import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
@@ -35,11 +32,13 @@ object CampaignUtils extends Logging {
         skuData(CustomerVariables.FK_CUSTOMER),
         skuData(ProductVariables.SPECIAL_PRICE)
       )
-    val customerRefSku = customerFilteredData.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+    val customerRefSku = customerFilteredData
+      //.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1))
 
-    return customerRefSku
+    customerRefSku
 
   }
 
@@ -88,48 +87,50 @@ object CampaignUtils extends Logging {
         Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
         skuData(CustomerVariables.FK_CUSTOMER),
         skuData(ProductVariables.SPECIAL_PRICE),
-        skuData(CustomerPageVisitVariables.BROWER_ID),
-        skuData(CustomerPageVisitVariables.DOMAIN)
+        skuData(PageVisitVariables.BROWSER_ID),
+        skuData(PageVisitVariables.DOMAIN)
       )
 
     // null or 0 FK_CUSTOMER
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
-      .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
-      .groupBy(CustomerPageVisitVariables.BROWER_ID).agg(
+      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
+      .groupBy(PageVisitVariables.BROWSER_ID).agg(
         first(ProductVariables.SKU) as (CampaignMergedFields.REF_SKU1),
         first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
-        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
+        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       ).select(
           col(CampaignMergedFields.REF_SKU1),
           col(CustomerVariables.FK_CUSTOMER),
-          col(CustomerPageVisitVariables.BROWER_ID) as "device_id",
-          col(CustomerPageVisitVariables.DOMAIN)
+          col(PageVisitVariables.BROWSER_ID) as "device_id",
+          col(PageVisitVariables.DOMAIN)
         )
 
     // non zero FK_CUSTOMER
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
-      .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
       .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
         as (CampaignMergedFields.REF_SKU1),
-        first(CustomerPageVisitVariables.BROWER_ID) as "device_id",
-        first(CustomerPageVisitVariables.DOMAIN) as CustomerPageVisitVariables.DOMAIN
+        first(PageVisitVariables.BROWSER_ID) as "device_id",
+        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
       ).select(
           col(CampaignMergedFields.REF_SKU1),
           col(CustomerVariables.FK_CUSTOMER),
           col("device_id"),
-          col(CustomerPageVisitVariables.DOMAIN)
+          col(PageVisitVariables.DOMAIN)
         )
 
     val customerRefSku = deviceOnlyCustomerRefSku.unionAll(registeredCustomerRefSku)
 
-    return customerRefSku
+    customerRefSku
 
   }
 
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
-    import sqlContext.implicits._
+    //    import sqlContext.implicits._
 
     if (refSkuData == null || NumberSku <= 0) {
       return null
@@ -143,7 +144,7 @@ object CampaignUtils extends Logging {
         ProductVariables.SKU_SIMPLE,
         ProductVariables.SPECIAL_PRICE)
 
-    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
+    // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
@@ -155,117 +156,14 @@ object CampaignUtils extends Logging {
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
     val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_LIST)
 
-    return grouped
+    grouped
   }
 
-  val currentDaysDifference = udf((date: Timestamp) => currentTimeDiff(date: Timestamp, "days"))
+  val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
 
-  val lastDayTimeDifference = udf((date: Timestamp) => lastDayTimeDiff(date: Timestamp, "days"))
+  val lastDayTimeDifference = udf((date: Timestamp) => TimeUtils.lastDayTimeDiff(date: Timestamp, "days"))
   //FIXME:Remove this function
-  val lastDayTimeDifferenceString = udf((date: String) => lastDayTimeDiff(date: String, "days"))
-
-  /**
-   * To calculate difference between current time and date provided as argument either in days, minutes hours
-   * @param date
-   * @param diffType
-   * @return
-   */
-  def currentTimeDiff(date: Timestamp, diffType: String): Double = {
-    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    //val prodDate = dateFormat.parse(date)
-
-    val cal = Calendar.getInstance();
-
-    val diff = cal.getTime().getTime - date.getTime
-
-    var diffTime: Double = 0
-
-    diffType match {
-      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
-      case "hours" => diffTime = diff / (60 * 60 * 1000)
-      case "seconds" => diffTime = diff / 1000
-      case "minutes" => diffTime = diff / (60 * 1000)
-    }
-
-    return diffTime
-  }
-
-  /**
-   * To calculate difference between start time of previous day and date provided as argument either in days, minutes hours
-   * @param date
-   * @param diffType
-   * @return
-   */
-  def lastDayTimeDiff(date: Timestamp, diffType: String): Double = {
-    //val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    //val prodDate = dateFormat.parse(date)
-
-    val cal = Calendar.getInstance();
-    cal.add(Calendar.DATE, -1)
-    val diff = startOfDay(cal.getTime) - date.getTime()
-
-    var diffTime: Double = 0
-
-    diffType match {
-      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
-      case "hours" => diffTime = diff / (60 * 60 * 1000)
-      case "seconds" => diffTime = diff / 1000
-      case "minutes" => diffTime = diff / (60 * 1000)
-    }
-
-    return diffTime
-  }
-
-  /**
-   * Input date is string
-   * @param date
-   * @param diffType
-   * @return
-   */
-  def lastDayTimeDiff(date: String, diffType: String): Double = {
-    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
-    val prodDate = dateFormat.parse(date)
-
-    val cal = Calendar.getInstance();
-    cal.add(Calendar.DATE, -1)
-    val diff = startOfDay(cal.getTime) - prodDate.getTime()
-
-    var diffTime: Double = 0
-
-    diffType match {
-      case "days" => diffTime = diff / (24 * 60 * 60 * 1000)
-      case "hours" => diffTime = diff / (60 * 60 * 1000)
-      case "seconds" => diffTime = diff / 1000
-      case "minutes" => diffTime = diff / (60 * 1000)
-    }
-
-    return diffTime
-  }
-
-  /**
-   * get start time of the day
-   * @param time
-   * @return
-   */
-  def startOfDay(time: Date): Long = {
-    val cal = Calendar.getInstance();
-    cal.setTimeInMillis(time.getTime());
-    cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to 0
-    cal.set(Calendar.MINUTE, 0); // set minutes to 0
-    cal.set(Calendar.SECOND, 0); //set seconds to 0
-    return cal.getTime.getTime
-  }
-
-  /**
-   * returns current time in given Format
-   * @param dateFormat
-   * @return date String
-   */
-  def now(dateFormat: String): String = {
-    val cal = Calendar.getInstance();
-    val sdf = new SimpleDateFormat(dateFormat);
-    return sdf.format(cal.getTime());
-  }
+  val lastDayTimeDifferenceString = udf((date: String) => TimeUtils.lastDayTimeDiff(date: String, "days"))
 
   /**
    * get all Orders which are successful
@@ -289,7 +187,7 @@ object CampaignUtils extends Logging {
         salesOrderItemData(SalesOrderItemVariables.UPDATED_AT)
       )
 
-    return successfulSku
+    successfulSku
   }
 
   /**
@@ -305,12 +203,14 @@ object CampaignUtils extends Logging {
   def skuSimpleNOTBought(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
     if (inputData == null || salesOrder == null || salesOrderItem == null) {
       logger.error("Either input Data is null or sales order or sales order item is null")
-      return null
+      null
     }
 
     val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER
+
+    )
       .select(
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
@@ -320,13 +220,13 @@ object CampaignUtils extends Logging {
       )
 
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
-      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ProductVariables.SPECIAL_PRICE))
 
     logger.info("Filtered all the sku simple which has been bought")
 
-    return skuSimpleNotBoughtTillNow
+    skuSimpleNotBoughtTillNow
   }
 
   def skuSimpleNOTBoughtWithoutPrice(inputData: DataFrame, salesOrder: DataFrame, salesOrderItem: DataFrame): DataFrame = {
@@ -337,7 +237,7 @@ object CampaignUtils extends Logging {
 
     val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
@@ -347,13 +247,13 @@ object CampaignUtils extends Logging {
       )
 
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
-      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT))
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT)).dropDuplicates()
 
     logger.info("Filtered all the sku simple which has been bought")
 
-    return skuSimpleNotBoughtTillNow
+    skuSimpleNotBoughtTillNow
   }
 
   /**
@@ -374,7 +274,7 @@ object CampaignUtils extends Logging {
 
     val successFulOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+    val successfulSalesData = salesOrder.join(successFulOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
@@ -383,13 +283,13 @@ object CampaignUtils extends Logging {
       )
 
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
-      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null")
       .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE))
 
     logger.info("Filtered all the sku simple which has been bought")
 
-    return skuSimpleNotBoughtTillNow
+    skuSimpleNotBoughtTillNow
   }
 
   /**
@@ -410,7 +310,7 @@ object CampaignUtils extends Logging {
 
     val successFullOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
@@ -420,7 +320,7 @@ object CampaignUtils extends Logging {
       )
 
     val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
-      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
@@ -431,7 +331,7 @@ object CampaignUtils extends Logging {
 
     logger.info("Filtered all the sku which has been bought")
 
-    return skuNotBoughtTillNow
+    skuNotBoughtTillNow
   }
 
   /**
@@ -450,7 +350,7 @@ object CampaignUtils extends Logging {
 
     val successFullOrderItems = getSuccessfulOrders(salesOrderItem)
 
-    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), "inner")
+    val successfulSalesData = salesOrder.join(successFullOrderItems, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(
         salesOrder(SalesOrderVariables.FK_CUSTOMER) as SUCCESS_ + SalesOrderVariables.FK_CUSTOMER,
         successFullOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) as SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER,
@@ -460,20 +360,20 @@ object CampaignUtils extends Logging {
       )
 
     val skuNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
-      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), "left_outer")
+      && inputData(ProductVariables.SKU) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null")
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
         inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
-        inputData(CustomerPageVisitVariables.BROWER_ID),
-        inputData(CustomerPageVisitVariables.DOMAIN)
+        inputData(PageVisitVariables.BROWSER_ID),
+        inputData(PageVisitVariables.DOMAIN)
       //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
 
-    return skuNotBoughtTillNow
+    skuNotBoughtTillNow
   }
 
   /**
@@ -502,7 +402,7 @@ object CampaignUtils extends Logging {
     }
 
     val filteredData = inData.filter(timeField + " >= '" + after + "' and " + timeField + " <= '" + before + "'")
-    logger.info("Input Data Frame has been filtered before" + before + "after '" + after)
+    logger.info("Input Data Frame has been filtered before" + before + " after '" + after)
     return filteredData
   }
 
@@ -527,8 +427,7 @@ object CampaignUtils extends Logging {
       return null
     }
 
-    val campaignOutputWithMailType = campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
-    return campaignOutputWithMailType
+    campaignOutput.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, lit(CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 0)))
   }
 
   /**
@@ -545,15 +444,16 @@ object CampaignUtils extends Logging {
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = itr30dayData.filter(ItrVariables.ITR_ + ItrVariables.CREATED_AT + " = " + "'" + yesterdayDateYYYYmmDD + "'")
 
-    return dfYesterdayItrData
+    dfYesterdayItrData
   }
 
-  //FIXME:add implementation
-  def addPriority(campaignData: DataFrame): DataFrame = {
-    val priorityMap = CampaignManager.mailTypePriorityMap
-    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3), e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
-    return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
-  }
+  //  //FIXME:add implementation
+  //  def addPriority(campaignData: DataFrame): DataFrame = {
+  //    val priorityMap = CampaignManager.mailTypePriorityMap
+  //    val campaignRDD = campaignData.map(e => Row.apply(e(0), e(1), e(2), e(3), e(4), e(5), priorityMap.get(Integer.parseInt(e(0).toString))))
+  //    return Spark.getSqlContext().createDataFrame(campaignRDD, Schema.campaignPriorityOutput)
+  //  }
+
   //FIXME: make it generalized for all campaigns
   /**
    * shortListSkuFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of SKU
@@ -577,7 +477,7 @@ object CampaignUtils extends Logging {
 
     val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
       &&
-      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
+      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
       .select(
         CustomerProductShortlistVariables.FK_CUSTOMER,
         CustomerProductShortlistVariables.EMAIL,
@@ -596,7 +496,7 @@ object CampaignUtils extends Logging {
         col(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE)
       )
 
-    return dfResult
+    dfResult
 
   }
 
@@ -625,7 +525,7 @@ object CampaignUtils extends Logging {
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       yesterdayItrData,
       skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
-      "inner"
+      SQL.INNER
     )
 
     val dfResult = dfJoin.select(
@@ -636,7 +536,7 @@ object CampaignUtils extends Logging {
       col(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
     )
 
-    return dfResult
+    dfResult
 
   }
   /**
@@ -663,19 +563,19 @@ object CampaignUtils extends Logging {
     //======= join data frame customer from skuCustomerPageVisit for mapping EMAIL to FK_CUSTOMER========
     val dfJoinCustomerToCustomerPageVisit = dfCustomerPageVisit.join(
       customer,
-      dfCustomerPageVisit(CustomerPageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
-      "left_outer"
+      dfCustomerPageVisit(PageVisitVariables.USER_ID) === customer(CustomerVariables.EMAIL),
+      SQL.LEFT_OUTER
     )
       .select(
-//        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
+        //        Udf.toLong(col(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.FK_CUSTOMER,
         col(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
-        col(CustomerPageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
-        col(CustomerPageVisitVariables.SKU),
-        col(CustomerPageVisitVariables.BROWER_ID),
-        col(CustomerPageVisitVariables.DOMAIN)
+        col(PageVisitVariables.USER_ID) as CustomerVariables.EMAIL, // renaming for CampaignUtils.skuNotBought
+        col(PageVisitVariables.SKU),
+        col(PageVisitVariables.BROWSER_ID),
+        col(PageVisitVariables.DOMAIN)
       )
 
-    return dfJoinCustomerToCustomerPageVisit
+    dfJoinCustomerToCustomerPageVisit
   }
 
   /**

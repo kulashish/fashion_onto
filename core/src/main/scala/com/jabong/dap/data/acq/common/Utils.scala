@@ -79,14 +79,16 @@ case class MergeInfo(
  * @param saveMode String The mode in which the data is to be saved. (Can be overwrite, append, error or ignore)
  */
 
-case class VarInfo(
+case class ParamInfo(
   source: String,
+  input: Option[String],
   fullDate: Option[String],
   incrDate: Option[String],
   path: Option[String],
   incrMode: Option[String],
   saveFormat: String,
-  saveMode: String)
+  saveMode: String,
+  fraction: Option[String])
 
 /**
  * Case class for storing the information for the data acquisition.
@@ -107,19 +109,20 @@ case class MergeJobInfo(
   merge: List[MergeInfo]) extends EmptyClass
 
 /**
- * Case class for storing the information for the customer and order variables job.
+ * Case class for storing the information of parameters to execute different jobs.
  *
- * @param vars List[COVarInfo] List of variables to run the customer and order variables job on.
+ * @param params List[ParamInfo] List of parameters to execute different jobs.
  */
-case class VarJobInfo(
-  vars: List[VarInfo]) extends EmptyClass
+case class ParamJobInfo(
+  isHistory: Option[Boolean],
+  params: List[ParamInfo]) extends EmptyClass
 
 /**
- * Object to access config variables application wide
+ * Object to access job params application wide
  */
-object VarJobConfig {
-  var varJobInfo: VarJobInfo = null
-  var varInfo: VarInfo = null
+object ParamJobConfig {
+  var paramJobInfo: ParamJobInfo = null
+  var paramInfo: ParamInfo = null
 }
 
 /**
@@ -147,7 +150,7 @@ case class CampaignDetail(
   mailType: Int)
 
 //case class CampaignList (
-//                                pushCampaignList: List[CampaignDetail]) extends EmptyClass
+//pushCampaignList: List[CampaignDetail]) extends EmptyClass
 
 /**
  *

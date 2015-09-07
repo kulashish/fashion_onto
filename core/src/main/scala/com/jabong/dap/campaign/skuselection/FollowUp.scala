@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
@@ -21,7 +22,7 @@ class FollowUp extends SkuSelector with Logging {
       return null
     }
 
-    val filteredSku = customerSkuData.join(itrData, customerSkuData(ProductVariables.SKU_SIMPLE) === itrData(ProductVariables.SKU_SIMPLE), "inner")
+    val filteredSku = customerSkuData.join(itrData, customerSkuData(ProductVariables.SKU_SIMPLE) === itrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .filter(ProductVariables.STOCK + " >= " + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),

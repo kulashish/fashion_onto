@@ -6,7 +6,7 @@ PKGNAME = $(BASE).tar.gz
 package:
 	rm -rf $(BASE)
 	rm -f $(PKGNAME)
-	sbt assembly
+	sbt clean assembly
 	mkdir -p $(BASE)/bin
 	mkdir -p $(BASE)/jar
 	mkdir -p $(BASE)/conf
@@ -14,6 +14,9 @@ package:
 	cp src/main/resources/*.json $(BASE)/conf/
 	cp scripts/confInit.sh $(BASE)/bin/
 	cp scripts/run.pl $(BASE)/bin/
+	cp scripts/ftp_upload.pl $(BASE)/bin/
+	cp scripts/dcf_feed_upload.sh $(BASE)/bin/
+	cp scripts/pricing_sku_data.sh $(BASE)/bin/
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/
 	mkdir -p $(BASE)/bin/clickstream
 	cp scripts/clickstream/* $(BASE)/bin/clickstream/

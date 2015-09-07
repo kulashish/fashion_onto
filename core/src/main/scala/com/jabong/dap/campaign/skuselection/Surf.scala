@@ -2,8 +2,9 @@ package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, CustomerPageVisitVariables, ItrVariables }
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, PageVisitVariables, ItrVariables }
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -60,15 +61,15 @@ class Surf extends SkuSelector with Logging {
     val dfJoin = skusFiltered.join(
       itrData,
       skusFiltered(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
-      "inner"
+      SQL.INNER
     )
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(CustomerVariables.EMAIL), //EMAIL can be encrypted EMAIL or BrowserId
         col(ProductVariables.SKU_SIMPLE),
         col(ProductVariables.SPECIAL_PRICE),
-        col(CustomerPageVisitVariables.BROWER_ID),
-        col(CustomerPageVisitVariables.DOMAIN)
+        col(PageVisitVariables.BROWSER_ID),
+        col(PageVisitVariables.DOMAIN)
       )
 
     return dfJoin

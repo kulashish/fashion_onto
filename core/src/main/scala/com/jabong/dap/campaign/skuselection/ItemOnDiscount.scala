@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.skuselection
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -42,11 +43,18 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
+    val updatedCustomerSelected = customerSelected.select(
+      Udf.yyyymmdd(customerSelected(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
+      col(CustomerVariables.FK_CUSTOMER),
+      col (ProductVariables.SKU_SIMPLE)
+    )
 
     // for previous price, rename it to ItrVariables.SPECIAL_PRICE
     val irt30Day = itr30dayData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE, ItrVariables.SPECIAL_PRICE)
 
-    val join30DaysDf = getJoinDF(customerSelected, irt30Day)
+    val join30DaysDf = getJoinDF(updatedCustomerSelected, irt30Day)
+
+    logger.info("joined customer selected with 30 days itr data")
 
     //join yesterdayItrData and joinDf on the basis of SKU
     //filter on the basis of SPECIAL_PRICE
@@ -58,10 +66,13 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(ItrVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
-    // FIXME: generate ref skus
-    //  val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
+    logger.info("After sku filter based on special price")
 
-    return dfResult
+    val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
+
+    logger.info("After reference sku generation")
+
+    return refSkus
   }
 
   /**
@@ -91,7 +102,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val joinDf = cpsl.join(itr30dayData, cpsl(CustomerProductShortlistVariables.SKU_SIMPLE) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE)
       &&
-      cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
+      cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
 
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
@@ -170,7 +181,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
 
     val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
       &&
-      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), "inner")
+      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
       .select(
         CustomerProductShortlistVariables.FK_CUSTOMER,
         CustomerProductShortlistVariables.EMAIL,
@@ -217,7 +228,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       yesterdayItrData,
       skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
-      "inner"
+      SQL.INNER
     )
 
     val dfFilter = dfJoin.filter(CustomerProductShortlistVariables.PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)

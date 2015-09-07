@@ -3,6 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.util.Properties
 
 import com.jabong.dap.common.AppConfig
+import com.jabong.dap.data.storage.DataSets
 
 /**
  * Class to get the Database connection properties and string for the respective server for the given source.
@@ -27,11 +28,11 @@ case class DbConnection(source: String) {
   def getConnectionProperties = {
     val connProp = new Properties()
     driver match {
-      case "sqlserver" =>
+      case DataSets.SQLSERVER =>
         connProp.put("userName", userName)
         connProp.put("password", password)
         connProp
-      case "mysql" =>
+      case DataSets.MYSQL =>
         connProp.put("user", userName)
         connProp.put("password", password)
         connProp.put("zeroDateTimeBehavior", "convertToNull")
@@ -43,10 +44,10 @@ case class DbConnection(source: String) {
 
   def getConnectionString = {
     driver match {
-      case "sqlserver" =>
+      case DataSets.SQLSERVER =>
         "jdbc:sqlserver://%s:%s;database=%s".
           format(server, port, dbName)
-      case "mysql" =>
+      case DataSets.MYSQL =>
         "jdbc:mysql://%s:%s/%s"
           .format(server, port, dbName)
       case _ => ""

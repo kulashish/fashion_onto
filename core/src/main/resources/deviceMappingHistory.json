@@ -1,10 +1,59 @@
 {
-  "vars": [
+  "params": [
     {
       "source": "customerDeviceMapping",
       "incrMode": "daily",
-      "path": "/data/input/device_mapping/device_mapping_20150727.csv",
-      "saveMode": "Ignore",
+      "incrDate": "2015/07/29",
+      "path": "/data/input/device_mapping/device_mapping_20150729.csv",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/07/30",
+      "fullDate": "2015/07/29",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/07/31",
+      "fullDate": "2015/07/30",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/08/01",
+      "fullDate": "2015/07/31",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/08/02",
+      "fullDate": "2015/08/01",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/08/03",
+      "fullDate": "2015/08/02",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/08/04",
+      "fullDate": "2015/08/03",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
   ]

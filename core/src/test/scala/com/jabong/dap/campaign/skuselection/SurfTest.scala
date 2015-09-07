@@ -1,8 +1,10 @@
 package com.jabong.dap.campaign.skuselection
 
-import com.jabong.dap.campaign.customerselection.YesterdaySessionDistinct
-import com.jabong.dap.common.SharedSparkContext
+import java.io.File
+
+import com.jabong.dap.common.constants.campaign.SkuSelection
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext, TestConstants }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
@@ -28,11 +30,11 @@ class SurfTest extends FlatSpec with SharedSparkContext {
     surf = new Surf()
 
     //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_surf_data")
-    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER_PAGE_VISIT, Schema.customerPageVisitSkuLevel)
-    dfItrData = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.ITR_30_DAY_DATA, Schema.itr)
-    dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.CUSTOMER, Schema.customer)
-    dfSalesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.SALES_ORDER, Schema.salesOrder)
-    dfSalesOrderItem = JsonUtils.readFromJson(DataSets.CAMPAIGN + "/" + DataSets.SKU_SELECTION + "/" + DataSets.SURF, DataSets.SALES_ORDER_ITEM, Schema.salesOrderItem)
+    dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, TestConstants.CUSTOMER_PAGE_VISIT, TestSchema.customerPageVisitSkuLevel)
+    dfItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, TestConstants.ITR_30_DAY_DATA, Schema.itr)
+    dfCustomer = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, DataSets.CUSTOMER, Schema.customer)
+    dfSalesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, DataSets.SALES_ORDER, Schema.salesOrder)
+    dfSalesOrderItem = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, DataSets.SALES_ORDER_ITEM, Schema.salesOrderItem)
 
   }
 

@@ -1,11 +1,8 @@
 package com.jabong.dap.model.customer
 
-import java.io.File
-
-import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
@@ -15,43 +12,42 @@ import org.scalatest.FlatSpec
  */
 class CustomerDeviceMappingTest extends FlatSpec with SharedSparkContext {
 
-  @transient var df: DataFrame = _
-  @transient var df1: DataFrame = _
-  @transient var df2: DataFrame = _
-  @transient var df3: DataFrame = _
-  @transient var df4: DataFrame = _
+  @transient var cus1: DataFrame = _
+  @transient var cus2: DataFrame = _
+  @transient var click1: DataFrame = _
+  @transient var click2: DataFrame = _
+  @transient var dcf: DataFrame = _
+  @transient var res1: DataFrame = _
+  @transient var res2: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
 
-    df = JsonUtils.readFromJson(DataSets.EXTRAS, DataSets.DEVICE_MAPPING, Schema.customerDeviceMapping)
+    cus1 = JsonUtils.readFromJson(DataSets.EXTRAS, "customer1")
 
-    df1 = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
+    cus2 = JsonUtils.readFromJson(DataSets.EXTRAS, "customer2")
 
-    df2 = JsonUtils.readFromJson(DataSets.CLICKSTREAM, "userDeviceMappingOutput")
+    click1 = JsonUtils.readFromJson(DataSets.EXTRAS, "clickstream")
 
-    df4 = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping_1", Schema.customerDeviceMapping)
+    click2 = JsonUtils.readFromJson(DataSets.EXTRAS, "clickstream1")
+
+    dcf = JsonUtils.readFromJson(DataSets.EXTRAS, "device_mapping", TestSchema.customerDeviceMapping)
+
+    res1 = JsonUtils.readFromJson(DataSets.EXTRAS, "res1", TestSchema.customerDeviceMapping)
+
+    res2 = JsonUtils.readFromJson(DataSets.EXTRAS, "res2", TestSchema.customerDeviceMapping)
 
   }
 
-  "Testing getLatestDevice method" should " return size 27" in {
+  "Testing getLatestDevice method 1" should "match the output dataframe" in {
 
-    df3 = CustomerDeviceMapping.getDataFrameCsv4mDCF(JsonUtils.TEST_RESOURCES + File.separator + DataSets.EXTRAS + File.separator + "device_mapping.csv")
-
-    val res = CustomerDeviceMapping.getLatestDevice(df2, df3, df1)
-
-    assert(res.collect().length == 27)
+    val res = CustomerDeviceMapping.getLatestDevice(click1, dcf, cus1)
+    assert(res.collect().toSet.equals(res1.collect().toSet))
   }
 
   "Testing getLatestDevice method" should " match the output dataframe" in {
 
-    val res = CustomerDeviceMapping.getLatestDevice(df2, df, df1)
-    df.collect().foreach(println)
-    df1.collect().foreach(println)
-    df2.collect().foreach(println)
-    res.collect().foreach(println)
-
-    assert(res.collect().toSet.equals(df4.collect().toSet))
+    val res = CustomerDeviceMapping.getLatestDevice(click2, dcf, cus2)
+    assert(res.collect().toSet.equals(res2.collect().toSet))
   }
-
 }

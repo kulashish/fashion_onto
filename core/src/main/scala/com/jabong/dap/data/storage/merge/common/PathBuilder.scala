@@ -2,6 +2,7 @@ package com.jabong.dap.data.storage.merge.common
 
 import java.io.File
 
+import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.data.storage.DataSets
 
 /**
@@ -11,7 +12,7 @@ import com.jabong.dap.data.storage.DataSets
 object PathBuilder {
 
   def getPrevDataPath(source: String, tableName: String, mode: String, prevDataDate: String): String = {
-    var path = "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, mode, prevDataDate)
+    var path = "%s/%s/%s/%s/%s".format(ConfigConstants.INPUT_PATH, source, tableName, mode, prevDataDate)
     if (mode.equals(DataSets.FULL)) {
       path = path + File.separator + "24"
     }
@@ -23,7 +24,7 @@ object PathBuilder {
   }
 
   def getIncrDataPath(incrDate: String, incrDataMode: String, source: String, tableName: String): String = {
-    val path = "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, incrDataMode, incrDate)
+    val path = "%s/%s/%s/%s/%s".format(ConfigConstants.INPUT_PATH, source, tableName, incrDataMode, incrDate)
     if (!DataVerifier.dataExists(path)) {
       println("Incr Data Path doesn't exist: " + path)
       throw new DataNotExist
@@ -34,9 +35,9 @@ object PathBuilder {
   def getSavePathMerge(source: String, tableName: String, mode: String, incrDate: String): String = {
     mode match {
       case DataSets.FULL =>
-        "%s/%s/%s/%s/%s/24".format(DataSets.INPUT_PATH, source, tableName, DataSets.FULL, incrDate)
+        "%s/%s/%s/%s/%s/24".format(ConfigConstants.INPUT_PATH, source, tableName, DataSets.FULL, incrDate)
       case _ =>
-        "%s/%s/%s/%s/%s".format(DataSets.INPUT_PATH, source, tableName, mode, incrDate)
+        "%s/%s/%s/%s/%s".format(ConfigConstants.INPUT_PATH, source, tableName, mode, incrDate)
     }
   }
 
