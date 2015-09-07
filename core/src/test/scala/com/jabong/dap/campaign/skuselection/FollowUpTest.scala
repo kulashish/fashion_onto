@@ -23,7 +23,6 @@ class FollowUpTest extends FlatSpec with SharedSparkContext {
   @transient var dfItr30DayData: DataFrame = _
   @transient var dfYesterdayItrData: DataFrame = _
 
-
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
