@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.ReturnReTarget
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
@@ -17,9 +18,7 @@ class LiveReturnReTargetCampaign {
     // filter by campaign -- i.e., campaign shount not have gone to customer in last 30 days
 
     // find list of (customers, ref skus)
-
-    val cancelRetargetSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.RETURN_RETARGET)
-    val refSkus = cancelRetargetSkuSelector.skuFilter(targetCustomersWithOrderItems)
+    val refSkus = ReturnReTarget.skuFilter(targetCustomersWithOrderItems)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.RETURN_RETARGET_CAMPAIGN)
 

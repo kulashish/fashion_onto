@@ -15,12 +15,10 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
   @transient var orderData: DataFrame = _
   @transient var orderItemDataFrame: DataFrame = _
   @transient var orderItemDataFrame1: DataFrame = _
-  var cancelRetarget: CancelReTarget = _
 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    cancelRetarget = new CancelReTarget()
 
     orderItemDataFrame = JsonUtils.readFromJson("sales_order", "sales_order_with_item", Schema.salesOrderItem)
     orderItemDataFrame1 = JsonUtils.readFromJson("campaigns", "sales_item_cancel_return", Schema.salesOrderItem)
@@ -29,7 +27,7 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
   }
 
   "empty order data " should "return empty data from execute function" in {
-    val skuData = cancelRetarget.skuFilter(null)
+    val skuData = CancelReTarget.skuFilter(null)
     assert(skuData == null)
   }
 
@@ -43,7 +41,7 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
     val returnCancel = new ReturnCancel()
 
     val customerSelectedData = returnCancel.customerSelection(orderData, orderItemDataFrame)
-    val skuData = cancelRetarget.skuFilter(customerSelectedData)
+    val skuData = CancelReTarget.skuFilter(customerSelectedData)
     assert(skuData.count() == 1)
   }
 

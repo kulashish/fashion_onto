@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.ItemOnDiscount
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection, SkuSelection }
@@ -29,8 +30,7 @@ class AcartIODCampaign {
 
     }
     //sku selection
-    val iod = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.ITEM_ON_DISCOUNT)
-    val refSkus = iod.skuFilter(custFiltered, last30daysItrData)
+    val refSkus = ItemOnDiscount.skuFilter(custFiltered, last30daysItrData)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_IOD_CAMPAIGN)
     //save campaign Output

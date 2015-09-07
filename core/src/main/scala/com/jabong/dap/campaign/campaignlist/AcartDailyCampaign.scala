@@ -2,8 +2,9 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.Daily
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -19,8 +20,7 @@ class AcartDailyCampaign {
     val selectedCustomers = acartCustomerSelector.customerSelection(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData)
 
     //sku selection
-    val daily = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.DAILY)
-    val refSkus = daily.skuFilter(selectedCustomers, yesterdayItrData)
+    val refSkus = Daily.skuFilter(selectedCustomers, yesterdayItrData)
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_DAILY_CAMPAIGN)
     //save campaign Output
