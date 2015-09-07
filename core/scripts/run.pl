@@ -39,7 +39,7 @@ sub run_component {
     else {
         $statusStr =  sprintf("child exited with value %d\n", $? >> 8);
     }
-    
+
     my $diff = $end - $start;
 
     my $msg = "\n";
@@ -156,6 +156,7 @@ if ($component eq "bob") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
      run_component($component, $command);
  } elsif ($component eq "recommendations") {
+        $AMMUNITION = "--num-executors 10 --executor-memory 500M";
         my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component recommendations --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/recommendation.json";
         run_component($component, $command);
 } else {
