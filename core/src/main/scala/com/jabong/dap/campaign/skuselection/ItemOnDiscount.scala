@@ -67,12 +67,12 @@ object ItemOnDiscount extends Logging {
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
     logger.info("After sku filter based on special price")
-    // FIXME: generate ref skus
-    val refSkus = CampaignUtils.generateReferenceSku(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    logger.info("After reference sku generation")
+    //val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    //logger.info("After reference sku generation")
+
+    return dfResult
   }
 
   /**

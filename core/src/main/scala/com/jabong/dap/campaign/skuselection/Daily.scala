@@ -29,8 +29,8 @@ object Daily extends Logging {
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
-    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    // val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    return filteredSku
   }
 }

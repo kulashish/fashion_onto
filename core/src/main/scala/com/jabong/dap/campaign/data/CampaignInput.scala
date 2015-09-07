@@ -2,7 +2,6 @@ package com.jabong.dap.campaign.data
 
 import java.io.File
 import java.sql.Timestamp
-
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -253,6 +252,13 @@ object CampaignInput extends Logging {
     return allCampaignData
   }
 
+  /**
+   * get campaign data for particular with priority
+   * @param name
+   * @param date
+   * @param priority
+   * @return
+   */
   def getCampaignData(name: String, date: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
     val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.CAMPAIGNS + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading " + name + " campaign data from path:- " + path)
@@ -271,7 +277,8 @@ object CampaignInput extends Logging {
               res(CampaignMergedFields.EMAIL),
               res(CampaignMergedFields.DOMAIN),
               res(CampaignMergedFields.DEVICE_ID),
-              res(CampaignCommon.PRIORITY)
+              res(CampaignCommon.PRIORITY),
+              res(CampaignMergedFields.LIVE_CART_URL)
             )
         } else {
           println("Adding campaign data to allCampaigns without changing the schema")
