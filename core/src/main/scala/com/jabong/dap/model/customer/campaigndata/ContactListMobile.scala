@@ -400,7 +400,7 @@ object ContactListMobile extends Logging {
         cityJoined(CustomerVariables.CITY_TIER),
         dndBc(DNDVariables.AGGREGATOR_STATUS_CODE) as CustomerVariables.MOBILE_PERMISSION_STATUS)
 
-    return cityJoined
+    return res
   }
 
   /**
