@@ -19,10 +19,10 @@ import org.apache.spark.sql.functions._
  * 2.past campaign check
  * 3. ref skus based on special price descending
  */
-class Surf extends SkuSelector with Logging {
+object Surf extends Logging {
 
   /**
-   * surf 3
+   * surf
    * @param dfCustomerPageVisit
    * @param dfItrData
    * @param dfCustomer
@@ -30,7 +30,7 @@ class Surf extends SkuSelector with Logging {
    * @param dfSalesOrderItem
    * @return
    */
-  override def skuFilter(past30DayCampaignMergedData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = {
+  def skuFilter(past30DayCampaignMergedData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = {
 
     if (dfCustomerPageVisit == null || dfItrData == null || dfCustomer == null || dfSalesOrder == null || dfSalesOrderItem == null) {
 
@@ -74,14 +74,4 @@ class Surf extends SkuSelector with Logging {
 
     return dfJoin
   }
-
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
 }

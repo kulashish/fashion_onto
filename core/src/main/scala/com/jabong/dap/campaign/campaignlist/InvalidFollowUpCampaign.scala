@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.FollowUp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
@@ -30,10 +31,8 @@ class InvalidFollowUpCampaign {
     }
 
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
-
     //filter sku based on followup filter
-    val filteredSku = followUp.skuFilter(custFiltered, itrData)
+    val filteredSku = FollowUp.skuFilter(custFiltered, itrData)
 
     //generate reference sku
     val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)

@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.LowStock
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
@@ -29,10 +30,8 @@ class AcartLowStockCampaign {
     }
 
     //sku selection
-    val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-
     //filter sku based on lowstock filter
-    val filteredSku = lowStock.skuFilter(selectedCustomers, yesterdayItrData)
+    val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData)
 
     //generate reference sku for acart with acart url
     val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)

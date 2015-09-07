@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.FollowUp
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
@@ -25,10 +26,8 @@ class AcartFollowUpCampaign {
       CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, 1000), 30)
 
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
-
     //filter sku based on followup filter
-    val filteredSku = followUp.skuFilter(selectedCustomers, itrData)
+    val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData)
 
     //generate reference sku for acart with acart url
     val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)

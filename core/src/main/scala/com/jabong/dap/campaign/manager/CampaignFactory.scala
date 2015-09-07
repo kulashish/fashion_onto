@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.skuselection.SkuSelector
 import com.jabong.dap.campaign.recommendation.Recommender
 import com.jabong.dap.campaign.customerselection.CustomerSelector
 
@@ -17,8 +16,6 @@ import com.jabong.dap.campaign.customerselection.CustomerSelector
 abstract class CampaignFactory {
 
   def getCustomerSelector(customerType: String): CustomerSelector
-
-  def getSkuSelector(action: String): SkuSelector
 
   def getRecommender(recType: String): Recommender
 

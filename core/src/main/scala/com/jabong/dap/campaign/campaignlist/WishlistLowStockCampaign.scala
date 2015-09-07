@@ -1,6 +1,8 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.Wishlist
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
@@ -29,10 +31,10 @@ class WishlistLowStockCampaign {
     // data will contain both sku and sku simple records
 
     // list1 filter only sku and join it with last day itr ---> output fk_customer, sku, price
-    val skuOnlyRecords = WishListCampaign.skuSelector(customerSelected, itrSkuYesterdayData, null, orderData, orderItemData, SkuSelection.LOW_STOCK)
+    val skuOnlyRecords = Wishlist.skuSelector(customerSelected, itrSkuYesterdayData, null, orderData, orderItemData, SkuSelection.LOW_STOCK)
 
     // list2 filter only sku-simple and join it with last day itr ---> output fk_customer, sku, price
-    val skuSimpleOnlyRecords = WishListCampaign.skuSimpleSelector(customerSelected, itrSkuSimpleYesterdayData, orderData, orderItemData, SkuSelection.LOW_STOCK)
+    val skuSimpleOnlyRecords = Wishlist.skuSimpleSelector(customerSelected, itrSkuSimpleYesterdayData, orderData, orderItemData, SkuSelection.LOW_STOCK)
 
     // union list1 and list2, group by customer, order by price, first/last
     //=======union both sku and sku simple==============================================================================

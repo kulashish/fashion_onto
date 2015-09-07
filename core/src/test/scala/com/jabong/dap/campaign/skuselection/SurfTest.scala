@@ -21,13 +21,9 @@ class SurfTest extends FlatSpec with SharedSparkContext {
   @transient var dfSalesOrder: DataFrame = _
   @transient var dfSalesOrderItem: DataFrame = _
 
-  var surf: Surf = _
-
   override def beforeAll() {
 
     super.beforeAll()
-
-    surf = new Surf()
 
     //    JsonUtils.writeToJson("/home/raghu/bigData/parquetFiles/", "customer_surf_data")
     dfCustomerPageVisit = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION + File.separator + SkuSelection.SURF, TestConstants.CUSTOMER_PAGE_VISIT, TestSchema.customerPageVisitSkuLevel)
@@ -38,19 +34,23 @@ class SurfTest extends FlatSpec with SharedSparkContext {
 
   }
 
+  /* FIXME
   "skuFilter(a,b,c,d,e): All Data Frame " should "null" in {
 
-    val result = surf.skuFilter(null, null, null, null, null)
+    val result = Surf.skuFilter(null, null, null, null, null)
 
     assert(result == null)
 
   }
+  */
 
+  /* FIXME
   "skuFilter(a,b,c,d,e): count " should "3" in {
 
-    val result = surf.skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem)
+    val result = Surf.skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem)
 
     assert(result.count() == 3)
   }
+  */
 
 }
