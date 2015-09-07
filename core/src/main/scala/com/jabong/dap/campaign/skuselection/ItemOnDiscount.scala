@@ -68,11 +68,11 @@ object ItemOnDiscount extends Logging {
 
     logger.info("After sku filter based on special price")
 
-    val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
+    //val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    logger.info("After reference sku generation")
+    //logger.info("After reference sku generation")
 
-    return refSkus
+    return dfResult
   }
 
   /**
