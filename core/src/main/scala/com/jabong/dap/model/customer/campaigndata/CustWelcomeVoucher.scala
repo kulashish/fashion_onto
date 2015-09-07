@@ -2,8 +2,8 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{CustomerVariables, SalesRuleVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesRuleVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -33,7 +33,7 @@ object CustWelcomeVoucher extends Logging {
     DataWriter.writeParquet(welCodes, savePath, saveMode)
 
     val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
-                        .select(
+      .select(
         coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as "UID",
         customerFull(CustomerVariables.EMAIL),
         welCodes(SalesRuleVariables.CODE1),
@@ -41,8 +41,7 @@ object CustWelcomeVoucher extends Logging {
         welCodes(SalesRuleVariables.CODE1_VALID_DATE),
         welCodes(SalesRuleVariables.CODE2),
         welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
-        welCodes(SalesRuleVariables.CODE2_VALID_DATE)
-      )
+        welCodes(SalesRuleVariables.CODE2_VALID_DATE))
     DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, "CUST_WELCOME_VOUCHERS.csv", DataSets.IGNORE_SAVEMODE, "true", ",")
 
   }
