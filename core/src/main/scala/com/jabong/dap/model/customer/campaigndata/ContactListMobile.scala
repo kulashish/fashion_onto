@@ -218,7 +218,7 @@ object ContactListMobile extends Logging {
 
         Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
-        lit("IN") as "COUNTRY",
+        lit("IN") as CustomerVariables.COUNTRY,
 
         Udf.latestString(joinDF(CustomerVariables.FIRST_NAME), joinDF(CustomerVariables.NEW_ + CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
 
