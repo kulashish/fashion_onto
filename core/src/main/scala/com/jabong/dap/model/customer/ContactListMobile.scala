@@ -66,25 +66,37 @@ object ContactListMobile extends Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-
     val paths = OptionUtils.getOptValue(params.path)
-    var dfCustomerIncr, dfCustomerListMobilePrevFull, dfCustomerSegmentsIncr, dfNLSIncr, dfSalesOrderIncr, dfSalesOrderFull, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull, dfSalesOrderItemIncr, dfSalesOrderCalcPrevFull, dfSalesOrderItemCalcPrevFull, dfDND, dfZoneCity: DataFrame = null
 
-    if (null != paths) {
-      (
-        dfCustomerIncr,
-        dfCustomerSegmentsIncr,
-        dfNLSIncr,
-        dfSalesOrderIncr,
-        dfSalesOrderFull,
-        dfSalesOrderAddrFull,
-        dfSalesOrderItemIncr,
-        dfDND,
-        dfZoneCity
-      ) = readDf(paths, incrDate)
-    } else {
+//    val dfCustomerIncr: DataFrame = null
+//    val dfCustomerListMobilePrevFull: DataFrame = null
+//    val dfCustomerSegmentsIncr: DataFrame = null
+//    val dfNLSIncr: DataFrame = null
+//    val dfSalesOrderIncr: DataFrame = null
+//    val dfSalesOrderFull: DataFrame = null
+//    val dfSalesOrderAddrFull: DataFrame = null
+//    val dfSalesOrderAddrFavPrevFull: DataFrame = null
+//    val dfSalesOrderItemIncr: DataFrame = null
+//    val dfSalesOrderCalcPrevFull: DataFrame = null
+//    val dfSalesOrderItemCalcPrevFull: DataFrame = null
+//    val dfDND: DataFrame = null
+//    val dfZoneCity: DataFrame = null
+//
+//    if (null != paths) {
+//      (
+//        dfCustomerIncr,
+//        dfCustomerSegmentsIncr,
+//        dfNLSIncr,
+//        dfSalesOrderIncr,
+//        dfSalesOrderFull,
+//        dfSalesOrderAddrFull,
+//        dfSalesOrderItemIncr,
+//        dfDND,
+//        dfZoneCity
+//      ) = readDf(paths, incrDate)
+//    } else {
       //read Data Frames
-      (
+      val (
         dfCustomerIncr,
         dfCustomerListMobilePrevFull,
         dfCustomerSegmentsIncr,
@@ -99,7 +111,7 @@ object ContactListMobile extends Logging {
         dfDND,
         dfZoneCity
       ) = readDf(incrDate)
-    }
+//    }
 
     //get  Customer CustomerSegments.getCustomerSegments
     val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(dfCustomerSegmentsIncr)
@@ -385,7 +397,7 @@ object ContactListMobile extends Logging {
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
-    (
+    return (
       dfCustomerIncr,
       dfCustomerListMobilePrevFull,
       dfCustomerSegmentsIncr,
@@ -421,7 +433,8 @@ object ContactListMobile extends Logging {
     val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
-    (
+
+    return (
       dfCustomerIncr,
       dfCustomerSegmentsIncr,
       dfNLSIncr,
@@ -432,7 +445,6 @@ object ContactListMobile extends Logging {
       dfDND,
       dfZoneCity
     )
-
   }
 
 }
