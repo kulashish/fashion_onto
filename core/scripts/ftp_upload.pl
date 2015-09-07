@@ -162,19 +162,19 @@ sub upload_ad4push_device_merger {
     print "ad4push devices directory is $base\n";
     system("mkdir -p $base");
 
-   # /data/tmp/ad4push/devices_android/daily/2015/09/02/exportDevices_517_20150902.csv
-   print "hadoop fs -get /data/tmp/ad4push/devices_android/daily/$date/exportDevices_517_$date_with_zero.csv $base/\n";
+   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/\n";
 
-   # /data/tmp/ad4push/devices_android/daily/2015/09/02/exportDevices_517_20150902.csv
-   system("hadoop fs -get /data/tmp/ad4push/devices_android/daily/$date/exportDevices_517_$date_with_zero.csv $base/");
+   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/");
 
-   # /data/tmp/ad4push/devices_ios/daily/2015/09/02/exportDevices_515_20150902.csv
-   print "hadoop fs -get /data/tmp/ad4push/devices_ios/daily/$date/exportDevices_515_$date_with_zero.csv $base/\n";
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/\n";
 
-   # /data/tmp/ad4push/devices_ios/daily/2015/09/02/exportDevices_515_20150902.csv
-   system("hadoop fs -get /data/tmp/ad4push/devices_ios/daily/$date/exportDevices_515_$date_with_zero.csv $base/");
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/");
 
-   system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_ad4push_devices/ $base/*; bye\"");
+   system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
 
 }
 

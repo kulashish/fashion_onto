@@ -22,8 +22,8 @@ object TimeUtils extends Logging {
    * @param date2
    * @return
    */
-  def daysBetweenTwoDates(date1: Date, date2: Date): BigInt = {
-    Math.abs(date1.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS
+  def daysBetweenTwoDates(date1: Date, date2: Date): Int = {
+    (Math.abs(date1.getTime - date2.getTime) / TimeConstants.CONVERT_MILLISECOND_TO_DAYS).toInt
   }
 
   /**
@@ -41,7 +41,7 @@ object TimeUtils extends Logging {
     val dt = Calendar.getInstance()
     dt.setTime(format.parse(date))
     val today = new Date
-    daysBetweenTwoDates(today, dt.getTime).toInt
+    daysBetweenTwoDates(today, dt.getTime)
   }
 
   /**
