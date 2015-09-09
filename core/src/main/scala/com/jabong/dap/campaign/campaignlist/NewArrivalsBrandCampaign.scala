@@ -18,6 +18,8 @@ class NewArrivalsBrandCampaign {
 
     val skus = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
 
+    //TODO: Fix recommendation Data
+    
     //TODO: generate reference skus
     //    val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
 
