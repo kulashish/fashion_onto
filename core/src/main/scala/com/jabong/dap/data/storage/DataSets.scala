@@ -127,6 +127,8 @@ object DataSets {
 
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val DND = "DND"
+  val SMS_OPT_OUT = "smsOptOut"
+  val MOBILE_DND = "MobileDnd"
   val ZONE_CITY = "zone_city"
   val CUST_PREFERENCE = "custPreference"
   val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"

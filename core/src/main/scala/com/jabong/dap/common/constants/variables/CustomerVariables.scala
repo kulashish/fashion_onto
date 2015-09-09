@@ -85,5 +85,6 @@ object CustomerVariables {
   val MOBILE_PERMISSION_STATUS = "mobile_permission_status"
   val IS_REFERRED = "is_referred"
   val UID = "uid"
+  val COUNTRY = "country"
 
 }

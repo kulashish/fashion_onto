@@ -142,6 +142,7 @@ object ContactListMobile extends Logging {
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
 
+
   }
 
   /**
@@ -250,9 +251,12 @@ object ContactListMobile extends Logging {
 
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.STATE_ZONE), joinDF(CustomerVariables.STATE_ZONE)) as CustomerVariables.STATE_ZONE,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE // DND
-        ).na.fill(Map(
-          CustomerVariables.MOBILE_PERMISSION_STATUS -> "0")).withColumn(CustomerVariables.DND, when(col(CustomerVariables.MOBILE_PERMISSION_STATUS).===("15"), "1").otherwise("0"))
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
+
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.DND), joinDF(CustomerVariables.DND)) as CustomerVariables.DND // DND
+
+
+      )
     }
 
     (dfMergedIncr, dfFull)
@@ -374,7 +378,6 @@ object ContactListMobile extends Logging {
 
     val res = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(CustomerVariables.PHONE), SQL.LEFT_OUTER)
       .select(
-
         cityJoined(SalesOrderVariables.FK_CUSTOMER),
         cityJoined(CustomerVariables.EMAIL),
         cityJoined(CustomerVariables.DOB),
@@ -398,7 +401,8 @@ object ContactListMobile extends Logging {
         cityJoined(SalesOrderItemVariables.NET_ORDERS),
         cityJoined(CustomerVariables.STATE_ZONE),
         cityJoined(CustomerVariables.CITY_TIER),
-        dndBc(DNDVariables.AGGREGATOR_STATUS_CODE) as CustomerVariables.MOBILE_PERMISSION_STATUS)
+        when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "15") as CustomerVariables.MOBILE_PERMISSION_STATUS,
+        when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "1").otherwise("0") as CustomerVariables.DND)
 
     return res
   }
@@ -430,6 +434,10 @@ object ContactListMobile extends Logging {
 
     val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
+    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MOBILE_DND, DataSets.SMS_OPT_OUT, DataSets.FULL, incrDate)
+
+    val dnd = dfDND.select(DNDVariables.MOBILE_NUMBER).unionAll(dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER))
+
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
     //TODO store the city names in lower case, all data coming as Upper case
     (
@@ -444,7 +452,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemIncr,
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
-      dfDND,
+      dnd,
       dfZoneCity)
   }
 
@@ -464,9 +472,13 @@ object ContactListMobile extends Logging {
 
     val dfSalesOrderItemIncr = DataReader.getDataFrame4mFullPath(salesOrderItemPath, DataSets.PARQUET)
 
-    val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
+    val dfDND = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MOBILE_DND, DataSets.DND, DataSets.FULL, incrDate)
 
-    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
+    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MOBILE_DND, DataSets.SMS_OPT_OUT, DataSets.FULL, incrDate)
+
+    val dnd = dfDND.select(DNDVariables.MOBILE_NUMBER).unionAll(dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER))
+
+    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.FULL, incrDate)
     (
       dfCustomerIncr,
       dfCustomerSegmentsIncr,
@@ -475,7 +487,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderFull,
       dfSalesOrderAddrFull,
       dfSalesOrderItemIncr,
-      dfDND,
+      dnd,
       dfZoneCity)
 
   }
