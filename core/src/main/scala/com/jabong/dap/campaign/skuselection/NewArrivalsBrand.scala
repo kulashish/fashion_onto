@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ SalesCartVariables, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import grizzled.slf4j.Logging
@@ -27,7 +28,7 @@ object NewArrivalsBrand extends Logging {
     val dfItrGrouped = itrData.filter(ProductVariables.ACTIVATED_AT + " > '" + yesterdayDate + "'")
       .groupBy(ProductVariables.BRAND, ProductVariables.GENDER).agg(count(ProductVariables.BRAND) as "count", first(ProductVariables.BRICK) as ProductVariables.BRICK, first(ProductVariables.MVP) as ProductVariables.MVP, first(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE)
 
-    val dfItrFilteredSku = dfItrGrouped.filter(col("count").geq(4))
+    val dfItrFilteredSku = dfItrGrouped.filter(col("count").geq(CampaignCommon.COUNT_NEW_ARRIVALS))
       .select(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.MVP, ProductVariables.SKU_SIMPLE)
 
     val dfResult = customerSelected.join(dfItrFilteredSku, customerSelected(SalesCartVariables.SKU) === dfItrFilteredSku(ProductVariables.SKU_SIMPLE), SQL.INNER)
