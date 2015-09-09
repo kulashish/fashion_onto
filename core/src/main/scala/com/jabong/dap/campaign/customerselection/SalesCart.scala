@@ -7,7 +7,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 7/9/15.
  */
-class NewArrivalsBrand extends CustomerSelector with Logging {
+class SalesCart extends CustomerSelector with Logging {
 
   override def customerSelection(salesCart30Day: DataFrame): DataFrame = {
     if (salesCart30Day == null) {

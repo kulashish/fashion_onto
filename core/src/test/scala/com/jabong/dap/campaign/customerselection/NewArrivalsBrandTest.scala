@@ -11,11 +11,11 @@ import org.scalatest.FlatSpec
  */
 class NewArrivalsBrandTest extends FlatSpec with SharedSparkContext {
   @transient var salesCartData: DataFrame = _
-  var newArrivalsBrand: NewArrivalsBrand = _
+  var newArrivalsBrand: SalesCart = _
 
   override def beforeAll() {
     super.beforeAll()
-    newArrivalsBrand = new NewArrivalsBrand()
+    newArrivalsBrand = new SalesCart()
     salesCartData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "sales_cart")
   }
 

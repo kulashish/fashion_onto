@@ -42,7 +42,7 @@ class CustomerSelectorFactory extends CampaignFactory {
       return new LastThirtyDaySession()
     }
     if (customerSelectionType.equalsIgnoreCase(CustomerSelection.NEW_ARRIVALS_BRAND)) {
-      return new NewArrivalsBrand()
+      return new SalesCart()
     }
 
     return null
