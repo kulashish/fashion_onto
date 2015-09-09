@@ -158,15 +158,15 @@ object ContactListMobile extends Logging {
    * @return
    */
   def getContactListMobileDF(
-    dfCustomerIncr: DataFrame,
-    dfCustomerListMobilePrevFull: DataFrame,
-    dfCustSegCalcIncr: DataFrame,
-    dfNLSIncr: DataFrame,
-    dfSalesOrderAddrFavCalc: DataFrame,
-    dfSalesOrderCalcFull: DataFrame,
-    dfSuccessfullOrders: DataFrame,
-    dfDND: DataFrame,
-    dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
+                              dfCustomerIncr: DataFrame,
+                              dfCustomerListMobilePrevFull: DataFrame,
+                              dfCustSegCalcIncr: DataFrame,
+                              dfNLSIncr: DataFrame,
+                              dfSalesOrderAddrFavCalc: DataFrame,
+                              dfSalesOrderCalcFull: DataFrame,
+                              dfSuccessfullOrders: DataFrame,
+                              dfDND: DataFrame,
+                              dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomerIncr == null || dfCustSegCalcIncr == null || dfNLSIncr == null) {
       log("Data frame should not be null")
