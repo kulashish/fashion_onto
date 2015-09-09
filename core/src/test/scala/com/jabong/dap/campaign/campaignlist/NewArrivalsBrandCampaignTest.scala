@@ -1,12 +1,10 @@
 package com.jabong.dap.campaign.campaignlist
 
-import com.jabong.dap.campaign.recommendation.generator.CommonRecommendation
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, SQLContext }
-import org.scalatest.{ GivenWhenThen, FeatureSpec }
+import org.scalatest.{ FeatureSpec, GivenWhenThen }
 
 /**
  * Created by raghu on 9/9/15.
