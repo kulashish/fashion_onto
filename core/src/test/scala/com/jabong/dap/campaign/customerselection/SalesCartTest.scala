@@ -9,7 +9,7 @@ import org.scalatest.FlatSpec
 /**
  * Created by raghu on 7/9/15.
  */
-class NewArrivalsBrandTest extends FlatSpec with SharedSparkContext {
+class SalesCartTest extends FlatSpec with SharedSparkContext {
   @transient var salesCartData: DataFrame = _
   var newArrivalsBrand: SalesCart = _
 

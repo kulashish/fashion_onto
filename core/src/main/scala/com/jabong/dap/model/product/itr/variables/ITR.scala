@@ -39,7 +39,6 @@ object ITR {
   val SPECIAL_FROM_DATE = "specialFromDate"
   val SPECIAL_PRICE = "specialPrice"
   val SIMPLE_SKU = "simpleSku"
-  val SKU_SIMPLE = "skuSimple"
   val VISIBILITY = "visibility"
   val QUANTITY = "quantity"
   val ID_CATALOG_CONFIG = "idCatalogConfig"

@@ -12,14 +12,14 @@ class NewArrivalsBrandCampaign {
   def runCampaign(salesCart30Days: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
 
     val newArivalsBrandCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
-      .getCustomerSelector(CustomerSelection.NEW_ARRIVALS_BRAND)
+      .getCustomerSelector(CustomerSelection.SALES_CART)
 
     val customerSelected = newArivalsBrandCustomerSelector.customerSelection(salesCart30Days)
 
     val skus = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
 
     //TODO: Fix recommendation Data
-    
+
     //TODO: generate reference skus
     //    val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
 
