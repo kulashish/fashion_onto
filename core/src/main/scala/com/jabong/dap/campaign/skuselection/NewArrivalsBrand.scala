@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.variables.{ SalesCartVariables, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
@@ -10,9 +12,9 @@ import org.apache.spark.sql.functions._
  */
 object NewArrivalsBrand extends Logging {
 
-  def skuFilter(itrData: DataFrame): DataFrame = {
+  def skuFilter(customerSelected: DataFrame, itrData: DataFrame): DataFrame = {
 
-    if (itrData == null) {
+    if (customerSelected == null || itrData == null) {
 
       logger.error("Data frame should not be null")
 
@@ -24,12 +26,15 @@ object NewArrivalsBrand extends Logging {
     val yesterdayDate = yesterdayDateTime.substring(0, yesterdayDateTime.indexOf(" ") + 1) + TimeConstants.START_TIME
 
     val dfItrGrouped = itrData.filter(ITR.ACTIVATED_AT + " > '" + yesterdayDate + "'")
-      .groupBy(ITR.BRAND_NAME, ITR.GENDER).agg(count(ITR.BRAND_NAME) as "count", first(ITR.MVP) as ITR.MVP)
+      .groupBy(ITR.BRAND_NAME, ITR.GENDER).agg(count(ITR.BRAND_NAME) as "count", first(ITR.MVP) as ITR.MVP, first(ITR.SKU_SIMPLE) as ITR.SKU_SIMPLE)
 
-    val dfCustomerSelection = dfItrGrouped.filter(col("count").geq(4))
-      .select(ITR.BRAND_NAME, ITR.GENDER, ITR.MVP)
+    val dfItrFilteredSku = dfItrGrouped.filter(col("count").geq(4))
+      .select(ITR.BRAND_NAME, ITR.GENDER, ITR.MVP, ITR.SKU_SIMPLE)
 
-    return dfCustomerSelection
+    val dfResult = customerSelected.join(dfItrFilteredSku, customerSelected(SalesCartVariables.SKU) === dfItrFilteredSku(ITR.SKU_SIMPLE), SQL.INNER)
+      .select(SalesCartVariables.FK_CUSTOMER, SalesCartVariables.EMAIL, SalesCartVariables.SKU, ITR.BRAND_NAME, ITR.GENDER, ITR.MVP)
+
+    return dfResult
   }
 
 }

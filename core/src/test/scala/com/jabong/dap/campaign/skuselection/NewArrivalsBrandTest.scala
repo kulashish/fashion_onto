@@ -11,20 +11,22 @@ import org.scalatest.FlatSpec
  */
 class NewArrivalsBrandTest extends FlatSpec with SharedSparkContext {
   @transient var itrData: DataFrame = _
+  @transient var customerSelected: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
     itrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "itr")
+    customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "sales_cart")
   }
 
   "Null itrData DataFrame" should "return null" in {
-    val customerSelected = NewArrivalsBrand.skuFilter(null)
-    assert(customerSelected == null)
+    val dfFilteredSku = NewArrivalsBrand.skuFilter(null, null)
+    assert(dfFilteredSku == null)
   }
 
   "itrData DataFrame " should "return 0" in {
-    val customerSelected = NewArrivalsBrand.skuFilter(itrData)
-    assert(customerSelected.count() == 0)
+    val dfFilteredSku = NewArrivalsBrand.skuFilter(customerSelected, itrData)
+    assert(dfFilteredSku.count() == 0)
   }
 
 }
