@@ -66,38 +66,24 @@ object ContactListMobile extends Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-
     val paths = OptionUtils.getOptValue(params.path)
-    var dfCustomerIncr, dfCustomerListMobilePrevFull, dfCustomerSegmentsIncr, dfNLSIncr, dfSalesOrderIncr, dfSalesOrderFull, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull, dfSalesOrderItemIncr, dfSalesOrderCalcPrevFull, dfSalesOrderItemCalcPrevFull, dfDND, dfZoneCity: DataFrame = null
 
-    if (null != paths) {
-      (
-        dfCustomerIncr,
-        dfCustomerSegmentsIncr,
-        dfNLSIncr,
-        dfSalesOrderIncr,
-        dfSalesOrderFull,
-        dfSalesOrderAddrFull,
-        dfSalesOrderItemIncr,
-        dfDND,
-        dfZoneCity) = readDf(paths, incrDate)
-    } else {
-      //read Data Frames
-      (
-        dfCustomerIncr,
-        dfCustomerListMobilePrevFull,
-        dfCustomerSegmentsIncr,
-        dfNLSIncr,
-        dfSalesOrderIncr,
-        dfSalesOrderFull,
-        dfSalesOrderAddrFull,
-        dfSalesOrderAddrFavPrevFull,
-        dfSalesOrderItemIncr,
-        dfSalesOrderCalcPrevFull,
-        dfSalesOrderItemCalcPrevFull,
-        dfDND,
-        dfZoneCity) = readDf(incrDate)
-    }
+    //read Data Frames
+    val (
+      dfCustomerIncr,
+      dfCustomerListMobilePrevFull,
+      dfCustomerSegmentsIncr,
+      dfNLSIncr,
+      dfSalesOrderIncr,
+      dfSalesOrderFull,
+      dfSalesOrderAddrFull,
+      dfSalesOrderAddrFavPrevFull,
+      dfSalesOrderItemIncr,
+      dfSalesOrderCalcPrevFull,
+      dfSalesOrderItemCalcPrevFull,
+      dfDND,
+      dfZoneCity
+      ) = readDf(paths, incrDate)
 
     //get  Customer CustomerSegments.getCustomerSegments
     val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(dfCustomerSegmentsIncr)
@@ -456,40 +442,45 @@ object ContactListMobile extends Logging {
       dfZoneCity)
   }
 
-  def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
-    val pathList = paths.split(";")
-    val custPath = pathList(0)
-    val custSegPath = pathList(1)
-    val nlsPath = pathList(2)
-    val salesOrderItemPath = pathList(3)
+  def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+    if (null != paths) {
+      val pathList = paths.split(";")
+      val custPath = pathList(0)
+      val custSegPath = pathList(1)
+      val nlsPath = pathList(2)
+      val salesOrderItemPath = pathList(3)
 
-    val dfCustomerIncr = DataReader.getDataFrame4mFullPath(custPath, DataSets.PARQUET)
-    val dfCustomerSegmentsIncr = DataReader.getDataFrame4mFullPath(custSegPath, DataSets.PARQUET)
-    val dfNLSIncr = DataReader.getDataFrame4mFullPath(nlsPath, DataSets.PARQUET)
-    val dfSalesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
-    val dfSalesOrderIncr = dfSalesOrderFull
-    val dfSalesOrderAddrFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfCustomerIncr = DataReader.getDataFrame4mFullPath(custPath, DataSets.PARQUET)
+      val dfCustomerSegmentsIncr = DataReader.getDataFrame4mFullPath(custSegPath, DataSets.PARQUET)
+      val dfNLSIncr = DataReader.getDataFrame4mFullPath(nlsPath, DataSets.PARQUET)
+      val dfSalesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfSalesOrderIncr = dfSalesOrderFull
+      val dfSalesOrderAddrFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
 
-    val dfSalesOrderItemIncr = DataReader.getDataFrame4mFullPath(salesOrderItemPath, DataSets.PARQUET)
+      val dfSalesOrderItemIncr = DataReader.getDataFrame4mFullPath(salesOrderItemPath, DataSets.PARQUET)
 
-    val dfDND = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MOBILE_DND, DataSets.DND, DataSets.FULL, incrDate)
+      val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
-    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MOBILE_DND, DataSets.SMS_OPT_OUT, DataSets.FULL, incrDate)
+      val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
-    val dnd = dfDND.select(DNDVariables.MOBILE_NUMBER).unionAll(dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER))
-
-    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.FULL, incrDate)
-    (
-      dfCustomerIncr,
-      dfCustomerSegmentsIncr,
-      dfNLSIncr,
-      dfSalesOrderIncr,
-      dfSalesOrderFull,
-      dfSalesOrderAddrFull,
-      dfSalesOrderItemIncr,
-      dnd,
-      dfZoneCity)
-
+      (
+        dfCustomerIncr,
+        null,
+        dfCustomerSegmentsIncr,
+        dfNLSIncr,
+        dfSalesOrderIncr,
+        dfSalesOrderFull,
+        dfSalesOrderAddrFull,
+        null,
+        dfSalesOrderItemIncr,
+        null,
+        null,
+        dfDND,
+        dfZoneCity
+        )
+    } else {
+      readDf(incrDate)
+    }
   }
 
 }
