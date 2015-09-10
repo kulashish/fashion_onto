@@ -128,7 +128,6 @@ object ContactListMobile extends Logging {
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
 
-
   }
 
   /**
@@ -144,15 +143,15 @@ object ContactListMobile extends Logging {
    * @return
    */
   def getContactListMobileDF(
-                              dfCustomerIncr: DataFrame,
-                              dfCustomerListMobilePrevFull: DataFrame,
-                              dfCustSegCalcIncr: DataFrame,
-                              dfNLSIncr: DataFrame,
-                              dfSalesOrderAddrFavCalc: DataFrame,
-                              dfSalesOrderCalcFull: DataFrame,
-                              dfSuccessfullOrders: DataFrame,
-                              dfDND: DataFrame,
-                              dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
+    dfCustomerIncr: DataFrame,
+    dfCustomerListMobilePrevFull: DataFrame,
+    dfCustSegCalcIncr: DataFrame,
+    dfNLSIncr: DataFrame,
+    dfSalesOrderAddrFavCalc: DataFrame,
+    dfSalesOrderCalcFull: DataFrame,
+    dfSuccessfullOrders: DataFrame,
+    dfDND: DataFrame,
+    dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomerIncr == null || dfCustSegCalcIncr == null || dfNLSIncr == null) {
       log("Data frame should not be null")
@@ -240,9 +239,7 @@ object ContactListMobile extends Logging {
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
 
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.DND), joinDF(CustomerVariables.DND)) as CustomerVariables.DND // DND
-
-
-      )
+        )
     }
 
     (dfMergedIncr, dfFull)
@@ -476,8 +473,7 @@ object ContactListMobile extends Logging {
         null,
         null,
         dfDND,
-        dfZoneCity
-        )
+        dfZoneCity)
     } else {
       readDf(incrDate)
     }
