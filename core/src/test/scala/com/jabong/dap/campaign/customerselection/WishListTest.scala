@@ -31,7 +31,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   "customerSelection: Data Frame dfCustomerProductShortlist" should "null" in {
 
-    val result = wishlist.customerSelection(null, 0)
+    val result = wishlist.customerSelection(null)
 
     assert(result == null)
 
@@ -39,7 +39,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   "customerSelection: ndays" should "negetive value" in {
 
-    val result = wishlist.customerSelection(dfCustomerProductShortlist, -1)
+    val result = wishlist.customerSelection(dfCustomerProductShortlist)
 
     assert(result == null)
 
@@ -53,7 +53,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val ndays = TimeUtils.daysFromToday(date)
 
-    val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
+    val result = wishlist.customerSelection(dfCustomerProductShortlist)
 
     assert(result != null)
 
@@ -67,7 +67,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val ndays = TimeUtils.daysFromToday(date)
 
-    val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
+    val result = wishlist.customerSelection(dfCustomerProductShortlist)
       .limit(30).collect().toSet
 
     val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
@@ -84,7 +84,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date))
 
-    val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
+    val result = wishlist.customerSelection(dfCustomerProductShortlist)
 
     assert(result == null)
 
@@ -98,7 +98,7 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
     val ndays = TimeUtils.daysFromToday(date)
 
-    val result = wishlist.customerSelection(dfCustomerProductShortlist, ndays)
+    val result = wishlist.customerSelection(dfCustomerProductShortlist)
     //      .limit(30).collect().toSet
 
     //                                  result.limit(30).write.json(DataSets.TEST_RESOURCES + DataSets.RESULT_CUSTOMER_PRODUCT_SHORTLIST + ".json")

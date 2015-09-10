@@ -2,13 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
-import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon, CustomerSelection }
-import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.udf.Udf
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 
 /**
  * Created by rahul for com.jabong.dap.campaign.campaignlist on 27/7/15.
@@ -32,9 +26,12 @@ object WishListCampaign {
 
     val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.WISH_LIST)
-    val lastDayCustomerSelected = wishListCustomerSelector.customerSelection(fullShortlistData, 1)
 
-    val last30DaysCustomerSelected = wishListCustomerSelector.customerSelection(fullShortlistData, 30)
+    val shortlistYesterdayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 1)
+    val lastDayCustomerSelected = wishListCustomerSelector.customerSelection(shortlistYesterdayData)
+
+    val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30)
+    val last30DaysCustomerSelected = wishListCustomerSelector.customerSelection(shortlistLast30DayData)
 
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
