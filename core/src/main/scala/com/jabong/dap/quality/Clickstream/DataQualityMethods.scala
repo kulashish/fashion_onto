@@ -1,11 +1,9 @@
 package com.jabong.dap.quality.Clickstream
 
-import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.mail.ScalaMail
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
-import com.jabong.dap.data.read.PathBuilder
-import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.clickstream.ClickStreamConstant
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -19,11 +17,11 @@ object DataQualityMethods extends Logging {
 
   def start(params: ParamInfo): Unit = {
 
-    logger.info("dcf feed generation process started")
+    logger.info("clickstreamDataQualityCheck started")
     val hiveContext = Spark.getHiveContext()
     val executeDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    val clickstreamTable = OptionUtils.getOptValue(params.input, DataSets.DCF_INPUT_MERGED_HIVE_TABLE)
+    //val clickstreamTable = OptionUtils.getOptValue(params.input, DataSets.DCF_INPUT_MERGED_HIVE_TABLE)
     val monthYear = TimeUtils.getMonthAndYear(executeDate, TimeConstants.DATE_FORMAT_FOLDER)
     val month = (monthYear.month + 1).toString
     val date = monthYear.day.toString
@@ -31,15 +29,17 @@ object DataQualityMethods extends Logging {
 
     val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_PAGEVISIT_TABLE,ClickStreamConstant.MERGE_PAGEVISIT)
     //var path= "./"+year+"/"+month+"/"+date
-    val finaloutput = Spark.getContext().parallelize(output)
-    finaloutput.coalesce(1,true).saveAsTextFile(PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, ClickStreamConstant.CLICKSTREAM_DATA_QUALITY, "CLICKSTREAM_QUALITY", DataSets.DAILY_MODE, date))
+    //logger.info("Value of output path"+ConfigConstants.WRITE_OUTPUT_PATH)
+    //val finaloutput = Spark.getContext().parallelize(output)
+    //finaloutput.coalesce(1,true).saveAsTextFile(PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, ClickStreamConstant.CLICKSTREAM_DATA_QUALITY, "CLICKSTREAM_QUALITY", DataSets.DAILY_MODE, date))
     //write(ConfigConstants.OUTPUT_PATH, "./Automation1/",output.getBytes())
-    //ScalaMail.sendMessage("tejas.jain@jabong.com","","","tejas.jain@jabong.com",output,"Quality Report","")
-
+    ScalaMail.sendMessage("tech.dap@jabong.com","","","tech.dap@jabong.com","Quality Report",output,"")
     //println("ScalaMailMain")
-  }
 
-def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
+    ScalaMail.sendMessage("tech.dap@jabong.com","","","tech.dap@jabong.com","Quality Report",output,"")
+
+  }
+    def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
 
 
     val data = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
@@ -65,7 +65,7 @@ def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: Str
     }
     else {
 
-      message += processName + "details" + "\n"
+      message += processName + " details:" + "\n \n"
 
       message += "Count of records :" + datacount.toString() + "\n"
 
@@ -113,11 +113,10 @@ def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: Str
 
       message += "Count of Null month1 :" + resultSet.filter(resultSet("month1") isNull).count() + "\n"
 
-      message += "Count of Null date1 :" + resultSet.filter(resultSet("date1") isNull).count() + "\n"
+      message += "Count of Null date1 :" + resultSet.filter(resultSet("date1") isNull).count() + "\n \n"
 
     }
 
     return message
-
   }
 }

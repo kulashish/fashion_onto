@@ -73,13 +73,13 @@ if ($target eq "stage") {
 }
 
 # spark path constants
-my $BASE_PATH = "/opt/alchemy-core/current";
+my $BASE_PATH = "/home/tjain/alchemy-core-0.1.7";
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $CORE_JAR = "$BASE_PATH/jar/Alchemy-assembly.jar";
-my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
+my $HDFS_CONF = "/user/tjain/conf";
 my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 
 # bobAcq & merge
@@ -155,7 +155,11 @@ if ($component eq "bob") {
 } elsif ($component eq "campaignQuality") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
      run_component($component, $command);
- } else {
+ } elsif ($component eq "clickstreamDataQualityCheck") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamDataQualityCheck --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamDataQualityCheck.json";
+      run_component($component, $command);
+  }
+  else {
     print "not a valid component\n";
 }
 
