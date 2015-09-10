@@ -17,7 +17,7 @@ import org.apache.spark.sql.functions._
  */
 object DNDMerger {
 
-  def start(params: ParamInfo, isHistory: Boolean) = {
+  def start(params: ParamInfo) = {
     println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
@@ -29,7 +29,7 @@ object DNDMerger {
     if ( null == path && null == OptionUtils.getOptValue(params.fullDate)) {
       println("First full csv path and prev full date both cannot be empty")
 
-      processData(DataSets.MOBILE_DND, prevDate, incrDate, filename, saveMode, path)
+      processData(DataSets.SMS_DELIVERED, prevDate, incrDate, filename, saveMode, path)
     } else {
       val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
      }
@@ -43,17 +43,24 @@ object DNDMerger {
    */
   def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, fullcsv: String) {
     var incr: DataFrame = null
-    incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.DND, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ";")
+    incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ";")
     var prevFull: DataFrame = null
     if (null == fullcsv) {
-      prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.DND, tablename, DataSets.DAILY_MODE, prevDate)
+      prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, prevDate)
     }
     else {
       prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
     }
+    if(null == incr){
+      var savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
+
+      DataWriter.writeParquet(prevFull, savePath, saveMode)
+
+      return
+    }
     val dndFull = mergeDNDData(prevFull, incr)
 
-    var savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.DND, tablename, DataSets.FULL, curDate)
+    var savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL, curDate)
 
     DataWriter.writeParquet(dndFull, savePath, saveMode)
 

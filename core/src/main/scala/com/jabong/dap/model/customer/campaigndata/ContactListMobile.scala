@@ -82,6 +82,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
       dfDND,
+      dfSmsOptOut,
       dfZoneCity
       ) = readDf(paths, incrDate)
 
@@ -120,6 +121,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderCalcFull,
       dfSuccessfullOrders,
       dfDND,
+      dfSmsOptOut,
       dfZoneCity)
 
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
@@ -151,6 +153,7 @@ object ContactListMobile extends Logging {
     dfSalesOrderCalcFull: DataFrame,
     dfSuccessfullOrders: DataFrame,
     dfDND: DataFrame,
+    dfSmsOptOut: DataFrame,
     dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomerIncr == null || dfCustSegCalcIncr == null || dfNLSIncr == null) {
@@ -175,7 +178,7 @@ object ContactListMobile extends Logging {
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
 
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND, dfSmsOptOut)
 
     var dfFull: DataFrame = dfMergedIncr
 
@@ -245,7 +248,7 @@ object ContactListMobile extends Logging {
     (dfMergedIncr, dfFull)
   }
 
-  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame): DataFrame = {
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame): DataFrame = {
 
     val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -357,9 +360,10 @@ object ContactListMobile extends Logging {
       mergedIncr(SalesOrderItemVariables.NET_ORDERS),
       cityBc(CustomerVariables.ZONE) as CustomerVariables.STATE_ZONE,
       cityBc(CustomerVariables.TIER1) as CustomerVariables.CITY_TIER)
+
     val dndBc = Spark.getContext().broadcast(dnd).value
 
-    val res = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(CustomerVariables.PHONE), SQL.LEFT_OUTER)
+    val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(CustomerVariables.PHONE), SQL.LEFT_OUTER)
       .select(
         cityJoined(SalesOrderVariables.FK_CUSTOMER),
         cityJoined(CustomerVariables.EMAIL),
@@ -384,8 +388,38 @@ object ContactListMobile extends Logging {
         cityJoined(SalesOrderItemVariables.NET_ORDERS),
         cityJoined(CustomerVariables.STATE_ZONE),
         cityJoined(CustomerVariables.CITY_TIER),
-        when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "15") as CustomerVariables.MOBILE_PERMISSION_STATUS,
         when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "1").otherwise("0") as CustomerVariables.DND)
+
+    val smsBc = Spark.getContext().broadcast(smsOptOut).value
+
+    val res = dndMerged.join(smsBc, dndMerged(DNDVariables.MOBILE_NUMBER) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
+        .select(
+        dndMerged(SalesOrderVariables.FK_CUSTOMER),
+        dndMerged(CustomerVariables.EMAIL),
+        dndMerged(CustomerVariables.DOB),
+        dndMerged(CustomerVariables.GENDER),
+        dndMerged(CustomerVariables.REG_DATE),
+        dndMerged(CustomerVariables.VERIFICATION_STATUS),
+        dndMerged(CustomerVariables.AGE),
+        dndMerged(CustomerVariables.PLATINUM_STATUS),
+        dndMerged(CustomerSegmentsVariables.MVP_TYPE),
+        dndMerged(CustomerSegmentsVariables.SEGMENT),
+        dndMerged(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        dndMerged(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS),
+        dndMerged(NewsletterVariables.NL_SUB_DATE),
+        dndMerged(NewsletterVariables.UNSUB_KEY),
+        dndMerged(SalesAddressVariables.CITY),
+        dndMerged(SalesAddressVariables.FIRST_NAME),
+        dndMerged(CustomerVariables.LAST_NAME),
+        dndMerged(CustomerVariables.PHONE),
+        dndMerged(SalesOrderVariables.LAST_ORDER_DATE),
+        dndMerged(CustomerVariables.LAST_UPDATED_AT),
+        dndMerged(SalesOrderItemVariables.NET_ORDERS),
+        dndMerged(CustomerVariables.STATE_ZONE),
+        dndMerged(CustomerVariables.CITY_TIER),
+        dndMerged(CustomerVariables.DND),
+        when(smsBc(DNDVariables.MOBILE_NUMBER).!==(null), "o").otherwise("i") as CustomerVariables.MOBILE_PERMISSION_STATUS
+      )
 
     return res
   }
@@ -395,7 +429,7 @@ object ContactListMobile extends Logging {
    * @param incrDate
    * @return
    */
-  def readDf(incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     val prevDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
     val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, incrDate)
@@ -417,7 +451,7 @@ object ContactListMobile extends Logging {
 
     val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
-    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MOBILE_DND, DataSets.SMS_OPT_OUT, DataSets.FULL, incrDate)
+    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
 
     val dnd = dfDND.select(DNDVariables.MOBILE_NUMBER).unionAll(dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER))
 
@@ -436,10 +470,11 @@ object ContactListMobile extends Logging {
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
       dnd,
+      dfSmsOptOut,
       dfZoneCity)
   }
 
-  def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(paths: String, incrDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     if (null != paths) {
       val pathList = paths.split(";")
       val custPath = pathList(0)
@@ -456,7 +491,9 @@ object ContactListMobile extends Logging {
 
       val dfSalesOrderItemIncr = DataReader.getDataFrame4mFullPath(salesOrderItemPath, DataSets.PARQUET)
 
-      val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
+      val dfDND = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL, incrDate)
+
+      val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
 
       val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
@@ -473,6 +510,7 @@ object ContactListMobile extends Logging {
         null,
         null,
         dfDND,
+        dfSmsOptOut,
         dfZoneCity)
     } else {
       readDf(incrDate)

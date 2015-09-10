@@ -32,6 +32,8 @@ object CustWelcomeVoucher extends Logging {
     //TODO add UID
     DataWriter.writeParquet(welCodes, savePath, saveMode)
 
+    val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
+    val ts = TimeUtils.getTimeStamp(date, TimeConstants.DATE_TIME_FORMAT)
     val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
       .select(
         coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as "UID",
@@ -41,7 +43,7 @@ object CustWelcomeVoucher extends Logging {
         welCodes(SalesRuleVariables.CODE1_VALID_DATE),
         welCodes(SalesRuleVariables.CODE2),
         welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
-        welCodes(SalesRuleVariables.CODE2_VALID_DATE))
+        welCodes(SalesRuleVariables.CODE2_VALID_DATE)).filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
     DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, "CUST_WELCOME_VOUCHERS.csv", DataSets.IGNORE_SAVEMODE, "true", ",")
 
   }
