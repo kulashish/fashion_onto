@@ -31,9 +31,10 @@
         <ok to="end" />
         <error to="fail" />
     </action>
-    
+
     <kill name="fail">
         <message>Something went wrong: ${wf:errorCode('bobAcqFull1')}</message>
     </kill>
+
     <end name='end' />
 </workflow-app>
