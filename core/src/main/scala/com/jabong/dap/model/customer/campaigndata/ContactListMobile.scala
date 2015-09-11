@@ -453,7 +453,6 @@ object ContactListMobile extends Logging {
 
     val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
 
-    val dnd = dfDND.select(DNDVariables.MOBILE_NUMBER).unionAll(dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER))
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
     //TODO store the city names in lower case, all data coming as Upper case
@@ -469,7 +468,7 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemIncr,
       dfSalesOrderCalcPrevFull,
       dfSalesOrderItemCalcPrevFull,
-      dnd,
+      dfDND,
       dfSmsOptOut,
       dfZoneCity)
   }
