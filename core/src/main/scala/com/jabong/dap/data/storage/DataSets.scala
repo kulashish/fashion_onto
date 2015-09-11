@@ -130,6 +130,7 @@ object DataSets {
 
   //Clickstream Data Quality
 
+  val CLICKSTREAM_DATA_QUALITY = "clickstreamDataQualityCheck"
 
 
 }
