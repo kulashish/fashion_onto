@@ -486,7 +486,7 @@ object CampaignInput extends Logging {
    * @param ndays
    * @return
    */
-  def loadNthDayShortlistData(fullShortlistData: DataFrame, ndays: Int): DataFrame = {
+  def loadNthDayShortlistData(fullShortlistData: DataFrame, ndays: Int, todayDate: String): DataFrame = {
 
     if (fullShortlistData == null) {
 
@@ -504,7 +504,7 @@ object CampaignInput extends Logging {
 
     }
 
-    val timestamp = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS))
+    val timestamp = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS, todayDate))
     val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
     val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
 
@@ -519,7 +519,7 @@ object CampaignInput extends Logging {
    * @param ndays
    * @return
    */
-  def loadNDaysShortlistData(fullShortlistData: DataFrame, ndays: Int): DataFrame = {
+  def loadNDaysShortlistData(fullShortlistData: DataFrame, ndays: Int, todayDate: String): DataFrame = {
 
     if (fullShortlistData == null) {
 
@@ -537,8 +537,8 @@ object CampaignInput extends Logging {
 
     }
 
-    val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS)
-    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS)
+    val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS, todayDate)
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS, todayDate)
 
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
     val endTimestamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
