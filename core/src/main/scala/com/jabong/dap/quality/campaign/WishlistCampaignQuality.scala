@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
-import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -67,10 +67,13 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
     val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.WISH_LIST)
 
-    val shortlistYesterdayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 1)
+    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS)
+
+    val shortlistYesterdayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 1, todayDate)
+
     val lastDayCustomerShortlistData = wishListCustomerSelector.customerSelection(shortlistYesterdayData)
 
-    val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30)
+    val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30, todayDate)
     val last30DaysCustomerShortlistData = wishListCustomerSelector.customerSelection(shortlistLast30DayData)
 
     val wishlistFollowupCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, date)

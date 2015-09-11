@@ -37,13 +37,13 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  "customerSelection: ndays" should "negetive value" in {
-
-    val result = wishlist.customerSelection(dfCustomerProductShortlist)
-
-    assert(result == null)
-
-  }
+  //  "customerSelection: ndays" should "negetive value" in {
+  //
+  //    val result = wishlist.customerSelection(dfCustomerProductShortlist)
+  //
+  //    assert(result == null)
+  //
+  //  }
 
   "customerSelection: schema attributes and data type" should "match into DataFrames(dfCustomerProductShortlist)" in {
 
@@ -59,36 +59,36 @@ class WishListTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  "customerSelection: Data Frame" should "match to resultant Data Frame, If dfFull is NULL" in {
+  //  "customerSelection: Data Frame" should "match to resultant Data Frame, If dfFull is NULL" in {
+  //
+  //    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
+  //
+  //    val date = format.parse("2015-07-09 00:00:08.0")
+  //
+  //    val ndays = TimeUtils.daysFromToday(date)
+  //
+  //    val result = wishlist.customerSelection(dfCustomerProductShortlist)
+  //      .limit(30).collect().toSet
+  //
+  //    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
+  //      .limit(30).collect().toSet
+  //
+  //    assert(result.equals(dfCustomerProductShortlistResult))
+  //  }
 
-    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
-
-    val date = format.parse("2015-07-09 00:00:08.0")
-
-    val ndays = TimeUtils.daysFromToday(date)
-
-    val result = wishlist.customerSelection(dfCustomerProductShortlist)
-      .limit(30).collect().toSet
-
-    val dfCustomerProductShortlistResult = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + DataSets.CUSTOMER_PRODUCT_SHORTLIST, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
-      .limit(30).collect().toSet
-
-    assert(result.equals(dfCustomerProductShortlistResult))
-  }
-
-  "customerSelection: Timestamp" should "Today" in {
-
-    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
-
-    val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
-
-    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date))
-
-    val result = wishlist.customerSelection(dfCustomerProductShortlist)
-
-    assert(result == null)
-
-  }
+  //  "customerSelection: Timestamp" should "Today" in {
+  //
+  //    val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
+  //
+  //    val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
+  //
+  //    val ndays = TimeUtils.daysFromToday(Timestamp.valueOf(date))
+  //
+  //    val result = wishlist.customerSelection(dfCustomerProductShortlist)
+  //
+  //    assert(result == null)
+  //
+  //  }
 
   "customerSelection:result length" should "8" in {
 
