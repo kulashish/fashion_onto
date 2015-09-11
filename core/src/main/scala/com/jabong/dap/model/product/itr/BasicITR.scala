@@ -52,8 +52,7 @@ object BasicITR extends Logging {
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
       SQL.LEFT_OUTER
-    ).
-      na.fill(Map(
+    ).na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,
         ITR.MARGIN -> 0.00,
         ITR.SPECIAL_PRICE -> 0.00,
@@ -62,6 +61,8 @@ object BasicITR extends Logging {
       ))
 
     itr.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
+
+    logger.info("Successfully written to path: " + getPath(false, incrDate))
 
     itr.
       groupBy(ITR.CONFIG_SKU).
@@ -79,6 +80,7 @@ object BasicITR extends Logging {
         sum(ITR.QUANTITY) as ITR.QUANTITY
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
+    logger.info("Successfully written to path: " + getPath(true, incrDate))
   }
 
   /**
@@ -87,9 +89,9 @@ object BasicITR extends Logging {
    */
   def getPath(skuLevel: Boolean, incrDate: String): String = {
     if (skuLevel) {
-      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, incrDate)
     } else {
-      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, incrDate)
     }
 
   }
