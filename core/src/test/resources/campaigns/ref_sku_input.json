@@ -1,7 +1,7 @@
-{"fk_customer":8552648,"skuSimple":"SO596WA65JLIINDFAS-1578394","specialPrice":1095.00}
-{"fk_customer":8552648,"skuSimple":"GE160BG56HMHINDFAS-2211538","specialPrice":2095.00}
-{"fk_customer":16509341,"skuSimple":"IM794WA05ZGKINDFAS-4434414","specialPrice":500.00}
-{"fk_customer":16509341,"skuSimple":"VA613SH24VHFINDFAS-3716539","specialPrice":200.00}
-{"fk_customer":5242607,"skuSimple":"VA613SH24VHFINDFAS-3716539","specialPrice":200.00}
-{"fk_customer":5242607,"skuSimple":"VA613SH24VHFINDFAS-3716539","specialPrice":200.00}
-{"fk_customer":5242607,"skuSimple":"FA903WA44JRZINDFAS-2926847","specialPrice":100.00}
+{"fk_customer":8552648,"skuSimple":"SO596WA65JLIINDFAS-1578394","specialPrice":1095.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"}
+{"fk_customer":8552648,"skuSimple":"GE160BG56HMHINDFAS-2211538","specialPrice":2095.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"}
+{"fk_customer":16509341,"skuSimple":"IM794WA05ZGKINDFAS-4434414","specialPrice":500.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"}
+{"fk_customer":16509341,"skuSimple":"VA613SH24VHFINDFAS-3716539","specialPrice":200.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"}
+{"fk_customer":5242607,"skuSimple":"VA613SH24VHFINDFAS-3716539","specialPrice":200.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"}
+{"fk_customer":5242607,"skuSimple":"VA613SH24VHFINDFAS-3716539","specialPrice":200.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"}
+{"fk_customer":5242607,"skuSimple":"FA903WA44JRZINDFAS-2926847","specialPrice":100.00,"brand":"adidas","brick":"test","mvp":1,"gender":"MEN"

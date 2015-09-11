@@ -42,6 +42,12 @@ object CampaignUtils extends Logging {
 
   }
 
+  /**
+   *
+   * @param refSkuData
+   * @param NumberSku
+   * @return
+   */
   def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     import sqlContext.implicits._
@@ -128,6 +134,12 @@ object CampaignUtils extends Logging {
 
   }
 
+  /**
+   * Per customer generate List of reference skus
+   * @param refSkuData
+   * @param NumberSku
+   * @return
+   */
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     //    import sqlContext.implicits._
@@ -142,21 +154,34 @@ object CampaignUtils extends Logging {
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(CustomerVariables.FK_CUSTOMER,
         ProductVariables.SKU_SIMPLE,
-        ProductVariables.SPECIAL_PRICE)
+        ProductVariables.SPECIAL_PRICE,
+        ProductVariables.BRICK,
+        ProductVariables.BRAND,
+        ProductVariables.MVP,
+        ProductVariables.GENDER)
 
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
+    val customerSkuMap = customerData.map(t => (t(t.fieldIndex(CustomerVariables.FK_CUSTOMER)), ((t(t.fieldIndex(ProductVariables.SPECIAL_PRICE))).asInstanceOf[BigDecimal].doubleValue()
+      , t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString),checkString))
     val customerGroup = customerSkuMap.groupByKey().
-      map{ case (key, value) => (key.toString, value.toList.distinct.sortBy(-_._1).take(NumberSku)) }
+      map{ case (key, value) => (key.toString, genListSkus(value.toList))}
+      //.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
 
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
     val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_LIST)
 
     grouped
+  }
+
+  def checkNullString(): Unit ={
+    
+  }
+  def genListSkus(refSKusList :List): List ={
+
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
