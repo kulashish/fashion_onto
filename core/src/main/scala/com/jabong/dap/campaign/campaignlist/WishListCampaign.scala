@@ -8,7 +8,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by rahul for com.jabong.dap.campaign.campaignlist on 27/7/15.
  */
-object WishListCampaign {
+class WishListCampaign {
 
   def runCampaign(shortlistYesterdayData: DataFrame,
                   shortlistLast30DayData: DataFrame,

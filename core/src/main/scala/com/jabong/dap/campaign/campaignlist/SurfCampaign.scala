@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 28/7/15.
  */
-object SurfCampaign extends Logging {
+class SurfCampaign extends Logging {
 
   def runCampaign(): Unit = {
 

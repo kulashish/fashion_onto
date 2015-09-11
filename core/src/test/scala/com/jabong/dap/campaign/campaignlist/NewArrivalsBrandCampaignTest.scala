@@ -26,7 +26,8 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
   feature("Generate New Arrivals Brand"){
     scenario("Yesterday New Arrivals Brand"){
       Given("salesCart30Days, recommendationsData, yesterdayItrData")
-      NewArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData)
+      val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
+      newArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData)
     }
   }
 }

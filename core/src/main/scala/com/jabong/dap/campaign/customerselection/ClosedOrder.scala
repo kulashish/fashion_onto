@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderItemVariables, SalesOrderVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -9,7 +10,7 @@ import org.apache.spark.sql.functions._
 /**
  * Created by raghu on 11/9/15.
  */
-class SalesOrder extends LiveCustomerSelector with Logging {
+class ClosedOrder extends LiveCustomerSelector with Logging {
 
   override def customerSelection(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame): DataFrame = {
 
@@ -21,7 +22,7 @@ class SalesOrder extends LiveCustomerSelector with Logging {
 
     }
 
-    val filterdSalesOrderItem = yesterdaySalesOrderItemData.filter(yesterdaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) === 6)
+    val filterdSalesOrderItem = yesterdaySalesOrderItemData.filter(yesterdaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) === OrderStatus.CLOSED_ORDER)
 
     val dfJoin = last30DaySalesOrderData.join(filterdSalesOrderItem, last30DaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER) === filterdSalesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(col(SalesOrderVariables.FK_CUSTOMER),

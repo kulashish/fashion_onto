@@ -12,5 +12,5 @@ object CustomerSelection {
   val YESTERDAY_SESSION_DISTINCT = "YesterdaySessionDistinct"
   val LAST_THIRTY_DAY_SESSION = "LastThirtyDaySession"
   val SALES_CART = "SalesCart"
-  val SALES_ORDER = "SalesOrder"
+  val CLOSED_ORDER = "ClosedOrder"
 }

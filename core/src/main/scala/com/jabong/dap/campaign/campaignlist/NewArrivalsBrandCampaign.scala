@@ -8,7 +8,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 7/9/15.
  */
-object NewArrivalsBrandCampaign {
+class NewArrivalsBrandCampaign {
   def runCampaign(salesCart30Days: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
 
     val newArivalsBrandCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)

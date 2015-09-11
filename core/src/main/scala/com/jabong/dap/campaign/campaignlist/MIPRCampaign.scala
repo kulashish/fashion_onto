@@ -7,12 +7,12 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 11/9/15.
  */
-object MIPRCampaign {
+class MIPRCampaign {
 
   def runCampaign(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
 
     val salesOrderCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
-      .getCustomerSelector(CustomerSelection.SALES_ORDER)
+      .getCustomerSelector(CustomerSelection.CLOSED_ORDER)
 
     val dfCustomerSelection = salesOrderCustomerSelector.customerSelection(last30DaySalesOrderData, yesterdaySalesOrderItemData)
 
