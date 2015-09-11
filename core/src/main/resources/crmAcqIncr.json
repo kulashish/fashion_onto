@@ -1,0 +1,13 @@
+{
+  "acquisition": [
+    {
+      "source": "crm",
+      "tableName": "CRM_tblProductAttributeMaster",
+      "primaryKey": "SKU",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "[Last Modification Date Time]"
+    }
+  ]
+}

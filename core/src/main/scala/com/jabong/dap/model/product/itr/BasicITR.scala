@@ -5,8 +5,8 @@ import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
-import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -90,8 +90,10 @@ object BasicITR extends Logging {
   def getPath(skuLevel: Boolean, incrDate: String): String = {
     if (skuLevel) {
       return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, incrDate)
+      return DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, incrDate)
     } else {
       return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, incrDate)
+      return DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, incrDate)
     }
 
   }
