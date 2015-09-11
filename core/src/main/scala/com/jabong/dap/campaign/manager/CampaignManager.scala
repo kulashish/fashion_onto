@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
@@ -149,8 +149,49 @@ object CampaignManager extends Serializable with Logging {
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
   def startWishlistCampaigns(campaignsConfig: String) = {
+
     CampaignManager.initCampaignsConfig(campaignsConfig)
-    WishListCampaign.runCampaign()
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+
+    val fullShortlistData = CampaignInput.loadFullShortlistData()
+
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+
+    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
+    val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
+
+    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS)
+
+    val shortlistYesterdayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 1, todayDate)
+
+    val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30, todayDate)
+    val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
+    val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
+
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+
+    // call iod campaign
+    val itrSku30DayData = CampaignInput.load30DayItrSkuData()
+
+    WishListCampaign.runCampaign(shortlistYesterdayData,
+      shortlistLast30DayData,
+      itrSkuYesterdayData,
+      itrSkuSimpleYesterdayData,
+      yesterdaySalesOrderData,
+      yesterdaySalesOrderItemData,
+      past30DayCampaignMergedData,
+      last30DaySalesOrderData,
+      last30DaySalesOrderItemData,
+      itrSku30DayData)
+
+    //Start: Shortlist Reminder Campaign
+    val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
+    val shortlist3rdDayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 3, todayDate)
+
+    ShortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
