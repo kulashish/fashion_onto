@@ -144,6 +144,10 @@ object CampaignManager extends Serializable with Logging {
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
     acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+
+    //Start: Shortlist Reminder email Campaign
+    val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
+    NewArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
   }
 
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
@@ -187,11 +191,14 @@ object CampaignManager extends Serializable with Logging {
       last30DaySalesOrderItemData,
       itrSku30DayData)
 
-    //Start: Shortlist Reminder Campaign
+    //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
     val shortlist3rdDayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 3, todayDate)
 
     ShortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
+
+    //Start: MIPR email Campaign
+    MIPRCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {

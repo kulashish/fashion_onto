@@ -9,12 +9,12 @@ import org.apache.spark.sql.DataFrame
  */
 object MIPRCampaign {
 
-  def runCampaign(salesOrder30DayData: DataFrame, salesOrderItemYesterdayData: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
 
     val salesOrderCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.SALES_ORDER)
 
-    val dfCustomerSelection = salesOrderCustomerSelector.customerSelection(salesOrder30DayData, salesOrderItemYesterdayData)
+    val dfCustomerSelection = salesOrderCustomerSelector.customerSelection(last30DaySalesOrderData, yesterdaySalesOrderItemData)
 
     //TODO: Fix recommendation Data
 
