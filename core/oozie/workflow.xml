@@ -1,0 +1,39 @@
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='dap-wf'>
+    <start to='bobAcqFull1' />
+
+    <action name='bobAcqFull1'>
+        <java>
+            <job-tracker>http://dataplatform-master.jabong.com:8050</job-tracker>
+            <name-node>hdfs://dataplatform-master.jabong.com:8020</name-node>
+            <configuration>
+                <property>
+                    <name>oozie.mapred.child.env</name>
+                    <value>YARN_CONF_DIR=/etc/hadoop/conf</value>
+                </property>
+            </configuration>
+            <main-class>com.jabong.dap.init.InitLauncher</main-class>
+            <arg>--master</arg>
+            <arg>yarn-cluster</arg>
+            <arg>--appResource</arg>
+            <arg>hdfs://dataplatform-master.jabong.com:8020/apps/alchemy/workflows/lib/Alchemy-assembly.jar</arg>
+            <arg>--mainClass</arg>
+            <arg>com.jabong.dap.init.Init</arg>
+            <arg>--component</arg>
+            <arg>acquisition</arg>
+            <arg>--config</arg>
+            <arg>hdfs://dataplatform-master.jabong.com:8020/apps/alchemy/conf/config.json</arg>
+            <arg>--tablesJson</arg>
+            <arg>hdfs://dataplatform-master.jabong.com:8020/user/jabong/bobAcqFull1_1.json</arg>
+            <arg>--verbose</arg>
+            <arg>true</arg>
+            <capture-output/>
+        </java>
+        <ok to="end" />
+        <error to="fail" />
+    </action>
+    
+    <kill name="fail">
+        <message>Something went wrong: ${wf:errorCode('bobAcqFull1')}</message>
+    </kill>
+    <end name='end' />
+</workflow-app>
