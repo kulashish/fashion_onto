@@ -23,4 +23,5 @@ object Recommendation {
   val BRAND_MVP_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP)
   val ORDER_ITEM_DAYS = 30
 
+  val NUM_REC_SKU_REF_SKU = 8
 }

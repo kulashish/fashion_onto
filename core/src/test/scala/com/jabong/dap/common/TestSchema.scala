@@ -165,13 +165,27 @@ object TestSchema {
   ))
 
   val referenceSku = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(ProductVariables.BRICK, StringType, true),
     StructField(ProductVariables.MVP, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
-    StructField(CampaignMergedFields.REF_SKU1, StringType, true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, LongType, true)
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
   ))
+
+  val finalReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.BRICK, StringType, true),
+      StructField(ProductVariables.MVP, StringType, true),StructField(CampaignMergedFields.REF_SKU, StringType, true),StructField(ProductVariables.GENDER, StringType, true)))), false)))
+
+  val genRecInput =  StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU, StringType, false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.REC_SKUS,ArrayType(StringType), false),
+    StructField(TestConstants.TEST_CASE_FILTER, LongType, true)))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
 

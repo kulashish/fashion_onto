@@ -340,13 +340,13 @@ object Schema {
     StructField(ProductVariables.BRICK, StringType, false),
     StructField(ProductVariables.MVP, StringType, false),
     StructField(ProductVariables.GENDER, StringType, false),
-    StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
+    StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
 
   val brandMvpRecommendationOutput = StructType(Array(
     StructField(ProductVariables.BRAND, StringType, false),
     StructField(ProductVariables.MVP, StringType, false),
     StructField(ProductVariables.GENDER, StringType, false),
-    StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
+    StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
 }
