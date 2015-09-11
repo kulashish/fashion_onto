@@ -64,7 +64,7 @@ object ContactListMobile extends Logging {
    */
   def start(params: ParamInfo) = {
 
-    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val paths = OptionUtils.getOptValue(params.path)
 

@@ -18,7 +18,7 @@ object CustPreference {
 
   def start(vars: ParamInfo) = {
 
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
 
     val (nls, custPref) = readDf(incrDate)

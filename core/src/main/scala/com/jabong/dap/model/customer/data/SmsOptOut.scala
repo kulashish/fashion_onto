@@ -19,14 +19,12 @@ object SmsOptOut {
 
   def start(params: ParamInfo) = {
     println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
-    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
     var filename = "53699_SMS_OPT_OUT_" + TimeUtils.getTodayDate("YYYYMMDD") + "*"
 
-    //TODO fill filename
-
-    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
     if ( null == path && null == OptionUtils.getOptValue(params.fullDate)) {
       println("First full csv path and prev full date both cannot be empty")

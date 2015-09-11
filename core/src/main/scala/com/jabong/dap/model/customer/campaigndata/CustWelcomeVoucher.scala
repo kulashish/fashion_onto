@@ -20,7 +20,7 @@ object CustWelcomeVoucher extends Logging {
 
   def start(vars: ParamInfo) = {
 
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
 
     val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate)
@@ -50,7 +50,7 @@ object CustWelcomeVoucher extends Logging {
 
   def readDf(incrDate: String): (DataFrame, DataFrame, DataFrame) = {
 
-    val prevDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val prevDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val dfSalesRuleIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
 
