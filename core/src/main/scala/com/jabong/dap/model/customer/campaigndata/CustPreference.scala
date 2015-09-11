@@ -20,8 +20,10 @@ object CustPreference {
 
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (nls, custPref) = readDf(incrDate)
+
+    val (nls, custPref) = readDf(incrDate, prevDate)
 
     val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
 
@@ -42,9 +44,7 @@ object CustPreference {
 
   }
 
-  def readDf(incrDate: String): (DataFrame, DataFrame) = {
-
-    val prevDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame) = {
 
     val dfNls = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
 

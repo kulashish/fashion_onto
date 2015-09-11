@@ -51,8 +51,8 @@ object SmsOptOut {
     else {
       prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
     }
-    if(null == incr){
-      var savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
+    if(null == incr || incr.count().equals(0)){
+      var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
 
       DataWriter.writeParquet(prevFull, savePath, saveMode)
 
@@ -60,7 +60,7 @@ object SmsOptOut {
     }
     val smsOptOutFull = mergeData(prevFull, incr)
 
-    var savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
 
     DataWriter.writeParquet(smsOptOutFull, savePath, saveMode)
 
