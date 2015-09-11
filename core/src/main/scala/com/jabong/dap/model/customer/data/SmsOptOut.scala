@@ -43,6 +43,7 @@ object SmsOptOut {
    */
   def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, fullcsv: String) {
     var incr: DataFrame = null
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
     incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ";")
     var prevFull: DataFrame = null
     if (null == fullcsv) {
@@ -52,16 +53,10 @@ object SmsOptOut {
       prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
     }
     if(null == incr || incr.count().equals(0)){
-      var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
-
       DataWriter.writeParquet(prevFull, savePath, saveMode)
-
       return
     }
     val smsOptOutFull = mergeData(prevFull, incr)
-
-    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
-
     DataWriter.writeParquet(smsOptOutFull, savePath, saveMode)
 
   }

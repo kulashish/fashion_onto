@@ -29,7 +29,7 @@ object CustWelcomeVoucher extends Logging {
 
     val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesprevFull)
 
-    val savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, incrDate)
+    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, incrDate)
 
     //TODO add UID
     DataWriter.writeParquet(welCodes, savePath, saveMode)

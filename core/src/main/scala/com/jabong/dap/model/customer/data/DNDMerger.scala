@@ -43,6 +43,7 @@ object DNDMerger {
    */
   def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, fullcsv: String) {
     var incr: DataFrame = null
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
     incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ";")
     var prevFull: DataFrame = null
     if (null == fullcsv) {
@@ -52,16 +53,10 @@ object DNDMerger {
       prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
     }
     if(null == incr || incr.count().equals(0)){
-      var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
-
       DataWriter.writeParquet(prevFull, savePath, saveMode)
-
       return
     }
     val dndFull = mergeDNDData(prevFull, incr)
-
-    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL, curDate)
-
     DataWriter.writeParquet(dndFull, savePath, saveMode)
 
   }
@@ -69,7 +64,6 @@ object DNDMerger {
   def mergeDNDData(full: DataFrame, newdf: DataFrame): DataFrame = {
     
     val filtered = newdf.filter(newdf(DNDVariables.AGGREGATOR_STATUS_CODE) === "15")
-
     val joined = full.join(filtered, full(DNDVariables.MOBILE_NUMBER) === filtered(DNDVariables.MOBILE_NUMBER), SQL.FULL_OUTER)
       .select(coalesce(full(DNDVariables.MOBILE_NUMBER), filtered(DNDVariables.MOBILE_NUMBER)) as DNDVariables.MOBILE_NUMBER,
         coalesce(full(DNDVariables.PROCESSED_DATE), filtered(DNDVariables.EVENT_CAPTURED_DT)) as DNDVariables.PROCESSED_DATE,

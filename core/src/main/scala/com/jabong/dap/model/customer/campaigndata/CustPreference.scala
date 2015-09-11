@@ -27,7 +27,7 @@ object CustPreference {
 
     val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
 
-    val savePath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate)
+    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate)
 
     //TODO change email with UID
     DataWriter.writeParquet(custPrefFull, savePath, saveMode)
