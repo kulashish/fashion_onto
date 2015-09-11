@@ -19,6 +19,7 @@ package:
 	cp scripts/pricing_sku_data.sh $(BASE)/bin/
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/
 	cp scripts/ad4push_device_merger.pl $(BASE)/bin/
+	cp scripts/responsys.pl $(BASE)/bin/
 	mkdir -p $(BASE)/bin/clickstream
 	cp scripts/clickstream/* $(BASE)/bin/clickstream/
 	tar -zcvf $(PKGNAME) $(BASE)
