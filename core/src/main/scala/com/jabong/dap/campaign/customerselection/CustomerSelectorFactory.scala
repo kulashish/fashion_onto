@@ -44,6 +44,9 @@ class CustomerSelectorFactory extends CampaignFactory {
     if (customerSelectionType.equalsIgnoreCase(CustomerSelection.SALES_CART)) {
       return new SalesCart()
     }
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.SALES_ORDER)) {
+      return new SalesOrder()
+    }
 
     return null
   }
