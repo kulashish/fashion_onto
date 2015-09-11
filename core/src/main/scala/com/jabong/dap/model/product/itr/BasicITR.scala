@@ -89,10 +89,8 @@ object BasicITR extends Logging {
    */
   def getPath(skuLevel: Boolean, incrDate: String): String = {
     if (skuLevel) {
-      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, incrDate)
       return DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, incrDate)
     } else {
-      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, incrDate)
       return DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, incrDate)
     }
 
