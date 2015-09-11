@@ -65,4 +65,5 @@ object CampaignCommon {
     "surf3" -> 58
   )
 
+  val COUNT_NEW_ARRIVALS = 4
 }
