@@ -33,7 +33,6 @@ class LiveCommonRecommender extends Recommender with Logging {
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
     refSkuExploded.printSchema()
-    println("OUTTESTDATA:-");
     val completeRefSku = refSkuExploded.select(
       refSkuExploded(CustomerVariables.FK_CUSTOMER),
       refSkuExploded(CampaignMergedFields.REF_SKU1),
@@ -42,6 +41,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
+    println("OUTTESTDATA:-"+completeRefSku.show(10));
 
     val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
       && completeRefSku(ProductVariables.MVP) === completeRefSku(ProductVariables.MVP)
@@ -52,7 +52,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
     println("TESTDATA"+recommendationJoined.show(10))
-    val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
+    val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
     println("DATATEST"+recommendationGrouped.take(5))
     val sqlContext = Spark.getSqlContext()
