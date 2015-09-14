@@ -137,4 +137,9 @@ object DataSets {
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
 
+  //Clickstream Data Quality
+
+  val CLICKSTREAM_DATA_QUALITY = "clickstreamDataQualityCheck"
+
+
 }
