@@ -33,7 +33,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
     refSkuExploded.printSchema()
-
+    println("OUTTESTDATA:-");
     val completeRefSku = refSkuExploded.select(
       refSkuExploded(CustomerVariables.FK_CUSTOMER),
       refSkuExploded(CampaignMergedFields.REF_SKU1),
@@ -51,7 +51,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
-    recommendationJoined.show(10)
+    println("TESTDATA"+recommendationJoined.show(10))
     val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
     println("DATATEST"+recommendationGrouped.take(5))
@@ -75,6 +75,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(refSku != null, "refSkus cannot be null")
     require(recommendation != null, "recommendation cannot be null")
     val y: List[String] = null
+    println("refSkus:-"+refSku)
     val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
     return outputSkus
   }
