@@ -149,6 +149,11 @@ object CampaignManager extends Serializable with Logging {
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
     acartIOD.runCampaign(past30DayCampaignMergedData, last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData)
+
+    //Start: Shortlist Reminder email Campaign
+    val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
+    val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
+    newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
   }
 
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
@@ -181,7 +186,8 @@ object CampaignManager extends Serializable with Logging {
     // call iod campaign
     val itrSku30DayData = CampaignInput.load30DayItrSkuData()
 
-    WishListCampaign.runCampaign(shortlistYesterdayData,
+    val wishListCampaign = new WishListCampaign()
+    wishListCampaign.runCampaign(shortlistYesterdayData,
       shortlistLast30DayData,
       itrSkuYesterdayData,
       itrSkuSimpleYesterdayData,
@@ -192,16 +198,22 @@ object CampaignManager extends Serializable with Logging {
       last30DaySalesOrderItemData,
       itrSku30DayData)
 
-    //Start: Shortlist Reminder Campaign
+    //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
     val shortlist3rdDayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 3, todayDate)
 
-    ShortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
+    val shortlistReminderCampaign = new ShortlistReminderCampaign()
+    shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
+
+    //Start: MIPR email Campaign
+    val miprCampaign = new MIPRCampaign()
+    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
-    SurfCampaign.runCampaign()
+    val surfCampaign = new SurfCampaign()
+    surfCampaign.runCampaign()
 
   }
 

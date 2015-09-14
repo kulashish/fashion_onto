@@ -7,7 +7,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 10/9/15.
  */
-object ShortlistReminderCampaign {
+class ShortlistReminderCampaign {
 
   def runCampaign(shortlist3rdDayData: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
 
