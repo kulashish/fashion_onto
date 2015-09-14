@@ -169,7 +169,6 @@ object CampaignUtils extends Logging {
       map{ case (key, data) => (key.toString, genListSkus(data.toList, NumberSku)) }.map(x => (x._1, x._2(0)._2, x._2))
     //.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
-    customerGroup.collect().foreach(println)
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
     val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.REF_SKUS)
 

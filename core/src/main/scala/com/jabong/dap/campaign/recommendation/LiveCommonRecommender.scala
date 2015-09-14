@@ -24,11 +24,15 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
 
+    refSkus.printSchema()
+
     val refSkuExploded = refSkus.select(
       refSkus(CustomerVariables.FK_CUSTOMER),
       refSkus(CampaignMergedFields.REF_SKU1),
       refSkus(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
+
+    refSkuExploded.printSchema()
 
     val completeRefSku = refSkuExploded.select(
       refSkuExploded(CustomerVariables.FK_CUSTOMER),
@@ -48,7 +52,6 @@ class LiveCommonRecommender extends Recommender with Logging {
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
 
-    println("JSONVALUE" + recommendationJoined.toJSON.collect().foreach(println))
     val recommendationGrouped = recommendationJoined.map(row => (row(0), row)).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
 
