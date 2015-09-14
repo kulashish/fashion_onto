@@ -639,7 +639,8 @@ object CampaignUtils extends Logging {
 
     val skuFilterData = skuFilter.filter(ProductVariables.SKU_SIMPLE + " is not null and " + CustomerVariables.FK_CUSTOMER + " is not null ")
 
-    val yesterdayItrData = yesterdayItr.withColumnRenamed(ProductVariables.SKU_SIMPLE, "ITR_" + ProductVariables.SKU_SIMPLE)
+    val yesterdayItrData = yesterdayItr.withColumnRenamed(ProductVariables.SKU_SIMPLE, "ITR_" + ProductVariables.SKU_SIMPLE).
+      withColumnRenamed(ProductVariables.SPECIAL_PRICE, "ITR_" + ProductVariables.SPECIAL_PRICE)
 
     val dfJoin = skuFilterData.join(
       yesterdayItrData,
@@ -650,7 +651,7 @@ object CampaignUtils extends Logging {
     val dfResult = dfJoin.select(
       col(CustomerVariables.FK_CUSTOMER),
       col(ProductVariables.SKU_SIMPLE),
-      col(ProductVariables.SPECIAL_PRICE),
+      col("ITR_"+ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
