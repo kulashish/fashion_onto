@@ -26,10 +26,9 @@ class ClosedOrderTest extends FlatSpec with SharedSparkContext {
     assert(customerSelected == null)
   }
 
-  "salesCartData DataFrame " should "return 2" in {
+  "salesCartData DataFrame " should "return 3" in {
     val customerSelected = closedOrder.customerSelection(last30DaySalesOrderData, yesterdaySalesOrderItemData)
-    println("count:" + customerSelected.count())
-    assert(customerSelected.count() == 2)
+    assert(customerSelected.count() == 3)
   }
 
 }

@@ -14,6 +14,7 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
 
   val MAX_STATUS = "max_status"
   val MIN_STATUS = "min_status"
+  val CLOSED = "_closed"
 
   override def customerSelection(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame): DataFrame = {
 
@@ -24,21 +25,27 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
       return null
 
     }
+    val dfClosedOrder = yesterdaySalesOrderItemData.filter(yesterdaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) === OrderStatus.CLOSED_ORDER)
+      .select(SalesOrderItemVariables.FK_SALES_ORDER, SalesOrderItemVariables.SKU)
 
-    val groupedSalesOrderItem = yesterdaySalesOrderItemData.groupBy(SalesOrderItemVariables.FK_SALES_ORDER).agg(first(SalesOrderItemVariables.SKU) as SalesOrderItemVariables.SKU,
-      max(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MAX_STATUS,
+    val groupedSalesOrderItem = yesterdaySalesOrderItemData.groupBy(SalesOrderItemVariables.FK_SALES_ORDER).agg(max(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MAX_STATUS,
       min(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MIN_STATUS
-    )
-
+    ).select(
+        col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderItemVariables.FK_SALES_ORDER + CLOSED,
+        col(MAX_STATUS),
+        col(MIN_STATUS)
+      )
     val filterdSalesOrderItem = groupedSalesOrderItem.filter(groupedSalesOrderItem(MAX_STATUS) === OrderStatus.CLOSED_ORDER and groupedSalesOrderItem(MIN_STATUS) === OrderStatus.CLOSED_ORDER)
 
-    val dfJoin = last30DaySalesOrderData.join(filterdSalesOrderItem, last30DaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER) === filterdSalesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
+    val dfJoin = dfClosedOrder.join(filterdSalesOrderItem, filterdSalesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER + CLOSED) === dfClosedOrder(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
+
+    val dfResult = last30DaySalesOrderData.join(dfJoin, last30DaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER) === dfJoin(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
         col(SalesOrderItemVariables.SKU)
       )
 
-    return dfJoin
+    return dfResult
   }
 
   override def customerSelection(inData: DataFrame): DataFrame = ???
