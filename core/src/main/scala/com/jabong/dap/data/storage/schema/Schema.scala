@@ -349,4 +349,13 @@ object Schema {
     StructField(ProductVariables.GENDER, StringType, false),
     StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
+
+  val finalReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+      StructField(ProductVariables.BRAND, StringType, true),StructField(ProductVariables.BRICK, StringType, true),StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
+  ))
+
 }
