@@ -125,6 +125,20 @@ object CustomerDeviceMapping extends Logging {
       DataWriter.writeParquet(res, savePath, saveMode)
   }
 
+
+  def getAd4pushId(prevFull: DataFrame, clicStreamIncr: DataFrame): DataFrame={
+    val grouped = clicStreamIncr.groupBy(PageVisitVariables.BROWSER_ID).agg(first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH)
+    var res : DataFrame = null
+    if(null == prevFull){
+      return grouped
+    } else{
+      res = prevFull.unionAll(grouped)
+    }
+    return res
+  }
+
+
+
   /**
    *
    * @param path for the dcf csv file
