@@ -8,7 +8,7 @@ Getopt::Long::Configure qw(gnu_getopt);
 use Data::Dumper;
 use Time::HiRes qw( time );
 use Mail::Sendmail;
- 
+
 my $debug;
 my $target;
 my $component;
@@ -28,7 +28,7 @@ sub run_component {
     system($YARN_CONF_DIR . $command);
     my $status = $?;
     my $end = time();
-    
+
     my $statusStr = "";
     if ($status == -1) {
         $statusStr =  "failed to execute: $!\n";
@@ -53,11 +53,11 @@ sub run_component {
     $msg .= "start: " . localtime($start) . "\n";
     $msg .= "end: " . localtime($end) . "\n";
     $msg .= "Status: " . $statusStr . "\n";
-    
+
     my $subject = $job_status. "run of $component @ ". localtime($start);
     print "$subject\n\n";
     print "$msg\n\n";
-    
+
     send_mail($subject, $msg);
 }
 
@@ -81,7 +81,6 @@ if ($target eq "stage") {
 }
 
 # spark path constants
-my $BASE_PATH = "/opt/alchemy-core/current";
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
