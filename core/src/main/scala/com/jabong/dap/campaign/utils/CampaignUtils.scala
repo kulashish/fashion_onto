@@ -10,9 +10,10 @@ import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 
 /**
@@ -166,11 +167,14 @@ object CampaignUtils extends Logging {
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
     val customerSkuMap = customerData.map(t => ((t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(), t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString, checkNullString(t(t.fieldIndex(ProductVariables.BRAND))), checkNullString(t(t.fieldIndex(ProductVariables.BRICK))), checkNullString(t(t.fieldIndex(ProductVariables.MVP))), checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
     val customerGroup = customerSkuMap.groupByKey().
-      map{ case (key, data) => (key.toString, genListSkus(data.toList, NumberSku)) }.map(x => (x._1, x._2(0)._2, x._2))
+      map{ case (key, data) => (key.toString, genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
     //.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.REF_SKUS)
+//    val grouped = customerGroup.toD
+//      .toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.REF_SKUS)
+
+    val grouped =   sqlContext.createDataFrame(customerGroup ,Schema.finalReferenceSku)
 
     grouped
   }
