@@ -1,0 +1,12 @@
+{
+  "acquisition": [
+    {
+      "source": "crm",
+      "tableName": "CRM_tblProductAttributeMaster",
+      "primaryKey": "SKU",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    }
+  ]
+}

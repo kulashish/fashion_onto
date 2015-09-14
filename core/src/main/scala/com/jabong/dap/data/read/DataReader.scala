@@ -148,4 +148,17 @@ object DataReader extends Logging {
     }
   }
 
+  def getDataFrame4mFullPath(fullPath: String, format: String): DataFrame = {
+    require(fullPath != null, "Path is null")
+
+    logger.info("Reading data from hdfs: " + fullPath + " in " + format + " format")
+    // used dir exists as the path itself contains the filename as well.
+    if (DataVerifier.dataExists(fullPath))
+      Spark.getSqlContext().read.format(format).load(fullPath)
+    else {
+      logger.error("Data not found for " + fullPath)
+      throw new DataNotFound
+    }
+  }
+
 }

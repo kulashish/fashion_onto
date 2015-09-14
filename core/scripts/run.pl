@@ -39,6 +39,11 @@ sub run_component {
     else {
         $statusStr =  sprintf("child exited with value %d\n", $? >> 8);
     }
+    my $job_status = "";
+
+    if($status != 0){
+        $job_status = "[FAILED]"
+    }
 
     my $diff = $end - $start;
 
@@ -49,7 +54,7 @@ sub run_component {
     $msg .= "end: " . localtime($end) . "\n";
     $msg .= "Status: " . $statusStr . "\n";
     
-    my $subject = "run of $component @ ". localtime($start);
+    my $subject = $job_status. "run of $component @ ". localtime($start);
     print "$subject\n\n";
     print "$msg\n\n";
     
@@ -67,7 +72,10 @@ if ($target eq "stage") {
 } elsif ($target eq "prod") {
     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
     $EMAIL_PREFIX = "[PROD]";
-} else {
+} elsif ($target eq "test-prod") {
+     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+     $EMAIL_PREFIX = "[TEST-PROD]";
+}else {
     print "not a valid target\n";
     exit -1;
 }
@@ -88,6 +96,7 @@ if ($component eq "bob") {
     run_component("bob Acquisition for Full tables", $command1);
     my $command2 = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
     run_component("bob Acquisition for Incremental tables", $command2);
+    $AMMUNITION = "--num-executors 10 --executor-memory 9G";
     my $command3 = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component("bob Merge for Incremental tables", $command3);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
@@ -147,7 +156,7 @@ if ($component eq "bob") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
           run_component($component, $command);
 } elsif ($component eq "mobilePushCampaignQuality") {
-     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
+     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
 } elsif ($component eq "dcfFeedGenerate") {
        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGen.json";

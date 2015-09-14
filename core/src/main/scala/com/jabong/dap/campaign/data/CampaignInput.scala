@@ -479,4 +479,72 @@ object CampaignInput extends Logging {
     val recommendations = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RECOMMENDATIONS, recommendationType, DataSets.DAILY_MODE, date)
     recommendations
   }
+
+  /**
+   *
+   * @param fullShortlistData
+   * @param ndays
+   * @return
+   */
+  def loadNthDayShortlistData(fullShortlistData: DataFrame, ndays: Int, todayDate: String): DataFrame = {
+
+    if (fullShortlistData == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
+
+    if (ndays <= 0) {
+
+      logger.error("ndays should not be negative value")
+
+      return null
+
+    }
+
+    val timestamp = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS, todayDate))
+    val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
+    val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
+
+    val nthDayShortlistData = CampaignUtils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+
+    return nthDayShortlistData
+  }
+
+  /**
+   *
+   * @param fullShortlistData
+   * @param ndays
+   * @return
+   */
+  def loadNDaysShortlistData(fullShortlistData: DataFrame, ndays: Int, todayDate: String): DataFrame = {
+
+    if (fullShortlistData == null) {
+
+      logger.error("Data frame should not be null")
+
+      return null
+
+    }
+
+    if (ndays <= 0) {
+
+      logger.error("ndays should not be negative value")
+
+      return null
+
+    }
+
+    val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS, todayDate)
+    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS, todayDate)
+
+    val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
+    val endTimestamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
+
+    val nDaysShortlistData = CampaignUtils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+
+    return nDaysShortlistData
+  }
 }

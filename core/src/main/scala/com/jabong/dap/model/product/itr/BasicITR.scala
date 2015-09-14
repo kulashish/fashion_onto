@@ -7,8 +7,8 @@ import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
-import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -54,8 +54,7 @@ object BasicITR extends Logging {
       bobDF,
       erpDF.col(ITR.JABONG_CODE) === bobDF.col(ITR.BARCODE_EAN),
       SQL.LEFT_OUTER
-    ).
-      na.fill(Map(
+    ).na.fill(Map(
         ITR.SPECIAL_MARGIN -> 0.00,
         ITR.MARGIN -> 0.00,
         ITR.SPECIAL_PRICE -> 0.00,
@@ -141,6 +140,8 @@ object BasicITR extends Logging {
 
     itrDF.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
 
+    logger.info("Successfully written to path: " + getPath(false, incrDate))
+
     itrDF.
       groupBy(ITR.CONFIG_SKU).
       agg(
@@ -159,6 +160,7 @@ object BasicITR extends Logging {
         sum(ITR.QUANTITY) as ITR.QUANTITY
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
+    logger.info("Successfully written to path: " + getPath(true, incrDate))
   }
 
   /**
@@ -167,9 +169,9 @@ object BasicITR extends Logging {
    */
   def getPath(skuLevel: Boolean, incrDate: String): String = {
     if (skuLevel) {
-      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic-sku", DataSets.DAILY_MODE, incrDate)
     } else {
-      return PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT))
+      return DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, incrDate)
     }
 
   }
