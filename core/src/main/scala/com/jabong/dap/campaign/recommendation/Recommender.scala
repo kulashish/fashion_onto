@@ -11,6 +11,6 @@ trait Recommender extends java.io.Serializable {
 
   // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
   // 8 recommendations
-  def generateRecommendation(orderData: DataFrame, recommendations: DataFrame): DataFrame
+  def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame): DataFrame
 
 }

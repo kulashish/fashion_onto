@@ -34,9 +34,9 @@ object CancelReTarget {
         inDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
         inDataFrame(SalesOrderItemVariables.UNIT_PRICE) as ProductVariables.SPECIAL_PRICE)
 
-    val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+   // val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSku
+    return filteredSku
   }
 
 }
