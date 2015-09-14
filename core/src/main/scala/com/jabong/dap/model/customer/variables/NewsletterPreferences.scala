@@ -32,8 +32,10 @@ object NewsletterPreferences extends Logging {
 
   def getNewsletterPref(newsletterSubscription: DataFrame, prevCalculated: DataFrame): (DataFrame, DataFrame) = {
     val incrementalResult = getIncrementalNewsletterPref(newsletterSubscription)
+    if(null == prevCalculated){
+      return (incrementalResult, incrementalResult)
+    }
     val mergedResult = getMergedNewsletterPref(incrementalResult, prevCalculated)
-
     (incrementalResult, mergedResult)
   }
 }
