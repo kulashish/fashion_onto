@@ -187,6 +187,15 @@ object TestSchema {
     StructField(CampaignMergedFields.REC_SKUS,ArrayType(StringType), false),
     StructField(TestConstants.TEST_CASE_FILTER, LongType, true)))
 
+  val refSkuInput =  StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, false),
+    StructField(ProductVariables.SPECIAL_PRICE,DecimalType(10, 2), true),
+    StructField(ProductVariables.MVP,StringType, false),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true)))
+
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
 
   val salesOrderPaybackRedeem = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true)))
