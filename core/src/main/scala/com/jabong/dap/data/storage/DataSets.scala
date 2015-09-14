@@ -129,4 +129,6 @@ object DataSets {
   val DND = "DND"
   val ZONE_CITY = "zone_city"
 
+  val AD4PUSH_ID = "ad4pushId"
+
 }
