@@ -1,0 +1,12 @@
+{
+  "isHistory": true,
+  "params": [
+    {
+      "source": "dndMerger",
+      "path": "/data/input/responsys//full/2015/07/09/24/exportDevices_515_20150709.csv",
+      "incrDate": "2015/09/10",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}
