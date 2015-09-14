@@ -30,7 +30,7 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
       min(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MIN_STATUS
     )
 
-    val filterdSalesOrderItem = groupedSalesOrderItem.filter(groupedSalesOrderItem("max_status") === OrderStatus.CLOSED_ORDER and groupedSalesOrderItem("min_status") === OrderStatus.CLOSED_ORDER)
+    val filterdSalesOrderItem = groupedSalesOrderItem.filter(groupedSalesOrderItem(MAX_STATUS) === OrderStatus.CLOSED_ORDER and groupedSalesOrderItem(MIN_STATUS) === OrderStatus.CLOSED_ORDER)
 
     val dfJoin = last30DaySalesOrderData.join(filterdSalesOrderItem, last30DaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER) === filterdSalesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(col(SalesOrderVariables.FK_CUSTOMER),
