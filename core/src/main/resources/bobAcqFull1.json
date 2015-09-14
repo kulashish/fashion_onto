@@ -71,6 +71,102 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_sizechart",
+      "primaryKey": "id_catalog_sizechart",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_distinct_sizechart",
+      "primaryKey": "id_catalog_distinct_sizechart",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_category_has_sizechart_image",
+      "primaryKey": "id_catalog_category_has_sizechart_image",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_attribute_option_app_men_apm_size",
+      "primaryKey": "id_catalog_attribute_option_app_men_apm_size",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_attribute_option_app_women_apw_size",
+      "primaryKey": "id_catalog_attribute_option_app_women_apw_size",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_attribute_option_app_kids_apk_size",
+      "primaryKey": "id_catalog_attribute_option_app_kids_apk_size",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_attribute_option_shoes_sh_size",
+      "primaryKey": "id_catalog_attribute_option_shoes_sh_size",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple_app_men",
+      "primaryKey": "id_catalog_simple_app_men",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple_app_women",
+      "primaryKey": "id_catalog_simple_app_women",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple_app_kids",
+      "primaryKey": "id_catalog_simple_app_kids",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple_shoes",
+      "primaryKey": "id_catalog_simple_shoes",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_attribute_set",
+      "primaryKey": "id_catalog_attribute_set",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
     }
   ]
 }

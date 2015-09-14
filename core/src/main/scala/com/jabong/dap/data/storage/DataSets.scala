@@ -94,6 +94,8 @@ object DataSets {
   // Data sources
   val BOB = "bob"
   val ERP = "erp"
+  val CRM = "crm"
+  val JDARESOURCE = "jDaReSource"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
   val RESPONSYS = "responsys"
@@ -134,6 +136,12 @@ object DataSets {
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val DND = "DND"
+  val SMS_DELIVERED = "sms_delivered"
+  val SMS_OPT_OUT = "sms_opt_out"
   val ZONE_CITY = "zone_city"
+  val CUST_PREFERENCE = "custPreference"
+  val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"
+  val DND_MERGER = "dndMerger"
+  val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
 
 }

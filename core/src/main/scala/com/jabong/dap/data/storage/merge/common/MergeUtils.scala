@@ -47,7 +47,7 @@ object MergeUtils extends MergeData {
 
     val df1 = joinedDF.filter(newpk + " IS NULL").select(dfBase("*"))
 
-    df1.unionAll(dfIncr).coalesce(numPart)
+    df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)
   }
 
   /**
@@ -81,7 +81,7 @@ object MergeUtils extends MergeData {
 
   def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey1: String, primaryKey2: String): DataFrame = {
 
-    var dfIncrVar = dfIncr
+    var dfIncrVar = dfIncr.dropDuplicates()
 
     dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
 
@@ -91,7 +91,7 @@ object MergeUtils extends MergeData {
     dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
 
     // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
+    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
 
     joinedDF
   }
@@ -105,7 +105,7 @@ object MergeUtils extends MergeData {
    */
   def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
 
-    var dfIncrVar = dfIncr
+    var dfIncrVar = dfIncr.dropDuplicates()
 
     dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
 
@@ -115,7 +115,7 @@ object MergeUtils extends MergeData {
     dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
 
     // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), SQL.FULL_OUTER)
+    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), SQL.FULL_OUTER)
 
     joinedDF
   }
