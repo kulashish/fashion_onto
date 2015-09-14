@@ -94,6 +94,8 @@ object DataSets {
   // Data sources
   val BOB = "bob"
   val ERP = "erp"
+  val CRM = "crm"
+  val JDARESOURCE = "jDaReSource"
   val UNICOMMERCE = "unicommerce"
   val NEXTBEE = "nextbee"
   val RESPONSYS = "responsys"

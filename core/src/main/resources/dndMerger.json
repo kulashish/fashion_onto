@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "dndMerger",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

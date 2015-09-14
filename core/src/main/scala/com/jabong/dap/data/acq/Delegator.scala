@@ -47,7 +47,7 @@ class Delegator extends Serializable with Logging {
         for (table <- AcqImportInfo.importInfo.acquisition) {
           AcqImportInfo.tableInfo = table
           table.source match {
-            case DataSets.ERP | DataSets.BOB | DataSets.UNICOMMERCE => new getHistoricalData().fetchData(table)
+            case DataSets.ERP | DataSets.BOB | DataSets.CRM | DataSets.UNICOMMERCE => new getHistoricalData().fetchData(table)
             case _ => logger.error("Unknown table source.")
           }
         }
@@ -55,7 +55,7 @@ class Delegator extends Serializable with Logging {
         for (table <- AcqImportInfo.importInfo.acquisition) {
           AcqImportInfo.tableInfo = table
           table.source match {
-            case DataSets.ERP | DataSets.BOB | DataSets.UNICOMMERCE => new Fetcher().fetch(table)
+            case DataSets.ERP | DataSets.BOB | DataSets.CRM | DataSets.UNICOMMERCE => new Fetcher().fetch(table)
             case _ => logger.error("Unknown table source.")
           }
         }
