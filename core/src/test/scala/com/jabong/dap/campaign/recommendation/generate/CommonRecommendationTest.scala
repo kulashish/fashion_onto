@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.recommendation.generate
 
 import com.jabong.dap.campaign.recommendation.generator.{ CommonRecommendation, PivotRecommendation }
 import com.jabong.dap.common._
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }

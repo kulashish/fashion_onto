@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.utils
 
 import java.io.File
 
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, SkuSelection}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, SkuSelection }
 import com.jabong.dap.common.constants.variables.{ ItrVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark, TestConstants }
@@ -33,7 +33,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input",TestSchema.refSkuInput)
+    refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input", TestSchema.refSkuInput)
     customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected")
     customerSelectedShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected_shortlist")
     salesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "sales_order_placed")
@@ -62,13 +62,13 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   "Generate reference skus with refernce sku input " should "return max 2 reference skus per customer sorted with price" in {
     val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
     val refSkuValues = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=16509341").select(CampaignMergedFields.REF_SKUS)
-      .collect()(0)(0).asInstanceOf[List[(Double,String,String,String,String,String)]]
+      .collect()(0)(0).asInstanceOf[List[(Double, String, String, String, String, String)]]
     assert(refSkuValues.size == 2)
   }
 
   "Generate reference skus with refernce sku input " should "return max 2 reference skus per customer sorted with price and take care of duplicate skus" in {
     val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 2)
-    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=5242607").select(CampaignMergedFields.REF_SKUS).collect()(0)(0).asInstanceOf[List[(Double,String,String,String,String,String)]]
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=5242607").select(CampaignMergedFields.REF_SKUS).collect()(0)(0).asInstanceOf[List[(Double, String, String, String, String, String)]]
     //val expectedData = Row(200.0, "VA613SH24VHFINDFAS-3716539")
     assert(refSkuFirst.size === 2)
     //  assert(refSkuFirst.head._2 == "VA613SH24VHFINDFAS-3716539")
@@ -76,9 +76,9 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
 
   "Generate reference skus with refernce sku input " should "return max 1 reference skus per customer sorted with price" in {
     val refSkus = CampaignUtils.generateReferenceSkus(refSkuInput, 1)
-    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648").select(CampaignMergedFields.REF_SKUS).collect()(0)(0).asInstanceOf[List[(Double,String,String,String,String,String)]]
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648").select(CampaignMergedFields.REF_SKUS).collect()(0)(0).asInstanceOf[List[(Double, String, String, String, String, String)]]
     val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
-   // assert(refSkuFirst.head === expectedData)
+    // assert(refSkuFirst.head === expectedData)
     assert(refSkuFirst.size == 1)
   }
 

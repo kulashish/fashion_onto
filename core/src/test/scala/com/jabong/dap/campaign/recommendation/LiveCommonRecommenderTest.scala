@@ -1,11 +1,11 @@
 package com.jabong.dap.campaign.recommendation
 
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{TestConstants, SharedSparkContext, Spark, TestSchema}
+import com.jabong.dap.common.{ TestConstants, SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{Row, DataFrame, SQLContext}
+import org.apache.spark.sql.{ Row, DataFrame, SQLContext }
 import org.scalatest.{ Matchers, FlatSpec }
 
 /**
@@ -94,22 +94,20 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
     }
   }
 
-
   "one ref sku per customer and only 3 recommended skus " should "return max 3 rec skus for the same ref sku" in {
     val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 1").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
       .groupByKey()
 
     val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
-    assert(expectedOut._2.size ==3)
+    assert(expectedOut._2.size == 3)
   }
-
 
   "one ref sku per customer  and more than 8" should "return max 8 rec skus for the same ref sku" in {
     val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 3").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
       .groupByKey()
 
     val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
-    assert(expectedOut._2.size ==8)
+    assert(expectedOut._2.size == 8)
   }
 
   "two ref sku per customer  and more than 8 in total" should "return max 8 rec skus and no duplicates for the same ref sku" in {
@@ -117,7 +115,7 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
       .groupByKey()
 
     val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
-    assert(expectedOut._2.size ==8)
+    assert(expectedOut._2.size == 8)
   }
 
 }
