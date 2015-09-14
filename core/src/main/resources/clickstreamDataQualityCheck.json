@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "clickstreamDataQualityCheck",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
