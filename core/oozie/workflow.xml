@@ -18,8 +18,7 @@
             <argument>bobFull</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <env-var>SPARK_HOME=/ext/spark</env-var>
-            <file>scripts/run.pl</file>
+            <file>scripts/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="end"/>
