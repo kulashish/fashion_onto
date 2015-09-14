@@ -225,9 +225,9 @@
 			<param>hivedb=${hivedb}</param>
 			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}</param>
 			<param>-hivevar</param>
-			<param>FieldSeparator='\;'</param>
+			<param>FieldSeparator=${fieldSeparator}</param>
 			<param>-hivevar</param>
-			<param>CollectionSeparator='|'</param>
+			<param>CollectionSeparator=${collectionSeparator}</param>
 		</hive>
 		<ok to='clean_dir' />
 		<error to='mail_on_error' />
@@ -236,7 +236,7 @@
 		<fs>
 			<delete path="${wf:actionData('prepare_variables')['HdfsInputPath']}" />
 		</fs>
-		<ok to='end' />
+		<ok to='mail_on_success' />
 		<error to='mail_on_error' />
 	</action>
 	<action name='mail_on_error'>
@@ -247,6 +247,15 @@
 		</email>
 		<ok to='step_failure' />
 		<error to='step_failure' />
+	</action>
+	<action name='mail_on_success'>
+		<email xmlns="uri:oozie:email-action:0.2">
+			<to>${mailRecepients}</to>
+			<subject> ${env} Workflow for old desktop for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
+			<body></body>
+		</email>
+		<ok to='end' />
+		<error to='end' />
 	</action>
 	<kill name='step_failure'>
 		<message>Script failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
