@@ -164,24 +164,28 @@ object CampaignUtils extends Logging {
 
     // FIXME: need to sort by special price
     // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(t.fieldIndex(CustomerVariables.FK_CUSTOMER)), ((t(t.fieldIndex(ProductVariables.SPECIAL_PRICE))).asInstanceOf[BigDecimal].doubleValue()
-      , t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString),checkString))
+    val customerSkuMap = customerData.map(t => ( (t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue()
+      , t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString,checkNullString(t(t.fieldIndex(ProductVariables.BRAND))),checkNullString(t(t.fieldIndex(ProductVariables.BRICK)))
+      ,checkNullString(t(t.fieldIndex(ProductVariables.MVP))),checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
     val customerGroup = customerSkuMap.groupByKey().
-      map{ case (key, value) => (key.toString, genListSkus(value.toList))}
+      map{ case (key, data) => (key.toString, genListSkus(data.toList,NumberSku))}.map(x => (x._1,x._2(0)._2,x._2))
       //.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
-
+    customerGroup.collect().foreach(println)
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU_LIST)
+    val grouped = customerGroup.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1,CampaignMergedFields.REF_SKUS)
 
     grouped
   }
 
-  def checkNullString(): Unit ={
-    
+  def checkNullString(value:Any): String ={
+    if(value ==null) return null else value.toString
   }
-  def genListSkus(refSKusList :List): List ={
 
+  def genListSkus(refSKusList :scala.collection.immutable.List[(Double,String,String,String,String,String)],numSKus :Int): List[(Double,String,String,String,String,String)] ={
+    require(refSKusList!=null,"refSkusList cannot be null")
+    require(refSKusList.size!=0,"refSkusList cannot be empty")
+    return refSKusList.sortBy(-_._1).distinct.take(numSKus)
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
@@ -431,6 +435,12 @@ object CampaignUtils extends Logging {
     return filteredData
   }
 
+  /**
+   *
+   * @param mailType
+   * @param mailTypePriorityMap
+   * @return
+   */
   def getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]): Int = {
     if (mailType == 0) {
       val errorString = ("Priority doesn't exist for mailType %d", mailType)
@@ -611,12 +621,47 @@ object CampaignUtils extends Logging {
   def createRefSkuAcartUrl(skuSimpleList: scala.collection.immutable.List[(Double, String)]): (String, String) = {
     var acartUrl = CampaignCommon.ACART_BASE_URL
     var i: Int = 0
-    skuSimpleList.sortBy(-_._1)
+    skuSimpleList.sortBy(-_._1).distinct
     for (skuSimple <- skuSimpleList) {
       if (i == 0) acartUrl += skuSimple._2 else acartUrl = acartUrl + "," + skuSimple._2
       i = i + 1;
     }
     return (skuSimpleList(0)._2, acartUrl)
+  }
+
+  /**
+   * Join with Itr
+   * @param skuFilter
+   * @param yesterdayItr
+   * @return
+   */
+  def yesterdayItrJoin(skuFilter:DataFrame,yesterdayItr:DataFrame): DataFrame ={
+    require(skuFilter!=null,"skuFilter data cannot be null")
+    require(yesterdayItr!=null,"yesterdayItrData  cannot be null")
+
+    val skuFilterData = skuFilter.filter(ProductVariables.SKU_SIMPLE + " is not null and " + CustomerVariables.FK_CUSTOMER + " is not null ")
+
+
+    val yesterdayItrData = yesterdayItr.withColumnRenamed(ProductVariables.SKU_SIMPLE, "ITR_" +ProductVariables.SKU_SIMPLE)
+
+
+    val dfJoin = skuFilterData.join(
+      yesterdayItrData,
+      skuFilterData(ProductVariables.SKU_SIMPLE) === yesterdayItrData("ITR_" + ProductVariables.SKU_SIMPLE),
+      SQL.INNER
+    )
+
+    val dfResult = dfJoin.select(
+      col(CustomerVariables.FK_CUSTOMER),
+      col(ProductVariables.SKU_SIMPLE),
+      col(ProductVariables.SPECIAL_PRICE),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
+    )
+
+    dfResult
   }
 }
 
