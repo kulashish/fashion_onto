@@ -12,6 +12,9 @@ import org.apache.spark.sql.functions._
  */
 class ClosedOrder extends LiveCustomerSelector with Logging {
 
+  val MAX_STATUS = "max_status"
+  val MIN_STATUS = "min_status"
+
   override def customerSelection(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame): DataFrame = {
 
     if (last30DaySalesOrderData == null || yesterdaySalesOrderItemData == null) {
@@ -22,7 +25,12 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
 
     }
 
-    val filterdSalesOrderItem = yesterdaySalesOrderItemData.filter(yesterdaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) === OrderStatus.CLOSED_ORDER)
+    val groupedSalesOrderItem = yesterdaySalesOrderItemData.groupBy(SalesOrderItemVariables.FK_SALES_ORDER).agg(first(SalesOrderItemVariables.SKU) as SalesOrderItemVariables.SKU,
+      max(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MAX_STATUS,
+      min(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MIN_STATUS
+    )
+
+    val filterdSalesOrderItem = groupedSalesOrderItem.filter(groupedSalesOrderItem("max_status") === OrderStatus.CLOSED_ORDER and groupedSalesOrderItem("min_status") === OrderStatus.CLOSED_ORDER)
 
     val dfJoin = last30DaySalesOrderData.join(filterdSalesOrderItem, last30DaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER) === filterdSalesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(col(SalesOrderVariables.FK_CUSTOMER),
