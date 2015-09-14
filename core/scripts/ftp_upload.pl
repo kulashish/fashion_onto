@@ -34,11 +34,14 @@ if ($component eq "campaigns") {
     uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
     upload_ad4push_customer_response();
+} elsif ($component eq "ad4push_device_merger") {
+    upload_ad4push_device_merger();
 } elsif ($component eq "dcf_feed") {
     upload_dcf_feed();
 } elsif ($component eq "pricing_sku_data") {
       upload_pricing_sku_data();
 }
+
 
 
 # upload ad4push customer response files
@@ -151,6 +154,27 @@ sub upload_ad4push_customer_response {
 
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
    system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
+
+}
+
+sub upload_ad4push_device_merger {
+    my $base = "/data/export/$date_with_zero/ad4push_devices";
+    print "ad4push devices directory is $base\n";
+    system("mkdir -p $base");
+
+   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/");
+
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/\n";
+
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   system("hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/");
+
+   system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
 
 }
 

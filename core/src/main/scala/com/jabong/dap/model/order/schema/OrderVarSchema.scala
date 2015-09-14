@@ -25,8 +25,8 @@ object OrderVarSchema {
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesAddressVariables.CITY, StringType, true),
     StructField(SalesAddressVariables.MOBILE, StringType, true),
-    StructField(SalesAddressVariables.SOA_FIRST_NAME, StringType, true),
-    StructField(SalesAddressVariables.SOA_LAST_NAME, StringType, true)
+    StructField(SalesAddressVariables.FIRST_NAME, StringType, true),
+    StructField(SalesAddressVariables.LAST_NAME, StringType, true)
   ))
 
   val salesOrderCoupon = StructType(Array(

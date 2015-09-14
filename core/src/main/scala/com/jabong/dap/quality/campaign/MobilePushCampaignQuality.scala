@@ -9,13 +9,13 @@ import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMerged
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{DbConnection, CampaignInfo}
+import com.jabong.dap.data.acq.common.{ DbConnection, CampaignInfo }
 import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 
@@ -76,7 +76,7 @@ object MobilePushCampaignQuality extends Logging {
       DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
       //A column added with a date
-      writeForJDaRe(cachedfCampaignQuality.withColumn("date",lit(TimeUtils.changeDateFormat(dateYesterday,TimeConstants.DATE_FORMAT_FOLDER,TimeConstants.DATE_FORMAT))))
+      writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))))
 
       logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
         + ConfigConstants.WRITE_OUTPUT_PATH + File.separator
@@ -89,9 +89,9 @@ object MobilePushCampaignQuality extends Logging {
 
   }
 
-  def writeForJDaRe(df:DataFrame)={
-    val dbConn=new DbConnection(CampaignCommon.J_DARE_SOURCE)
-    df.write.mode(DataSets.APPEND_SAVEMODE.toLowerCase).jdbc(dbConn.getConnectionString,CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY,dbConn.getConnectionProperties)
+  def writeForJDaRe(df: DataFrame) = {
+    val dbConn = new DbConnection(CampaignCommon.J_DARE_SOURCE)
+    df.write.mode(DataSets.APPEND_SAVEMODE.toLowerCase).jdbc(dbConn.getConnectionString, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dbConn.getConnectionProperties)
   }
 
   def getCampaignQuality(campaignName: String, dateYesterday: String): ListBuffer[Row] = {

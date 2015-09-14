@@ -7,7 +7,11 @@ import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
-import com.jabong.dap.model.customer.ContactListMobile
+import com.jabong.dap.model.customer.campaigndata.ContactListMobile
+import com.jabong.dap.model.customer.campaigndata.CustWelcomeVoucher
+import com.jabong.dap.model.customer.campaigndata.CustPreference
+import com.jabong.dap.model.customer.data.DNDMerger
+import com.jabong.dap.model.customer.data.SmsOptOut
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
@@ -62,6 +66,10 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
+          case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
+          case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
+          case DataSets.DND_MERGER => DNDMerger.start(paramJob)
+          case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
           case _ => logger.error("Unknown source.")
 
         }
