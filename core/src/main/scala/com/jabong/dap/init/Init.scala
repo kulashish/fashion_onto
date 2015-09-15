@@ -128,10 +128,6 @@ object Init {
       case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
       case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.pushCampaignsJson)
 
-      // clickstream use cases
-      case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables(params.paramJson)
-      case "clickstreamSurf3Variable" => SurfVariablesMain.startSurf3Variable(params.paramJson)
-      case "clickstreamSurf3MergeData30" => GetSurfVariables.getSurf3mergedForLast30Days(params.paramJson)
 
       //campaign quality check
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)

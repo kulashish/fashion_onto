@@ -2,7 +2,7 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.io.File
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -10,6 +10,7 @@ import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobConfig}
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.clickstream.utils.GroupData
 import com.jabong.dap.model.clickstream.variables.SurfVariablesMain._
 import com.jabong.dap.model.custorder.ParamJsonValidator
@@ -113,54 +114,26 @@ object GetSurfVariables extends java.io.Serializable with Logging{
 
   }
 
-  def getSurf3mergedForLast30Days(paramJsonPath: String): DataFrame = {
+  def getSurf3mergedForLast30Days(params: ParamInfo): DataFrame = {
 
-    val validated = try {
-      val conf = new Configuration()
-      val fileSystem = FileSystem.get(conf)
-      implicit val formats = net.liftweb.json.DefaultFormats
-      val path = new Path(paramJsonPath)
-      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
-      ParamJobConfig.paramInfo = json.extract[ParamInfo]
-      ParamJsonValidator.validateRequiredValues(ParamJobConfig.paramInfo)
-      true
-    } catch {
-      case e: ParseException =>
-        logger.error("Error while parsing JSON: " + e.getMessage)
-        false
+    println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
+    var tablename = "merge.merge_pagevisit"
+    for (i <- 30 to 1 by -1) {
+      val dateFolder = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+      var dataPath = "/data/clickstream/merge" + File.separator + dateFolder
 
-      case e: IllegalArgumentException =>
-        logger.error("Error while validating JSON: " + e.getMessage)
-        false
+      val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
+      Spark.init(conf)
+      val hiveContext = Spark.getHiveContext()
 
-      case e: Exception =>
-        logger.error("Some unknown error occurred: " + e.getMessage)
-        throw e
-        false
-    }
-      var tablename = "merge.merge_pagevisit"
-      for (i <- 30 to 1 by -1) {
-        // val cal = Calendar.getInstance()
-        // cal.add(Calendar.DATE, -i)
-        // var year = cal.get(Calendar.YEAR)
-        // var day = cal.get(Calendar.DAY_OF_MONTH)
-        // var month = cal.get(Calendar.MONTH)
-        // val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
-        // var dt = dateFormat.format(cal.getTime())
+      val dayBeforeYesterdayDateFolder = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
-        val dateFolder = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
-        var dataPath = "/data/clickstream/merge" + File.separator + dateFolder
+      if (DataVerifier.dataExists(dataPath)) {
 
-        val conf = new SparkConf().setAppName("Clickstream Surf Variables").set("spark.driver.allowMultipleContexts", "true")
-        Spark.init(conf)
-        val hiveContext = Spark.getHiveContext()
-        // val sqlContext = Spark.getSqlContext()
-
-        val dayBeforeYesterdayDateFolder = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT_FOLDER)
-
-        if (DataVerifier.dataExists(dataPath)) {
-
-          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
+        val currentMergedDataPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
+        if (DataWriter.canWrite(saveMode, currentMergedDataPath)) {
           var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
 
           var oldMergedData: DataFrame = null
@@ -176,24 +149,27 @@ object GetSurfVariables extends java.io.Serializable with Logging{
           var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
 
           var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, dateFolder)
-          mergedData.write.parquet(currentMergedDataPath)
 
-        } else {
+          DataWriter.writeParquet(mergedData, currentMergedDataPath, saveMode)
+        }
 
-          val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
+      } else {
+
+        val currentMergedDataPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dateFolder)
+        if (DataWriter.canWrite(saveMode, currentMergedDataPath)) {
           var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData30", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
 
           var oldMergedData: DataFrame = null
           // check if merged data exists
           if (DataVerifier.dataExists(oldMergedDataPath)) {
             oldMergedData = hiveContext.read.load(oldMergedDataPath)
-            oldMergedData.write.parquet(currentMergedDataPath)
+            DataWriter.writeParquet(oldMergedData, currentMergedDataPath, saveMode)
           }
         }
       }
-      return null
-
     }
+    return null
+  }
 
   def uidToDeviceid(hiveContext: HiveContext): DataFrame = {
     val uiddeviceiddf = hiveContext.sql("select distinct case when userid is null then concat('_app_',bid) else userid end as userid,bid as deviceid,domain,max(pagets) as pagets from finalpagevisit where bid is not null and pagets is not null group by userid,bid,domain order by userid,pagets desc")
