@@ -71,7 +71,7 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param recommendation
    * @return
    */
-  def getRecommendedSkus(refSku: Long, recommendation: List[Row]): List[(String)] = {
+  def getRecommendedSkus(refSku: String, recommendation: List[Row]): List[(String)] = {
     require(refSku != null, "refSkus cannot be null")
     require(recommendation != null, "recommendation cannot be null")
     val y: List[String] = null
