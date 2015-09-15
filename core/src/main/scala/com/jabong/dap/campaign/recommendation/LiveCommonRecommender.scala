@@ -65,20 +65,20 @@ class LiveCommonRecommender extends Recommender with Logging {
     return campaignDataWithRecommendations
   }
 
-  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
-  /**
-   *
-   * @param refSku
-   * @param recommendation
-   * @return
-   */
-  def getRecommendedSkus(refSku: String, recommendation: List[(Row)]): List[(Row)] = {
-    require(refSku != null, "refSkus cannot be null")
-    require(recommendation != null, "recommendation cannot be null")
-    println("refSkus:-"+refSku)
-    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
-    return recommendation
-  }
+//  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
+//  /**
+//   *
+//   * @param refSku
+//   * @param recommendation
+//   * @return
+//   */
+//  def getRecommendedSkus(refSku: String, recommendation: List[(Row)]): List[(Row)] = {
+//    require(refSku != null, "refSkus cannot be null")
+//    require(recommendation != null, "recommendation cannot be null")
+//    println("refSkus:-"+refSku)
+//    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
+//    return recommendation
+//  }
 
   def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[String], mutable.MutableList[String], Int) = {
     require(iterable != null, "iterable cannot be null")
