@@ -1,21 +1,22 @@
-<coordinator-app name="dap-pushCamapignMerge" frequency="35 3 * * *" start="2015-09-14T35:03Z" end="2016-09-13T23:59Z" timezone="GMT+05:30" xmlns="uri:oozie:coordinator:0.4">
-    <dataset name="clickstreamMergeData" frequency="${coord:days(1)}"
-             initial-instance="2015-09-14T03:30Z" timezone="GMT+05:30">
-        <uri-template>
-            ${nameNode}/data/output/campaigns/merge/${YEAR}${MONTH}/${DAY}/
-        </uri-template>
-        <done-flag>000000_0</done-flag>
-    </dataset>
+<coordinator-app name="dap-pushCampaignMerge" frequency="${frequency}" start="${startTime}" end="${endTime}" timezone="${timezone}" xmlns="uri:oozie:coordinator:0.4">
+    <datasets>
+        <dataset name="pushCampaignData" frequency="${datasetFrequency}"
+                 initial-instance="${datasetinitialinstance}" timezone="${datasettimezone}">
+            <uri-template>${dataseturitemplate}/${YEAR}/${MONTH}/${DAY}</uri-template>
+            <done-flag>${doneFlag}</done-flag>
+        </dataset>
+    </datasets>
 
     <input-events>
-        <data-in name="input" dataset="clickstreamMergeData">
-            <instance>${coord:current(0)}</instance>
+        <data-in name="input" dataset="pushCampaignData">
+            <start-instance>${inputeventstartinstance}</start-instance>
+            <end-instance>${inputeventendinstance}</end-instance>
         </data-in>
     </input-events>
 
     <action>
         <workflow>
-            <app-path>${nameNode}/apps/alchemy/workflows/pushCampaignMerge</app-path>
+            <app-path>${workflowPath}</app-path>
         </workflow>
     </action>
 </coordinator-app>

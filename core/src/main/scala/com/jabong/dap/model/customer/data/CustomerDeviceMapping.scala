@@ -112,8 +112,10 @@ object CustomerDeviceMapping extends Logging {
     var ad4pushFull: DataFrame = null
     if (DataVerifier.dataExists(ad4pushpath)) {
       val ad4pushPrev = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
+      println("calling ad4pushPrev and Incr merge")
       ad4pushFull = getAd4pushId(ad4pushPrev, clickIncr)
     } else {
+      println("calling null and Incr merge")
       ad4pushFull = getAd4pushId(null, clickIncr)
     }
     val ad4pushCurPath: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.EXTRAS + File.separator + DataSets.AD4PUSH_ID + File.separator + DataSets.FULL_MERGE_MODE + File.separator + curDate
@@ -143,14 +145,19 @@ object CustomerDeviceMapping extends Logging {
       DataWriter.writeParquet(res, savePath, saveMode)
   }
 
-  def getAd4pushId(prevFull: DataFrame, clicStreamIncr: DataFrame): DataFrame = {
-    val grouped = clicStreamIncr.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
+  def getAd4pushId(prevFull: DataFrame, clickstreamIncr: DataFrame): DataFrame = {
+    println(clickstreamIncr.count())
+    clickstreamIncr.show(10)
+    val grouped = clickstreamIncr.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
       first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
       first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+    println("Done Grouping")
     var res: DataFrame = null
     if (null == prevFull) {
       return grouped
     } else {
+      println(prevFull.count())
+      prevFull.show(10)
       res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
         .select(
           coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
