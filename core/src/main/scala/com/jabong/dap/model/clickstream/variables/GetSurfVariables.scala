@@ -6,10 +6,18 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobConfig}
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.clickstream.utils.GroupData
+import com.jabong.dap.model.clickstream.variables.SurfVariablesMain._
+import com.jabong.dap.model.custorder.ParamJsonValidator
+import grizzled.slf4j.Logging
+import net.liftweb.json.JsonParser.ParseException
+import net.liftweb.json._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
@@ -20,7 +28,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by Divya on 15/7/15.
  */
-object GetSurfVariables extends java.io.Serializable {
+object GetSurfVariables extends java.io.Serializable with Logging{
 
   /**
    * For a customer(userid,device.domain) -> list of products viewd yesterday
@@ -105,8 +113,31 @@ object GetSurfVariables extends java.io.Serializable {
 
   }
 
-  def getSurf3mergedForLast30Days(): DataFrame =
-    {
+  def getSurf3mergedForLast30Days(paramJsonPath: String): DataFrame = {
+
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(paramJsonPath)
+      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      ParamJobConfig.paramInfo = json.extract[ParamInfo]
+      ParamJsonValidator.validateRequiredValues(ParamJobConfig.paramInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
       var tablename = "merge.merge_pagevisit"
       for (i <- 30 to 1 by -1) {
         // val cal = Calendar.getInstance()

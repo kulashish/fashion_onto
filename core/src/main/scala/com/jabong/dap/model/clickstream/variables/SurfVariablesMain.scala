@@ -5,10 +5,17 @@ import java.io.File
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobInfo, ParamJobConfig}
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
+import com.jabong.dap.model.custorder.ParamJsonValidator
+import grizzled.slf4j.Logging
+import net.liftweb.json.JsonParser.ParseException
+import net.liftweb.json._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -16,7 +23,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 /**
  * Created by Divya on 13/7/15.
  */
-object SurfVariablesMain extends java.io.Serializable {
+object SurfVariablesMain extends java.io.Serializable with Logging {
 
   def main(args: Array[String]) {
     val gap = args(3).toInt
@@ -77,7 +84,33 @@ object SurfVariablesMain extends java.io.Serializable {
 */
   }
 
-  def startClickstreamYesterdaySessionVariables() = {
+  def startClickstreamYesterdaySessionVariables(paramJsonPath: String) = {
+
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(paramJsonPath)
+      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      ParamJobConfig.paramInfo = json.extract[ParamInfo]
+      ParamJsonValidator.validateRequiredValues(ParamJobConfig.paramInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
+
     // var gap = 1
     val hiveContext = Spark.getHiveContext()
 
@@ -116,7 +149,32 @@ object SurfVariablesMain extends java.io.Serializable {
     variableSurf1.write.save(surf1VariablePath)
   }
 
-  def startSurf3Variable() = {
+  def startSurf3Variable(paramJsonPath: String) = {
+
+    val validated = try {
+      val conf = new Configuration()
+      val fileSystem = FileSystem.get(conf)
+      implicit val formats = net.liftweb.json.DefaultFormats
+      val path = new Path(paramJsonPath)
+      val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+      ParamJobConfig.paramInfo = json.extract[ParamInfo]
+      ParamJsonValidator.validateRequiredValues(ParamJobConfig.paramInfo)
+      true
+    } catch {
+      case e: ParseException =>
+        logger.error("Error while parsing JSON: " + e.getMessage)
+        false
+
+      case e: IllegalArgumentException =>
+        logger.error("Error while validating JSON: " + e.getMessage)
+        false
+
+      case e: Exception =>
+        logger.error("Some unknown error occurred: " + e.getMessage)
+        throw e
+        false
+    }
+
     // var gap = 1
     val hiveContext = Spark.getHiveContext()
 
