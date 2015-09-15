@@ -261,7 +261,7 @@ object CampaignProcessor {
         campaigns(CampaignMergedFields.LIVE_REF_SKU1),
         campaigns(CampaignMergedFields.EMAIL),
         campaigns(CampaignMergedFields.DOMAIN),
-        when((campaigns(CampaignMergedFields.DOMAIN) === DataSets.ANDROID || campaigns(CampaignMergedFields.DOMAIN) === null) ,ad4push(PageVisitVariables.ADD4PUSH)).otherwise(campaigns(CampaignMergedFields.deviceId)) as PageVisitVariables.ADD4PUSH ,
+        when((campaigns(CampaignMergedFields.DOMAIN) === DataSets.ANDROID && ad4push(PageVisitVariables.ADD4PUSH) !== null), ad4push(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH ,
         campaigns(CampaignMergedFields.deviceId),
         campaigns(CampaignMergedFields.LIVE_PROD_NAME),
         campaigns(CampaignMergedFields.LIVE_BRAND),

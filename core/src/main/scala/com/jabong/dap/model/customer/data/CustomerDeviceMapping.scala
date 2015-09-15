@@ -144,7 +144,7 @@ object CustomerDeviceMapping extends Logging {
                   .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID)
                   .agg(
                     first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
-                    first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP)
+                    first(PageVisitVariables.PAGE_TIMESTAMP ) as PageVisitVariables.PAGE_TIMESTAMP)
     var res : DataFrame = null
     if(null == prevFull){
       return grouped
