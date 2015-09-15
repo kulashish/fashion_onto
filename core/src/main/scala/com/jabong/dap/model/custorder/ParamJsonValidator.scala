@@ -1,8 +1,7 @@
 package com.jabong.dap.model.custorder
 
-import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobInfo}
+import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo }
 import com.jabong.dap.data.storage.DataSets
-
 
 /**
  * Created by pooja on 9/7/15.

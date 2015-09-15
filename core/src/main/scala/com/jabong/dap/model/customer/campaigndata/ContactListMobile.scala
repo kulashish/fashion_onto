@@ -69,7 +69,6 @@ object ContactListMobile extends Logging {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-
     //read Data Frames
     val (
       dfCustomerIncr,
@@ -244,7 +243,7 @@ object ContactListMobile extends Logging {
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
 
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.DND), joinDF(CustomerVariables.DND)) as CustomerVariables.DND // DND
-        )
+      )
     }
 
     (dfMergedIncr, dfFull)
@@ -395,7 +394,7 @@ object ContactListMobile extends Logging {
     val smsBc = Spark.getContext().broadcast(smsOptOut).value
 
     val res = dndMerged.join(smsBc, dndMerged(DNDVariables.MOBILE_NUMBER) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
-        .select(
+      .select(
         dndMerged(SalesOrderVariables.FK_CUSTOMER),
         dndMerged(CustomerVariables.EMAIL),
         dndMerged(CustomerVariables.DOB),
@@ -453,7 +452,6 @@ object ContactListMobile extends Logging {
     val dfDND = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
     val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
-
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
     //TODO store the city names in lower case, all data coming as Upper case

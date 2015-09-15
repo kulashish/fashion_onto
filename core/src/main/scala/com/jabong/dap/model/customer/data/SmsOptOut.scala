@@ -4,7 +4,7 @@ import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.DNDVariables
-import com.jabong.dap.common.time.{TimeUtils, TimeConstants}
+import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -26,7 +26,7 @@ object SmsOptOut {
 
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
-    if ( null == path && null == OptionUtils.getOptValue(params.fullDate)) {
+    if (null == path && null == OptionUtils.getOptValue(params.fullDate)) {
       println("First full csv path and prev full date both cannot be empty")
 
       processData(DataSets.SMS_OPT_OUT, prevDate, incrDate, filename, saveMode, path)
@@ -48,11 +48,10 @@ object SmsOptOut {
     var prevFull: DataFrame = null
     if (null == fullcsv) {
       prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, prevDate)
-    }
-    else {
+    } else {
       prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
     }
-    if(null == incr || incr.count().equals(0)){
+    if (null == incr || incr.count().equals(0)) {
       DataWriter.writeParquet(prevFull, savePath, saveMode)
       return
     }

@@ -144,9 +144,8 @@ object DataSets {
 
   val CLICKSTREAM_YESTERDAY_SESSION = "clickstreamYesterdaySession"
 
-  val CLICKSTREAM_SURF3_VARIABLE= "clickstreamSurf3Variable"
+  val CLICKSTREAM_SURF3_VARIABLE = "clickstreamSurf3Variable"
 
-  val CLICKSTREAM_SURF3_MERGED_DATA30 =  "clickstreamSurf3MergeData30"
-
+  val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
 
 }

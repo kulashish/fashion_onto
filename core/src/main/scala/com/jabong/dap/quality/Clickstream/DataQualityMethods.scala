@@ -1,8 +1,8 @@
 package com.jabong.dap.quality.Clickstream
 
 import com.jabong.dap.common.mail.ScalaMail
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.model.clickstream.ClickStreamConstant
 import grizzled.slf4j.Logging
@@ -13,7 +13,6 @@ import org.apache.spark.sql.hive.HiveContext
  * Created by tejas on 13/8/15.
  */
 object DataQualityMethods extends Logging {
-
 
   def start(params: ParamInfo): Unit = {
 
@@ -27,20 +26,19 @@ object DataQualityMethods extends Logging {
     val date = monthYear.day.toString
     val year = monthYear.year.toString
 
-    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_PAGEVISIT_TABLE,ClickStreamConstant.MERGE_PAGEVISIT)
+    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_PAGEVISIT_TABLE, ClickStreamConstant.MERGE_PAGEVISIT)
     //var path= "./"+year+"/"+month+"/"+date
     //logger.info("Value of output path"+ConfigConstants.WRITE_OUTPUT_PATH)
     //val finaloutput = Spark.getContext().parallelize(output)
     //finaloutput.coalesce(1,true).saveAsTextFile(PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, ClickStreamConstant.CLICKSTREAM_DATA_QUALITY, "CLICKSTREAM_QUALITY", DataSets.DAILY_MODE, date))
     //write(ConfigConstants.OUTPUT_PATH, "./Automation1/",output.getBytes())
-    ScalaMail.sendMessage("tech.dap@jabong.com","","","tech.dap@jabong.com","Quality Report",output,"")
+    ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output, "")
     //println("ScalaMailMain")
 
-    ScalaMail.sendMessage("tech.dap@jabong.com","","","tech.dap@jabong.com","Quality Report",output,"")
+    ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output, "")
 
   }
-    def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
-
+  def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
 
     val data = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
@@ -62,8 +60,7 @@ object DataQualityMethods extends Logging {
     val datacount = resultSet.count()
     if (datacount == 0) {
       message += "There is no data available in " + processName
-    }
-    else {
+    } else {
 
       message += processName + " details:" + "\n \n"
 
