@@ -112,18 +112,19 @@ object CustomerDeviceMapping extends Logging {
    * @param curDate
    */
   def processData(prevDate: String, path: String, curDate: String, saveMode: String, clickIncr: DataFrame) {
-    var cmrFull: DataFrame = null
-    // val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
-    if (null != path) {
-      cmrFull = getDataFrameCsv4mDCF(path)
-    } else {
-      cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
-    }
-    val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
-    val res = getLatestDevice(clickIncr, cmrFull, customerIncr)
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
-    if (DataWriter.canWrite(saveMode, savePath))
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      var cmrFull: DataFrame = null
+      if (null != path) {
+        cmrFull = getDataFrameCsv4mDCF(path)
+      } else {
+        cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+      }
+      val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
+      val res = getLatestDevice(clickIncr, cmrFull, customerIncr)
+
       DataWriter.writeParquet(res, savePath, saveMode)
+    }
   }
 
   def processAdd4pushData(prevDate: String, curDate: String, saveMode: String, clickIncr: DataFrame) = {
