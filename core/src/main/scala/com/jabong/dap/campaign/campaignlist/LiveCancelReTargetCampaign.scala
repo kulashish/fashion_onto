@@ -5,6 +5,9 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.CancelReTarget
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, SkuSelection }
+import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -30,6 +33,8 @@ class LiveCancelReTargetCampaign {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
+    val path = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "test_campaigns", "ref_sku", DataSets.DAILY_MODE, "")
+    refSkusWithCampaignId.write.parquet(path)
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, brickMvpRecommendations)
 
     //save campaign Output
