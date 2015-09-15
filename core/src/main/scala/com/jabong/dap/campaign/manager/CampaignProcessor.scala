@@ -227,13 +227,13 @@ object CampaignProcessor {
    */
   def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String, saveMode: String) {
     val dfResult = df.select(
-      CampaignMergedFields.deviceId,
-      CampaignMergedFields.LIVE_MAIL_TYPE,
-      CampaignMergedFields.LIVE_BRAND,
-      CampaignMergedFields.LIVE_REF_SKU1,
-      CampaignMergedFields.LIVE_BRICK,
-      CampaignMergedFields.LIVE_PROD_NAME,
-      CampaignMergedFields.LIVE_CART_URL
+      when(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID, df(PageVisitVariables.ADD4PUSH)).otherwise(df(CampaignMergedFields.deviceId)) as CampaignMergedFields.deviceId,
+      df(CampaignMergedFields.LIVE_MAIL_TYPE),
+      df(CampaignMergedFields.LIVE_BRAND),
+      df(CampaignMergedFields.LIVE_REF_SKU1),
+      df(CampaignMergedFields.LIVE_BRICK),
+      df(CampaignMergedFields.LIVE_PROD_NAME),
+      df(CampaignMergedFields.LIVE_CART_URL)
     )
     val tablename =
       domain match {
