@@ -168,7 +168,11 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "campaignQuality") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
      run_component($component, $command);
- } else {
+ } elsif ($component eq "clickstreamDataQualityCheck") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamDataQualityCheck --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamDataQualityCheck.json";
+      run_component($component, $command);
+  }
+  else {
     print "not a valid component\n";
 }
 
