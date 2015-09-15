@@ -50,43 +50,43 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
     assert(expectedRecommendations != null)
   }
 
-//  "refSku is null" should "return IllegalArgumentException" in {
-//    val inputRecommendations: List[Row] = List(Row(7L, "SO596WA65JLIINDFAS"), Row(4L, "ES418WA79UAUINDFAS"))
-//
-//    a[IllegalArgumentException] should be thrownBy {
-//      liveRecommender.getRecommendedSkus(null, inputRecommendations)
-//    }
-//  }
-//
-//  "recommendation is null" should "return IllegalArgumentException" in {
-//    val refSku = "AD004WA32UCLINDFAS"
-//    a[IllegalArgumentException] should be thrownBy {
-//      liveRecommender.getRecommendedSkus(refSku, null)
-//    }
-//  }
-//
-//  "ref sku AD004WA32UCLINDFAS with two recommendation " should "return ref skus with recommendations" in {
-//    val refSku = "AD004WA32UCLINDFAS"
-//    val row1 = Row(7L, "SO596WA65JLIINDFAS")
-//    val row2 = Row(4L, "ES418WA79UAUINDFAS")
-//    val inputRecommendations: List[Row] = List(row1, row2)
-//    val expectedValue = liveRecommender.getRecommendedSkus(refSku, inputRecommendations)
-//    assert(expectedValue.size == 2)
-//  }
-//
-//  "ref sku SO596WA65JLIINDFAS with two recommendation " should "return ref skus with recommendations" in {
-//    val refSku = "SO596WA65JLIINDFAS"
-//    val row1 = Row(7L, "SO596WA65JLIINDFAS")
-//    val row2 = Row(4L, "ES418WA79UAUINDFAS")
-//    val inputRecommendations: List[Row] = List(row1, row2)
-//    val expectedValue = liveRecommender.getRecommendedSkus(refSku, inputRecommendations)
-//    assert(expectedValue.size == 1)
-//  }
+  //  "refSku is null" should "return IllegalArgumentException" in {
+  //    val inputRecommendations: List[Row] = List(Row(7L, "SO596WA65JLIINDFAS"), Row(4L, "ES418WA79UAUINDFAS"))
+  //
+  //    a[IllegalArgumentException] should be thrownBy {
+  //      liveRecommender.getRecommendedSkus(null, inputRecommendations)
+  //    }
+  //  }
+  //
+  //  "recommendation is null" should "return IllegalArgumentException" in {
+  //    val refSku = "AD004WA32UCLINDFAS"
+  //    a[IllegalArgumentException] should be thrownBy {
+  //      liveRecommender.getRecommendedSkus(refSku, null)
+  //    }
+  //  }
+  //
+  //  "ref sku AD004WA32UCLINDFAS with two recommendation " should "return ref skus with recommendations" in {
+  //    val refSku = "AD004WA32UCLINDFAS"
+  //    val row1 = Row(7L, "SO596WA65JLIINDFAS")
+  //    val row2 = Row(4L, "ES418WA79UAUINDFAS")
+  //    val inputRecommendations: List[Row] = List(row1, row2)
+  //    val expectedValue = liveRecommender.getRecommendedSkus(refSku, inputRecommendations)
+  //    assert(expectedValue.size == 2)
+  //  }
+  //
+  //  "ref sku SO596WA65JLIINDFAS with two recommendation " should "return ref skus with recommendations" in {
+  //    val refSku = "SO596WA65JLIINDFAS"
+  //    val row1 = Row(7L, "SO596WA65JLIINDFAS")
+  //    val row2 = Row(4L, "ES418WA79UAUINDFAS")
+  //    val inputRecommendations: List[Row] = List(row1, row2)
+  //    val expectedValue = liveRecommender.getRecommendedSkus(refSku, inputRecommendations)
+  //    assert(expectedValue.size == 1)
+  //  }
 
-//  "refskus and brick mvp geneder recommendation  data as input" should "return ref skus with max eight recommendations" in {
-//    val expectedValue = liveRecommender.generateRecommendation(newReferenceSkuData, recommendationOutput)
-//    assert(expectedValue !=null)
-//  }
+  //  "refskus and brick mvp geneder recommendation  data as input" should "return ref skus with max eight recommendations" in {
+  //    val expectedValue = liveRecommender.generateRecommendation(newReferenceSkuData, recommendationOutput)
+  //    assert(expectedValue !=null)
+  //  }
 
   "iterable row is null " should "return IllegalArgumentException" in {
     a[IllegalArgumentException] should be thrownBy {
@@ -95,28 +95,28 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
   }
 
   //FIXME: Test cases fix
-//  "one ref sku per customer and only 3 recommended skus " should "return max 3 rec skus for the same ref sku" in {
-//    val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 1").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
-//      .groupByKey()
-//
-//    val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
-//    assert(expectedOut._2.size == 3)
-//  }
-//
-//  "one ref sku per customer  and more than 8" should "return max 8 rec skus for the same ref sku" in {
-//    val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 3").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
-//      .groupByKey()
-//
-//    val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
-//    assert(expectedOut._2.size == 8)
-//  }
-//
-//  "two ref sku per customer  and more than 8 in total" should "return max 8 rec skus and no duplicates for the same ref sku" in {
-//    val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 2").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
-//      .groupByKey()
-//
-//    val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
-//    assert(expectedOut._2.size == 8)
-//  }
+  //  "one ref sku per customer and only 3 recommended skus " should "return max 3 rec skus for the same ref sku" in {
+  //    val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 1").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
+  //      .groupByKey()
+  //
+  //    val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
+  //    assert(expectedOut._2.size == 3)
+  //  }
+  //
+  //  "one ref sku per customer  and more than 8" should "return max 8 rec skus for the same ref sku" in {
+  //    val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 3").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
+  //      .groupByKey()
+  //
+  //    val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
+  //    assert(expectedOut._2.size == 8)
+  //  }
+  //
+  //  "two ref sku per customer  and more than 8 in total" should "return max 8 rec skus and no duplicates for the same ref sku" in {
+  //    val refRecSkuInput = genRecSkuInput.filter(TestConstants.TEST_CASE_FILTER + "= 2").map(row => ((row(row.fieldIndex(CustomerVariables.FK_CUSTOMER))), row))
+  //      .groupByKey()
+  //
+  //    val expectedOut = liveRecommender.getRecSkus(refRecSkuInput.first()._2)
+  //    assert(expectedOut._2.size == 8)
+  //  }
 
 }

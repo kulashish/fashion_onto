@@ -24,7 +24,6 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
 
-
     val refSkuExploded = refSkus.select(
       refSkus(CustomerVariables.FK_CUSTOMER),
       refSkus(CampaignMergedFields.REF_SKU1),
@@ -46,8 +45,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       .select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
-       // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
-        recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
+        // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
+        recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
 
@@ -63,20 +62,20 @@ class LiveCommonRecommender extends Recommender with Logging {
     return campaignDataWithRecommendations
   }
 
-//  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
-//  /**
-//   *
-//   * @param refSku
-//   * @param recommendation
-//   * @return
-//   */
-//  def getRecommendedSkus(refSku: String, recommendation: List[(Row)]): List[(Row)] = {
-//    require(refSku != null, "refSkus cannot be null")
-//    require(recommendation != null, "recommendation cannot be null")
-//    println("refSkus:-"+refSku)
-//    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
-//    return recommendation
-//  }
+  //  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
+  //  /**
+  //   *
+  //   * @param refSku
+  //   * @param recommendation
+  //   * @return
+  //   */
+  //  def getRecommendedSkus(refSku: String, recommendation: List[(Row)]): List[(Row)] = {
+  //    require(refSku != null, "refSkus cannot be null")
+  //    require(recommendation != null, "recommendation cannot be null")
+  //    println("refSkus:-"+refSku)
+  //    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
+  //    return recommendation
+  //  }
   /**
    * return recommended skus based on number of reference sku (if ref sku is 1 then all 8 rec sku and if its 2 ,then 4 rec sku each)
    * @param iterable

@@ -13,7 +13,7 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 
 /**
@@ -171,10 +171,10 @@ object CampaignUtils extends Logging {
     //.distinct.sortBy(-_._1).take(NumberSku)) }
     //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
     // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-//    val grouped = customerGroup.toD
-//      .toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.REF_SKUS)
+    //    val grouped = customerGroup.toD
+    //      .toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.REF_SKUS)
 
-    val grouped =   sqlContext.createDataFrame(customerGroup ,Schema.finalReferenceSku)
+    val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
     grouped
   }
@@ -654,7 +654,7 @@ object CampaignUtils extends Logging {
     val dfResult = dfJoin.select(
       col(CustomerVariables.FK_CUSTOMER),
       col(ProductVariables.SKU_SIMPLE),
-      col("ITR_"+ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
+      col("ITR_" + ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),

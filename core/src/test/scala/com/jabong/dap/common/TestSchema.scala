@@ -184,7 +184,7 @@ object TestSchema {
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(CampaignMergedFields.REF_SKU, StringType, false),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
-    StructField(CampaignMergedFields.REC_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SKU, StringType, true)))),false),
+    StructField(CampaignMergedFields.REC_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SKU, StringType, true)))), false),
     StructField(TestConstants.TEST_CASE_FILTER, LongType, true)))
 
   val refSkuInput = StructType(Array(
