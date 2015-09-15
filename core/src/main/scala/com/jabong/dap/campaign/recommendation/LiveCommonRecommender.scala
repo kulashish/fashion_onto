@@ -41,43 +41,42 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
-    println("WTFFFFFF:-"+completeRefSku.show(10));
     recommendations.printSchema()
     val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
       && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
       && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       .select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
-        //recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
+        recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
        // recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
     recommendationJoined.printSchema()
     println("TESTDATA"+recommendationJoined.show(10))
-//    val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
-//      .map({ case (key, value) => (key, value._1, value._2, value._3) })
-//   // println("DATATEST"+recommendationGrouped.take(5))
-//    val sqlContext = Spark.getSqlContext()
-//    import sqlContext.implicits._
-//    val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU,
-//      CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-    //println("DATATEST:-----"+campaignDataWithRecommendations.take(5))
+    val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
+      .map({ case (key, value) => (key, value._1, value._2, value._3) })
+   // println("DATATEST"+recommendationGrouped.take(5))
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+    val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU,
+      CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+    println("DATATEST:-----"+campaignDataWithRecommendations.take(5))
 
-    return recommendationJoined
+    return campaignDataWithRecommendations
   }
 
-  val recommendedSkus = udf((refSkus: String, recommendations: List[(Long,String)]) => getRecommendedSkus(refSkus: String, recommendations: List[(Long,String)]))
+  val recommendedSkus = udf((refSkus: String, recommendations: List[(Long,String)]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
   /**
    *
    * @param refSku
    * @param recommendation
    * @return
    */
-  def getRecommendedSkus(refSku: String, recommendation: List[(Long,String)]): List[(Long,String)] = {
-//    require(refSku != null, "refSkus cannot be null")
+  def getRecommendedSkus(refSku: String, recommendation: List[(Row)]): List[(Row)] = {
+    require(refSku != null, "refSkus cannot be null")
     require(recommendation != null, "recommendation cannot be null")
     println("refSkus:-"+refSku)
-  //  val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
+    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
     return recommendation
   }
 
