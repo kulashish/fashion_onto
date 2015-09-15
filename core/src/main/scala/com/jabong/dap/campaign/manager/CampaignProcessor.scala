@@ -198,7 +198,7 @@ object CampaignProcessor {
    */
   def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
     val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
-    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
+    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).na.drop(Array(PageVisitVariables.ADD4PUSH))
 
     exportCampaignCSV(iosDF, date, DataSets.IOS_CODE, saveMode)
     exportCampaignCSV(androidDF, date, DataSets.ANDROID_CODE, saveMode)
