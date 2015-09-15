@@ -47,8 +47,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       .select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
-        recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
-       // recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
+       // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
+        recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
     recommendationJoined.printSchema()
@@ -65,7 +65,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     return campaignDataWithRecommendations
   }
 
-  val recommendedSkus = udf((refSkus: String, recommendations: List[(Row)]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
+  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
   /**
    *
    * @param refSku
