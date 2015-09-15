@@ -140,7 +140,7 @@ object CustomerDeviceMapping extends Logging {
 
   def getAd4pushId(prevFull: DataFrame, clicStreamIncr: DataFrame): DataFrame={
     val grouped = clicStreamIncr
-                  .filter(clicStreamIncr(PageVisitVariables.DOMAIN) === DataSets.ANDROID  || clicStreamIncr(PageVisitVariables.ADD4PUSH).!==(null))
+                  .filter(clicStreamIncr(PageVisitVariables.DOMAIN) === DataSets.ANDROID)
                   .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID)
                   .agg(
                     first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
