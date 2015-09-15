@@ -56,12 +56,12 @@ class LiveCommonRecommender extends Recommender with Logging {
     println("TESTDATA"+recommendationJoined.show(10))
     val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
-    println("DATATEST"+recommendationGrouped.take(5))
+   // println("DATATEST"+recommendationGrouped.take(5))
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
     val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU,
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-    println("DATATEST:-----"+campaignDataWithRecommendations.take(5))
+    //println("DATATEST:-----"+campaignDataWithRecommendations.take(5))
 
     return recommendationJoined
   }
