@@ -48,7 +48,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       .select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
-        recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
+        //recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
+        recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
     println("TESTDATA"+recommendationJoined.show(10))
@@ -75,7 +76,7 @@ class LiveCommonRecommender extends Recommender with Logging {
 //    require(refSku != null, "refSkus cannot be null")
     require(recommendation != null, "recommendation cannot be null")
     println("refSkus:-"+refSku)
-    //val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
+    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
     return recommendation
   }
 
