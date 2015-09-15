@@ -20,6 +20,13 @@ package:
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/
 	cp scripts/ad4push_device_merger.pl $(BASE)/bin/
 	cp scripts/responsys.pl $(BASE)/bin/
+	mkdir -p $(BASE)/workflows/acquisition
+    mkdir -p $(BASE)/workflows/clickstream
+    mkdir -p $(BASE)/workflows/pushCampaignMerge
+    cp oozie/job.properties $(BASE)/workflows/
+	cp oozie/acquisition/* $(BASE)/workflows/acquisition/
+	cp oozie/clickstream/* $(BASE)/workflows/clickstream/
+	cp oozie/pushCampaignMerge/* $(BASE)/workflows/pushCampaignMerge/
 	mkdir -p $(BASE)/bin/clickstream
 	cp scripts/clickstream/* $(BASE)/bin/clickstream/
 	tar -zcvf $(PKGNAME) $(BASE)

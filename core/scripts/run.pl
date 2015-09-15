@@ -66,13 +66,13 @@ my $HDFS_BASE;
 my $EMAIL_PREFIX;
 
 # target needs to be either stage or prod
-if ($target eq "stage") {
+if ($target eq "STAGE") {
     $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
     $EMAIL_PREFIX = "[STAGE]";
-} elsif ($target eq "prod") {
+} elsif ($target eq "PROD") {
     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
     $EMAIL_PREFIX = "[PROD]";
-} elsif ($target eq "test-prod") {
+} elsif ($target eq "TEST-PROD") {
      $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
      $EMAIL_PREFIX = "[TEST-PROD]";
 }else {
@@ -95,7 +95,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
     run_component("bob Acquisition for Full tables", $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
-} elsif ($component eq "bobFull2") {
+} elsif ($component eq "bobAcqFull2") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
     run_component("bob Acquisition for customer_product_shortlist table", $command);
 } elsif ($component eq "bobAcqIncr") {
@@ -113,7 +113,7 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "erpMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component("erp Merge for Incremental tables", $command);
-} elsif ($component eq "retargetPushCampaign") {
+} elsif ($component eq "pushRetargetCampaign") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
     run_component($component, $command);
