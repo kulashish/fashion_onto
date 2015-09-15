@@ -137,8 +137,6 @@ object CustomerDeviceMapping extends Logging {
   }
 
   def getAd4pushId(prevFull: DataFrame, clickstreamIncr: DataFrame): DataFrame = {
-    println(clickstreamIncr.count())
-    clickstreamIncr.show(10)
     val notNullAdd4push = clickstreamIncr
       .select(
         PageVisitVariables.BROWSER_ID,
@@ -147,21 +145,14 @@ object CustomerDeviceMapping extends Logging {
       )
       .dropDuplicates()
       .na.drop(Array(PageVisitVariables.ADD4PUSH))
-    println("after dropping duplicates: ")
-    notNullAdd4push.printSchema()
-    notNullAdd4push.show(10)
     val grouped = notNullAdd4push.orderBy(col(PageVisitVariables.BROWSER_ID), desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.BROWSER_ID)
       .agg(
         first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
         first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
       )
-    grouped.printSchema()
-    grouped.show(10)
     var res: DataFrame = grouped
     if (null != prevFull) {
-      println(prevFull.count())
-      prevFull.show(10)
       res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
         .select(
           coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
