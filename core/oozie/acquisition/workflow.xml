@@ -20,6 +20,14 @@
 
     <action name="bobAcqFull1">
         <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
