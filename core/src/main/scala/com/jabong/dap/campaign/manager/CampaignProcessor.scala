@@ -198,7 +198,7 @@ object CampaignProcessor {
    */
   def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
     val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
-    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID)
+    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).na.drop(Array(PageVisitVariables.ADD4PUSH))
 
     exportCampaignCSV(iosDF, date, DataSets.IOS_CODE, saveMode)
     exportCampaignCSV(androidDF, date, DataSets.ANDROID_CODE, saveMode)
@@ -206,7 +206,7 @@ object CampaignProcessor {
     for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
       val mailType = campaignDetails.mailType
       val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(androidDF(PageVisitVariables.ADD4PUSH) as CampaignMergedFields.deviceId).na.drop().distinct
+      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(androidDF(PageVisitVariables.ADD4PUSH) as CampaignMergedFields.deviceId).distinct
 
       val fileI = campaignDetails.campaignName + mailType + "_" + DataSets.IOS_CODE
       val fileA = campaignDetails.campaignName + mailType + "_" + DataSets.ANDROID_CODE
