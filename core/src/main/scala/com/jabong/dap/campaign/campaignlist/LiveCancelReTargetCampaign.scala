@@ -34,6 +34,7 @@ class LiveCancelReTargetCampaign {
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
     val path = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, "test_campaigns", "ref_sku", DataSets.DAILY_MODE, "")
+    println("COUNT-REF-SKU:-"+refSkusWithCampaignId.count)
     refSkusWithCampaignId.write.parquet(path)
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, brickMvpRecommendations)
 
