@@ -141,22 +141,22 @@ object CustomerDeviceMapping extends Logging {
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
-    }
+  }
 
 
   def getAd4pushId(prevFull: DataFrame, clicStreamIncr: DataFrame): DataFrame={
     val grouped = clicStreamIncr.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
-                    first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
-                    first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+      first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
+      first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     var res : DataFrame = null
     if(null == prevFull){
       return grouped
     } else{
       res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
-      .select(
-      coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
-      coalesce(grouped(PageVisitVariables.ADD4PUSH) , prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
-      coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP) , prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+        .select(
+          coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+          coalesce(grouped(PageVisitVariables.ADD4PUSH) , prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
+          coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP) , prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     }
     return res
   }

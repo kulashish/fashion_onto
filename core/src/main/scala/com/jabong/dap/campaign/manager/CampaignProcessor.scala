@@ -206,7 +206,7 @@ object CampaignProcessor {
     for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
       val mailType = campaignDetails.mailType
       val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
+      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(androidDF(PageVisitVariables.ADD4PUSH) as CampaignMergedFields.deviceId).distinct
 
       val fileI = campaignDetails.campaignName + mailType + "_" + DataSets.IOS_CODE
       val fileA = campaignDetails.campaignName + mailType + "_" + DataSets.ANDROID_CODE
@@ -227,13 +227,13 @@ object CampaignProcessor {
    */
   def exportCampaignCSV(df: DataFrame, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER), domain: String, saveMode: String) {
     val dfResult = df.select(
-      CampaignMergedFields.deviceId,
-      CampaignMergedFields.LIVE_MAIL_TYPE,
-      CampaignMergedFields.LIVE_BRAND,
-      CampaignMergedFields.LIVE_REF_SKU1,
-      CampaignMergedFields.LIVE_BRICK,
-      CampaignMergedFields.LIVE_PROD_NAME,
-      CampaignMergedFields.LIVE_CART_URL
+      when(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID, df(PageVisitVariables.ADD4PUSH)).otherwise(df(CampaignMergedFields.deviceId)) as CampaignMergedFields.deviceId,
+      df(CampaignMergedFields.LIVE_MAIL_TYPE),
+      df(CampaignMergedFields.LIVE_BRAND),
+      df(CampaignMergedFields.LIVE_REF_SKU1),
+      df(CampaignMergedFields.LIVE_BRICK),
+      df(CampaignMergedFields.LIVE_PROD_NAME),
+      df(CampaignMergedFields.LIVE_CART_URL)
     )
     val tablename =
       domain match {
@@ -250,6 +250,26 @@ object CampaignProcessor {
     //    val csvFullPath = path + File.separator + fileName
 
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGNS, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
+  }
+
+
+  def addAd4pushId(ad4push: DataFrame, campaigns: DataFrame): DataFrame={
+    val ad4pushBc = Spark.getContext().broadcast(ad4push).value
+    val joined = campaigns.join(ad4pushBc, ad4pushBc(PageVisitVariables.BROWSER_ID) === campaigns(CampaignMergedFields.DEVICE_ID), SQL.LEFT_OUTER)
+      .select(campaigns(CampaignMergedFields.CUSTOMER_ID),
+        campaigns(CampaignMergedFields.LIVE_MAIL_TYPE),
+        campaigns(CampaignMergedFields.LIVE_REF_SKU1),
+        campaigns(CampaignMergedFields.EMAIL),
+        campaigns(CampaignMergedFields.DOMAIN),
+        ad4push(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
+        campaigns(CampaignMergedFields.deviceId),
+        campaigns(CampaignMergedFields.LIVE_PROD_NAME),
+        campaigns(CampaignMergedFields.LIVE_BRAND),
+        campaigns(CampaignMergedFields.LIVE_BRICK),
+        campaigns(CampaignMergedFields.LIVE_CART_URL),
+        campaigns(CampaignMergedFields.END_OF_DATE))
+
+    return joined
   }
 
 }
