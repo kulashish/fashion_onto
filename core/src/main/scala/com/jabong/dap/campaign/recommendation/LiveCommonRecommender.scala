@@ -24,7 +24,6 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
 
-    refSkus.printSchema()
 
     val refSkuExploded = refSkus.select(
       refSkus(CustomerVariables.FK_CUSTOMER),
@@ -32,7 +31,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkus(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
-    refSkuExploded.printSchema()
+    //FIXME: To check if there is any ref sku in recommended sku
     val completeRefSku = refSkuExploded.select(
       refSkuExploded(CustomerVariables.FK_CUSTOMER),
       refSkuExploded(CampaignMergedFields.REF_SKU1),
@@ -41,7 +40,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
-    recommendations.printSchema()
+
     val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
       && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
       && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
@@ -51,17 +50,16 @@ class LiveCommonRecommender extends Recommender with Logging {
         recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
-    recommendationJoined.printSchema()
-    println("TESTDATA"+recommendationJoined.show(10))
+
     val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
-   // println("DATATEST"+recommendationGrouped.take(5))
+
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
     val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKUS,
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-    println("DATATEST:-----"+campaignDataWithRecommendations.take(5))
 
+    logger.info("recommendation attached with campaign")
     return campaignDataWithRecommendations
   }
 
@@ -79,7 +77,11 @@ class LiveCommonRecommender extends Recommender with Logging {
 //    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
 //    return recommendation
 //  }
-
+  /**
+   * return recommended skus based on number of reference sku (if ref sku is 1 then all 8 rec sku and if its 2 ,then 4 rec sku each)
+   * @param iterable
+   * @return
+   */
   def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[String], mutable.MutableList[String], Int) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
