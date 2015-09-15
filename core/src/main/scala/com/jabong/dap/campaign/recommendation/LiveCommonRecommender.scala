@@ -64,19 +64,18 @@ class LiveCommonRecommender extends Recommender with Logging {
     return campaignDataWithRecommendations
   }
 
-  val recommendedSkus = udf((refSkus: String, recommendations: List[Row]) => getRecommendedSkus(refSkus: String, recommendations: List[Row]))
+  val recommendedSkus = udf((refSkus: Long, recommendations: List[Row]) => getRecommendedSkus(refSkus: Long, recommendations: List[Row]))
   /**
    *
    * @param refSku
    * @param recommendation
    * @return
    */
-  def getRecommendedSkus(refSku: String, recommendation: List[Row]): List[(String)] = {
+  def getRecommendedSkus(refSku: Long, recommendation: List[Row]): List[(String)] = {
     require(refSku != null, "refSkus cannot be null")
     require(recommendation != null, "recommendation cannot be null")
-    val y: List[String] = null
     println("refSkus:-"+refSku)
-    val outputSkus = recommendation.filterNot(x => x.getString(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
+    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
     return outputSkus
   }
 
