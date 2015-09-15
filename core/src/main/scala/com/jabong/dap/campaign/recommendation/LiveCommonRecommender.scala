@@ -58,7 +58,6 @@ class LiveCommonRecommender extends Recommender with Logging {
     val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKUS,
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
 
-    logger.info("recommendation attached with campaign")
     return campaignDataWithRecommendations
   }
 
