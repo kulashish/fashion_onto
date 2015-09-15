@@ -14,12 +14,13 @@ import com.jabong.dap.model.customer.data.DNDMerger
 import com.jabong.dap.model.customer.data.SmsOptOut
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
+import com.jabong.dap.quality.Clickstream.DataQualityMethods
 import com.jabong.dap.quality.campaign.CampaignQualityEntry
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 /**
  * Created by pooja on 9/7/15.
@@ -64,11 +65,13 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
+          case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
           case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
           case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
           case _ => logger.error("Unknown source.")
+
         }
       }
     }

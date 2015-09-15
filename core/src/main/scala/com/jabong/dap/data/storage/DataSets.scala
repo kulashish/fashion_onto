@@ -138,5 +138,9 @@ object DataSets {
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
 
   val AD4PUSH_ID = "ad4pushId"
+  //Clickstream Data Quality
+
+  val CLICKSTREAM_DATA_QUALITY = "clickstreamDataQualityCheck"
+
 
 }
