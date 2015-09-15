@@ -95,7 +95,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     val skuPerIteration = if (numberRefSku == 1) 8 else 4
     for (row <- iterable) {
       var i = 1;
-      val recommendations = row(recommendationIndex).asInstanceOf[List[String]].foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
+      val recommendations = row(recommendationIndex).asInstanceOf[Array[String]].foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
       referenceSkus += row(refSkuIndex).toString
     }
     return (referenceSkus, recommendedSkus, mailType)
