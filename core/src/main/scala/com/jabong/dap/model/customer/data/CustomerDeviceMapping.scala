@@ -130,7 +130,7 @@ object CustomerDeviceMapping extends Logging {
   def processAdd4pushData(prevDate: String, curDate: String, saveMode: String, clickIncr: DataFrame) = {
     val ad4pushCurPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, ad4pushCurPath)) {
-      val ad4pushPrev = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
+      val ad4pushPrev = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
       val ad4pushFull = getAd4pushId(ad4pushPrev, clickIncr)
       DataWriter.writeParquet(ad4pushFull, ad4pushCurPath, saveMode)
     }
@@ -140,10 +140,11 @@ object CustomerDeviceMapping extends Logging {
     println(clickstreamIncr.count())
     clickstreamIncr.show(10)
     val grouped = clickstreamIncr.filter(col(PageVisitVariables.ADD4PUSH) !== null)
-      .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
-      col(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
-      first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
-      first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+      .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP)).groupBy(PageVisitVariables.BROWSER_ID)
+      .agg(
+        first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
+        first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
+      )
     grouped.printSchema()
     grouped.show(10)
     var res: DataFrame = grouped
