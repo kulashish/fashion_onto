@@ -56,15 +56,9 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="afterClickstreamVars"/>
+        <ok to="deviceMapping"/>
         <error to="fail"/>
     </action>
-
-    <fork name="afterClickstreamVars">
-        <path start="deviceMapping" />
-        <path start="dcfFeedGenerate" />
-        <path start="pricingSKUData" />
-    </fork>
 
     <action name="deviceMapping">
         <shell xmlns="uri:oozie:shell-action:0.2">
@@ -86,9 +80,15 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="pushSurfCampaign"/>
+        <ok to="afterClickstreamVars"/>
         <error to="fail"/>
     </action>
+
+    <fork name="afterClickstreamVars">
+        <path start="pushSurfCampaign" />
+        <path start="dcfFeedGenerate" />
+        <path start="pricingSKUData" />
+    </fork>
 
     <action name="pushSurfCampaign">
         <shell xmlns="uri:oozie:shell-action:0.2">
