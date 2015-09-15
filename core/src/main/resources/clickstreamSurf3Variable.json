@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "clickstreamSurf3Variable",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}

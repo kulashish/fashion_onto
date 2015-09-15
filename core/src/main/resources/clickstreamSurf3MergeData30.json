@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "clickstreamSurf3MergeData30",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}

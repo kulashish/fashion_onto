@@ -2,11 +2,11 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.io.File
 
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobConfig}
+import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobConfig }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -18,7 +18,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
@@ -29,7 +29,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by Divya on 15/7/15.
  */
-object GetSurfVariables extends java.io.Serializable with Logging{
+object GetSurfVariables extends java.io.Serializable with Logging {
 
   /**
    * For a customer(userid,device.domain) -> list of products viewd yesterday

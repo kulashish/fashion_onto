@@ -7,7 +7,7 @@ import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
-import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, SurfVariablesMain}
+import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata.ContactListMobile
 import com.jabong.dap.model.customer.campaigndata.CustWelcomeVoucher
 import com.jabong.dap.model.customer.campaigndata.CustPreference
@@ -21,7 +21,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 
 /**
  * Created by pooja on 9/7/15.
@@ -72,7 +72,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
 
-            //Clickstream data moved from Init.scala
+          //Clickstream data moved from Init.scala
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)
           case DataSets.CLICKSTREAM_SURF3_VARIABLE => SurfVariablesMain.startSurf3Variable(paramJob)
           case DataSets.CLICKSTREAM_SURF3_MERGED_DATA30 => GetSurfVariables.getSurf3mergedForLast30Days(paramJob)

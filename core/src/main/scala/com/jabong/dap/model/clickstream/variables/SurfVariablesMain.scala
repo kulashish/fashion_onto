@@ -2,10 +2,10 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.io.File
 
-import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobInfo, ParamJobConfig}
+import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo, ParamJobConfig }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -16,7 +16,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -149,7 +149,7 @@ object SurfVariablesMain extends java.io.Serializable with Logging {
     val currentMergedDataPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, yesterdayDateFolder)
     var processedVariablePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
 
-    if (DataWriter.canWrite(saveMode, currentMergedDataPath) || DataWriter.canWrite(saveMode,processedVariablePath)) {
+    if (DataWriter.canWrite(saveMode, currentMergedDataPath) || DataWriter.canWrite(saveMode, processedVariablePath)) {
       var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
 
       var oldMergedData: DataFrame = null

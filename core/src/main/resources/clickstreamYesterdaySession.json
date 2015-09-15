@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "clickstreamYesterdaySession",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}
