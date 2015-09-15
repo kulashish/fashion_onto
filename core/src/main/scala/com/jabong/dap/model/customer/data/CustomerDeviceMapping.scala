@@ -146,7 +146,7 @@ object CustomerDeviceMapping extends Logging {
         PageVisitVariables.PAGE_TIMESTAMP
       )
       .dropDuplicates()
-      //.na.drop(Array(PageVisitVariables.ADD4PUSH))
+      .na.drop(Array(PageVisitVariables.ADD4PUSH))
     println("after dropping duplicates: ")
     notNullAdd4push.printSchema()
     notNullAdd4push.show(10)
