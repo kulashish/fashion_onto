@@ -27,7 +27,7 @@
             <argument>bobAcqFull1</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="bobAcqFull2"/>
@@ -51,7 +51,7 @@
             <argument>bobAcqFull2</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="bobJoin"/>
@@ -75,7 +75,7 @@
             <argument>bobAcqIncr</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="bobMerge"/>
@@ -99,7 +99,7 @@
             <argument>bobMerge</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="bobJoin"/>
@@ -123,7 +123,7 @@
             <argument>erpAcqIncr</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="erpMerge"/>
@@ -147,7 +147,7 @@
             <argument>erpMerge</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="bobErpJoin"/>
@@ -178,7 +178,7 @@
             <argument>pushRetargetCampaign</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="pushCampaignMergeJoin"/>
@@ -204,7 +204,7 @@
             <argument>basicItr</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="pushCampaignStart2"/>
@@ -234,7 +234,7 @@
             <argument>pushInvalidCampaign</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="pushCampaignMergeJoin"/>
@@ -257,7 +257,7 @@
             <argument>pushAbandonedCartCampaign</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="pushCampaignMergeJoin"/>
@@ -280,7 +280,7 @@
             <argument>pushWishlistCampaign</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="pushCampaignMergeJoin"/>
