@@ -235,7 +235,6 @@ object CampaignManager extends Serializable with Logging {
       val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
       val mergedData = CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
 
-
       val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
       println("Starting write parquet after repartitioning and caching")
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)

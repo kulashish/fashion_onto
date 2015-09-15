@@ -252,8 +252,7 @@ object CampaignProcessor {
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGNS, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
   }
 
-
-  def addAd4pushId(ad4push: DataFrame, campaigns: DataFrame): DataFrame={
+  def addAd4pushId(ad4push: DataFrame, campaigns: DataFrame): DataFrame = {
     val ad4pushBc = Spark.getContext().broadcast(ad4push).value
     val joined = campaigns.join(ad4pushBc, ad4pushBc(PageVisitVariables.BROWSER_ID) === campaigns(CampaignMergedFields.DEVICE_ID), SQL.LEFT_OUTER)
       .select(campaigns(CampaignMergedFields.CUSTOMER_ID),
