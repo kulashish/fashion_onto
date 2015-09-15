@@ -143,8 +143,8 @@ object CustomerDeviceMapping extends Logging {
                   .filter(clicStreamIncr(PageVisitVariables.DOMAIN) === DataSets.ANDROID  || clicStreamIncr(PageVisitVariables.ADD4PUSH) !== null)
                   .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID)
                   .agg(
-                    first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
-                    first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+                    first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
+                    first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP)
     var res : DataFrame = null
     if(null == prevFull){
       return grouped
