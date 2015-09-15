@@ -52,6 +52,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
+    recommendationJoined.printSchema()
     println("TESTDATA"+recommendationJoined.show(10))
     val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
@@ -62,7 +63,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     println("DATATEST:-----"+campaignDataWithRecommendations.take(5))
 
-    return campaignDataWithRecommendations
+    return recommendationJoined
   }
 
   val recommendedSkus = udf((refSkus: String, recommendations: List[(Long,String)]) => getRecommendedSkus(refSkus: String, recommendations: List[(Long,String)]))
