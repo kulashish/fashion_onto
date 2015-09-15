@@ -138,14 +138,15 @@ object CustomerDeviceMapping extends Logging {
   def getAd4pushId(prevFull: DataFrame, clickstreamIncr: DataFrame): DataFrame = {
     println(clickstreamIncr.count())
     clickstreamIncr.show(10)
-    val grouped = clickstreamIncr.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
+    val grouped = clickstreamIncr.filter(col(PageVisitVariables.ADD4PUSH) !== null)
+      .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
+      col(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
       first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
       first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
-    println("Done Grouping")
-    var res: DataFrame = null
-    if (null == prevFull) {
-      return grouped
-    } else {
+    grouped.printSchema()
+    grouped.show(10)
+    var res: DataFrame = grouped
+    if (null != prevFull) {
       println(prevFull.count())
       prevFull.show(10)
       res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
