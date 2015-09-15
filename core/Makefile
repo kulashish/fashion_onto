@@ -21,9 +21,9 @@ package:
 	cp scripts/ad4push_device_merger.pl $(BASE)/bin/
 	cp scripts/responsys.pl $(BASE)/bin/
 	mkdir -p $(BASE)/workflows/acquisition
-    mkdir -p $(BASE)/workflows/clickstream
-    mkdir -p $(BASE)/workflows/pushCampaignMerge
-    cp oozie/job.properties $(BASE)/workflows/
+	mkdir -p $(BASE)/workflows/clickstream
+	mkdir -p $(BASE)/workflows/pushCampaignMerge
+	cp oozie/job.properties $(BASE)/workflows/
 	cp oozie/acquisition/* $(BASE)/workflows/acquisition/
 	cp oozie/clickstream/* $(BASE)/workflows/clickstream/
 	cp oozie/pushCampaignMerge/* $(BASE)/workflows/pushCampaignMerge/
