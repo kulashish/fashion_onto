@@ -223,7 +223,7 @@
 			</configuration>
 			<script>${hiveDailyReportsScript}</script>
 			<param>hivedb=${hivedb}</param>
-			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}</param>
+			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
 			<param>-hivevar</param>
 			<param>FieldSeparator=${fieldSeparator}</param>
 			<param>-hivevar</param>
