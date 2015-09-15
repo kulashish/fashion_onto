@@ -72,7 +72,7 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @return
    */
   def getRecommendedSkus(refSku: Long, recommendation: List[Row]): List[(String)] = {
-    require(refSku != null, "refSkus cannot be null")
+//    require(refSku != null, "refSkus cannot be null")
     require(recommendation != null, "recommendation cannot be null")
     println("refSkus:-"+refSku)
     val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
