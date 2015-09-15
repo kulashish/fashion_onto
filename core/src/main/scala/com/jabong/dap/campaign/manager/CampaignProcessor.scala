@@ -206,7 +206,7 @@ object CampaignProcessor {
     for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
       val mailType = campaignDetails.mailType
       val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
+      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(androidDF(PageVisitVariables.ADD4PUSH) as CampaignMergedFields.deviceId).distinct
 
       val fileI = campaignDetails.campaignName + mailType + "_" + DataSets.IOS_CODE
       val fileA = campaignDetails.campaignName + mailType + "_" + DataSets.ANDROID_CODE
@@ -250,6 +250,26 @@ object CampaignProcessor {
     //    val csvFullPath = path + File.separator + fileName
 
     DataWriter.writeCsv(dfResult, DataSets.CAMPAIGNS, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
+  }
+
+
+  def addAd4pushId(ad4push: DataFrame, campaigns: DataFrame): DataFrame={
+    val ad4pushBc = Spark.getContext().broadcast(ad4push).value
+    val joined = campaigns.join(ad4pushBc, ad4pushBc(PageVisitVariables.BROWSER_ID) === campaigns(CampaignMergedFields.DEVICE_ID), SQL.LEFT_OUTER)
+      .select(campaigns(CampaignMergedFields.CUSTOMER_ID),
+        campaigns(CampaignMergedFields.LIVE_MAIL_TYPE),
+        campaigns(CampaignMergedFields.LIVE_REF_SKU1),
+        campaigns(CampaignMergedFields.EMAIL),
+        campaigns(CampaignMergedFields.DOMAIN),
+        when((campaigns(CampaignMergedFields.DOMAIN) === DataSets.ANDROID || campaigns(CampaignMergedFields.DOMAIN) === null) ,ad4push(PageVisitVariables.ADD4PUSH)).otherwise(campaigns(CampaignMergedFields.deviceId)) as PageVisitVariables.ADD4PUSH ,
+        campaigns(CampaignMergedFields.deviceId),
+        campaigns(CampaignMergedFields.LIVE_PROD_NAME),
+        campaigns(CampaignMergedFields.LIVE_BRAND),
+        campaigns(CampaignMergedFields.LIVE_BRICK),
+        campaigns(CampaignMergedFields.LIVE_CART_URL),
+        campaigns(CampaignMergedFields.END_OF_DATE))
+
+    return joined
   }
 
 }

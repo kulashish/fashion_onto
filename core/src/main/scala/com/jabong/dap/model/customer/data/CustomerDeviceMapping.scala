@@ -109,17 +109,11 @@ object CustomerDeviceMapping extends Logging {
 
   def processAdd4pushData(prevDate: String, curDate: String, saveMode: String, clickIncr: DataFrame) = {
     val ad4pushpath: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.EXTRAS + File.separator + DataSets.AD4PUSH_ID + File.separator + DataSets.FULL_MERGE_MODE + File.separator + prevDate
-    var ad4pushFull: DataFrame = null
-    if (DataVerifier.dataExists(ad4pushpath)){
-      val ad4pushPrev = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
-      ad4pushFull = getAd4pushId(ad4pushPrev, clickIncr)
-    }else{
-      ad4pushFull = getAd4pushId(null, clickIncr)
-    }
-    val ad4pushCurPath: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.EXTRAS + File.separator + DataSets.AD4PUSH_ID + File.separator + DataSets.FULL_MERGE_MODE + File.separator + curDate
-    if (DataWriter.canWrite(saveMode, ad4pushCurPath))
-      DataWriter.writeParquet(ad4pushFull, ad4pushCurPath, saveMode)
-
+    val ad4pushPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
+    val ad4pushFull = getAd4pushId(ad4pushPrevFull, clickIncr)
+    val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, curDate)
+    if (DataWriter.canWrite(saveMode, path))
+      DataWriter.writeParquet(ad4pushFull, path, saveMode)
   }
 
   /**
@@ -145,7 +139,10 @@ object CustomerDeviceMapping extends Logging {
 
 
   def getAd4pushId(prevFull: DataFrame, clicStreamIncr: DataFrame): DataFrame={
-    val grouped = clicStreamIncr.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
+    val grouped = clicStreamIncr
+                  .filter(clicStreamIncr(PageVisitVariables.DOMAIN) === DataSets.ANDROID  || clicStreamIncr(PageVisitVariables.ADD4PUSH) !== null)
+                  .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID)
+                  .agg(
                     first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
                     first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     var res : DataFrame = null
