@@ -14,7 +14,7 @@
 
     <fork name="acquisition">
         <path start="bobAcqFull1" />
-        <path start="bobAcqIncr" />
+        <path start="bobAcqFull2" />
         <path start="erpAcqIncr" />
     </fork>
 
@@ -38,31 +38,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="bobAcqFull2"/>
-        <error to="fail"/>
-    </action>
-
-    <action name="bobAcqFull2">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>bobAcqFull2</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="bobJoin"/>
+        <ok to="bobAcqIncr"/>
         <error to="fail"/>
     </action>
 
@@ -110,7 +86,31 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="bobJoin"/>
+        <ok to="bobErpJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="bobAcqFull2">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>bobAcqFull2</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="bobErpJoin"/>
         <error to="fail"/>
     </action>
 
@@ -162,11 +162,37 @@
         <error to="fail"/>
     </action>
 
-    <join name="bobJoin" to="pushCampaignStart1"/>
+    <join name="bobErpJoin" to="basicItr"/>
 
-    <fork name="pushCampaignStart1">
+    <action name="basicItr">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>basicItr</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="pushCampaignStart"/>
+        <error to="fail"/>
+    </action>
+
+    <fork name="pushCampaignStart">
         <path start="pushRetargetCampaign" />
-        <path start="bobErpJoin" />
+        <path start="pushInvalidCampaign" />
+        <path start="pushAbandonedCartCampaign" />
+        <path start="pushWishlistCampaign" />
     </fork>
 
     <action name="pushRetargetCampaign">
@@ -192,38 +218,6 @@
         <ok to="pushCampaignMergeJoin"/>
         <error to="fail"/>
     </action>
-
-    <join name="bobErpJoin" to="basicItr"/>
-
-    <action name="basicItr">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>basicItr</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="pushCampaignStart2"/>
-        <error to="fail"/>
-    </action>
-
-    <fork name="pushCampaignStart2">
-        <path start="pushInvalidCampaign" />
-        <path start="pushAbandonedCartCampaign" />
-        <path start="pushWishlistCampaign" />
-    </fork>
 
     <action name="pushInvalidCampaign">
         <shell xmlns="uri:oozie:shell-action:0.2">
