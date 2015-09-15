@@ -206,7 +206,7 @@ object CampaignProcessor {
     for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
       val mailType = campaignDetails.mailType
       val iosSplitDF = iosDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(CampaignMergedFields.deviceId).distinct
-      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(androidDF(PageVisitVariables.ADD4PUSH) as CampaignMergedFields.deviceId).distinct
+      val androidSplitDF = androidDF.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + mailType).select(androidDF(PageVisitVariables.ADD4PUSH) as CampaignMergedFields.deviceId).na.drop().distinct
 
       val fileI = campaignDetails.campaignName + mailType + "_" + DataSets.IOS_CODE
       val fileA = campaignDetails.campaignName + mailType + "_" + DataSets.ANDROID_CODE
