@@ -41,7 +41,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
-    println("OUTTESTDATA:-"+completeRefSku.show(10));
+    println("WTFFFFFF:-"+completeRefSku.show(10));
     recommendations.printSchema()
     val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
       && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
@@ -49,7 +49,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       .select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
         //recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
-        recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
+       // recommendations(CampaignMergedFields.RECOMMENDATIONS+"."+ProductVariables.SKU) as  CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
     recommendationJoined.printSchema()
