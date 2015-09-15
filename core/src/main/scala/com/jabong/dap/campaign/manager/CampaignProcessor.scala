@@ -254,7 +254,7 @@ object CampaignProcessor {
 
   def addAd4pushId(ad4push: DataFrame, campaigns: DataFrame): DataFrame = {
     val ad4pushBc = Spark.getContext().broadcast(ad4push).value
-    val joined = campaigns.join(ad4pushBc, ad4pushBc(PageVisitVariables.BROWSER_ID) === campaigns(CampaignMergedFields.DEVICE_ID), SQL.LEFT_OUTER)
+    val joined = campaigns.join(ad4pushBc, ad4pushBc(PageVisitVariables.BROWSER_ID) === campaigns(CampaignMergedFields.deviceId), SQL.LEFT_OUTER)
       .select(campaigns(CampaignMergedFields.CUSTOMER_ID),
         campaigns(CampaignMergedFields.LIVE_MAIL_TYPE),
         campaigns(CampaignMergedFields.LIVE_REF_SKU1),
