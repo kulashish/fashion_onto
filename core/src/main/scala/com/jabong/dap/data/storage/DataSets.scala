@@ -111,6 +111,7 @@ object DataSets {
   //Clickstream
   val CLICKSTREAM = "clickstream"
   val CAMPAIGNS = "campaigns"
+  val EMAIL_CAMPAIGNS = "email_campaigns"
   val DCF_FEED = "dcf_feed"
   val EXTRAS = "extras"
 
@@ -144,4 +145,5 @@ object DataSets {
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
 
+  val PUSH_CAMPAIGNS= CAMPAIGNS
 }

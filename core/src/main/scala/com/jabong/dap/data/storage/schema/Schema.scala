@@ -306,6 +306,14 @@ object Schema {
     StructField(CampaignMergedFields.DEVICE_ID, StringType, true)
   ))
 
+  val emailCampaignSchema = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.REC_SKU, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true)
+  ))
+
   val campaign = StructType(Array(
     StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_MAIL_TYPE, IntegerType, true),

@@ -2,9 +2,11 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation, CampaignCommon}
 import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -14,6 +16,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.spark.sql.functions._
 import scala.collection.mutable.HashMap
 
 /**
@@ -273,27 +276,55 @@ object CampaignManager extends Serializable with Logging {
    * Merges all the campaign output based on priority
    * @param campaignJsonPath
    */
-  def startPushCampaignMerge(campaignJsonPath: String) = {
+  def startCampaignMerge(campaignJsonPath: String, campaignType:String) = {
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
       //      createCampaignMaps(json)
       val saveMode = DataSets.OVERWRITE_SAVEMODE
-      val dateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder)
+      val dateFolder = TimeUtils.YESTERDAY_FOLDER
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, DataSets.PUSH_CAMPAIGNS)
 
-      val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
-      val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
+      val mergedData =
+      if(DataSets.PUSH_CAMPAIGNS==campaignType) {
+        val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+        val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
 
-      val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-      val mergedData = CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
+        val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
+        CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
+      }
+      else{
+        CampaignProcessor.mergeEmailCampaign(allCampaignsData)
+      }
 
       println("Starting write parquet after repartitioning and caching")
-      val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+      val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
         DataWriter.writeParquet(mergedData, writePath, saveMode)
 
       //writing csv file
-      CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
+      if(DataSets.PUSH_CAMPAIGNS==campaignType)
+        CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
+      else{
+        val expectedCSV = mergedData
+          .select(col(CustomerVariables.FK_CUSTOMER))
+          .withColumn(CampaignMergedFields.REF_SKU1+"-1",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(0)))
+          .withColumn(CampaignMergedFields.REF_SKU1+"-2",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(1)))
+
+          .withColumn(CampaignMergedFields.REC_SKU+"-1",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(0)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-2",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(1)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-3",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(2)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-4",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(3)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-5",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(4)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-6",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(5)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-7",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(6)))
+          .withColumn(CampaignMergedFields.REC_SKU+"-8",Udf.getElementArray(col(CampaignMergedFields.REF_SKU1),lit(7)))
+          .select(col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE), col(CustomerVariables.EMAIL))
+          .drop(CampaignMergedFields.REF_SKU1)
+          .drop(CampaignMergedFields.REC_SKU)
+
+        DataWriter.writeCsv(expectedCSV,DataSets.CAMPAIGNS,DataSets.EMAIL_CAMPAIGNS,DataSets.DAILY_MODE,dateFolder,TimeUtils.changeDateFormat(dateFolder, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD),saveMode, "true",";")
+      }
     }
   }
-
 }
