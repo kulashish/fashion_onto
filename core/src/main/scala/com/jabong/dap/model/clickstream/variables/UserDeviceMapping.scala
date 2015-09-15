@@ -34,7 +34,8 @@ object UserDeviceMapping {
 
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
-      col(PageVisitVariables.PAGE_TIMESTAMP)
+      col(PageVisitVariables.PAGE_TIMESTAMP),
+      col(PageVisitVariables.ADD4PUSH)
     )
       .filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL")
       .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
@@ -43,7 +44,7 @@ object UserDeviceMapping {
     // Get user device mapping sorted by time
     val dfuserDeviceMap = dfAppUser.filter(PageVisitVariables.USER_ID + " IS NOT NULL")
       .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
-      .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
+      .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN, PageVisitVariables.ADD4PUSH)
       .agg(
         max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
       )
@@ -72,7 +73,9 @@ object UserDeviceMapping {
       col(PageVisitVariables.USER_ID), // Taken care in input DF
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
-      col(PageVisitVariables.PAGE_TIMESTAMP)
+      col(PageVisitVariables.PAGE_TIMESTAMP),
+      col(PageVisitVariables.ADD4PUSH)
+
     )
       //.filter(PageVisitVariables.BROWSER_ID + " IS NOT NULL") Taken care in input DF
       .filter(PageVisitVariables.DOMAIN + " IS NOT NULL")
@@ -82,7 +85,7 @@ object UserDeviceMapping {
     val dfuserDeviceMap = dfAppUser
       .filter(PageVisitVariables.USER_ID + " IS NOT NULL")
       .orderBy(PageVisitVariables.PAGE_TIMESTAMP)
-      .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
+      .groupBy(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN, PageVisitVariables.ADD4PUSH)
       .agg(
         max(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
       )
@@ -91,7 +94,9 @@ object UserDeviceMapping {
       col(PageVisitVariables.USER_ID),
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
-      col(PageVisitVariables.PAGE_TIMESTAMP)
+      col(PageVisitVariables.PAGE_TIMESTAMP),
+      col(PageVisitVariables.ADD4PUSH)
+
     )
   }
 }
