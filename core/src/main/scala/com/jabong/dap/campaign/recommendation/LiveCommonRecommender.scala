@@ -44,7 +44,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     println("OUTTESTDATA:-"+completeRefSku.show(10));
 
     val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
-      && completeRefSku(ProductVariables.MVP) === completeRefSku(ProductVariables.MVP)
+      && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
       && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       .select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
