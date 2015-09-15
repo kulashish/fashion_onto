@@ -109,11 +109,17 @@ object CustomerDeviceMapping extends Logging {
 
   def processAdd4pushData(prevDate: String, curDate: String, saveMode: String, clickIncr: DataFrame) = {
     val ad4pushpath: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.EXTRAS + File.separator + DataSets.AD4PUSH_ID + File.separator + DataSets.FULL_MERGE_MODE + File.separator + prevDate
-    val ad4pushPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
-    val ad4pushFull = getAd4pushId(ad4pushPrevFull, clickIncr)
-    val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, curDate)
-    if (DataWriter.canWrite(saveMode, path))
-      DataWriter.writeParquet(ad4pushFull, path, saveMode)
+    var ad4pushFull: DataFrame = null
+    if (DataVerifier.dataExists(ad4pushpath)){
+      val ad4pushPrev = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
+      ad4pushFull = getAd4pushId(ad4pushPrev, clickIncr)
+    }else{
+      ad4pushFull = getAd4pushId(null, clickIncr)
+    }
+    val ad4pushCurPath: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.EXTRAS + File.separator + DataSets.AD4PUSH_ID + File.separator + DataSets.FULL_MERGE_MODE + File.separator + curDate
+    if (DataWriter.canWrite(saveMode, ad4pushCurPath))
+      DataWriter.writeParquet(ad4pushFull, ad4pushCurPath, saveMode)
+
   }
 
   /**
@@ -135,25 +141,22 @@ object CustomerDeviceMapping extends Logging {
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
-    }
+  }
 
 
   def getAd4pushId(prevFull: DataFrame, clicStreamIncr: DataFrame): DataFrame={
-    val grouped = clicStreamIncr
-                  .filter(clicStreamIncr(PageVisitVariables.DOMAIN) === DataSets.ANDROID)
-                  .orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID)
-                  .agg(
-                    first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
-                    first(PageVisitVariables.PAGE_TIMESTAMP ) as PageVisitVariables.PAGE_TIMESTAMP)
+    val grouped = clicStreamIncr.orderBy(PageVisitVariables.PAGE_TIMESTAMP).groupBy(PageVisitVariables.BROWSER_ID).agg(
+      first(desc(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
+      first(desc(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     var res : DataFrame = null
     if(null == prevFull){
       return grouped
     } else{
       res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
-      .select(
-      coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
-      coalesce(grouped(PageVisitVariables.ADD4PUSH) , prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
-      coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP) , prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+        .select(
+          coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+          coalesce(grouped(PageVisitVariables.ADD4PUSH) , prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
+          coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP) , prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     }
     return res
   }
