@@ -635,7 +635,7 @@ object CampaignUtils extends Logging {
     require(skuFilter != null, "skuFilter data cannot be null")
     require(yesterdayItr != null, "yesterdayItrData  cannot be null")
 
-    val skuFilterData = skuFilter.filter(ProductVariables.SKU_SIMPLE + " is not null)
+    val skuFilterData = skuFilter.filter(ProductVariables.SKU_SIMPLE + " is not null")
 
     val yesterdayItrData = yesterdayItr.withColumnRenamed(ProductVariables.SKU_SIMPLE, "ITR_" + ProductVariables.SKU_SIMPLE).
       withColumnRenamed(ProductVariables.SPECIAL_PRICE, "ITR_" + ProductVariables.SPECIAL_PRICE)
