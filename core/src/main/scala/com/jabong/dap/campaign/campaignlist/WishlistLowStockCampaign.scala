@@ -7,6 +7,7 @@ import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -44,21 +45,11 @@ class WishlistLowStockCampaign {
       col(CustomerProductShortlistVariables.SPECIAL_PRICE)
     )
 
-    var skusFiltered = dfUnion
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dfUnion)
 
-    if (past30DayCampaignMergedData != null) {
-      //past campaign check whether the campaign has been sent to customer in last 30 days
-      val pastCampaignCheck = new PastCampaignCheck()
-
-      skusFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfUnion,
-        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, 1000), 30)
-    }
-    val refSkus = CampaignUtils.generateReferenceSku(skusFiltered, CampaignCommon.NUMBER_REF_SKUS)
-
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN)
-
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN)
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dfUnion)
 
   }
 

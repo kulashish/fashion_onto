@@ -53,8 +53,7 @@ object Surf extends Logging {
     var skusFiltered = dfSkuNotBought
     if (past30DayCampaignMergedData != null) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
-      val pastCampaignCheck = new PastCampaignCheck()
-      skusFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfSkuNotBought,
+      skusFiltered = PastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfSkuNotBought,
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
 
