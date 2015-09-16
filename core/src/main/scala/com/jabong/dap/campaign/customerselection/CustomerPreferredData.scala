@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import grizzled.slf4j.Logging
@@ -9,7 +10,7 @@ import org.apache.spark.sql.functions._
 /**
  * Created by raghu on 15/9/15.
  */
-class CustomerPreferredData extends LiveCustomerSelector with Logging {
+class CustomerPreferredData extends CustomerSelector with Logging {
 
   override def customerSelection(yestCustomerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
 
@@ -18,8 +19,10 @@ class CustomerPreferredData extends LiveCustomerSelector with Logging {
       return null
     }
 
+    val successFulOrderItems = CampaignUtils.getSuccessfulOrders(last6thDaySalesOrderItemData)
+
     //join SalesOrder and SalesOrderItem Data
-    val dfJoinOrderAndItem = last6thDaySalesOrderData.join(last6thDaySalesOrderItemData, last6thDaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER) === last6thDaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER), SQL.INNER)
+    val dfJoinOrderAndItem = last6thDaySalesOrderData.join(successFulOrderItems, successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) === last6thDaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER), SQL.INNER)
       .select(SalesOrderVariables.FK_CUSTOMER, SalesOrderItemVariables.SKU)
 
     val dfCustomerData = yestCustomerData.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.CITY, ProductVariables.BRAND)
