@@ -144,6 +144,7 @@ object CampaignUtils extends Logging {
   def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     //    import sqlContext.implicits._
+    // FIXME: customer null check won't work for surf, check if sku simple need to be converted to sku
 
     if (refSkuData == null || NumberSku <= 0) {
       return null
@@ -163,16 +164,10 @@ object CampaignUtils extends Logging {
 
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
-    // FIXME: need to sort by special price
-    // For some campaign like wishlist, we will have to write another variant where we get price from itr
+    // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
     val customerSkuMap = customerData.map(t => ((t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(), t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString, checkNullString(t(t.fieldIndex(ProductVariables.BRAND))), checkNullString(t(t.fieldIndex(ProductVariables.BRICK))), checkNullString(t(t.fieldIndex(ProductVariables.MVP))), checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
-    //.distinct.sortBy(-_._1).take(NumberSku)) }
-    //  .map{case(key,value) => (key,value(0)._2,value(1)._2)}
-    // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    //    val grouped = customerGroup.toD
-    //      .toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.REF_SKUS)
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 

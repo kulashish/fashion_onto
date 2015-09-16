@@ -13,4 +13,5 @@ object CustomerSelection {
   val LAST_THIRTY_DAY_SESSION = "LastThirtyDaySession"
   val SALES_CART = "SalesCart"
   val CLOSED_ORDER = "ClosedOrder"
+  val CUSTOMER_PREFERRED_DATA = "CustomerPreferredData"
 }
