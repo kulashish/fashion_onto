@@ -47,6 +47,9 @@ class CustomerSelectorFactory extends CampaignFactory {
     if (customerSelectionType.equalsIgnoreCase(CustomerSelection.CLOSED_ORDER)) {
       return new ClosedOrder()
     }
+    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.CUSTOMER_PREFERRED_DATA)) {
+      return new CustomerPreferredData()
+    }
 
     return null
   }
