@@ -129,9 +129,9 @@ object Init {
       case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.pushCampaignsJson)
 
       // clickstream use cases
-      case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
-      case "clickstreamSurf3Variable" => SurfVariablesMain.startSurf3Variable()
-      case "clickstreamSurf3MergeData30" => GetSurfVariables.getSurf3mergedForLast30Days()
+      case "clickstreamYesterdaySession" => new ComponentExecutor().start(params.paramJson)
+      case "clickstreamSurf3Variable" => new ComponentExecutor().start(params.paramJson)
+      case "clickstreamSurf3MergeData30" => new ComponentExecutor().start(params.paramJson)
 
       //campaign quality check
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)
@@ -142,6 +142,8 @@ object Init {
 
       // dcf feed
       case "dcfFeedGenerate" => new ComponentExecutor().start(params.paramJson)
+
+      case "clickstreamDataQualityCheck" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }

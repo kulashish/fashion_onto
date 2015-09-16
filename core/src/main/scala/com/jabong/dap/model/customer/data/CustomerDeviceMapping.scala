@@ -100,7 +100,9 @@ object CustomerDeviceMapping extends Logging {
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
     val path = OptionUtils.getOptValue(vars.path)
     val saveMode = vars.saveMode
-    processData(prevDate, path, incrDate, saveMode)
+    val clickIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, incrDate)
+    processData(prevDate, path, incrDate, saveMode, clickIncr)
+    processAdd4pushData(prevDate, incrDate, saveMode, clickIncr)
   }
 
   /**
@@ -109,20 +111,55 @@ object CustomerDeviceMapping extends Logging {
    * @param path
    * @param curDate
    */
-  def processData(prevDate: String, path: String, curDate: String, saveMode: String) {
-    val df1 = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, curDate)
-    var df2: DataFrame = null
-    // val TMP_OUTPUT_PATH = DataSets.basePath + File.separator + "output1"
-    if (null != path) {
-      df2 = getDataFrameCsv4mDCF(path)
-    } else {
-      df2 = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
-    }
-    val df3 = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
-    val res = getLatestDevice(df1, df2, df3)
+  def processData(prevDate: String, path: String, curDate: String, saveMode: String, clickIncr: DataFrame) {
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
-    if (DataWriter.canWrite(saveMode, savePath))
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      var cmrFull: DataFrame = null
+      if (null != path) {
+        cmrFull = getDataFrameCsv4mDCF(path)
+      } else {
+        cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+      }
+      val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
+      val res = getLatestDevice(clickIncr, cmrFull, customerIncr)
+
       DataWriter.writeParquet(res, savePath, saveMode)
+    }
+  }
+
+  def processAdd4pushData(prevDate: String, curDate: String, saveMode: String, clickIncr: DataFrame) = {
+    val ad4pushCurPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, curDate)
+    if (DataWriter.canWrite(saveMode, ad4pushCurPath)) {
+      val ad4pushPrev = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
+      val ad4pushFull = getAd4pushId(ad4pushPrev, clickIncr)
+      DataWriter.writeParquet(ad4pushFull, ad4pushCurPath, saveMode)
+    }
+  }
+
+  def getAd4pushId(prevFull: DataFrame, clickstreamIncr: DataFrame): DataFrame = {
+    val notNullAdd4push = clickstreamIncr
+      .select(
+        PageVisitVariables.BROWSER_ID,
+        PageVisitVariables.ADD4PUSH,
+        PageVisitVariables.PAGE_TIMESTAMP
+      )
+      .dropDuplicates()
+      .na.drop(Array(PageVisitVariables.ADD4PUSH))
+    val grouped = notNullAdd4push.orderBy(col(PageVisitVariables.BROWSER_ID), desc(PageVisitVariables.PAGE_TIMESTAMP))
+      .groupBy(PageVisitVariables.BROWSER_ID)
+      .agg(
+        first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
+        first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
+      )
+    var res: DataFrame = grouped
+    if (null != prevFull) {
+      res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
+        .select(
+          coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+          coalesce(grouped(PageVisitVariables.ADD4PUSH), prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
+          coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP), prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
+    }
+    return res
   }
 
   /**

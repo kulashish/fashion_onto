@@ -1,35 +1,18 @@
-18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c bob  >>/opt/alchemy-core/logs/bob_logs.txt
-
-18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c bobFull  >>/opt/alchemy-core/logs/bobFull_logs.txt
-
-18 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c erp  >>/opt/alchemy-core/logs/erp_logs.txt
-
-0 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c basicItr >>/opt/alchemy-core/logs/basicItr_logs.txt
-
-0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushInvalidCampaign  >>/opt/alchemy-core/logs/pushInvalidCampaign_logs.txt
-
-0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushAbandonedCartCampaign  >>/opt/alchemy-core/logs/pushAbandonedCartCampaign_logs.txt
-
-0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c retargetPushCampaign  >>/opt/alchemy-core/logs/retargetPushCampaign_logs.txt
-
-0 3 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushWishlistCampaign  >>/opt/alchemy-core/logs/pushWishlistCampaign_logs.txt
+18 0 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/acquisition/job.properties -run
 
 30 3 * * * sh /opt/alchemy-core/current/bin/clickstream/clickstream_pipe.sh >>/opt/alchemy-core/logs/clickstream_logs.txt
-
-0 4 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c deviceMapping >>/opt/alchemy-core/logs/deviceMapping_logs.txt
-
-30 4 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushSurfCampaign >>/opt/alchemy-core/logs/pushSurfCampaign_logs.txt
 
 30 4 * * * sh /opt/alchemy-core/current/bin/dcf_feed_upload.sh >>/opt/alchemy-core/logs/dcf_feed.txt
 
 0 5 * * * sh /opt/alchemy-core/current/bin/pricing_sku_data.sh >>/opt/alchemy-core/logs/pricing_sku_data.txt
 
-30 5 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c pushCampaignMerge >>/opt/alchemy-core/logs/pushCampaignMerge_logs.txt
+30 5 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/pushCampaignMerge/job.properties -run
 
 30 6 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
 
-30 7 * * * perl /opt/alchemy-core/current/bin/run.pl -t prod -c mobilePushCampaignQuality >>/opt/alchemy-core/logs/mobilePushCampaignQuality_logs.txt
+0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
 0 11 * * * perl /opt/alchemy-core/current/bin/ad4push_device_merger.pl  >>/opt/alchemy-core/logs/ad4pushDevices_logs.txt
 
 30 11 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
+

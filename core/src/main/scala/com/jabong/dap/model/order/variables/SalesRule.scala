@@ -46,11 +46,11 @@ object SalesRule {
         wc2(SalesRuleVariables.CREATED_AT) as SalesRuleVariables.CODE2_CREATION_DATE,
         wc2(SalesRuleVariables.TO_DATE) as SalesRuleVariables.CODE2_VALID_DATE
       )
-    if(null == wcPrev){
+    if (null == wcPrev) {
       wcfull = wcIncr
-    } else{
+    } else {
       wcfull = wcPrev.join(wcIncr, wcPrev(SalesRuleVariables.FK_CUSTOMER) === wcIncr(SalesRuleVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                .select(
+        .select(
           coalesce(wcIncr(SalesRuleVariables.FK_CUSTOMER), wcPrev(SalesRuleVariables.FK_CUSTOMER)) as SalesRuleVariables.FK_CUSTOMER,
           coalesce(wcIncr(SalesRuleVariables.CODE1), wcPrev(SalesRuleVariables.CODE1)) as SalesRuleVariables.CODE1,
           coalesce(wcIncr(SalesRuleVariables.CODE1_CREATION_DATE), wcPrev(SalesRuleVariables.CODE1_CREATION_DATE)) as SalesRuleVariables.CODE1_CREATION_DATE,

@@ -1,12 +1,16 @@
 name := "Alchemy"
 
-version := "0.1.9"
+version := "0.1.10"
 
 scalaVersion := "2.10.5"
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("public")
 )
+
+libraryDependencies += "com.sun.mail" % "javax.mail" % "1.5.3"
+
+libraryDependencies += "javax.mail" % "javax.mail-api" % "1.5.3"
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "1.2.1"  % "provided"
 
@@ -40,3 +44,6 @@ assemblyJarName in assembly := "Alchemy-assembly.jar"
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")
+
+
+//seq(lsSettings :_*)
