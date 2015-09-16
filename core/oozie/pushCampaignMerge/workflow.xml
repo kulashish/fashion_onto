@@ -29,7 +29,7 @@
             <argument>pushCampaignMerge</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="mobilePushCampaignQuality"/>
@@ -53,7 +53,7 @@
             <argument>mobilePushCampaignQuality</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>scripts/run.pl#run.pl</file>
+            <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
         <ok to="end"/>
