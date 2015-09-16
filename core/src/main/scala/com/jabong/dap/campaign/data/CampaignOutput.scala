@@ -21,8 +21,8 @@ object CampaignOutput {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
-    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE,path)) {
-      DataWriter.writeParquet(campaignOutput,path,DataSets.IGNORE_SAVEMODE)
+    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
+      DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
     }
 
   }
