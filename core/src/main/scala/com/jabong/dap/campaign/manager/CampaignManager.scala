@@ -57,6 +57,23 @@ object CampaignManager extends Serializable with Logging {
 
     return true
   }
+  def startInvalidIODCampaign(campaignsConfig:String)={
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+
+    val invalidIODCampaign = new InvalidIODCampaign()
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+    val fullOrderData = CampaignInput.loadFullOrderData()
+
+    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+
+    // last 3 days of orderitem data
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
+
+    invalidIODCampaign.runCampaign(past30DayCampaignMergedData,orderData,orderItemData,last30daysItrData,brickMvpRecommendations)
+  }
 
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()

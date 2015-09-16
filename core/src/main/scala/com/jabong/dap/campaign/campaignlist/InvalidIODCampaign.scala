@@ -13,7 +13,7 @@ import org.apache.spark.sql.DataFrame
  */
 class InvalidIODCampaign {
 
-  def runCampaign(past30DayCampaignMergedData: DataFrame,customerOrderData: DataFrame, orderItemData: DataFrame,last30daysItrData: DataFrame): Unit ={
+  def runCampaign(past30DayCampaignMergedData: DataFrame,customerOrderData: DataFrame, orderItemData: DataFrame,last30daysItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit ={
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
@@ -30,7 +30,15 @@ class InvalidIODCampaign {
 
     //sku selection
     val invalidIod = ItemOnDiscount.skuFilter(custFiltered,last30daysItrData)
-    val campaignOutput = CampaignUtils.addCampaignMailType(invalidIod, CampaignCommon.INVALID_IOD_CAMPAIGN)
+    val yesterdayItrData = CampaignUtils.getYesterdayItrData(last30daysItrData)
+    val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(invalidIod, yesterdayItrData)
+    val refSkus = CampaignUtils.generateReferenceSkus(filteredSkuJoinedItr, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_IOD_CAMPAIGN)
+
+    // create recommendations
+    val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
+
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, brickMvpRecommendations)
 
     //save campaign Output
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.INVALID_IOD_CAMPAIGN)
