@@ -16,8 +16,8 @@ import org.apache.spark.sql.DataFrame
  */
 object PastCampaignCheck extends Logging {
 
-  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData().cache()
-  val past30DayEmailCampaignMergedData: DataFrame = null
+  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS).cache()
+  val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS).cache()
 
   
   /**
