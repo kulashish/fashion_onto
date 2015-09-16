@@ -406,6 +406,8 @@ object CampaignInput extends Logging {
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
+          // added to add new column add4pushId for the old camaigns data
+          SchemaUtils.changeSchema(mergedCampaignData, campaignMerged30Day.schema)
           campaignMerged30Day = campaignMerged30Day.unionAll(mergedCampaignData)
         }
       }

@@ -2,9 +2,8 @@ package com.jabong.dap.campaign.data
 
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.DataFrame
 
 object CampaignOutput {
@@ -20,13 +19,10 @@ object CampaignOutput {
   def saveCampaignDataForYesterday(campaignOutput: DataFrame, campaignName: String) = {
 
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
-    val path = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
-
-    val dataExits = DataVerifier.dataExists(path)
-
-    if (!dataExits) {
-      campaignOutput.write.parquet(path)
+    if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE,path)) {
+      DataWriter.writeParquet(campaignOutput,path,DataSets.IGNORE_SAVEMODE)
     }
 
   }
