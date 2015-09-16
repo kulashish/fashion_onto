@@ -1,16 +1,17 @@
-package com.jabong.dap.campaign.skuselection
+package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, SalesOrderVariables, SalesOrderItemVariables }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
+import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
  * Created by raghu on 15/9/15.
  */
-object DCFBrandInCity {
+class CustomerPreferredData extends LiveCustomerSelector with Logging {
 
-  def skuFilter(yestCustomerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
+  override def customerSelection(yestCustomerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
 
     if (yestCustomerData == null || last6thDaySalesOrderData == null || last6thDaySalesOrderItemData == null) {
       log("Data frame should not be null")
@@ -28,5 +29,13 @@ object DCFBrandInCity {
 
     return dfResult
   }
+
+  override def customerSelection(inData: DataFrame): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 
 }
