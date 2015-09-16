@@ -2,9 +2,9 @@ package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.status.OrderStatus
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -44,7 +44,7 @@ object InvalidFollowupQuality extends BaseCampaignQuality {
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 
-    val invalidFollow = CampaignInput.getCampaignData(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, date)
+    val invalidFollow = CampaignInput.getCampaignData(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
 
     val itr = CampaignInput.loadYesterdayItrSkuData()
 

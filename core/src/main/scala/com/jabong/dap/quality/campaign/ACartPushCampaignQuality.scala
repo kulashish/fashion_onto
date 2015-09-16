@@ -5,8 +5,8 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
 import com.jabong.dap.common.constants.variables.ACartVariables
-import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -75,9 +75,9 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
     val salesCart3rdDay = CampaignQualityEntry.salesCart3rdDayData
     // val yesterDayItr30Days = CampaignInput.load30DayItrSkuSimpleData()
     // val yesterDayItrData = CampaignInput.loadYesterdayItrSimpleData()
-    val acartFollowUp = CampaignInput.getCampaignData(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, date, CampaignCommon.VERY_LOW_PRIORITY)
-    val acartIOD = CampaignInput.getCampaignData(CampaignCommon.ACART_IOD_CAMPAIGN, date, CampaignCommon.VERY_LOW_PRIORITY)
-    val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, date, CampaignCommon.VERY_LOW_PRIORITY)
+    val acartFollowUp = CampaignInput.getCampaignData(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS, CampaignCommon.VERY_LOW_PRIORITY)
+    val acartIOD = CampaignInput.getCampaignData(CampaignCommon.ACART_IOD_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS,CampaignCommon.VERY_LOW_PRIORITY)
+    val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS,CampaignCommon.VERY_LOW_PRIORITY)
     return (salesCart30Days, salesCart3rdDay, acartFollowUp, acartIOD, acartLowStock)
   }
 

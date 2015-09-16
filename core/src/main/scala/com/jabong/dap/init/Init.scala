@@ -3,6 +3,7 @@ package com.jabong.dap.init
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.custorder.ComponentExecutor
@@ -30,7 +31,7 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     paramJson: String = null,
-    pushCampaignsJson: String = null,
+    campaignsJson: String = null,
     config: String = null)
 
   def main(args: Array[String]) {
@@ -71,7 +72,7 @@ object Init {
 
       opt[String]("pushCampaignsJson")
         .text("Path to push Campaigns priority config file.")
-        .action((x, c) => c.copy(pushCampaignsJson = x))
+        .action((x, c) => c.copy(campaignsJson = x))
 
     }
 
@@ -122,11 +123,12 @@ object Init {
       case "Ad4pushCustReact" => new ComponentExecutor().start(params.paramJson)
       case "Ad4pushDeviceMerger" => new ComponentExecutor().start(params.paramJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
-      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.pushCampaignsJson)
-      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.pushCampaignsJson)
-      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns(params.pushCampaignsJson)
-      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
-      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.pushCampaignsJson)
+      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.campaignsJson)
+      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.campaignsJson)
+      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns(params.campaignsJson)
+      case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
+      case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
+      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => SurfVariablesMain.startClickstreamYesterdaySessionVariables()
@@ -134,7 +136,7 @@ object Init {
       case "clickstreamSurf3MergeData30" => GetSurfVariables.getSurf3mergedForLast30Days()
 
       //campaign quality check
-      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)
+      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson)
       // all pushCampaign quality checks
       case "campaignQuality" => new ComponentExecutor().start(params.paramJson)
       //pricing sku data

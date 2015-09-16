@@ -530,5 +530,7 @@ object UdfUtils {
       return 0
     }
   }
-
+  def getElementArray(strings: Array[String], i: Int): String = {
+    strings(i)
+  }
 }
