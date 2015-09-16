@@ -192,7 +192,7 @@
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>loc=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 		</hive>
-		<ok to='end' />
+		<ok to='hive_daily_reports' />
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_daily_reports'>
