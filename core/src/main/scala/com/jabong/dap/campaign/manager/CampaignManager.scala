@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
@@ -14,6 +14,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -58,11 +59,15 @@ object CampaignManager extends Serializable with Logging {
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
 
-    val orderItemData = CampaignInput.loadYesterdayOrderItemData()
+    val orderItemData = CampaignInput.loadYesterdayOrderItemData().cache()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
-    liveRetargetCampaign.runCampaign(orderData, orderItemData)
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    liveRetargetCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
   }
 
   def startPushInvalidCampaign(campaignsConfig: String) = {

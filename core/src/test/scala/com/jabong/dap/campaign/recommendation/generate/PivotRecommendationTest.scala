@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.recommendation.generate
 
-import com.jabong.dap.campaign.recommendation.generator.CommonRecommendation
+import com.jabong.dap.campaign.recommendation.generator.{ PivotRecommendation, CommonRecommendation }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets

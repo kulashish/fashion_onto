@@ -13,6 +13,13 @@ object CampaignMergedFields {
   val EMAIL = "email"
   val DOMAIN = "domain"
 
+  val REF_SKUS = "ref_skus"
+
+  val REC_SKUS = "rec_skus"
+
+  val REF_SKU = "ref_sku"
+
+
   val deviceId = "deviceId"
   val LIVE_MAIL_TYPE = "LIVE_MAIL_TYPE"
   val LIVE_BRAND = "LIVE_BRAND"
@@ -20,4 +27,6 @@ object CampaignMergedFields {
   val LIVE_BRICK = "LIVE_BRICK"
   val LIVE_PROD_NAME = "LIVE_PROD_NAME"
   val LIVE_CART_URL = "LIVE_CART_URL"
+
+  val RECOMMENDATIONS = "recommendations"
 }

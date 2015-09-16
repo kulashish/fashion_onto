@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.recommendation.generate
 
 import com.jabong.dap.campaign.recommendation.generator.{ CommonRecommendation, PivotRecommendation }
 import com.jabong.dap.common._
-import com.jabong.dap.common.constants.campaign.Recommendation
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.variables.ProductVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -122,7 +122,7 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
       StructField(ProductVariables.BRICK, StringType, false),
       StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
+      StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
     ))
     a[IllegalArgumentException] should be thrownBy {
       commonRecommendation.genRecommend(inventoryCheckInput, null, dataFrameSchema, 8)
@@ -134,14 +134,14 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
       StructField(ProductVariables.BRICK, StringType, false),
       StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
+      StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP)
 
     val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema, 8)
 
     val recommendations = recOut.filter(ProductVariables.GENDER + "='WOMEN'")
-      .select(ProductVariables.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
+      .select(CampaignMergedFields.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
     assert(recommendations.length == 1)
   }
 
@@ -151,14 +151,14 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
       StructField(ProductVariables.MVP, StringType, false),
       StructField(ProductVariables.BRAND, StringType, false),
       StructField(ProductVariables.GENDER, StringType, false),
-      StructField(ProductVariables.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
+      StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
     ))
     val pivotKeys = Array(ProductVariables.BRICK, ProductVariables.MVP, ProductVariables.BRAND)
 
     val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema, 8)
 
     val recommendations = recOut.filter(ProductVariables.GENDER + "='UNISEX'")
-      .select(ProductVariables.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
+      .select(CampaignMergedFields.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
     assert(recommendations.length == 1)
   }
 
