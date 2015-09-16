@@ -681,6 +681,8 @@ object CampaignUtils extends Logging {
     if (campaignName.startsWith("acart")) {
       //generate reference sku for acart with acart url
       refSkus = CampaignUtils.generateReferenceSkusForAcart(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
+    } else if (campaignName.startsWith("surf")) {
+      refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
     } else {
       refSkus = CampaignUtils.generateReferenceSku(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }

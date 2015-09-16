@@ -50,16 +50,10 @@ object Surf extends Logging {
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem).
       withColumnRenamed(ItrVariables.SKU, ProductVariables.SKU_SIMPLE)
 
-    var skusFiltered = dfSkuNotBought
-    if (past30DayCampaignMergedData != null) {
-      //past campaign check whether the campaign has been sent to customer in last 30 days
-      skusFiltered = PastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfSkuNotBought,
-        CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
-    }
 
-    val dfJoin = skusFiltered.join(
+    val dfJoin = dfSkuNotBought.join(
       itrData,
-      skusFiltered(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
+      dfSkuNotBought(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),
       SQL.INNER
     )
       .select(
