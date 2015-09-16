@@ -6,6 +6,7 @@ import com.jabong.dap.campaign.skuselection.ItemOnDiscount
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection, SkuSelection }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -20,24 +21,15 @@ class AcartIODCampaign {
     //FIXME:Filter the order items data for 30 days
     val selectedCustomers = acartCustomerSelection.customerSelection(last30DayAcartData, last30daySalesOrderData, last30DaySalesOrderItemData)
 
-    var custFiltered = selectedCustomers
-
-    if (past30DayCampaignMergedData != null) {
-      //past campaign check whether the campaign has been sent to customer in last 30 days
-      val pastCampaignCheck = new PastCampaignCheck()
-      custFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
-        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_IOD_CAMPAIGN, 1000), 30)
-
-    }
     //sku selection
     //filter sku based on iod filter
-    val filteredSku = ItemOnDiscount.skuFilter(custFiltered, last30daysItrData)
-    //generate reference sku for acart with acart url
-    val refSkus = CampaignUtils.generateReferenceSkusForAcart(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    val filteredSku = ItemOnDiscount.skuFilter(selectedCustomers, last30daysItrData)
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_IOD_CAMPAIGN)
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_IOD_CAMPAIGN)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_IOD_CAMPAIGN, filteredSku)
+
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_IOD_CAMPAIGN, filteredSku)
 
   }
 

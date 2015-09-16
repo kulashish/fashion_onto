@@ -61,11 +61,15 @@ object CampaignManager extends Serializable with Logging {
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
 
-    val orderItemData = CampaignInput.loadYesterdayOrderItemData()
+    val orderItemData = CampaignInput.loadYesterdayOrderItemData().cache()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
-    liveRetargetCampaign.runCampaign(orderData, orderItemData)
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    liveRetargetCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
   }
 
   def startPushInvalidCampaign(campaignsConfig: String) = {

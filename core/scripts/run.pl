@@ -111,7 +111,7 @@ if ($component eq "bob") {
     run_component("erp Merge for Incremental tables", $command2);
 } elsif ($component eq "retargetPushCampaign") {
     # for retarget campaign module
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
     run_component($component, $command);
 } elsif ($component eq "clickstreamYesterdaySession") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json";

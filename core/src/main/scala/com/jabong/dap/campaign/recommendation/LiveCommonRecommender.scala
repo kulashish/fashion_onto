@@ -1,14 +1,14 @@
 package com.jabong.dap.campaign.recommendation
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
-import com.jabong.dap.common.time.TimeUtils
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ DataFrame }
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.functions._
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /**
  * Created by rahul aneja on 21/8/15.
@@ -24,33 +24,83 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
 
-    val recommendationJoined = refSkus.join(recommendations, refSkus(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
-      && refSkus(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
-      && refSkus(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
-      .select(refSkus(CampaignMergedFields.REF_SKU1),
-        refSkus(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        refSkus(CustomerVariables.FK_CUSTOMER),
-        recommendations(ProductVariables.BRICK),
-        recommendations(ProductVariables.MVP),
-        recommendations(ProductVariables.GENDER),
-        recommendations(ProductVariables.RECOMMENDATIONS))
+    val refSkuExploded = refSkus.select(
+      refSkus(CustomerVariables.FK_CUSTOMER),
+      refSkus(CampaignMergedFields.REF_SKU1),
+      refSkus(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
-    //  val refSkusWithRecommendations = recommendationJoined.map(row=> getRecommendedSkus(row(row.fieldIndex(CampaignMergedFields.REF_SKU1))
-    //  ,row(row.fieldIndex(ProductVariables.RECOMMENDATIONS))))
+    //FIXME: To check if there is any ref sku in recommended sku
+    val completeRefSku = refSkuExploded.select(
+      refSkuExploded(CustomerVariables.FK_CUSTOMER),
+      refSkuExploded(CampaignMergedFields.REF_SKU1),
+      refSkuExploded(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      refSkuExploded("ref_sku_fields.brick") as ProductVariables.BRICK,
+      refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
+      refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
+      refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
-    return recommendationJoined
+    val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
+      && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+      && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+      .select(
+        completeRefSku(CustomerVariables.FK_CUSTOMER),
+        // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
+        recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
+        completeRefSku(CampaignMergedFields.REF_SKU),
+        completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
+
+    val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
+      .map({ case (key, value) => (key, value._1, value._2, value._3) })
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+    val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKUS,
+      CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+
+    return campaignDataWithRecommendations
   }
 
+  //  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
+  //  /**
+  //   *
+  //   * @param refSku
+  //   * @param recommendation
+  //   * @return
+  //   */
+  //  def getRecommendedSkus(refSku: String, recommendation: List[(Row)]): List[(Row)] = {
+  //    require(refSku != null, "refSkus cannot be null")
+  //    require(recommendation != null, "recommendation cannot be null")
+  //    println("refSkus:-"+refSku)
+  //    val outputSkus = recommendation.filterNot(x => x(1) == refSku).take(Recommendation.NUM_REC_SKU_REF_SKU).map(x => x(1).toString())
+  //    return recommendation
+  //  }
   /**
-   *
-   * @param refSku
-   * @param recommendation
+   * return recommended skus based on number of reference sku (if ref sku is 1 then all 8 rec sku and if its 2 ,then 4 rec sku each)
+   * @param iterable
    * @return
    */
-  def getRecommendedSkus(refSku: String, recommendation: List[(Long, String)]): List[String] = {
-    require(refSku != null, "refSkus cannot be null")
-    require(recommendation != null, "recommendation cannot be null")
-    val outputSkus = recommendation.filterNot(_._2 == refSku).take(8).map(_._2)
-    return outputSkus
+  def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[String], mutable.MutableList[String], Int) = {
+    require(iterable != null, "iterable cannot be null")
+    require(iterable.size != 0, "iterable cannot be of size zero")
+
+    val topRow = iterable.head
+    val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
+    val referenceSkus: mutable.MutableList[String] = mutable.MutableList()
+    val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
+    val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+    val mailType = topRow(campaignMailTypeIndex).asInstanceOf[Int]
+    val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKU)
+    val numberRefSku = iterable.size
+    val skuPerIteration = if (numberRefSku == 1) 8 else 4
+    for (row <- iterable) {
+      var i = 1;
+      val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
+        foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
+
+      referenceSkus += row(refSkuIndex).toString
+    }
+    return (referenceSkus, recommendedSkus, mailType)
   }
+
 }

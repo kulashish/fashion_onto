@@ -5,6 +5,7 @@ import com.jabong.dap.campaign.skuselection.Wishlist
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -35,13 +36,11 @@ class WishlistFollowupCampaign {
       col(CustomerProductShortlistVariables.SPECIAL_PRICE)
     )
 
-    val refSkus = CampaignUtils.generateReferenceSku(dfUnion, CampaignCommon.NUMBER_REF_SKUS)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false)
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN)
-
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN)
-
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false)
   }
 
 }
