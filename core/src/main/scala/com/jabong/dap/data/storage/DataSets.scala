@@ -143,5 +143,9 @@ object DataSets {
   val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
+  
+  // type of campaigns
+  val PUSH_CAMPAIGNS = "push_campaigns"
+  val EMAIL_CAMPAIGNS = "email_campaigns"
 
 }

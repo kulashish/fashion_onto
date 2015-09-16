@@ -48,9 +48,7 @@ class WishlistIODCampaign {
 
     if (past30DayCampaignMergedData != null) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
-      val pastCampaignCheck = new PastCampaignCheck()
-
-      skusFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfUnion,
+      skusFiltered = PastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, dfUnion,
         CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.WISHLIST_IOD_CAMPAIGN, 1000), 30)
     }
     val refSkus = CampaignUtils.generateReferenceSku(skusFiltered, CampaignCommon.NUMBER_REF_SKUS)

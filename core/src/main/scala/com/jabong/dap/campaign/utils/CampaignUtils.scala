@@ -3,6 +3,8 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -657,6 +659,36 @@ object CampaignUtils extends Logging {
     )
 
     dfResult
+  }
+
+  /**
+   * Function to be called after customer selection and sku filter
+   * * @param campaignType
+   * @param filteredSku
+   */
+  def campaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, pastCampaignCheck: Boolean = true) = {
+
+    var custFiltered = filteredSku
+
+    if (pastCampaignCheck) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      custFiltered = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, filteredSku,
+        CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
+    }
+    
+    var refSkus:DataFrame = null
+
+    if (campaignName.startsWith("acart")) {
+      //generate reference sku for acart with acart url
+      refSkus = CampaignUtils.generateReferenceSkusForAcart(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
+    } else {
+      refSkus = CampaignUtils.generateReferenceSku(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
+    }
+      
+    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, campaignName)
+
+    //save campaign Output for mobile
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
   }
 }
 

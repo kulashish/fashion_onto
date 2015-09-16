@@ -7,14 +7,19 @@ import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
 /**
  * To check whether we send the campaign to the user earlier
  */
-class PastCampaignCheck extends Logging {
+object PastCampaignCheck extends Logging {
 
+  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData().cache()
+  val past30DayEmailCampaignMergedData: DataFrame = null
+
+  
   /**
    *
    * @param pastCampaignData
@@ -69,7 +74,18 @@ class PastCampaignCheck extends Logging {
     return pastCampaignNotSendCustomers
   }
 
-  /**
+  def campaignCommonRefSkuCheck(campaignType: String, customerSkuSimpleSelected: DataFrame, campaignMailType: Int, nDays: Int): DataFrame = {
+    var pastCampaignData: DataFrame = null
+    
+    if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
+      pastCampaignData = past30DayEmailCampaignMergedData
+    } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
+      pastCampaignData = past30DayMobileCampaignMergedData
+    }
+    campaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
+  }
+
+    /**
    *  To check whether the campaign has been sent to customer for the same ref sku in last nDays
    * @param pastCampaignData
    * @param customerSkuSimpleSelected
