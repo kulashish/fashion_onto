@@ -42,10 +42,10 @@
 			<mkdir path="${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports" />
 			<mkdir path="${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />
 		</fs>
-		<ok to='create_pagevisit_000_setup_emr' />
+		<ok to='create_pagevisit_000-setup-artemis' />
 		<error to='step_failure' />
 	</action>
-	<action name='create_pagevisit_000_setup_emr'>
+	<action name='create_pagevisit_000-setup-artemis'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -67,7 +67,7 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${setupEmrScript}</script>
+			<script>${createDBScript}</script>
 			<param>hivedb=${hivedb}</param>
 		</hive>
 		<ok to='create_pagevisit_001_create_master_tables' />
@@ -99,10 +99,10 @@
 			<param>hivedb=${hivedb}</param>
 			<param>INPUT=${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</param>
 		</hive>
-		<ok to='create_pagevisit_001_create_sku_cat_table' />
+		<ok to='create_pagevisit_002-create-external-pagevisit.q' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='create_pagevisit_001_create_sku_cat_table'>
+	<action name='create_pagevisit_002-create-external-pagevisit.q'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -124,39 +124,9 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${createSkuCatTablesScript}</script>
+			<script>${createExternalPagevisit}</script>
 			<param>hivedb=${hivedb}</param>
 			<param>S3_DAILY_INPUT=${wf:actionData('prepare_variables')['HdfsBsonData']}</param>
-			<file>${reportsCoreHiveUdfJarPath}</file>
-		</hive>
-		<ok to='create_pagevisit_002_create_pagevisit_table' />
-		<error to='mail_on_error' />
-	</action>
-	<action name='create_pagevisit_002_create_pagevisit_table'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
-			<script>${createPagevisitTableScript}</script>
-			<param>hivedb=${hivedb}</param>
-			<param>PagevisitDir=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<file>${reportsCoreHiveUdfJarPath}</file>
 		</hive>
 		<ok to='create_dailyPagevisit_Partition' />
@@ -184,7 +154,7 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${createDailyPagevisitPartitionScript}</script>
+			<script>${AddDailyPagevisitPartitionScript}</script>
 			<param>dbname=${partitionedDb}</param>
 			<param>tableName=${partionTable}</param>
 			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
@@ -192,46 +162,10 @@
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>loc=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 		</hive>
-		<ok to='end' />
-		<error to='mail_on_error' />
-	</action>
-	<action name='hive_daily_reports'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-				<property>
-					<name>hive.exec.reducers.bytes.per.reducer</name>
-					<value>1000000000</value>
-				</property>
-			</configuration>
-			<script>${hiveDailyReportsScript}</script>
-			<param>hivedb=${hivedb}</param>
-			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}</param>
-			<param>-hivevar</param>
-			<param>FieldSeparator=${fieldSeparator}</param>
-			<param>-hivevar</param>
-			<param>CollectionSeparator=${collectionSeparator}</param>
-		</hive>
 		<ok to='clean_dir' />
 		<error to='mail_on_error' />
 	</action>
+
 	<action name='clean_dir'>
 		<fs>
 			<delete path="${wf:actionData('prepare_variables')['HdfsInputPath']}" />
