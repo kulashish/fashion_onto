@@ -1,4 +1,4 @@
-<workflow-app xmlns='uri:oozie:workflow:0.3' name='desktop-clickstream-wf'>
+<workflow-app xmlns='uri:oozie:workflow:0.3' name='apps-clickstream-wf'>
 	<start to='prepare_variables' />
 	<action name='prepare_variables'>
 		<shell xmlns="uri:oozie:shell-action:0.1">
@@ -34,18 +34,18 @@
 			<arg>${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</arg>
 			<file>${bsonToTextJarPath}</file>
 		</java>
-		<ok to='mkdir_OUTPUT' />
+		<ok to='create_dirs' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='mkdir_OUTPUT'>
+	<action name='create_dirs'>
 		<fs>
 			<mkdir path="${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports" />
 			<mkdir path="${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />
 		</fs>
-		<ok to='create_pagevisit_000_setup_emr' />
-		<error to='step_failure' />
+		<ok to='hive_priority_reports_000_setup_emr' />
+		<error to='mail_on_error' />
 	</action>
-	<action name='create_pagevisit_000_setup_emr'>
+	<action name='hive_priority_reports_000_setup_emr'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -70,10 +70,10 @@
 			<script>${setupEmrScript}</script>
 			<param>hivedb=${hivedb}</param>
 		</hive>
-		<ok to='create_pagevisit_001_create_master_tables' />
+		<ok to='hive_priority_reports_001_create_master_table' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='create_pagevisit_001_create_master_tables'>
+	<action name='hive_priority_reports_001_create_master_table'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -95,14 +95,14 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${createMasterTablesScript}</script>
+			<script>${createMasterTableScript}</script>
 			<param>hivedb=${hivedb}</param>
 			<param>INPUT=${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</param>
 		</hive>
-		<ok to='create_pagevisit_001_create_sku_cat_table' />
+		<ok to='hive_priority_reports_002_create_ext_pagevisit' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='create_pagevisit_001_create_sku_cat_table'>
+	<action name='hive_priority_reports_002_create_ext_pagevisit'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -124,45 +124,48 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${createSkuCatTablesScript}</script>
-			<param>hivedb=${hivedb}</param>
-			<param>S3_DAILY_INPUT=${wf:actionData('prepare_variables')['HdfsBsonData']}</param>
-			<file>${reportsCoreHiveUdfJarPath}</file>
-		</hive>
-		<ok to='create_pagevisit_002_create_pagevisit_table' />
-		<error to='mail_on_error' />
-	</action>
-	<action name='create_pagevisit_002_create_pagevisit_table'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
-			<script>${createPagevisitTableScript}</script>
+			<script>${createExternalPagevisitScript}</script>
 			<param>hivedb=${hivedb}</param>
 			<param>PagevisitDir=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
-			<file>${reportsCoreHiveUdfJarPath}</file>
 		</hive>
-		<ok to='create_dailyPagevisit_Partition' />
+		<ok to='hive_priority_reports_004_CTR_reports' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='create_dailyPagevisit_Partition'>
+	<action name='hive_priority_reports_004_CTR_reports'>
+		<hive xmlns="uri:oozie:hive-action:0.2">
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.compress.map.output</name>
+					<value>true</value>
+				</property>
+				<property>
+					<name>hive.execution.engine</name>
+					<value>tez</value>
+				</property>
+				<property>
+					<name>hive.metastore.client.connect.retry.delay</name>
+					<value>5</value>
+				</property>
+				<property>
+					<name>hive.metastore.client.socket.timeout</name>
+					<value>1800</value>
+				</property>
+				<property>
+					<name>hive.optimize.reducededuplication</name>
+					<value>false</value>
+				</property>
+			</configuration>
+			<script>${CtrReportsScript}</script>
+			<param>FieldSeparator=${fieldSeparator}</param>
+			<param>hivedb=${hivedb}</param>
+			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
+		</hive>
+		<ok to='hive_priority_reports_004_CRM_reports' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='hive_priority_reports_004_CRM_reports'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -184,6 +187,36 @@
 					<value>1800</value>
 				</property>
 			</configuration>
+			<script>${CrmReportsScript}</script>
+			<param>FieldSeparator=${fieldSeparator}</param>
+			<param>hivedb=${hivedb}</param>
+			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
+		</hive>
+		<ok to='create_daily_pagevisit_partition' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='create_daily_pagevisit_partition'>
+		<hive xmlns="uri:oozie:hive-action:0.2">
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+				<configuration>
+					<property>
+						<name>mapred.compress.map.output</name>
+						<value>true</value>
+					</property>
+					<property>
+						<name>hive.execution.engine</name>
+						<value>tez</value>
+					</property>
+					<property>
+						<name>hive.metastore.client.connect.retry.delay</name>
+						<value>5</value>
+					</property>
+					<property>
+						<name>hive.metastore.client.socket.timeout</name>
+						<value>1800</value>
+					</property>
+				</configuration>
 			<script>${createDailyPagevisitPartitionScript}</script>
 			<param>dbname=${partitionedDb}</param>
 			<param>tableName=${partionTable}</param>
@@ -195,6 +228,28 @@
 		<ok to='clean_dir' />
 		<error to='mail_on_error' />
 	</action>
+	<action name='ftp_priority_reports'>
+		<shell xmlns="uri:oozie:shell-action:0.1">
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queueName}</value>
+				</property>
+			</configuration>
+			<exec>${ftpPriorityReportsScript}</exec>
+			<argument>${wf:actionData('prepare_variables')['ftp_date']}</argument>
+			<argument>${FTP_HOST}</argument>
+			<argument>${FTP_USER}</argument>
+			<argument>${FTP_PASSWD}</argument>
+			<argument>${REMOTE_PATH}</argument>
+			<argument>${wf:actionData('prepare_variables')['DailyHiveOutput']}</argument>
+			<file>${ftpPriorityReportsScript}</file>			
+		</shell>
+		<ok to='clean_dir' />
+		<error to='mail_on_error' />
+	</action>
 	<action name='clean_dir'>
 		<fs>
 			<delete path="${wf:actionData('prepare_variables')['HdfsInputPath']}" />
@@ -202,36 +257,26 @@
 		<ok to='mail_on_success' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='mail_on_error'>
-		<email xmlns="uri:oozie:email-action:0.2">
-			<to>${mailRecepients}</to>
-			<subject>${env} Workflow for old desktop for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
-			<body>Node: [${wf:lastErrorNode()}] \n Error: [${wf:errorMessage(wf:lastErrorNode())}]</body>
-		</email>
-		<ok to='step_failure' />
-		<error to='step_failure' />
-	</action>
 	<action name='mail_on_success'>
 		<email xmlns="uri:oozie:email-action:0.2">
 			<to>${mailRecepients}</to>
-			<subject> ${env} Workflow for old desktop for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
+			<subject> ${env} Workflow for Apps for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
 			<body></body>
 		</email>
 		<ok to='end' />
 		<error to='end' />
+	</action>
+	<action name='mail_on_error'>
+		<email xmlns="uri:oozie:email-action:0.2">
+			<to>${mailRecepients}</to>
+			<subject>${env} Workflow for Apps for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
+			<body>Node: [${wf:lastErrorNode()}] \n Error: [${wf:errorMessage(wf:lastErrorNode())}]</body>
+		</email>
+		<ok to='step_failure' />
+		<error to='step_failure' />
 	</action>
 	<kill name='step_failure'>
 		<message>Script failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 	<end name='end' />
 </workflow-app>
-
-
-
-
-
-
-
-
-
-
