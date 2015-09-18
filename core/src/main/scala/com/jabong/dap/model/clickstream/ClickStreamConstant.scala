@@ -5,9 +5,9 @@ package com.jabong.dap.model.clickstream
  */
 object ClickStreamConstant {
 
-  val CLICKSTREAM_DESKTOP_TABLE = "clickstream_artemis.clickstream_desktop"
-  val CLICKSTREAM_APPS_TABLE = "clickstream_apps.apps"
-  val CLICKSTREAM_PAGEVISIT_TABLE = "clickstream.pagevisit"
-  val MERGE_PAGEVISIT = "merge.merge_pagevisit"
+  val CLICKSTREAM_ARTEMIS_DESKTOP_TABLE = "clickstream.artemis_pagevisit"
+  val CLICKSTREAM_APPS_TABLE = "clickstream.apps_pagevisit"
+  val CLICKSTREAM_DESKTOP_PAGEVISIT_TABLE = "clickstream.desktop_pagevisit"
+  val MERGE_PAGEVISIT = "clickstream.merge_pagevisit"
 
 }
