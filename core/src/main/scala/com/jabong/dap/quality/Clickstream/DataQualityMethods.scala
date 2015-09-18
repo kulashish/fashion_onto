@@ -26,7 +26,7 @@ object DataQualityMethods extends Logging {
     val date = monthYear.day.toString
     val year = monthYear.year.toString
 
-    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_PAGEVISIT_TABLE, ClickStreamConstant.MERGE_PAGEVISIT)
+    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_ARTEMIS_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.MERGE_PAGEVISIT)
     //var path= "./"+year+"/"+month+"/"+date
     //logger.info("Value of output path"+ConfigConstants.WRITE_OUTPUT_PATH)
     //val finaloutput = Spark.getContext().parallelize(output)
@@ -38,19 +38,19 @@ object DataQualityMethods extends Logging {
     ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output, "")
 
   }
-  def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, tablename: String, tablename1: String, tablename2: String, tablename3: String): String = {
+  def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, clickStreamArtemisTable: String, clickStreamAppsTable: String, clickStreamDesktopTable: String, clickStreamMergeTable: String): String = {
 
-    val data = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val data = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + clickStreamArtemisTable + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    val clickstreamapps = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename1 + "  where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val clickstreamapps = hiveContext.sql("select id, bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + clickStreamAppsTable + "  where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    val clickstreampagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename2 + "  where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val clickstreampagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + clickStreamDesktopTable + "  where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    val mergepagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + tablename3 + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
+    val mergepagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + clickStreamMergeTable + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    var msg = qualityCount(data, "Clickstream_Desktop", "")
+    var msg = qualityCount(data, "Clickstream_Artemis_Desktop", "")
     msg = qualityCount(clickstreamapps, "Clickstream_apps", msg)
-    msg = qualityCount(clickstreampagevisit, "Clickstream_pagevisit", msg)
+    msg = qualityCount(clickstreampagevisit, "Clickstream_Desktop_pagevisit", msg)
     msg = qualityCount(mergepagevisit, "merge_pagevisit", msg)
     return msg
   }
