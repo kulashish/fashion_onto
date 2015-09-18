@@ -139,5 +139,5 @@ object Udf {
 
   val successOrder = udf((i: Int) => UdfUtils.successOrder(i: Int))
 
-  val getElementArray = udf((a:Array[String],i:Int) => UdfUtils.getElementArray(a:Array[String],i:Int))
+  val getElementArray = udf((a: Array[String], i: Int) => UdfUtils.getElementArray(a: Array[String], i: Int))
 }

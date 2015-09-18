@@ -80,7 +80,7 @@ object Surf6Quality extends BaseCampaignQuality with Logging {
 
     val surf6Data = CampaignQualityEntry.yestSessionData
 
-    val surf6Campaign = CampaignInput.getCampaignData(CampaignCommon.SURF6_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
+    val surf6Campaign = CampaignInput.getCampaignData(CampaignCommon.SURF6_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
 
     return (surf6Data, surf6Campaign)
   }

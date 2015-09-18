@@ -32,7 +32,6 @@ class LiveCancelReTargetCampaign {
     // ***** email use case
     CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.CANCEL_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false, brickMvpRecommendations)
 
-
   }
 
 }

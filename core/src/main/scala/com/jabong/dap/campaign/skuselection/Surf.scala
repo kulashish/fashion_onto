@@ -50,7 +50,6 @@ object Surf extends Logging {
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem).
       withColumnRenamed(ItrVariables.SKU, ProductVariables.SKU_SIMPLE)
 
-
     val dfJoin = dfSkuNotBought.join(
       itrData,
       dfSkuNotBought(ProductVariables.SKU_SIMPLE) === itrData(ItrVariables.ITR_ + ItrVariables.SKU),

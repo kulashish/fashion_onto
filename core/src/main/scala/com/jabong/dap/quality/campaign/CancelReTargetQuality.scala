@@ -68,7 +68,7 @@ object CancelReTargetQuality extends BaseCampaignQuality {
 
     val orderDF = CampaignQualityEntry.last30DaysOrderData
 
-    val cancelRetargetDF = CampaignInput.getCampaignData(CampaignCommon.CANCEL_RETARGET_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
+    val cancelRetargetDF = CampaignInput.getCampaignData(CampaignCommon.CANCEL_RETARGET_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
     return (orderItemDF, orderDF, cancelRetargetDF)
   }
 

@@ -32,6 +32,4 @@ class AcartFollowUpCampaign {
     CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, filteredSku)
   }
 
-
-
 }

@@ -76,8 +76,8 @@ object ACartPushCampaignQuality extends BaseCampaignQuality with Logging {
     // val yesterDayItr30Days = CampaignInput.load30DayItrSkuSimpleData()
     // val yesterDayItrData = CampaignInput.loadYesterdayItrSimpleData()
     val acartFollowUp = CampaignInput.getCampaignData(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS, CampaignCommon.VERY_LOW_PRIORITY)
-    val acartIOD = CampaignInput.getCampaignData(CampaignCommon.ACART_IOD_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS,CampaignCommon.VERY_LOW_PRIORITY)
-    val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS,CampaignCommon.VERY_LOW_PRIORITY)
+    val acartIOD = CampaignInput.getCampaignData(CampaignCommon.ACART_IOD_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS, CampaignCommon.VERY_LOW_PRIORITY)
+    val acartLowStock = CampaignInput.getCampaignData(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, date, DataSets.PUSH_CAMPAIGNS, CampaignCommon.VERY_LOW_PRIORITY)
     return (salesCart30Days, salesCart3rdDay, acartFollowUp, acartIOD, acartLowStock)
   }
 

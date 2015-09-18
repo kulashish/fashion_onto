@@ -77,9 +77,9 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
     val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30, todayDate)
     val last30DaysCustomerShortlistData = wishListCustomerSelector.customerSelection(shortlistLast30DayData)
 
-    val wishlistFollowupCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
-    val wishlistIODCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_IOD_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
-    val wishlistLowStockCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
+    val wishlistFollowupCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
+    val wishlistIODCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_IOD_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
+    val wishlistLowStockCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
 
     return (last30DaysCustomerShortlistData, lastDayCustomerShortlistData, wishlistFollowupCampaignDF, wishlistIODCampaignDF, wishlistLowStockCampaignDF)
 

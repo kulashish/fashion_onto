@@ -24,7 +24,6 @@ class LiveReturnReTargetCampaign {
     // save 2 ref skus + 8 recommendation per customer (null allowed for mobile push)
     val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(filteredSkus, yesterdayItrData)
 
-
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false)
 

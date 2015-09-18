@@ -13,11 +13,11 @@ object CampaignOutput {
 
   var testMode: Boolean = false
   var testData: mutable.MutableList[(DataFrame, String, String)] = null
-  
+
   def setTestMode(newMode: Boolean): Unit = {
     testMode = newMode
   }
-  
+
   /**
    * List of (customerID, ref skus, recommendations)
    * @param campaignOutput
@@ -42,11 +42,11 @@ object CampaignOutput {
       }
     }
   }
-  
-  def saveTestData(campaignOutput: DataFrame, campaignName: String, campaignType: String ): Unit = {
-      if (null == testData) {
-        testData = new mutable.MutableList[(DataFrame, String, String)]
-      }
+
+  def saveTestData(campaignOutput: DataFrame, campaignName: String, campaignType: String): Unit = {
+    if (null == testData) {
+      testData = new mutable.MutableList[(DataFrame, String, String)]
+    }
     testData += Tuple3(campaignOutput, campaignName, campaignType)
   }
 }

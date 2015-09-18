@@ -44,7 +44,7 @@ object InvalidFollowupQuality extends BaseCampaignQuality {
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 
-    val invalidFollow = CampaignInput.getCampaignData(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
+    val invalidFollow = CampaignInput.getCampaignData(CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
 
     val itr = CampaignInput.loadYesterdayItrSkuData()
 
