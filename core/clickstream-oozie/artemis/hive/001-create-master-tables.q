@@ -1,5 +1,5 @@
 
-CREATE EXTERNAL TABLE pageview(
+CREATE EXTERNAL TABLE ${hivedb}.pageview(
 id                 STRING,
 bid                STRING,
 userid             STRING,

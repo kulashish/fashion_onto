@@ -99,10 +99,10 @@
 			<param>hivedb=${hivedb}</param>
 			<param>INPUT=${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</param>
 		</hive>
-		<ok to='create_pagevisit_002-create-external-pagevisit.q' />
+		<ok to='create_pagevisit_002-create-external-pagevisit' />
 		<error to='mail_on_error' />
 	</action>
-	<action name='create_pagevisit_002-create-external-pagevisit.q'>
+	<action name='create_pagevisit_002-create-external-pagevisit'>
 		<hive xmlns="uri:oozie:hive-action:0.2">
 			<job-tracker>${jobTracker}</job-tracker>
 			<name-node>${nameNode}</name-node>
@@ -125,9 +125,8 @@
 				</property>
 			</configuration>
 			<script>${createExternalPagevisit}</script>
+			<param>PagevisitDir=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>hivedb=${hivedb}</param>
-			<param>S3_DAILY_INPUT=${wf:actionData('prepare_variables')['HdfsBsonData']}</param>
-			<file>${reportsCoreHiveUdfJarPath}</file>
 		</hive>
 		<ok to='create_dailyPagevisit_Partition' />
 		<error to='mail_on_error' />
@@ -156,7 +155,7 @@
 			</configuration>
 			<script>${AddDailyPagevisitPartitionScript}</script>
 			<param>dbname=${partitionedDb}</param>
-			<param>tableName=${partionTable}</param>
+			<param>tableName=${partitionTable}</param>
 			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
 			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
@@ -185,7 +184,7 @@
 	<action name='mail_on_success'>
 		<email xmlns="uri:oozie:email-action:0.2">
 			<to>${mailRecepients}</to>
-			<subject> ${env} Workflow for old desktop for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
+			<subject> ${env} Workflow for new desktop for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
 			<body></body>
 		</email>
 		<ok to='end' />

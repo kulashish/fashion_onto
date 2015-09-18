@@ -1,6 +1,5 @@
-dfs -mkdir -p ${PagevisitDir};
 
-CREATE EXTERNAL TABLE pagevisit(
+CREATE EXTERNAL TABLE ${hivedb}.pagevisit(
 id                 STRING,
 bid                STRING,
 userid             STRING,
@@ -45,7 +44,7 @@ TBLPROPERTIES ("orc.compress"="SNAPPY");
 
 
 
-INSERT OVERWRITE TABLE pagevisit 
+INSERT OVERWRITE TABLE ${hivedb}.pagevisit
    SELECT id,
       bid,
       userid,
@@ -82,5 +81,5 @@ INSERT OVERWRITE TABLE pagevisit
       appVersion,
       loginMode,
       add4Push
-  FROM pageview;
+  FROM ${hivedb}.pageview;
 
