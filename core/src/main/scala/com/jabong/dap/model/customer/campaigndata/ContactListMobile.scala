@@ -337,30 +337,31 @@ object ContactListMobile extends Logging {
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
 
-    val cityJoined = mergedIncr.join(cityBc, cityBc(SalesAddressVariables.CITY) === mergedIncr(SalesAddressVariables.CITY), SQL.LEFT_OUTER).select(
-      mergedIncr(SalesOrderVariables.FK_CUSTOMER),
-      mergedIncr(CustomerVariables.EMAIL),
-      mergedIncr(CustomerVariables.DOB),
-      mergedIncr(CustomerVariables.GENDER),
-      mergedIncr(CustomerVariables.REG_DATE),
-      mergedIncr(CustomerVariables.VERIFICATION_STATUS),
-      mergedIncr(CustomerVariables.AGE),
-      mergedIncr(CustomerVariables.PLATINUM_STATUS),
-      mergedIncr(CustomerSegmentsVariables.MVP_TYPE),
-      mergedIncr(CustomerSegmentsVariables.SEGMENT),
-      mergedIncr(CustomerSegmentsVariables.DISCOUNT_SCORE),
-      mergedIncr(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS),
-      mergedIncr(NewsletterVariables.NL_SUB_DATE),
-      mergedIncr(NewsletterVariables.UNSUB_KEY),
-      mergedIncr(SalesAddressVariables.CITY),
-      mergedIncr(SalesAddressVariables.FIRST_NAME),
-      mergedIncr(CustomerVariables.LAST_NAME),
-      mergedIncr(CustomerVariables.PHONE),
-      mergedIncr(SalesOrderVariables.LAST_ORDER_DATE),
-      mergedIncr(CustomerVariables.LAST_UPDATED_AT),
-      mergedIncr(SalesOrderItemVariables.NET_ORDERS),
-      cityBc(CustomerVariables.ZONE) as CustomerVariables.STATE_ZONE,
-      cityBc(CustomerVariables.TIER1) as CustomerVariables.CITY_TIER)
+    val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(cityBc(SalesAddressVariables.CITY)) === Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
+      .select(
+        mergedIncr(SalesOrderVariables.FK_CUSTOMER),
+        mergedIncr(CustomerVariables.EMAIL),
+        mergedIncr(CustomerVariables.DOB),
+        mergedIncr(CustomerVariables.GENDER),
+        mergedIncr(CustomerVariables.REG_DATE),
+        mergedIncr(CustomerVariables.VERIFICATION_STATUS),
+        mergedIncr(CustomerVariables.AGE),
+        mergedIncr(CustomerVariables.PLATINUM_STATUS),
+        mergedIncr(CustomerSegmentsVariables.MVP_TYPE),
+        mergedIncr(CustomerSegmentsVariables.SEGMENT),
+        mergedIncr(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        mergedIncr(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS),
+        mergedIncr(NewsletterVariables.NL_SUB_DATE),
+        mergedIncr(NewsletterVariables.UNSUB_KEY),
+        mergedIncr(SalesAddressVariables.CITY),
+        mergedIncr(SalesAddressVariables.FIRST_NAME),
+        mergedIncr(CustomerVariables.LAST_NAME),
+        mergedIncr(CustomerVariables.PHONE),
+        mergedIncr(SalesOrderVariables.LAST_ORDER_DATE),
+        mergedIncr(CustomerVariables.LAST_UPDATED_AT),
+        mergedIncr(SalesOrderItemVariables.NET_ORDERS),
+        cityBc(CustomerVariables.ZONE) as CustomerVariables.STATE_ZONE,
+        cityBc(CustomerVariables.TIER1) as CustomerVariables.CITY_TIER)
 
     val dndBc = Spark.getContext().broadcast(dnd).value
 
