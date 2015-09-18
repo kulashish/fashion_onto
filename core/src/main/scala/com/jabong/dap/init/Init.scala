@@ -1,10 +1,9 @@
 package com.jabong.dap.init
 
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.{ AppConfig, Config, Spark }
+import com.jabong.dap.common.{AppConfig, Config, Spark}
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
-import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.custorder.ComponentExecutor
 import com.jabong.dap.model.product.itr.Itr
 import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
@@ -132,6 +131,10 @@ object Init {
       case "clickstreamYesterdaySession" => new ComponentExecutor().start(params.paramJson)
       case "clickstreamSurf3Variable" => new ComponentExecutor().start(params.paramJson)
       case "clickstreamSurf3MergeData30" => new ComponentExecutor().start(params.paramJson)
+
+      // responsys files
+      case "dndMerger" => new ComponentExecutor().start(params.paramJson)
+      case "smsOptOutMerger" => new ComponentExecutor().start(params.paramJson)
 
       //campaign quality check
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)
