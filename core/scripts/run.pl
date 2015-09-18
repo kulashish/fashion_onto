@@ -173,6 +173,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "dndMerger") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component dndMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dndMerger.json";
       run_component($component, $command);
+} elsif ($component eq "smsOptOutMerger") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component smsOptOutMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/smsOptOutMerger.json";
+      run_component($component, $command);
 } else {
       print "not a valid component\n";
 }
