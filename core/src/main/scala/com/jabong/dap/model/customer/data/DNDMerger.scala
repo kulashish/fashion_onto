@@ -23,12 +23,7 @@ object DNDMerger {
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-
-    if (null == path && null == OptionUtils.getOptValue(params.fullDate)) {
-      println("First full csv path and prev full date both cannot be empty")
-    } else {
-      processData(DataSets.SMS_DELIVERED, prevDate, incrDate, saveMode, path)
-    }
+    processData(DataSets.SMS_DELIVERED, prevDate, incrDate, saveMode, path)
   }
 
   /**
