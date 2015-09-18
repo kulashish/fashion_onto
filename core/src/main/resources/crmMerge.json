@@ -3,8 +3,36 @@
     {
       "source": "crm",
       "tableName": "tblProductAttributeMaster",
-      "primaryKey": "SKU",
+      "primaryKey": "sku",
       "mergeMode": "full",
+      "saveMode": "Overwrite"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketDetails",
+      "primaryKey": "TicketID",
+      "mode": "full",
+      "saveMode": "Overwrite"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblOrderDetails",
+      "primaryKey": "OrderNo",
+      "mode": "full",
+      "saveMode": "Overwrite"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblProductDetails",
+      "primaryKey": "ProductId",
+      "mode": "full",
+      "saveMode": "Overwrite"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketProducts",
+      "primaryKey": "TicketProductsID",
+      "mode": "full",
       "saveMode": "Overwrite"
     }
   ]
