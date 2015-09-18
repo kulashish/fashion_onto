@@ -1,7 +1,7 @@
 package com.jabong.dap.init
 
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.{AppConfig, Config, Spark}
+import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.custorder.ComponentExecutor

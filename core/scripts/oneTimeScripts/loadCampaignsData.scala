@@ -1,6 +1,6 @@
 import java.util.Properties
 import java.util.Calendar
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.{ SparkConf, SparkContext }
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions._
 
@@ -47,6 +47,5 @@ object loadCampaignsData {
     connProp.put("password", "jdare")
     df.write.mode("append").jdbc("jdbc:mysql://172.16.84.37:3306/jdare", target_table_name, connProp)
   }
-
 
 }
