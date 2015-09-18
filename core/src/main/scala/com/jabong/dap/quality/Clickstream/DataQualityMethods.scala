@@ -26,7 +26,7 @@ object DataQualityMethods extends Logging {
     val date = monthYear.day.toString
     val year = monthYear.year.toString
 
-    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_ARTEMIS_DESKTOP_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_DESKTOP_PAGEVISIT_TABLE, ClickStreamConstant.MERGE_PAGEVISIT)
+    val output = DataQualityMethods.Artemisdaily(hiveContext, date, month, year, ClickStreamConstant.CLICKSTREAM_ARTEMIS_TABLE, ClickStreamConstant.CLICKSTREAM_APPS_TABLE, ClickStreamConstant.CLICKSTREAM_DESKTOP_TABLE, ClickStreamConstant.MERGE_PAGEVISIT)
     //var path= "./"+year+"/"+month+"/"+date
     //logger.info("Value of output path"+ConfigConstants.WRITE_OUTPUT_PATH)
     //val finaloutput = Spark.getContext().parallelize(output)
