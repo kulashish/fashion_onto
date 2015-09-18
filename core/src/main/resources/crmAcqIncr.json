@@ -2,12 +2,48 @@
   "acquisition": [
     {
       "source": "crm",
-      "tableName": "CRM_tblProductAttributeMaster",
-      "primaryKey": "SKU",
+      "tableName": "tblProductAttributeMaster",
+      "primaryKey": "sku",
       "mode": "daily",
       "saveFormat": "orc",
       "saveMode": "Ignore",
       "dateColumn": "[Last Modification Date Time]"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketDetails",
+      "primaryKey": "TicketID",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "UpdateDate"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblOrderDetails",
+      "primaryKey": "OrderNo",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "LastUpdatedAt"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblProductDetails",
+      "primaryKey": "ProductId",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "UpdateDate"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketProducts",
+      "primaryKey": "TicketProductsID",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "UpdateDate"
     }
   ]
 }

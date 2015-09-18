@@ -2,7 +2,7 @@
   "merge": [
     {
       "source": "crm",
-      "tableName": "CRM_tblProductAttributeMaster",
+      "tableName": "tblProductAttributeMaster",
       "primaryKey": "SKU",
       "mergeMode": "full",
       "saveMode": "Overwrite"
