@@ -48,49 +48,63 @@ object CampaignUtils extends Logging {
   }
 
   /**
-   *
+   * generate ref skus for Acart campaigns
    * @param refSkuData
    * @param NumberSku
    * @return
    */
   def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
-
-    import sqlContext.implicits._
-
-    if (refSkuData == null || NumberSku <= 0) {
-      return null
-    }
-
-    //    refSkuData.printSchema()
-
-    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
-      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
-      .select(CustomerVariables.FK_CUSTOMER,
-        ProductVariables.SKU_SIMPLE,
-        ProductVariables.SPECIAL_PRICE)
-
-    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
-
-    // FIXME: need to sort by special price
-    // For some campaign like wishlist, we will have to write another variant where we get price from itr
-    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
-    var customerGroup: RDD[(String, scala.collection.immutable.List[(Double, String)])] = null
-    try {
-      customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct) }
-
-    } catch {
-      case e: Exception => {
-        e.printStackTrace()
-      }
-    }
-    //  .map{case(key,value) => (key,value(0)._2.toString())}
-
-    // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
-    val customerFinalGroup = customerGroup.map{ case (key, value) => (key, createRefSkuAcartUrl(value)) }.map{ case (key, value) => (key, value._1, value._2) }
-    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.LIVE_CART_URL)
-
-    return grouped
+    val referenceSkus = generateReferenceSkus(refSkuData,100)
+    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0),t(1),t(2).asInstanceOf[List[(Double, String, String, String, String, String)]].take(NumberSku),
+      (t(2).asInstanceOf[List[Row]]))).map(t => Row(t._1,t._2,t._3,createRefSkuAcartUrl(t._4)))
+   val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSku)
+     return refSkuForAcart
   }
+
+//    /**
+//   *
+//   * @param refSkuData
+//   * @param NumberSku
+//   * @return
+//   */
+//  def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
+//
+//    import sqlContext.implicits._
+//
+//    if (refSkuData == null || NumberSku <= 0) {
+//      return null
+//    }
+//
+//    //    refSkuData.printSchema()
+//
+//    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+//      + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+//      .select(CustomerVariables.FK_CUSTOMER,
+//        ProductVariables.SKU_SIMPLE,
+//        ProductVariables.SPECIAL_PRICE)
+//
+//    // DataWriter.writeParquet(customerData,DataSets.OUTPUT_PATH,"test","customerData","daily", "1")
+//
+//    // FIXME: need to sort by special price
+//    // For some campaign like wishlist, we will have to write another variant where we get price from itr
+//    val customerSkuMap = customerData.map(t => (t(0), ((t(2)).asInstanceOf[BigDecimal].doubleValue(), t(1).toString)))
+//    var customerGroup: RDD[(String, scala.collection.immutable.List[(Double, String)])] = null
+//    try {
+//      customerGroup = customerSkuMap.groupByKey().map{ case (key, value) => (key.toString, value.toList.distinct) }
+//
+//    } catch {
+//      case e: Exception => {
+//        e.printStackTrace()
+//      }
+//    }
+//    //  .map{case(key,value) => (key,value(0)._2.toString())}
+//
+//    // .agg($"sku",$+CustomerVariables.CustomerForeignKey)
+//    val customerFinalGroup = customerGroup.map{ case (key, value) => (key, createRefSkuAcartUrl(value)) }.map{ case (key, value) => (key, value._1, value._2) }
+//    val grouped = customerFinalGroup.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1, CampaignMergedFields.LIVE_CART_URL)
+//
+//    return grouped
+//  }
 
   def generateReferenceSkuForSurf(skuData: DataFrame, NumberSku: Int): DataFrame = {
     val customerFilteredData = skuData.filter(ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -159,7 +173,7 @@ object CampaignUtils extends Logging {
     val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(col(CustomerVariables.FK_CUSTOMER),
-        Udf.skuFromSimpleSku(col(ProductVariables.SKU_SIMPLE)) as ProductVariables.SKU,
+        col(ProductVariables.SKU_SIMPLE),
         col(ProductVariables.SPECIAL_PRICE),
         col(ProductVariables.BRICK),
         col(ProductVariables.BRAND),
@@ -169,7 +183,7 @@ object CampaignUtils extends Logging {
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
-    val customerSkuMap = customerData.map(t => ((t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(), t(t.fieldIndex(ProductVariables.SKU)).toString, checkNullString(t(t.fieldIndex(ProductVariables.BRAND))), checkNullString(t(t.fieldIndex(ProductVariables.BRICK))), checkNullString(t(t.fieldIndex(ProductVariables.MVP))), checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
+    val customerSkuMap = customerData.map(t => ((t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(), t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString, checkNullString(t(t.fieldIndex(ProductVariables.BRAND))), checkNullString(t(t.fieldIndex(ProductVariables.BRICK))), checkNullString(t(t.fieldIndex(ProductVariables.MVP))), checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
@@ -613,21 +627,40 @@ object CampaignUtils extends Logging {
     dfJoinCustomerToCustomerPageVisit
   }
 
+
+ // val getACartUrl = udf((skuSimpleList : List[Row]) => createRefSkuAcartUrl1(skuSimpleList : List[Row]))
   /**
    * return one reference sku with acrt url
    * @param skuSimpleList
    * @return (refsku,acart_url)
    */
-  def createRefSkuAcartUrl(skuSimpleList: scala.collection.immutable.List[(Double, String)]): (String, String) = {
+  def createRefSkuAcartUrl(skuSimpleList: List[Row]): (String) = {
     var acartUrl = CampaignCommon.ACART_BASE_URL
+    println(acartUrl)
     var i: Int = 0
-    skuSimpleList.sortBy(-_._1).distinct
     for (skuSimple <- skuSimpleList) {
-      if (i == 0) acartUrl += skuSimple._2 else acartUrl = acartUrl + "," + skuSimple._2
+      println("LIST:-"+skuSimple)
+      if (i == 0) acartUrl += skuSimple(1) else acartUrl = acartUrl + "," + skuSimple(1)
       i = i + 1;
     }
-    return (skuSimpleList(0)._2, acartUrl)
+    return (acartUrl)
   }
+
+//  /**
+//   * return one reference sku with acrt url
+//   * @param skuSimpleList
+//   * @return (refsku,acart_url)
+//   */
+//  def createRefSkuAcartUrl(skuSimpleList: scala.collection.immutable.List[(Double, String)]): (String, String) = {
+//    var acartUrl = CampaignCommon.ACART_BASE_URL
+//    var i: Int = 0
+//    skuSimpleList.sortBy(-_._1).distinct
+//    for (skuSimple <- skuSimpleList) {
+//      if (i == 0) acartUrl += skuSimple._2 else acartUrl = acartUrl + "," + skuSimple._2
+//      i = i + 1;
+//    }
+//    return (skuSimpleList(0)._2, acartUrl)
+//  }
 
   /**
    * Join with Itr
