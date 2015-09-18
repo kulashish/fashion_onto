@@ -186,7 +186,7 @@
 			</configuration>
 			<script>${createDailyPagevisitPartitionScript}</script>
 			<param>dbname=${partitionedDb}</param>
-			<param>tableName=${partionTable}</param>
+			<param>tableName=${partitionTable}</param>
 			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
 			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
