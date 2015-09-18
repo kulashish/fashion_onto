@@ -26,10 +26,10 @@ class LiveReturnReTargetCampaign {
 
 
     // ***** mobile push use case
-    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr)
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false, brickMvpRecommendations)
 
   }
 }
