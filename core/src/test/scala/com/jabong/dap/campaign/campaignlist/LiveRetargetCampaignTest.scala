@@ -29,11 +29,17 @@ class LiveRetargetCampaignTest extends FeatureSpec with GivenWhenThen with Share
     recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/email_campaigns", "brick_mvp_recommendations")
   }
 
-  feature("Run live cancel retarget campaign") {
+  feature("Run live cancel and return retarget campaigns") {
     scenario("Order which has been cancelled ") {
       Given("salesOrder, salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
       val liveRetargetCampaign = new LiveRetargetCampaign()
       liveRetargetCampaign.runCampaign(salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
+      val cancelRetargetOutput = CampaignOutput.testData.head
+      val returnRetargetOutput = CampaignOutput.testData(2)
+      assert(cancelRetargetOutput._3 == "push_campaigns" && cancelRetargetOutput._2 == "cancel_retarget")
+      assert(cancelRetargetOutput._1.count() == 2)
+      assert(returnRetargetOutput._3 == "push_campaigns" && returnRetargetOutput._2 == "return_retarget")
+      assert(returnRetargetOutput._1.count() == 0)
     }
   }
 }

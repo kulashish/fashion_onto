@@ -38,7 +38,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.brick") as ProductVariables.BRICK,
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
-      refSkuExploded("ref_sku_fields.sku") as CampaignMergedFields.REF_SKU)
+      refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
       && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
