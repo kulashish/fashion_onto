@@ -40,6 +40,10 @@ object UdfUtils {
 
   }
 
+  def toLower(s: String): String = {
+    return s.toLowerCase()
+  }
+
   /**
    * max of Timestamp t1 or t2
    * @param t1

@@ -139,4 +139,6 @@ object Udf {
 
   val successOrder = udf((i: Int) => UdfUtils.successOrder(i: Int))
 
+  val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
+
 }

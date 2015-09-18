@@ -7,32 +7,26 @@ package com.jabong.dap.common.mail
  * Created by tejas on 19/8/15.
  */
 
+import java.util.{ Date, Properties }
+import javax.mail.{ Address, Message, Session, Transport }
+import javax.mail.internet.{ InternetAddress, MimeMessage }
 
-import java.util.{Date, Properties}
-import javax.mail.{Address, Message, Session, Transport}
-import javax.mail.internet.{InternetAddress, MimeMessage}
-
-
-object ScalaMail extends java.io.Serializable
-{
+object ScalaMail extends java.io.Serializable {
   var message: Message = null
-  var username:String =""
-  var password:String =""
-  var to:String =""
-  var cc:String =""
-  var bcc:String =""
-
-
-
+  var username: String = ""
+  var password: String = ""
+  var to: String = ""
+  var cc: String = ""
+  var bcc: String = ""
 
   // throws MessagingException
-  def sendMessage(to: String,cc: String,bcc: String,from: String,subject: String,content: String,smtpHost: String) {
+  def sendMessage(to: String, cc: String, bcc: String, from: String, subject: String, content: String, smtpHost: String) {
     message = createMessage
     message.setFrom(new InternetAddress(from))
     message.setSentDate(new Date())
     message.setSubject(subject)
     message.setText(content)
-    setToCcBccRecipients(to,cc,bcc)
+    setToCcBccRecipients(to, cc, bcc)
     Transport.send(message)
   }
 
@@ -50,13 +44,12 @@ object ScalaMail extends java.io.Serializable
     props.put("mail.smtp.host", "localhost.localdomain")
     props.put("mail.smtp.port", "25")
 
-
     /*val session = Session.getInstance(props,
       new Authenticator() {
         override def getPasswordAuthentication = new
             PasswordAuthentication(username, password)
       })*/
-    val session = Session.getInstance(props,null)
+    val session = Session.getInstance(props, null)
     /*new Authenticator() {
       override def getPasswordAuthentication = new
           PasswordAuthentication(username, password)
@@ -66,7 +59,7 @@ object ScalaMail extends java.io.Serializable
   }
 
   // throws AddressException, MessagingException
-  def setToCcBccRecipients (to:String,cc:String,bcc:String){
+  def setToCcBccRecipients(to: String, cc: String, bcc: String) {
     setMessageRecipients(to, Message.RecipientType.TO)
     if (cc != null) {
       setMessageRecipients(cc, Message.RecipientType.CC)
@@ -80,8 +73,7 @@ object ScalaMail extends java.io.Serializable
   def setMessageRecipients(recipient: String, recipientType: Message.RecipientType) {
     // had to do the asInstanceOf[...] call here to make scala happy
     val addressArray = buildInternetAddressArray(recipient).asInstanceOf[Array[Address]]
-    if ((addressArray != null) && (addressArray.length > 0))
-    {
+    if ((addressArray != null) && (addressArray.length > 0)) {
       message.setRecipients(recipientType, addressArray)
     }
   }
@@ -91,7 +83,5 @@ object ScalaMail extends java.io.Serializable
     // could test for a null or blank String but I'm letting parse just throw an exception
     return InternetAddress.parse(address)
   }
-
-
 
 }

@@ -22,7 +22,6 @@ object CustPreference {
     val saveMode = vars.saveMode
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
-
     val (nls, custPref) = readDf(incrDate, prevDate)
 
     val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)

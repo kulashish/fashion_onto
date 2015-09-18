@@ -2,8 +2,40 @@
   "acquisition": [
     {
       "source": "crm",
-      "tableName": "CRM_tblProductAttributeMaster",
-      "primaryKey": "SKU",
+      "tableName": "tblProductAttributeMaster",
+      "primaryKey": "sku",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketDetails",
+      "primaryKey": "TicketID",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketProducts",
+      "primaryKey": "TicketProductsID",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblOrderDetails",
+      "primaryKey": "OrderNo",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblProductDetails",
+      "primaryKey": "ProductId",
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore"

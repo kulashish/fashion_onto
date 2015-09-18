@@ -137,9 +137,15 @@ object DataSets {
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
 
+  val AD4PUSH_ID = "ad4pushId"
   //Clickstream Data Quality
 
   val CLICKSTREAM_DATA_QUALITY = "clickstreamDataQualityCheck"
 
+  val CLICKSTREAM_YESTERDAY_SESSION = "clickstreamYesterdaySession"
+
+  val CLICKSTREAM_SURF3_VARIABLE = "clickstreamSurf3Variable"
+
+  val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
 
 }
