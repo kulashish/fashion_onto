@@ -1,0 +1,102 @@
+{
+  "params": [
+    {
+      "source": "dndMerger",
+      "path": "/data/input/responsys/sms_delivered/full/2015/09/03/24/DND_Data.csv",
+      "incrDate": "2015/09/04",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/04",
+      "incrDate": "2015/09/05",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/05",
+      "incrDate": "2015/09/06",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/06",
+      "incrDate": "2015/09/07",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/07",
+      "incrDate": "2015/09/08",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/08",
+      "incrDate": "2015/09/09",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/09",
+      "incrDate": "2015/09/10",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/10",
+      "incrDate": "2015/09/11",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/11",
+      "incrDate": "2015/09/12",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/12",
+      "incrDate": "2015/09/13",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/13",
+      "incrDate": "2015/09/14",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/14",
+      "incrDate": "2015/09/15",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/15",
+      "incrDate": "2015/09/16",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "dndMerger",
+      "fullDate": "2015/09/16",
+      "incrDate": "2015/09/17",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}

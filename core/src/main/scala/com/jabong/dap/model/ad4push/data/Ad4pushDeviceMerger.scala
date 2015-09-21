@@ -59,14 +59,18 @@ object Ad4pushDeviceMerger extends Logging {
     newDF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.DAILY_MODE, curDate, filename + ".csv", "true", ",")
       .dropDuplicates()
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
+      if (!SchemaUtils.isSchemaEqual(newDF.schema, Ad4pushSchema.Ad4pushDeviceIOS)) {
+        newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
+      }
     }
 
     var full: DataFrame = null
     if (null != fullcsv) {
       full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.UDID)
-      full = SchemaUtils.changeSchema(full, Ad4pushSchema.Ad4pushDeviceIOS)
-      full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceIOS).dropDuplicates()
+      if (!SchemaUtils.isSchemaEqual(full.schema, Ad4pushSchema.Ad4pushDeviceIOS)) {
+        full = SchemaUtils.changeSchema(full, Ad4pushSchema.Ad4pushDeviceIOS)
+        full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceIOS).dropDuplicates()
+      }
     } else {
       full = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, prevDate)
     }

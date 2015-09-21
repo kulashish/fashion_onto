@@ -2,13 +2,21 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.io.File
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo, ParamJobConfig }
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
+import com.jabong.dap.model.custorder.ParamJsonValidator
+import grizzled.slf4j.Logging
+import net.liftweb.json.JsonParser.ParseException
+import net.liftweb.json._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -16,7 +24,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 /**
  * Created by Divya on 13/7/15.
  */
-object SurfVariablesMain extends java.io.Serializable {
+object SurfVariablesMain extends java.io.Serializable with Logging {
 
   def main(args: Array[String]) {
     val gap = args(3).toInt
@@ -77,7 +85,11 @@ object SurfVariablesMain extends java.io.Serializable {
 */
   }
 
-  def startClickstreamYesterdaySessionVariables() = {
+  def startClickstreamYesterdaySessionVariables(params: ParamInfo) = {
+
+    println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
+    val yesterdayDateFolder = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
     // var gap = 1
     val hiveContext = Spark.getHiveContext()
 
@@ -95,28 +107,32 @@ object SurfVariablesMain extends java.io.Serializable {
     val tablename = "merge.merge_pagevisit"
     val finalTempTable = "finalpagevisit"
 
-    val yesterdayDateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    val userDeviceMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, yesterdayDateFolder)
 
-    val userDeviceMapPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, yesterdayDateFolder)
+    if (DataWriter.canWrite(saveMode, userDeviceMapPath)) {
+      var useridDeviceidFrame = getAppIdUserIdData(yesterdayDateFolder, tablename)
+      var UserObj = new GroupData()
+      UserObj.calculateColumns(useridDeviceidFrame)
 
-    var useridDeviceidFrame = getAppIdUserIdData(yesterdayDateFolder, tablename)
-    var UserObj = new GroupData()
-    UserObj.calculateColumns(useridDeviceidFrame)
-
-    // user device mapping
-    var userDeviceMapping = UserDeviceMapping
-      .getUserDeviceMapApp(useridDeviceidFrame)
-      .write.mode("error")
-      .save(userDeviceMapPath)
+      // user device mapping
+      var userDeviceMapping = UserDeviceMapping
+        .getUserDeviceMapApp(useridDeviceidFrame)
+      DataWriter.writeParquet(userDeviceMapping, userDeviceMapPath, saveMode)
+    }
 
     // variable 1
-    var surf1VariablePath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
-    val dMY = TimeUtils.getMonthAndYear(yesterdayDateFolder, TimeConstants.DATE_FORMAT_FOLDER)
-    val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename, dMY.year, dMY.day, dMY.month + 1)
-    variableSurf1.write.save(surf1VariablePath)
+    var surf1VariablePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf1ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
+    if (DataWriter.canWrite(saveMode, surf1VariablePath)) {
+      val dMY = TimeUtils.getMonthAndYear(yesterdayDateFolder, TimeConstants.DATE_FORMAT_FOLDER)
+      val variableSurf1 = GetSurfVariables.listOfProductsViewedInSession(hiveContext, tablename, dMY.year, dMY.day, dMY.month + 1)
+      DataWriter.writeParquet(variableSurf1, surf1VariablePath, saveMode)
+    }
   }
 
-  def startSurf3Variable() = {
+  def startSurf3Variable(params: ParamInfo) = {
+    val yesterdayDateFolder = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
+
     // var gap = 1
     val hiveContext = Spark.getHiveContext()
 
@@ -128,33 +144,36 @@ object SurfVariablesMain extends java.io.Serializable {
     // val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     // var dt = dateFormat.format(cal.getTime())
 
-    val yesterdayDateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    val dayBeforeYesterdayDate = TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT)
+    val dayBeforeYesterdayDateFolder = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, yesterdayDateFolder)
 
-    val currentMergedDataPath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, yesterdayDateFolder)
-    var processedVariablePath = PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
+    val currentMergedDataPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, yesterdayDateFolder)
+    var processedVariablePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, yesterdayDateFolder)
 
-    var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, dayBeforeYesterdayDate)
+    if (DataWriter.canWrite(saveMode, currentMergedDataPath) || DataWriter.canWrite(saveMode, processedVariablePath)) {
+      var oldMergedDataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3mergedData", DataSets.DAILY_MODE, dayBeforeYesterdayDateFolder)
 
-    var oldMergedData: DataFrame = null
+      var oldMergedData: DataFrame = null
 
-    // check if merged data exists
-    if (DataVerifier.dataExists(oldMergedDataPath)) {
-      oldMergedData = hiveContext.read.load(oldMergedDataPath)
+      // check if merged data exists
+      if (DataVerifier.dataExists(oldMergedDataPath)) {
+        oldMergedData = hiveContext.read.load(oldMergedDataPath)
+      }
+
+      var useridDeviceidFrame = getAppIdUserIdData(yesterdayDateFolder, tablename)
+      var UserObj = new GroupData()
+      UserObj.calculateColumns(useridDeviceidFrame)
+      val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(hiveContext, useridDeviceidFrame)
+      var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
+
+      if (null != oldMergedData) {
+        var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
+        //processedVariable.write.save(processedVariablePath)
+        DataWriter.writeParquet(processedVariable, processedVariablePath, saveMode)
+      }
+      var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, yesterdayDateFolder)
+      //mergedData.write.parquet(currentMergedDataPath)
+      DataWriter.writeParquet(mergedData, currentMergedDataPath, saveMode)
     }
-
-    var useridDeviceidFrame = getAppIdUserIdData(yesterdayDateFolder, tablename)
-    var UserObj = new GroupData()
-    UserObj.calculateColumns(useridDeviceidFrame)
-    val userWiseData: RDD[(String, Row)] = UserObj.groupDataByAppUser(hiveContext, useridDeviceidFrame)
-    var incremental = GetSurfVariables.Surf3Incremental(userWiseData, UserObj, hiveContext)
-
-    if (null != oldMergedData) {
-      var processedVariable = GetSurfVariables.ProcessSurf3Variable(oldMergedData, incremental)
-      processedVariable.write.save(processedVariablePath)
-    }
-    var mergedData = GetSurfVariables.mergeSurf3Variable(hiveContext, oldMergedData, incremental, yesterdayDateFolder)
-    mergedData.write.parquet(currentMergedDataPath)
 
   }
 

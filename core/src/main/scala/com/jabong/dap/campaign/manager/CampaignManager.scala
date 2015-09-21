@@ -300,11 +300,14 @@ object CampaignManager extends Serializable with Logging {
       else{
         CampaignProcessor.mergeEmailCampaign(allCampaignsData)
       }
+      val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
 
+
+      val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
       println("Starting write parquet after repartitioning and caching")
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
-        DataWriter.writeParquet(mergedData, writePath, saveMode)
+        DataWriter.writeParquet(finalCampaign, writePath, saveMode)
 
       //writing csv file
       if(DataSets.PUSH_CAMPAIGNS==campaignType)
