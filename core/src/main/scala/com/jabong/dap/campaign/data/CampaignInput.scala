@@ -431,21 +431,23 @@ object CampaignInput extends Logging {
 
     var campaignMerged30Day: DataFrame = null
 
-    for (i <- 1 to 30) {
+    for (i <- 2 to 31) {
 
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
 
       logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
 
-      val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
-      val campaignMergedExits = DataVerifier.dataExists(path)
-
-      if (campaignMergedExits) {
-        val mergedCampaignData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
+      val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
+      if (null != mergedCampaignData) {
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {
-          campaignMerged30Day = campaignMerged30Day.unionAll(mergedCampaignData)
+          var newMergedCamapignData = mergedCampaignData
+          if (!SchemaUtils.isSchemaEqual(mergedCampaignData.schema, campaignMerged30Day.schema)) {
+            // added to add new column add4pushId for the old camaigns data
+            newMergedCamapignData = SchemaUtils.changeSchema(mergedCampaignData, campaignMerged30Day.schema)
+          }
+          campaignMerged30Day = campaignMerged30Day.unionAll(newMergedCamapignData)
         }
       }
     }

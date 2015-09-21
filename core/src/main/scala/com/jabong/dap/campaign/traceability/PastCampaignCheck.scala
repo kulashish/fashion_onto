@@ -42,7 +42,7 @@ object PastCampaignCheck extends Logging {
       .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
         pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1))
 
-    logger.info("Filtering campaign customer based on mail type" + campaignMailType + " and date >= " + filterDate)
+    logger.info("Filtering campaign customer based on mail type " + campaignMailType + " and date >= " + filterDate)
 
     return mailTypeCustomers
   }

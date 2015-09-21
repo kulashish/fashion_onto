@@ -147,4 +147,15 @@ object DataSets {
   val PUSH_CAMPAIGNS = "push_campaigns"
   val EMAIL_CAMPAIGNS = "email_campaigns"
 
+  val AD4PUSH_ID = "ad4pushId"
+  //Clickstream Data Quality
+
+  val CLICKSTREAM_DATA_QUALITY = "clickstreamDataQualityCheck"
+
+  val CLICKSTREAM_YESTERDAY_SESSION = "clickstreamYesterdaySession"
+
+  val CLICKSTREAM_SURF3_VARIABLE = "clickstreamSurf3Variable"
+
+  val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
+
 }

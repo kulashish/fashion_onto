@@ -1,0 +1,28 @@
+{
+  "acquisition": [
+    {
+      "source": "crm",
+      "tableName": "tblTicketMaster",
+      "primaryKey": "IssueID",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblBrickReasonCodeMapping",
+      "primaryKey": "AutoId",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblReturnReasonType",
+      "primaryKey": "ResunID",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    }
+  ]
+}
