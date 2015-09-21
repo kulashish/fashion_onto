@@ -93,30 +93,30 @@ my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
-    run_component("bob Acquisition for Full tables", $command);
+    run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
-    run_component("bob Acquisition for customer_product_shortlist table", $command);
+    run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
-    run_component("bob Acquisition for Incremental tables", $command);
+    run_component($component, $command);
 } elsif ($component eq "bobMerge") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
-    run_component("bob Merge for Incremental tables", $command);
+    run_component($component, $command);
 } elsif ($component eq "bobMergeMonthly") {
     $AMMUNITION = "--num-executors 9 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
-    run_component("bob Merge for Incremental tables", $command);
+    run_component($component, $command);
 # erp Acquisition
 } elsif ($component eq "erpAcqIncr") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
-    run_component("erp Acquisition for Incremental tables", $command);
+    run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
-    run_component("erp Merge for Incremental tables", $command);
+    run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
