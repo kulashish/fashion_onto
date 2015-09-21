@@ -2,27 +2,22 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.io.File
 
-import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.PageVisitVariables
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobConfig }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import com.jabong.dap.model.clickstream.utils.GroupData
-import com.jabong.dap.model.clickstream.variables.SurfVariablesMain._
-import com.jabong.dap.model.custorder.ParamJsonValidator
 import grizzled.slf4j.Logging
-import net.liftweb.json.JsonParser.ParseException
-import net.liftweb.json._
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -119,7 +114,7 @@ object GetSurfVariables extends java.io.Serializable with Logging {
     println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    var tablename = "merge.merge_pagevisit"
+    var tablename = ClickStreamConstant.MERGE_PAGEVISIT
     for (i <- 30 to 1 by -1) {
       val dateFolder = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       var dataPath = "/data/clickstream/merge" + File.separator + dateFolder
@@ -141,7 +136,7 @@ object GetSurfVariables extends java.io.Serializable with Logging {
           if (DataVerifier.dataExists(oldMergedDataPath)) {
             oldMergedData = hiveContext.read.load(oldMergedDataPath)
           }
-          var useridDeviceidFrame: DataFrame = SurfVariablesMain.getAppIdUserIdData(dateFolder, "merge.merge_pagevisit")
+          var useridDeviceidFrame: DataFrame = SurfVariablesMain.getAppIdUserIdData(dateFolder, ClickStreamConstant.MERGE_PAGEVISIT)
 
           var UserObj = new GroupData()
           UserObj.calculateColumns(useridDeviceidFrame)

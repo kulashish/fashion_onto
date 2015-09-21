@@ -2,24 +2,20 @@ package com.jabong.dap.model.clickstream.variables
 
 import java.io.File
 
-import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo, ParamJobConfig }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{OptionUtils, Spark}
+import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.clickstream.utils.{ GetMergedClickstreamData, GroupData }
-import com.jabong.dap.model.custorder.ParamJsonValidator
+import com.jabong.dap.model.clickstream.ClickStreamConstant
+import com.jabong.dap.model.clickstream.utils.{GetMergedClickstreamData, GroupData}
 import grizzled.slf4j.Logging
-import net.liftweb.json.JsonParser.ParseException
-import net.liftweb.json._
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ Path, FileSystem }
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by Divya on 13/7/15.
@@ -104,7 +100,7 @@ object SurfVariablesMain extends java.io.Serializable with Logging {
     // var day = cal.get(Calendar.DAY_OF_MONTH)
     // var month = mFormat.format(cal.getTime())
 
-    val tablename = "merge.merge_pagevisit"
+    val tablename = ClickStreamConstant.MERGE_PAGEVISIT
     val finalTempTable = "finalpagevisit"
 
     val userDeviceMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, yesterdayDateFolder)
@@ -139,7 +135,7 @@ object SurfVariablesMain extends java.io.Serializable with Logging {
     // calculate yesterday date
     // val cal = Calendar.getInstance()
     // cal.add(Calendar.DATE, -1)
-    val tablename = "merge.merge_pagevisit"
+    val tablename = ClickStreamConstant.MERGE_PAGEVISIT
 
     // val dateFormat = new SimpleDateFormat("dd/MM/YYYY")
     // var dt = dateFormat.format(cal.getTime())
