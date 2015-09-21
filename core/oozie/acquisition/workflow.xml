@@ -62,9 +62,14 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="bobMerge"/>
+        <ok to="bobMergeFork"/>
         <error to="fail"/>
     </action>
+
+    <fork name="bobMergeFork">
+        <path start="bobMerge" />
+        <path start="bobMergeMonthly" />
+    </fork>
 
     <action name="bobMerge">
         <shell xmlns="uri:oozie:shell-action:0.2">
@@ -86,9 +91,35 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="bobErpJoin"/>
+        <ok to="bobMergeJoin"/>
         <error to="fail"/>
     </action>
+
+    <action name="bobMergeMonthly">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>bobMergeMonthly</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="bobMergeJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="bobMergeJoin" to="bobErpJoin"/>
 
     <action name="bobAcqFull2">
         <shell xmlns="uri:oozie:shell-action:0.2">

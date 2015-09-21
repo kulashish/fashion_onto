@@ -105,6 +105,10 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component("bob Merge for Incremental tables", $command);
+} elsif ($component eq "bobMergeMonthly") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
+    run_component("bob Merge for Incremental tables", $command);
 # erp Acquisition
 } elsif ($component eq "erpAcqIncr") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
