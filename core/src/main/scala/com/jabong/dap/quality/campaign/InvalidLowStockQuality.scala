@@ -44,7 +44,7 @@ object InvalidLowStockQuality extends BaseCampaignQuality {
 
     val orderItemJoined = orderItemDF.join(fullOrderData, fullOrderData(SalesOrderVariables.ID_SALES_ORDER) === orderItemDF(SalesOrderItemVariables.FK_SALES_ORDER))
 
-    val invalidLow = CampaignInput.getCampaignData(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN,DataSets.PUSH_CAMPAIGNS, date)
+    val invalidLow = CampaignInput.getCampaignData(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
 
     val itr = CampaignInput.loadYesterdayItrSkuData()
 

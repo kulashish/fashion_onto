@@ -29,7 +29,7 @@ class InvalidLowStockCampaign {
 
     //sku selection
     val filteredSku = LowStock.skuFilter(selectedCustomers, itrData)
-    
+
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku)
 

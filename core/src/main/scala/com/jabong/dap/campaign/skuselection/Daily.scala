@@ -24,6 +24,7 @@ object Daily extends Logging {
         customerSkuData(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         yesterdayItrData(ProductVariables.SPECIAL_PRICE),
         yesterdayItrData(ProductVariables.BRICK),
+        yesterdayItrData(ProductVariables.BRAND),
         yesterdayItrData(ProductVariables.MVP),
         yesterdayItrData(ProductVariables.GENDER))
 
