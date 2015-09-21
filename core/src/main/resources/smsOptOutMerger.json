@@ -1,8 +1,7 @@
 {
   "params": [
     {
-      "source": "dcf_feed",
-      "input" : "clickstream.merge_pagevisit",
+      "source": "smsOptOutMerger",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
