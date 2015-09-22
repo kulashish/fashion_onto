@@ -57,7 +57,7 @@ object CampaignManager extends Serializable with Logging {
 
     return true
   }
-  def startInvalidIODCampaign(campaignsConfig:String)={
+  def startInvalidIODCampaign(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
     val invalidIODCampaign = new InvalidIODCampaign()
@@ -71,7 +71,7 @@ object CampaignManager extends Serializable with Logging {
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
-    invalidIODCampaign.runCampaign(orderData,orderItemData,yesterdayItrData,brickMvpRecommendations)
+    invalidIODCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
   }
 
   def startPushRetargetCampaign() = {
@@ -202,7 +202,7 @@ object CampaignManager extends Serializable with Logging {
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
 
-    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+    //    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // call iod campaign
     val itrSku30DayData = CampaignInput.load30DayItrSkuData()
@@ -214,7 +214,6 @@ object CampaignManager extends Serializable with Logging {
       itrSkuSimpleYesterdayData,
       yesterdaySalesOrderData,
       yesterdaySalesOrderItemData,
-      past30DayCampaignMergedData,
       last30DaySalesOrderData,
       last30DaySalesOrderItemData,
       itrSku30DayData)
@@ -312,12 +311,11 @@ object CampaignManager extends Serializable with Logging {
         if (DataSets.PUSH_CAMPAIGNS == campaignType) {
           val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
           val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
-        val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-        CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
-      }
-      else{
-        CampaignProcessor.mergeEmailCampaign(allCampaignsData)
-      }
+          val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
+          CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
+        } else {
+          CampaignProcessor.mergeEmailCampaign(allCampaignsData)
+        }
       val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
 
       val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)

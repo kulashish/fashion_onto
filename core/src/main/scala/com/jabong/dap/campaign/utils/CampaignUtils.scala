@@ -8,23 +8,23 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Utility Class
  */
 object CampaignUtils extends Logging {
 
-  var testMode:Boolean = false
+  var testMode: Boolean = false
 
   val SUCCESS_ = "success_"
 
@@ -210,7 +210,7 @@ object CampaignUtils extends Logging {
     val refList = refSKusList.sortBy(-_._1).distinct
     val listSize = refList.size
     var numberSkus = numSKus
-    if(numberSkus > refList.size) numberSkus = listSize
+    if (numberSkus > refList.size) numberSkus = listSize
     return refList.take(numberSkus)
   }
 
@@ -277,7 +277,15 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ProductVariables.SPECIAL_PRICE))
+      .select(
+        inputData(CustomerVariables.FK_CUSTOMER),
+        inputData(ProductVariables.SKU_SIMPLE),
+        inputData(ProductVariables.SPECIAL_PRICE),
+        inputData(ProductVariables.BRAND),
+        inputData(ProductVariables.BRICK),
+        inputData(ProductVariables.MVP),
+        inputData(ProductVariables.GENDER)
+      )
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -379,9 +387,13 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
-        //inputData(CustomerVariables.EMAIL),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
-        inputData(ProductVariables.SPECIAL_PRICE)
+        inputData(ProductVariables.SPECIAL_PRICE),
+        inputData(ProductVariables.BRAND),
+        inputData(ProductVariables.BRICK),
+        inputData(ProductVariables.MVP),
+        inputData(ProductVariables.GENDER)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -693,7 +705,7 @@ object CampaignUtils extends Logging {
     )
 
     val dfResult = dfJoin.select(
-      col(CustomerVariables.FK_CUSTOMER),
+      skuFilter("*"),
       col(ProductVariables.SKU_SIMPLE),
       col("ITR_" + ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
       col(ProductVariables.BRAND),

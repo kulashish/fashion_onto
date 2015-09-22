@@ -14,7 +14,7 @@ import org.apache.spark.sql.functions._
 class WishlistLowStockCampaign {
 
   // wishlist low stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr
-  def runCampaign(past30DayCampaignMergedData: DataFrame, customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
+  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
     // select customers who have added one or more items to wishlist during 30 days
 
     // sku filter

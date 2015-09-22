@@ -16,7 +16,6 @@ class WishListCampaign {
                   itrSkuSimpleYesterdayData: DataFrame,
                   yesterdaySalesOrderData: DataFrame,
                   yesterdaySalesOrderItemData: DataFrame,
-                  past30DayCampaignMergedData: DataFrame,
                   last30DaySalesOrderData: DataFrame,
                   last30DaySalesOrderItemData: DataFrame,
                   itrSku30DayData: DataFrame): Unit = {
@@ -30,10 +29,10 @@ class WishListCampaign {
     wishlistFollowupCampaign.runCampaign(lastDayCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, yesterdaySalesOrderData, yesterdaySalesOrderItemData)
 
     val wishListLowStockCampaign = new WishlistLowStockCampaign()
-    wishListLowStockCampaign.runCampaign(past30DayCampaignMergedData, last30DaysCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    wishListLowStockCampaign.runCampaign(last30DaysCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
     val wishListIODCampaign = new WishlistIODCampaign()
-    wishListIODCampaign.runCampaign(past30DayCampaignMergedData, last30DaysCustomerSelected, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+    wishListIODCampaign.runCampaign(last30DaysCustomerSelected, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
   }
 

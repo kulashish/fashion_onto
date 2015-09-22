@@ -39,7 +39,11 @@ object Wishlist extends Logging {
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
       col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE,
       col(ItrVariables.STOCK) as ItrVariables.ITR_ + ItrVariables.STOCK,
-      col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
+      col(ItrVariables.CREATED_AT) as ItrVariables.ITR_ + ItrVariables.CREATED_AT,
+      col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
+      col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
+      col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
+      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
     )
 
     val joinDf = skuCustomerProductShortlist.join(lastDaySkuItrData, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === lastDaySkuItrData(ItrVariables.ITR_ + ItrVariables.SKU), SQL.INNER)
@@ -50,7 +54,11 @@ object Wishlist extends Logging {
         col(ItrVariables.ITR_ + CustomerProductShortlistVariables.SPECIAL_PRICE) as CustomerProductShortlistVariables.SPECIAL_PRICE,
         col(ItrVariables.ITR_ + ItrVariables.STOCK) as ItrVariables.STOCK,
         col(ItrVariables.ITR_ + ItrVariables.CREATED_AT) as ItrVariables.CREATED_AT,
-        col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT
+        col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT,
+        col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
+        col(ItrVariables.ITR_ + ItrVariables.BRICK) as ProductVariables.BRICK,
+        col(ItrVariables.ITR_ + ItrVariables.MVP) as ProductVariables.MVP,
+        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER
       )
 
     var skuList = joinDf
@@ -89,7 +97,11 @@ object Wishlist extends Logging {
       val yesterdayItrData = lastDayItrSimpleData.select(
         col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
         col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE,
-        col(ItrVariables.STOCK) as ItrVariables.ITR_ + ItrVariables.STOCK
+        col(ItrVariables.STOCK) as ItrVariables.ITR_ + ItrVariables.STOCK,
+        col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
+        col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
+        col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
+        col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
       )
       val joinDF = skuSimpleCustomerProductShortlist.join(yesterdayItrData, skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE), "inner")
       var filteredDF: DataFrame = null
@@ -107,15 +119,26 @@ object Wishlist extends Logging {
         col(CustomerProductShortlistVariables.SKU_SIMPLE),
         col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT,
         col(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE) as ItrVariables.SPECIAL_PRICE, // last day price
-        col(ItrVariables.ITR_ + ItrVariables.STOCK) as ItrVariables.STOCK
+        col(ItrVariables.ITR_ + ItrVariables.STOCK) as ItrVariables.STOCK,
+        col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
+        col(ItrVariables.ITR_ + ItrVariables.BRICK) as ProductVariables.BRICK,
+        col(ItrVariables.ITR_ + ItrVariables.MVP) as ProductVariables.MVP,
+        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER
       )
     } else {
-      skuSimpleList = skuSimpleCustomerProductShortlist.select(
+
+      val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(skuSimpleCustomerProductShortlist, lastDayItrSimpleData)
+
+      filteredSkuJoinedItr.select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
         col(CustomerProductShortlistVariables.SKU_SIMPLE),
         col(CustomerProductShortlistVariables.CREATED_AT) as SalesOrderItemVariables.UPDATED_AT,
-        col(CustomerProductShortlistVariables.PRICE) as ItrVariables.SPECIAL_PRICE
+        col(CustomerProductShortlistVariables.PRICE) as ItrVariables.SPECIAL_PRICE,
+        col(ProductVariables.BRAND),
+        col(ProductVariables.BRICK),
+        col(ProductVariables.MVP),
+        col(ProductVariables.GENDER)
       )
 
     }
@@ -125,9 +148,13 @@ object Wishlist extends Logging {
     // convert sku simple to sku
     val result = skuOnlyRecordsNotBought.select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      //col(CustomerProductShortlistVariables.EMAIL),
+      col(CustomerProductShortlistVariables.EMAIL),
       Udf.skuFromSimpleSku(dfCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE)) as CustomerProductShortlistVariables.SKU,
-      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
     )
     result
   }
@@ -142,13 +169,21 @@ object Wishlist extends Logging {
       col(CustomerProductShortlistVariables.SKU),
       col(CustomerProductShortlistVariables.SPECIAL_PRICE),
       col(SalesOrderItemVariables.UPDATED_AT),
-      Udf.yyyymmddString(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT
+      Udf.yyyymmddString(dfJoinCustomerWithYestardayItr(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
+      col(ProductVariables.BRAND),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
     )
 
     val irt30Day = df30DaysItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
       col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE,
-      Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
+      Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT,
+      col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
+      col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
+      col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
+      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
     )
 
     val resultDf = joinCustomerWithYestardayItr.join(irt30Day, joinCustomerWithYestardayItr(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
@@ -160,7 +195,11 @@ object Wishlist extends Logging {
         CustomerProductShortlistVariables.EMAIL,
         CustomerProductShortlistVariables.SKU,
         CustomerProductShortlistVariables.SPECIAL_PRICE,
-        SalesOrderItemVariables.UPDATED_AT
+        SalesOrderItemVariables.UPDATED_AT,
+        ProductVariables.BRAND,
+        ProductVariables.BRICK,
+        ProductVariables.MVP,
+        ProductVariables.GENDER
       )
 
     return resultDf
