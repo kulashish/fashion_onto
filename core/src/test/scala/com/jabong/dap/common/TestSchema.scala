@@ -2,6 +2,7 @@ package com.jabong.dap.common
 
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.types._
 
 /**
@@ -205,7 +206,8 @@ object TestSchema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
-    StructField(ProductVariables.ACTIVATED_AT, TimestampType, true)
+    StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),
+    StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))

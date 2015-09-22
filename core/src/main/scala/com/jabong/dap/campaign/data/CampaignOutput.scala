@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.data
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -15,6 +16,7 @@ object CampaignOutput {
 
   def setTestMode(newMode: Boolean): Unit = {
     testMode = newMode
+    CampaignUtils.testMode = newMode
   }
 
   /**
