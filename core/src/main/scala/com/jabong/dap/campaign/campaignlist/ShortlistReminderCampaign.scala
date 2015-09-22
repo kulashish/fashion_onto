@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
  */
 class ShortlistReminderCampaign {
 
-  def runCampaign(shortlist3rdDayData: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(shortlist3rdDayData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
 
     val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.WISH_LIST)
@@ -23,7 +23,7 @@ class ShortlistReminderCampaign {
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.SHORTLIST_REMINDER, filteredSku, false, recommendationsData)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.SHORTLIST_REMINDER, filteredSku, false, brickMvpRecommendations)
   }
 
 }

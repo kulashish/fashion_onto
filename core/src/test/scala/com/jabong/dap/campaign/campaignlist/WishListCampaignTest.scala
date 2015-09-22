@@ -25,6 +25,7 @@ class WishListCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
   @transient var itrSkuSimpleYesterdayData: DataFrame = _
   @transient var itrSkuYesterdayData: DataFrame = _
   @transient var itrSku30DayData: DataFrame = _
+  @transient var brickMvpRecommendations: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
@@ -39,6 +40,7 @@ class WishListCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
     itrSkuYesterdayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/wishlist", "basic_sku_itr", TestSchema.basicItr)
     itrSku30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/wishlist", "basic_sku_itr", TestSchema.basicItr)
     itrSkuSimpleYesterdayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/wishlist", "itr_sku_simple", TestSchema.basicSimpleItr)
+    brickMvpRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "brick_mvp_recommendations")
   }
 
   feature("Run wishlist campaign") {
@@ -56,7 +58,8 @@ class WishListCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
         yesterdaySalesOrderItemData,
         last30DaySalesOrderData,
         last30DaySalesOrderItemData,
-        itrSku30DayData)
+        itrSku30DayData,
+        brickMvpRecommendations)
 
       val wishlistPushCampaignOut = CampaignOutput.testData.head
       val wishlistEmailCampaignOut = CampaignOutput.testData(1)

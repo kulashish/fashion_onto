@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
  */
 class MIPRCampaign {
 
-  def runCampaign(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, recommendationsData: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(last30DaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
 
     val salesOrderCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.CLOSED_ORDER)
@@ -23,7 +23,7 @@ class MIPRCampaign {
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.MIPR_CAMPAIGN, filteredSku, false, recommendationsData)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.MIPR_CAMPAIGN, filteredSku, false, brickMvpRecommendations)
 
   }
 

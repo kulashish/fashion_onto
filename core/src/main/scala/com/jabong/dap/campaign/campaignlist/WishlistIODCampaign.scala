@@ -14,7 +14,7 @@ import org.apache.spark.sql.functions._
 class WishlistIODCampaign {
 
   // wishlist iod stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr, 30 day itr sku
-  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSku30DayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
+  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSku30DayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
     // select customers who have added one or more items to wishlist during 30 days
 
     // sku filter
@@ -54,7 +54,7 @@ class WishlistIODCampaign {
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_IOD_CAMPAIGN, dfUnion)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_IOD_CAMPAIGN, dfUnion)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_IOD_CAMPAIGN, dfUnion, true, brickMvpRecommendations)
 
   }
 
