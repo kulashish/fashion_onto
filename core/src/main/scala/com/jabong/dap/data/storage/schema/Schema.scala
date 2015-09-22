@@ -368,6 +368,19 @@ object Schema {
         StructField(ProductVariables.BRAND, StringType, true),
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
+        StructField(ProductVariables.GENDER, StringType, true)))), false)
+  ))
+
+  val finalReferenceSkuWithACartUrl = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(
+      StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),
+        StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+        StructField(ProductVariables.BRAND, StringType, true),
+        StructField(ProductVariables.BRICK, StringType, true),
+        StructField(ProductVariables.MVP, StringType, true),
         StructField(ProductVariables.GENDER, StringType, true)))), false),
 
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
