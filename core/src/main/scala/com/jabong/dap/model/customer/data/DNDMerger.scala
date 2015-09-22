@@ -18,7 +18,7 @@ import org.apache.spark.sql.functions._
 object DNDMerger {
 
   def start(params: ParamInfo) = {
-    println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
+    //println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
