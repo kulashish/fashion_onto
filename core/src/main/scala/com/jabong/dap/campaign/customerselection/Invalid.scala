@@ -47,7 +47,13 @@ class Invalid extends LiveCustomerSelector with Logging {
     // Now we have customers with invalid orders in last n days
     var customerInValidItemsData = customerOrderData.join(inValidSku,
       customerOrderData(SalesOrderVariables.ID_SALES_ORDER).equalTo(inValidSku(SalesOrderItemVariables.FK_SALES_ORDER)), SQL.INNER)
-      .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER), customerOrderData(SalesOrderVariables.ID_SALES_ORDER), inValidSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS), inValidSku(SalesOrderItemVariables.UNIT_PRICE), inValidSku(SalesOrderItemVariables.UPDATED_AT), inValidSku(ProductVariables.SKU), inValidSku(SalesOrderItemVariables.FK_SALES_ORDER))
+      .select(customerOrderData(SalesOrderVariables.FK_CUSTOMER),
+        customerOrderData(SalesOrderVariables.ID_SALES_ORDER),
+        inValidSku(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
+        inValidSku(SalesOrderItemVariables.UNIT_PRICE),
+        inValidSku(SalesOrderItemVariables.UPDATED_AT),
+        inValidSku(ProductVariables.SKU),
+        inValidSku(SalesOrderItemVariables.FK_SALES_ORDER))
 
     val customerInValidItemsSchema = customerInValidItemsData.schema
 

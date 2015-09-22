@@ -9,14 +9,14 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-class FollowUp extends SkuSelector with Logging {
+object FollowUp extends Logging {
 
   // 1. stock should be >= 10
   // 2. pick based on special price (descending)
   // 1 day data
   // inDataFrame =  [(id_customer, sku simple)]
   // itrData = [(skusimple, date, stock, special price)]
-  override def skuFilter(customerSkuData: DataFrame, itrData: DataFrame): DataFrame = {
+  def skuFilter(customerSkuData: DataFrame, itrData: DataFrame): DataFrame = {
     if (customerSkuData == null || itrData == null) {
       logger.error("either customer selected skus are null or itrData is null")
       return null
@@ -30,12 +30,12 @@ class FollowUp extends SkuSelector with Logging {
 
     logger.info("Join selected customer sku with sku data and filter by stock>=" + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
     //generate reference skus
-    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    //    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    return filteredSku
   }
 
-  override def skuFilter(dfCustomerProductShortlist: DataFrame, df30DaysSkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
+  def skuFilterblahBlah(dfCustomerProductShortlist: DataFrame, df30DaysSkuItrData: DataFrame, dfYesterdaySkuSimpleItrData: DataFrame): DataFrame = {
     //=====================================calculate SKU data frame=====================================================
     val itr30dayData = df30DaysSkuItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
@@ -82,12 +82,4 @@ class FollowUp extends SkuSelector with Logging {
 
     return dfResult
   }
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
-
-  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
-
 }

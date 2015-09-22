@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -56,6 +57,8 @@ import org.apache.spark.sql.functions._
  */
 object ContactListMobile extends Logging {
 
+  val SUM_SPECIAL_PRICE = "sum_special_price"
+  val COUNT_BRAND = "count_brand"
   val udfEmailOptInStatus = udf((nls_email: String, status: String) => Customer.getEmailOptInStatus(nls_email: String, status: String))
 
   /**
@@ -84,7 +87,8 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemCalcPrevFull,
       dfDND,
       dfSmsOptOut,
-      dfZoneCity
+      dfZoneCity,
+      dfYestItr
       ) = readDf(paths, incrDate, prevDate)
 
     //get  Customer CustomerSegments.getCustomerSegments
@@ -112,6 +116,8 @@ object ContactListMobile extends Logging {
     val pathSalesOrderItem = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ITEM_ORDERS_COUNT, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(successfulCalcFull, pathSalesOrderItem, saveMode)
 
+    val dfMostPreferredBrand = getdfMostPreferredBrand(dfSalesOrderFull, dfSalesOrderItemCalcPrevFull, dfYestItr)
+
     //Save Data Frame Contact List Mobile
     val (dfContactListMobileIncr, dfContactListMobileFull) = getContactListMobileDF (
       dfCustomerIncr,
@@ -123,7 +129,8 @@ object ContactListMobile extends Logging {
       dfSuccessfullOrders,
       dfDND,
       dfSmsOptOut,
-      dfZoneCity)
+      dfZoneCity,
+      dfMostPreferredBrand)
 
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(dfContactListMobileFull, pathContactListMobileFull, saveMode)
@@ -155,7 +162,8 @@ object ContactListMobile extends Logging {
     dfSuccessfullOrders: DataFrame,
     dfDND: DataFrame,
     dfSmsOptOut: DataFrame,
-    dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
+    dfZoneCity: DataFrame,
+    dfMostPreferredBrand: DataFrame): (DataFrame, DataFrame) = {
 
     if (dfCustomerIncr == null || dfCustSegCalcIncr == null || dfNLSIncr == null) {
       log("Data frame should not be null")
@@ -179,7 +187,7 @@ object ContactListMobile extends Logging {
     //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
     // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
 
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND, dfSmsOptOut)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfullOrders, dfZoneCity, dfDND, dfSmsOptOut, dfMostPreferredBrand)
 
     var dfFull: DataFrame = dfMergedIncr
 
@@ -244,27 +252,47 @@ object ContactListMobile extends Logging {
 
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.DND), joinDF(CustomerVariables.DND)) as CustomerVariables.DND // DND
       )
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.DND), joinDF(CustomerVariables.DND)) as CustomerVariables.DND, // DND
+
+        coalesce(joinDF(CustomerVariables.NEW_ + ProductVariables.BRAND), joinDF(ProductVariables.BRAND)) as ProductVariables.BRAND
+      )
     }
 
     (dfMergedIncr, dfFull)
   }
 
-  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame): DataFrame = {
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, dfMostPreferredBrand: DataFrame): DataFrame = {
 
-    val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val customerAddBrandCol = customerIncr.join(dfMostPreferredBrand, customerIncr(CustomerVariables.ID_CUSTOMER) === dfMostPreferredBrand(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
-        coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        customerIncr(CustomerVariables.ID_CUSTOMER),
         customerIncr(CustomerVariables.EMAIL),
-        customerIncr(CustomerVariables.BIRTHDAY) as CustomerVariables.DOB,
+        customerIncr(CustomerVariables.BIRTHDAY),
         customerIncr(CustomerVariables.GENDER),
         customerIncr(CustomerVariables.REG_DATE),
         customerIncr(CustomerVariables.FIRST_NAME),
         customerIncr(CustomerVariables.LAST_NAME),
         customerIncr(CustomerVariables.PHONE),
-        customerIncr(CustomerVariables.IS_CONFIRMED) as CustomerVariables.VERIFICATION_STATUS,
-        Udf.age(customerIncr(CustomerVariables.BIRTHDAY)) as CustomerVariables.AGE,
-        customerIncr(CustomerVariables.REWARD_TYPE) as CustomerVariables.PLATINUM_STATUS,
+        customerIncr(CustomerVariables.IS_CONFIRMED),
+        customerIncr(CustomerVariables.BIRTHDAY),
+        customerIncr(CustomerVariables.REWARD_TYPE),
         customerIncr(CustomerVariables.UPDATED_AT),
+        dfMostPreferredBrand(ProductVariables.BRAND))
+
+    val customerSeg = customerAddBrandCol.join(custSegCalcIncr, customerAddBrandCol(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+      .select(
+        coalesce(customerAddBrandCol(CustomerVariables.ID_CUSTOMER), custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        customerAddBrandCol(CustomerVariables.EMAIL),
+        customerAddBrandCol(CustomerVariables.BIRTHDAY) as CustomerVariables.DOB,
+        customerAddBrandCol(CustomerVariables.GENDER),
+        customerAddBrandCol(CustomerVariables.REG_DATE),
+        customerAddBrandCol(CustomerVariables.FIRST_NAME),
+        customerAddBrandCol(CustomerVariables.LAST_NAME),
+        customerAddBrandCol(CustomerVariables.PHONE),
+        customerAddBrandCol(CustomerVariables.IS_CONFIRMED) as CustomerVariables.VERIFICATION_STATUS,
+        Udf.age(customerAddBrandCol(CustomerVariables.BIRTHDAY)) as CustomerVariables.AGE,
+        customerAddBrandCol(CustomerVariables.REWARD_TYPE) as CustomerVariables.PLATINUM_STATUS,
+        customerAddBrandCol(CustomerVariables.UPDATED_AT),
         custSegCalcIncr(CustomerSegmentsVariables.MVP_TYPE),
         custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
         custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE))
@@ -431,7 +459,7 @@ object ContactListMobile extends Logging {
    * @param incrDate
    * @return
    */
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
     val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, incrDate)
     val dfCustomerListMobilePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, prevDate)
@@ -455,6 +483,9 @@ object ContactListMobile extends Logging {
     val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
+
+    val yestItr = CampaignInput.loadYesterdayItrSimpleData()
+
     //TODO store the city names in lower case, all data coming as Upper case
     (
       dfCustomerIncr,
@@ -470,10 +501,11 @@ object ContactListMobile extends Logging {
       dfSalesOrderItemCalcPrevFull,
       dfDND,
       dfSmsOptOut,
-      dfZoneCity)
+      dfZoneCity,
+      yestItr)
   }
 
-  def readDf(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     if (null != paths) {
       val pathList = paths.split(";")
       val custPath = pathList(0)
@@ -496,6 +528,8 @@ object ContactListMobile extends Logging {
 
       val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
+      val yestItr = CampaignInput.loadYesterdayItrSimpleData()
+
       (
         dfCustomerIncr,
         null,
@@ -510,10 +544,41 @@ object ContactListMobile extends Logging {
         null,
         dfDND,
         dfSmsOptOut,
-        dfZoneCity)
+        dfZoneCity,
+        yestItr)
     } else {
       readDf(incrDate, prevDate)
     }
+  }
+
+  /**
+   *
+   *
+   * @param dfSalesOrderFull
+   * @param dfSalesOrderItemCalcPrevFull
+   * @param dfYestItr
+   * @return
+   */
+  def getdfMostPreferredBrand(dfSalesOrderFull: DataFrame, dfSalesOrderItemCalcPrevFull: DataFrame, dfYestItr: DataFrame): DataFrame = {
+
+    if (dfSalesOrderFull == null || dfSalesOrderItemCalcPrevFull == null || dfYestItr == null) {
+      log("Data frame should not be null")
+      return null
+    }
+
+    //join SalesOrder and SalesOrderItem Data
+    val dfJoinOrderAndItem = dfSalesOrderFull.join(dfSalesOrderItemCalcPrevFull, dfSalesOrderItemCalcPrevFull(SalesOrderItemVariables.FK_SALES_ORDER) === dfSalesOrderFull(SalesOrderVariables.ID_SALES_ORDER), SQL.INNER)
+      .select(SalesOrderVariables.FK_CUSTOMER, SalesOrderItemVariables.SKU)
+
+    //join Itr and dfJoinOrderAndItem
+    val dfJoinItrAndOrder = dfYestItr.join(dfJoinOrderAndItem, dfJoinOrderAndItem(SalesOrderItemVariables.SKU) === dfYestItr(ProductVariables.SKU_SIMPLE), SQL.INNER)
+      .select(SalesOrderVariables.FK_CUSTOMER, ProductVariables.BRAND, ProductVariables.SPECIAL_PRICE)
+
+    val dfGrouped = dfJoinItrAndOrder.groupBy(SalesOrderVariables.FK_CUSTOMER, ProductVariables.BRAND).agg(count(ProductVariables.BRAND) as COUNT_BRAND, sum(ProductVariables.SPECIAL_PRICE) as SUM_SPECIAL_PRICE)
+
+    val dfResult = dfGrouped.sort(COUNT_BRAND, SUM_SPECIAL_PRICE).groupBy(SalesOrderVariables.FK_CUSTOMER).agg(last(ProductVariables.BRAND))
+
+    dfResult
   }
 
 }

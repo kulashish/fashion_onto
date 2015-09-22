@@ -41,6 +41,7 @@ object CampaignCommon {
 
   val PRIORITY = "priority"
 
+  val ACART_BASE_URL = "www.jabong.com/cart/addmulti?skus="
   //add following source name with other params in AppConfig.config.credentials
   val J_DARE_SOURCE = "jDaReSource"
 
@@ -64,4 +65,5 @@ object CampaignCommon {
     "surf3" -> 58
   )
 
+  val COUNT_NEW_ARRIVALS = 4
 }

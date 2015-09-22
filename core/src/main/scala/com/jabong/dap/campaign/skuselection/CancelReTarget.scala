@@ -11,52 +11,14 @@ import org.apache.spark.sql.functions._
 /**
  * Cancel Re-target class
  */
-class CancelReTarget extends SkuSelector {
-
-  /*
-  Given list of ordered sku return those which are cancelled
-   */
-
-  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-
-  //  def execute(orderItemDataFrame: DataFrame): DataFrame = {
-  //
-  //    if (orderItemDataFrame == null) {
-  //      return null
-  //    }
-  //
-  //    val filteredSku = skuFilter(orderItemDataFrame)
-  //
-  //    val refSku = CampaignUtils.generateReferenceSku(filteredSku, 1)
-  //
-  //    filteredSku.collect().foreach(println)
-  //
-  //    return refSku
-  //  }
-  //
-  ////  def groupedSku(filteredSku:DataFrame): Unit ={
-  ////    val mappedData = filteredSku.map(row =>(row(0),row))
-  ////    mappedData.groupByKey().map{case(key,value)=>(key,getGroupedSku(value))}
-  //////    mappedData.com
-  ////
-  ////  }
-  //
-  //  def getGroupedSku(data:Iterable[Row]): Unit ={
-  //
-  //  }
-
-  def skuCompleteData(skuList: DataFrame, itrData: DataFrame): DataFrame = {
-    return null
-  }
+object CancelReTarget {
 
   /**
    * Override sku Filter method to filter skus based on different order cancel statuses
    * @param inDataFrame
    * @return
    */
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = {
+  def skuFilter(inDataFrame: DataFrame): DataFrame = {
     if (inDataFrame == null) {
       return null
     }
@@ -72,14 +34,9 @@ class CancelReTarget extends SkuSelector {
         inDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
         inDataFrame(SalesOrderItemVariables.UNIT_PRICE) as ProductVariables.SPECIAL_PRICE)
 
-    val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    // val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSku
+    return filteredSku
   }
 
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
 }

@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
@@ -306,6 +306,14 @@ object Schema {
     StructField(CampaignMergedFields.DEVICE_ID, StringType, true)
   ))
 
+  val emailCampaignSchema = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.REC_SKU, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true)
+  ))
+
   val campaign = StructType(Array(
     StructField(CampaignMergedFields.CUSTOMER_ID, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_MAIL_TYPE, IntegerType, true),
@@ -334,6 +342,28 @@ object Schema {
     StructField(PageVisitVariables.ACTUAL_VISIT_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true),
     StructField(PageVisitVariables.SKU_LIST, ArrayType(StringType), true)
+  ))
+
+  val brickMvpRecommendationOutput = StructType(Array(
+    StructField(ProductVariables.BRICK, StringType, false),
+    StructField(ProductVariables.MVP, StringType, false),
+    StructField(ProductVariables.GENDER, StringType, false),
+    StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
+  ))
+
+  val brandMvpRecommendationOutput = StructType(Array(
+    StructField(ProductVariables.BRAND, StringType, false),
+    StructField(ProductVariables.MVP, StringType, false),
+    StructField(ProductVariables.GENDER, StringType, false),
+    StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
+  ))
+
+  val finalReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+      StructField(ProductVariables.BRAND, StringType, true),StructField(ProductVariables.BRICK, StringType, true),StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
   ))
 
 }

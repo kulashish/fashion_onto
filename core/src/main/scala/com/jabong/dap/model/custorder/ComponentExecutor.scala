@@ -1,5 +1,6 @@
 package com.jabong.dap.model.custorder
 
+import com.jabong.dap.campaign.recommendation.generator.RecommendationGenerator
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
@@ -28,6 +29,7 @@ import org.apache.hadoop.fs.{ FileSystem, Path }
  */
 class ComponentExecutor extends Serializable with Logging {
 
+  @throws(classOf[Exception])
   def start(paramJsonPath: String) = {
     val validated = try {
       val conf = new Configuration()
@@ -66,6 +68,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DCF_FEED => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
+          case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
           case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
           case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)

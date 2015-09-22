@@ -2,8 +2,10 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.Surf
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -17,16 +19,13 @@ class Surf6Campaign {
 
     val customerSurfData = customerSelector.customerSelection(yestSurfSessionData)
 
-    val surfSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.SURF)
+    val skus = Surf.skuFilter(past30DayCampaignMergedData, customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, CampaignCommon.SURF6_CAMPAIGN)
 
-    val skus = surfSkuSelector.skuFilter(past30DayCampaignMergedData, customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, CampaignCommon.SURF6_CAMPAIGN)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.SURF6_CAMPAIGN, skus)
 
-    val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
-
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.SURF6_CAMPAIGN)
-
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.SURF6_CAMPAIGN)
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.SURF6_CAMPAIGN, skus)
 
   }
 

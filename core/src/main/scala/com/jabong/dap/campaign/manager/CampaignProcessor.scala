@@ -177,6 +177,7 @@ object CampaignProcessor {
         camp(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL,
         camp(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
         camp(CampaignMergedFields.DEVICE_ID) as CampaignMergedFields.deviceId,
+        camp(CampaignMergedFields.LIVE_CART_URL) as CampaignMergedFields.LIVE_CART_URL,
         itr(ITR.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
         itr(ITR.BRAND_NAME) as CampaignMergedFields.LIVE_BRAND,
         itr(ITR.BRICK) as CampaignMergedFields.LIVE_BRICK,
@@ -190,6 +191,14 @@ object CampaignProcessor {
     finalCampaign
   }
 
+  def mergeEmailCampaign(allCampaignsData: DataFrame):DataFrame={
+    allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
+                    .agg(first(CustomerVariables.FK_CUSTOMER),
+                          first(CampaignMergedFields.REF_SKU1),
+                          first(CampaignMergedFields.REC_SKU),
+                          first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+                          first(CustomerVariables.EMAIL))
+  }
   /**
    *
    * @param df

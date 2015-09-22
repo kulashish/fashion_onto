@@ -14,5 +14,6 @@ object ProductVariables {
   val CATEGORY = "category"
   val SKU_LIST = "skuList"
   val QUANTITY = "quantity"
-  val RECOMMENDATIONS = "recommendations"
+  val NUMBER_SIMPLE_PER_SKU = "number_simple_per_sku"
+  val ACTIVATED_AT = "activatedAt"
 }

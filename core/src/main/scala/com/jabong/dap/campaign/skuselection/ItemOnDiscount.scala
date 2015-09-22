@@ -15,7 +15,7 @@ import org.apache.spark.sql.functions._
 /**
  * Item On Discount Execution Class
  */
-class ItemOnDiscount extends SkuSelector with Logging {
+object ItemOnDiscount extends Logging {
 
   // sku filter
   // 2. Today's Special Price of SKU (SIMPLE – include size) is less than
@@ -25,7 +25,7 @@ class ItemOnDiscount extends SkuSelector with Logging {
   //
   // dfCustomerProductShortlist =  [(id_customer, sku simple)]
   // itr30dayData = [(skusimple, date, special price)]
-  override def skuFilter(customerSelected: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
+  def skuFilter(customerSelected: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
 
     if (customerSelected == null || df30DaysItrData == null) {
 
@@ -67,12 +67,12 @@ class ItemOnDiscount extends SkuSelector with Logging {
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
 
     logger.info("After sku filter based on special price")
-    // FIXME: generate ref skus
-    val refSkus = CampaignUtils.generateReferenceSku(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    logger.info("After reference sku generation")
+    //val refSkus = CampaignUtils.generateReferenceSkusForAcart(dfResult, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    //logger.info("After reference sku generation")
+
+    return dfResult
   }
 
   /**
@@ -243,17 +243,5 @@ class ItemOnDiscount extends SkuSelector with Logging {
     return dfResult
 
   }
-
-  // not needed
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
-
-  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
-
 }
 

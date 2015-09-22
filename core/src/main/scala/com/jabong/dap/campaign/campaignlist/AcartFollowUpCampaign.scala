@@ -2,9 +2,11 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.FollowUp
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -19,19 +21,17 @@ class AcartFollowUpCampaign {
     //FIXME:Filter the order items data for last 3 days
     val selectedCustomers = acartCustomerSelector.customerSelection(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData)
 
-    //past campaign check whether the campaign has been sent to customer in last 30 days
-    val pastCampaignCheck = new PastCampaignCheck()
-    val custFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
-      CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, 1000), 30)
-
     //sku selection
-    val followUp = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.FOLLOW_UP)
-    val refSkus = followUp.skuFilter(selectedCustomers, itrData)
+    //filter sku based on followup filter
+    val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData)
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, filteredSku)
 
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN)
-
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, filteredSku)
   }
+
+
+
 }

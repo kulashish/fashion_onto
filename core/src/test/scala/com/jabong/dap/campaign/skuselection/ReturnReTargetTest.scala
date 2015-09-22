@@ -14,24 +14,22 @@ class ReturnReTargetTest extends FlatSpec with SharedSparkContext {
   @transient var sqlContext: SQLContext = _
   @transient var testDataFrame: DataFrame = _
   @transient var orderItemDataFrame: DataFrame = _
-  var returnReTarget: ReturnReTarget = _
 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    returnReTarget = new ReturnReTarget()
     orderItemDataFrame = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order_with_item")
     // testDataFrame = JsonUtils.readFromJson("sales_cart", "SalesCartEmpty")
   }
 
   "empty order data " should "return empty data from execute function of return re-target " in {
-    val skuData = returnReTarget.skuFilter(null)
+    val skuData = ReturnReTarget.skuFilter(null)
     assert(skuData == null)
   }
 
   //FIXME: change the test cases to pass
   "Last day order items data " should "return two records from execute function" in {
-    val skuData = returnReTarget.skuFilter(orderItemDataFrame)
+    val skuData = ReturnReTarget.skuFilter(orderItemDataFrame)
     assert(skuData.count() == 1)
   }
 

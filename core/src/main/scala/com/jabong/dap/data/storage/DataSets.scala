@@ -127,6 +127,13 @@ object DataSets {
   //Campaign Quality
   val CAMPAIGN_QUALITY = "campaign_quality"
 
+  //recommendations
+  val RECOMMENDATIONS = "recommendations"
+  val BRICK_MVP_RECOMMENDATIONS = "brick_mvp"
+  val BRAND_MVP_RECOMMENDATIONS = "brand_mvp"
+
+
+  // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
@@ -136,6 +143,10 @@ object DataSets {
   val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
+  
+  // type of campaigns
+  val PUSH_CAMPAIGNS = "push_campaigns"
+  val EMAIL_CAMPAIGNS = "email_campaigns"
 
   val AD4PUSH_ID = "ad4pushId"
   //Clickstream Data Quality
