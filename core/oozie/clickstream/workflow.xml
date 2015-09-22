@@ -4,7 +4,7 @@
         <name-node>${nameNode}</name-node>
         <configuration>
             <property>
-                <name>mapred.job.queue.name</name>
+                <name>mapreduce.job.queuename</name>
                 <value>${queueName}</value>
             </property>
         </configuration>
@@ -13,15 +13,7 @@
     <start to='clickstreamYesterdaySession' />
 
     <action name="clickstreamYesterdaySession">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
+        <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
@@ -37,15 +29,7 @@
     </action>
 
     <action name="clickstreamSurf3Variable">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
+        <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
@@ -61,15 +45,7 @@
     </action>
 
     <action name="deviceMapping">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
+        <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
@@ -91,15 +67,7 @@
     </fork>
 
     <action name="pushSurfCampaign">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
+        <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
@@ -115,15 +83,7 @@
     </action>
 
     <action name="dcfFeedGenerate">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
+        <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
@@ -139,15 +99,7 @@
     </action>
 
     <action name="pricingSKUData">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
+        <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
