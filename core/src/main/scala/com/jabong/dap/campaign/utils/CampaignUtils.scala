@@ -8,28 +8,27 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.{Udf, UdfUtils}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Utility Class
  */
 object CampaignUtils extends Logging {
 
+  var testMode:Boolean = false
+
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
-  import sqlContext.implicits._
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -208,8 +207,11 @@ object CampaignUtils extends Logging {
   def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
-    //FIXME: handle case of, if list size is less than numSkus
-    return refSKusList.sortBy(-_._1).distinct.take(numSKus)
+    val refList = refSKusList.sortBy(-_._1).distinct
+    val listSize = refList.size
+    var numberSkus = numSKus
+    if(numberSkus > refList.size) numberSkus = listSize
+    return refList.take(numberSkus)
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
@@ -645,10 +647,8 @@ object CampaignUtils extends Logging {
    */
   def createRefSkuAcartUrl(skuSimpleList: List[Row]): (String) = {
     var acartUrl = CampaignCommon.ACART_BASE_URL
-    println(acartUrl)
     var i: Int = 0
     for (skuSimple <- skuSimpleList) {
-      println("LIST:-" + skuSimple)
       if (i == 0) acartUrl += skuSimple(1) else acartUrl = acartUrl + "," + skuSimple(1)
       i = i + 1;
     }
@@ -714,7 +714,7 @@ object CampaignUtils extends Logging {
 
     var custFiltered = filteredSku
 
-    if (pastCampaignCheck) {
+    if (pastCampaignCheck && !testMode) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
       custFiltered = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, filteredSku,
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)

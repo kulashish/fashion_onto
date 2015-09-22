@@ -14,7 +14,7 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartIODCampaign {
 
-  def runCampaign(past30DayCampaignMergedData: DataFrame, last30DayAcartData: DataFrame, last30daySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, last30daysItrData: DataFrame): Unit = {
+  def runCampaign(last30DayAcartData: DataFrame, last30daySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, last30daysItrData: DataFrame,brickMvpRecommendations : DataFrame): Unit = {
 
     val acartCustomerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
@@ -29,7 +29,7 @@ class AcartIODCampaign {
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_IOD_CAMPAIGN, filteredSku)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_IOD_CAMPAIGN, filteredSku)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_IOD_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 

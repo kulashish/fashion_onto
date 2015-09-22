@@ -26,7 +26,11 @@ object FollowUp extends Logging {
       .filter(ProductVariables.STOCK + " >= " + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),
-        itrData(ProductVariables.SPECIAL_PRICE))
+        itrData(ProductVariables.SPECIAL_PRICE),
+        itrData(ProductVariables.BRAND),
+        itrData(ProductVariables.BRICK),
+        itrData(ProductVariables.MVP),
+        itrData(ProductVariables.GENDER))
 
     logger.info("Join selected customer sku with sku data and filter by stock>=" + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
     //generate reference skus
