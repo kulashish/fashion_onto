@@ -97,6 +97,8 @@ object CampaignManager extends Serializable with Logging {
     val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
     // last 3 days of orderitem data
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
@@ -173,8 +175,8 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
-    val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-    newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
+    //val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
+   // newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
   }
 
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
