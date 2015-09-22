@@ -199,7 +199,11 @@ object CampaignUtils extends Logging {
   def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
-    return refSKusList.sortBy(-_._1).distinct.take(numSKus)
+    val refList = refSKusList.sortBy(-_._1).distinct
+    val listSize = refList.size
+    var numberSkus = numSKus
+    if(numberSkus > refList.size) numberSkus = listSize
+    return refList.take(numberSkus)
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
@@ -635,10 +639,8 @@ object CampaignUtils extends Logging {
    */
   def createRefSkuAcartUrl(skuSimpleList: List[Row]): (String) = {
     var acartUrl = CampaignCommon.ACART_BASE_URL
-    println(acartUrl)
     var i: Int = 0
     for (skuSimple <- skuSimpleList) {
-      println("LIST:-" + skuSimple)
       if (i == 0) acartUrl += skuSimple(1) else acartUrl = acartUrl + "," + skuSimple(1)
       i = i + 1;
     }
