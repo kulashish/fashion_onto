@@ -57,7 +57,7 @@ object CampaignUtils extends Logging {
     val referenceSkus = generateReferenceSkus(refSkuData, 100)
     val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String)]].take(NumberSku),
       (t(2).asInstanceOf[List[Row]]))).map(t => Row(t._1, t._2, t._3, createRefSkuAcartUrl(t._4)))
-    val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSku)
+    val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSkuWithACartUrl)
     return refSkuForAcart
   }
 
@@ -771,7 +771,6 @@ object CampaignUtils extends Logging {
   def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame) = {
 
     var refSkus: DataFrame = null
-
     if (campaignName.startsWith("acart")) {
       //generate reference sku for acart with acart url
       refSkus = CampaignUtils.generateReferenceSkusForAcart(custFiltered, CampaignCommon.NUMBER_REF_SKUS)

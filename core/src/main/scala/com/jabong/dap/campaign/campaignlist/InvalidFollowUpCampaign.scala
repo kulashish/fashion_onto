@@ -14,7 +14,7 @@ import org.apache.spark.sql.DataFrame
  */
 class InvalidFollowUpCampaign {
 
-  def runCampaign(past30DayCampaignMergedData: DataFrame, customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
@@ -29,7 +29,7 @@ class InvalidFollowUpCampaign {
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 
