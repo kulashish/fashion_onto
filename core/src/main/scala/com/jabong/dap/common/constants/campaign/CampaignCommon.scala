@@ -18,6 +18,7 @@ object CampaignCommon {
   val RETURN_RETARGET_CAMPAIGN = "return_retarget"
   val INVALID_FOLLOWUP_CAMPAIGN = "invalid_followup"
   val INVALID_LOWSTOCK_CAMPAIGN = "invalid_lowstock"
+  val INVALID_IOD_CAMPAIGN="invalid_iod"
   val ACART_FOLLOWUP_CAMPAIGN = "acart_followup"
   val ACART_DAILY_CAMPAIGN = "acart_daily"
   val ACART_LOWSTOCK_CAMPAIGN = "acart_lowstock"

@@ -128,6 +128,7 @@ object Init {
       case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
       case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
+      case "invalidIODCampaign" => CampaignManager.startInvalidIODCampaign(params.campaignsJson)
 
       // clickstream use cases
       case "clickstreamYesterdaySession" => new ComponentExecutor().start(params.paramJson)
