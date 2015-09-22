@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
@@ -21,6 +22,7 @@ class MIPRCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
+    CampaignOutput.setTestMode(true)
     last30DaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "sales_order", Schema.salesOrder)
     yesterdaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "sales_order_item", Schema.salesOrderItem)
     //    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "itr")

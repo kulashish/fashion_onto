@@ -194,7 +194,7 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
 
     val customerGroup = customerSkuMap.groupByKey().
-      map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, Row(x._2)))
+      map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
