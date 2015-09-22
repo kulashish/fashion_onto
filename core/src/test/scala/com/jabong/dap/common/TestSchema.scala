@@ -204,7 +204,8 @@ object TestSchema {
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
-    StructField(ProductVariables.STOCK, LongType, true)
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.ACTIVATED_AT, TimestampType, true)
   ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))

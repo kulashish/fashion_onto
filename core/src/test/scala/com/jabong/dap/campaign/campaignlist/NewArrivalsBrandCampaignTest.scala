@@ -1,8 +1,10 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.{ FeatureSpec, GivenWhenThen }
 
@@ -19,8 +21,10 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    salesCart30Days = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "sales_cart")
-    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "itr")
+    CampaignOutput.setTestMode(true)
+    salesCart30Days = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "sales_cart", Schema.salesCart)
+    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "itr", TestSchema.basicSimpleItr)
+    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "brick_mvp_recommendations")
   }
 
   feature("Generate New Arrivals Brand"){

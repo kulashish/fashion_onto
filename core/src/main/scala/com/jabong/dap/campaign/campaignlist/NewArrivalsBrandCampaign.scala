@@ -2,7 +2,9 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.NewArrivalsBrand
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -16,12 +18,10 @@ class NewArrivalsBrandCampaign {
 
     val customerSelected = newArivalsBrandCustomerSelector.customerSelection(salesCart30Days)
 
-    val skus = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
+    val filteredSku = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
 
-    //TODO: Fix recommendation Data
-
-    //TODO: generate reference skus
-    //    val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.NEW_ARRIVALS_BRAND, filteredSku, false, recommendationsData)
 
   }
 }

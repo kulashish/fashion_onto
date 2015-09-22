@@ -64,10 +64,12 @@ object CampaignCommon {
     "surf1" -> 56,
     "surf3" -> 58,
     //FIXME: Write correct mail type for mipr campaign
-    "mipr" -> 101
+    "mipr" -> 101,
+    "newArrivalsBrand" -> 102
   )
 
   val COUNT_NEW_ARRIVALS = 4
 
   val MIPR_CAMPAIGN = "mipr"
+  val NEW_ARRIVALS_BRAND = "newArrivalsBrand"
 }
