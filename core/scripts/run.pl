@@ -142,7 +142,7 @@ if ($component eq "bobAcqFull1") {
      $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
-} elsif ($component eq "emailCampaignMerge") {
+}} elsif ($component eq "emailCampaignMerge") {
       $SPARK_HOME = "/ext/spark-1.4.1-bin-hadoop2.6";
       $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
@@ -160,6 +160,10 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 7 --executor-memory 9G";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
+} elsif ($component eq "invalidIODCampaign") {
+    $AMMUNITION = "--num-executors 7 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component invalidIODCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/email_campaigns.json";
+    run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
           run_component($component, $command);
@@ -172,18 +176,18 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "campaignQuality") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
      run_component($component, $command);
+ } elsif ($component eq "recommendations") {
+        $AMMUNITION = "--num-executors 10 --executor-memory 500M";
+        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component recommendations --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/recommendation.json";
+        run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamDataQualityCheck --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamDataQualityCheck.json";
       run_component($component, $command);
 } elsif ($component eq "dndMerger") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component dndMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dndMerger.json";
       run_component($component, $command);
-} elsif ($component eq "recommendations") {
-        $AMMUNITION = "--num-executors 10 --executor-memory 500M";
-        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component recommendations --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/recommendation.json";
-        run_component($component, $command);
 } else {
-    print "not a valid component\n";
+      print "not a valid component\n";
 }
 
 

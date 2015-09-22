@@ -5,6 +5,7 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.ReturnReTarget
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ Recommendation, SkuSelection, CampaignCommon }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -23,17 +24,11 @@ class LiveReturnReTargetCampaign {
     // save 2 ref skus + 8 recommendation per customer (null allowed for mobile push)
     val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(filteredSkus, yesterdayItrData)
 
-    val refSkus = CampaignUtils.generateReferenceSkus(filteredSkuJoinedItr, CampaignCommon.NUMBER_REF_SKUS)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false)
 
-    val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.RETURN_RETARGET_CAMPAIGN)
-
-    // create recommendations
-    val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
-
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, brickMvpRecommendations)
-
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.RETURN_RETARGET_CAMPAIGN)
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.RETURN_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false, brickMvpRecommendations)
 
   }
 }

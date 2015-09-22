@@ -19,7 +19,6 @@ object PastCampaignCheck extends Logging {
   val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS).cache()
   val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS).cache()
 
-  
   /**
    *
    * @param pastCampaignData
@@ -76,7 +75,7 @@ object PastCampaignCheck extends Logging {
 
   def campaignCommonRefSkuCheck(campaignType: String, customerSkuSimpleSelected: DataFrame, campaignMailType: Int, nDays: Int): DataFrame = {
     var pastCampaignData: DataFrame = null
-    
+
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       pastCampaignData = past30DayEmailCampaignMergedData
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
@@ -85,7 +84,7 @@ object PastCampaignCheck extends Logging {
     campaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
   }
 
-    /**
+  /**
    *  To check whether the campaign has been sent to customer for the same ref sku in last nDays
    * @param pastCampaignData
    * @param customerSkuSimpleSelected

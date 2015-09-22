@@ -226,10 +226,10 @@ object CampaignInput extends Logging {
    * Load all campaign data
    * @return dataframe with call campaigns data
    */
-  def loadAllCampaignsData(date: String, campaignType:String): DataFrame = {
+  def loadAllCampaignsData(date: String, campaignType: String): DataFrame = {
     require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
 
-    logger.info("Reading last day all campaigns data from hdfs : CampaignType"+campaignType)
+    logger.info("Reading last day all campaigns data from hdfs : CampaignType" + campaignType)
     //FIXME:use proper data frame
     var allCampaignData: DataFrame = null
     var df: DataFrame = null
@@ -239,12 +239,11 @@ object CampaignInput extends Logging {
       val campaignName = campaignDetails.campaignName
 
       df = getCampaignData(campaignName, date, campaignType, campaignPriority)
-      if(null != allCampaignData) allCampaignData = df else if(null != df) allCampaignData = allCampaignData.unionAll(df)
+      if (null != allCampaignData) allCampaignData = df else if (null != df) allCampaignData = allCampaignData.unionAll(df)
     }
-    logger.info("merging full campaign done for type: "+campaignType)
+    logger.info("merging full campaign done for type: " + campaignType)
     return allCampaignData
   }
-
 
   /**
    * get campaign data for particular with priority
@@ -253,22 +252,22 @@ object CampaignInput extends Logging {
    * @param priority
    * @return
    */
-  def getCampaignData(name: String, date: String, campaignType:String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
+  def getCampaignData(name: String, date: String, campaignType: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
     require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
 
     val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + campaignType + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
-    logger.info(" Reading " + name + " campaign data from path:- " + path +", Type: "+campaignType)
+    logger.info(" Reading " + name + " campaign data from path:- " + path + ", Type: " + campaignType)
     if (DataVerifier.dataExists(path)) {
       var result: DataFrame = null
       try {
         val campaignData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, name, DataSets.DAILY_MODE, date)
           .withColumn(CampaignCommon.PRIORITY, lit(priority))
 
-        val campaignSchema = if(DataSets.PUSH_CAMPAIGNS == campaignType) Schema.campaignSchema else Schema.emailCampaignSchema
+        val campaignSchema = if (DataSets.PUSH_CAMPAIGNS == campaignType) Schema.campaignSchema else Schema.emailCampaignSchema
 
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, campaignSchema)) {
           val res = SchemaUtils.changeSchema(campaignData, campaignSchema)
-          if(DataSets.PUSH_CAMPAIGNS ==campaignType)  {
+          if (DataSets.PUSH_CAMPAIGNS == campaignType) {
             result = res
               .select(
                 res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
@@ -280,19 +279,18 @@ object CampaignInput extends Logging {
                 res(CampaignCommon.PRIORITY),
                 res(CampaignMergedFields.LIVE_CART_URL)
               )
-          }
-          else {
+          } else {
             result = res.select(
-                res(CustomerVariables.FK_CUSTOMER),
-                res(CampaignMergedFields.REF_SKU1),
-                res(CampaignMergedFields.REC_SKU),
-                res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-                res(CustomerVariables.EMAIL),
-                res(CampaignCommon.PRIORITY)
+              res(CustomerVariables.FK_CUSTOMER),
+              res(CampaignMergedFields.REF_SKU1),
+              res(CampaignMergedFields.REC_SKU),
+              res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+              res(CustomerVariables.EMAIL),
+              res(CampaignCommon.PRIORITY)
             )
           }
         } else {
-          logger.info("Adding campaign data to allCampaigns without changing the schema for type: "+campaignType)
+          logger.info("Adding campaign data to allCampaigns without changing the schema for type: " + campaignType)
           result = campaignData
         }
       } catch {
@@ -304,8 +302,8 @@ object CampaignInput extends Logging {
       }
       logger.info("Before replacing null customer id with 0 and device_id with empty string: ")
 
-      if(DataSets.PUSH_CAMPAIGNS == campaignType )
-        return result.na.fill( Map( CampaignMergedFields.CUSTOMER_ID -> 0, CampaignMergedFields.DEVICE_ID -> "" ))
+      if (DataSets.PUSH_CAMPAIGNS == campaignType)
+        return result.na.fill(Map(CampaignMergedFields.CUSTOMER_ID -> 0, CampaignMergedFields.DEVICE_ID -> ""))
       else return result
     }
     return null
@@ -429,7 +427,7 @@ object CampaignInput extends Logging {
     itr30Day
   }
 
-  def load30DayCampaignMergedData(campaignType: String =  DataSets.PUSH_CAMPAIGNS): DataFrame = {
+  def load30DayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS): DataFrame = {
 
     var campaignMerged30Day: DataFrame = null
 
@@ -439,13 +437,8 @@ object CampaignInput extends Logging {
 
       logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
 
-      val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, "campaigns", "merged", DataSets.DAILY_MODE, date)
+      val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
       if (null != mergedCampaignData) {
-      val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
-      val campaignMergedExits = DataVerifier.dataExists(path)
-
-      if (campaignMergedExits) {
-        val mergedCampaignData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
         } else {

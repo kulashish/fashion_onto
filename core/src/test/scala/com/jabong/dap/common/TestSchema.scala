@@ -178,7 +178,7 @@ object TestSchema {
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.BRICK, StringType, true),
-      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
+      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.SKU, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
 
   val genRecInput = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
@@ -195,6 +195,17 @@ object TestSchema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.BRICK, StringType, true),
     StructField(ProductVariables.BRAND, StringType, true)))
+
+  val basicSimpleItr = StructType(Array(
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.CATEGORY, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.STOCK, LongType, true)
+  ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))
 
