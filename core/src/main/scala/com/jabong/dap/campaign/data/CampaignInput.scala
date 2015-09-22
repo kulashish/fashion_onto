@@ -142,6 +142,7 @@ object CampaignInput extends Logging {
       itrData(ITR.BRAND_NAME) as ProductVariables.BRAND,
       itrData(ITR.BRICK) as ProductVariables.BRICK,
       itrData(ITR.PRICE_BAND),
+      itrData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT)
 
     filteredItr
@@ -400,6 +401,7 @@ object CampaignInput extends Logging {
         col(ITR.BRAND_NAME) as ProductVariables.BRAND,
         col(ITR.BRICK) as ProductVariables.BRICK,
         col(ITR.PRICE_BAND),
+        col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
@@ -421,6 +423,7 @@ object CampaignInput extends Logging {
           col(ITR.BRAND_NAME) as ProductVariables.BRAND,
           col(ITR.BRICK) as ProductVariables.BRICK,
           col(ITR.PRICE_BAND),
+          col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
     }

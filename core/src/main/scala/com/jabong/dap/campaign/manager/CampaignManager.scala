@@ -97,6 +97,8 @@ object CampaignManager extends Serializable with Logging {
     val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
     val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
 
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
     // last 3 days of orderitem data
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
@@ -105,7 +107,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     val invalidFollowUp = new InvalidFollowUpCampaign()
-    invalidFollowUp.runCampaign(past30DayCampaignMergedData, orderData, orderItemData, yesterdayItrData)
+    invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
 
     // invalid lowstock
     // last 30 days of order item data
@@ -115,7 +117,7 @@ object CampaignManager extends Serializable with Logging {
     val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
 
     val invalidLowStock = new InvalidLowStockCampaign()
-    invalidLowStock.runCampaign(past30DayCampaignMergedData, last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
+    invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
   }
 
@@ -173,8 +175,8 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
-    val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-    newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
+    //val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
+   // newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
   }
 
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
