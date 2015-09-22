@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
@@ -32,6 +33,10 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
       Given("salesCart30Days, recommendationsData, yesterdayItrData")
       val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
       newArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData)
+
+      val NewArrivalsBrandCampaignOut = CampaignOutput.testData.head
+      assert(NewArrivalsBrandCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && NewArrivalsBrandCampaignOut._2 == CampaignCommon.NEW_ARRIVALS_BRAND)
+
     }
   }
 }
