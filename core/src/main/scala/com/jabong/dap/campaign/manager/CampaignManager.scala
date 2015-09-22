@@ -107,7 +107,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
     val invalidFollowUp = new InvalidFollowUpCampaign()
-    invalidFollowUp.runCampaign(past30DayCampaignMergedData, orderData, orderItemData, yesterdayItrData)
+    invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
 
     // invalid lowstock
     // last 30 days of order item data
@@ -117,7 +117,7 @@ object CampaignManager extends Serializable with Logging {
     val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
 
     val invalidLowStock = new InvalidLowStockCampaign()
-    invalidLowStock.runCampaign(past30DayCampaignMergedData, last60DayOrderData, last30DayOrderItemData, yesterdayItrData)
+    invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
   }
 
