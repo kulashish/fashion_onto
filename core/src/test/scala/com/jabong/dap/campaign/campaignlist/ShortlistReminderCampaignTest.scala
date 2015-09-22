@@ -1,8 +1,11 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.{ FeatureSpec, GivenWhenThen }
 
@@ -20,8 +23,10 @@ class ShortlistReminderCampaignTest extends FeatureSpec with GivenWhenThen with 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    shortlist3rdDayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/customer_product_shortlist", "customer_product_shortlist")
-    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "itr")
+    CampaignOutput.setTestMode(true)
+    shortlist3rdDayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/shortlist_reminder", "customer_product_shortlist", Schema.customerProductShortlist)
+    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/shortlist_reminder", "itr", TestSchema.basicSimpleItr)
+    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/shortlist_reminder", "brick_mvp_recommendations")
   }
 
   feature("Generate Shortlist Reminder Data"){
@@ -29,6 +34,10 @@ class ShortlistReminderCampaignTest extends FeatureSpec with GivenWhenThen with 
       Given("shortlist3rdDayData, recommendationsData, yesterdayItrData")
       val shortlistReminderCampaign = new ShortlistReminderCampaign()
       shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, yesterdayItrData)
+
+      val ShortlistReminderCampaignOut = CampaignOutput.testData.head
+      assert(ShortlistReminderCampaignOut._1.count() == 1)
+      assert(ShortlistReminderCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && ShortlistReminderCampaignOut._2 == CampaignCommon.SHORTLIST_REMINDER)
     }
   }
 }

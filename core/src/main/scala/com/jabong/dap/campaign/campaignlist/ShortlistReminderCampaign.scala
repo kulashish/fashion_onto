@@ -1,7 +1,10 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.Daily
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -16,11 +19,11 @@ class ShortlistReminderCampaign {
 
     val dfCustomerSelection = wishListCustomerSelector.customerSelection(shortlist3rdDayData)
 
-    //TODO: Fix recommendation Data
+    //filter sku based on daily filter
+    val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
-    //TODO: generate reference skus
-    //    val refSkus = CampaignUtils.generateReferenceSkuForSurf(skus, 1)
-
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.SHORTLIST_REMINDER, filteredSku, false, recommendationsData)
   }
 
 }
