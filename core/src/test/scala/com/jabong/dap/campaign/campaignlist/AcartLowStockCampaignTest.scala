@@ -41,6 +41,8 @@ class AcartLowStockCampaignTest extends FeatureSpec with GivenWhenThen with Shar
        assert(acartPushCampaignOut._3 == "push_campaigns" && acartPushCampaignOut._2 == "acart_lowstock")
        assert(acartPushCampaignOut._1.count() == 0)
        assert(acartEmailCamapignOut._3 == "email_campaigns" && acartEmailCamapignOut._2 == "acart_lowstock")
+       assert(acartEmailCamapignOut._1.count() == 0)
+
      }
    }
 
