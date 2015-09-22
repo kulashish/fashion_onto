@@ -2,6 +2,7 @@
 
 HdfsInputPath=$1
 HiveOutput=$2
+Day="1"
 
 LY=`date -d "$Day day ago" +'%Y'`
 LM=`date -d "$Day day ago" +'%-m'`

@@ -10,8 +10,8 @@
 					<value>${queueName}</value>
 				</property>
 			</configuration>
-			<exec>${prepareVariablesPath}</exec>
-			<file>${prepareVariablesPath}</file>
+			<exec>${clickstreamPipeline_fullMerge_prepareVariablesPath}</exec>
+			<file>${clickstreamPipeline_fullMerge_prepareVariablesPath}</file>
 			<capture-output/>
 		</shell>
 		<ok to='make_dirs' />
@@ -19,7 +19,7 @@
 	</action>
 	<action name='make_dirs'>
 		<fs>
-			<mkdir path="${mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />		
+			<mkdir path="${clickstreamPipeline_fullMerge_mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />		
 		</fs>
 		<ok to='web_and_app_merge' />
 		<error to='mail_on_error' />
@@ -46,11 +46,11 @@
 					<value>mr</value>
 				</property>
 			</configuration>
-			<script>${webAppMergeScript}</script>
-			<param>hivedb=${partitionedDB}</param>
-			<param>MergeDir=${mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
-			<param>DesktopMergeTable=${desktopPartitionTable}</param>
-			<param>appsTable=${appsTable}</param>
+			<script>${clickstreamPipeline_fullMerge_webAppMergeScript}</script>
+			<param>hivedb=${clickstreamPipeline_partitionedDb}</param>
+			<param>MergeDir=${clickstreamPipeline_fullMerge_mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<param>DesktopMergeTable=${clickstreamPipeline_desktopMergePartitionTable}</param>
+			<param>appsTable=${clickstreamPipeline_appsPartitionTable}</param>
 			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
 			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
@@ -80,21 +80,21 @@
 					<value>tez</value>
 				</property>
 			</configuration>
-			<script>${createMergedPartitionScript}</script>
-			<param>dbname=${mergeDb}</param>
-			<param>loc=${mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<script>${clickstreamPipeline_fullMerge_createMergedPartitionScript}</script>
+			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
+			<param>loc=${clickstreamPipeline_fullMerge_mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
 			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
-			<param>tableName=${mergeTable}</param>
+			<param>tableName=${clickstreamPipeline_mergeTable}</param>
 		</hive>
 		<ok to='mail_on_success' />
 		<error to='mail_on_error' />
 	</action>
 	<action name='mail_on_error'>
 		<email xmlns="uri:oozie:email-action:0.2">
-			<to>${mailRecepients}</to>
-			<subject>${env} Workflow for desktop-app-merge for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
+			<to>${clickstreamPipeline_mailRecepients}</to>
+			<subject>${clickstreamPipeline_env} Workflow for desktop-app-merge for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
 			<body>Node: [${wf:lastErrorNode()}]  Error: [${wf:errorMessage(wf:lastErrorNode())}]</body>
 		</email>
 		<ok to='step_failure' />
@@ -102,8 +102,8 @@
 	</action>
 	<action name='mail_on_success'>
 		<email xmlns="uri:oozie:email-action:0.2">
-			<to>${mailRecepients}</to>
-			<subject> ${env} Workflow for desktop-app-merge for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
+			<to>${clickstreamPipeline_mailRecepients}</to>
+			<subject> ${clickstreamPipeline_env} Workflow for desktop-app-merge for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
 			<body></body>
 		</email>
 		<ok to='end' />

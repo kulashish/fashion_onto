@@ -10,10 +10,10 @@
 					<value>${queueName}</value>
 				</property>
 			</configuration>
-			<exec>${prepareVariablesPath}</exec>
-			<argument>${HdfsInputPath}</argument>
-			<argument>${HiveOutput}</argument>
-			<file>${prepareVariablesPath}</file>
+			<exec>${clickstreamPipeline_apps_prepareVariablesPath}</exec>
+			<argument>${clickstreamPipeline_apps_HdfsInputPath}</argument>
+			<argument>${clickstreamPipeline_apps_HiveOutput}</argument>
+			<file>${clickstreamPipeline_apps_prepareVariablesPath}</file>
 			<capture-output/>
 		</shell>
 		<ok to='bson_to_text' />
@@ -29,10 +29,10 @@
 					<value>${queueName}</value>
 				</property>
 			</configuration>
-			<main-class>${bsonToTextMainClass}</main-class>
+			<main-class>${clickstreamPipeline_apps_bsonToTextMainClass}</main-class>
 			<arg>${wf:actionData('prepare_variables')['HdfsBsonData']}</arg>
 			<arg>${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</arg>
-			<file>${bsonToTextJarPath}</file>
+			<file>${clickstreamPipeline_apps_bsonToTextJarPath}</file>
 		</java>
 		<ok to='create_dirs' />
 		<error to='mail_on_error' />
@@ -40,7 +40,7 @@
 	<action name='create_dirs'>
 		<fs>
 			<mkdir path="${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports" />
-			<mkdir path="${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />
+			<mkdir path="${clickstreamPipeline_apps_PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />
 		</fs>
 		<ok to='hive_priority_reports_000_setup_emr' />
 		<error to='mail_on_error' />
@@ -67,8 +67,8 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${setupEmrScript}</script>
-			<param>hivedb=${hivedb}</param>
+			<script>${clickstreamPipeline_apps_setupEmrScript}</script>
+			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 		</hive>
 		<ok to='hive_priority_reports_001_create_master_table' />
 		<error to='mail_on_error' />
@@ -95,8 +95,8 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${createMasterTableScript}</script>
-			<param>hivedb=${hivedb}</param>
+			<script>${clickstreamPipeline_apps_createMasterTableScript}</script>
+			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 			<param>INPUT=${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</param>
 		</hive>
 		<ok to='hive_priority_reports_002_create_ext_pagevisit' />
@@ -124,9 +124,9 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${createExternalPagevisitScript}</script>
-			<param>hivedb=${hivedb}</param>
-			<param>PagevisitDir=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<script>${clickstreamPipeline_apps_createExternalPagevisitScript}</script>
+			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
+			<param>PagevisitDir=${clickstreamPipeline_apps_PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 		</hive>
 		<ok to='hive_priority_reports_004_CTR_reports' />
 		<error to='mail_on_error' />
@@ -157,9 +157,9 @@
 					<value>false</value>
 				</property>
 			</configuration>
-			<script>${CtrReportsScript}</script>
-			<param>FieldSeparator=${fieldSeparator}</param>
-			<param>hivedb=${hivedb}</param>
+			<script>${clickstreamPipeline_apps_CtrReportsScript}</script>
+			<param>FieldSeparator=${clickstreamPipeline_fieldSeparator}</param>
+			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
 		</hive>
 		<ok to='hive_priority_reports_004_CRM_reports' />
@@ -187,9 +187,9 @@
 					<value>1800</value>
 				</property>
 			</configuration>
-			<script>${CrmReportsScript}</script>
-			<param>FieldSeparator=${fieldSeparator}</param>
-			<param>hivedb=${hivedb}</param>
+			<script>${clickstreamPipeline_apps_CrmReportsScript}</script>
+			<param>FieldSeparator=${clickstreamPipeline_fieldSeparator}</param>
+			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
 		</hive>
 		<ok to='create_daily_pagevisit_partition' />
@@ -217,13 +217,13 @@
 						<value>1800</value>
 					</property>
 				</configuration>
-			<script>${createDailyPagevisitPartitionScript}</script>
-			<param>dbname=${partitionedDb}</param>
-			<param>tableName=${partitionTable}</param>
+			<script>${clickstreamPipeline_apps_createDailyPagevisitPartitionScript}</script>
+			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
+			<param>tableName=${clickstreamPipeline_appsPartitionTable}</param>
 			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
 			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
-			<param>loc=${PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<param>loc=${clickstreamPipeline_apps_PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 		</hive>
 		<ok to='clean_dir' />
 		<error to='mail_on_error' />
@@ -238,14 +238,14 @@
 					<value>${queueName}</value>
 				</property>
 			</configuration>
-			<exec>${ftpPriorityReportsScript}</exec>
+			<exec>${clickstreamPipeline_apps_ftpPriorityReportsScript}</exec>
 			<argument>${wf:actionData('prepare_variables')['ftp_date']}</argument>
-			<argument>${FTP_HOST}</argument>
-			<argument>${FTP_USER}</argument>
-			<argument>${FTP_PASSWD}</argument>
-			<argument>${REMOTE_PATH}</argument>
+			<argument>${clickstreamPipeline_apps_FTP_HOST}</argument>
+			<argument>${clickstreamPipeline_apps_FTP_USER}</argument>
+			<argument>${clickstreamPipeline_apps_FTP_PASSWD}</argument>
+			<argument>${clickstreamPipeline_apps_REMOTE_PATH}</argument>
 			<argument>${wf:actionData('prepare_variables')['DailyHiveOutput']}</argument>
-			<file>${ftpPriorityReportsScript}</file>			
+			<file>${clickstreamPipeline_apps_ftpPriorityReportsScript}</file>			
 		</shell>
 		<ok to='clean_dir' />
 		<error to='mail_on_error' />
@@ -259,8 +259,8 @@
 	</action>
 	<action name='mail_on_success'>
 		<email xmlns="uri:oozie:email-action:0.2">
-			<to>${mailRecepients}</to>
-			<subject> ${env} Workflow for Apps for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
+			<to>${clickstreamPipeline_mailRecepients}</to>
+			<subject> ${clickstreamPipeline_env} Workflow for Apps for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
 			<body></body>
 		</email>
 		<ok to='end' />
@@ -268,8 +268,8 @@
 	</action>
 	<action name='mail_on_error'>
 		<email xmlns="uri:oozie:email-action:0.2">
-			<to>${mailRecepients}</to>
-			<subject>${env} Workflow for Apps for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
+			<to>${clickstreamPipeline_mailRecepients}</to>
+			<subject>${clickstreamPipeline_env} Workflow for Apps for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
 			<body>Node: [${wf:lastErrorNode()}] \n Error: [${wf:errorMessage(wf:lastErrorNode())}]</body>
 		</email>
 		<ok to='step_failure' />
