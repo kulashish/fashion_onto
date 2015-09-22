@@ -38,7 +38,11 @@ object ItemOnDiscount extends Logging {
     val itr30dayData = df30DaysItrData.select(
       col(ItrVariables.SKU_SIMPLE) as ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE,
       col(ItrVariables.SPECIAL_PRICE) as ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE,
-      Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT
+      Udf.yyyymmddString(df30DaysItrData(ItrVariables.CREATED_AT)) as ItrVariables.ITR_ + ItrVariables.CREATED_AT,
+      col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
+      col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
+      col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
+      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
     )
 
     //filter yesterday itrData from itr30dayData
@@ -64,7 +68,11 @@ object ItemOnDiscount extends Logging {
         col(CustomerVariables.FK_CUSTOMER),
         //col(CustomerVariables.EMAIL),
         col(ItrVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
-        col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE)
+        col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
+        col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
+        col(ItrVariables.ITR_ + ItrVariables.BRICK) as ProductVariables.BRICK,
+        col(ItrVariables.ITR_ + ItrVariables.MVP) as ProductVariables.MVP,
+        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER)
 
     logger.info("After sku filter based on special price")
 
