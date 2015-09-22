@@ -370,7 +370,6 @@ object Schema {
         StructField(ProductVariables.MVP, StringType, true),
         StructField(ProductVariables.GENDER, StringType, true)))), false),
 
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
