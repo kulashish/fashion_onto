@@ -8,23 +8,23 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Utility Class
  */
 object CampaignUtils extends Logging {
 
-  var testMode:Boolean = false
+  var testMode: Boolean = false
 
   val SUCCESS_ = "success_"
 
@@ -210,7 +210,7 @@ object CampaignUtils extends Logging {
     val refList = refSKusList.sortBy(-_._1).distinct
     val listSize = refList.size
     var numberSkus = numSKus
-    if(numberSkus > refList.size) numberSkus = listSize
+    if (numberSkus > refList.size) numberSkus = listSize
     return refList.take(numberSkus)
   }
 
