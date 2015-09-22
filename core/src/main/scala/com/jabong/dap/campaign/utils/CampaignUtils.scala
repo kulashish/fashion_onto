@@ -17,6 +17,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 
@@ -183,7 +184,15 @@ object CampaignUtils extends Logging {
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
-    val customerSkuMap = customerData.map(t => ((t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(), t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString, checkNullString(t(t.fieldIndex(ProductVariables.BRAND))), checkNullString(t(t.fieldIndex(ProductVariables.BRICK))), checkNullString(t(t.fieldIndex(ProductVariables.MVP))), checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
+    val customerSkuMap = customerData.map(t => (
+      (t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))),
+      (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
+        t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString,
+        checkNullString(t(t.fieldIndex(ProductVariables.BRAND))),
+        checkNullString(t(t.fieldIndex(ProductVariables.BRICK))),
+        checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
+        checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
+
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
@@ -199,6 +208,7 @@ object CampaignUtils extends Logging {
   def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
+    //FIXME: handle case of, if list size is less than numSkus
     return refSKusList.sortBy(-_._1).distinct.take(numSKus)
   }
 

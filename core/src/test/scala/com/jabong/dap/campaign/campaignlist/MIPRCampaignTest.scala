@@ -1,8 +1,10 @@
 package com.jabong.dap.campaign.campaignlist
 
+import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
+import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.{ GivenWhenThen, FeatureSpec }
 
@@ -20,9 +22,12 @@ class MIPRCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
-    last30DaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "sales_order")
-    yesterdaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "sales_order_item")
-    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "itr")
+    CampaignOutput.setTestMode(true)
+    last30DaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "sales_order", Schema.salesOrder)
+    yesterdaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "sales_order_item", Schema.salesOrderItem)
+    //    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "itr")
+    yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "itr", TestSchema.basicSimpleItr)
+    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/mipr", "brick_mvp_recommendations")
   }
 
   feature("Generate All closed item"){
