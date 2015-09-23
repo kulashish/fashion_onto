@@ -31,7 +31,7 @@ class AcartLowStockCampaign {
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
+    //CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 
