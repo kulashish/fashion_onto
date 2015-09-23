@@ -133,8 +133,8 @@ object CampaignManager extends Serializable with Logging {
     val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // load common recommendations
-    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
-
+    //val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    val brickMvpRecommendations = null
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
     // FIXME: search for email
