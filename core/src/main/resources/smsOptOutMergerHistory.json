@@ -1,0 +1,53 @@
+{
+  "params": [
+    {
+      "source": "smsOptOutMerger",
+      "path": "/data/input/responsys/sms_opt_out/full/2015/09/10/24/Customer_opt_out_data.csv",
+      "incrDate": "2015/09/11",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "smsOptOutMerger",
+      "fullDate": "2015/09/11",
+      "incrDate": "2015/09/12",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "smsOptOutMerger",
+      "fullDate": "2015/09/12",
+      "incrDate": "2015/09/13",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "smsOptOutMerger",
+      "fullDate": "2015/09/13",
+      "incrDate": "2015/09/14",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "smsOptOutMerger",
+      "fullDate": "2015/09/14",
+      "incrDate": "2015/09/15",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "smsOptOutMerger",
+      "fullDate": "2015/09/15",
+      "incrDate": "2015/09/16",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "smsOptOutMerger",
+      "fullDate": "2015/09/16",
+      "incrDate": "2015/09/17",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}
