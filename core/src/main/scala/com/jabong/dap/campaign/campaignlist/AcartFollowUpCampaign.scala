@@ -21,9 +21,13 @@ class AcartFollowUpCampaign {
     //FIXME:Filter the order items data for last 3 days
     val selectedCustomers = acartCustomerSelector.customerSelection(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData)
 
+    CampaignUtils.debug(selectedCustomers, "AcartFollowUpCampaigns selected Customer ")
+
     //sku selection
     //filter sku based on followup filter
     val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData)
+
+    CampaignUtils.debug(filteredSku, "AcartFollowUpCampaigns filteredSku ")
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_FOLLOWUP_CAMPAIGN, filteredSku)
