@@ -230,8 +230,8 @@ object CampaignManager extends Serializable with Logging {
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
 
     //Start: MIPR email Campaign
-    val miprCampaign = new MIPRCampaign()
-    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
+  //  val miprCampaign = new MIPRCampaign()
+//    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
