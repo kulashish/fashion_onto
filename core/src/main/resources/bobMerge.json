@@ -41,14 +41,6 @@
       "primaryKey": "id_customer",
       "mergeMode": "full",
       "saveMode": "Overwrite"
-    },
-    {
-      "source": "bob",
-      "tableName": "sales_cart",
-      "primaryKey": "id_sales_cart",
-      "mergeMode": "monthly",
-      "dateColumn": "updated_at",
-      "saveMode": "Overwrite"
     }
   ]
 }

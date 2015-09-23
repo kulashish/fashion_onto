@@ -18,45 +18,39 @@ import org.apache.spark.sql.functions._
 object SmsOptOut {
 
   def start(params: ParamInfo) = {
-    println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
+    //println("Start Time: " + TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS))
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
-    var filename = "53699_SMS_OPT_OUT_" + TimeUtils.getTodayDate("YYYYMMDD") + "*"
-
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-
-    if (null == path && null == OptionUtils.getOptValue(params.fullDate)) {
-      println("First full csv path and prev full date both cannot be empty")
-
-      processData(DataSets.SMS_OPT_OUT, prevDate, incrDate, filename, saveMode, path)
-    } else {
-      val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    }
+    processData(DataSets.SMS_OPT_OUT, prevDate, incrDate, saveMode, path)
   }
 
   /**
    *
    * @param prevDate
    * @param fullcsv
-   * @param curDate
+   * @param incrDate
    */
-  def processData(tablename: String, prevDate: String, curDate: String, filename: String, saveMode: String, fullcsv: String) {
-    var incr: DataFrame = null
-    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, curDate)
-    incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, curDate, filename, "true", ";")
-    var prevFull: DataFrame = null
-    if (null == fullcsv) {
-      prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL, prevDate)
-    } else {
-      prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
+  def processData(tablename: String, prevDate: String, incrDate: String, saveMode: String, fullcsv: String) {
+    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      var prevFull: DataFrame = null
+      if (null == fullcsv) {
+        prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, prevDate)
+      } else {
+        prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
+      }
+      val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      val filename = "53699_SMS_OPT_OUT_" + newDate + ".txt"
+      val incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, incrDate, filename, "true", ";")
+      if (null == incr || incr.count().equals(0)) {
+        DataWriter.writeParquet(prevFull, savePath, saveMode)
+        return
+      }
+      val smsOptOutFull = mergeData(prevFull, incr)
+      DataWriter.writeParquet(smsOptOutFull, savePath, saveMode)
     }
-    if (null == incr || incr.count().equals(0)) {
-      DataWriter.writeParquet(prevFull, savePath, saveMode)
-      return
-    }
-    val smsOptOutFull = mergeData(prevFull, incr)
-    DataWriter.writeParquet(smsOptOutFull, savePath, saveMode)
 
   }
 

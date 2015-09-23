@@ -10,6 +10,7 @@ import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
@@ -63,7 +64,6 @@ object SkuData {
     val day = cal.get(Calendar.DAY_OF_MONTH)
     val month = cal.get(Calendar.MONTH) + 1 //month starts from 0
 
-    val tableName = "merge.merge_pagevisit"
-    Spark.getHiveContext().sql("select productsku, domain from " + tableName + " where pagetype in('CPD','DPD','QPD') and domain is not null and date1=" + day + " and month1=" + month + " and year1=" + year)
+    Spark.getHiveContext().sql("select productsku, domain from " + ClickStreamConstant.MERGE_PAGEVISIT + " where pagetype in('CPD','DPD','QPD') and domain is not null and date1=" + day + " and month1=" + month + " and year1=" + year)
   }
 }

@@ -1,6 +1,6 @@
 name := "Alchemy"
 
-version := "0.1.10"
+version := "0.1.11"
 
 scalaVersion := "2.10.5"
 
@@ -36,8 +36,6 @@ libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
   "org.slf4j" % "slf4j-simple" % "1.7.5",
   "org.clapper" %% "grizzled-slf4j" % "1.0.1",
   "org.pegdown" % "pegdown" % "1.0.2")
-
-unmanagedJars in Compile += file("lib/sqljdbc4.jar")
 
 test in assembly := {}
 assemblyJarName in assembly := "Alchemy-assembly.jar"
