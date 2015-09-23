@@ -136,11 +136,13 @@ object DataSets {
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
+  val BLOCK_LIST_NUMBERS = "block_list_numbers"
   val ZONE_CITY = "zone_city"
   val CUST_PREFERENCE = "custPreference"
   val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
+  val SOLUTIONS_INFINITI = "solutionsInfiniti"
 
   // type of campaigns
   val PUSH_CAMPAIGNS = "push_campaigns"
