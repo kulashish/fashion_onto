@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
@@ -35,6 +36,11 @@ class MIPRCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
       Given("last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, yesterdayItrData")
       val miprCampaign = new MIPRCampaign()
       miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, yesterdayItrData)
+
+      val MIPRCampaignOut = CampaignOutput.testData.head
+      //      assert(MIPRCampaignOut._1.count() == 1)
+      assert(MIPRCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && MIPRCampaignOut._2 == CampaignCommon.MIPR_CAMPAIGN)
+
     }
   }
 }

@@ -277,7 +277,9 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ProductVariables.SPECIAL_PRICE))
+      .select(
+        inputData("*")
+      )
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -379,9 +381,13 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
-        //inputData(CustomerVariables.EMAIL),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
-        inputData(ProductVariables.SPECIAL_PRICE)
+        inputData(ProductVariables.SPECIAL_PRICE),
+        inputData(ProductVariables.BRAND),
+        inputData(ProductVariables.BRICK),
+        inputData(ProductVariables.MVP),
+        inputData(ProductVariables.GENDER)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -693,7 +699,7 @@ object CampaignUtils extends Logging {
     )
 
     val dfResult = dfJoin.select(
-      col(CustomerVariables.FK_CUSTOMER),
+      skuFilter("*"),
       col(ProductVariables.SKU_SIMPLE),
       col("ITR_" + ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
       col(ProductVariables.BRAND),
