@@ -35,6 +35,7 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
       newArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData)
 
       val NewArrivalsBrandCampaignOut = CampaignOutput.testData.head
+      //      assert(NewArrivalsBrandCampaignOut._1.count() == 1)
       assert(NewArrivalsBrandCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && NewArrivalsBrandCampaignOut._2 == CampaignCommon.NEW_ARRIVALS_BRAND)
 
     }
