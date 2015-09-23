@@ -278,13 +278,7 @@ object CampaignUtils extends Logging {
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
-        inputData(CustomerVariables.FK_CUSTOMER),
-        inputData(ProductVariables.SKU_SIMPLE),
-        inputData(ProductVariables.SPECIAL_PRICE),
-        inputData(ProductVariables.BRAND),
-        inputData(ProductVariables.BRICK),
-        inputData(ProductVariables.MVP),
-        inputData(ProductVariables.GENDER)
+        inputData("*")
       )
 
     logger.info("Filtered all the sku simple which has been bought")

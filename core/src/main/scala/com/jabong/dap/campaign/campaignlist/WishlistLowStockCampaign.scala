@@ -6,7 +6,7 @@ import com.jabong.dap.campaign.skuselection.Wishlist
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -42,7 +42,11 @@ class WishlistLowStockCampaign {
     val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
-      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
     )
 
     // ***** mobile push use case

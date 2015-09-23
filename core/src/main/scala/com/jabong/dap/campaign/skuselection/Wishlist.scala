@@ -129,7 +129,7 @@ object Wishlist extends Logging {
 
       val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(skuSimpleCustomerProductShortlist, lastDayItrSimpleData)
 
-      filteredSkuJoinedItr.select(
+      skuSimpleList = filteredSkuJoinedItr.select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
         col(CustomerProductShortlistVariables.SKU_SIMPLE),
