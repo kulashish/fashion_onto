@@ -22,12 +22,12 @@ class AcartIODCampaign {
     //FIXME:Filter the order items data for 30 days
     val selectedCustomers = acartCustomerSelection.customerSelection(last30DayAcartData, last30daySalesOrderData, last30DaySalesOrderItemData)
 
-    CampaignUtils.debug(selectedCustomers,"AcartIODCampaigns selected Customer ")
+    CampaignUtils.debug(selectedCustomers, "AcartIODCampaigns selected Customer ")
     //sku selection
     //filter sku based on iod filter
     val filteredSku = ItemOnDiscount.skuFilter(selectedCustomers, last30daysItrData)
 
-    CampaignUtils.debug(filteredSku,"AcartIODCampaigns filteredSku ")
+    CampaignUtils.debug(filteredSku, "AcartIODCampaigns filteredSku ")
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_IOD_CAMPAIGN, filteredSku)

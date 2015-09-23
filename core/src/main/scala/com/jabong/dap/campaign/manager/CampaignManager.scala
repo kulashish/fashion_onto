@@ -130,7 +130,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
-   // val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+    // val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // load common recommendations
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()

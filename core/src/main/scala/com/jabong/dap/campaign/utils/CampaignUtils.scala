@@ -729,7 +729,7 @@ object CampaignUtils extends Logging {
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
 
-    debug(custFiltered,campaignType+"::"+ campaignName+" after pastcampaign check status:-"+pastCampaignCheck)
+    debug(custFiltered, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
 
     if (campaignType.equalsIgnoreCase(DataSets.PUSH_CAMPAIGNS)) {
       pushCampaignPostProcess(campaignType, campaignName, custFiltered)
@@ -755,7 +755,7 @@ object CampaignUtils extends Logging {
       refSkus = CampaignUtils.generateReferenceSku(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
 
-    debug(refSkus,campaignType+"::"+ campaignName+" after reference sku generation")
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, campaignName)
 
@@ -781,7 +781,7 @@ object CampaignUtils extends Logging {
       refSkus = CampaignUtils.generateReferenceSkus(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
 
-    debug(refSkus,campaignType+"::"+ campaignName+" after reference sku generation")
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
@@ -789,13 +789,13 @@ object CampaignUtils extends Logging {
 
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
 
-    debug(campaignOutput,campaignType+"::"+ campaignName+" after recommendation sku generation")
+    debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
     //save campaign Output for mobile
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
   }
 
-  @elidable(FINE) def debug(data: DataFrame, name: String)  {
-    println("Count of "+name+":-"+data.count()+"\n")
+  @elidable(FINE) def debug(data: DataFrame, name: String) {
+    println("Count of " + name + ":-" + data.count() + "\n")
     data.printSchema()
   }
 }
