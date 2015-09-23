@@ -32,10 +32,6 @@ object LowStock extends Logging {
         itrDataFrame(ProductVariables.BRICK),
         itrDataFrame(ProductVariables.MVP),
         itrDataFrame(ProductVariables.GENDER))
-    CampaignUtils.debug(itrDataFrame," sku filter itr ")
-
-    CampaignUtils.debug(itrDataFrame.filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)," low stock sku filter itr ")
-
 
     //  val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
