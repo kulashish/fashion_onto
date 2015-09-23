@@ -153,12 +153,12 @@ if ($component eq "bobAcqFull1") {
      $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
      run_component($component, $command);
-}} elsif ($component eq "emailCampaignMerge") {
+} elsif ($component eq "emailCampaignMerge") {
       $SPARK_HOME = "/ext/spark-1.4.1-bin-hadoop2.6";
       $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
       run_component($component, $command);
- }elsif ($component eq "deviceMapping") {
+} elsif ($component eq "deviceMapping") {
        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component deviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/deviceMapping.json";
        run_component($component, $command);
 } elsif ($component eq "Ad4pushCustReact") {
