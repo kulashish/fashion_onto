@@ -19,6 +19,9 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
 
+import scala.annotation.elidable
+import scala.annotation.elidable._
+
 /**
  * Utility Class
  */
@@ -720,6 +723,8 @@ object CampaignUtils extends Logging {
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
 
+    debug(custFiltered,campaignType+"::"+ campaignName+" after pastcampaign check status:-"+pastCampaignCheck)
+
     if (campaignType.equalsIgnoreCase(DataSets.PUSH_CAMPAIGNS)) {
       pushCampaignPostProcess(campaignType, campaignName, custFiltered)
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
@@ -743,6 +748,8 @@ object CampaignUtils extends Logging {
     } else {
       refSkus = CampaignUtils.generateReferenceSku(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
+
+    debug(refSkus,campaignType+"::"+ campaignName+" after reference sku generation")
 
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, campaignName)
 
@@ -768,15 +775,22 @@ object CampaignUtils extends Logging {
       refSkus = CampaignUtils.generateReferenceSkus(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
 
+    debug(refSkus,campaignType+"::"+ campaignName+" after reference sku generation")
+
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
 
+    debug(campaignOutput,campaignType+"::"+ campaignName+" after recommendation sku generation")
     //save campaign Output for mobile
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
   }
 
+  @elidable(FINE) def debug(data: DataFrame, name: String)  {
+    println("Count of "+name+":-"+data.count()+"\n")
+    data.printSchema()
+  }
 }
 
