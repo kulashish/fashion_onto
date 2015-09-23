@@ -13,19 +13,19 @@ import org.apache.spark.sql.DataFrame
  */
 class Surf2Campaign {
 
-  def runCampaign(past30DayCampaignMergedData: DataFrame, yestSurfSessionData: DataFrame, yestItrSkuData: DataFrame, customerMasterData: DataFrame, yestOrderData: DataFrame, yestOrderItemData: DataFrame): Unit = {
+  def runCampaign(yestSurfSessionData: DataFrame, yestItrSkuData: DataFrame, customerMasterData: DataFrame, yestOrderData: DataFrame, yestOrderItemData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.YESTERDAY_SESSION)
 
     val customerSurfData = customerSelector.customerSelection(yestSurfSessionData, yestItrSkuData)
 
-    val skus = Surf.skuFilter(past30DayCampaignMergedData, customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, CampaignCommon.SURF2_CAMPAIGN)
+    val skus = Surf.skuFilter(customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, CampaignCommon.SURF2_CAMPAIGN)
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.SURF2_CAMPAIGN, skus)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.SURF2_CAMPAIGN, skus)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.SURF2_CAMPAIGN, skus, true, brickMvpRecommendations)
 
   }
 

@@ -30,7 +30,7 @@ object Surf extends Logging {
    * @param dfSalesOrderItem
    * @return
    */
-  def skuFilter(past30DayCampaignMergedData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = {
+  def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = {
 
     if (dfCustomerPageVisit == null || dfItrData == null || dfCustomer == null || dfSalesOrder == null || dfSalesOrderItem == null) {
 
@@ -61,7 +61,12 @@ object Surf extends Logging {
         col(ProductVariables.SKU_SIMPLE),
         col(ProductVariables.SPECIAL_PRICE),
         col(PageVisitVariables.BROWSER_ID),
-        col(PageVisitVariables.DOMAIN)
+        col(PageVisitVariables.DOMAIN),
+        col(ProductVariables.BRICK),
+        col(ProductVariables.BRAND),
+        col(ProductVariables.MVP),
+        col(ProductVariables.GENDER)
+
       )
 
     return dfJoin
