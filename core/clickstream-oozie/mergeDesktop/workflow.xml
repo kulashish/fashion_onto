@@ -46,6 +46,12 @@
 	</action>
 	<action name='merge_desktop_and_artemis'>
 		<hive xmlns="uri:oozie:hive-action:0.5">
+			<configuration>
+				<property>
+					<name>hive.execution.engine</name>
+					<value>mr</value>
+				</property>
+			</configuration>>
 			<script>${clickstreamPipeline_desktopMerge_mergeDesktopScript}</script>
 			<param>hivedb=${clickstreamPipeline_partitionedDb}</param>
 			<param>DesktopMergeDir=${clickstreamPipeline_desktopMerge_DesktopMergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
