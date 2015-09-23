@@ -152,7 +152,8 @@ object TestSchema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
-    StructField(ProductVariables.STOCK, LongType, true)
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
 
   val recommendationSku = StructType(Array(
@@ -206,6 +207,7 @@ object TestSchema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),
     StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
 

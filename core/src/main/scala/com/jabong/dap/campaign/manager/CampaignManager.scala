@@ -204,10 +204,12 @@ object CampaignManager extends Serializable with Logging {
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
 
-    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+    //    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // call iod campaign
     val itrSku30DayData = CampaignInput.load30DayItrSkuData()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
     val wishListCampaign = new WishListCampaign()
     wishListCampaign.runCampaign(shortlistYesterdayData,
@@ -216,10 +218,10 @@ object CampaignManager extends Serializable with Logging {
       itrSkuSimpleYesterdayData,
       yesterdaySalesOrderData,
       yesterdaySalesOrderItemData,
-      past30DayCampaignMergedData,
       last30DaySalesOrderData,
       last30DaySalesOrderItemData,
-      itrSku30DayData)
+      itrSku30DayData,
+      brickMvpRecommendations)
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
