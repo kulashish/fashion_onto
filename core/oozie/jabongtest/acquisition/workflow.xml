@@ -1,4 +1,4 @@
-<workflow-app xmlns="uri:oozie:workflow:0.5" name="dap-acquisition-test-wf">
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="dap-acquisition-wf">
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
