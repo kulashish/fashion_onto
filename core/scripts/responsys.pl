@@ -22,3 +22,4 @@ system("hadoop fs -mkdir -p /data/input/responsys/sms_delivered/daily/$date/");
 system("hadoop fs -copyFromLocal 53699_SMS_DELIVERED_$date_with_zero" . "_*.txt /data/input/responsys/sms_delivered/daily/$date/53699_SMS_DELIVERED_$date_with_zero" . ".txt");
 
 system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c dndMerger");
+system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c smsOptOutMerger");
