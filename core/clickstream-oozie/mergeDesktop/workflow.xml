@@ -1,15 +1,29 @@
-<workflow-app xmlns='uri:oozie:workflow:0.3' name='merge-desktop-clickstream-wf'>
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='merge-desktop-clickstream-wf'>
+	<global>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+			<property>
+				<name>mapred.job.queue.name</name>
+				<value>${queueName}</value>
+			</property>
+			<property>
+				<name>hive.execution.engine</name>
+				<value>tez</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.connect.retry.delay</name>
+				<value>5</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.socket.timeout</name>
+				<value>1800</value>
+			</property>
+		</configuration>
+	</global>
 	<start to='prepare_variables' />
 	<action name='prepare_variables'>
-		<shell xmlns="uri:oozie:shell-action:0.1">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.job.queue.name</name>
-					<value>${queueName}</value>
-				</property>
-			</configuration>
+		<shell xmlns="uri:oozie:shell-action:0.5">
 			<exec>${clickstreamPipeline_desktopMerge_prepareVariablesPath}</exec>
 			<argument>${clickstreamPipeline_desktopMerge_DesktopMergeOutput}</argument>
 			<file>${clickstreamPipeline_desktopMerge_prepareVariablesPath}</file>
@@ -27,27 +41,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='merge_desktop_and_artemis'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>mr</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_desktopMerge_mergeDesktopScript}</script>
 			<param>hivedb=${clickstreamPipeline_partitionedDb}</param>
 			<param>DesktopMergeDir=${clickstreamPipeline_desktopMerge_DesktopMergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
@@ -62,23 +56,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='create_desktop_merged_partition'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_desktopMerge_createDesktopMergedPartitionScript}</script>
 			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
 			<param>loc=${clickstreamPipeline_desktopMerge_DesktopMergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
@@ -91,22 +69,8 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_priority_reports'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>		
-				</property>
 				<property>
 					<name>hive.exec.reducers.bytes.per.reducer</name>
 					<value>1000000000</value>
@@ -126,6 +90,20 @@
 			<param>pagevisitDB=${clickstreamPipeline_partitionedDb}</param>
 			<param>pagevisitTable=${clickstreamPipeline_desktopMergePartitionTable}</param>
 		</hive>
+		<ok to='mail_on_success' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='ftp_priority_reports'>
+		<shell xmlns="uri:oozie:shell-action:0.3">
+			<exec>${clickstreamPipeline_desktopMerge_ftpPriorityReportsScript}</exec>
+			<argument>${wf:actionData('prepare_variables')['ftp_date']}</argument>
+			<argument>${clickstreamPipeline_FTP_HOST}</argument>
+			<argument>${clickstreamPipeline_FTP_USER}</argument>
+			<argument>${clickstreamPipeline_FTP_PASSWD}</argument>
+			<argument>${clickstreamPipeline_REMOTE_PATH}</argument>
+			<argument>${wf:actionData('prepare_variables')['DailyHiveOutput']}</argument>
+			<file>${clickstreamPipeline_desktopMerge_ftpPriorityReportsScript}</file>
+		</shell>
 		<ok to='mail_on_success' />
 		<error to='mail_on_error' />
 	</action>

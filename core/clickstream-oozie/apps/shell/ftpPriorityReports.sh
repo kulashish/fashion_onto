@@ -8,17 +8,18 @@ FTP_PASSWD=$4
 REMOTE_PATH=$5
 DailyHiveOutput=$6
 
-mkdir -p /tmp/reports/productImpressions
-mkdir -p /tmp/reports/productViews
+mkdir -p /tmp/reports/appProductImpressions
+mkdir -p /tmp/reports/appProductViews
 
 
-hadoop fs -copyToLocal $DailyHiveOutput/reports/appProductImpressions/* /tmp/reports/productImpressions
-hadoop fs -copyToLocal $DailyHiveOutput/reports/productViews/* /tmp/reports/productViews
+hadoop fs -copyToLocal $DailyHiveOutput/reports/appProductImpressions/* /tmp/reports/appProductImpressions
+hadoop fs -copyToLocal $DailyHiveOutput/reports/appProductViews/* /tmp/reports/appProductViews
 
 mkdir -p /tmp/priority_reports/
 
-cat /tmp/reports/productImpressions/000* > /tmp/priority_reports/app_product_impressions_$ftp_date.csv
-cat /tmp/reports/productViews/000* > /tmp/priority_reports/app_product_views_$ftp_date.csv
+cat /tmp/reports/appProductImpressions/000* > /tmp/priority_reports/app_product_impressions_$ftp_date.csv
+cat /tmp/reports/appProductViews/000* > /tmp/priority_reports/app_product_views_$ftp_date.csv
+cd /tmp/priority_reports/
 
 
 ftp -n -v $FTP_HOST <<END

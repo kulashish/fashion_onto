@@ -1,15 +1,29 @@
-<workflow-app xmlns='uri:oozie:workflow:0.3' name='artemis-clickstream-wf'>
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='artemis-clickstream-wf'>
+	<global>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+			<property>
+				<name>mapred.compress.map.output</name>
+				<value>true</value>
+			</property>
+			<property>
+				<name>hive.execution.engine</name>
+				<value>tez</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.connect.retry.delay</name>
+				<value>5</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.socket.timeout</name>
+				<value>1800</value>
+			</property>
+		</configuration>
+	</global>
 	<start to='prepare_variables' />
 	<action name='prepare_variables'>
-		<shell xmlns="uri:oozie:shell-action:0.1">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.job.queue.name</name>
-					<value>${queueName}</value>
-				</property>
-			</configuration>
+		<shell xmlns="uri:oozie:shell-action:0.3">
 			<exec>${clickstreamPipeline_artemis_prepareVariablesPath}</exec>
 			<argument>${clickstreamPipeline_artemis_HdfsInputPath}</argument>
 			<argument>${clickstreamPipeline_artemis_HiveOutput}</argument>
@@ -21,14 +35,6 @@
 	</action>
 	<action name='bson_to_text'>
 		<java>
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.job.queue.name</name>
-					<value>${queueName}</value>
-				</property>
-			</configuration>
 			<main-class>${clickstreamPipeline_artemis_bsonToTextMainClass}</main-class>
 			<arg>${wf:actionData('prepare_variables')['HdfsBsonData']}</arg>
 			<arg>${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</arg>
@@ -46,27 +52,7 @@
 		<error to='step_failure' />
 	</action>
 	<action name='create_pagevisit_000-setup-artemis'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_artemis_createDBScript}</script>
 			<param>hivedb=${clickstreamPipeline_artemis_hivedb}</param>
 		</hive>
@@ -74,27 +60,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='create_pagevisit_001_create_master_tables'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_artemis_createMasterTablesScript}</script>
 			<param>hivedb=${clickstreamPipeline_artemis_hivedb}</param>
 			<param>INPUT=${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</param>
@@ -103,27 +69,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='create_pagevisit_002-create-external-pagevisit'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_artemis_createExternalPagevisit}</script>
 			<param>PagevisitDir=${clickstreamPipeline_artemis_PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>hivedb=${clickstreamPipeline_artemis_hivedb}</param>
@@ -132,27 +78,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='create_dailyPagevisit_Partition'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_artemis_AddDailyPagevisitPartitionScript}</script>
 			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
 			<param>tableName=${clickstreamPipeline_artemisPartitionTable}</param>

@@ -1,15 +1,29 @@
-<workflow-app xmlns='uri:oozie:workflow:0.3' name='apps-clickstream-wf'>
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='apps-clickstream-wf'>
+	<global>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+			<property>
+				<name>mapred.compress.map.output</name>
+				<value>true</value>
+			</property>
+			<property>
+				<name>hive.execution.engine</name>
+				<value>tez</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.connect.retry.delay</name>
+				<value>5</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.socket.timeout</name>
+				<value>1800</value>
+			</property>
+		</configuration>
+	</global>>
 	<start to='prepare_variables' />
 	<action name='prepare_variables'>
-		<shell xmlns="uri:oozie:shell-action:0.1">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.job.queue.name</name>
-					<value>${queueName}</value>
-				</property>
-			</configuration>
+		<shell xmlns="uri:oozie:shell-action:0.3">
 			<exec>${clickstreamPipeline_apps_prepareVariablesPath}</exec>
 			<argument>${clickstreamPipeline_apps_HdfsInputPath}</argument>
 			<argument>${clickstreamPipeline_apps_HiveOutput}</argument>
@@ -21,14 +35,6 @@
 	</action>
 	<action name='bson_to_text'>
 		<java>
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.job.queue.name</name>
-					<value>${queueName}</value>
-				</property>
-			</configuration>
 			<main-class>${clickstreamPipeline_apps_bsonToTextMainClass}</main-class>
 			<arg>${wf:actionData('prepare_variables')['HdfsBsonData']}</arg>
 			<arg>${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</arg>
@@ -46,27 +52,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_priority_reports_000_setup_emr'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_apps_setupEmrScript}</script>
 			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 		</hive>
@@ -74,27 +60,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_priority_reports_001_create_master_table'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_apps_createMasterTableScript}</script>
 			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 			<param>INPUT=${wf:actionData('prepare_variables')['HdfsInputPath']}/mr</param>
@@ -103,27 +69,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_priority_reports_002_create_ext_pagevisit'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_apps_createExternalPagevisitScript}</script>
 			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
 			<param>PagevisitDir=${clickstreamPipeline_apps_PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
@@ -132,26 +78,8 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_priority_reports_004_CTR_reports'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
 				<property>
 					<name>hive.optimize.reducededuplication</name>
 					<value>false</value>
@@ -166,27 +94,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='hive_priority_reports_004_CRM_reports'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.compress.map.output</name>
-					<value>true</value>
-				</property>
-				<property>
-					<name>hive.execution.engine</name>
-					<value>tez</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.connect.retry.delay</name>
-					<value>5</value>
-				</property>
-				<property>
-					<name>hive.metastore.client.socket.timeout</name>
-					<value>1800</value>
-				</property>
-			</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_apps_CrmReportsScript}</script>
 			<param>FieldSeparator=${clickstreamPipeline_fieldSeparator}</param>
 			<param>hivedb=${clickstreamPipeline_apps_hivedb}</param>
@@ -196,27 +104,7 @@
 		<error to='mail_on_error' />
 	</action>
 	<action name='create_daily_pagevisit_partition'>
-		<hive xmlns="uri:oozie:hive-action:0.2">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-				<configuration>
-					<property>
-						<name>mapred.compress.map.output</name>
-						<value>true</value>
-					</property>
-					<property>
-						<name>hive.execution.engine</name>
-						<value>tez</value>
-					</property>
-					<property>
-						<name>hive.metastore.client.connect.retry.delay</name>
-						<value>5</value>
-					</property>
-					<property>
-						<name>hive.metastore.client.socket.timeout</name>
-						<value>1800</value>
-					</property>
-				</configuration>
+		<hive xmlns="uri:oozie:hive-action:0.5">
 			<script>${clickstreamPipeline_apps_createDailyPagevisitPartitionScript}</script>
 			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
 			<param>tableName=${clickstreamPipeline_appsPartitionTable}</param>
@@ -225,25 +113,17 @@
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>loc=${clickstreamPipeline_apps_PagevisitDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 		</hive>
-		<ok to='clean_dir' />
+		<ok to='ftp_priority_reports' />
 		<error to='mail_on_error' />
 	</action>
 	<action name='ftp_priority_reports'>
-		<shell xmlns="uri:oozie:shell-action:0.1">
-			<job-tracker>${jobTracker}</job-tracker>
-			<name-node>${nameNode}</name-node>
-			<configuration>
-				<property>
-					<name>mapred.job.queue.name</name>
-					<value>${queueName}</value>
-				</property>
-			</configuration>
+		<shell xmlns="uri:oozie:shell-action:0.3">
 			<exec>${clickstreamPipeline_apps_ftpPriorityReportsScript}</exec>
 			<argument>${wf:actionData('prepare_variables')['ftp_date']}</argument>
-			<argument>${clickstreamPipeline_apps_FTP_HOST}</argument>
-			<argument>${clickstreamPipeline_apps_FTP_USER}</argument>
-			<argument>${clickstreamPipeline_apps_FTP_PASSWD}</argument>
-			<argument>${clickstreamPipeline_apps_REMOTE_PATH}</argument>
+			<argument>${clickstreamPipeline_FTP_HOST}</argument>
+			<argument>${clickstreamPipeline_FTP_USER}</argument>
+			<argument>${clickstreamPipeline_FTP_PASSWD}</argument>
+			<argument>${clickstreamPipeline_REMOTE_PATH}</argument>
 			<argument>${wf:actionData('prepare_variables')['DailyHiveOutput']}</argument>
 			<file>${clickstreamPipeline_apps_ftpPriorityReportsScript}</file>			
 		</shell>
