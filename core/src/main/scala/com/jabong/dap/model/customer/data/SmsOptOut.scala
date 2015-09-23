@@ -50,7 +50,7 @@ object SmsOptOut {
       }
       val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filename = "53699_SMS_OPT_OUT_" + newDate + ".txt"
-      val incr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, incrDate, filename, "true", ";")
+      val incr = DataReader.getDataFrame4mCsvOrNull(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.DAILY_MODE, incrDate, filename, "true", ";")
       if (null == incr || incr.count().equals(0)) {
         DataWriter.writeParquet(prevFull, savePath, saveMode)
         return
