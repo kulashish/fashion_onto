@@ -8,6 +8,10 @@
 				<value>${queueName}</value>
 			</property>
 			<property>
+				<name>mapred.compress.map.output</name>
+				<value>true</value>
+			</property>
+			<property>
 				<name>hive.execution.engine</name>
 				<value>tez</value>
 			</property>
@@ -23,7 +27,7 @@
 	</global>
 	<start to='prepare_variables' />
 	<action name='prepare_variables'>
-		<shell xmlns="uri:oozie:shell-action:0.5">
+		<shell xmlns="uri:oozie:shell-action:0.3">
 			<exec>${clickstreamPipeline_desktopMerge_prepareVariablesPath}</exec>
 			<argument>${clickstreamPipeline_desktopMerge_DesktopMergeOutput}</argument>
 			<file>${clickstreamPipeline_desktopMerge_prepareVariablesPath}</file>

@@ -4,6 +4,10 @@
 		<name-node>${nameNode}</name-node>
 		<configuration>
 			<property>
+				<name>mapred.job.queue.name</name>
+				<value>${queueName}</value>
+			</property>
+			<property>
 				<name>mapred.compress.map.output</name>
 				<value>true</value>
 			</property>

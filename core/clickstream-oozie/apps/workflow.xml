@@ -4,6 +4,10 @@
 		<name-node>${nameNode}</name-node>
 		<configuration>
 			<property>
+				<name>mapred.job.queue.name</name>
+				<value>${queueName}</value>
+			</property>
+			<property>
 				<name>mapred.compress.map.output</name>
 				<value>true</value>
 			</property>
@@ -20,7 +24,7 @@
 				<value>1800</value>
 			</property>
 		</configuration>
-	</global>>
+	</global>
 	<start to='prepare_variables' />
 	<action name='prepare_variables'>
 		<shell xmlns="uri:oozie:shell-action:0.3">
