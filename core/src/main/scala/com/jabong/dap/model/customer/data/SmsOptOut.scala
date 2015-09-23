@@ -62,19 +62,19 @@ object SmsOptOut {
    * @param incrDate
    */
   def processDataSolutionsInfinity(prevDate: String, incrDate: String, saveMode: String, fullcsvPath: String) {
-    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITY, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
+    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
     val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     val filename1 = "blocklist_numbers_jabong" + newDate + ".csv"
     val filename2 = "blocklist_numbers_jabongdnd" + newDate + ".csv"
     if (DataWriter.canWrite(saveMode, savePath)) {
       var prevFull: DataFrame = null
       if (null == fullcsvPath) {
-        prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITY, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, prevDate)
+        prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, prevDate)
       } else {
         prevFull = DataReader.getDataFrame4mCsv(fullcsvPath+"/blocklist_numbers_jabong.csv", "true", ",").unionAll(DataReader.getDataFrame4mCsv(fullcsvPath+"/blocklist_numbers_jabongdnd.csv", "true", ",")).dropDuplicates()
       }
-      val incrjb = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITY, DataSets.BLOCK_LIST_NUMBERS, DataSets.DAILY_MODE, incrDate, filename1, "true", ";")
-      val incrdnd = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITY, DataSets.BLOCK_LIST_NUMBERS, DataSets.DAILY_MODE, incrDate, filename2, "true", ";")
+      val incrjb = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.DAILY_MODE, incrDate, filename1, "true", ";")
+      val incrdnd = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.DAILY_MODE, incrDate, filename2, "true", ";")
       var incr: DataFrame = null
 
       if (incrjb != null && incrdnd != null){

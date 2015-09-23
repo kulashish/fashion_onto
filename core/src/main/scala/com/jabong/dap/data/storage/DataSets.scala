@@ -136,7 +136,7 @@ object DataSets {
   val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
-  val SOLUTIONS_INFINITY = "solutionsInfinity"
+  val SOLUTIONS_INFINITI = "solutionsInfiniti"
 
   val AD4PUSH_ID = "ad4pushId"
   //Clickstream Data Quality

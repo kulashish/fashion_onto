@@ -459,7 +459,7 @@ object ContactListMobile extends Logging {
 
     val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
 
-    val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.SOLUTIONS_INFINITY, DataSets.FULL, incrDate)
+    val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.SOLUTIONS_INFINITI, DataSets.FULL, incrDate)
 
     val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
     //TODO store the city names in lower case, all data coming as Upper case
@@ -502,7 +502,7 @@ object ContactListMobile extends Logging {
 
       val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
 
-      val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.SOLUTIONS_INFINITY, DataSets.FULL, incrDate)
+      val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.SOLUTIONS_INFINITI, DataSets.FULL, incrDate)
 
       val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
 
