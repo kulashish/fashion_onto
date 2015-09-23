@@ -61,58 +61,69 @@ sub run_component {
     send_mail($job_status, $subject, $msg);
 }
 
+# spark path constants
+my $SPARK_HOME = "/ext/spark";
+my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
+my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
+my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
+my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+
 # base params
 my $HDFS_BASE;
 my $EMAIL_PREFIX;
+my $HDFS_LIB;
+my $HDFS_CONF;
 
 # target needs to be either stage or prod
 if ($target eq "STAGE") {
     $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
     $EMAIL_PREFIX = "[STAGE]";
 } elsif ($target eq "PROD") {
     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
     $EMAIL_PREFIX = "[PROD]";
 } elsif ($target eq "TEST-PROD") {
      $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+     $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
+     $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
      $EMAIL_PREFIX = "[TEST-PROD]";
 }else {
     print "not a valid target\n";
     exit -1;
 }
 
-# spark path constants
-my $SPARK_HOME = "/ext/spark";
-my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
-my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
-my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
-my $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
 my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
-my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
-my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
 
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
-    run_component("bob Acquisition for Full tables", $command);
+    run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
-    run_component("bob Acquisition for customer_product_shortlist table", $command);
+    run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
-    run_component("bob Acquisition for Incremental tables", $command);
+    run_component($component, $command);
 } elsif ($component eq "bobMerge") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
-    run_component("bob Merge for Incremental tables", $command);
+    run_component($component, $command);
+} elsif ($component eq "bobMergeMonthly") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
+    run_component($component, $command);
 # erp Acquisition
 } elsif ($component eq "erpAcqIncr") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
-    run_component("erp Acquisition for Incremental tables", $command);
+    run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
-    run_component("erp Merge for Incremental tables", $command);
+    run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
@@ -185,6 +196,9 @@ if ($component eq "bobAcqFull1") {
       run_component($component, $command);
 } elsif ($component eq "dndMerger") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component dndMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dndMerger.json";
+      run_component($component, $command);
+} elsif ($component eq "smsOptOutMerger") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component smsOptOutMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/smsOptOutMerger.json";
       run_component($component, $command);
 } else {
       print "not a valid component\n";

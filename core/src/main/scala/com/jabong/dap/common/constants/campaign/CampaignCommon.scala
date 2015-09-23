@@ -18,7 +18,7 @@ object CampaignCommon {
   val RETURN_RETARGET_CAMPAIGN = "return_retarget"
   val INVALID_FOLLOWUP_CAMPAIGN = "invalid_followup"
   val INVALID_LOWSTOCK_CAMPAIGN = "invalid_lowstock"
-  val INVALID_IOD_CAMPAIGN="invalid_iod"
+  val INVALID_IOD_CAMPAIGN = "invalid_iod"
   val ACART_FOLLOWUP_CAMPAIGN = "acart_followup"
   val ACART_DAILY_CAMPAIGN = "acart_daily"
   val ACART_LOWSTOCK_CAMPAIGN = "acart_lowstock"
@@ -65,10 +65,14 @@ object CampaignCommon {
     "surf1" -> 56,
     "surf3" -> 58,
     //FIXME: Write correct mail type for mipr campaign
-    "mipr" -> 101
+    "mipr" -> 101,
+    "new_arrivals_brand" -> 102,
+    "shortlist_reminder" -> 103
   )
 
   val COUNT_NEW_ARRIVALS = 4
 
   val MIPR_CAMPAIGN = "mipr"
+  val NEW_ARRIVALS_BRAND = "new_arrivals_brand"
+  val SHORTLIST_REMINDER = "shortlist_reminder"
 }
