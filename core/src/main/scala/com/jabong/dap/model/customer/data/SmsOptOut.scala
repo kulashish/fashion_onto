@@ -87,7 +87,7 @@ object SmsOptOut {
 
       if (null == incr || incr.count().equals(0)) {
         if(!prevFull.columns.contains(DNDVariables.PROCESSED_DATE)){
-          prevFull = prevFull.withColumn(DNDVariables.PROCESSED_DATE, lit(TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)))
+          prevFull = prevFull.withColumn(DNDVariables.PROCESSED_DATE, lit(TimeUtils.getDate(incrDate, TimeConstants.DATE_TIME_FORMAT)))
         }
         DataWriter.writeParquet(prevFull, savePath, saveMode)
         return
