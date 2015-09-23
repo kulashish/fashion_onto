@@ -43,5 +43,5 @@ assemblyJarName in assembly := "Alchemy-assembly.jar"
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")
 
-scalacOptions ++= Seq( "-Xelide-below", "MINIMUM" ) // elide
+scalacOptions ++= Seq( "-Xelide-below", "INFO" ) // elide
 //seq(lsSettings :_*)
