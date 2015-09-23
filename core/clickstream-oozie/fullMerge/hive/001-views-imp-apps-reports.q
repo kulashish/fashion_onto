@@ -1,4 +1,3 @@
-
 set hive.optimize.reducededuplication = false;
 
 CREATE EXTERNAL TABLE ${dbname}.productViews(
@@ -19,7 +18,7 @@ FROM
     SELECT productsku, IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'android', count(*), 0) androidCount,
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'windows', count(*), 0) windowsCount, 
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'ios', count(*), 0) iosCount, count(*) totalCount
-    FROM pagevisit WHERE pagetype IN ('CPD') and domain IN ('android','windows','ios')
+    FROM ${pagevisitDB}.${pagevisitTable} WHERE pagetype IN ('CPD') and domain IN ('android','windows','ios')
     GROUP BY productsku, REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1)
   ) tmp
 GROUP BY tmp.productsku;
@@ -43,11 +42,9 @@ FROM
     SELECT impSku, IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'android', count(*), 0) androidCount,
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'windows', count(*), 0) windowsCount, 
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'ios', count(*), 0) iosCount, count(*) totalCount
-    FROM pagevisit
+    FROM ${pagevisitDB}.${pagevisitTable}
     LATERAL VIEW EXPLODE(impressions.sku) imp AS impSku 
     WHERE pagetype = 'CTL' and domain IN ('android','windows','ios')
     GROUP BY impSku, REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1)
   ) tmp
 GROUP BY tmp.impSku;
-
-set hive.optimize.reducededuplication = true;
