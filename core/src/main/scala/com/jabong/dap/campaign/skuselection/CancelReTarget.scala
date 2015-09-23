@@ -32,7 +32,7 @@ object CancelReTarget {
       .orderBy(SalesOrderItemVariables.UNIT_PRICE)
       .select(inDataFrame(CustomerVariables.FK_CUSTOMER),
         inDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
-        inDataFrame(SalesOrderItemVariables.UNIT_PRICE) as ProductVariables.SPECIAL_PRICE)
+        inDataFrame(SalesOrderItemVariables.UNIT_PRICE))
 
     // val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
