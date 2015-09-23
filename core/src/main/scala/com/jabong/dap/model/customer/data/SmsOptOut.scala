@@ -29,8 +29,8 @@ object SmsOptOut {
       paths = path.split(";")
     }
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    processDataResponsys(DataSets.SMS_OPT_OUT, prevDate, incrDate, saveMode, paths(0).trim)
-    processDataSolutionsInfinity(prevDate, incrDate, saveMode, paths(1).trim)
+    processDataResponsys(DataSets.SMS_OPT_OUT, prevDate, incrDate, saveMode, paths(0))
+    processDataSolutionsInfinity(prevDate, incrDate, saveMode, paths(1))
   }
 
   /**
@@ -46,7 +46,7 @@ object SmsOptOut {
       if (null == fullcsv) {
         prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, prevDate)
       } else {
-        prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",").withColumnRenamed("MOBILE", DNDVariables.MOBILE_NUMBER)
+        prevFull = DataReader.getDataFrame4mCsv(fullcsv.trim(), "true", ",").withColumnRenamed("MOBILE", DNDVariables.MOBILE_NUMBER)
       }
       val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filename = "53699_SMS_OPT_OUT_" + newDate + ".txt"
@@ -77,7 +77,7 @@ object SmsOptOut {
       if (null == fullcsvPath) {
         prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, prevDate)
       } else {
-        prevFull = DataReader.getDataFrame4mCsv(fullcsvPath + File.separator + "blocklist_numbers_jabong.csv", "true", ",").unionAll(DataReader.getDataFrame4mCsv(fullcsvPath + File.separator + "blocklist_numbers_jabongdnd.csv", "true", ",")).dropDuplicates()
+        prevFull = DataReader.getDataFrame4mCsv(fullcsvPath.trim() + File.separator + "blocklist_numbers_jabong.csv", "true", ",").unionAll(DataReader.getDataFrame4mCsv(fullcsvPath.trim() + File.separator + "blocklist_numbers_jabongdnd.csv", "true", ",")).dropDuplicates()
       }
       // as we may not get files everyday.
       val incrjb = DataReader.getDataFrame4mCsvOrNull(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.DAILY_MODE, incrDate, filename1, "true", ";")
