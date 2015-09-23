@@ -150,7 +150,7 @@ object CampaignManager extends Serializable with Logging {
     val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
 
     val acartFollowup = new AcartFollowUpCampaign()
-    //acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
+    acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
     // FIXME: part of customerselction for iod and lowstock can be merged
 
@@ -160,7 +160,7 @@ object CampaignManager extends Serializable with Logging {
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
     val acartLowStock = new AcartLowStockCampaign()
-    //acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
+    acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
     // item on discount
     // last30DayAcartData
@@ -171,7 +171,7 @@ object CampaignManager extends Serializable with Logging {
     val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
-    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData, brickMvpRecommendations)
+    //acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData, brickMvpRecommendations)
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)

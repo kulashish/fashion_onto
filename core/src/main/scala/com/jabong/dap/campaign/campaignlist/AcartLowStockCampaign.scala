@@ -21,10 +21,12 @@ class AcartLowStockCampaign {
     //FIXME:Filter the order items data for last day
     val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
+    CampaignUtils.debug(selectedCustomers,"AcartLowStockCampaigns selected Customer ")
     //sku selection
     //filter sku based on lowstock filter
     val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData)
 
+    CampaignUtils.debug(filteredSku,"AcartLowStockCampaigns filteredSku ")
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku)
 
