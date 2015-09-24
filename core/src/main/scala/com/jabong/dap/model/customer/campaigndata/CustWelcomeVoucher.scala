@@ -25,32 +25,35 @@ object CustWelcomeVoucher extends Logging {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
-
-    val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesprevFull)
-
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, incrDate)
 
-    //TODO add UID
-    DataWriter.writeParquet(welCodes, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
 
-    val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
-    val ts = TimeUtils.getTimeStamp(date, TimeConstants.DATE_TIME_FORMAT)
-    val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
-      .select(
-        coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as ContactListMobileVars.UID,
-        customerFull(CustomerVariables.EMAIL) as "EMAIL",
-        welCodes(SalesRuleVariables.CODE1),
-        welCodes(SalesRuleVariables.CODE1_CREATION_DATE),
-        welCodes(SalesRuleVariables.CODE1_VALID_DATE),
-        welCodes(SalesRuleVariables.CODE2),
-        welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
-        welCodes(SalesRuleVariables.CODE2_VALID_DATE))
-      .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
+      val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_WELCOME_VOUCHERS.csv", DataSets.IGNORE_SAVEMODE, "true", ";")
+      val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesprevFull).cache()
 
+
+      //TODO add UID
+      DataWriter.writeParquet(welCodes, savePath, saveMode)
+
+      val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
+      val ts = TimeUtils.getTimeStamp(date, TimeConstants.DATE_TIME_FORMAT)
+      val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
+        .select(
+          coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as ContactListMobileVars.UID,
+          customerFull(CustomerVariables.EMAIL) as "EMAIL",
+          welCodes(SalesRuleVariables.CODE1),
+          welCodes(SalesRuleVariables.CODE1_CREATION_DATE),
+          welCodes(SalesRuleVariables.CODE1_VALID_DATE),
+          welCodes(SalesRuleVariables.CODE2),
+          welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
+          welCodes(SalesRuleVariables.CODE2_VALID_DATE))
+        .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
+
+      val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_WELCOME_VOUCHERS", DataSets.IGNORE_SAVEMODE, "true", ";")
+    }
   }
 
   def readDf(incrDate: String, prevDate: String, fullpath: String): (DataFrame, DataFrame, DataFrame) = {

@@ -1,0 +1,11 @@
+{
+  "params": [
+    {
+      "source": "custPreference",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
+

@@ -22,28 +22,33 @@ object CustPreference {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (nls, custPref) = readDf(incrDate, prevDate, fullPath)
-
-    val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
-
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate)
 
-    //TODO change email with UID
-    DataWriter.writeParquet(custPrefFull, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
 
-    val res = custPrefFull.select(
-      custPrefFull(NewsletterVariables.EMAIL) as ContactListMobileVars.UID,
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS),
-      custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ)
-    )
+      val (nls, custPref) = readDf(incrDate, prevDate, fullPath)
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_PREFERENCE.csv", DataSets.IGNORE_SAVEMODE, "true", ";")
+      val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
+
+      custPrefFull.cache()
+
+      //TODO change email with UID
+      DataWriter.writeParquet(custPrefFull, savePath, saveMode)
+
+      val res = custPrefFull.select(
+        custPrefFull(NewsletterVariables.EMAIL) as ContactListMobileVars.UID,
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS),
+        custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ)
+      )
+
+      val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_PREFERENCE", DataSets.IGNORE_SAVEMODE, "true", ";")
+    }
   }
 
   def readDf(incrDate: String, prevDate: String, fullPath: String): (DataFrame, DataFrame) = {
