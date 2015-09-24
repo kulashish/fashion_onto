@@ -28,8 +28,8 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(recommendations != null, "recommendations cannot be null")
     require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE) contains recType, "recommendation type is invalid")
     var refSkusUpdatedSchema: DataFrame = null
-    if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)){
-       refSkusUpdatedSchema = SchemaUtils.changeSchema(refSkus, Schema.expectedFinalReferenceSku)
+    if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)) {
+      refSkusUpdatedSchema = SchemaUtils.changeSchema(refSkus, Schema.expectedFinalReferenceSku)
     }
 
     val refSkuExploded = refSkusUpdatedSchema.select(
