@@ -16,6 +16,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import scala.collection.mutable.HashMap
 
@@ -230,15 +231,53 @@ object CampaignManager extends Serializable with Logging {
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
 
     //Start: MIPR email Campaign
-  //  val miprCampaign = new MIPRCampaign()
-//    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
+    //  val miprCampaign = new MIPRCampaign()
+    //    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
-    CampaignManager.initCampaignsConfig(campaignsConfig)
-    val surfCampaign = new SurfCampaign()
-    surfCampaign.runCampaign()
 
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+
+    val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData().cache()
+    val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData().cache()
+    val customerMasterData = loadCustomerMasterData()
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val yestOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
+    val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData()
+
+    //surf3
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val lastDaySurf3Data = CampaignInput.loadLastDaySurf3Data()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    val surfCampaign = new SurfCampaign()
+
+    surfCampaign.runCampaign(
+      yestSurfSessionData,
+      yestItrSkuData,
+      customerMasterData,
+      yestOrderData,
+      yestOrderItemData,
+      lastDaySurf3Data,
+      last30DaySalesOrderData,
+      last30DaySalesOrderItemData,
+      brickMvpRecommendations
+    )
+
+  }
+
+  def loadCustomerMasterData(): DataFrame = {
+
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading last day customer master data from hdfs")
+
+    //        val customerMasterData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, "2015/07/29")
+    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
+    customerMasterData
   }
 
   def initCampaignsConfig(campaignJsonPath: String) = {
