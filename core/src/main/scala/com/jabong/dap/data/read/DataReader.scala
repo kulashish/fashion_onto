@@ -127,6 +127,7 @@ object DataReader extends Logging {
 
     val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
     logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
+
     if (DataVerifier.dataExists(fetchPath, filename))
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fetchPath)
     else {
@@ -144,11 +145,24 @@ object DataReader extends Logging {
 
     val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
     logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
-    if (DataVerifier.dataExists(fetchPath, filename))
-      Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fetchPath)
-    else {
-      logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
-      null
+    try {
+      if (DataVerifier.dataExists(fetchPath, filename))
+        Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fetchPath)
+      else {
+        logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
+        null
+      }
+    } catch {
+      case e: DataNotFound =>
+        logger.info("Data not found for the path %s and filename %s".format(fetchPath, filename))
+        null
+      case e: UnsupportedOperationException =>
+        if ("empty collection".equalsIgnoreCase(e.getMessage)) {
+          logger.info("Empty file for the path %s and filename %s".format(fetchPath, filename))
+          null
+        } else {
+          throw e
+        }
     }
   }
 
