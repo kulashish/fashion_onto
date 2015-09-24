@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, SalesRuleVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, SalesRuleVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -32,7 +32,6 @@ object CustWelcomeVoucher extends Logging {
       val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
 
       val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesprevFull).cache()
-
 
       //TODO add UID
       DataWriter.writeParquet(welCodes, savePath, saveMode)

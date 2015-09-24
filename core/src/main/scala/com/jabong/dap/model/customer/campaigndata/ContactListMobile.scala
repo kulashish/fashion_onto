@@ -148,7 +148,7 @@ object ContactListMobile extends Logging {
    * @param dfZoneCity
    * @return
    */
-  def getContactListMobileDF (
+  def getContactListMobileDF(
     dfCustomerIncr: DataFrame,
     dfCustomerListMobilePrevFull: DataFrame,
     dfCustSegCalcIncr: DataFrame,

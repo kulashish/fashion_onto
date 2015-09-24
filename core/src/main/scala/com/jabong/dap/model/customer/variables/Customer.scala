@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, NewsletterVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, NewsletterVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.merge.common.MergeUtils

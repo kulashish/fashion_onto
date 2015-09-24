@@ -1,7 +1,7 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.model.customer.schema.CustVarSchema

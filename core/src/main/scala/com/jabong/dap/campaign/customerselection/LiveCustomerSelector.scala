@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, ACartVariables, CustomerVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, ACartVariables, CustomerVariables }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 

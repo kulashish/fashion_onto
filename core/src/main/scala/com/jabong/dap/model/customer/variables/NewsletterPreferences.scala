@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.variables
 
-import com.jabong.dap.common.constants.variables.{NewsletterPreferencesVariables, NewsletterVariables}
+import com.jabong.dap.common.constants.variables.{ NewsletterPreferencesVariables, NewsletterVariables }
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
