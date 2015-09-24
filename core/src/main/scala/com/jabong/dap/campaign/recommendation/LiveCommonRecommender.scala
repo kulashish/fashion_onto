@@ -20,9 +20,11 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param recommendations
    * @return
    */
-  override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame): DataFrame = {
+  override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE): DataFrame = {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
+    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE) contains recType,"recommendation type is invalid")
+
 
     val refSkuExploded = refSkus.select(
       refSkus(CustomerVariables.FK_CUSTOMER),
@@ -38,19 +40,29 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.brick") as ProductVariables.BRICK,
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
+      refSkuExploded("ref_sku_fields.brand") as ProductVariables.BRAND,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
-    val recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
-      && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
-      && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
-      .select(
+    var recommendationJoined:DataFrame = null
+
+    if(recType.equalsIgnoreCase(Recommendation.BRICK_MVP_SUB_TYPE)){
+      recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
+        && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+        && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+    }else{
+      recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
+        && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+        && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+    }
+
+    val recommendationSelected =  recommendationJoined.select(
         completeRefSku(CustomerVariables.FK_CUSTOMER),
         // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
         recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
         completeRefSku(CampaignMergedFields.REF_SKU),
         completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
 
-    val recommendationGrouped = recommendationJoined.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3) })
 
     val sqlContext = Spark.getSqlContext()
