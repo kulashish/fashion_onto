@@ -1,0 +1,57 @@
+<workflow-app name="clickstream-pipeline-wf" xmlns="uri:oozie:workflow:0.5">
+	<start to='apps-fork' />
+	<fork name='apps-fork'>
+		<path start='artemis-desktop-fork' />
+		<path start='apps-clickstream-wf' />
+	</fork>
+	<fork name='artemis-desktop-fork'>
+		<path start='desktop-clickstream-wf' />
+		<path start='artemis-clickstream-wf' />
+	</fork>
+	<action name='desktop-clickstream-wf'>
+		<sub-workflow>
+			<app-path>${clickstreamPipeline_desktopWorkflowPath}</app-path>
+			<propagate-configuration/>
+		</sub-workflow>
+		<ok to='desktop-artemis-merge-join' />
+		<error to='pipeline-failure' />
+	</action>
+	<action name='artemis-clickstream-wf'>
+		<sub-workflow>
+			<app-path>${clickstreamPipeline_artemisWorkflowPath}</app-path>
+			<propagate-configuration/>
+		</sub-workflow>
+		<ok to='desktop-artemis-merge-join' />
+		<error to='pipeline-failure' />
+	</action>
+	<action name='apps-clickstream-wf'>
+		<sub-workflow>
+			<app-path>${clickstreamPipeline_appsWorkflowPath}</app-path>
+			<propagate-configuration/>
+		</sub-workflow>
+		<ok to='full-merge-join' />
+		<error to='pipeline-failure' />
+	</action>
+	<join name='desktop-artemis-merge-join' to='desktop-artemis-merge-wf' />
+	<action name='desktop-artemis-merge-wf'>
+		<sub-workflow>
+			<app-path>${clickstreamPipeline_desktopMergeWorkflowPath}</app-path>
+			<propagate-configuration/>
+		</sub-workflow>
+		<ok to='full-merge-join' />
+		<error to='pipeline-failure' />
+	</action>
+	<join name='full-merge-join' to='full-merge-wf' />
+	<action name='full-merge-wf'>
+		<sub-workflow>
+			<app-path>${clickstreamPipeline_fullMergeWorkflowPath}</app-path>
+			<propagate-configuration/>
+		</sub-workflow>
+		<ok to='end' />
+		<error to='pipeline-failure' />
+	</action>
+	<kill name='pipeline-failure'>
+		<message>Clickstream Pipeline terminated. Error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+	<end name='end' />
+</workflow-app>
