@@ -1,7 +1,7 @@
 package com.jabong.dap.init
 
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.{AppConfig, Config, Spark}
+import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
@@ -139,7 +139,6 @@ object Init {
       case DataSets.CUST_WELCOME_VOUCHER => new ComponentExecutor().start(params.paramJson)
       case DataSets.CUST_PREFERENCE => new ComponentExecutor().start(params.paramJson)
       case DataSets.CONTACT_LIST_MOBILE => new ComponentExecutor().start(params.paramJson)
-
 
       //campaign quality check
       case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)

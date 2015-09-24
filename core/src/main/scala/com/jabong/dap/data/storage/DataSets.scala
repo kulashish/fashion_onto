@@ -128,7 +128,6 @@ object DataSets {
   //Campaign Quality
   val CAMPAIGN_QUALITY = "campaignQuality"
 
-
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
