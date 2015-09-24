@@ -277,8 +277,7 @@ object CampaignInput extends Logging {
                 res(CampaignMergedFields.EMAIL),
                 res(CampaignMergedFields.DOMAIN),
                 res(CampaignMergedFields.DEVICE_ID),
-                res(CampaignCommon.PRIORITY),
-                res(CampaignMergedFields.LIVE_CART_URL)
+                res(CampaignCommon.PRIORITY)
               )
           } else {
             result = res.select(
