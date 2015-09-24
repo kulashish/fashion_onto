@@ -16,6 +16,6 @@ object NewsletterPrefSchema {
     StructField(NewsletterPreferencesVariables.PREF_ALERTS, BooleanType, true),
     StructField(NewsletterPreferencesVariables.PREF_NL_CLEARANCE, BooleanType, true),
     StructField(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS, BooleanType, true),
-    StructField(NewsletterPreferencesVariables.NEWPREF_NL_FREQ, StringType, true)
+    StructField(NewsletterPreferencesVariables.PREF_NL_FREQ, StringType, true)
   ))
 }

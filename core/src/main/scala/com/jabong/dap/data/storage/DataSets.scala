@@ -38,6 +38,7 @@ object DataSets {
 
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
+  val PRICING_SKU_DATA = "pricingSKUData"
 
   val DEVICES_IOS = "devices_ios"
   val DEVICES_ANDROID = "devices_android"
@@ -122,9 +123,10 @@ object DataSets {
   //DCF FEEDS
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"
+  val DCF_FEED_GENERATE = "dcfFeedGenerate"
 
   //Campaign Quality
-  val CAMPAIGN_QUALITY = "campaign_quality"
+  val CAMPAIGN_QUALITY = "campaignQuality"
 
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val DND = "DND"

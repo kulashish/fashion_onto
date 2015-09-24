@@ -84,16 +84,16 @@ object SmsOptOut {
       val incrdnd = DataReader.getDataFrame4mCsvOrNull(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.DAILY_MODE, incrDate, filename2, "true", ";")
       var incr: DataFrame = null
 
-      if (incrjb != null && incrdnd != null){
+      if (incrjb != null && incrdnd != null) {
         incr = incrdnd.unionAll(incrjb).dropDuplicates()
-      } else if(incrjb == null && incrdnd != null){
+      } else if (incrjb == null && incrdnd != null) {
         incr = incrdnd
-      } else if(incrjb != null && incrdnd == null){
+      } else if (incrjb != null && incrdnd == null) {
         incr = incrjb
       }
 
       if (null == incr || incr.count().equals(0)) {
-        if(!prevFull.columns.contains(DNDVariables.PROCESSED_DATE)){
+        if (!prevFull.columns.contains(DNDVariables.PROCESSED_DATE)) {
           prevFull = prevFull.withColumn(DNDVariables.PROCESSED_DATE, lit(TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT)))
         }
         DataWriter.writeParquet(prevFull, savePath, saveMode)
@@ -104,7 +104,7 @@ object SmsOptOut {
     }
 
   }
-    def mergeData(full: DataFrame, newdf: DataFrame): DataFrame = {
+  def mergeData(full: DataFrame, newdf: DataFrame): DataFrame = {
     val joined = full.join(newdf, full(DNDVariables.MOBILE_NUMBER) === newdf(DNDVariables.MOBILE_NUMBER), SQL.FULL_OUTER)
       .select(coalesce(full(DNDVariables.MOBILE_NUMBER), newdf(DNDVariables.MOBILE_NUMBER)) as DNDVariables.MOBILE_NUMBER,
         coalesce(full(DNDVariables.PROCESSED_DATE), newdf(DNDVariables.EVENT_CAPTURED_DT)) as DNDVariables.PROCESSED_DATE

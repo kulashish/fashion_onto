@@ -1,9 +1,11 @@
 {
   "params": [
     {
-      "source": "pricingSKUData",
+      "source": "custWelcomeVoucher",
+      "incrMode": "daily",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
   ]
 }
+
