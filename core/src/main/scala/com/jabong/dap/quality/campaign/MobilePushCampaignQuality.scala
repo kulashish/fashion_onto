@@ -98,7 +98,7 @@ object MobilePushCampaignQuality extends Logging {
 
     logger.info("Calling method getCampaignQuality........")
 
-    val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+    val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.PUSH_CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
     val dataExits = DataVerifier.dataExists(path)
 
@@ -111,7 +111,7 @@ object MobilePushCampaignQuality extends Logging {
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
-      val dataFrame = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+      val dataFrame = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.PUSH_CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
