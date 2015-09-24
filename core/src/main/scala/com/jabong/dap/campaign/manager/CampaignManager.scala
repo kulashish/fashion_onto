@@ -175,8 +175,7 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
-    //val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-    // newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
+
   }
 
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
@@ -230,9 +229,7 @@ object CampaignManager extends Serializable with Logging {
     val shortlistReminderCampaign = new ShortlistReminderCampaign()
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
 
-    //Start: MIPR email Campaign
-    //  val miprCampaign = new MIPRCampaign()
-    //    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
+
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
@@ -268,6 +265,29 @@ object CampaignManager extends Serializable with Logging {
       brickMvpRecommendations
     )
 
+  }
+
+  def startMiscellaneousCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+    //loading brickmvp recommendations
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    //loading brandmvp recommendations
+    val brandMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE).cache()
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
+    val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
+
+    //Start: MIPR email Campaign
+    val miprCampaign = new MIPRCampaign()
+    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData)
+    val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
+
+    //Start: New Arrival email Campaign
+    val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
+    newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
   }
 
   def loadCustomerMasterData(): DataFrame = {
