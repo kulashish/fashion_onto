@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesRuleVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, SalesRuleVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -21,12 +21,9 @@ object CustWelcomeVoucher extends Logging {
   def start(vars: ParamInfo) = {
 
     val saveMode = vars.saveMode
-
     val fullpath = OptionUtils.getOptValue(vars.path)
-
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
-
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
     val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
 
@@ -41,15 +38,18 @@ object CustWelcomeVoucher extends Logging {
     val ts = TimeUtils.getTimeStamp(date, TimeConstants.DATE_TIME_FORMAT)
     val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
       .select(
-        coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as "UID",
-        customerFull(CustomerVariables.EMAIL),
+        coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as ContactListMobileVars.UID,
+        customerFull(CustomerVariables.EMAIL) as "EMAIL",
         welCodes(SalesRuleVariables.CODE1),
         welCodes(SalesRuleVariables.CODE1_CREATION_DATE),
         welCodes(SalesRuleVariables.CODE1_VALID_DATE),
         welCodes(SalesRuleVariables.CODE2),
         welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
-        welCodes(SalesRuleVariables.CODE2_VALID_DATE)).filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
-    DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, "CUST_WELCOME_VOUCHERS.csv", DataSets.IGNORE_SAVEMODE, "true", ",")
+        welCodes(SalesRuleVariables.CODE2_VALID_DATE))
+      .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
+
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_WELCOME_VOUCHERS.csv", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 

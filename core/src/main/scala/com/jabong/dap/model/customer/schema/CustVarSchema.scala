@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables}
 import org.apache.spark.sql.types._
 
 /**
@@ -33,13 +33,13 @@ object CustVarSchema {
     StructField(CustomerVariables.LAST_NAME, StringType, true),
     StructField(CustomerVariables.PHONE, StringType, true),
     StructField(CustomerVariables.CITY, StringType, true),
-    StructField(CustomerVariables.VERIFICATION_STATUS, BooleanType, true),
-    StructField(NewsletterVariables.NL_SUB_DATE, TimestampType, true),
-    StructField(NewsletterVariables.UNSUB_KEY, StringType, true),
-    StructField(CustomerVariables.AGE, IntegerType, true),
-    StructField(CustomerVariables.REG_DATE, TimestampType, true),
+    StructField(ContactListMobileVars.VERIFICATION_STATUS, BooleanType, true),
+    StructField(ContactListMobileVars.NL_SUB_DATE, TimestampType, true),
+    StructField(ContactListMobileVars.UNSUB_KEY, StringType, true),
+    StructField(ContactListMobileVars.AGE, IntegerType, true),
+    StructField(ContactListMobileVars.REG_DATE, TimestampType, true),
     StructField(CustomerVariables.LAST_UPDATED_AT, TimestampType, true),
-    StructField(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS, StringType, true)
+    StructField(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS, StringType, true)
   ))
 
 }

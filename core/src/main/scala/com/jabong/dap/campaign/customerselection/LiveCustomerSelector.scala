@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ ACartVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, ACartVariables, CustomerVariables}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -21,10 +21,10 @@ abstract class LiveCustomerSelector extends CustomerSelector {
       return null
     }
 
-    val customerFilteredData = skuFilteredData.join(orderData, skuFilteredData.col(ACartVariables.UID).equalTo(orderData.col(CustomerVariables.FK_CUSTOMER)), SQL.LEFT_OUTER)
+    val customerFilteredData = skuFilteredData.join(orderData, skuFilteredData.col(ContactListMobileVars.UID).equalTo(orderData.col(CustomerVariables.FK_CUSTOMER)), SQL.LEFT_OUTER)
       .withColumn("sku1", skuOrdered(skuFilteredData(ACartVariables.ACART_SKU1), orderData("sku_list")))
       .withColumn("sku2", skuOrdered(skuFilteredData(ACartVariables.ACART_SKU2), orderData("sku_list")))
-      .select(ACartVariables.UID, "sku1", "sku2")
+      .select(ContactListMobileVars.UID, "sku1", "sku2")
 
     return customerFilteredData
   }
@@ -61,7 +61,7 @@ abstract class LiveCustomerSelector extends CustomerSelector {
     val filteredData = customerData.withColumn(ACartVariables.ACART_SKU1, skuFilter(customerData(ACartVariables.ACART_PRICE_SKU1), customerData(ACartVariables.ACART_PRICE_SKU1_PRICE), customerData(ACartVariables.ACART_PRICE_SKU1_TODAY_PRICE))).withColumn(
       ACartVariables.ACART_SKU2,
       skuFilter(customerData(ACartVariables.ACART_PRICE_SKU2), customerData(ACartVariables.ACART_PRICE_SKU2_PRICE), customerData(ACartVariables.ACART_PRICE_SKU1_TODAY_PRICE))
-    ).select(ACartVariables.UID, ACartVariables.ACART_SKU1, ACartVariables.ACART_PRICE_SKU1_BRAND, ACartVariables.ACART_PRICE_SKU1_BRICK, ACartVariables.ACART_PRICE_SKU1_CATEGORY, ACartVariables.ACART_PRICE_SKU1_COLOR,
+    ).select(ContactListMobileVars.UID, ACartVariables.ACART_SKU1, ACartVariables.ACART_PRICE_SKU1_BRAND, ACartVariables.ACART_PRICE_SKU1_BRICK, ACartVariables.ACART_PRICE_SKU1_CATEGORY, ACartVariables.ACART_PRICE_SKU1_COLOR,
         ACartVariables.ACART_PRICE_SKU1_GENDER, ACartVariables.ACART_SKU2, ACartVariables.ACART_PRICE_SKU2_BRAND, ACartVariables.ACART_PRICE_SKU2_BRICK, ACartVariables.ACART_PRICE_SKU2_CATEGORY,
         ACartVariables.ACART_PRICE_SKU2_COLOR, ACartVariables.ACART_PRICE_SKU2_GENDER)
       .filter(ACartVariables.ACART_SKU1 + " is not null or " + ACartVariables.ACART_SKU2 + " is not null")
