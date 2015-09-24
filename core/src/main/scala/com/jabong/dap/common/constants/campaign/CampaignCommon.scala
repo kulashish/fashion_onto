@@ -48,12 +48,11 @@ object CampaignCommon {
 
   val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
 
-
   val MIPR_CAMPAIGN = "mipr"
   val NEW_ARRIVALS_BRAND = "new_arrivals_brand"
   val SHORTLIST_REMINDER = "shortlist_reminder"
   val COUNT_NEW_ARRIVALS = 4
-  
+
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
     "return_retarget" -> 47,
@@ -73,6 +72,6 @@ object CampaignCommon {
     "mipr" -> 67,
     "new_arrivals_brand" -> 68,
     "shortlist_reminder" -> 53,
-    "invalid_iod"-> 100
+    "invalid_iod" -> 100
   )
 }

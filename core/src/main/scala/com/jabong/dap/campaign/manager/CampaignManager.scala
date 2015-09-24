@@ -229,7 +229,6 @@ object CampaignManager extends Serializable with Logging {
     val shortlistReminderCampaign = new ShortlistReminderCampaign()
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
 
-
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {

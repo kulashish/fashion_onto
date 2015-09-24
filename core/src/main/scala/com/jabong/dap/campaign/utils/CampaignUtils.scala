@@ -789,9 +789,9 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    var campaignOutput:DataFrame = null
+    var campaignOutput: DataFrame = null
 
-    if(campaignName == CampaignCommon.NEW_ARRIVALS_BRAND) campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations,Recommendation.BRAND_MVP_SUB_TYPE)
+    if (campaignName == CampaignCommon.NEW_ARRIVALS_BRAND) campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, Recommendation.BRAND_MVP_SUB_TYPE)
     else campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
