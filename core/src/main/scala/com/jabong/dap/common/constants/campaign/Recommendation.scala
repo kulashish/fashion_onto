@@ -15,7 +15,7 @@ object Recommendation {
   val NUM_RECOMMENDATIONS = 20
   val BRICK_MVP_SUB_TYPE = "brick_mvp"
 
-  val BRAND_MVP_SUB_TYPE = "brick_mvp"
+  val BRAND_MVP_SUB_TYPE = "brand_mvp"
 
   val INVENTORY_FILTER = "inventory_filter"
 
