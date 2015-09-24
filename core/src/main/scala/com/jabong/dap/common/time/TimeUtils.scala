@@ -165,6 +165,12 @@ object TimeUtils extends Logging {
     ts
   }
 
+  def getTimeStamp(): Timestamp = {
+    val time = (new Date()).getTime()
+    val ts = new Timestamp(time)
+    ts
+  }
+
   def getDate(dt: String, dateFormat: String): Date = {
     val sdf = new SimpleDateFormat(dateFormat)
     return sdf.parse(dt)
