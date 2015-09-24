@@ -69,8 +69,8 @@ object Init {
         .text("Path to customer and Order variables merge job json config file.")
         .action((x, c) => c.copy(paramJson = x))
 
-      opt[String]("pushCampaignsJson")
-        .text("Path to push Campaigns priority config file.")
+      opt[String]("campaignsJson")
+        .text("Path to Campaigns priority config file.")
         .action((x, c) => c.copy(campaignsJson = x))
 
     }
