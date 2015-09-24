@@ -155,12 +155,10 @@ case class CampaignDetail(
 
 /**
  *
- * @param pushBasePath
  * @param pushCampaignList
  */
 //case class for campaignConfig expects path and campaign List
 case class CampaignConfig(
-  var pushBasePath: String,
   var pushCampaignList: List[CampaignDetail])
 
 object CampaignInfo {
