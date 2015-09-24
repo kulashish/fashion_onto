@@ -376,7 +376,7 @@ object CampaignManager extends Serializable with Logging {
 
       //writing csv file
       if (DataSets.PUSH_CAMPAIGNS == campaignType)
-        CampaignProcessor.splitFileToCSV(mergedData, dateFolder)
+        CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
       else {
         val expectedCSV = mergedData
           .select(col(CustomerVariables.FK_CUSTOMER))
