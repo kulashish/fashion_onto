@@ -58,22 +58,6 @@ object CampaignManager extends Serializable with Logging {
 
     return true
   }
-  def startInvalidIODCampaign(campaignsConfig: String) = {
-    CampaignManager.initCampaignsConfig(campaignsConfig)
-
-    val invalidIODCampaign = new InvalidIODCampaign()
-    val fullOrderData = CampaignInput.loadFullOrderData()
-
-    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
-
-    // last 3 days of orderitem data
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
-    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
-
-    invalidIODCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
-  }
 
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
@@ -107,6 +91,7 @@ object CampaignManager extends Serializable with Logging {
     // yesterday itr - Qty of Ref SKU to be greater than/equal to 10
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
+    val last30DaysItrData = CampaignInput.load30DayItrSkuSimpleData()
     val invalidFollowUp = new InvalidFollowUpCampaign()
     invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
 
@@ -120,6 +105,9 @@ object CampaignManager extends Serializable with Logging {
     val invalidLowStock = new InvalidLowStockCampaign()
     invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
+    // invalid iod campaign
+    val invalidIODCampaign = new InvalidIODCampaign()
+    invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations)
   }
 
   def startPushAbandonedCartCampaign(campaignsConfig: String) = {
