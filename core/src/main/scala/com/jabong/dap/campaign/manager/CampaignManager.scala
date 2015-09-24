@@ -368,7 +368,7 @@ object CampaignManager extends Serializable with Logging {
       //      createCampaignMaps(json)
       val saveMode = DataSets.OVERWRITE_SAVEMODE
       val dateFolder = TimeUtils.YESTERDAY_FOLDER
-      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, DataSets.PUSH_CAMPAIGNS)
+      val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, campaignType)
 
       val mergedData =
         if (DataSets.PUSH_CAMPAIGNS == campaignType) {
