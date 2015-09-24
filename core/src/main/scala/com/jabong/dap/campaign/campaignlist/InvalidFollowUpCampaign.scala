@@ -23,7 +23,7 @@ class InvalidFollowUpCampaign {
 
     //sku selection
     //filter sku based on followup filter
-    val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData)
+    val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku)

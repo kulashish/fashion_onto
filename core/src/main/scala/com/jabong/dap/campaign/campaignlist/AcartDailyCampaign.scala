@@ -22,7 +22,7 @@ class AcartDailyCampaign {
 
     //sku selection
     //filter sku based on daily filter
-    val filteredSku = Daily.skuFilter(selectedCustomers, yesterdayItrData)
+    val filteredSku = Daily.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_DAILY_CAMPAIGN, filteredSku, false)

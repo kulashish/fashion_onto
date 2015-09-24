@@ -25,7 +25,7 @@ class AcartIODCampaign {
     CampaignUtils.debug(selectedCustomers, "AcartIODCampaigns selected Customer ")
     //sku selection
     //filter sku based on iod filter
-    val filteredSku = ItemOnDiscount.skuFilter(selectedCustomers, last30daysItrData)
+    val filteredSku = ItemOnDiscount.skuFilter(selectedCustomers, last30daysItrData).cache()
 
     CampaignUtils.debug(filteredSku, "AcartIODCampaigns filteredSku ")
 

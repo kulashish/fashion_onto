@@ -28,7 +28,7 @@ class InvalidLowStockCampaign {
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     //sku selection
-    val filteredSku = LowStock.skuFilter(selectedCustomers, itrData)
+    val filteredSku = LowStock.skuFilter(selectedCustomers, itrData).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku)

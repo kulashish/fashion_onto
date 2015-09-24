@@ -2,7 +2,7 @@
   "params": [
     {
       "source": "recommendations",
-      "subType":"brick_mvp",
+      "subType":"all",
       "saveFormat": "parquet",
       "saveMode": "Ignore"
     }

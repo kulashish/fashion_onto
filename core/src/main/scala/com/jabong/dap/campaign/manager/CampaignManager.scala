@@ -58,22 +58,6 @@ object CampaignManager extends Serializable with Logging {
 
     return true
   }
-  def startInvalidIODCampaign(campaignsConfig: String) = {
-    CampaignManager.initCampaignsConfig(campaignsConfig)
-
-    val invalidIODCampaign = new InvalidIODCampaign()
-    val fullOrderData = CampaignInput.loadFullOrderData()
-
-    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
-
-    // last 3 days of orderitem data
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
-    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
-
-    invalidIODCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
-  }
 
   def startPushRetargetCampaign() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
@@ -107,6 +91,7 @@ object CampaignManager extends Serializable with Logging {
     // yesterday itr - Qty of Ref SKU to be greater than/equal to 10
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
 
+    val last30DaysItrData = CampaignInput.load30DayItrSkuSimpleData()
     val invalidFollowUp = new InvalidFollowUpCampaign()
     invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
 
@@ -120,6 +105,9 @@ object CampaignManager extends Serializable with Logging {
     val invalidLowStock = new InvalidLowStockCampaign()
     invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
+    // invalid iod campaign
+    val invalidIODCampaign = new InvalidIODCampaign()
+    invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations)
   }
 
   def startPushAbandonedCartCampaign(campaignsConfig: String) = {
@@ -175,8 +163,7 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
-    //val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-    // newArrivalsBrandCampaign.runCampaign(last30DayAcartData, recommendationsData, yesterdayItrData)
+
   }
 
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
@@ -230,9 +217,6 @@ object CampaignManager extends Serializable with Logging {
     val shortlistReminderCampaign = new ShortlistReminderCampaign()
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
 
-    //Start: MIPR email Campaign
-    //  val miprCampaign = new MIPRCampaign()
-    //    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, itrSkuSimpleYesterdayData)
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
@@ -268,6 +252,29 @@ object CampaignManager extends Serializable with Logging {
       brickMvpRecommendations
     )
 
+  }
+
+  def startMiscellaneousCampaigns(campaignsConfig: String) = {
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+    //loading brickmvp recommendations
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    //loading brandmvp recommendations
+    val brandMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE).cache()
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
+    val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
+
+    //Start: MIPR email Campaign
+    val miprCampaign = new MIPRCampaign()
+    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData)
+    val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
+
+    //Start: New Arrival email Campaign
+    val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
+    newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
   }
 
   def loadCustomerMasterData(): DataFrame = {

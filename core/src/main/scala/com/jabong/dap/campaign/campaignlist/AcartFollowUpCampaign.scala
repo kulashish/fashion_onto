@@ -25,7 +25,7 @@ class AcartFollowUpCampaign {
 
     //sku selection
     //filter sku based on followup filter
-    val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData)
+    val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData).cache()
 
     CampaignUtils.debug(filteredSku, "AcartFollowUpCampaigns filteredSku ")
 

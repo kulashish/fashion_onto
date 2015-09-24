@@ -19,7 +19,7 @@ class Surf2Campaign {
 
     val customerSurfData = customerSelector.customerSelection(yestSurfSessionData, yestItrSkuData)
 
-    val skus = Surf.skuFilter(customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, CampaignCommon.SURF2_CAMPAIGN)
+    val skus = Surf.skuFilter(customerSurfData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, CampaignCommon.SURF2_CAMPAIGN).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.SURF2_CAMPAIGN, skus)
