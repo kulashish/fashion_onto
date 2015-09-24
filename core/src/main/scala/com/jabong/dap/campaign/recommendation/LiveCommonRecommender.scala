@@ -40,6 +40,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
     //FIXME: To check if there is any ref sku in recommended sku
+    //FIXME: add column as rec skus instead of passing entire data to genRecSkus function
     val completeRefSku = refSkuExploded.select(
       refSkuExploded(CustomerVariables.FK_CUSTOMER),
       refSkuExploded(CampaignMergedFields.REF_SKU1),

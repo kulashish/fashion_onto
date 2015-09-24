@@ -180,7 +180,7 @@ object TestSchema {
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.BRICK, StringType, true),
-      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.SKU, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
+      StructField(ProductVariables.MVP, StringType, true),StructField(ProductVariables.BRAND, StringType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
 
   val genRecInput = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
