@@ -20,4 +20,7 @@ object ConfigConstants {
   val WRITE_OUTPUT_PATH = OptionUtils.getOptValue(AppConfig.config.writeOutputPath, OUTPUT_PATH)
 
   val READ_OUTPUT_PATH = OptionUtils.getOptValue(AppConfig.config.readOutputPath, OUTPUT_PATH)
+
+  val ZONE_CITY_PINCODE_PATH = basePath + File.separator + "input/DWH/zone_city_pincode/full/2015/09/24/"
+
 }

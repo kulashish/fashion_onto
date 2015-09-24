@@ -22,7 +22,7 @@ object TestSchema {
 
   val mvp_seg = StructType(Array(
     StructField(CustomerSegmentsVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerSegmentsVariables.MVP_TYPE, IntegerType, true),
+    StructField(ContactListMobileVars.MVP_TYPE, IntegerType, true),
     StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true),
     StructField(CustomerSegmentsVariables.DISCOUNT_SCORE, IntegerType, true)
   ))

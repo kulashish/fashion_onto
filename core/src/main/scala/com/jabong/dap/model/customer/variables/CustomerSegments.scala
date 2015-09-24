@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerSegmentsVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
@@ -47,7 +47,7 @@ object CustomerSegments {
       .sort(desc(CustomerSegmentsVariables.UPDATED_AT))
       .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
       .agg(
-        first(CustomerSegmentsVariables.MVP_SCORE) as CustomerSegmentsVariables.MVP_TYPE,
+        first(CustomerSegmentsVariables.MVP_SCORE) as ContactListMobileVars.MVP_TYPE,
         first(CustomerSegmentsVariables.SEGMENT) as CustomerSegmentsVariables.SEGMENT,
         first(CustomerSegmentsVariables.DISCOUNT_SCORE) as CustomerSegmentsVariables.DISCOUNT_SCORE
       )
