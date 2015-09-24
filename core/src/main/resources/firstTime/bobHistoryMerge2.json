@@ -94,6 +94,26 @@
       "incrDate": "2015-09-01",
       "fullDate": "2015/08/31",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_rule",
+      "primaryKey": "id_sales_rule",
+      "mergeMode": "full",
+      "dateColumn": "updated_at",
+      "incrDate": "2013-06-01",
+      "fullDate": "2012/11/30",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "newsletter_subscription",
+      "primaryKey": "id_newsletter_subscription",
+      "mergeMode": "full",
+      "dateColumn": "updated_at",
+      "incrDate": "2014-03-01",
+      "fullDate": "2014/02/28",
+      "saveMode": "Ignore"
     }
   ]
 }

@@ -136,22 +136,21 @@ object Init {
       // responsys files
       case DataSets.DND_MERGER => new ComponentExecutor().start(params.paramJson)
       case DataSets.SMS_OPT_OUT_MERGER => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
       case DataSets.CUST_WELCOME_VOUCHER => new ComponentExecutor().start(params.paramJson)
       case DataSets.CUST_PREFERENCE => new ComponentExecutor().start(params.paramJson)
+      case DataSets.CONTACT_LIST_MOBILE => new ComponentExecutor().start(params.paramJson)
+
 
       //campaign quality check
+      case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)
-
-      // all pushCampaign quality checks
       case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
+
       //pricing sku data
       case DataSets.PRICING_SKU_DATA => new ComponentExecutor().start(params.paramJson)
 
       // dcf feed
       case DataSets.DCF_FEED_GENERATE => new ComponentExecutor().start(params.paramJson)
-
-      case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
     }
   }
 }

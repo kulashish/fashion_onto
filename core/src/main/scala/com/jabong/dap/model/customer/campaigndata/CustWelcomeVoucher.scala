@@ -20,12 +20,15 @@ object CustWelcomeVoucher extends Logging {
 
   def start(vars: ParamInfo) = {
 
+    val saveMode = vars.saveMode
+
+    val fullpath = OptionUtils.getOptValue(vars.path)
+
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
 
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val saveMode = vars.saveMode
 
-    val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate)
+    val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
 
     val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesprevFull)
 
@@ -50,11 +53,18 @@ object CustWelcomeVoucher extends Logging {
 
   }
 
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String, fullpath: String): (DataFrame, DataFrame, DataFrame) = {
 
-    val dfSalesRuleIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
+    var dfSalesRuleIncr: DataFrame = null
+    var dfWelCodesPrevFull: DataFrame = null
 
-    val dfWelCodesPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, prevDate)
+    if (null != fullpath) {
+      dfSalesRuleIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL_MERGE_MODE, incrDate)
+      dfWelCodesPrevFull = null
+    } else {
+      dfSalesRuleIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
+      dfWelCodesPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, prevDate)
+    }
 
     val customer = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL, prevDate)
 
