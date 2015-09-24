@@ -79,10 +79,19 @@
 	</action>
 	<action name='hive_priority_reports'>
 		<hive xmlns="uri:oozie:hive-action:0.5">
+			<configuration>
+				<property>
+						<name>set hive.optimize.reducededuplication</name>
+						<value>false</value>
+				</property>
+			</configuration>
 			<script>${clickstreamPipeline_fullMerge_hivePriorityReportsScript}</script>
 			<param>FieldSeparator=${clickstreamPipeline_fieldSeparator}</param>
-			<param>hivedb=${clickstreamPipeline_partitionedDb}</param>
+			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
 			<param>pagevisitTable=${clickstreamPipeline_mergeTable}</param>
+			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
+			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
+			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
 		</hive>
 		<ok to='ftp_priority_reports' />

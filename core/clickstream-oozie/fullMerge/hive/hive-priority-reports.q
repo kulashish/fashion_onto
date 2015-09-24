@@ -1,5 +1,3 @@
-set hive.optimize.reducededuplication = false;
-
 CREATE EXTERNAL TABLE ${dbname}.appProductViews(
 productsku      STRING,
 totalCount      INT,
@@ -18,7 +16,7 @@ FROM
     SELECT productsku, IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'android', count(*), 0) androidCount,
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'windows', count(*), 0) windowsCount,
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'ios', count(*), 0) iosCount, count(*) totalCount
-    FROM ${pagevisitDB}.${pagevisitTable} WHERE pagetype IN ('CPD') and domain IN ('android','windows','ios')
+    FROM ${dbname}.${pagevisitTable} WHERE pagetype IN ('CPD') and domain IN ('android','windows','ios') and year1=${year1} and month1=${month1} and date1=${date1}
     GROUP BY productsku, REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1)
   ) tmp
 GROUP BY tmp.productsku;
@@ -42,9 +40,9 @@ FROM
     SELECT impSku, IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'android', count(*), 0) androidCount,
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'windows', count(*), 0) windowsCount,
       IF(REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1) == 'ios', count(*), 0) iosCount, count(*) totalCount
-    FROM ${pagevisitDB}.${pagevisitTable}
+    FROM ${dbname}.${pagevisitTable}
     LATERAL VIEW EXPLODE(impressions.sku) imp AS impSku
-    WHERE pagetype = 'CTL' and domain IN ('android','windows','ios')
+    WHERE pagetype = 'CTL' and domain IN ('android','windows','ios') and year1=${year1} and month1=${month1} and date1=${date1}
     GROUP BY impSku, REGEXP_EXTRACT(mobileOs, '.*(android|windows|ios).*', 1)
   ) tmp
 GROUP BY tmp.impSku;
@@ -68,7 +66,7 @@ FROM
     SELECT productsku, IF(REGEXP_EXTRACT(formula, '.*(old|new).*', 1) == 'old', count(*), 0) oldFormulaCount,
       IF(REGEXP_EXTRACT(formula, '.*(old|new).*', 1) == 'new', count(*), 0) newFormulaCount,
       IF(domain == 'w', count(*), 0) webCount, IF(domain == 'm', count(*), 0) mobileCount, count(*) totalFormulaCount
-    FROM ${pagevisitDB}.${pagevisitTable}
+    FROM ${dbname}.${pagevisitTable}
     WHERE pagetype IN ('QPD', 'CPD') and year1=${year1} and month1=${month1} and date1=${date1} and domain IN ('w','m')
     GROUP BY productsku, domain, REGEXP_EXTRACT(formula, '.*(old|new).*', 1)
   ) tmp
@@ -92,11 +90,14 @@ FROM
     SELECT impSku, IF(REGEXP_EXTRACT(formula, '.*(old|new).*', 1) == 'old', count(*), 0) oldFormulaCount,
     IF(REGEXP_EXTRACT(formula, '.*(old|new).*', 1) == 'new', count(*), 0) newFormulaCount,
       IF(domain == 'w', count(*), 0) webCount, IF(domain == 'm', count(*), 0) mobileCount, count(*) totalFormulaCount
-    FROM ${pagevisitDB}.${pagevisitTable}
+    FROM ${dbname}.${pagevisitTable}
     LATERAL VIEW EXPLODE(impressions.sku) imp AS impSku
     WHERE pagetype = 'CTL' and year1=${year1} and month1=${month1} and date1=${date1} and domain IN ('w','m')
     GROUP BY impSku, domain, REGEXP_EXTRACT(formula, '.*(old|new).*', 1)
   ) tmp
 GROUP BY tmp.impSku;
 
-
+drop table ${dbname}.appProductViews;
+drop table ${dbname}.appProductImpressions;
+drop table ${dbname}.desktopProductViews;
+drop table ${dbname}.desktopProductImpressions;
