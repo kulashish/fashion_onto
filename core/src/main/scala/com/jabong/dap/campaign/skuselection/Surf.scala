@@ -44,7 +44,11 @@ object Surf extends Logging {
 
     val itrData = dfItrData.select(
       col(ItrVariables.SKU) as ItrVariables.ITR_ + ItrVariables.SKU,
-      col(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
+      col(ITR.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
+      col(ProductVariables.BRICK),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
     )
 
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem).

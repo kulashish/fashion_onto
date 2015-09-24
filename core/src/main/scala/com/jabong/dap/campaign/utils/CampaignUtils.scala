@@ -173,7 +173,7 @@ object CampaignUtils extends Logging {
 
     //    refSkuData.printSchema()
 
-    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(col(CustomerVariables.FK_CUSTOMER),
         col(ProductVariables.SKU_SIMPLE),
@@ -775,9 +775,11 @@ object CampaignUtils extends Logging {
     if (campaignName.startsWith("acart")) {
       //generate reference sku for acart with acart url
       refSkus = CampaignUtils.generateReferenceSkusForAcart(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
-    } else if (campaignName.startsWith("surf")) {
-      refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
-    } else {
+    } //FIXME: need to handle null customer id for surf campaigns
+    //else if (campaignName.startsWith("surf")) {
+    // refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
+    //}
+    else {
       refSkus = CampaignUtils.generateReferenceSkus(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
 

@@ -239,8 +239,8 @@ object CampaignManager extends Serializable with Logging {
 
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
-    val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData()
-    val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData()
+    val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData().cache()
+    val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData().cache()
     val customerMasterData = loadCustomerMasterData()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val yestOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
