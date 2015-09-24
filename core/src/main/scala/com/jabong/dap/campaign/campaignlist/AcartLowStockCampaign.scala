@@ -24,7 +24,7 @@ class AcartLowStockCampaign {
     CampaignUtils.debug(selectedCustomers, "AcartLowStockCampaigns selected Customer ")
     //sku selection
     //filter sku based on lowstock filter
-    val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData)
+    val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
     CampaignUtils.debug(filteredSku, "AcartLowStockCampaigns filteredSku ")
     // ***** mobile push use case

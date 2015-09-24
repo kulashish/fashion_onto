@@ -48,7 +48,7 @@ class WishlistIODCampaign {
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
       col(ProductVariables.GENDER)
-    )
+    ).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_IOD_CAMPAIGN, dfUnion)

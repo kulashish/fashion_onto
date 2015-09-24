@@ -24,7 +24,7 @@ class LiveCancelReTargetCampaign {
     val filteredSkus = CancelReTarget.skuFilter(targetCustomersWithOrderItems)
 
     // save 2 ref skus + 8 recommendation per customer (null allowed for mobile push)
-    val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(filteredSkus, yesterdayItrData)
+    val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(filteredSkus, yesterdayItrData).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.CANCEL_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false)
