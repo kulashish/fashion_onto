@@ -137,15 +137,15 @@
         <error to="fail"/>
     </action>
 
-    <join name="bobErpJoin" to="basicItr"/>
+    <join name="bobErpJoin" to="basicITR"/>
 
-    <action name="basicItr">
+    <action name="basicITR">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>basicItr</argument>
+            <argument>basicITR</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
