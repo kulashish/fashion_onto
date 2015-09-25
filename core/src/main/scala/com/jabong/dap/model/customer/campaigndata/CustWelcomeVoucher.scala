@@ -36,8 +36,6 @@ object CustWelcomeVoucher extends Logging {
       //TODO add UID
       DataWriter.writeParquet(welCodes, savePath, saveMode)
 
-      val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
-      val ts = TimeUtils.getTimeStamp(date, TimeConstants.DATE_TIME_FORMAT)
       val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
         .select(
           coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as ContactListMobileVars.UID,
@@ -48,7 +46,7 @@ object CustWelcomeVoucher extends Logging {
           welCodes(SalesRuleVariables.CODE2),
           welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
           welCodes(SalesRuleVariables.CODE2_VALID_DATE))
-        .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
+        .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(TimeUtils.getTimeStamp()) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(TimeUtils.getTimeStamp()))
 
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_WELCOME_VOUCHERS", DataSets.IGNORE_SAVEMODE, "true", ";")
@@ -61,7 +59,7 @@ object CustWelcomeVoucher extends Logging {
     var dfWelCodesPrevFull: DataFrame = null
 
     if (null != fullpath) {
-      dfSalesRuleIncr = DataReader.getDataFrame4mFullPath(fullpath, DataSets.PARQUET)
+      dfSalesRuleIncr = DataReader.getDataFrame4mFullPath(fullpath, DataSets.PARQUET).filter(col(SalesRuleVariables.TO_DATE).geq(TimeUtils.getTimeStamp()))
     } else {
       dfSalesRuleIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
       dfWelCodesPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, prevDate)
