@@ -43,7 +43,8 @@ object Wishlist extends Logging {
       col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
       col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
       col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
-      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
+      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER,
+      col(ProductVariables.PRODUCT_NAME) as ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME
     )
 
     val joinDf = skuCustomerProductShortlist.join(lastDaySkuItrData, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === lastDaySkuItrData(ItrVariables.ITR_ + ItrVariables.SKU), SQL.INNER)
@@ -58,7 +59,8 @@ object Wishlist extends Logging {
         col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
         col(ItrVariables.ITR_ + ItrVariables.BRICK) as ProductVariables.BRICK,
         col(ItrVariables.ITR_ + ItrVariables.MVP) as ProductVariables.MVP,
-        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER
+        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER,
+        col(ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME) as ProductVariables.PRODUCT_NAME
       )
 
     var skuList = joinDf
@@ -101,7 +103,8 @@ object Wishlist extends Logging {
         col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
         col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
         col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
-        col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
+        col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER,
+        col(ProductVariables.PRODUCT_NAME) as ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME
       )
       val joinDF = skuSimpleCustomerProductShortlist.join(yesterdayItrData, skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE), "inner")
       var filteredDF: DataFrame = null
@@ -123,7 +126,9 @@ object Wishlist extends Logging {
         col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
         col(ItrVariables.ITR_ + ItrVariables.BRICK) as ProductVariables.BRICK,
         col(ItrVariables.ITR_ + ItrVariables.MVP) as ProductVariables.MVP,
-        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER
+        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER,
+        col(ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME) as ProductVariables.PRODUCT_NAME
+
       )
     } else {
 
@@ -138,7 +143,8 @@ object Wishlist extends Logging {
         col(ProductVariables.BRAND),
         col(ProductVariables.BRICK),
         col(ProductVariables.MVP),
-        col(ProductVariables.GENDER)
+        col(ProductVariables.GENDER),
+        col(ProductVariables.PRODUCT_NAME)
       )
 
     }
@@ -154,7 +160,8 @@ object Wishlist extends Logging {
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     )
     result
   }
@@ -173,7 +180,8 @@ object Wishlist extends Logging {
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     )
 
     val irt30Day = df30DaysItrData.select(
@@ -199,7 +207,8 @@ object Wishlist extends Logging {
         ProductVariables.BRAND,
         ProductVariables.BRICK,
         ProductVariables.MVP,
-        ProductVariables.GENDER
+        ProductVariables.GENDER,
+        ProductVariables.PRODUCT_NAME
       )
 
     return resultDf

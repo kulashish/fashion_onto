@@ -48,7 +48,8 @@ object Surf extends Logging {
       col(ProductVariables.BRICK),
       col(ProductVariables.BRAND),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     )
 
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem).
@@ -69,7 +70,8 @@ object Surf extends Logging {
         col(ProductVariables.BRICK),
         col(ProductVariables.BRAND),
         col(ProductVariables.MVP),
-        col(ProductVariables.GENDER)
+        col(ProductVariables.GENDER),
+        col(ProductVariables.PRODUCT_NAME)
 
       )
 

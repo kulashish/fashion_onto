@@ -6,6 +6,7 @@ import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 object Daily extends Logging {
 
@@ -26,7 +27,8 @@ object Daily extends Logging {
         yesterdayItrData(ProductVariables.BRICK),
         yesterdayItrData(ProductVariables.BRAND),
         yesterdayItrData(ProductVariables.MVP),
-        yesterdayItrData(ProductVariables.GENDER))
+        yesterdayItrData(ProductVariables.GENDER),
+        yesterdayItrData(ProductVariables.PRODUCT_NAME))
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus

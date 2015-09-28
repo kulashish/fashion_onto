@@ -31,7 +31,8 @@ object LowStock extends Logging {
         itrDataFrame(ProductVariables.BRAND),
         itrDataFrame(ProductVariables.BRICK),
         itrDataFrame(ProductVariables.MVP),
-        itrDataFrame(ProductVariables.GENDER))
+        itrDataFrame(ProductVariables.GENDER),
+        itrDataFrame(ProductVariables.PRODUCT_NAME))
 
     //  val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 

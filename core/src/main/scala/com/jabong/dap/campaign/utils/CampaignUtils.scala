@@ -181,7 +181,8 @@ object CampaignUtils extends Logging {
         col(ProductVariables.BRICK),
         col(ProductVariables.BRAND),
         col(ProductVariables.MVP),
-        col(ProductVariables.GENDER))
+        col(ProductVariables.GENDER),
+        col(ProductVariables.PRODUCT_NAME))
 
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
@@ -193,7 +194,8 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.BRAND))),
         checkNullString(t(t.fieldIndex(ProductVariables.BRICK))),
         checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
-        checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
+        checkNullString(t(t.fieldIndex(ProductVariables.GENDER))),
+        checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -207,7 +209,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -390,7 +392,8 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.BRAND),
         inputData(ProductVariables.BRICK),
         inputData(ProductVariables.MVP),
-        inputData(ProductVariables.GENDER)
+        inputData(ProductVariables.GENDER),
+        inputData(ProductVariables.PRODUCT_NAME)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -708,7 +711,8 @@ object CampaignUtils extends Logging {
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     )
 
     dfResult
