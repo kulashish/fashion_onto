@@ -216,7 +216,7 @@ sub upload_email_campaigns_custWelcomeVoucher {
     # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
     system("hadoop fs -get /data/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
 
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mkdir -p crm/email_campaigns ; mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
 }
 
 sub upload_email_campaigns_custPreference {
@@ -233,7 +233,7 @@ sub upload_email_campaigns_custPreference {
     # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
     system("hadoop fs -get /data/tmp/variables/custPreference/daily/$date/$filename $base/");
 
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mkdir -p crm/email_campaigns ; mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
 }
 
 sub dcf_file_format_change{
