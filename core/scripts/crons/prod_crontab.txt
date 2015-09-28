@@ -28,3 +28,5 @@
 
 30 11 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
 
+0 8 * * * sh /opt/alchemy-core/current/bin/emailCampaignVariables.sh >>/opt/alchemy-core/logs/emailCampaignVariables.txt
+
