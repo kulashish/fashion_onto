@@ -11,7 +11,6 @@ object CustomerSegmentsVariables {
   val FREQUENCY = "frequency"
   val RECENCY = "recency"
   val MVP_SCORE = "mvp_score"
-  val MVP_TYPE = "mvp_type"
   val DISCOUNT_SCORE = "discount_score"
   val FK_CUSTOMER = "fk_customer"
   val CREATED_AT = "created_at"

@@ -10,7 +10,6 @@ object CampaignMergedFields {
   val CUSTOMER_ID = "customer_id"
   val REF_SKU1 = "ref_sku1"
   val REF_SKU2 = "ref_sku2"
-  val REC_SKU = "rec_sku"
   val EMAIL = "email"
   val DOMAIN = "domain"
 
@@ -29,4 +28,11 @@ object CampaignMergedFields {
   val LIVE_CART_URL = "LIVE_CART_URL"
 
   val RECOMMENDATIONS = "recommendations"
+
+  //Expected names
+  val LIVE_REF_SKU="LIVE_REF_SKU"
+  val LIVE_REC_SKU="LIVE_REC_SKU"
+  val TYPO_MOBILE_PERMISION_STATUS ="MOBILE_PERMISION_STATUS"
+  val LAST_UPDATED_DATE="LAST_UPDATED_DATE"
+  val COUNTRY_CODE="COUNTRY_CODE"
 }

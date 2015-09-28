@@ -1,7 +1,7 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.SalesOrderVariables
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.model.customer.schema.CustVarSchema
@@ -26,7 +26,7 @@ object SalesOrder {
 
   def processVariables(salesOrderCalcFull: DataFrame, salesOrderIncr: DataFrame): DataFrame = {
     val salesOrderCalcIncr = salesOrderIncr.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(
-      max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.LAST_ORDER_DATE,
+      max(SalesOrderVariables.CREATED_AT) as ContactListMobileVars.LAST_ORDER_DATE,
       max(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.UPDATED_AT,
       min(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.FIRST_ORDER_DATE,
       count(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.ORDERS_COUNT,
@@ -37,7 +37,7 @@ object SalesOrder {
     } else {
       val joinedDF = salesOrderCalcFull.unionAll(salesOrderCalcIncr)
       val salesOrderCalcNewFull = joinedDF.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(
-        max(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.LAST_ORDER_DATE,
+        max(ContactListMobileVars.LAST_ORDER_DATE) as ContactListMobileVars.LAST_ORDER_DATE,
         max(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.UPDATED_AT,
         min(SalesOrderVariables.FIRST_ORDER_DATE) as SalesOrderVariables.FIRST_ORDER_DATE,
         sum(SalesOrderVariables.ORDERS_COUNT) as SalesOrderVariables.ORDERS_COUNT,

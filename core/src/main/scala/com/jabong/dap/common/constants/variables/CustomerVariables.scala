@@ -11,7 +11,6 @@ object CustomerVariables {
   val MIDDLE_NAME = "middle_name"
   val LAST_NAME = "last_name"
   val BIRTHDAY = "birthday"
-  val DOB = "dob"
   val GENDER = "gender"
   val PHONE = "phone"
   val PASSWORD = "password"
@@ -31,7 +30,6 @@ object CustomerVariables {
   val SESSION_COOKIE = "session_cookie"
   val LOGGED_IN = "logged_in"
   val REWARD_TYPE = "reward_type"
-  val PLATINUM_STATUS = "platinum_status"
   val DOMAIN = "domain"
   val USER_DEVICE_TYPE = "user_device_type"
   val API_TOKEN = "api_token"
@@ -58,17 +56,15 @@ object CustomerVariables {
   val FK_REFERRAL_CODE = "fk_referral_code"
   val SMS_OPT = "sms_opt"
   val IS_PAYBACK_EARN = "is_payback_earn"
+  val ZONE = "ZONE"
+  val TIER1 = "TIER1"
 
   //variables name
   val CUSTOMER_ALL_ORDER_TIMESLOT = "customer_all_order_timeslot"
   val CUSTOMER_PREFERRED_ORDER_TIMESLOT = "customer_preferred_order_timeslot"
-  val REG_DATE = "reg_date"
   val LAST_UPDATED_AT = "last_updated_at"
-  val EMAIL_SUBSCRIPTION_STATUS = "email_subscription_status"
   val FK_CUSTOMER_CPOT = "fk_customer_cpot"
   val NLS_UPDATED_AT = "nls_updated_at"
-  val VERIFICATION_STATUS = "verification_status"
-  val AGE = "age"
 
   //for renaming column name
   val NEW_ = "new_"
@@ -76,15 +72,5 @@ object CustomerVariables {
   val APP_FILTER = "_app_"
   val APP_TYPE = "app_type"
   val RESPONSYS_ID = "responsys_id"
-
-  val CITY_TIER = "city_tier"
-  val STATE_ZONE = "state_zone"
-  val DND = "dnd"
-  val ZONE = "zone"
-  val TIER1 = "tier1"
-  val MOBILE_PERMISSION_STATUS = "mobile_permission_status"
-  val IS_REFERRED = "is_referred"
-  val UID = "uid"
-  val COUNTRY = "country"
 
 }
