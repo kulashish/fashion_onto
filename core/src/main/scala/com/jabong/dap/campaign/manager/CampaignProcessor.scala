@@ -194,7 +194,7 @@ object CampaignProcessor {
     allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
       .agg(first(CustomerVariables.FK_CUSTOMER),
         first(CampaignMergedFields.REF_SKUS),
-        first(CampaignMergedFields.REC_SKU),
+        first(CampaignMergedFields.REC_SKUS),
         first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         first(CustomerVariables.EMAIL),
         first(CampaignMergedFields.LIVE_CART_URL))
