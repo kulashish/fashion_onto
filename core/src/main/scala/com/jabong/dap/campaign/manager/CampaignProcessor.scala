@@ -196,7 +196,6 @@ object CampaignProcessor {
         first(CampaignMergedFields.REF_SKUS) as CampaignMergedFields.REF_SKUS,
         first(CampaignMergedFields.REC_SKUS) as CampaignMergedFields.REC_SKUS,
         first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-        first(CustomerVariables.EMAIL) as CustomerVariables.EMAIL,
         first(CampaignMergedFields.LIVE_CART_URL) as CampaignMergedFields.LIVE_CART_URL)
   }
   /**
