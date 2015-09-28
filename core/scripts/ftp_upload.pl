@@ -219,7 +219,7 @@ sub upload_email_campaigns_custWelcomeVoucher {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mkdir -p crm/email_campaigns/$date_with_zero ; mput -O crm/email_campaigns/$date_with_zero/ $base/$filename ; bye\"");
 }
 
-sub upload_emailVar_custPreference {
+sub upload_email_campaigns_custPreference {
     my $base = "/data/export/$date_with_zero/custPreference";
     print "custWelcomeVoucher directory is $base\n";
     system("mkdir -p $base");
