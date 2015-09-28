@@ -192,12 +192,11 @@ object CampaignProcessor {
 
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
     allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
-      .agg(first(CustomerVariables.FK_CUSTOMER),
-        first(CampaignMergedFields.REF_SKUS),
-        first(CampaignMergedFields.REC_SKU),
-        first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CustomerVariables.EMAIL),
-        first(CampaignMergedFields.LIVE_CART_URL))
+      .agg(first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
+        first(CampaignMergedFields.REF_SKUS) as CampaignMergedFields.REF_SKUS,
+        first(CampaignMergedFields.REC_SKUS) as CampaignMergedFields.REC_SKUS,
+        first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+        first(CampaignMergedFields.LIVE_CART_URL) as CampaignMergedFields.LIVE_CART_URL)
   }
   /**
    *

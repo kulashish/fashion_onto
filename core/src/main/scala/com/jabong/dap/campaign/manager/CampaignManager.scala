@@ -366,20 +366,18 @@ object CampaignManager extends Serializable with Logging {
         } else {
           CampaignProcessor.mergeEmailCampaign(allCampaignsData)
         }
-      val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
 
-      val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
       println("Starting write parquet after repartitioning and caching for "+campaignType)
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-      if (DataWriter.canWrite(saveMode, writePath))
-        DataWriter.writeParquet(if(campaignType==DataSets.PUSH_CAMPAIGNS) finalCampaign else mergedData, writePath, saveMode)
-
-      val GARBAGE="NA" //:TODO replace with correct value
-      //writing csv file
-      if (DataSets.PUSH_CAMPAIGNS == campaignType)
+      if(campaignType==DataSets.PUSH_CAMPAIGNS){
+        val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
+        val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
+        DataWriter.writeParquet(finalCampaign, writePath, saveMode)
         CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
-      else {
-        val expectedCSV = mergedData
+      }
+      else{
+        val GARBAGE="NA" //:TODO replace with correct value
+        val expectedDF = mergedData
           .withColumn(ContactListMobileVars.UID,lit(GARBAGE))
           .withColumn(ContactListMobileVars.EMAIL,lit("**")+col(CustomerVariables.EMAIL)+"**")
           .withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
@@ -391,25 +389,25 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.LIVE_REF_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REF_SKUS), lit(0)))
           .withColumn(CampaignMergedFields.LIVE_REF_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REF_SKUS), lit(1)))
           .withColumn(CampaignMergedFields.LIVE_REF_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REF_SKUS), lit(2)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(0)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(1)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(2)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "4", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(3)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "5", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(4)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "6", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(5)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(6)))
-          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKU), lit(7)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(0)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(1)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(2)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "4", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(3)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "5", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(4)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "6", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(5)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(6)))
+          .withColumn(CampaignMergedFields.LIVE_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
           .withColumn(CampaignMergedFields.LIVE_CART_URL, col(CampaignMergedFields.LIVE_CART_URL))
-          .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(GARBAGE))
+          .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
           .withColumn(ContactListMobileVars.MOBILE, lit(GARBAGE))
           .withColumn(CampaignMergedFields.TYPO_MOBILE_PERMISION_STATUS, lit(GARBAGE))
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
           .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.REC_SKU)
+          .drop(CampaignMergedFields.REC_SKUS)
           .drop(CustomerVariables.FK_CUSTOMER)
-
-        DataWriter.writeCsv(expectedCSV, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, TimeUtils.changeDateFormat(dateFolder, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD), saveMode, "true", ";")
+        DataWriter.writeParquet(expectedDF, writePath, saveMode)
+        DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, TimeUtils.changeDateFormat(dateFolder, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD), saveMode, "true", ";")
       }
     }
   }

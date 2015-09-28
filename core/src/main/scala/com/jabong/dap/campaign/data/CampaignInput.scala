@@ -242,7 +242,7 @@ object CampaignInput extends Logging {
       val campaignName = campaignDetails.campaignName
 
       df = getCampaignData(campaignName, date, campaignType, campaignPriority)
-      if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else allCampaignData = df
+      if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if(null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
     return allCampaignData
@@ -285,7 +285,7 @@ object CampaignInput extends Logging {
             result = res.select(
               res(CustomerVariables.FK_CUSTOMER),
               res(CampaignMergedFields.REF_SKUS),
-              res(CampaignMergedFields.REC_SKU),
+              res(CampaignMergedFields.REC_SKUS),
               res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
               res(CustomerVariables.EMAIL),
               res(CampaignCommon.PRIORITY),
