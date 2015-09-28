@@ -60,7 +60,7 @@ object SalesRule {
           coalesce(wcIncr(SalesRuleVariables.CODE2_VALID_DATE), wcPrev(SalesRuleVariables.CODE2_VALID_DATE)) as SalesRuleVariables.CODE2_VALID_DATE
         )
     }
-    return wcfull
+    wcfull
   }
 
 }
