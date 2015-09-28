@@ -534,7 +534,7 @@ object UdfUtils {
       return 0
     }
   }
-  def getElementArray(strings: Array[String], i: Int): String = {
+  def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
     if(i>=strings.size) "" else strings(i)
   }
 }
