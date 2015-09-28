@@ -3,6 +3,7 @@
     {
       "source": "custWelcomeVoucher",
       "path": "/data/input/bob/sales_rule/full/2015/09/26/24",
+      "incrDate": "2015/09/26",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
