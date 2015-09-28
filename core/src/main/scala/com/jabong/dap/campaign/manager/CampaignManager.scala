@@ -399,7 +399,7 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
           .withColumn(CampaignMergedFields.LIVE_CART_URL, col(CampaignMergedFields.LIVE_CART_URL))
-          .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(GARBAGE))
+          .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
           .withColumn(ContactListMobileVars.MOBILE, lit(GARBAGE))
           .withColumn(CampaignMergedFields.TYPO_MOBILE_PERMISION_STATUS, lit(GARBAGE))
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
