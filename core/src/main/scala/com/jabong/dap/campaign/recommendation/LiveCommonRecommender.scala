@@ -113,7 +113,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
     val mailType = topRow(campaignMailTypeIndex).asInstanceOf[Int]
-    val acartUrl = CampaignUtils.checkNullString(acartUrlIndex)
+    val acartUrl = CampaignUtils.checkNullString(topRow(acartUrlIndex))
     val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKU)
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) 8 else 4
