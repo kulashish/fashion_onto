@@ -32,9 +32,7 @@ object CustWelcomeVoucher extends Logging {
       val (salesRuleIncr, welCodesPrevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
 
       val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesPrevFull).cache()
-      println("after getting the codes from salesRule Table")
-      welCodes.printSchema()
-      welCodes.show(10)
+      logger.info("after getting the codes from salesRule Table")
 
       //TODO add UID
       DataWriter.writeParquet(welCodes, savePath, saveMode)
@@ -50,8 +48,7 @@ object CustWelcomeVoucher extends Logging {
           welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
           welCodes(SalesRuleVariables.CODE2_VALID_DATE))
         .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(TimeUtils.getTimeStamp()) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(TimeUtils.getTimeStamp()))
-      println("after filter on date")
-      res.show(10)
+      logger.info("after filter on date")
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, incrDate, "53699_28346_" + fileDate + "_CUST_WELCOME_VOUCHERS", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
@@ -63,7 +60,7 @@ object CustWelcomeVoucher extends Logging {
     var dfWelCodesPrevFull: DataFrame = null
 
     if (null != fullpath) {
-      dfSalesRuleIncr = DataReader.getDataFrame4mFullPath(fullpath, DataSets.PARQUET).filter(col(SalesRuleVariables.TO_DATE).geq(TimeUtils.getTimeStamp(incrDate, TimeConstants.DATE_FORMAT_FOLDER)))
+      dfSalesRuleIncr = DataReader.getDataFrame4mFullPath(fullpath, DataSets.PARQUET)
     } else {
       dfSalesRuleIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
       dfWelCodesPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.FULL_MERGE_MODE, prevDate)
