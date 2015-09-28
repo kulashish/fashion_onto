@@ -1,8 +1,11 @@
 package com.jabong.dap.campaign.recommendation
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
+import com.jabong.dap.common.schema.SchemaUtils
+import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
@@ -24,18 +27,25 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
     require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE) contains recType, "recommendation type is invalid")
+    var refSkusUpdatedSchema: DataFrame = refSkus
+    if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)) {
+      refSkusUpdatedSchema = SchemaUtils.changeSchema(refSkus, Schema.expectedFinalReferenceSku)
+    }
 
-    val refSkuExploded = refSkus.select(
-      refSkus(CustomerVariables.FK_CUSTOMER),
-      refSkus(CampaignMergedFields.REF_SKU1),
-      refSkus(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+    val refSkuExploded = refSkusUpdatedSchema.select(
+      refSkusUpdatedSchema(CustomerVariables.FK_CUSTOMER),
+      refSkusUpdatedSchema(CampaignMergedFields.REF_SKU1),
+      refSkusUpdatedSchema(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      refSkusUpdatedSchema(CampaignMergedFields.LIVE_CART_URL),
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
     //FIXME: To check if there is any ref sku in recommended sku
+    //FIXME: add column as rec skus instead of passing entire data to genRecSkus function
     val completeRefSku = refSkuExploded.select(
       refSkuExploded(CustomerVariables.FK_CUSTOMER),
       refSkuExploded(CampaignMergedFields.REF_SKU1),
       refSkuExploded(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      refSkuExploded(CampaignMergedFields.LIVE_CART_URL),
       refSkuExploded("ref_sku_fields.brick") as ProductVariables.BRICK,
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
@@ -59,15 +69,16 @@ class LiveCommonRecommender extends Recommender with Logging {
       // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
       recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
       completeRefSku(CampaignMergedFields.REF_SKU),
-      completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
+      completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+      completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
     val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
-      .map({ case (key, value) => (key, value._1, value._2, value._3) })
+      .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
     val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKUS,
-      CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+      CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
     return campaignDataWithRecommendations
   }
@@ -91,7 +102,7 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[String], mutable.MutableList[String], Int) = {
+  def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[String], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -100,7 +111,9 @@ class LiveCommonRecommender extends Recommender with Logging {
     val referenceSkus: mutable.MutableList[String] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+    val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
     val mailType = topRow(campaignMailTypeIndex).asInstanceOf[Int]
+    val acartUrl = CampaignUtils.checkNullString(topRow(acartUrlIndex))
     val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKU)
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) 8 else 4
@@ -111,7 +124,7 @@ class LiveCommonRecommender extends Recommender with Logging {
 
       referenceSkus += row(refSkuIndex).toString
     }
-    return (referenceSkus, recommendedSkus, mailType)
+    return (referenceSkus, recommendedSkus, mailType, acartUrl)
   }
 
 }

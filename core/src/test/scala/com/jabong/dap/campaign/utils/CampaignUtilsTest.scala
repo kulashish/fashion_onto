@@ -222,4 +222,12 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     assert(result.count() == 0)
 
   }
+
+  "Generate reference skus with refernce sku input " should "return max 2 reference skus with acart utl per customer sorted with price and take care of duplicate skus" in {
+    val refSkus = CampaignUtils.generateReferenceSkusForAcart(refSkuInput, 2)
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=5242607").select(CampaignMergedFields.REF_SKUS).collect()(0)(0).asInstanceOf[List[(Double, String, String, String, String, String)]]
+    //val expectedData = Row(200.0, "VA613SH24VHFINDFAS-3716539")
+    assert(refSkuFirst.size === 2)
+    //  assert(refSkuFirst.head._2 == "VA613SH24VHFINDFAS-3716539")
+  }
 }
