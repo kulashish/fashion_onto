@@ -23,7 +23,7 @@ system("sed '/^\$/d' exportDevices_515_$date_with_zero.csv | sed -n $regex2 >cle
 system("hadoop fs -copyFromLocal cleaned/exportDevices_515_$date_with_zero.csv /data/input/ad4push/devices_ios/daily/$date/.");
 
 # call ad4push Device Merger
-system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c Ad4pushDeviceMerger");
+system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c ad4pushDeviceMerger");
 
 # copy processed data to ftp location
 system("perl /opt/alchemy-core/current/bin/ftp_upload.pl -c ad4push_device_merger");
