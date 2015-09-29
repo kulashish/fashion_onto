@@ -141,6 +141,8 @@ object Udf {
 
   val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a:ArrayBuffer[String], i: Int))
 
+  val getElementInTupleArray = udf((a: ArrayBuffer[(String,String,String,String)], i: Int, value:Int) => UdfUtils.getElementInTupleArray(a:ArrayBuffer[(String,String,String,String)], i: Int,value:Int))
+
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
 }
