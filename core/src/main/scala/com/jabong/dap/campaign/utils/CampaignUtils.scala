@@ -739,6 +739,10 @@ object CampaignUtils extends Logging {
       pushCampaignPostProcess(campaignType, campaignName, custFiltered)
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
       emailCampaignPostProcess(campaignType, campaignName, custFiltered, recommendations)
+    } else if (campaignType.equalsIgnoreCase(DataSets.CALENDAR_CAMPAIGNS)) {
+
+      //FIXME: add method for calendarCampaignPostProcess
+      // calendarCampaignPostProcess(campaignType, campaignName, custFiltered, recommendations)
     }
 
   }

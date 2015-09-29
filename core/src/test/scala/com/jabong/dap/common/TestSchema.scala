@@ -211,6 +211,7 @@ object TestSchema {
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.PRICE_BAND, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
     StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),

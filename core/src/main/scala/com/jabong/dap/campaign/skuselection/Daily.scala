@@ -21,14 +21,14 @@ object Daily extends Logging {
     }
 
     val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
-        customerSkuData(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
+      .select(customerSkuData("*"),
         yesterdayItrData(ProductVariables.SPECIAL_PRICE),
         yesterdayItrData(ProductVariables.BRICK),
         yesterdayItrData(ProductVariables.BRAND),
         yesterdayItrData(ProductVariables.MVP),
         yesterdayItrData(ProductVariables.GENDER),
-        yesterdayItrData(ProductVariables.PRODUCT_NAME))
+        yesterdayItrData(ProductVariables.PRODUCT_NAME),
+        yesterdayItrData(ProductVariables.PRICE_BAND))
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
