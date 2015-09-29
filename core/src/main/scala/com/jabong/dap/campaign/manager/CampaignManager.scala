@@ -407,7 +407,7 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CustomerVariables.FK_CUSTOMER)
+          .drop(CampaignMergedFields.CUSTOMER_ID)
 
         CampaignUtils.debug(expectedDF,"expectedDF final before writing data frame for"+campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)

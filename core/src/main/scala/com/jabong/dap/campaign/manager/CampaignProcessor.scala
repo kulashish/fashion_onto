@@ -112,9 +112,9 @@ object CampaignProcessor {
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
+    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.FK_CUSTOMER) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
       .select(
-        bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+        bcCampaign(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
         bcCampaign(CampaignMergedFields.REC_SKUS),
