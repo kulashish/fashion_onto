@@ -85,6 +85,47 @@ object CampaignProcessor {
   }
 
   /**
+   *
+   * @param cmr
+   * @param campaign
+   * @return
+   */
+  def mapEmailCampaignWithCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
+    println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
+
+    val notNullCampaign = campaign.filter(!(col(CampaignMergedFields.CUSTOMER_ID) === 0))
+
+    println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
+
+    println("Starting the CMR: ") // + cmr.count())
+
+    val cmrn = cmr
+      .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
+      .select(
+        cmr(CustomerVariables.EMAIL),
+        cmr(CustomerVariables.RESPONSYS_ID),
+        cmr(CustomerVariables.ID_CUSTOMER),
+        cmr(PageVisitVariables.BROWSER_ID),
+        cmr(PageVisitVariables.DOMAIN)
+      )
+
+    println("After removing customer id = 0 or null ") // + cmrn.count())
+
+    val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
+    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
+      .select(
+        bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+        bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        bcCampaign(CampaignMergedFields.REF_SKUS),
+        bcCampaign(CampaignMergedFields.REC_SKUS),
+        bcCampaign(CampaignCommon.PRIORITY),
+        bcCampaign(CampaignMergedFields.LIVE_CART_URL),
+        Udf.email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL
+      )
+    println("After joining campaigns with the cmr: " + campaignDevice.count())
+    campaignDevice
+  }
+  /**
    * takes union input of all campaigns and return merged campaign list
    * @param inputCampaignsData
    * @param key
