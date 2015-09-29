@@ -19,7 +19,7 @@ class Surf3Campaign {
     // rename domain to browserid
     val lastdaySurf3DataFixed = lastdaySurf3Data.withColumnRenamed("device", PageVisitVariables.BROWSER_ID)
 
-    val skus = Surf.skuFilter(lastdaySurf3DataFixed, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData, CampaignCommon.SURF3_CAMPAIGN).cache()
+    val skus = Surf.skuFilter(lastdaySurf3DataFixed, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.SURF3_CAMPAIGN, skus)

@@ -39,7 +39,7 @@ object TestSchema {
 
   val accRegDateAndUpdatedAt = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.REG_DATE, TimestampType, true),
+    StructField(ContactListMobileVars.REG_DATE, TimestampType, true),
     StructField(CustomerVariables.UPDATED_AT, TimestampType, true)
   ))
 
@@ -128,6 +128,7 @@ object TestSchema {
     StructField(ProductVariables.BRAND, StringType, true),
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
@@ -150,6 +151,7 @@ object TestSchema {
     StructField(ProductVariables.BRAND, StringType, true),
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
@@ -162,6 +164,7 @@ object TestSchema {
     StructField(ProductVariables.MVP, StringType, true),
     StructField(ProductVariables.BRAND, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
     StructField(TestConstants.TEST_CASE_FILTER, LongType, true)
   ))
@@ -180,7 +183,7 @@ object TestSchema {
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.BRICK, StringType, true),
-      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.BRAND, StringType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
+      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.BRAND, StringType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true), StructField(ProductVariables.GENDER, StringType, true), StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false)))
 
   val genRecInput = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
@@ -197,7 +200,8 @@ object TestSchema {
     StructField(ProductVariables.MVP, StringType, false),
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.BRICK, StringType, true),
-    StructField(ProductVariables.BRAND, StringType, true)))
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true)))
 
   val basicSimpleItr = StructType(Array(
     StructField(ProductVariables.SKU_SIMPLE, StringType, true),
@@ -206,6 +210,7 @@ object TestSchema {
     StructField(ProductVariables.BRAND, StringType, true),
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
     StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),

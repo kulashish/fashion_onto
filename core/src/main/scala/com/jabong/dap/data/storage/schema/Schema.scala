@@ -289,6 +289,7 @@ object Schema {
     StructField(ItrVariables.BRICK, StringType, true),
     StructField(ItrVariables.MVP, IntegerType, true),
     StructField(ItrVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ItrVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ItrVariables.AVERAGE_PRICE, DecimalType(10, 2), true),
     StructField(ItrVariables.WEEKLY_AVERAGE_SALE, DecimalType(10, 2), true),
@@ -355,6 +356,7 @@ object Schema {
     StructField(ProductVariables.BRAND, StringType, false),
     StructField(ProductVariables.MVP, StringType, false),
     StructField(ProductVariables.GENDER, StringType, false),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, false),
     StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
 
@@ -381,12 +383,12 @@ object Schema {
         StructField(ProductVariables.BRAND, StringType, true),
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
-        StructField(ProductVariables.GENDER, StringType, true)))), false),
+        StructField(ProductVariables.GENDER, StringType, true),
+        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false),
 
-      StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
-      StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
-
 
   val finalReferenceSkuWithACartUrl = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
@@ -398,7 +400,8 @@ object Schema {
         StructField(ProductVariables.BRAND, StringType, true),
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
-        StructField(ProductVariables.GENDER, StringType, true)))), false),
+        StructField(ProductVariables.GENDER, StringType, true),
+        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false),
 
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))

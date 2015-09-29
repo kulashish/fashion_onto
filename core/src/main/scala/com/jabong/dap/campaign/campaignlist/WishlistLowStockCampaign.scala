@@ -46,7 +46,8 @@ class WishlistLowStockCampaign {
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     ).cache()
 
     // ***** mobile push use case

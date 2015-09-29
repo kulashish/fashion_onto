@@ -49,7 +49,7 @@ class SurfCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
 
   feature("Run surf campaign") {
     scenario("run all surf campaigns") {
-      Given(" past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yesterdaySalesOrderData, esterdaySalesOrderItemData, lastDaySurf3Data, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations")
+      Given(" past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, lastDaySurf3Data, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations")
 
       val surfCampaign = new SurfCampaign()
 

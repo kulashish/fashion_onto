@@ -30,7 +30,7 @@ object Surf extends Logging {
    * @param dfSalesOrderItem
    * @return
    */
-  def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = {
+  def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = {
 
     if (dfCustomerPageVisit == null || dfItrData == null || dfCustomer == null || dfSalesOrder == null || dfSalesOrderItem == null) {
 
@@ -48,7 +48,8 @@ object Surf extends Logging {
       col(ProductVariables.BRICK),
       col(ProductVariables.BRAND),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     )
 
     val dfSkuNotBought = CampaignUtils.skuNotBoughtR2(dfCustomerEmailToCustomerId, dfSalesOrder, dfSalesOrderItem).
@@ -69,7 +70,8 @@ object Surf extends Logging {
         col(ProductVariables.BRICK),
         col(ProductVariables.BRAND),
         col(ProductVariables.MVP),
-        col(ProductVariables.GENDER)
+        col(ProductVariables.GENDER),
+        col(ProductVariables.PRODUCT_NAME)
 
       )
 

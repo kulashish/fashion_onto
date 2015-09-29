@@ -42,7 +42,8 @@ object ItemOnDiscount extends Logging {
       col(ItrVariables.BRAND) as ItrVariables.ITR_ + ItrVariables.BRAND,
       col(ItrVariables.BRICK) as ItrVariables.ITR_ + ItrVariables.BRICK,
       col(ItrVariables.MVP) as ItrVariables.ITR_ + ItrVariables.MVP,
-      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER
+      col(ItrVariables.GENDER) as ItrVariables.ITR_ + ItrVariables.GENDER,
+      col(ProductVariables.PRODUCT_NAME) as ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME
     )
 
     //filter yesterday itrData from itr30dayData
@@ -72,7 +73,8 @@ object ItemOnDiscount extends Logging {
         col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
         col(ItrVariables.ITR_ + ItrVariables.BRICK) as ProductVariables.BRICK,
         col(ItrVariables.ITR_ + ItrVariables.MVP) as ProductVariables.MVP,
-        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER)
+        col(ItrVariables.ITR_ + ItrVariables.GENDER) as ProductVariables.GENDER,
+        col(ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME) as ProductVariables.PRODUCT_NAME)
 
     logger.info("After sku filter based on special price")
 

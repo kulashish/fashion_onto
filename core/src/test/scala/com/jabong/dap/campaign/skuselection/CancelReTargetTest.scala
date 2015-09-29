@@ -42,7 +42,7 @@ class CancelReTargetTest extends FlatSpec with SharedSparkContext {
 
     val customerSelectedData = returnCancel.customerSelection(orderData, orderItemDataFrame)
     val skuData = CancelReTarget.skuFilter(customerSelectedData)
-    assert(skuData.count() == 1)
+    assert(skuData.count() == 2)
   }
 
 }
