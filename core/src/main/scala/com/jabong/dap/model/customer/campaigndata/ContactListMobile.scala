@@ -522,11 +522,11 @@ object ContactListMobile extends Logging {
 
     val dfDND = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.DAILY_MODE, incrDate)
 
-    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL, incrDate)
+    val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.SMS_OPT_OUT, DataSets.FULL, incrDate)
 
-    val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.SOLUTIONS_INFINITI, DataSets.FULL, incrDate)
+    val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.SMS_OPT_OUT, DataSets.FULL, incrDate)
 
-    val dfZoneCity = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.ZONE_CITY, DataSets.DAILY_MODE, incrDate)
+    val dfZoneCity = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ";")
     //TODO store the city names in lower case, all data coming as Upper case
     (
       dfCustomerIncr,
@@ -563,9 +563,9 @@ object ContactListMobile extends Logging {
 
       val dfDND = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
 
-      val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.RESPONSYS, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfSmsOptOut = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.SMS_OPT_OUT, DataSets.FULL_MERGE_MODE, incrDate)
 
-      val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SMS_OPT_OUT, DataSets.SOLUTIONS_INFINITI, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.SMS_OPT_OUT, DataSets.FULL_MERGE_MODE, incrDate)
 
       val dfZoneCity = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ";")
 
