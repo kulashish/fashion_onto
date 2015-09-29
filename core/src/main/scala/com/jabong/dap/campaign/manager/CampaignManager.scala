@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
@@ -356,17 +357,19 @@ object CampaignManager extends Serializable with Logging {
       val saveMode = DataSets.OVERWRITE_SAVEMODE
       val dateFolder = TimeUtils.YESTERDAY_FOLDER
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, campaignType)
+      val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
 
       val mergedData =
         if (DataSets.PUSH_CAMPAIGNS == campaignType) {
-          val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
           val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
           val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
           CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
         } else {
-          CampaignProcessor.mergeEmailCampaign(allCampaignsData)
+          val allCamp = CampaignProcessor.mapEmailCampaignWithCMR(cmr, allCampaignsData)
+          CampaignProcessor.mergeEmailCampaign(allCamp)
         }
 
+      CampaignUtils.debug(mergedData,"merged data frame for"+campaignType)
       println("Starting write parquet after repartitioning and caching for " + campaignType)
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (campaignType == DataSets.PUSH_CAMPAIGNS) {
@@ -405,6 +408,8 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.REC_SKUS)
           .drop(CustomerVariables.FK_CUSTOMER)
+
+        CampaignUtils.debug(expectedDF,"expectedDF final before writing data frame for"+campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, TimeUtils.changeDateFormat(dateFolder, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD), saveMode, "true", ";")
       }
