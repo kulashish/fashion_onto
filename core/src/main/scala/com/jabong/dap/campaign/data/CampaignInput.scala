@@ -405,7 +405,7 @@ object CampaignInput extends Logging {
         col(ITR.BRAND_NAME) as ProductVariables.BRAND,
         col(ITR.BRICK) as ProductVariables.BRICK,
         col(ITR.PRICE_BAND),
-        col(ProductVariables.PRODUCT_NAME),
+        col(ITR.PRODUCT_NAME),
         col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
 
