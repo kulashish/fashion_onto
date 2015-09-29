@@ -186,6 +186,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "custWelcomeVoucher") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custWelcomeVoucher --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custWelcomeVoucher.json";
       run_component($component, $command);
+} elsif ($component eq "contactListMobile") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
+      run_component($component, $command);
 } else {
       print "not a valid component\n";
 }
