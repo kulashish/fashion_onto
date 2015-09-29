@@ -93,7 +93,7 @@ object CampaignProcessor {
   def mapEmailCampaignWithCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
 
-    val notNullCampaign = campaign.filter(!(col(CampaignMergedFields.CUSTOMER_ID) === 0))
+    val notNullCampaign = campaign.filter(!(col(CustomerVariables.FK_CUSTOMER) === 0))
 
     println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
 
