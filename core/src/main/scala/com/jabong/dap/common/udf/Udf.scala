@@ -2,6 +2,7 @@ package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
 
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable.ArrayBuffer
@@ -141,7 +142,7 @@ object Udf {
 
   val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a:ArrayBuffer[String], i: Int))
 
-  val getElementInTupleArray = udf((a: ArrayBuffer[(String,String,String,String)], i: Int, value:Int) => UdfUtils.getElementInTupleArray(a:ArrayBuffer[(String,String,String,String)], i: Int,value:Int))
+  val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value:Int) => UdfUtils.getElementInTupleArray(a:ArrayBuffer[(Row)], i: Int,value:Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
