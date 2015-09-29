@@ -3,7 +3,6 @@ package com.jabong.dap.campaign.calendarcampaign
 /**
  * Created by raghu on 29/9/15.
  */
-import com.jabong.dap.campaign.campaignlist.MIPRCampaign
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
@@ -40,9 +39,9 @@ class PricepointCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
       val pricePointCampaign = new PricepointCampaign()
       pricePointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
 
-      val MIPRCampaignOut = CampaignOutput.testData.head
-      //      assert(MIPRCampaignOut._1.count() == 1)
-      assert(MIPRCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && MIPRCampaignOut._2 == CampaignCommon.MIPR_CAMPAIGN)
+      val pricepointCampaignOut = CampaignOutput.testData.head
+      //      assert(pricepointCampaignOut._1.count() == 1)
+      assert(pricepointCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && pricepointCampaignOut._2 == CampaignCommon.PRICEPOINT_CAMPAIGN)
 
     }
   }

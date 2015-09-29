@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.calendarcampaign
 
-import com.jabong.dap.campaign.campaignlist.BrandInCityCampaign
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
