@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.skuselection
 import java.io.File
 
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ TestSchema, TestConstants, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
@@ -48,7 +48,7 @@ class FollowUpTest extends FlatSpec with SharedSparkContext {
   "Invalid customer selected data and last days itr " should "ref skus of fk_customer" in {
     val refSkus = FollowUp.skuFilter(customerSelected, itrData)
     val refSkuList = refSkus.filter(CustomerVariables.FK_CUSTOMER + " = " + 8552648)
-      .select(CampaignMergedFields.REF_SKU1).collect().toString
+      .select(ProductVariables.SKU_SIMPLE).collect().toString
     val expectedData = "ES418WA79UAUINDFAS"
     assert(refSkus.count() == 1)
     //  assert(refSkuList.head === expectedData)

@@ -34,23 +34,19 @@ class SurfTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  /* FIXME
-  "skuFilter(a,b,c,d,e): All Data Frame " should "null" in {
+  "skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem): All Data Frame " should "null" in {
 
     val result = Surf.skuFilter(null, null, null, null, null)
 
     assert(result == null)
 
   }
-  */
 
-  /* FIXME
-  "skuFilter(a,b,c,d,e): count " should "3" in {
+  "skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem): count " should "3 filtered skus" in {
 
     val result = Surf.skuFilter(dfCustomerPageVisit, dfItrData, dfCustomer, dfSalesOrder, dfSalesOrderItem)
 
     assert(result.count() == 3)
   }
-  */
 
 }

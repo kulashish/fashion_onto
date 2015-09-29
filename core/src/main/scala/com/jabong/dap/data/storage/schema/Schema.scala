@@ -370,8 +370,7 @@ object Schema {
         StructField(ProductVariables.BRAND, StringType, true),
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
-        StructField(ProductVariables.GENDER, StringType, true),
-        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false)
+        StructField(ProductVariables.GENDER, StringType, true)))), false)
   ))
 
   val expectedFinalReferenceSku = StructType(Array(

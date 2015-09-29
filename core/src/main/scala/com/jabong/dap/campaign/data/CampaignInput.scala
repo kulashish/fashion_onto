@@ -141,7 +141,7 @@ object CampaignInput extends Logging {
       itrData(ITR.GENDER) as ProductVariables.GENDER,
       itrData(ITR.BRAND_NAME) as ProductVariables.BRAND,
       itrData(ITR.BRICK) as ProductVariables.BRICK,
-      itrData(ITR.PRODUCT_NAME) as ProductVariables.PRODUCT_NAME,
+      itrData(ITR.PRODUCT_NAME),
       itrData(ITR.PRICE_BAND),
       itrData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT)
@@ -163,7 +163,7 @@ object CampaignInput extends Logging {
       itrData(ITR.PRICE_BAND),
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
       itrData(ITR.BRICK),
-      itrData(ProductVariables.PRODUCT_NAME),
+      itrData(ITR.PRODUCT_NAME),
       itrData(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
       itrData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
@@ -242,7 +242,7 @@ object CampaignInput extends Logging {
       val campaignName = campaignDetails.campaignName
 
       df = getCampaignData(campaignName, date, campaignType, campaignPriority)
-      if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if(null == allCampaignData) allCampaignData = df
+      if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
     return allCampaignData
@@ -360,7 +360,7 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_BAND),
         col(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
         col(ITR.BRICK),
-        col(ProductVariables.PRODUCT_NAME),
+        col(ITR.PRODUCT_NAME),
         col(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
         col(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
@@ -384,7 +384,7 @@ object CampaignInput extends Logging {
           col(ITR.PRICE_BAND),
           col(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
           col(ITR.BRICK),
-          col(ProductVariables.PRODUCT_NAME),
+          col(ITR.PRODUCT_NAME),
           col(ITR.NUMBER_SIMPLE_PER_SKU) as ProductVariables.NUMBER_SIMPLE_PER_SKU,
           col(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY))
       }
@@ -428,7 +428,7 @@ object CampaignInput extends Logging {
           col(ITR.BRAND_NAME) as ProductVariables.BRAND,
           col(ITR.BRICK) as ProductVariables.BRICK,
           col(ITR.PRICE_BAND),
-          col(ProductVariables.PRODUCT_NAME),
+          col(ITR.PRODUCT_NAME),
           col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
       }
