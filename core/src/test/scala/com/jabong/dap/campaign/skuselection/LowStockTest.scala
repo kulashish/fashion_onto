@@ -39,12 +39,12 @@ class LowStockTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  //  "skuFilter: schema attributes and data type" should
-  //    "match into dfCustomerProductShortlist and dfItr30DayData" in {
-  //
-  //      val result = lowStock.skuFilter(dfCustomerProductShortlist, dfItr30DayData)
-  //      assert(result != null)
-  //
-  //    }
+  "skuFilter: schema attributes and data type" should
+    "match into dfCustomerProductShortlist and dfItr30DayData" in {
+
+      val result = LowStock.skuFilter(dfCustomerProductShortlist, dfItr30DayData)
+      assert(result != null)
+
+    }
 
 }

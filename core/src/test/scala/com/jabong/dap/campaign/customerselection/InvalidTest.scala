@@ -39,7 +39,7 @@ class InvalidTest extends FlatSpec with SharedSparkContext {
 
   "One days orders data" should "return null successful orders" in {
     val expectedOrders = invalidCustomerSelection.getSuccessfulOrders(salesOrderItemDataFrame)
-    assert(expectedOrders.count() == 3)
+    assert(expectedOrders.count() == 9)
   }
 
   "One days orders data" should "return null invalid orders" in {

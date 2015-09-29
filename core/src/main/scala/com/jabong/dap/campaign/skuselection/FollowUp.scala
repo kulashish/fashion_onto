@@ -30,7 +30,8 @@ object FollowUp extends Logging {
         itrData(ProductVariables.BRAND),
         itrData(ProductVariables.BRICK),
         itrData(ProductVariables.MVP),
-        itrData(ProductVariables.GENDER))
+        itrData(ProductVariables.GENDER),
+        itrData(ProductVariables.PRODUCT_NAME))
 
     logger.info("Join selected customer sku with sku data and filter by stock>=" + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
     //generate reference skus

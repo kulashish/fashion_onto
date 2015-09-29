@@ -6,6 +6,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
 import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -37,7 +38,8 @@ class WishlistFollowupCampaign {
       col(ProductVariables.BRAND),
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
-      col(ProductVariables.GENDER)
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME)
     ).cache()
 
     // ***** mobile push use case

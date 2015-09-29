@@ -25,7 +25,7 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
     CampaignOutput.setTestMode(true)
     salesCart30Days = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "sales_cart", Schema.salesCart)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "itr", TestSchema.basicSimpleItr)
-    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "brick_mvp_recommendations")
+    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/new_arrivals_brand", "brand_mvp_recommendations")
   }
 
   feature("Generate New Arrivals Brand"){
