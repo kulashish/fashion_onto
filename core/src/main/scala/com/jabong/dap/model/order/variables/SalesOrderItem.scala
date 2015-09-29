@@ -2,7 +2,7 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -161,29 +161,88 @@ object SalesOrderItem {
 
   /**
    *
-   * @param salesOrderItemInc
+   * @param salesOrderItemIncr
    * @return
    */
-  def getSuccessfullOrders(salesOrderItemInc: DataFrame, salesOrderFull: DataFrame, salesPrev: DataFrame): (DataFrame, DataFrame) = {
-    val successOrders = salesOrderItemInc
-      .select(salesOrderItemInc(SalesOrderItemVariables.FK_SALES_ORDER), Udf.successOrder(salesOrderItemInc(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)) as "STATUS")
+  def getSuccessfullOrdersBrand(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame,
+                                dfSuccessOrdersCalcPrevFull: DataFrame, dfFavBrandCalcPrevFull: DataFrame,
+                                yestItr: DataFrame): (DataFrame, DataFrame, DataFrame, DataFrame) = {
+    val soiIncrSelected = salesOrderItemIncr
+      .select(
+        salesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER),
+        salesOrderItemIncr(SalesOrderItemVariables.SKU),
+        Udf.successOrder(salesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)) as "STATUS"
+      ).cache()
 
-    val successOrdersJoined = successOrders.join(salesOrderFull, successOrders(SalesOrderItemVariables.FK_SALES_ORDER) === salesOrderFull(SalesOrderVariables.ID_SALES_ORDER)).
-      select(
+    val salesOrderJoined = soiIncrSelected.join(salesOrderFull, soiIncrSelected(SalesOrderItemVariables.FK_SALES_ORDER) === salesOrderFull(SalesOrderVariables.ID_SALES_ORDER))
+    val (ordersCount, successOrdersUnion) = getSuccessfullOrders(salesOrderJoined, dfSuccessOrdersCalcPrevFull)
+
+    val (favBrandIncr, favBrandUnion) = getMostPreferredBrand(salesOrderJoined, dfFavBrandCalcPrevFull, yestItr)
+
+    (ordersCount, successOrdersUnion, favBrandIncr, favBrandUnion)
+  }
+
+  def getMostPreferredBrand(salesOrderJoined: DataFrame, dfFavBrandCalcPrevFull: DataFrame, yestItr: DataFrame): (DataFrame, DataFrame) = {
+    val salesOrderJoinedIncr = salesOrderJoined.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU)
+      .except(dfFavBrandCalcPrevFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU))
+    val mostPrefBrandJoinedIncr = salesOrderJoined.join(yestItr, salesOrderJoined(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE))
+      .select(
         col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
-        col("STATUS")
-      ).filter("STATUS = 1").
-        dropDuplicates()
-
-    var newOrders = successOrdersJoined
-    var salesUnion = successOrdersJoined
-    if (null != salesPrev) {
-      newOrders = successOrdersJoined.except(salesPrev)
-      salesUnion = salesPrev.unionAll(successOrdersJoined)
+        col(SalesOrderItemVariables.SKU),
+        col(ProductVariables.BRAND),
+        col(ProductVariables.SPECIAL_PRICE)
+      )
+    var mostPrefBrandIncr = mostPrefBrandJoinedIncr
+    var mostPrefBrandUnion = mostPrefBrandJoinedIncr
+    if (null != dfFavBrandCalcPrevFull) {
+      mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr)
+      mostPrefBrandIncr = mostPrefBrandJoinedIncr.join(mostPrefBrandUnion,
+        mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
+        SQL.LEFT_OUTER)
+        .select(
+          mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
+          mostPrefBrandUnion(SalesOrderVariables.ID_SALES_ORDER),
+          mostPrefBrandUnion(SalesOrderItemVariables.SKU),
+          mostPrefBrandUnion(ProductVariables.BRAND),
+          mostPrefBrandUnion(ProductVariables.SPECIAL_PRICE))
     }
-    val ordersCount = newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
-    (ordersCount, salesUnion)
+
+    val SUM_SPECIAL_PRICE = "sum_special_price"
+    val COUNT_BRAND = "count_brand"
+
+    val favBrandIncr = mostPrefBrandIncr.groupBy(SalesOrderVariables.FK_CUSTOMER, ProductVariables.BRAND)
+      .agg(count(ProductVariables.BRAND) as COUNT_BRAND, sum(ProductVariables.SPECIAL_PRICE) as SUM_SPECIAL_PRICE)
+      .sort(COUNT_BRAND, SUM_SPECIAL_PRICE)
+      .groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(last(ProductVariables.BRAND) as SalesOrderItemVariables.FAV_BRAND)
+
+    (favBrandIncr, mostPrefBrandUnion)
+  }
+
+  /**
+   *
+   * @param salesOrderJoined
+   * @return
+   */
+  def getSuccessfullOrders(salesOrderJoined: DataFrame, dfSalesOrderItemCalcPrevFull: DataFrame): (DataFrame, DataFrame) = {
+    val successOrdersJoined = salesOrderJoined
+      .select(
+        col(SalesOrderVariables.FK_CUSTOMER),
+        col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
+        col("STATUS"))
+      .filter("STATUS = 1")
+      .dropDuplicates()
+    var newOrders = successOrdersJoined
+    var successOrdersUnion = successOrdersJoined
+    if (null != dfSalesOrderItemCalcPrevFull) {
+      newOrders = successOrdersJoined.except(dfSalesOrderItemCalcPrevFull)
+      successOrdersUnion = dfSalesOrderItemCalcPrevFull.unionAll(newOrders)
+    }
+    val ordersCount = newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+
+    (ordersCount, successOrdersUnion)
   }
 
   /**
