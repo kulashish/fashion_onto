@@ -2,7 +2,7 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
