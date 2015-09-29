@@ -9,6 +9,7 @@ import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
+import org.apache.spark.sql.Row
 
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
@@ -540,7 +541,7 @@ object UdfUtils {
   }
 
 
-  def getElementInTupleArray(strings: ArrayBuffer[(String,String,String,String)], i: Int, value: Int): String = {
-    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i).productElement(value))
+  def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
+    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
 }
