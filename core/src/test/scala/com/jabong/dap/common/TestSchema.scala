@@ -2,6 +2,7 @@ package com.jabong.dap.common
 
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.types._
 
 /**
@@ -22,7 +23,7 @@ object TestSchema {
 
   val mvp_seg = StructType(Array(
     StructField(CustomerSegmentsVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerSegmentsVariables.MVP_TYPE, IntegerType, true),
+    StructField(ContactListMobileVars.MVP_TYPE, IntegerType, true),
     StructField(CustomerSegmentsVariables.SEGMENT, IntegerType, true),
     StructField(CustomerSegmentsVariables.DISCOUNT_SCORE, IntegerType, true)
   ))
@@ -151,7 +152,8 @@ object TestSchema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
-    StructField(ProductVariables.STOCK, LongType, true)
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
 
   val recommendationSku = StructType(Array(
@@ -178,12 +180,13 @@ object TestSchema {
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.BRICK, StringType, true),
-      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.SKU, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
+      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.BRAND, StringType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false)))
 
   val genRecInput = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(CampaignMergedFields.REF_SKU, StringType, false),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SKU, StringType, true)))), false),
     StructField(TestConstants.TEST_CASE_FILTER, LongType, true)))
 
@@ -204,7 +207,9 @@ object TestSchema {
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
-    StructField(ProductVariables.STOCK, LongType, true)
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),
+    StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))

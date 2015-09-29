@@ -81,7 +81,8 @@ class Invalid extends LiveCustomerSelector with Logging {
         customerInValidItemsData("invalid_" + SalesOrderVariables.FK_SALES_ORDER) as (SalesOrderVariables.FK_SALES_ORDER),
         customerInValidItemsData("invalid_" + CustomerVariables.FK_CUSTOMER) as (CustomerVariables.FK_CUSTOMER),
         customerInValidItemsData("invalid_" + ProductVariables.SKU) as (ProductVariables.SKU_SIMPLE),
-        customerInValidItemsData("invalid_" + SalesOrderItemVariables.UNIT_PRICE) as (SalesOrderItemVariables.UNIT_PRICE))
+        customerInValidItemsData("invalid_" + SalesOrderItemVariables.UNIT_PRICE) as (SalesOrderItemVariables.UNIT_PRICE),
+        customerInValidItemsData("invalid_" + SalesOrderItemVariables.UPDATED_AT) as (SalesOrderItemVariables.CREATED_AT))
 
     return customerSelected
   }

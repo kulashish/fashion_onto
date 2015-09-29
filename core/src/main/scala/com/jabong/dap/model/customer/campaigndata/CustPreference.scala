@@ -2,13 +2,13 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, NewsletterPreferencesVariables, NewsletterVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.variables.NewsletterPreferences
-import com.jabong.dap.common.constants.variables.{ NewsletterPreferencesVariables, NewsletterVariables }
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -17,39 +17,51 @@ import org.apache.spark.sql.DataFrame
 object CustPreference {
 
   def start(vars: ParamInfo) = {
-
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = vars.saveMode
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-
-    val (nls, custPref) = readDf(incrDate, prevDate)
-
-    val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
+    val fullPath = OptionUtils.getOptValue(vars.path)
+    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate)
 
-    //TODO change email with UID
-    DataWriter.writeParquet(custPrefFull, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
 
-    val res = custPrefFull.select(
-      custPrefFull(NewsletterVariables.EMAIL) as "UID",
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS),
-      custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
-      custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS))
-    DataWriter.writeCsv(res, ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, "CUST_PREFERENCE.csv", DataSets.IGNORE_SAVEMODE, "true", ",")
+      val (nls, custPref) = readDf(incrDate, prevDate, fullPath)
 
+      val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
+
+      custPrefFull.cache()
+
+      //TODO change email with UID
+      DataWriter.writeParquet(custPrefFull, savePath, saveMode)
+
+      val res = custPrefFull.select(
+        custPrefFull(NewsletterVariables.EMAIL) as ContactListMobileVars.UID,
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS),
+        custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS),
+        custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ)
+      )
+
+      val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_PREFERENCE", DataSets.IGNORE_SAVEMODE, "true", ";")
+    }
   }
 
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String, fullPath: String): (DataFrame, DataFrame) = {
+    var dfNls: DataFrame = null
+    var dfcustPrefPrevFull: DataFrame = null
+    if (null != fullPath) {
+      dfNls = DataReader.getDataFrame4mFullPath(fullPath, DataSets.PARQUET)
+    } else {
+      dfNls = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, incrDate)
+      dfcustPrefPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, prevDate)
+    }
 
-    val dfNls = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, incrDate)
-
-    val dfcustPrefPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, prevDate)
-
-    return (dfNls, dfcustPrefPrevFull)
+    (dfNls, dfcustPrefPrevFull)
   }
 
 }

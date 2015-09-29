@@ -8,7 +8,7 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -16,19 +16,22 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ DataFrame, Row }
+
+import scala.annotation.elidable
+import scala.annotation.elidable._
 
 /**
  * Utility Class
  */
 object CampaignUtils extends Logging {
 
+  var testMode: Boolean = false
+
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
-  import sqlContext.implicits._
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -57,7 +60,7 @@ object CampaignUtils extends Logging {
     val referenceSkus = generateReferenceSkus(refSkuData, 100)
     val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String)]].take(NumberSku),
       (t(2).asInstanceOf[List[Row]]))).map(t => Row(t._1, t._2, t._3, createRefSkuAcartUrl(t._4)))
-    val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSku)
+    val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSkuWithACartUrl)
     return refSkuForAcart
   }
 
@@ -170,7 +173,7 @@ object CampaignUtils extends Logging {
 
     //    refSkuData.printSchema()
 
-    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
+    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(col(CustomerVariables.FK_CUSTOMER),
         col(ProductVariables.SKU_SIMPLE),
@@ -183,7 +186,15 @@ object CampaignUtils extends Logging {
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
-    val customerSkuMap = customerData.map(t => ((t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))), (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(), t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString, checkNullString(t(t.fieldIndex(ProductVariables.BRAND))), checkNullString(t(t.fieldIndex(ProductVariables.BRICK))), checkNullString(t(t.fieldIndex(ProductVariables.MVP))), checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
+    val customerSkuMap = customerData.map(t => (
+      (t(t.fieldIndex(CustomerVariables.FK_CUSTOMER))),
+      (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
+        t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString,
+        checkNullString(t(t.fieldIndex(ProductVariables.BRAND))),
+        checkNullString(t(t.fieldIndex(ProductVariables.BRICK))),
+        checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
+        checkNullString(t(t.fieldIndex(ProductVariables.GENDER))))))
+
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[Long], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
@@ -199,7 +210,11 @@ object CampaignUtils extends Logging {
   def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
-    return refSKusList.sortBy(-_._1).distinct.take(numSKus)
+    val refList = refSKusList.sortBy(-_._1).distinct
+    val listSize = refList.size
+    var numberSkus = numSKus
+    if (numberSkus > refList.size) numberSkus = listSize
+    return refList.take(numberSkus)
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
@@ -265,7 +280,9 @@ object CampaignUtils extends Logging {
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData, inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER)
       && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(ProductVariables.SKU_SIMPLE), inputData(ProductVariables.SPECIAL_PRICE))
+      .select(
+        inputData("*")
+      )
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -367,9 +384,13 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(
         inputData(CustomerVariables.FK_CUSTOMER),
-        //inputData(CustomerVariables.EMAIL),
+        inputData(CustomerVariables.EMAIL),
         inputData(ProductVariables.SKU),
-        inputData(ProductVariables.SPECIAL_PRICE)
+        inputData(ProductVariables.SPECIAL_PRICE),
+        inputData(ProductVariables.BRAND),
+        inputData(ProductVariables.BRICK),
+        inputData(ProductVariables.MVP),
+        inputData(ProductVariables.GENDER)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -635,10 +656,8 @@ object CampaignUtils extends Logging {
    */
   def createRefSkuAcartUrl(skuSimpleList: List[Row]): (String) = {
     var acartUrl = CampaignCommon.ACART_BASE_URL
-    println(acartUrl)
     var i: Int = 0
     for (skuSimple <- skuSimpleList) {
-      println("LIST:-" + skuSimple)
       if (i == 0) acartUrl += skuSimple(1) else acartUrl = acartUrl + "," + skuSimple(1)
       i = i + 1;
     }
@@ -683,7 +702,7 @@ object CampaignUtils extends Logging {
     )
 
     val dfResult = dfJoin.select(
-      col(CustomerVariables.FK_CUSTOMER),
+      skuFilter("*"),
       col(ProductVariables.SKU_SIMPLE),
       col("ITR_" + ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
       col(ProductVariables.BRAND),
@@ -704,11 +723,13 @@ object CampaignUtils extends Logging {
 
     var custFiltered = filteredSku
 
-    if (pastCampaignCheck) {
+    if (pastCampaignCheck && !testMode) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
       custFiltered = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, filteredSku,
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
+
+    debug(custFiltered, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
 
     if (campaignType.equalsIgnoreCase(DataSets.PUSH_CAMPAIGNS)) {
       pushCampaignPostProcess(campaignType, campaignName, custFiltered)
@@ -734,6 +755,8 @@ object CampaignUtils extends Logging {
       refSkus = CampaignUtils.generateReferenceSku(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
 
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
+
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, campaignName)
 
     //save campaign Output for mobile
@@ -749,25 +772,36 @@ object CampaignUtils extends Logging {
   def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame) = {
 
     var refSkus: DataFrame = null
-
     if (campaignName.startsWith("acart")) {
       //generate reference sku for acart with acart url
       refSkus = CampaignUtils.generateReferenceSkusForAcart(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
-    } else if (campaignName.startsWith("surf")) {
-      refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
-    } else {
+    } //FIXME: need to handle null customer id for surf campaigns
+    //else if (campaignName.startsWith("surf")) {
+    // refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
+    //}
+    else {
       refSkus = CampaignUtils.generateReferenceSkus(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
     }
+
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
+    var campaignOutput: DataFrame = null
 
+    if (campaignName == CampaignCommon.NEW_ARRIVALS_BRAND) campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, Recommendation.BRAND_MVP_SUB_TYPE)
+    else campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
+
+    debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
     //save campaign Output for mobile
     CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
   }
 
+  @elidable(FINE) def debug(data: DataFrame, name: String) {
+    println("Count of " + name + ":-" + data.count() + "\n")
+    data.printSchema()
+  }
 }
 

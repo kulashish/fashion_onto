@@ -14,60 +14,37 @@ import org.apache.spark.sql.DataFrame
  */
 class SurfCampaign extends Logging {
 
-  def runCampaign(): Unit = {
-
-    // surf 1,2,6
-    // one day surf session data
-    val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData()
-
-    // not bought for last day
-    val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData()
-    val fullOrderData = CampaignInput.loadFullOrderData()
-    val yestOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
-
-    val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData()
-
-    // load customer master record for email id to fk_customer mapping
-    val customerMasterData = loadCustomerMasterData()
-
-    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+  def runCampaign(
+    yestSurfSessionData: DataFrame,
+    yestItrSkuData: DataFrame,
+    customerMasterData: DataFrame,
+    yestOrderData: DataFrame,
+    yestOrderItemData: DataFrame,
+    lastDaySurf3Data: DataFrame,
+    last30DaySalesOrderData: DataFrame,
+    last30DaySalesOrderItemData: DataFrame,
+    brickMvpRecommendations: DataFrame) = {
 
     // common customer selection for surf 1, 2, 6
     val surf1Campaign = new Surf1Campaign()
-    surf1Campaign.runCampaign(past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
+    surf1Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, brickMvpRecommendations)
 
     val surf2Campaign = new Surf2Campaign()
-    surf2Campaign.runCampaign(past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
+    surf2Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, brickMvpRecommendations)
 
     val surf6Campaign = new Surf6Campaign()
-    surf6Campaign.runCampaign(past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData)
-
-    //surf3
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-
-    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
-    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    surf6Campaign.runCampaign(yestSurfSessionData, yestItrSkuData, customerMasterData, yestOrderData, yestOrderItemData, brickMvpRecommendations)
 
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     val surf3DataPath = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, "Surf3ProcessedVariable", DataSets.DAILY_MODE, dateYesterday)
+
     if (DataVerifier.dataExists(surf3DataPath)) {
-      val lastDaySurf3Data = CampaignInput.loadLastDaySurf3Data()
       val surf3Campaign = new Surf3Campaign()
-      surf3Campaign.runCampaign(past30DayCampaignMergedData, lastDaySurf3Data, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData)
+      surf3Campaign.runCampaign(lastDaySurf3Data, yestItrSkuData, customerMasterData, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations)
     } else {
       println("Note: Surf3 campaign not run due to surf 3 data not available")
     }
 
-  }
-
-  def loadCustomerMasterData(): DataFrame = {
-
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last day customer master data from hdfs")
-
-    //        val customerMasterData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, "2015/07/29")
-    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
-    customerMasterData
   }
 
 }

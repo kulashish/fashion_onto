@@ -6,7 +6,7 @@ import com.jabong.dap.campaign.skuselection.Wishlist
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -14,7 +14,7 @@ import org.apache.spark.sql.functions._
 class WishlistLowStockCampaign {
 
   // wishlist low stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr
-  def runCampaign(past30DayCampaignMergedData: DataFrame, customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
+  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
     // select customers who have added one or more items to wishlist during 30 days
 
     // sku filter
@@ -42,14 +42,18 @@ class WishlistLowStockCampaign {
     val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
-      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
-    )
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
+    ).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dfUnion)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dfUnion)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_LOWSTOCK_CAMPAIGN, dfUnion, true, brickMvpRecommendations)
 
   }
 

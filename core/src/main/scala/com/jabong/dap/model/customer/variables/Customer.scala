@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, NewsletterVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, NewsletterVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.merge.common.MergeUtils
@@ -130,16 +130,16 @@ object Customer {
       col(CustomerVariables.LAST_NAME),
       col(CustomerVariables.PHONE),
       col(CustomerVariables.CITY),
-      col(CustomerVariables.IS_CONFIRMED) as CustomerVariables.VERIFICATION_STATUS,
-      col(NewsletterVariables.NLS_CREATED_AT) as NewsletterVariables.NL_SUB_DATE,
-      col(NewsletterVariables.UNSUBSCRIBE_KEY) as NewsletterVariables.UNSUB_KEY,
+      col(CustomerVariables.IS_CONFIRMED) as ContactListMobileVars.VERIFICATION_STATUS,
+      col(NewsletterVariables.NLS_CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
+      col(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
 
-      Udf.age(dfJoin(CustomerVariables.BIRTHDAY)) as CustomerVariables.AGE,
+      Udf.age(dfJoin(CustomerVariables.BIRTHDAY)) as ContactListMobileVars.AGE,
 
       Udf.minTimestamp(
         dfJoin(CustomerVariables.CREATED_AT),
         dfJoin(NewsletterVariables.NLS_CREATED_AT)
-      ) as CustomerVariables.REG_DATE,
+      ) as ContactListMobileVars.REG_DATE,
 
       Udf.maxTimestamp(
         dfJoin(CustomerVariables.UPDATED_AT),
@@ -153,7 +153,7 @@ object Customer {
       udfEmailOptInStatus(
         dfJoin(NewsletterVariables.NLS_EMAIL),
         dfJoin(NewsletterVariables.STATUS)
-      ) as CustomerVariables.EMAIL_SUBSCRIPTION_STATUS
+      ) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS
     )
 
     var dfFull: DataFrame = dfInc
@@ -195,19 +195,19 @@ object Customer {
 
         Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
-        Udf.latestBool(joinDF(CustomerVariables.VERIFICATION_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.VERIFICATION_STATUS)) as CustomerVariables.VERIFICATION_STATUS,
+        Udf.latestBool(joinDF(ContactListMobileVars.VERIFICATION_STATUS), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
 
-        Udf.latestTimestamp(joinDF(NewsletterVariables.NL_SUB_DATE), joinDF(CustomerVariables.NEW_ + NewsletterVariables.NL_SUB_DATE)) as NewsletterVariables.NL_SUB_DATE,
+        Udf.latestTimestamp(joinDF(ContactListMobileVars.NL_SUB_DATE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
 
-        Udf.latestString(joinDF(NewsletterVariables.UNSUB_KEY), joinDF(CustomerVariables.NEW_ + NewsletterVariables.UNSUB_KEY)) as NewsletterVariables.UNSUB_KEY,
+        Udf.latestString(joinDF(ContactListMobileVars.UNSUB_KEY), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
 
-        Udf.latestInt(joinDF(CustomerVariables.AGE), joinDF(CustomerVariables.NEW_ + CustomerVariables.AGE)) as CustomerVariables.AGE,
+        Udf.latestInt(joinDF(ContactListMobileVars.AGE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
 
-        Udf.minTimestamp(joinDF(CustomerVariables.REG_DATE), joinDF(CustomerVariables.NEW_ + CustomerVariables.REG_DATE)) as CustomerVariables.REG_DATE,
+        Udf.minTimestamp(joinDF(ContactListMobileVars.REG_DATE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
 
         Udf.maxTimestamp(joinDF(CustomerVariables.LAST_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
 
-        Udf.latestString(joinDF(CustomerVariables.EMAIL_SUBSCRIPTION_STATUS), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL_SUBSCRIPTION_STATUS)) as CustomerVariables.EMAIL_SUBSCRIPTION_STATUS
+        Udf.latestString(joinDF(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS
       )
     }
 

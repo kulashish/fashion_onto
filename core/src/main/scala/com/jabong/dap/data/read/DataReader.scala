@@ -127,11 +127,42 @@ object DataReader extends Logging {
 
     val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
     logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
+
     if (DataVerifier.dataExists(fetchPath, filename))
       Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fetchPath)
     else {
       logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
       throw new DataNotFound
+    }
+  }
+
+  def getDataFrame4mCsvOrNull(basePath: String, source: String, tableName: String, mode: String, date: String, filename: String, header: String, delimiter: String): DataFrame = {
+    require(basePath != null, "Base Path is null")
+    require(source != null, "Source Type is null")
+    require(tableName != null, "Table Name is null")
+    require(mode != null, "Mode is null")
+    require(date != null, "Date is null")
+
+    val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
+    logger.info("Reading data from hdfs: " + fetchPath + File.separator + filename + " in csv format")
+    try {
+      if (DataVerifier.dataExists(fetchPath, filename))
+        Spark.getSqlContext().read.format("com.databricks.spark.csv").option("header", header).option("delimiter", delimiter).load(fetchPath)
+      else {
+        logger.error("Data not found for the path %s and filename %s".format(fetchPath, filename))
+        null
+      }
+    } catch {
+      case e: DataNotFound =>
+        logger.info("Data not found for the path %s and filename %s".format(fetchPath, filename))
+        null
+      case e: UnsupportedOperationException =>
+        if ("empty collection".equalsIgnoreCase(e.getMessage)) {
+          logger.info("Empty file for the path %s and filename %s".format(fetchPath, filename))
+          null
+        } else {
+          throw e
+        }
     }
   }
 

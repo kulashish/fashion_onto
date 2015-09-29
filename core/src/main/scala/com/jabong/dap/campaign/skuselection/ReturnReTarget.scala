@@ -27,7 +27,7 @@ object ReturnReTarget {
       .select(
         orderItemDataFrame(CustomerVariables.FK_CUSTOMER),
         orderItemDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
-        orderItemDataFrame(SalesOrderItemVariables.UNIT_PRICE) as ProductVariables.SPECIAL_PRICE)
+        orderItemDataFrame(SalesOrderItemVariables.UNIT_PRICE))
 
     //val refSku = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 

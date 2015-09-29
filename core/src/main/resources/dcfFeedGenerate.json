@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "dcfFeedGenerate",
+      "input" : "clickstream.merge_pagevisit",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

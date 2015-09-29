@@ -27,7 +27,11 @@ object LowStock extends Logging {
       .filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
       .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
         customerSkuData(ProductVariables.SKU_SIMPLE),
-        itrDataFrame(ProductVariables.SPECIAL_PRICE))
+        itrDataFrame(ProductVariables.SPECIAL_PRICE),
+        itrDataFrame(ProductVariables.BRAND),
+        itrDataFrame(ProductVariables.BRICK),
+        itrDataFrame(ProductVariables.MVP),
+        itrDataFrame(ProductVariables.GENDER))
 
     //  val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 

@@ -14,22 +14,24 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartLowStockCampaign {
 
-  def runCampaign(past30DayCampaignMergedData: DataFrame, last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame): Unit = {
+  def runCampaign(last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for last day
     val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
+    CampaignUtils.debug(selectedCustomers, "AcartLowStockCampaigns selected Customer ")
     //sku selection
     //filter sku based on lowstock filter
-    val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData)
+    val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
+    CampaignUtils.debug(filteredSku, "AcartLowStockCampaigns filteredSku ")
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 

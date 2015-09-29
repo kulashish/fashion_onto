@@ -19,7 +19,7 @@ class InvalidLowStockCampaign {
    * @param orderItemData
    * @param itrData
    */
-  def runCampaign(past30DayCampaignMergedData: DataFrame, customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
@@ -28,13 +28,13 @@ class InvalidLowStockCampaign {
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
     //sku selection
-    val filteredSku = LowStock.skuFilter(selectedCustomers, itrData)
+    val filteredSku = LowStock.skuFilter(selectedCustomers, itrData).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 }

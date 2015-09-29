@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "smsOptOutMerger",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

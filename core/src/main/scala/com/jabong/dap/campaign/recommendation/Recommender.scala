@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.recommendation
 
+import com.jabong.dap.common.constants.campaign.Recommendation
 import org.apache.spark.sql.DataFrame
 
 import scala.collection.immutable.HashMap
@@ -11,6 +12,6 @@ trait Recommender extends java.io.Serializable {
 
   // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
   // 8 recommendations
-  def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame): DataFrame
+  def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = null): DataFrame
 
 }

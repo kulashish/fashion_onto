@@ -10,6 +10,7 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -24,7 +25,7 @@ object DcfFeedGenerator extends Logging {
     val hiveContext = Spark.getHiveContext()
     val executeDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    val clickstreamTable = OptionUtils.getOptValue(params.input, DataSets.DCF_INPUT_MERGED_HIVE_TABLE)
+    val clickstreamTable = OptionUtils.getOptValue(params.input, ClickStreamConstant.MERGE_PAGEVISIT)
     val monthYear = TimeUtils.getMonthAndYear(executeDate, TimeConstants.DATE_FORMAT_FOLDER)
     val month = monthYear.month + 1
     val date = monthYear.day

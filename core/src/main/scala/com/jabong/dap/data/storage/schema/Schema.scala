@@ -308,8 +308,8 @@ object Schema {
 
   val emailCampaignSchema = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
-    StructField(CampaignMergedFields.REF_SKU1, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.REC_SKU, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true),
     StructField(CustomerVariables.EMAIL, StringType, true)
   ))
@@ -361,11 +361,46 @@ object Schema {
   val finalReferenceSku = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
-    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true),
-      StructField(ProductVariables.BRAND, StringType, true), StructField(ProductVariables.BRICK, StringType, true), StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.GENDER, StringType, true)))), false),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
-    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
 
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(
+      StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),
+        StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+        StructField(ProductVariables.BRAND, StringType, true),
+        StructField(ProductVariables.BRICK, StringType, true),
+        StructField(ProductVariables.MVP, StringType, true),
+        StructField(ProductVariables.GENDER, StringType, true)))), false)
+  ))
+
+  val expectedFinalReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(
+      StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),
+        StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+        StructField(ProductVariables.BRAND, StringType, true),
+        StructField(ProductVariables.BRICK, StringType, true),
+        StructField(ProductVariables.MVP, StringType, true),
+        StructField(ProductVariables.GENDER, StringType, true)))), false),
+
+      StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+      StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
+  ))
+
+
+  val finalReferenceSkuWithACartUrl = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(
+      StructType(Array(StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),
+        StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+        StructField(ProductVariables.BRAND, StringType, true),
+        StructField(ProductVariables.BRICK, StringType, true),
+        StructField(ProductVariables.MVP, StringType, true),
+        StructField(ProductVariables.GENDER, StringType, true)))), false),
+
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
 }

@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, SalesOrderItemVariables, SalesOrderVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -44,7 +44,7 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
     val dfResult = last30DaySalesOrderData.join(dfJoin, last30DaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER) === dfJoin(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)
       .select(col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
-        col(SalesOrderItemVariables.SKU)
+        col(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE
       )
 
     return dfResult

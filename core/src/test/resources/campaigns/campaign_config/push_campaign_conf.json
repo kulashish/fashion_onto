@@ -1,5 +1,4 @@
 {
-  "pushBasePath":"misc/pushCampaignTestRun",
   "pushCampaignList": [
     {
       "campaignName": "cancel_retarget",

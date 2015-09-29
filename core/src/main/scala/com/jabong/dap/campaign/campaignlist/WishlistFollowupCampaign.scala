@@ -4,13 +4,13 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.skuselection.Wishlist
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerProductShortlistVariables }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 class WishlistFollowupCampaign {
-  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame): Unit = {
+  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     // select customers who have added one or more items to wishlist during last day
 
@@ -33,14 +33,18 @@ class WishlistFollowupCampaign {
     val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
       col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
-      col(CustomerProductShortlistVariables.SPECIAL_PRICE)
-    )
+      col(CustomerProductShortlistVariables.SPECIAL_PRICE),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER)
+    ).cache()
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false, brickMvpRecommendations)
   }
 
 }

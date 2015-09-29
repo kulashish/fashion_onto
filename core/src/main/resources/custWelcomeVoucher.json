@@ -1,0 +1,11 @@
+{
+  "params": [
+    {
+      "source": "custWelcomeVoucher",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
+

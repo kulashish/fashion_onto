@@ -38,6 +38,7 @@ object DataSets {
 
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
+  val PRICING_SKU_DATA = "pricingSKUData"
 
   val DEVICES_IOS = "devices_ios"
   val DEVICES_ANDROID = "devices_android"
@@ -120,12 +121,12 @@ object DataSets {
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
 
   //DCF FEEDS
-  val DCF_INPUT_MERGED_HIVE_TABLE = "merge.merge_pagevisit"
   val CLICKSTREAM_MERGED_FEED = "clickstream_merged_feed"
   val DCF_FEED_FILENAME = "webhistory_"
+  val DCF_FEED_GENERATE = "dcfFeedGenerate"
 
   //Campaign Quality
-  val CAMPAIGN_QUALITY = "campaign_quality"
+  val CAMPAIGN_QUALITY = "campaignQuality"
 
   //recommendations
   val RECOMMENDATIONS = "recommendations"
@@ -137,11 +138,13 @@ object DataSets {
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
+  val BLOCK_LIST_NUMBERS = "block_list_numbers"
   val ZONE_CITY = "zone_city"
   val CUST_PREFERENCE = "custPreference"
   val CUST_WELCOME_VOUCHER = "custWelcomeVoucher"
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
+  val SOLUTIONS_INFINITI = "solutionsInfiniti"
 
   // type of campaigns
   val PUSH_CAMPAIGNS = "push_campaigns"
