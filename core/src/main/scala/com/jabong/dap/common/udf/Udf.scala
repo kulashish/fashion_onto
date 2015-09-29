@@ -146,4 +146,6 @@ object Udf {
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
+  val addString =  udf((s: String,constant: String) => UdfUtils.addString(s: String,constant: String))
+
 }

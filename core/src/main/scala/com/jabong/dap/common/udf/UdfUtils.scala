@@ -544,4 +544,8 @@ object UdfUtils {
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
+
+  def addString(value:String ,constant:String): String = {
+    if(value == null) return null else constant+value+constant
+  }
 }
