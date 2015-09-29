@@ -31,6 +31,7 @@ object CampaignCommon {
   val MERGED_CAMPAIGN = "merged"
   val WISHLIST_FOLLOWUP_CAMPAIGN = "wishlist_followup"
   val WISHLIST_LOWSTOCK_CAMPAIGN = "wishlist_lowstock"
+  val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10

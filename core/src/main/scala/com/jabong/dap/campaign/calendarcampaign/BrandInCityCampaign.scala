@@ -10,9 +10,9 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 14/9/15.
  */
-class DCFBrandInCityCampaign {
+class BrandInCityCampaign {
 
-  def runCampaign(yestCustomerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame, recommendationsData: DataFrame) = {
+  def runCampaign(yestCustomerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.CUSTOMER_PREFERRED_DATA)
