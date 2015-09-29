@@ -50,6 +50,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.brand") as ProductVariables.BRAND,
+      refSkuExploded("ref_sku_fields.productName") as ProductVariables.PRODUCT_NAME,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     var recommendationJoined: DataFrame = null
@@ -69,6 +70,9 @@ class LiveCommonRecommender extends Recommender with Logging {
       // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
       recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
       completeRefSku(CampaignMergedFields.REF_SKU),
+      completeRefSku(ProductVariables.BRAND) as CampaignMergedFields.LIVE_BRAND,
+      completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_BRICK,
+      completeRefSku(ProductVariables.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
@@ -102,19 +106,22 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[String], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[(String, String, String, String)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
     val topRow = iterable.head
     val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
-    val referenceSkus: mutable.MutableList[String] = mutable.MutableList()
+    val referenceSkus: mutable.MutableList[(String, String, String, String)] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
     val mailType = topRow(campaignMailTypeIndex).asInstanceOf[Int]
     val acartUrl = CampaignUtils.checkNullString(topRow(acartUrlIndex))
     val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKU)
+    val liveBrandIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRAND)
+    val liveBrickIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRICK)
+    val liveProdNameIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_PROD_NAME)
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) 8 else 4
     for (row <- iterable) {
@@ -122,7 +129,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
-      referenceSkus += row(refSkuIndex).toString
+      referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)), CampaignUtils.checkNullString(row(liveProdNameIndex))))
+
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)
   }

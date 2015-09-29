@@ -3,6 +3,7 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.util.Date
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -536,5 +537,10 @@ object UdfUtils {
   }
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
     if(i>=strings.size) "" else strings(i)
+  }
+
+
+  def getElementInTupleArray(strings: ArrayBuffer[(String,String,String,String)], i: Int, value: Int): String = {
+    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i).productElement(value))
   }
 }

@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
@@ -367,28 +367,27 @@ object CampaignManager extends Serializable with Logging {
           CampaignProcessor.mergeEmailCampaign(allCampaignsData)
         }
 
-      println("Starting write parquet after repartitioning and caching for "+campaignType)
+      println("Starting write parquet after repartitioning and caching for " + campaignType)
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-      if(campaignType==DataSets.PUSH_CAMPAIGNS){
+      if (campaignType == DataSets.PUSH_CAMPAIGNS) {
         val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
         val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
         DataWriter.writeParquet(finalCampaign, writePath, saveMode)
         CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
-      }
-      else{
-        val GARBAGE="NA" //:TODO replace with correct value
+      } else {
+        val GARBAGE = "NA" //:TODO replace with correct value
         val expectedDF = mergedData
-          .withColumn(ContactListMobileVars.UID,lit(GARBAGE))
-          .withColumn(ContactListMobileVars.EMAIL,lit("**")+col(CustomerVariables.EMAIL)+"**")
+          .withColumn(ContactListMobileVars.UID, lit(GARBAGE))
+          .withColumn(ContactListMobileVars.EMAIL, lit("**") + col(CustomerVariables.EMAIL) + "**")
           .withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
 
-          .withColumn(CampaignMergedFields.LIVE_BRAND, lit(GARBAGE))
-          .withColumn(CampaignMergedFields.LIVE_BRICK, lit(GARBAGE))
-          .withColumn(CampaignMergedFields.LIVE_PROD_NAME,lit(GARBAGE))
+          .withColumn(CampaignMergedFields.LIVE_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+          .withColumn(CampaignMergedFields.LIVE_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(3)))
+          .withColumn(CampaignMergedFields.LIVE_PROD_NAME, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
 
-          .withColumn(CampaignMergedFields.LIVE_REF_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REF_SKUS), lit(0)))
-          .withColumn(CampaignMergedFields.LIVE_REF_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REF_SKUS), lit(1)))
-          .withColumn(CampaignMergedFields.LIVE_REF_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REF_SKUS), lit(2)))
+          .withColumn(CampaignMergedFields.LIVE_REF_SKU + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.LIVE_REF_SKU + "2", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(1), lit(1)))
+          .withColumn(CampaignMergedFields.LIVE_REF_SKU + "3", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(2), lit(1)))
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(0)))
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(1)))
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(2)))

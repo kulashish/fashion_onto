@@ -28,13 +28,13 @@ class SalesRuleTest extends FlatSpec with SharedSparkContext {
   }
 
   "The result Dataframe" should "have size 4" in {
-    var wcCodes = SalesRule.getCode(df1, 1)
-    assert(wcCodes.collect.size == 4)
+    val wcCodes = SalesRule.getCode(df1, "3")
+    assert(wcCodes.count() == 6)
   }
 
   "The result Dataframe" should "have size 3" in {
-    var wcCodes = SalesRule.getCode(df1, 2)
-    assert(wcCodes.collect.size == 3)
+    val wcCodes = SalesRule.getCode(df1, "5")
+    assert(wcCodes.count == 3)
   }
 
   //  override def afterAll() {
