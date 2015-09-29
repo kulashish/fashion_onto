@@ -50,6 +50,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.brand") as ProductVariables.BRAND,
+      refSkuExploded("ref_sku_fields.productName") as ProductVariables.BRAND,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     var recommendationJoined: DataFrame = null
@@ -71,6 +72,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(CampaignMergedFields.REF_SKU),
       completeRefSku(ProductVariables.BRAND) as CampaignMergedFields.LIVE_BRAND,
       completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_BRICK,
+      completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_PROD_NAME,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
@@ -119,6 +121,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKU)
     val liveBrandIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRAND)
     val liveBrickIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRICK)
+    val liveProdNameIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_PROD_NAME)
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) 8 else 4
     for (row <- iterable) {
@@ -127,7 +130,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
       referenceSkus += ((row(refSkuIndex).toString ,CampaignUtils.checkNullString(row(liveBrandIndex))
-        ,CampaignUtils.checkNullString(row(liveBrickIndex)),""))
+        ,CampaignUtils.checkNullString(row(liveBrickIndex)),CampaignUtils.checkNullString(row(liveProdNameIndex))))
 
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)
