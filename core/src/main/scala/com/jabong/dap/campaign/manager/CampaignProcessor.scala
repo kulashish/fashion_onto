@@ -93,7 +93,7 @@ object CampaignProcessor {
   def mapEmailCampaignWithCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
 
-    val notNullCampaign = campaign.filter(!(col(CampaignMergedFields.CUSTOMER_ID) === 0))
+    val notNullCampaign = campaign.filter(!(col(CustomerVariables.FK_CUSTOMER) === 0))
 
     println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
 
@@ -112,9 +112,9 @@ object CampaignProcessor {
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CampaignMergedFields.CUSTOMER_ID) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
+    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.FK_CUSTOMER) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
       .select(
-        bcCampaign(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+        bcCampaign(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
         bcCampaign(CampaignMergedFields.REC_SKUS),
@@ -233,7 +233,7 @@ object CampaignProcessor {
 
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
     allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
-      .agg(first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
+      .agg(first(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         first(CampaignMergedFields.REF_SKUS) as CampaignMergedFields.REF_SKUS,
         first(CampaignMergedFields.REC_SKUS) as CampaignMergedFields.REC_SKUS,
         first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,

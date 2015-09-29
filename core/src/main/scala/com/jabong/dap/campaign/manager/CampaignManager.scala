@@ -369,7 +369,7 @@ object CampaignManager extends Serializable with Logging {
           CampaignProcessor.mergeEmailCampaign(allCamp)
         }
 
-      CampaignUtils.debug(mergedData,"merged data frame for"+campaignType)
+      CampaignUtils.debug(mergedData, "merged data frame for" + campaignType)
       println("Starting write parquet after repartitioning and caching for " + campaignType)
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (campaignType == DataSets.PUSH_CAMPAIGNS) {
@@ -381,9 +381,8 @@ object CampaignManager extends Serializable with Logging {
         val GARBAGE = "NA" //:TODO replace with correct value
         val expectedDF = mergedData
           .withColumn(ContactListMobileVars.UID, lit(GARBAGE))
-          .withColumn(ContactListMobileVars.EMAIL, lit("**") + col(CustomerVariables.EMAIL) + "**")
+          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
           .withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
-
           .withColumn(CampaignMergedFields.LIVE_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
           .withColumn(CampaignMergedFields.LIVE_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
           .withColumn(CampaignMergedFields.LIVE_PROD_NAME, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(3)))
@@ -407,9 +406,11 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CustomerVariables.FK_CUSTOMER)
+          .drop(CampaignMergedFields.CUSTOMER_ID)
+          .drop(CustomerVariables.EMAIL)
+          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
 
-        CampaignUtils.debug(expectedDF,"expectedDF final before writing data frame for"+campaignType)
+        CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, TimeUtils.changeDateFormat(dateFolder, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD), saveMode, "true", ";")
       }
