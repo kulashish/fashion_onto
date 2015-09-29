@@ -50,7 +50,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.mvp") as ProductVariables.MVP,
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.brand") as ProductVariables.BRAND,
-      refSkuExploded("ref_sku_fields.productName") as ProductVariables.BRAND,
+      refSkuExploded("ref_sku_fields.productName") as ProductVariables.PRODUCT_NAME,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     var recommendationJoined: DataFrame = null
@@ -72,7 +72,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(CampaignMergedFields.REF_SKU),
       completeRefSku(ProductVariables.BRAND) as CampaignMergedFields.LIVE_BRAND,
       completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_BRICK,
-      completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_PROD_NAME,
+      completeRefSku(ProductVariables.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
