@@ -408,6 +408,7 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.REC_SKUS)
           .drop(CampaignMergedFields.CUSTOMER_ID)
+          .drop(CustomerVariables.EMAIL)
 
         CampaignUtils.debug(expectedDF,"expectedDF final before writing data frame for"+campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
