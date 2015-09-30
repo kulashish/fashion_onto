@@ -131,6 +131,8 @@ object Udf {
 
   val bigDecimal2Double = udf((d: java.math.BigDecimal) => UdfUtils.bigDecimal2Double(d: java.math.BigDecimal))
 
+  val udfEmailOptInStatus = udf((nls_email: String, status: String) => UdfUtils.getEmailOptInStatus(nls_email: String, status: String))
+
   /**
    * email will return s1 if either s is empty or null
    */

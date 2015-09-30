@@ -3,17 +3,17 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, _ }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, _}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments }
-import com.jabong.dap.model.order.variables.{ SalesOrder, SalesOrderAddress, SalesOrderItem }
+import com.jabong.dap.model.customer.variables.CustomerSegments
+import com.jabong.dap.model.order.variables.{SalesOrder, SalesOrderAddress, SalesOrderItem}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -55,8 +55,6 @@ import org.apache.spark.sql.functions._
  *
  */
 object ContactListMobile extends Logging {
-
-  val udfEmailOptInStatus = udf((nls_email: String, status: String) => Customer.getEmailOptInStatus(nls_email: String, status: String))
 
   /**
    * Start Method for the contact_list_mobile.csv generation for email campaigns.
@@ -348,7 +346,7 @@ object ContactListMobile extends Logging {
         customerSeg(ContactListMobileVars.MVP_TYPE),
         customerSeg(CustomerSegmentsVariables.SEGMENT),
         customerSeg(CustomerSegmentsVariables.DISCOUNT_SCORE),
-        udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        Udf.udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
         nls(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
         Udf.maxTimestamp(customerSeg(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT)
