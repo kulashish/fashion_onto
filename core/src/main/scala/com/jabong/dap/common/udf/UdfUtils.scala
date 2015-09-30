@@ -9,6 +9,7 @@ import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
+import org.apache.spark.sql.Row
 
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
@@ -527,12 +528,12 @@ object UdfUtils {
     if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s else s1
   }
 
-  def successOrder(i: Int): Int = {
+  def successOrder(i: Long): Int = {
     val successCodes = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
     if (successCodes.contains(i)) {
-      return 1
+      1
     } else {
-      return 0
+      0
     }
   }
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
@@ -540,7 +541,11 @@ object UdfUtils {
   }
 
 
-  def getElementInTupleArray(strings: ArrayBuffer[(String,String,String,String)], i: Int, value: Int): String = {
-    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i).productElement(value))
+  def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
+    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+  }
+
+  def addString(value:String ,constant:String): String = {
+    if(value == null) return null else constant+value+constant
   }
 }

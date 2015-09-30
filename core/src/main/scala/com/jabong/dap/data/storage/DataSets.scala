@@ -8,7 +8,6 @@ object DataSets {
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
-  val SALES_ORDER_ITEM_ORDERS_COUNT = "sales_order_item/ordersCount"
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
@@ -39,6 +38,10 @@ object DataSets {
   val SKU_DATA = "sku_data"
   val PRICING = "pricing"
   val PRICING_SKU_DATA = "pricingSKUData"
+
+  // precalculated values for email campaigns
+  val SUCCESSFUL_ORDERS_COUNT = "successfulOrdersCount"
+  val FAV_BRAND = "favBrand"
 
   val DEVICES_IOS = "devices_ios"
   val DEVICES_ANDROID = "devices_android"
