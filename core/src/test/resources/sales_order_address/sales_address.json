@@ -13,6 +13,10 @@
 {"fk_customer":1, "city":"Hyderabad","phone":"1230", "first_name":"a", "last_name": "A"}
 {"fk_customer":3, "city":"Hyderabad","phone":"2220", "first_name":"c", "last_name": "C"}
 {"fk_customer":1, "city":"Bangalore","phone":"1230", "first_name":"a", "last_name": "a"}
+{"fk_customer":1, "city":"Bangalore","phone":"1230", "first_name":"a", "last_name": ""}
 {"fk_customer":1, "city":"","phone":null, "first_name":"", "last_name": ""}
 {"fk_customer":2, "city":" ","phone":null, "first_name":" ", "last_name": " "}
 {"fk_customer":4, "city":"","phone":null, "first_name":"", "last_name": ""}
+{"fk_customer":4, "city":"","phone":null, "first_name":"abc", "last_name": ""}
+{"fk_customer":5, "city":"","phone":null, "first_name":"abc1", "last_name": ""}
+{"fk_customer":7, "city":"","phone":null, "first_name":"", "last_name": ""}
