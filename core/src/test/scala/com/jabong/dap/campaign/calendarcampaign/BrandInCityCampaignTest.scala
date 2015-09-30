@@ -25,11 +25,11 @@ class BrandInCityCampaignTest extends FeatureSpec with GivenWhenThen with Shared
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     CampaignOutput.setTestMode(true)
+    yestCustomerData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "customer")
     last6thDaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "sales_order", Schema.salesOrder)
     last6thDaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "sales_order_item", Schema.salesOrderItem)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "itr", TestSchema.basicSimpleItr)
-    brickMvpRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "brick_mvp_recommendations")
-    yestCustomerData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "customer")
+    brickMvpRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign", "brick_mvp_recommendations")
   }
 
   feature("Generate customer favorite brand"){

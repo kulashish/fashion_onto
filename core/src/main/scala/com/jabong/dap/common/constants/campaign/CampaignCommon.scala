@@ -33,9 +33,12 @@ object CampaignCommon {
   val WISHLIST_LOWSTOCK_CAMPAIGN = "wishlist_lowstock"
   val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
   val PRICEPOINT_CAMPAIGN = "pricepoint"
+  val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
+  val BEAUTY_CAMPAIGN = "beauty_campaign"
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
+  val LAST_FIVE_PURCHASES = 5
 
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"

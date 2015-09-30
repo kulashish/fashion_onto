@@ -712,7 +712,9 @@ object CampaignUtils extends Logging {
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
       col(ProductVariables.GENDER),
-      col(ProductVariables.PRODUCT_NAME)
+      col(ProductVariables.PRODUCT_NAME),
+      col(ProductVariables.CATEGORY),
+      col(ProductVariables.PRICE_BAND)
     )
 
     dfResult

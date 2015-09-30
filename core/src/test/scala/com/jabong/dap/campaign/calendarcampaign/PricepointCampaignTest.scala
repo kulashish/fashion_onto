@@ -30,7 +30,7 @@ class PricepointCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
     last20thDaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "sales_order", Schema.salesOrder)
     last20thDaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "sales_order_item", Schema.salesOrderItem)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "itr", TestSchema.basicSimpleItr)
-    brickMvpRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "brick_mvp_recommendations")
+    brickMvpRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign", "brick_mvp_recommendations")
   }
 
   feature("Generate Price Point"){
