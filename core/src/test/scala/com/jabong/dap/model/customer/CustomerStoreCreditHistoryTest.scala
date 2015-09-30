@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{TestSchema, SharedSparkContext}
+import com.jabong.dap.common.{ TestSchema, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -11,7 +11,7 @@ import org.scalatest.FlatSpec
 /**
  * Created by pooja on 30/9/15.
  */
-class CustomerStoreCreditHistoryTest  extends FlatSpec with SharedSparkContext {
+class CustomerStoreCreditHistoryTest extends FlatSpec with SharedSparkContext {
 
   @transient var dfCSH: DataFrame = _
 
@@ -38,11 +38,11 @@ class CustomerStoreCreditHistoryTest  extends FlatSpec with SharedSparkContext {
   "getLastJrCovertDate: schema attributes and data type" should
     "match into DataFrame(dfCSH)" in {
 
-    val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
+      val result = CustomerStorecreditsHistory.getLastJrCovertDate(dfCSH: DataFrame)
 
-    assert(result != null)
+      assert(result != null)
 
-  }
+    }
 
   "getLastJrCovertDate: Data Frame" should "match to resultant Data Frame" in {
 

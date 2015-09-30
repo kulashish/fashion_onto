@@ -1,7 +1,7 @@
 package com.jabong.dap.model.customer
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, TestSchema}
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.variables.CustomerSegments
@@ -38,11 +38,11 @@ class CustomerSegmentsTest extends FlatSpec with SharedSparkContext {
   "getMvpAndSeg: schema attributes and data type" should
     "match into DataFrame(dfCSH)" in {
 
-    val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
+      val result = CustomerSegments.getCustomerSegments(dfCustomerSegments: DataFrame)
 
-    assert(result != null)
+      assert(result != null)
 
-  }
+    }
 
   "getMvpAndSeg: Data Frame" should "match to resultant Data Frame" in {
 
