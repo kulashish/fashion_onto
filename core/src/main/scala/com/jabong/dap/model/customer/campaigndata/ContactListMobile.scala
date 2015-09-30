@@ -283,7 +283,7 @@ object ContactListMobile extends Logging {
 
         Udf.latestInt(joinDF(ContactListMobileVars.AGE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
 
-        Udf.latestString(joinDF(CustomerVariables.REWARD_TYPE), joinDF(CustomerVariables.NEW_ + CustomerVariables.REWARD_TYPE)) as CustomerVariables.REWARD_TYPE,
+        Udf.latestString(joinDF(ContactListMobileVars.PLATINUM_STATUS), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
 
         lit("") as ContactListMobileVars.IS_REFERED, //IS_REFERRED
 
