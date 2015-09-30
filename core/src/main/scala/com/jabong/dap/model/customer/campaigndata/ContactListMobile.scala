@@ -431,7 +431,7 @@ object ContactListMobile extends Logging {
         mergedIncr(SalesAddressVariables.CITY),
         mergedIncr(SalesAddressVariables.FIRST_NAME),
         mergedIncr(CustomerVariables.LAST_NAME),
-        mergedIncr(CustomerVariables.PHONE),
+        mergedIncr(SalesAddressVariables.MOBILE),
         mergedIncr(ContactListMobileVars.LAST_ORDER_DATE),
         mergedIncr(CustomerVariables.LAST_UPDATED_AT),
         mergedIncr(ContactListMobileVars.NET_ORDERS),
@@ -441,7 +441,7 @@ object ContactListMobile extends Logging {
 
     val dndBc = Spark.getContext().broadcast(dnd).value
 
-    val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(CustomerVariables.PHONE), SQL.LEFT_OUTER)
+    val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(SalesAddressVariables.MOBILE), SQL.LEFT_OUTER)
       .select(
         cityJoined(CustomerVariables.ID_CUSTOMER),
         cityJoined(CustomerVariables.EMAIL),
@@ -460,7 +460,7 @@ object ContactListMobile extends Logging {
         cityJoined(SalesAddressVariables.CITY),
         cityJoined(SalesAddressVariables.FIRST_NAME),
         cityJoined(CustomerVariables.LAST_NAME),
-        cityJoined(CustomerVariables.PHONE),
+        cityJoined(SalesAddressVariables.MOBILE),
         cityJoined(ContactListMobileVars.LAST_ORDER_DATE),
         cityJoined(CustomerVariables.LAST_UPDATED_AT),
         cityJoined(ContactListMobileVars.NET_ORDERS),
@@ -471,7 +471,7 @@ object ContactListMobile extends Logging {
 
     val smsBc = Spark.getContext().broadcast(smsOptOut).value
 
-    val res = dndMerged.join(smsBc, dndMerged(DNDVariables.MOBILE_NUMBER) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
+    val res = dndMerged.join(smsBc, dndMerged(SalesAddressVariables.MOBILE) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
       .select(
         dndMerged(CustomerVariables.ID_CUSTOMER),
         dndMerged(CustomerVariables.EMAIL),
@@ -490,7 +490,7 @@ object ContactListMobile extends Logging {
         dndMerged(SalesAddressVariables.CITY),
         dndMerged(SalesAddressVariables.FIRST_NAME),
         dndMerged(CustomerVariables.LAST_NAME),
-        dndMerged(CustomerVariables.PHONE),
+        dndMerged(SalesAddressVariables.MOBILE),
         dndMerged(ContactListMobileVars.LAST_ORDER_DATE),
         dndMerged(CustomerVariables.LAST_UPDATED_AT),
         dndMerged(ContactListMobileVars.NET_ORDERS),
