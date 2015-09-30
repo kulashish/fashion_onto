@@ -36,7 +36,8 @@ object SalesOrder {
       salesOrderCalcIncr
     } else {
       val joinedDF = salesOrderCalcFull.unionAll(salesOrderCalcIncr)
-      val salesOrderCalcNewFull = joinedDF.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(
+      val salesOrderCalcNewFull = joinedDF.groupBy(SalesOrderVariables.FK_CUSTOMER)
+        .agg(
         max(ContactListMobileVars.LAST_ORDER_DATE) as ContactListMobileVars.LAST_ORDER_DATE,
         max(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.UPDATED_AT,
         min(SalesOrderVariables.FIRST_ORDER_DATE) as SalesOrderVariables.FIRST_ORDER_DATE,
