@@ -29,15 +29,14 @@ object CustWelcomeVoucher extends Logging {
 
     if (DataWriter.canWrite(saveMode, savePath)) {
 
-      val (salesRuleIncr, welCodesprevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
+      val (salesRuleIncr, welCodesPrevFull, customerFull) = readDf(incrDate, prevDate, fullpath)
 
-      val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesprevFull).cache()
+      val welCodes = SalesRule.createWcCodes(salesRuleIncr, welCodesPrevFull).cache()
+      logger.info("after getting the codes from salesRule Table")
 
       //TODO add UID
       DataWriter.writeParquet(welCodes, savePath, saveMode)
 
-      val date = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
-      val ts = TimeUtils.getTimeStamp(date, TimeConstants.DATE_TIME_FORMAT)
       val res = welCodes.join(customerFull, welCodes(SalesRuleVariables.FK_CUSTOMER) === customerFull(CustomerVariables.ID_CUSTOMER))
         .select(
           coalesce(welCodes(SalesRuleVariables.FK_CUSTOMER), customerFull(CustomerVariables.ID_CUSTOMER)) as ContactListMobileVars.UID,
@@ -48,10 +47,10 @@ object CustWelcomeVoucher extends Logging {
           welCodes(SalesRuleVariables.CODE2),
           welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
           welCodes(SalesRuleVariables.CODE2_VALID_DATE))
-        .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(ts) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(ts))
-
+        .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(TimeUtils.getTimeStamp()) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(TimeUtils.getTimeStamp()))
+      logger.info("after filter on date")
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_WELCOME_VOUCHERS", DataSets.IGNORE_SAVEMODE, "true", ";")
+      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_WELCOME_VOUCHER, DataSets.DAILY_MODE, incrDate, "53699_28346_" + fileDate + "_CUST_WELCOME_VOUCHERS", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
   }
 

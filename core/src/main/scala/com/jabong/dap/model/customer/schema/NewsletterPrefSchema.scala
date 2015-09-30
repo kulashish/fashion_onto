@@ -12,10 +12,10 @@ object NewsletterPrefSchema {
     StructField(NewsletterPreferencesVariables.EMAIL, StringType, true),
     StructField(NewsletterPreferencesVariables.PREF_NL_SALE, BooleanType, true),
     StructField(NewsletterPreferencesVariables.PREF_NL_FASHION, BooleanType, true),
-    StructField(NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS, BooleanType, true),
+    StructField(NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS, BooleanType, true),
     StructField(NewsletterPreferencesVariables.PREF_ALERTS, BooleanType, true),
     StructField(NewsletterPreferencesVariables.PREF_NL_CLEARANCE, BooleanType, true),
-    StructField(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS, BooleanType, true),
+    StructField(NewsletterPreferencesVariables.PREF_NL_NEWARIVALS, BooleanType, true),
     StructField(NewsletterPreferencesVariables.PREF_NL_FREQ, StringType, true)
   ))
 }

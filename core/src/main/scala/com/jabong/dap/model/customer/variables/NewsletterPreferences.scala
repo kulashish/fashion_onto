@@ -18,9 +18,9 @@ object NewsletterPreferences extends Logging {
       col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull as NewsletterPreferencesVariables.PREF_ALERTS,
       col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_SALE as NewsletterPreferencesVariables.PREF_NL_SALE,
       col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_FASHION as NewsletterPreferencesVariables.PREF_NL_FASHION,
-      col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_RECOMMENDATIONS as NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS,
+      col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_RECOMMENDATIONS as NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS,
       col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_CLEARANCE as NewsletterPreferencesVariables.PREF_NL_CLEARANCE,
-      col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_NEWARRIVALS as NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS,
+      col(NewsletterVariables.NEWSLETTER_PREFERENCES).isNotNull && col(NewsletterVariables.NEWSLETTER_PREFERENCES) contains NewsletterPreferencesVariables.STR_PREF_NL_NEWARRIVALS as NewsletterPreferencesVariables.PREF_NL_NEWARIVALS,
       col(NewsletterVariables.FREQUENCY) as NewsletterPreferencesVariables.PREF_NL_FREQ
     )
     dfResult

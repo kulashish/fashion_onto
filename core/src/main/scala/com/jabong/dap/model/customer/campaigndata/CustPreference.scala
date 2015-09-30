@@ -26,28 +26,33 @@ object CustPreference {
 
     if (DataWriter.canWrite(saveMode, savePath)) {
 
-      val (nls, custPref) = readDf(incrDate, prevDate, fullPath)
+      val (nls, custPrefPrevFull) = readDf(incrDate, prevDate, fullPath)
 
-      val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPref)
+      val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPrefPrevFull)
 
       custPrefFull.cache()
 
       //TODO change email with UID
       DataWriter.writeParquet(custPrefFull, savePath, saveMode)
 
-      val res = custPrefFull.select(
-        custPrefFull(NewsletterVariables.EMAIL) as ContactListMobileVars.UID,
-        custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
-        custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
-        custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMMENDATIONS),
-        custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS),
-        custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
-        custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARRIVALS),
-        custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ)
-      )
+      var res1: DataFrame = custPrefFull
+      if (null != custPrefPrevFull) {
+        res1 = custPrefFull.except(custPrefPrevFull)
+      }
+
+      val res = res1
+        .select(
+          custPrefFull(NewsletterVariables.EMAIL) as ContactListMobileVars.UID,
+          custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
+          custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
+          custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS),
+          custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS),
+          custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
+          custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARIVALS),
+          custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ))
 
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUST_PREFERENCE", DataSets.IGNORE_SAVEMODE, "true", ";")
+      DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.DAILY_MODE, incrDate, "53699_28335_" + fileDate + "_CUST_PREFERENCE", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
   }
 

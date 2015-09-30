@@ -30,6 +30,9 @@ print $date_with_zero . "\n";
 my $date_with_hiphen = strftime "%Y-%m-%d", localtime(time() - 60*60*24);
 print $date_with_hiphen . "\n";
 
+my $date_with_zero_today = strftime "%Y%m%d", localtime(time());
+print $date_with_zero_today . "\n";
+
 if ($component eq "campaigns") {
     uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
@@ -39,8 +42,15 @@ if ($component eq "campaigns") {
 } elsif ($component eq "dcf_feed") {
     upload_dcf_feed();
 } elsif ($component eq "pricing_sku_data") {
-      upload_pricing_sku_data();
+    upload_pricing_sku_data();
+} elsif ($component eq "custWelcomeVoucher") {
+    upload_email_campaigns_custWelcomeVoucher();
+} elsif ($component eq "custPreference") {
+    upload_email_campaigns_custPreference();
+} elsif ($component eq "contactListMobile") {
+    upload_email_campaigns_contactListMobile
 }
+
 
 
 
@@ -153,7 +163,7 @@ sub upload_ad4push_customer_response {
    system("hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/ad4push_customer_response_$date_with_zero.csv $base/");
 
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
-   system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
+   # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
 
 }
 
@@ -193,6 +203,57 @@ sub upload_dcf_feed {
 
      system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
      system("lftp -c \"open -u shortlistdump,dumpshortlist 54.254.101.71 ;  mput -O webhistory_data/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
+}
+
+sub upload_email_campaigns_custWelcomeVoucher {
+    my $base = "/data/export/$date_with_zero/custWelcomeVoucher";
+    print "custWelcomeVoucher directory is $base\n";
+    system("mkdir -p $base");
+
+    # 53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
+    my $filename = "53699_28346_$date_with_zero_today"."_CUST_WELCOME_VOUCHERS.csv";
+
+    # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
+    print "hadoop fs -get /data/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/\n";
+
+    # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
+    system("hadoop fs -get /data/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+}
+
+sub upload_email_campaigns_custPreference {
+    my $base = "/data/export/$date_with_zero/custPreference";
+    print "custWelcomeVoucher directory is $base\n";
+    system("mkdir -p $base");
+
+    # 53699_28335_20150927_CUST_PREFERENCE.csv
+    my $filename = "53699_28335_$date_with_zero_today"."_CUST_PREFERENCE.csv";
+
+    # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
+    print "hadoop fs -get /data/tmp/variables/custPreference/daily/$date/$filename $base/\n";
+
+    # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
+    system("hadoop fs -get /data/tmp/variables/custPreference/daily/$date/$filename $base/");
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+}
+
+sub upload_email_campaigns_contactListMobile {
+    my $base = "/data/export/$date_with_zero/contactListMobile";
+    print "contactListMobile directory is $base\n";
+    system("mkdir -p $base");
+
+    # 53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
+    my $filename = "53699_28334_$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
+
+    # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
+    print "hadoop fs -get /data/tmp/variables/contactListMobile/daily/$date/$filename $base/\n";
+
+    # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
+    system("hadoop fs -get /data/tmp/variables/contactListMobile/daily/$date/$filename $base/");
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
 }
 
 sub dcf_file_format_change{

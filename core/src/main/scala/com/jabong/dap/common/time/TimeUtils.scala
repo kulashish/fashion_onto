@@ -2,8 +2,7 @@ package com.jabong.dap.common.time
 
 import java.sql.Timestamp
 import java.text.{ DateFormatSymbols, SimpleDateFormat }
-import java.util
-import java.util.{ Calendar, Date }
+import java.util.{ Arrays, Calendar, Date }
 import com.jabong.dap.common.StringUtils
 import grizzled.slf4j.Logging
 import scala.collection.immutable.HashMap
@@ -161,6 +160,12 @@ object TimeUtils extends Logging {
     val sdf = new SimpleDateFormat(dateFormat)
     val dt = sdf.parse(date)
     val time = dt.getTime()
+    val ts = new Timestamp(time)
+    ts
+  }
+
+  def getTimeStamp(): Timestamp = {
+    val time = (new Date()).getTime()
     val ts = new Timestamp(time)
     ts
   }
@@ -406,7 +411,7 @@ object TimeUtils extends Logging {
   def nextNDay(dayName: String, n: Int): String = {
     val dfs = new DateFormatSymbols()
     val dayNameCaps = dayName.capitalize
-    val weekDays = util.Arrays.copyOfRange(dfs.getWeekdays(), 1, 8)
+    val weekDays = Arrays.copyOfRange(dfs.getWeekdays(), 1, 8)
 
     val index = weekDays.indexOf(dayNameCaps)
     if (index == -1) {

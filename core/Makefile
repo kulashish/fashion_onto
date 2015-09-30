@@ -17,6 +17,7 @@ package:
 	cp scripts/ftp_upload.pl $(BASE)/bin/
 	cp scripts/dcf_feed_upload.sh $(BASE)/bin/
 	cp scripts/pricing_sku_data.sh $(BASE)/bin/
+	cp scripts/emailCampaignVariables.sh $(BASE)/bin/
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/
 	cp scripts/ad4push_device_merger.pl $(BASE)/bin/
 	cp scripts/responsys.pl $(BASE)/bin/
