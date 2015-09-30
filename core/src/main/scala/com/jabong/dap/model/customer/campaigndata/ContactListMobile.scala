@@ -3,20 +3,17 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.ContactListMobileVars
-import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, _}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
-import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments }
-import com.jabong.dap.model.order.variables.{ SalesOrder, SalesOrderAddress, SalesOrderItem }
+import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments}
+import com.jabong.dap.model.order.variables.{SalesOrder, SalesOrderAddress, SalesOrderItem}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -215,16 +212,14 @@ object ContactListMobile extends Logging {
     dfBlockedNumbers: DataFrame,
     dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
 
+    println("inside the getContactListMobileDF")
+
     if (null == dfCustomerIncr || null == dfNLSIncr || null == dfDND || null == dfSmsOptOut || null == dfBlockedNumbers || null == dfZoneCity) {
       log("Data frame should not be null")
       return null
     }
 
-    if (!SchemaUtils.isSchemaEqual(dfCustomerIncr.schema, Schema.customer) ||
-      !SchemaUtils.isSchemaEqual(dfNLSIncr.schema, Schema.nls)) {
-      log("schema attributes or data type mismatch")
-      return null
-    }
+    println("After null check")
 
     val nls = dfNLSIncr.select(
       col(NewsletterVariables.EMAIL) as NewsletterVariables.NLS_EMAIL,
@@ -233,11 +228,19 @@ object ContactListMobile extends Logging {
       col(NewsletterVariables.CREATED_AT) as NewsletterVariables.NLS_CREATED_AT,
       col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT)
 
+    println("after nls calc " + nls.count())
+
     val dfSmsOptOutMerged = dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER).unionAll(dfBlockedNumbers.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
+
+    println("after smsOptOutMerged " + dfSmsOptOutMerged.count())
 
     val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged)
 
+    println("after mergeIncrData " + dfMergedIncr.count())
+
     if (null != dfContactListMobilePrevFull) {
+
+      println("inside dfContactListMobilePrevFull not null")
 
       //join old and new data frame
       val joinDF = MergeUtils.joinOldAndNewDF(dfMergedIncr, dfContactListMobilePrevFull, CustomerVariables.ID_CUSTOMER)
@@ -302,12 +305,14 @@ object ContactListMobile extends Logging {
       )
       (dfFull.except(dfContactListMobilePrevFull), dfFull)
     } else {
+      println("With dfContactListMobilePrevFull null")
       (dfMergedIncr, dfMergedIncr)
     }
 
   }
 
   def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame): DataFrame = {
+    println("Inside mergeIncrData")
 
     val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -315,7 +320,7 @@ object ContactListMobile extends Logging {
         customerIncr(CustomerVariables.EMAIL),
         customerIncr(CustomerVariables.BIRTHDAY) as ContactListMobileVars.DOB,
         customerIncr(CustomerVariables.GENDER),
-        customerIncr(ContactListMobileVars.REG_DATE),
+        customerIncr(CustomerVariables.CREATED_AT),
         customerIncr(CustomerVariables.FIRST_NAME),
         customerIncr(CustomerVariables.LAST_NAME),
         customerIncr(CustomerVariables.PHONE),
