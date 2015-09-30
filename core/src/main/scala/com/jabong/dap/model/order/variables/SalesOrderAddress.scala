@@ -42,7 +42,7 @@ object SalesOrderAddress {
     if (null == str) {
       return ""
     }
-    return str.toString()
+    return str.toString().trim()
   }
 
   /**
@@ -66,26 +66,37 @@ object SalesOrderAddress {
     val a = scala.collection.mutable.ListBuffer[String]()
     val b = scala.collection.mutable.ListBuffer[String]()
     val c = scala.collection.mutable.ListBuffer[String]()
+    val default = (-1, 0)
     list.foreach{ e =>
       val (l, m, n) = e
       if(l.length() > 0) a += l
       if(m.length() > 0) b += m
       if(n.length() > 1) c += n
     }
-    val x = a.groupBy(identity).mapValues(_.length)
-    val amax = x.valuesIterator.max
-    val default = (-1, 0)
-    val fCity = x.find(_._2 == amax).getOrElse(default)._1.toString
-    val y = b.groupBy(identity).mapValues(_.length)
-    val bmax = y.valuesIterator.max
-    val fMobile = y.find(_._2 == bmax).getOrElse(default)._1.toString
-    val z = c.groupBy(identity).mapValues(_.length)
-    val cmax = z.valuesIterator.max
-    val fName = z.find(_._2 == cmax).getOrElse(default)._1.toString
+    var fCity = ""
+    if (a.size > 0) {
+      val x = a.groupBy(identity).mapValues(_.length)
+      val amax = x.valuesIterator.max
+      fCity = x.find(_._2 == amax).getOrElse(default)._1.toString
+    }
+    var fMobile: String = null
+    if (b.size > 0) {
+      val y = b.groupBy(identity).mapValues(_.length)
+      val bmax = y.valuesIterator.max
+      fMobile = y.find(_._2 == bmax).getOrElse(default)._1.toString
+    }
+    var fName = ""
+    var lName = ""
+    if (c.size > 0) {
+      val z = c.groupBy(identity).mapValues(_.length)
+      val cmax = z.valuesIterator.max
+      val name = z.find(_._2 == cmax).getOrElse(default)._1.toString
+      val nameArr = name.split(',')
+      fName = nameArr(0)
+      lName = nameArr(1)
+    }
 
-    val nameArr = fName.split(',')
-
-    return (fCity, fMobile, nameArr(0), nameArr(1))
+    return (fCity, fMobile, fName, lName)
   }
 
   /**
