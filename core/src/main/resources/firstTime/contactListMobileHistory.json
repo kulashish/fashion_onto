@@ -1,0 +1,11 @@
+{
+  "params": [
+    {
+      "source": "contactListMobile",
+      "path": "first time",
+      "incrDate": "2015/09/27",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}
