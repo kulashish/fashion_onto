@@ -16,7 +16,7 @@ my $component;
 GetOptions (
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed | pricing_sku_data\n";
+) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed | pricing_sku_data | contactListMobile | custPreference | custWelcomeVoucher | email_campaigns\n";
 
 
 use POSIX qw(strftime);
@@ -49,6 +49,8 @@ if ($component eq "campaigns") {
     upload_email_campaigns_custPreference();
 } elsif ($component eq "contactListMobile") {
     upload_email_campaigns_contactListMobile
+} elsif ($component eq "email_campaigns") {
+    upload_email_campaigns();
 }
 
 
