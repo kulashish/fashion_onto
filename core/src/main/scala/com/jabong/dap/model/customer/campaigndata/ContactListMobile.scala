@@ -151,7 +151,7 @@ object ContactListMobile extends Logging {
     }
 
     val dfCsv = dfContactListMobileIncr.select(
-      col(ContactListMobileVars.UID),
+      col(CustomerVariables.ID_CUSTOMER) as ContactListMobileVars.UID,
       col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
       col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
@@ -246,7 +246,7 @@ object ContactListMobile extends Logging {
 
       //merge old and new data frame
       val dfFull = joinDF.select(
-        Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as ContactListMobileVars.UID,
+        Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
 
         Udf.latestString(joinDF(CustomerVariables.EMAIL), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
 
@@ -454,7 +454,7 @@ object ContactListMobile extends Logging {
         cityBc(CustomerVariables.ZONE) as ContactListMobileVars.STATE_ZONE,
         cityBc(CustomerVariables.TIER1) as ContactListMobileVars.CITY_TIER)
 
-    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone merge " + cityJoined.count())
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone merge ")
 
     val dndBc = Spark.getContext().broadcast(dnd).value
 
@@ -486,7 +486,7 @@ object ContactListMobile extends Logging {
         cityJoined(ContactListMobileVars.CITY_TIER),
         when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "1").otherwise("0") as ContactListMobileVars.DND)
 
-    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone, dnd merge" + dndMerged.count())
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone, dnd merge ")
 
     val smsBc = Spark.getContext().broadcast(smsOptOut).value
 
@@ -520,7 +520,7 @@ object ContactListMobile extends Logging {
         when(smsBc(DNDVariables.MOBILE_NUMBER).!==(null), "o").otherwise("i") as ContactListMobileVars.MOBILE_PERMISION_STATUS
       )
 
-    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone, dnd, smsOptOut merge " + res.count())
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone, dnd, smsOptOut merge")
 
     res
   }
