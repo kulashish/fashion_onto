@@ -26,12 +26,14 @@ object SalesOrderAddress {
       SalesAddressVariables.PHONE,
       SalesAddressVariables.FIRST_NAME,
       SalesAddressVariables.LAST_NAME)
-    var jData: DataFrame = null
-    if (null == prevFav) {
-      jData = curFav
-    } else {
+    var jData = curFav
+    if (null != prevFav) {
       jData = prevFav.unionAll(curFav)
     }
+    jData.cache()
+
+    println("Count for sales Address Data" + jData.count())
+
     (getFav(jData), jData)
   }
 
