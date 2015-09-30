@@ -21,7 +21,6 @@ class BrandInCityCampaign {
 
     val dfCustomerSelection = customerSelector.customerSelection(yestCustomerData, last6thDaySalesOrderData, last6thDaySalesOrderItemData)
 
-    //FIXME: These fields are coming ID_CUSTOMER, CITY, BRAND, SKU
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
     // ***** email use case

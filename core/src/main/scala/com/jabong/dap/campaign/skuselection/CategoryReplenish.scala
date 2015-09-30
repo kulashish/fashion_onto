@@ -18,6 +18,8 @@ object CategoryReplenish extends Logging {
 
     val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(customerSkuData, yesterdayItrData)
 
+    //FIXME: generate data based on category
+
     return (null, null)
   }
 
