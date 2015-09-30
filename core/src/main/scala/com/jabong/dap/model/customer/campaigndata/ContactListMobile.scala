@@ -414,7 +414,7 @@ object ContactListMobile extends Logging {
 
     val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(cityBc(ContactListMobileVars.CITY)) === Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
       .select(
-        mergedIncr(SalesOrderVariables.FK_CUSTOMER),
+        mergedIncr(CustomerVariables.ID_CUSTOMER),
         mergedIncr(CustomerVariables.EMAIL),
         mergedIncr(ContactListMobileVars.DOB),
         mergedIncr(CustomerVariables.GENDER),
@@ -443,7 +443,7 @@ object ContactListMobile extends Logging {
 
     val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(CustomerVariables.PHONE), SQL.LEFT_OUTER)
       .select(
-        cityJoined(SalesOrderVariables.FK_CUSTOMER),
+        cityJoined(CustomerVariables.ID_CUSTOMER),
         cityJoined(CustomerVariables.EMAIL),
         cityJoined(ContactListMobileVars.DOB),
         cityJoined(CustomerVariables.GENDER),
@@ -473,7 +473,7 @@ object ContactListMobile extends Logging {
 
     val res = dndMerged.join(smsBc, dndMerged(DNDVariables.MOBILE_NUMBER) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
       .select(
-        dndMerged(SalesOrderVariables.FK_CUSTOMER),
+        dndMerged(CustomerVariables.ID_CUSTOMER),
         dndMerged(CustomerVariables.EMAIL),
         dndMerged(ContactListMobileVars.DOB),
         dndMerged(CustomerVariables.GENDER),
