@@ -331,6 +331,8 @@ object ContactListMobile extends Logging {
         custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
         custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE))
 
+    println("After custSegCalcIncr and customerIncr merge")
+
     val customerMerged = customerSeg.join(nls, nls(NewsletterVariables.EMAIL) === customerSeg(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
         coalesce(customerSeg(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -352,38 +354,47 @@ object ContactListMobile extends Logging {
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
         Udf.maxTimestamp(customerSeg(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT)
 
+    println("After custSegCalcIncr, customerIncr, nls merge")
+
     val salesOrderAddress = salesAddrCalFull.join(salesOrderCalcFull, salesAddrCalFull(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(salesAddrCalFull(SalesOrderVariables.FK_CUSTOMER), salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         salesAddrCalFull(SalesAddressVariables.CITY),
-        salesAddrCalFull(SalesAddressVariables.MOBILE),
+        salesAddrCalFull(SalesAddressVariables.PHONE),
         salesAddrCalFull(SalesAddressVariables.FIRST_NAME),
         salesAddrCalFull(SalesAddressVariables.LAST_NAME),
         salesOrderCalcFull(ContactListMobileVars.LAST_ORDER_DATE),
         salesOrderCalcFull(SalesOrderVariables.UPDATED_AT))
 
+    println("After salesAddrCalFull, salesOrderCalcFull merge")
+
     val salesMerged = salesOrderAddress.join(successfulOrdersIncr, successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         salesOrderAddress(SalesAddressVariables.CITY),
-        salesOrderAddress(SalesAddressVariables.MOBILE),
+        salesOrderAddress(SalesAddressVariables.PHONE),
         salesOrderAddress(SalesAddressVariables.FIRST_NAME),
         salesOrderAddress(SalesAddressVariables.LAST_NAME),
         salesOrderAddress(ContactListMobileVars.LAST_ORDER_DATE),
         salesOrderAddress(SalesOrderVariables.UPDATED_AT),
         successfulOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL))
 
+    println("After salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr merge")
+
+
     val brandMerged = salesMerged.join(favBrandIncr, salesMerged(SalesOrderVariables.FK_CUSTOMER) === favBrandIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(salesMerged(SalesOrderVariables.FK_CUSTOMER), favBrandIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         salesMerged(SalesAddressVariables.CITY),
-        salesMerged(SalesAddressVariables.MOBILE),
+        salesMerged(SalesAddressVariables.PHONE),
         salesMerged(SalesAddressVariables.FIRST_NAME),
         salesMerged(SalesAddressVariables.LAST_NAME),
         salesMerged(ContactListMobileVars.LAST_ORDER_DATE),
         salesMerged(SalesOrderVariables.UPDATED_AT),
         salesMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL),
         favBrandIncr(SalesOrderItemVariables.FAV_BRAND))
+
+    println("After salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr merge")
 
     val mergedIncr = customerMerged.join(brandMerged, brandMerged(SalesOrderVariables.FK_CUSTOMER) === customerMerged(CustomerVariables.ID_CUSTOMER))
       .select(
@@ -404,11 +415,13 @@ object ContactListMobile extends Logging {
         brandMerged(SalesAddressVariables.CITY),
         coalesce(customerMerged(CustomerVariables.FIRST_NAME), brandMerged(SalesAddressVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
         coalesce(customerMerged(CustomerVariables.LAST_NAME), brandMerged(SalesAddressVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
-        coalesce(customerMerged(CustomerVariables.PHONE), brandMerged(SalesAddressVariables.MOBILE)) as SalesAddressVariables.MOBILE,
+        coalesce(customerMerged(CustomerVariables.PHONE), brandMerged(SalesAddressVariables.PHONE)) as SalesAddressVariables.PHONE,
         brandMerged(ContactListMobileVars.LAST_ORDER_DATE),
         Udf.maxTimestamp(brandMerged(SalesOrderVariables.UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
         brandMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
         brandMerged(SalesOrderItemVariables.FAV_BRAND))
+
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr merge")
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
 
@@ -431,7 +444,7 @@ object ContactListMobile extends Logging {
         mergedIncr(SalesAddressVariables.CITY),
         mergedIncr(SalesAddressVariables.FIRST_NAME),
         mergedIncr(CustomerVariables.LAST_NAME),
-        mergedIncr(SalesAddressVariables.MOBILE),
+        mergedIncr(SalesAddressVariables.PHONE),
         mergedIncr(ContactListMobileVars.LAST_ORDER_DATE),
         mergedIncr(CustomerVariables.LAST_UPDATED_AT),
         mergedIncr(ContactListMobileVars.NET_ORDERS),
@@ -439,9 +452,11 @@ object ContactListMobile extends Logging {
         cityBc(CustomerVariables.ZONE) as ContactListMobileVars.STATE_ZONE,
         cityBc(CustomerVariables.TIER1) as ContactListMobileVars.CITY_TIER)
 
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone merge")
+
     val dndBc = Spark.getContext().broadcast(dnd).value
 
-    val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(SalesAddressVariables.MOBILE), SQL.LEFT_OUTER)
+    val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(SalesAddressVariables.PHONE), SQL.LEFT_OUTER)
       .select(
         cityJoined(CustomerVariables.ID_CUSTOMER),
         cityJoined(CustomerVariables.EMAIL),
@@ -460,7 +475,7 @@ object ContactListMobile extends Logging {
         cityJoined(SalesAddressVariables.CITY),
         cityJoined(SalesAddressVariables.FIRST_NAME),
         cityJoined(CustomerVariables.LAST_NAME),
-        cityJoined(SalesAddressVariables.MOBILE),
+        cityJoined(SalesAddressVariables.PHONE),
         cityJoined(ContactListMobileVars.LAST_ORDER_DATE),
         cityJoined(CustomerVariables.LAST_UPDATED_AT),
         cityJoined(ContactListMobileVars.NET_ORDERS),
@@ -469,9 +484,11 @@ object ContactListMobile extends Logging {
         cityJoined(ContactListMobileVars.CITY_TIER),
         when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "1").otherwise("0") as ContactListMobileVars.DND)
 
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone, dnd merge")
+
     val smsBc = Spark.getContext().broadcast(smsOptOut).value
 
-    val res = dndMerged.join(smsBc, dndMerged(SalesAddressVariables.MOBILE) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
+    val res = dndMerged.join(smsBc, dndMerged(SalesAddressVariables.PHONE) === smsBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
       .select(
         dndMerged(CustomerVariables.ID_CUSTOMER),
         dndMerged(CustomerVariables.EMAIL),
@@ -490,7 +507,7 @@ object ContactListMobile extends Logging {
         dndMerged(SalesAddressVariables.CITY),
         dndMerged(SalesAddressVariables.FIRST_NAME),
         dndMerged(CustomerVariables.LAST_NAME),
-        dndMerged(SalesAddressVariables.MOBILE),
+        dndMerged(SalesAddressVariables.PHONE),
         dndMerged(ContactListMobileVars.LAST_ORDER_DATE),
         dndMerged(CustomerVariables.LAST_UPDATED_AT),
         dndMerged(ContactListMobileVars.NET_ORDERS),
@@ -500,6 +517,8 @@ object ContactListMobile extends Logging {
         dndMerged(ContactListMobileVars.DND),
         when(smsBc(DNDVariables.MOBILE_NUMBER).!==(null), "o").otherwise("i") as ContactListMobileVars.MOBILE_PERMISION_STATUS
       )
+
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr, cityZone, dnd, smsOptOut merge")
 
     res
   }

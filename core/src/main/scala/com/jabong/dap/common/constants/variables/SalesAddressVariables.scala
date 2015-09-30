@@ -10,7 +10,6 @@ object SalesAddressVariables {
   val CITY = "city"
   val COUNTRY = "country"
   val PHONE = "phone"
-  val MOBILE = "mobile"
   val FIRST_NAME = "first_name"
   val LAST_NAME = "last_name"
 

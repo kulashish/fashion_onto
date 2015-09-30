@@ -26,7 +26,6 @@ object SalesOrderAddress {
       SalesAddressVariables.PHONE,
       SalesAddressVariables.FIRST_NAME,
       SalesAddressVariables.LAST_NAME)
-      .withColumnRenamed(SalesAddressVariables.PHONE, SalesAddressVariables.MOBILE)
     var jData: DataFrame = null
     if (null == prevFav) {
       jData = curFav
