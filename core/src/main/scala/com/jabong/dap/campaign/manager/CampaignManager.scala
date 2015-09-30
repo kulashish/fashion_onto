@@ -410,10 +410,10 @@ object CampaignManager extends Serializable with Logging {
           .drop(CustomerVariables.EMAIL)
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
 
-        val emailCampaignFileName = "53699_33838_"+TimeUtils.getTodayDate(TimeConstants.YYYYMMDD)+"_LIVE_CAMPAIGN"
+        val emailCampaignFileName = "53699_33838_" + TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
-        DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName , saveMode, "true", ";")
+        DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
       }
     }
   }

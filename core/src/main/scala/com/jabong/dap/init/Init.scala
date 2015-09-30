@@ -146,7 +146,7 @@ object Init {
 
       // all pushCampaign quality checks
       case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
-      
+
       //campaign quality check
       case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson)
 

@@ -543,15 +543,14 @@ object UdfUtils {
     }
   }
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
-    if(i>=strings.size) "" else strings(i)
+    if (i >= strings.size) "" else strings(i)
   }
-
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
-    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+    if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
 
-  def addString(value:String ,constant:String): String = {
-    if(value == null) return null else constant+value+constant
+  def addString(value: String, constant: String): String = {
+    if (value == null) return null else constant + value + constant
   }
 }

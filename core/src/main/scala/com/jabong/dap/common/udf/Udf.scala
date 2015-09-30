@@ -142,12 +142,12 @@ object Udf {
 
   val successOrder = udf((i: Long) => UdfUtils.successOrder(i: Long))
 
-  val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a:ArrayBuffer[String], i: Int))
+  val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a: ArrayBuffer[String], i: Int))
 
-  val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value:Int) => UdfUtils.getElementInTupleArray(a:ArrayBuffer[(Row)], i: Int,value:Int))
+  val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: ArrayBuffer[(Row)], i: Int, value: Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
-  val addString =  udf((s: String,constant: String) => UdfUtils.addString(s: String,constant: String))
+  val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
 
 }
