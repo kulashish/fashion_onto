@@ -221,6 +221,7 @@ object ContactListMobile extends Logging {
 
     val nls = dfNLSIncr.select(
       col(NewsletterVariables.EMAIL),
+      col(NewsletterVariables.FK_CUSTOMER),
       col(NewsletterVariables.STATUS),
       col(NewsletterVariables.UNSUBSCRIBE_KEY),
       col(NewsletterVariables.CREATED_AT),
