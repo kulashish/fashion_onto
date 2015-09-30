@@ -193,8 +193,6 @@ sub upload_dcf_feed {
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 
-
-
      print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/\n";
 
      system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/");
@@ -261,7 +259,7 @@ sub upload_email_campaigns_contactListMobile {
 
 sub upload_email_campaigns {
     my $base = "/data/test/export/$date_with_zero/campaigns/email_campaigns";
-    
+
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
 
