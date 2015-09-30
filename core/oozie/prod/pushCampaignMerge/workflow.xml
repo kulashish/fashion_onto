@@ -11,7 +11,12 @@
         </configuration>
     </global>
 
-    <start to='pushCampaignMerge' />
+    <start to='campaignMerge' />
+
+    <fork name="campaignMerge">
+    <path start="pushCampaignMerge" />
+    <path start="emailCampaignMerge" />
+    </fork>
 
     <action name="pushCampaignMerge">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -25,9 +30,27 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="mobilePushCampaignQuality"/>
+        <ok to="campaignMergeJoin"/>
         <error to="fail"/>
     </action>
+
+    <action name="emailCampaignMerge">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignMergeJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="campaignMergeJoin" to="mobilePushCampaignQuality"/>
 
     <action name="mobilePushCampaignQuality">
         <shell xmlns="uri:oozie:shell-action:0.3">
