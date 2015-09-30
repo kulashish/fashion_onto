@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, PageVisitVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.CampaignInfo
@@ -102,6 +102,7 @@ object CampaignProcessor {
     val cmrn = cmr
       .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
       .select(
+        cmr(ContactListMobileVars.UID),
         cmr(CustomerVariables.EMAIL),
         cmr(CustomerVariables.RESPONSYS_ID),
         cmr(CustomerVariables.ID_CUSTOMER),
@@ -114,6 +115,7 @@ object CampaignProcessor {
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
     val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.FK_CUSTOMER) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
       .select(
+        cmr(ContactListMobileVars.UID),
         bcCampaign(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
@@ -232,7 +234,8 @@ object CampaignProcessor {
 
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
     allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
-      .agg(first(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+      .agg(first(ContactListMobileVars.UID) as ContactListMobileVars.UID,
+        first(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         first(CampaignMergedFields.REF_SKUS) as CampaignMergedFields.REF_SKUS,
         first(CampaignMergedFields.REC_SKUS) as CampaignMergedFields.REC_SKUS,
         first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,

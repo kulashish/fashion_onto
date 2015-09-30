@@ -381,7 +381,7 @@ object CampaignManager extends Serializable with Logging {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp="temp"
         val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL,CampaignMergedFields.LIVE_CART_URL+temp)
-          .withColumn(ContactListMobileVars.UID, lit(GARBAGE))
+          .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
           .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
           .withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
           .withColumn(CampaignMergedFields.LIVE_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
