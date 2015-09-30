@@ -4,7 +4,8 @@ import java.io.File
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.mail.ScalaMail
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
@@ -85,6 +86,13 @@ object MobilePushCampaignQuality extends Logging {
         + DataSets.DAILY_MODE + File.separator
         + dateYesterday
       )
+
+      val emailSubscribers = OptionUtils.getOptValue(CampaignInfo.campaigns.emailSubscribers, "tech.dap@jabong.com")
+
+      val output = cachedfCampaignQuality.collect.foldLeft("")((a, b) => a + b + "\n")
+
+      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", output, "")
+
     }
 
   }
