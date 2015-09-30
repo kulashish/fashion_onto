@@ -331,7 +331,7 @@ object ContactListMobile extends Logging {
         custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
         custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE))
 
-    println("After custSegCalcIncr and customerIncr merge " + customerSeg.count())
+    println("After custSegCalcIncr and customerIncr merge ")
 
     val customerMerged = customerSeg.join(nls, nls(NewsletterVariables.EMAIL) === customerSeg(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
@@ -354,7 +354,7 @@ object ContactListMobile extends Logging {
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
         Udf.maxTimestamp(customerSeg(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT)
 
-    println("After custSegCalcIncr, customerIncr, nls merge " + customerMerged.count())
+    println("After custSegCalcIncr, customerIncr, nls merge ")
 
     val salesOrderAddress = salesAddrCalFull.join(salesOrderCalcFull, salesAddrCalFull(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
