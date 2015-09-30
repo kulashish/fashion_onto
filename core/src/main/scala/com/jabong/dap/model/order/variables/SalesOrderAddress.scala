@@ -68,9 +68,9 @@ object SalesOrderAddress {
     val c = scala.collection.mutable.ListBuffer[String]()
     list.foreach{ e =>
       val (l, m, n) = e
-      a += l
-      b += m
-      c += n
+      if(l.length() > 0) a += l
+      if(m.length() > 0) b += m
+      if(n.length() > 1) c += n
     }
     val x = a.groupBy(identity).mapValues(_.length)
     val amax = x.valuesIterator.max
