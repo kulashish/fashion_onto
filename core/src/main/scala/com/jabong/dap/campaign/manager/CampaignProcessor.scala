@@ -122,7 +122,6 @@ object CampaignProcessor {
         bcCampaign(CampaignMergedFields.LIVE_CART_URL),
         Udf.email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL
       )
-    println("After joining campaigns with the cmr: " + campaignDevice.count())
     campaignDevice
   }
   /**
