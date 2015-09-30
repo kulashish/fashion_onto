@@ -379,8 +379,8 @@ object CampaignManager extends Serializable with Logging {
         CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
       } else {
         val GARBAGE = "NA" //:TODO replace with correct value
-        val temp="temp"
-        val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL,CampaignMergedFields.LIVE_CART_URL+temp)
+        val temp = "temp"
+        val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL, CampaignMergedFields.LIVE_CART_URL + temp)
           .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
           .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
           .withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
@@ -400,7 +400,7 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(6)))
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
-          .withColumn(CampaignMergedFields.LIVE_CART_URL,col(CampaignMergedFields.LIVE_CART_URL+temp))
+          .withColumn(CampaignMergedFields.LIVE_CART_URL, col(CampaignMergedFields.LIVE_CART_URL + temp))
           .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
           .withColumn(ContactListMobileVars.MOBILE, lit(GARBAGE))
           .withColumn(CampaignMergedFields.TYPO_MOBILE_PERMISION_STATUS, lit(GARBAGE))
@@ -410,7 +410,7 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.CUSTOMER_ID)
           .drop(CustomerVariables.EMAIL)
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-          .drop(CampaignMergedFields.LIVE_CART_URL+temp)
+          .drop(CampaignMergedFields.LIVE_CART_URL + temp)
 
         val emailCampaignFileName = "53699_33838_" + TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
