@@ -102,25 +102,33 @@ object ContactListMobile extends Logging {
     // FK_CUSTOMER, CITY, MOBILE, FIRST_NAME, LAST_NAME
 
     val pathSalesOrderFavFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfSalesOrderAddrFavFull, pathSalesOrderFavFull, saveMode)
-
+    if (DataWriter.canWrite(saveMode, pathSalesOrderFavFull)) {
+      DataWriter.writeParquet(dfSalesOrderAddrFavFull, pathSalesOrderFavFull, saveMode)
+    }
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
     val dfSalesOrderCalcFull = SalesOrder.processVariables(dfSalesOrderCalcPrevFull, dfSalesOrderIncr)
     //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT, FIRST_ORDER_DATE, ORDERS_COUNT, DAYS_SINCE_LAST_ORDER
 
     val pathSalesOrderCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(dfSalesOrderCalcFull, pathSalesOrderCalcFull, saveMode)
+    if (DataWriter.canWrite(saveMode, pathSalesOrderCalcFull)) {
+      DataWriter.writeParquet(dfSalesOrderCalcFull, pathSalesOrderCalcFull, saveMode)
+    }
 
     //SalesOrderItem.getSucessfulOrders for NET_ORDERS for variable
-    val (dfSuccessfulOrders, successfulCalcFull, dfFavBrandIncr, favBrandCalcFull) = SalesOrderItem.getSuccessfullOrdersBrand(
-      dfSalesOrderItemIncr, dfSalesOrderFull, dfSuccessOrdersCalcPrevFull, dfFavBrandCalcPrevFull, dfYestItr)
-    //ORDERS_COUNT_SUCCESSFUL
+    val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
+    val (dfSuccessfulOrders, successOrdersCalcFull, dfFavBrandIncr, favBrandCalcFull) = SalesOrderItem.getSuccessfullOrdersBrand(
+      dfSalesOrderItemIncr, salesOrderFull, dfSuccessOrdersCalcPrevFull, dfFavBrandCalcPrevFull, dfYestItr)
+    //ORDERS_COUNT_SUCCESSFUL, FAV_BRAND
 
-    val pathSuccessfulCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SUCCESSFUL_ORDERS_COUNT, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(successfulCalcFull, pathSuccessfulCalcFull, saveMode)
+    val pathSuccessOrdersCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SUCCESSFUL_ORDERS_COUNT, DataSets.DAILY_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, pathSuccessOrdersCalcFull)) {
+      DataWriter.writeParquet(successOrdersCalcFull, pathSuccessOrdersCalcFull, saveMode)
+    }
 
     val pathFavBrandCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.FAV_BRAND, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(favBrandCalcFull, pathFavBrandCalcFull, saveMode)
+    if (DataWriter.canWrite(saveMode, pathFavBrandCalcFull)) {
+      DataWriter.writeParquet(favBrandCalcFull, pathFavBrandCalcFull, saveMode)
+    }
 
     //Save Data Frame Contact List Mobile
     val (dfContactListMobileIncr, dfContactListMobileFull) = getContactListMobileDF (
@@ -138,10 +146,14 @@ object ContactListMobile extends Logging {
       dfZoneCity)
 
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfContactListMobileFull, pathContactListMobileFull, saveMode)
+    if (DataWriter.canWrite(saveMode, pathContactListMobileFull)) {
+      DataWriter.writeParquet(dfContactListMobileFull, pathContactListMobileFull, saveMode)
+    }
 
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
+    if (DataWriter.canWrite(saveMode, pathContactListMobile)) {
+      DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
+    }
 
     val dfCsv = dfContactListMobileIncr.select(
       col(ContactListMobileVars.UID),
