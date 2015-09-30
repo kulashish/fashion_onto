@@ -222,11 +222,11 @@ object ContactListMobile extends Logging {
     println("After null check")
 
     val nls = dfNLSIncr.select(
-      col(NewsletterVariables.EMAIL) as NewsletterVariables.NLS_EMAIL,
+      col(NewsletterVariables.EMAIL),
       col(NewsletterVariables.STATUS),
       col(NewsletterVariables.UNSUBSCRIBE_KEY),
-      col(NewsletterVariables.CREATED_AT) as NewsletterVariables.NLS_CREATED_AT,
-      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.NLS_UPDATED_AT)
+      col(NewsletterVariables.CREATED_AT),
+      col(NewsletterVariables.UPDATED_AT))
 
     println("after nls calc " + nls.count())
 
@@ -338,7 +338,7 @@ object ContactListMobile extends Logging {
         customerSeg(CustomerVariables.EMAIL),
         customerSeg(ContactListMobileVars.DOB),
         customerSeg(CustomerVariables.GENDER),
-        Udf.minTimestamp(customerSeg(CustomerVariables.CREATED_AT), nls(NewsletterVariables.NLS_CREATED_AT)) as ContactListMobileVars.REG_DATE,
+        Udf.minTimestamp(customerSeg(CustomerVariables.CREATED_AT), nls(NewsletterVariables.CREATED_AT)) as ContactListMobileVars.REG_DATE,
         customerSeg(ContactListMobileVars.VERIFICATION_STATUS),
         customerSeg(ContactListMobileVars.AGE),
         customerSeg(CustomerVariables.FIRST_NAME),
@@ -348,8 +348,8 @@ object ContactListMobile extends Logging {
         customerSeg(ContactListMobileVars.MVP_TYPE),
         customerSeg(CustomerSegmentsVariables.SEGMENT),
         customerSeg(CustomerSegmentsVariables.DISCOUNT_SCORE),
-        udfEmailOptInStatus(nls(NewsletterVariables.NLS_EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
-        nls(NewsletterVariables.NLS_CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
+        udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        nls(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
         Udf.maxTimestamp(customerSeg(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT)
 
