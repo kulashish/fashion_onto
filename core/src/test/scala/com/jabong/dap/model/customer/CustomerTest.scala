@@ -1,11 +1,11 @@
 package com.jabong.dap.model.customer
 
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, TestSchema}
-import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments, CustomerStorecreditsHistory}
-import org.apache.spark.sql.{DataFrame, Row}
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
+import org.apache.spark.sql.{ DataFrame, Row }
 import org.scalatest.FlatSpec
 
 /**
@@ -13,9 +13,9 @@ import org.scalatest.FlatSpec
  */
 class CustomerTest extends FlatSpec with SharedSparkContext {
 
-  @transient var dfCustomer: DataFrame = _
-  @transient var dfNLS: DataFrame = _
-  @transient var dfSalesOrder: DataFrame = _
+  //  @transient var dfCustomer: DataFrame = _
+  //  @transient var dfNLS: DataFrame = _
+  //  @transient var dfSalesOrder: DataFrame = _
   @transient var dfCSH: DataFrame = _
   @transient var dfCustomerSegments: DataFrame = _
 
@@ -23,9 +23,9 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     super.beforeAll()
 
-    dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
-    dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
-    dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)
+    // dfCustomer = JsonUtils.readFromJson(DataSets.CUSTOMER, DataSets.CUSTOMER, Schema.customer)
+    // dfNLS = JsonUtils.readFromJson(DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
+    // dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, DataSets.SALES_ORDER, Schema.salesOrder)
     dfCSH = JsonUtils.readFromJson(DataSets.CUSTOMER_STORECREDITS_HISTORY, DataSets.CUSTOMER_STORECREDITS_HISTORY, Schema.csh)
     dfCustomerSegments = JsonUtils.readFromJson(DataSets.CUSTOMER_SEGMENTS, DataSets.CUSTOMER_SEGMENTS, Schema.customerSegments)
 
