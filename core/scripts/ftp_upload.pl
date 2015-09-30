@@ -193,6 +193,8 @@ sub upload_dcf_feed {
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 
+
+
      print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/\n";
 
      system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/");
@@ -252,6 +254,22 @@ sub upload_email_campaigns_contactListMobile {
 
     # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
     system("hadoop fs -get /data/tmp/variables/contactListMobile/daily/$date/$filename $base/");
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+}
+
+
+sub upload_email_campaigns {
+    my $base = "/data/test/export/$date_with_zero/campaigns/email_campaigns";
+    
+    print "email campaigns directory is $base\n";
+    system("mkdir -p $base");
+
+    my $filename = "53699_33838_$date_with_zero_today_LIVE_CAMPAIGN.csv";
+
+    print "hadoop fs -get /data/test/output/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
+
+    system("hadoop fs -get /data/test/output/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
 }
