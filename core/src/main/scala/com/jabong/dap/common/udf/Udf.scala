@@ -129,6 +129,8 @@ object Udf {
    */
   val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
 
+  val bigDecimal2Double = udf((d: BigDecimal) => UdfUtils.bigDecimal2Double(d: BigDecimal))
+
   /**
    * email will return s1 if either s is empty or null
    */

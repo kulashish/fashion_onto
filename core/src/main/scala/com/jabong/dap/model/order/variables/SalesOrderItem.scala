@@ -2,7 +2,7 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -196,7 +196,7 @@ object SalesOrderItem {
         col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
         col(SalesOrderItemVariables.SKU),
         col(ProductVariables.BRAND),
-        col(ProductVariables.SPECIAL_PRICE)
+        Udf.bigDecimal2Double(col(ProductVariables.SPECIAL_PRICE)) as ProductVariables.SPECIAL_PRICE
       )
 
     var mostPrefBrandIncr = mostPrefBrandJoinedIncr

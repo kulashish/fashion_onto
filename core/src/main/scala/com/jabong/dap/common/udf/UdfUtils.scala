@@ -487,7 +487,6 @@ object UdfUtils {
    * @return
    */
   def getToLong(str: String): Long = {
-
     if (str == null) {
       return 0
     }
@@ -499,6 +498,13 @@ object UdfUtils {
         return 0
       }
     }
+  }
+
+  def bigDecimal2Double(bd: BigDecimal): Double = {
+    if (null == bd) {
+      return 0.0
+    }
+    return bd.doubleValue()
   }
 
   /**
