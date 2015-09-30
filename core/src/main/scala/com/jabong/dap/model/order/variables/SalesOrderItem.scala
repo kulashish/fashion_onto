@@ -196,7 +196,7 @@ object SalesOrderItem {
         col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
         col(SalesOrderItemVariables.SKU),
         col(ProductVariables.BRAND),
-        col(ProductVariables.SPECIAL_PRICE)
+        Udf.bigDecimal2Double(col(ProductVariables.SPECIAL_PRICE)) as ProductVariables.SPECIAL_PRICE
       )
 
     var mostPrefBrandIncr = mostPrefBrandJoinedIncr

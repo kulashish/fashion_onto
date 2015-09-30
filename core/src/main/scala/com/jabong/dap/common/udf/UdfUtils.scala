@@ -470,6 +470,26 @@ object UdfUtils {
   }
 
   /**
+   * EMAIL_SUBSCRIPTION_STATUS
+   * iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
+   * @param nls_email
+   * @param status
+   * @return String
+   */
+  def getEmailOptInStatus(nls_email: String, status: String): String = {
+
+    if (nls_email == null) {
+      return "O"
+    }
+
+    status match {
+      case "subscribed" => "I"
+      case "unsubscribed" => "U"
+    }
+
+  }
+
+  /**
    * Returns empty string if the string contains all zeros or null.
    * @param str
    * @return String
@@ -487,7 +507,6 @@ object UdfUtils {
    * @return
    */
   def getToLong(str: String): Long = {
-
     if (str == null) {
       return 0
     }
@@ -499,6 +518,13 @@ object UdfUtils {
         return 0
       }
     }
+  }
+
+  def bigDecimal2Double(bd: java.math.BigDecimal): Double = {
+    if (null == bd) {
+      return 0.0
+    }
+    bd.doubleValue()
   }
 
   /**
@@ -537,15 +563,14 @@ object UdfUtils {
     }
   }
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
-    if(i>=strings.size) "" else strings(i)
+    if (i >= strings.size) "" else strings(i)
   }
-
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
-    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+    if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
 
-  def addString(value:String ,constant:String): String = {
-    if(value == null) return null else constant+value+constant
+  def addString(value: String, constant: String): String = {
+    if (value == null) return null else constant + value + constant
   }
 }
