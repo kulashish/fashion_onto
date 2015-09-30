@@ -247,7 +247,7 @@ object ContactListMobile extends Logging {
 
       //merge old and new data frame
       val dfFull = joinDF.select(
-        Udf.latestInt(joinDF(CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
 
         Udf.latestString(joinDF(CustomerVariables.EMAIL), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
 
@@ -281,7 +281,7 @@ object ContactListMobile extends Logging {
 
         coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.SEGMENT), joinDF(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
 
-        Udf.latestInt(joinDF(ContactListMobileVars.AGE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
+        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.AGE), joinDF(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
 
         Udf.latestString(joinDF(ContactListMobileVars.PLATINUM_STATUS), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
 
