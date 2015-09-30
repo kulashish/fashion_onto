@@ -9,7 +9,7 @@ import org.apache.spark.sql.types._
 object OrderVarSchema {
 
   val salesRule = StructType(Array(
-    StructField(SalesRuleVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesRuleVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesRuleVariables.UPDATED_AT, TimestampType, true),
     StructField(SalesRuleVariables.CODE, StringType, true),
     StructField(SalesRuleVariables.CREATED_AT, TimestampType, true),
@@ -17,7 +17,7 @@ object OrderVarSchema {
   ))
 
   val salesOrder = StructType(Array(
-    StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesOrderVariables.CREATED_AT, TimestampType, true)
   ))
 
@@ -30,12 +30,12 @@ object OrderVarSchema {
   ))
 
   val salesOrderCoupon = StructType(Array(
-    StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesOrderVariables.COUPON_CODE, StringType, true)
   ))
 
   val salesOrderItem = StructType(Array(
-    StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true),
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesOrderItemVariables.FK_SALES_ORDER, IntegerType, true),
     StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true)
   ))

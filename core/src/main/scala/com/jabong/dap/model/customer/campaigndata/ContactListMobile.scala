@@ -111,7 +111,7 @@ object ContactListMobile extends Logging {
 
     //SalesOrderItem.getSucessfulOrders for NET_ORDERS for variable
     val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
-    val (dfSuccessfulOrders, successOrdersCalcFull, dfFavBrandIncr, favBrandCalcFull) = SalesOrderItem.getSuccessfullOrdersBrand(
+    val (dfSuccessfulOrders, successOrdersCalcFull, dfFavBrandIncr, favBrandCalcFull) = SalesOrderItem.getSuccessfullOrdersBrand (
       dfSalesOrderItemIncr, salesOrderFull, dfSuccessOrdersCalcPrevFull, dfFavBrandCalcPrevFull, dfYestItr)
     //ORDERS_COUNT_SUCCESSFUL, FAV_BRAND
 
@@ -366,7 +366,7 @@ object ContactListMobile extends Logging {
         salesOrderCalcFull(ContactListMobileVars.LAST_ORDER_DATE),
         salesOrderCalcFull(SalesOrderVariables.UPDATED_AT))
 
-    println("After salesAddrCalFull, salesOrderCalcFull merge " + salesOrderAddress.count())
+    println("After salesAddrCalFull, salesOrderCalcFull merge ")
 
     val salesMerged = salesOrderAddress.join(successfulOrdersIncr, successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -379,7 +379,7 @@ object ContactListMobile extends Logging {
         salesOrderAddress(SalesOrderVariables.UPDATED_AT),
         successfulOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL))
 
-    println("After salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr merge " + salesMerged.count())
+    println("After salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr merge ")
 
 
     val brandMerged = salesMerged.join(favBrandIncr, salesMerged(SalesOrderVariables.FK_CUSTOMER) === favBrandIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
@@ -394,7 +394,7 @@ object ContactListMobile extends Logging {
         salesMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL),
         favBrandIncr(SalesOrderItemVariables.FAV_BRAND))
 
-    println("After salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr merge " + brandMerged.count())
+    println("After salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr merge ")
 
     val mergedIncr = customerMerged.join(brandMerged, brandMerged(SalesOrderVariables.FK_CUSTOMER) === customerMerged(CustomerVariables.ID_CUSTOMER))
       .select(
@@ -421,9 +421,11 @@ object ContactListMobile extends Logging {
         brandMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
         brandMerged(SalesOrderItemVariables.FAV_BRAND))
 
-    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr merge " + mergedIncr.count())
+    println("After custSegCalcIncr, customerIncr, nls, salesAddrCalFull, salesOrderCalcFull, successfulOrdersIncr, favBrandIncr merge ")
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
+    cityZone.printSchema()
+    println(cityZone.count())
 
     val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(cityBc(ContactListMobileVars.CITY)) === Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
       .select(
