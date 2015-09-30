@@ -48,7 +48,7 @@ if ($component eq "campaigns") {
 } elsif ($component eq "custPreference") {
     upload_email_campaigns_custPreference();
 } elsif ($component eq "contactListMobile") {
-    upload_email_campaigns_contactListMobile
+    upload_email_campaigns_contactListMobile();
 } elsif ($component eq "email_campaigns") {
     upload_email_campaigns();
 }
@@ -265,7 +265,7 @@ sub upload_email_campaigns {
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
 
-    my $filename = "53699_33838_$date_with_zero_today_LIVE_CAMPAIGN.csv";
+    my $filename = "53699_33838_$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
 
     print "hadoop fs -get /data/test/output/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
