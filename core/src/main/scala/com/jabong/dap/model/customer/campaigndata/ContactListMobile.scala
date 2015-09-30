@@ -412,7 +412,7 @@ object ContactListMobile extends Logging {
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
 
-    val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(cityBc(SalesAddressVariables.CITY)) === Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
+    val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(cityBc(ContactListMobileVars.CITY)) === Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
       .select(
         mergedIncr(SalesOrderVariables.FK_CUSTOMER),
         mergedIncr(CustomerVariables.EMAIL),
