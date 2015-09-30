@@ -531,9 +531,9 @@ object UdfUtils {
   def successOrder(i: Long): Int = {
     val successCodes = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
     if (successCodes.contains(i)) {
-      return 1
+      1
     } else {
-      return 0
+      0
     }
   }
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
