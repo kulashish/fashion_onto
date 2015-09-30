@@ -183,9 +183,14 @@ object SalesOrderItem {
   }
 
   def getMostPreferredBrand(salesOrderJoined: DataFrame, dfFavBrandCalcPrevFull: DataFrame, yestItr: DataFrame): (DataFrame, DataFrame) = {
-    val salesOrderJoinedIncr = salesOrderJoined.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU)
-      .except(dfFavBrandCalcPrevFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU))
-    val mostPrefBrandJoinedIncr = salesOrderJoined.join(yestItr, salesOrderJoined(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE))
+    var salesOrderJoinedIncr = salesOrderJoined
+
+    if (null != dfFavBrandCalcPrevFull) {
+      salesOrderJoinedIncr = salesOrderJoined.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU)
+        .except(dfFavBrandCalcPrevFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU))
+    }
+
+    val mostPrefBrandJoinedIncr = salesOrderJoinedIncr.join(yestItr, salesOrderJoined(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE))
       .select(
         col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
@@ -193,8 +198,11 @@ object SalesOrderItem {
         col(ProductVariables.BRAND),
         col(ProductVariables.SPECIAL_PRICE)
       )
+
     var mostPrefBrandIncr = mostPrefBrandJoinedIncr
+
     var mostPrefBrandUnion = mostPrefBrandJoinedIncr
+
     if (null != dfFavBrandCalcPrevFull) {
       mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr)
       mostPrefBrandIncr = mostPrefBrandJoinedIncr.join(mostPrefBrandUnion,
