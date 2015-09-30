@@ -387,7 +387,7 @@ object ContactListMobile extends Logging {
 
     val mergedIncr = customerMerged.join(brandMerged, brandMerged(SalesOrderVariables.FK_CUSTOMER) === customerMerged(CustomerVariables.ID_CUSTOMER))
       .select(
-        coalesce(customerMerged(SalesOrderVariables.FK_CUSTOMER), brandMerged(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(customerMerged(CustomerVariables.ID_CUSTOMER), brandMerged(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         customerMerged(CustomerVariables.EMAIL),
         customerMerged(ContactListMobileVars.DOB),
         customerMerged(CustomerVariables.GENDER),
