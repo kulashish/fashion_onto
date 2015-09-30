@@ -42,7 +42,7 @@ object SalesOrderAddress {
     if (null == str) {
       return ""
     }
-    return str.toString().trim()
+    str.toString().trim()
   }
 
   /**
@@ -53,8 +53,8 @@ object SalesOrderAddress {
   def getFav(favData: DataFrame): DataFrame = {
     val mapCity = favData.map(s => (s(0) -> (convert2String(s(1)), convert2String(s(2)), convert2String(s(3)) + ", " + convert2String(s(4)))))
     val grouped = mapCity.groupByKey()
-    val x = grouped.map(s => (Row(s._1.toString, findMax(s._2.toList))))
-    return Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
+    val x = grouped.map(s => (Row(s._1.asInstanceOf[Long], findMax(s._2.toList))))
+    Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
   }
 
   /**
@@ -96,7 +96,7 @@ object SalesOrderAddress {
       lName = nameArr(1)
     }
 
-    return (fCity, fMobile, fName, lName)
+    (fCity, fMobile, fName, lName)
   }
 
   /**
