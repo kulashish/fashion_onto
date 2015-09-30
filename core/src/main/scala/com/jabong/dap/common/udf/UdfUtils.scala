@@ -500,11 +500,11 @@ object UdfUtils {
     }
   }
 
-  def bigDecimal2Double(bd: BigDecimal): Double = {
+  def bigDecimal2Double(bd: java.math.BigDecimal): Double = {
     if (null == bd) {
       return 0.0
     }
-    return bd.doubleValue()
+    bd.doubleValue()
   }
 
   /**
