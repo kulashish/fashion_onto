@@ -1,12 +1,11 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{ TestSchema, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{SharedSparkContext, TestSchema}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.schema.CustVarSchema
-import com.jabong.dap.model.customer.variables.{ Customer, CustomerSegments, CustomerStorecreditsHistory }
-import org.apache.spark.sql.{ DataFrame, Row }
+import com.jabong.dap.model.customer.variables.{Customer, CustomerSegments, CustomerStorecreditsHistory}
+import org.apache.spark.sql.{DataFrame, Row}
 import org.scalatest.FlatSpec
 
 /**
@@ -32,7 +31,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /*////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // //Name of variable: EMAIL, ACC_REG_DATE, UPDATED_AT
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,7 +105,7 @@ class CustomerTest extends FlatSpec with SharedSparkContext {
 
     assert(result._2.limit(30).collect().toSet.equals(dfResultIncremental) == true)
 
-  }
+  }*/
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Name of variable: EMAIL_OPT_IN_STATUS
