@@ -138,7 +138,7 @@ object Udf {
 
   val domain = udf((s: String, s1: String) => UdfUtils.domain(s: String, s1: String))
 
-  val successOrder = udf((i: Int) => UdfUtils.successOrder(i: Int))
+  val successOrder = udf((i: Long) => UdfUtils.successOrder(i: Long))
 
   val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a:ArrayBuffer[String], i: Int))
 
