@@ -209,19 +209,18 @@ object ContactListMobile extends Logging {
     dfSalesOrderAddrFavCalc: DataFrame,
     dfSalesOrderCalcFull: DataFrame,
     dfSuccessfulOrders: DataFrame,
-    dfFavBrandFull: DataFrame,
+    dfFavBrandIncr: DataFrame,
     dfDND: DataFrame,
     dfSmsOptOut: DataFrame,
     dfBlockedNumbers: DataFrame,
     dfZoneCity: DataFrame): (DataFrame, DataFrame) = {
 
-    if (dfCustomerIncr == null || dfCustSegCalcIncr == null || dfNLSIncr == null) {
+    if (null == dfCustomerIncr || null == dfNLSIncr || null == dfDND || null == dfSmsOptOut || null == dfBlockedNumbers || null == dfZoneCity) {
       log("Data frame should not be null")
       return null
     }
 
     if (!SchemaUtils.isSchemaEqual(dfCustomerIncr.schema, Schema.customer) ||
-      !SchemaUtils.isSchemaEqual(dfCustSegCalcIncr.schema, Schema.customerSegments) ||
       !SchemaUtils.isSchemaEqual(dfNLSIncr.schema, Schema.nls)) {
       log("schema attributes or data type mismatch")
       return null
@@ -236,10 +235,7 @@ object ContactListMobile extends Logging {
 
     val dfSmsOptOutMerged = dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER).unionAll(dfBlockedNumbers.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    //Name of variable: CUSTOMERS PREFERRED ORDER TIMESLOT
-    // val udfCPOT = SalesOrder.getCPOT(dfSalesOrderAddrFavCalc: DataFrame)
-
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfulOrders, dfFavBrandFull, dfZoneCity, dfDND, dfSmsOptOutMerged)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, nls, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged)
 
     if (null != dfContactListMobilePrevFull) {
 
@@ -501,7 +497,7 @@ object ContactListMobile extends Logging {
         when(smsBc(DNDVariables.MOBILE_NUMBER).!==(null), "o").otherwise("i") as ContactListMobileVars.MOBILE_PERMISION_STATUS
       )
 
-    return res
+    res
   }
 
   /**
