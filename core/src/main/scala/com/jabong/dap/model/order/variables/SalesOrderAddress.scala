@@ -30,11 +30,19 @@ object SalesOrderAddress {
     if (null != prevFav) {
       jData = prevFav.unionAll(curFav)
     }
+
     jData.cache()
 
     println("Count for sales Address Data" + jData.count())
 
     (getFav(jData), jData)
+  }
+
+  def convert2String(str: Any): String = {
+    if (null == str) {
+      return ""
+    }
+    return str.toString()
   }
 
   /**
@@ -43,7 +51,7 @@ object SalesOrderAddress {
    * @return
    */
   def getFav(favData: DataFrame): DataFrame = {
-    val mapCity = favData.map(s => (s(0) -> (s(1).toString, s(2).toString, s(3).toString + ", " + s(4).toString)))
+    val mapCity = favData.map(s => (s(0) -> (convert2String(s(1)), convert2String(s(2)), convert2String(s(3)) + ", " + convert2String(s(4)))))
     val grouped = mapCity.groupByKey()
     val x = grouped.map(s => (Row(s._1.toString, findMax(s._2.toList))))
     return Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
