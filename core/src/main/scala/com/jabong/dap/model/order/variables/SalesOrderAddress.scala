@@ -31,10 +31,6 @@ object SalesOrderAddress {
       jData = prevFav.unionAll(curFav)
     }
 
-    jData.cache()
-
-    println("Count for sales Address Data" + jData.count())
-
     (getFav(jData), jData)
   }
 
