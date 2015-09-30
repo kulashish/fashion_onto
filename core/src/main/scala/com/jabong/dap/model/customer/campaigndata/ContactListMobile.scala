@@ -552,7 +552,7 @@ object ContactListMobile extends Logging {
 
     val dfFavBrandCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.FAV_BRAND, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val dfYestItr = CampaignInput.loadYesterdayItrSimpleData()
+    val dfYestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
 
     val dfDND = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
 
