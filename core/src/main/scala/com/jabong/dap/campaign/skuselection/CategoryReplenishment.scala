@@ -7,7 +7,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by raghu on 30/9/15.
  */
-object CategoryReplenish extends Logging {
+object CategoryReplenishment extends Logging {
 
   def skuFilter(customerSkuData: DataFrame, yesterdayItrData: DataFrame): (DataFrame, DataFrame) = {
 

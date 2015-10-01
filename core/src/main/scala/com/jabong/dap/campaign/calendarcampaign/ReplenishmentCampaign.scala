@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.calendarcampaign
 
 import com.jabong.dap.campaign.manager.CampaignProducer
-import com.jabong.dap.campaign.skuselection.CategoryReplenish
+import com.jabong.dap.campaign.skuselection.CategoryReplenishment
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import com.jabong.dap.data.storage.DataSets
@@ -20,7 +20,7 @@ class ReplenishmentCampaign {
     val dfCustomerSelection = customerSelector.customerSelection(customerData, fullSalesOrderData, fullSalesOrderItemData)
 
     //filter sku based on daily filter
-    val (dfNonBeautyFrag, dfBeauty) = CategoryReplenish.skuFilter(dfCustomerSelection, yesterdayItrData)
+    val (dfNonBeautyFrag, dfBeauty) = CategoryReplenishment.skuFilter(dfCustomerSelection, yesterdayItrData)
 
     // ***** NON_BEAUTY_FRAG_CAMPAIGN email use case
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN, dfNonBeautyFrag, false, brickMvpRecommendations)
