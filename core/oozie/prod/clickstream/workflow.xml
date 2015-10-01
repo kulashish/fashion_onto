@@ -61,10 +61,67 @@
     </action>
 
     <fork name="afterClickstreamVars">
+        <path start="emailCampaignVars" />
         <path start="pushSurfCampaign" />
         <path start="dcfFeedGenerate" />
         <path start="pricingSKUData" />
     </fork>
+
+    <fork name="emailCampaignVars">
+        <path start="custWelcomeVoucher" />
+        <path start="custPreference" />
+        <path start="contactListMobile" />
+    </fork>
+
+    <action name="custWelcomeVoucher">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custWelcomeVoucher</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="custPreference">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custWelcomeVoucher</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="contactListMobile">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custWelcomeVoucher</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="joinEmailCampaignVars" to="endJoin"/>
 
     <action name="pushSurfCampaign">
         <shell xmlns="uri:oozie:shell-action:0.3">
