@@ -299,44 +299,46 @@ object ContactListMobile extends Logging {
   }
 
   def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame): DataFrame = {
-    val customerSeg = customerIncr.join(custSegCalcIncr, customerIncr(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val customerNls = customerIncr.join(nls, customerIncr(CustomerVariables.EMAIL) === nls(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         customerIncr(CustomerVariables.EMAIL),
         customerIncr(CustomerVariables.BIRTHDAY) as ContactListMobileVars.DOB,
         customerIncr(CustomerVariables.GENDER),
-        customerIncr(CustomerVariables.CREATED_AT),
+        Udf.minTimestamp(customerIncr(CustomerVariables.CREATED_AT), nls(NewsletterVariables.CREATED_AT)) as ContactListMobileVars.REG_DATE,
         customerIncr(CustomerVariables.FIRST_NAME),
         customerIncr(CustomerVariables.LAST_NAME),
         customerIncr(CustomerVariables.PHONE),
         customerIncr(CustomerVariables.IS_CONFIRMED) as ContactListMobileVars.VERIFICATION_STATUS,
         Udf.age(customerIncr(CustomerVariables.BIRTHDAY)) as ContactListMobileVars.AGE,
         customerIncr(CustomerVariables.REWARD_TYPE) as ContactListMobileVars.PLATINUM_STATUS,
-        customerIncr(CustomerVariables.UPDATED_AT),
-        custSegCalcIncr(ContactListMobileVars.MVP_TYPE),
-        custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
-        custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE))
-
-    val customerMerged = customerSeg.join(nls, nls(NewsletterVariables.EMAIL) === customerSeg(CustomerVariables.EMAIL), SQL.FULL_OUTER)
-      .select(
-        coalesce(customerSeg(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
-        customerSeg(CustomerVariables.EMAIL),
-        customerSeg(ContactListMobileVars.DOB),
-        customerSeg(CustomerVariables.GENDER),
-        Udf.minTimestamp(customerSeg(CustomerVariables.CREATED_AT), nls(NewsletterVariables.CREATED_AT)) as ContactListMobileVars.REG_DATE,
-        customerSeg(ContactListMobileVars.VERIFICATION_STATUS),
-        customerSeg(ContactListMobileVars.AGE),
-        customerSeg(CustomerVariables.FIRST_NAME),
-        customerSeg(CustomerVariables.LAST_NAME),
-        customerSeg(CustomerVariables.PHONE),
-        customerSeg(ContactListMobileVars.PLATINUM_STATUS),
-        customerSeg(ContactListMobileVars.MVP_TYPE),
-        customerSeg(CustomerSegmentsVariables.SEGMENT),
-        customerSeg(CustomerSegmentsVariables.DISCOUNT_SCORE),
         Udf.udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
         nls(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
-        Udf.maxTimestamp(customerSeg(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT)
+        Udf.maxTimestamp(customerIncr(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT
+      )
+
+    val customerMerged = customerNls.join(custSegCalcIncr, customerNls(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+      .select(
+        coalesce(customerNls(CustomerVariables.ID_CUSTOMER), custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        customerNls(CustomerVariables.EMAIL),
+        customerNls(ContactListMobileVars.DOB),
+        customerNls(CustomerVariables.GENDER),
+        customerNls(ContactListMobileVars.REG_DATE),
+        customerNls(CustomerVariables.FIRST_NAME),
+        customerNls(CustomerVariables.LAST_NAME),
+        customerNls(CustomerVariables.PHONE),
+        customerNls(ContactListMobileVars.VERIFICATION_STATUS),
+        customerNls(ContactListMobileVars.AGE),
+        customerNls(ContactListMobileVars.PLATINUM_STATUS),
+        customerNls(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
+        customerNls(ContactListMobileVars.NL_SUB_DATE),
+        customerNls(ContactListMobileVars.UNSUB_KEY),
+        customerNls(CustomerVariables.UPDATED_AT),
+        custSegCalcIncr(ContactListMobileVars.MVP_TYPE),
+        custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
+        custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE)
+      )
 
     val salesOrderAddress = salesAddrCalFull.join(salesOrderCalcFull, salesAddrCalFull(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -346,7 +348,8 @@ object ContactListMobile extends Logging {
         salesAddrCalFull(SalesAddressVariables.FIRST_NAME),
         salesAddrCalFull(SalesAddressVariables.LAST_NAME),
         salesOrderCalcFull(ContactListMobileVars.LAST_ORDER_DATE),
-        salesOrderCalcFull(SalesOrderVariables.UPDATED_AT))
+        salesOrderCalcFull(SalesOrderVariables.UPDATED_AT)
+      )
 
     val salesMerged = salesOrderAddress.join(successfulOrdersIncr, successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -357,7 +360,8 @@ object ContactListMobile extends Logging {
         salesOrderAddress(SalesAddressVariables.LAST_NAME),
         salesOrderAddress(ContactListMobileVars.LAST_ORDER_DATE),
         salesOrderAddress(SalesOrderVariables.UPDATED_AT),
-        successfulOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL))
+        successfulOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+      )
 
     val brandMerged = salesMerged.join(favBrandIncr, salesMerged(SalesOrderVariables.FK_CUSTOMER) === favBrandIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
@@ -369,7 +373,8 @@ object ContactListMobile extends Logging {
         salesMerged(ContactListMobileVars.LAST_ORDER_DATE),
         salesMerged(SalesOrderVariables.UPDATED_AT),
         salesMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL),
-        favBrandIncr(SalesOrderItemVariables.FAV_BRAND))
+        favBrandIncr(SalesOrderItemVariables.FAV_BRAND)
+      )
 
     val mergedIncr = customerMerged.join(brandMerged, brandMerged(SalesOrderVariables.FK_CUSTOMER) === customerMerged(CustomerVariables.ID_CUSTOMER))
       .select(
@@ -394,7 +399,8 @@ object ContactListMobile extends Logging {
         brandMerged(ContactListMobileVars.LAST_ORDER_DATE),
         Udf.maxTimestamp(brandMerged(SalesOrderVariables.UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
         brandMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
-        brandMerged(SalesOrderItemVariables.FAV_BRAND))
+        brandMerged(SalesOrderItemVariables.FAV_BRAND)
+      )
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
 
