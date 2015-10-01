@@ -139,7 +139,7 @@ object PastCampaignCheck extends Logging {
       return customerSkuSimpleSelected
     }
 
-    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays)
+    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays, DataSets.EMAIL_CAMPAIGNS)
 
     val customerSkuSelected = customerSkuSimpleSelected.
       withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
