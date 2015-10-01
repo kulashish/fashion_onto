@@ -1,6 +1,7 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, NewsletterPreferencesVariables, NewsletterVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -10,6 +11,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.variables.NewsletterPreferences
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 4/9/15.
@@ -26,7 +28,7 @@ object CustPreference {
 
     if (DataWriter.canWrite(saveMode, savePath)) {
 
-      val (nls, custPrefPrevFull) = readDf(incrDate, prevDate, fullPath)
+      val (nls, custPrefPrevFull, cmr) = readDf(incrDate, prevDate, fullPath)
 
       val (nlsInr, custPrefFull) = NewsletterPreferences.getNewsletterPref(nls, custPrefPrevFull)
 
@@ -40,9 +42,9 @@ object CustPreference {
         res1 = custPrefFull.except(custPrefPrevFull)
       }
 
-      val res = res1
+      val res = res1.join(cmr, res1(NewsletterVariables.EMAIL) === cmr(NewsletterVariables.EMAIL), SQL.LEFT_OUTER)
         .select(
-          custPrefFull(NewsletterVariables.EMAIL) as ContactListMobileVars.UID,
+          cmr(ContactListMobileVars.UID),
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE),
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION),
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS),
@@ -56,7 +58,7 @@ object CustPreference {
     }
   }
 
-  def readDf(incrDate: String, prevDate: String, fullPath: String): (DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String, fullPath: String): (DataFrame, DataFrame, DataFrame) = {
     var dfNls: DataFrame = null
     var dfcustPrefPrevFull: DataFrame = null
     if (null != fullPath) {
@@ -65,8 +67,9 @@ object CustPreference {
       dfNls = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, incrDate)
       dfcustPrefPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, prevDate)
     }
+    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, prevDate)
 
-    (dfNls, dfcustPrefPrevFull)
+    (dfNls, dfcustPrefPrevFull, cmr)
   }
 
 }
