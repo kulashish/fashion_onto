@@ -126,7 +126,6 @@ if ($component eq "bobAcqFull1") {
     run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
-    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
