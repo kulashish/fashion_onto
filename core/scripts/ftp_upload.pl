@@ -48,7 +48,7 @@ if ($component eq "campaigns") {
 } elsif ($component eq "custPreference") {
     upload_email_campaigns_custPreference();
 } elsif ($component eq "contactListMobile") {
-    upload_email_campaigns_contactListMobile
+    upload_email_campaigns_contactListMobile();
 }
 
 
