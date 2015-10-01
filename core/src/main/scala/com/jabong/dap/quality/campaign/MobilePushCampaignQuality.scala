@@ -16,7 +16,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{SaveMode, DataFrame, Row}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 
@@ -99,7 +99,10 @@ object MobilePushCampaignQuality extends Logging {
 
   def writeForJDaRe(df: DataFrame) = {
     val dbConn = new DbConnection(CampaignCommon.J_DARE_SOURCE)
-    df.write.mode(DataSets.APPEND_SAVEMODE.toLowerCase).jdbc(dbConn.getConnectionString, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dbConn.getConnectionProperties)
+    val dateNow = new java.util.Date
+    val tsString = new java.sql.Timestamp(dateNow.getTime).toString
+    val dfWithInsertedOn= df.withColumn("created_at", lit(tsString))
+    dfWithInsertedOn.write.mode(SaveMode.Append).jdbc(dbConn.getConnectionString, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dbConn.getConnectionProperties)
   }
 
   def getCampaignQuality(campaignName: String, dateYesterday: String): ListBuffer[Row] = {
