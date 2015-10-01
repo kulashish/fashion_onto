@@ -31,10 +31,6 @@ object SalesOrderAddress {
       jData = prevFav.unionAll(curFav)
     }
 
-    jData.cache()
-
-    println("Count for sales Address Data" + jData.count())
-
     (getFav(jData), jData)
   }
 
@@ -42,7 +38,7 @@ object SalesOrderAddress {
     if (null == str) {
       return ""
     }
-    return str.toString().trim()
+    str.toString().trim()
   }
 
   /**
@@ -53,8 +49,8 @@ object SalesOrderAddress {
   def getFav(favData: DataFrame): DataFrame = {
     val mapCity = favData.map(s => (s(0) -> (convert2String(s(1)), convert2String(s(2)), convert2String(s(3)) + ", " + convert2String(s(4)))))
     val grouped = mapCity.groupByKey()
-    val x = grouped.map(s => (Row(s._1.toString, findMax(s._2.toList))))
-    return Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
+    val x = grouped.map(s => ((s._1.asInstanceOf[Long], findMax(s._2.toList)))).map(x => Row(x._1, x._2._1, x._2._2, x._2._3, x._2._4))
+    Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
   }
 
   /**
@@ -69,9 +65,9 @@ object SalesOrderAddress {
     val default = (-1, 0)
     list.foreach{ e =>
       val (l, m, n) = e
-      if(l.length() > 0) a += l
-      if(m.length() > 0) b += m
-      if(n.length() > 1) c += n
+      if (l.length() > 0) a += l
+      if (m.length() > 0) b += m
+      if (n.length() > 1) c += n
     }
     var fCity = ""
     if (a.size > 0) {
@@ -96,7 +92,7 @@ object SalesOrderAddress {
       lName = nameArr(1)
     }
 
-    return (fCity, fMobile, fName, lName)
+    (fCity, fMobile, fName, lName)
   }
 
   /**

@@ -28,16 +28,6 @@ object Udf {
   val latestTimestamp = udf((a1: Timestamp, a2: Timestamp) => UdfUtils.getLatest(a1: Timestamp, a2: Timestamp))
 
   /**
-   * latestInt will return latest Integer value
-   */
-  val latestInt = udf((a1: Integer, a2: Integer) => UdfUtils.getLatest(a1: Integer, a2: Integer))
-
-  /**
-   * latestBool will return latest Boolean value
-   */
-  val latestBool = udf((a1: Boolean, a2: Boolean) => UdfUtils.getLatest(a1: Boolean, a2: Boolean))
-
-  /**
    * latestDecimal will return latest Decimal value
    */
   val latestDecimal = udf((a1: java.math.BigDecimal, a2: java.math.BigDecimal) => UdfUtils.getLatest(a1: java.math.BigDecimal, a2: java.math.BigDecimal))

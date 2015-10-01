@@ -193,7 +193,7 @@ object SalesOrderItem {
     val mostPrefBrandJoinedIncr = salesOrderJoinedIncr.join(yestItr, salesOrderJoined(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE))
       .select(
         col(SalesOrderVariables.FK_CUSTOMER),
-        col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
+        col(SalesOrderVariables.ID_SALES_ORDER),
         col(SalesOrderItemVariables.SKU),
         col(ProductVariables.BRAND),
         Udf.bigDecimal2Double(col(ProductVariables.SPECIAL_PRICE)) as ProductVariables.SPECIAL_PRICE
