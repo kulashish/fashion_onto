@@ -19,6 +19,10 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
  */
 object UdfUtils {
 
+  def csvDateFormat(s : String): String = {
+    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
+  }
+
   /**
    * min of Timestamp t1 or t2
    * @param t1
