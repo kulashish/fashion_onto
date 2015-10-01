@@ -142,6 +142,6 @@ object Udf {
 
   val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
 
-  val dateCsvFormat = udf((s: String) => UdfUtils.csvDateFormat(s: String))
+  val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
 
 }
