@@ -89,9 +89,9 @@ object MobilePushCampaignQuality extends Logging {
 
       val emailSubscribers = OptionUtils.getOptValue(CampaignInfo.campaigns.emailSubscribers, "tech.dap@jabong.com")
 
-      val output = cachedfCampaignQuality.collect.foldLeft("")((a, b) => a + b + "\n")
+      val content = ScalaMail.generateHTML(cachedfCampaignQuality)
 
-      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", output, "")
+      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", content, "")
 
     }
 
