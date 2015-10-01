@@ -405,17 +405,17 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(ContactListMobileVars.MOBILE, lit(GARBAGE))
           .withColumn(CampaignMergedFields.TYPO_MOBILE_PERMISION_STATUS, lit(GARBAGE))
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CampaignMergedFields.CUSTOMER_ID)
           .drop(CustomerVariables.EMAIL)
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.LIVE_CART_URL + temp)
 
         val emailCampaignFileName = "53699_33838_" + TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+          .drop(CampaignMergedFields.REF_SKUS)
+          .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
-        DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
+        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
       }
     }
   }
