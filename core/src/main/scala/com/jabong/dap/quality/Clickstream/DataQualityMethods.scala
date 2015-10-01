@@ -32,10 +32,10 @@ object DataQualityMethods extends Logging {
     //val finaloutput = Spark.getContext().parallelize(output)
     //finaloutput.coalesce(1,true).saveAsTextFile(PathBuilder.buildPath(ConfigConstants.WRITE_OUTPUT_PATH, ClickStreamConstant.CLICKSTREAM_DATA_QUALITY, "CLICKSTREAM_QUALITY", DataSets.DAILY_MODE, date))
     //write(ConfigConstants.OUTPUT_PATH, "./Automation1/",output.getBytes())
-    ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output, "")
+    ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output)
     //println("ScalaMailMain")
 
-    ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output, "")
+    ScalaMail.sendMessage("tech.dap@jabong.com", "", "", "tech.dap@jabong.com", "Quality Report", output)
 
   }
   def Artemisdaily(hiveContext: HiveContext, day: String, month: String, year: String, clickStreamArtemisTable: String, clickStreamAppsTable: String, clickStreamDesktopTable: String, clickStreamMergeTable: String): String = {

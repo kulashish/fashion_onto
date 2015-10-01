@@ -9,7 +9,7 @@ package com.jabong.dap.common.mail
 
 import java.util.{ Date, Properties }
 import javax.mail.{ Address, Message, Session, Transport }
-import javax.mail.internet.{ InternetAddress, MimeMessage }
+import javax.mail.internet.{MimeMultipart, MimeBodyPart, InternetAddress, MimeMessage}
 
 object ScalaMail extends java.io.Serializable {
   var message: Message = null
@@ -20,12 +20,18 @@ object ScalaMail extends java.io.Serializable {
   var bcc: String = ""
 
   // throws MessagingException
-  def sendMessage(to: String, cc: String, bcc: String, from: String, subject: String, content: String, smtpHost: String) {
+  def sendMessage(to: String, cc: String, bcc: String, from: String, subject: String, content: String) {
     message = createMessage
     message.setFrom(new InternetAddress(from))
     message.setSentDate(new Date())
     message.setSubject(subject)
-    message.setText(content)
+//    message.setText(content)
+    val mbp3 = new MimeBodyPart()
+    mbp3.setContent(content, "text/html")
+    val mp = new MimeMultipart()
+    mp.addBodyPart(mbp3)
+    message.setContent(mp)
+
     setToCcBccRecipients(to, cc, bcc)
     Transport.send(message)
   }
