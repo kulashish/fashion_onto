@@ -85,7 +85,8 @@ object ContactListMobile extends Logging {
       dfDND,
       dfSmsOptOut,
       dfBlockedNumbers,
-      dfZoneCity
+      dfZoneCity,
+      dfCmrFull
       ) = readDf(paths, incrDate, prevDate)
 
     //get  Customer CustomerSegments.getCustomerSegments
@@ -151,8 +152,9 @@ object ContactListMobile extends Logging {
       DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
     }
 
-    val dfCsv = dfContactListMobileIncr.select(
-      col(CustomerVariables.ID_CUSTOMER) as ContactListMobileVars.UID,
+    val dfCsv = dfContactListMobileIncr.join(dfCmrFull, dfCmrFull(ContactListMobileVars.EMAIL) === dfContactListMobileIncr(ContactListMobileVars.EMAIL), SQL.LEFT_OUTER)
+      .select(
+      dfCmrFull(ContactListMobileVars.UID),
       col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
       col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
@@ -501,7 +503,7 @@ object ContactListMobile extends Logging {
    * @param incrDate
    * @return
    */
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
     val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, incrDate)
     val dfCustomerListMobilePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, prevDate)
@@ -531,7 +533,8 @@ object ContactListMobile extends Logging {
     val dfBlockedNumbers = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
 
     val dfZoneCity = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
-    //TODO store the city names in lower case, all data coming as Upper case
+
+    val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
     (
       dfCustomerIncr,
       dfCustomerListMobilePrevFull,
@@ -549,10 +552,11 @@ object ContactListMobile extends Logging {
       dfDND,
       dfSmsOptOut,
       dfBlockedNumbers,
-      dfZoneCity)
+      dfZoneCity,
+      dfCmr)
   }
 
-  def readDf(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     if (null != paths) {
       val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, incrDate)
       val dfCustomerSegmentsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_SEGMENTS, DataSets.FULL_MERGE_MODE, incrDate)
@@ -573,6 +577,8 @@ object ContactListMobile extends Logging {
 
       val dfZoneCity = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
 
+      val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+
       (
         dfCustomerIncr,
         null,
@@ -590,7 +596,8 @@ object ContactListMobile extends Logging {
         dfDND,
         dfSmsOptOut,
         dfBlockedNumbers,
-        dfZoneCity)
+        dfZoneCity,
+        dfCmr)
     } else {
       readDf(incrDate, prevDate)
     }
