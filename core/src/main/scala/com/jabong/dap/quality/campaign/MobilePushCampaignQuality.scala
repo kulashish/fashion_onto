@@ -91,8 +91,7 @@ object MobilePushCampaignQuality extends Logging {
 
       val content = ScalaMail.generateHTML(cachedfCampaignQuality)
 
-      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", output)
-      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", content, "")
+      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", content)
 
     }
 
