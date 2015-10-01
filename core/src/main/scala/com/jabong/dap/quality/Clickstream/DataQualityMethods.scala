@@ -45,11 +45,11 @@ object DataQualityMethods extends Logging {
 
     val mergepagevisit = hiveContext.sql("select id, browserid as bid, visitid, pagets, actualvisitid, channel, ip, url, pagetype, domain, device, useragent, year1, month1, date1 from " + clickStreamMergeTable + " where date1 = " + day + " and month1 = " + month + " and year1 = " + year).persist()
 
-    var msg = qualityCount(data, "Clickstream_Artemis_Desktop", "")
+    var msg = "<pre>" + qualityCount(data, "Clickstream_Artemis_Desktop", "")
     msg = qualityCount(clickstreamapps, "Clickstream_apps", msg)
     msg = qualityCount(clickstreampagevisit, "Clickstream_Desktop_pagevisit", msg)
-    msg = qualityCount(mergepagevisit, "merge_pagevisit", msg)
-    return msg
+    msg = qualityCount(mergepagevisit, "merge_pagevisit", msg) + "</pre>"
+    msg
   }
 
   def qualityCount(resultSet: DataFrame, processName: String, oldMessage: String): String = {
