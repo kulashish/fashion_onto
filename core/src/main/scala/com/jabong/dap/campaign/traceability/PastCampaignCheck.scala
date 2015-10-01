@@ -26,7 +26,7 @@ object PastCampaignCheck extends Logging {
    * @param nDays
    * @return
    */
-  def getCampaignCustomers(pastCampaignData: DataFrame, campaignMailType: Int, nDays: Int): DataFrame = {
+  def getCampaignCustomers(pastCampaignData: DataFrame, campaignMailType: Int, nDays: Int , campaignType: String = DataSets.PUSH_CAMPAIGNS): DataFrame = {
     if (pastCampaignData == null || campaignMailType == 0 || nDays < 0) {
       logger.error("Any of the argument is null")
       return null
@@ -38,9 +38,15 @@ object PastCampaignCheck extends Logging {
 
     val filterDate = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT)
 
-    val mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
-      .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
-        pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1))
+    var mailTypeCustomers:DataFrame = null
+    if(campaignType.equals(DataSets.PUSH_CAMPAIGNS)){
+       mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
+        .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
+          pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1))
+    }else if(campaignType.equals(DataSets.EMAIL_CAMPAIGNS)){
+        mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.LAST_UPDATED_DATE + " >= '" + filterDate + "'")
+    }
+
 
     logger.info("Filtering campaign customer based on mail type " + campaignMailType + " and date >= " + filterDate)
 
@@ -78,10 +84,13 @@ object PastCampaignCheck extends Logging {
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       pastCampaignData = past30DayEmailCampaignMergedData
+      emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
       pastCampaignData = past30DayMobileCampaignMergedData
+      campaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     }
-    campaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
+    logger.info("Invalid campaign Type :- returning the same  customer selected data ")
+    return customerSkuSimpleSelected
   }
 
   /**
@@ -117,6 +126,45 @@ object PastCampaignCheck extends Logging {
     return pastCampaignNotSendCustomers
   }
 
+
+  /**
+   *  To check whether the email campaign has been sent to customer for the same ref sku in last nDays
+   * @param pastCampaignData
+   * @param customerSkuSimpleSelected
+   * @param campaignMailType
+   * @param nDays
+   * @return
+   */
+  def emailCampaignRefSkuCheck(pastCampaignData: DataFrame, customerSkuSimpleSelected: DataFrame, campaignMailType: Int, nDays: Int): DataFrame = {
+    if (pastCampaignData == null || customerSkuSimpleSelected == null || campaignMailType == 0 || nDays < 0) {
+      logger.error("Any of the argument is null")
+      return customerSkuSimpleSelected
+    }
+
+    val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays)
+
+    val customerSkuSelected = customerSkuSimpleSelected.
+      withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
+
+    val pastCampaignNotSendCustomers = customerSkuSelected
+      .join(pastCampaignSendCustomers, customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID)
+      &&
+      (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
+        ||
+      (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU+"2"))
+        ||
+      (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU+"3"))
+        , SQL.LEFT_OUTER)
+      .filter(
+         CampaignMergedFields.CUSTOMER_ID + " is null"
+      )
+      .select(
+        customerSkuSelected("*")
+      )
+
+    return pastCampaignNotSendCustomers
+  }
+  
   def getLastNDaysData(n: Int): DataFrame = {
     var data: DataFrame = null
     for (i <- 1 to n) {
