@@ -88,7 +88,7 @@ my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-jav
 my $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
 my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
 my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
-my $AMMUNITION = "--num-executors 20 --executor-memory 1G";
+my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
