@@ -109,6 +109,7 @@ abstract class CommonRecommendation extends Logging {
         ProductVariables.GENDER,
         ProductVariables.SPECIAL_PRICE,
         ProductVariables.STOCK,
+        ProductVariables.PRICE_BAND,
         Recommendation.NUMBER_LAST_30_DAYS_ORDERED,
         Recommendation.WEEKLY_AVERAGE_SALE,
         Recommendation.LAST_SOLD_DATE)
@@ -276,6 +277,7 @@ abstract class CommonRecommendation extends Logging {
         inputData(ProductVariables.BRICK),
         inputData(ProductVariables.MVP),
         inputData(ProductVariables.GENDER),
+        inputData(ProductVariables.PRICE_BAND),
         inputData(ProductVariables.SPECIAL_PRICE)
       )
       .filter(Recommendation.INVENTORY_FILTER + " = true")
