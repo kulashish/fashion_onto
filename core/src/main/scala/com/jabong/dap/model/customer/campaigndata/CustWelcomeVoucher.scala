@@ -5,6 +5,7 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -42,11 +43,11 @@ object CustWelcomeVoucher extends Logging {
         .select(
           cmrFull(ContactListMobileVars.UID),
           welCodes(SalesRuleVariables.CODE1),
-          welCodes(SalesRuleVariables.CODE1_CREATION_DATE),
-          welCodes(SalesRuleVariables.CODE1_VALID_DATE),
+          Udf.dateCsvFormat(welCodes(SalesRuleVariables.CODE1_CREATION_DATE)) as SalesRuleVariables.CODE1_CREATION_DATE,
+          Udf.dateCsvFormat(welCodes(SalesRuleVariables.CODE1_VALID_DATE)) as SalesRuleVariables.CODE1_VALID_DATE,
           welCodes(SalesRuleVariables.CODE2),
-          welCodes(SalesRuleVariables.CODE2_CREATION_DATE),
-          welCodes(SalesRuleVariables.CODE2_VALID_DATE))
+          Udf.dateCsvFormat(welCodes(SalesRuleVariables.CODE2_CREATION_DATE)) as SalesRuleVariables.CODE2_CREATION_DATE,
+          Udf.dateCsvFormat(welCodes(SalesRuleVariables.CODE2_VALID_DATE)) as SalesRuleVariables.CODE2_VALID_DATE)
         .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(TimeUtils.getTimeStamp()) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(TimeUtils.getTimeStamp()))
       logger.info("after filter on date")
 
