@@ -2,6 +2,7 @@ package oneTimeScripts
 
 import java.io.File
 
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.{ DataFrame, SaveMode }
@@ -16,10 +17,13 @@ object loadAd4pushId {
   val PAGE_TIMESTAMP = "pagets"
 
   def main(args: Array[String]) = {
-    val date = args(0).trim() + "-24"
+    val incrDate = args(0).trim()
+    val dt = TimeUtils.getMonthAndYear(incrDate, TimeConstants.DATE_FORMAT)
+    val date = incrDate + "-24"
     val hiveContext = new HiveContext(new SparkContext(new SparkConf().setAppName("gettingAd4PushIds")))
     val tablename = "clickstream.apps_pagevisit"
-    val sqlQuery = "select bid as %s, %s, %s from %s where domain = 'android'".format(BROWSER_ID, ADD4PUSH, PAGE_TIMESTAMP, tablename)
+    val sqlQuery = "select bid as %s, %s, %s from %s where domain = 'android' and date1<=%s and month1<=%s and year1<=%s"
+      .format(BROWSER_ID, ADD4PUSH, PAGE_TIMESTAMP, tablename, dt.day, dt.month, dt.year)
     val clickIncr = hiveContext.sql(sqlQuery)
     val ad4pushFull = getAd4pushId(clickIncr)
     val ad4pushCurPath = "%s/%s/%s/%s/%s".format("/data/output", "extras", "ad4pushId", "full", date.replaceAll("-", File.separator))
