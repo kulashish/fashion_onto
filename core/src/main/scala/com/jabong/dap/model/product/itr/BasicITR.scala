@@ -34,8 +34,10 @@ object BasicITR extends Logging {
       val minDate = TimeUtils.getDate(startDate, TimeConstants.DATE_FORMAT_FOLDER)
       count = TimeUtils.daysFromToday(minDate)
     }
+    logger.info("value of count, startDate, saveMode: " + count + ", " + startDate + ", " + saveMode)
     for (i <- count to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
+      logger.info("value of date: " + date)
       generateITR(date, saveMode)
     }
   }
