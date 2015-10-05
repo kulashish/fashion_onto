@@ -1,7 +1,7 @@
-{"sku":"PU102MA64WPJINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"MEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
-{"sku":"SW222HO42CONINDFAS","brand":"nike","brick":"mens shoes","mvp":1,"gender":"MEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
-{"sku":"WI261BG36LNZINDFAS","brand":"adidas","brick":"mens shoes","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
-{"sku":"XW574WA35AZGINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"UNISEX","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
-{"sku":"BR828MA28TMPINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
-{"sku":"SO596WA65JLIINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
-{"sku":"ES418WA79UAUINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4}
+{"sku":"PU102MA64WPJINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"MEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"B"}
+{"sku":"SW222HO42CONINDFAS","brand":"nike","brick":"mens shoes","mvp":1,"gender":"MEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"C"}
+{"sku":"WI261BG36LNZINDFAS","brand":"adidas","brick":"mens shoes","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"B"}
+{"sku":"XW574WA35AZGINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"UNISEX","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"B"}
+{"sku":"BR828MA28TMPINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"B"}
+{"sku":"SO596WA65JLIINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"D"}
+{"sku":"ES418WA79UAUINDFAS","brand":"adidas","brick":"test","mvp":1,"gender":"WOMEN","specialPrice":120.7,"stock":120,"category":"MEN FOOTWEAR","number_simple_per_sku":4,"priceBand":"C"}
