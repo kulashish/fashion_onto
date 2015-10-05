@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
