@@ -23,7 +23,8 @@ object loadAd4pushId {
     val hiveContext = new HiveContext(new SparkContext(new SparkConf().setAppName("gettingAd4PushIds")))
     val tablename = "clickstream.apps_pagevisit"
     val sqlQuery = "select bid as %s, %s, %s from %s where domain = 'android' and date1<=%s and month1<=%s and year1<=%s"
-      .format(BROWSER_ID, ADD4PUSH, PAGE_TIMESTAMP, tablename, dt.day, dt.month, dt.year)
+      .format(BROWSER_ID, ADD4PUSH, PAGE_TIMESTAMP, tablename, dt.day, dt.month+1, dt.year)
+    println(sqlQuery)
     val clickIncr = hiveContext.sql(sqlQuery)
     val ad4pushFull = getAd4pushId(clickIncr)
     val ad4pushCurPath = "%s/%s/%s/%s/%s".format("/data/output", "extras", "ad4pushId", "full", date.replaceAll("-", File.separator))
