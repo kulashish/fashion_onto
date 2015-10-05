@@ -135,6 +135,8 @@ object DataSets {
   val RECOMMENDATIONS = "recommendations"
   val BRICK_MVP_RECOMMENDATIONS = "brick_mvp"
   val BRAND_MVP_RECOMMENDATIONS = "brand_mvp"
+  val BRICK_PRICE_BAND_RECOMMENDATIONS = "brand_price_band"
+
 
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"

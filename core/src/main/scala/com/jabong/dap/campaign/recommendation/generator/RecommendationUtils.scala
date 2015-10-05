@@ -19,7 +19,10 @@ object RecommendationUtils extends Serializable {
   recommendationType += (
     "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS)),
     "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS)),
-    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRAND_MVP_RECOMMENDATIONS))
+    "brick_mvp" -> Array((Recommendation.BRICK_PRICE_BAND_PIVOT, Schema.brickPriceBandRecommendationOutput, DataSets.BRICK_PRICE_BAND_RECOMMENDATIONS)),
+    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS),
+                   (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRAND_MVP_RECOMMENDATIONS),
+                   (Recommendation.BRICK_PRICE_BAND_PIVOT, Schema.brickPriceBandRecommendationOutput, DataSets.BRICK_PRICE_BAND_RECOMMENDATIONS))
   )
 
   var RecommendationGenderMap = new HashMap[String, String]
