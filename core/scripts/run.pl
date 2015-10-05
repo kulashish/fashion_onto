@@ -88,33 +88,38 @@ my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-jav
 my $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
 my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
 my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
-my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
     run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
     run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
     run_component($component, $command);
 } elsif ($component eq "bobMerge") {
-    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
+    $AMMUNITION = "--num-executors 12 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component($component, $command);
 } elsif ($component eq "bobMergeMonthly") {
-    $AMMUNITION = "--num-executors 9 --executor-memory 9G";
+    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
     run_component($component, $command);
 # erp Acquisition
 } elsif ($component eq "erpAcqIncr") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
     run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
@@ -129,6 +134,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamSurf3Variable.json";
     run_component($component, $command);
 } elsif ($component eq "basicITR") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
     run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
