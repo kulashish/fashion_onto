@@ -105,7 +105,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
     run_component($component, $command);
 } elsif ($component eq "bobMerge") {
-    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
+    $AMMUNITION = "--num-executors 12 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component($component, $command);
 } elsif ($component eq "bobMergeMonthly") {
@@ -119,6 +119,7 @@ if ($component eq "bobAcqFull1") {
     run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
@@ -133,6 +134,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamSurf3Variable.json";
     run_component($component, $command);
 } elsif ($component eq "basicITR") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
     run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
