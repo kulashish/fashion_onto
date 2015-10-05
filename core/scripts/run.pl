@@ -59,6 +59,7 @@ sub run_component {
     print "$msg\n\n";
 
     send_mail($job_status, $subject, $msg);
+    return $status;
 }
 
 # base params
