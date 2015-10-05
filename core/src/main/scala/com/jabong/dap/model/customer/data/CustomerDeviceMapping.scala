@@ -153,7 +153,7 @@ object CustomerDeviceMapping extends Logging {
       )
     var res: DataFrame = grouped
     if (null != prevFull) {
-      res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
+      res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID), SQL.FULL_OUTER)
         .select(
           coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(grouped(PageVisitVariables.ADD4PUSH), prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,

@@ -2,8 +2,9 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.constants.campaign.CampaignCommon
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
 import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.constants.variables.PageVisitVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
@@ -236,13 +237,17 @@ object CampaignManager extends Serializable with Logging {
       val mergedData = CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
 
       val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
+      val iosDF = finalCampaign.filter(finalCampaign(CampaignMergedFields.DOMAIN) === DataSets.IOS)
+      val androidDF = finalCampaign.filter(finalCampaign(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).na.drop(Array(PageVisitVariables.ADD4PUSH))
+
+      val mergedAd4push = iosDF.unionAll(androidDF)
       println("Starting write parquet after repartitioning and caching")
       val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
       if (DataWriter.canWrite(saveMode, writePath))
-        DataWriter.writeParquet(finalCampaign, writePath, saveMode)
+        DataWriter.writeParquet(mergedAd4push, writePath, saveMode)
 
       //writing csv file
-      CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
+      CampaignProcessor.splitFileToCSV(iosDF, androidDF, dateFolder)
     }
   }
 
