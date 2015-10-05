@@ -16,3 +16,4 @@ hadoop fs -put /opt/alchemy-core/current/jar/Alchemy-assembly.jar /apps/alchemy/
 #copying run.pl to hdfs
 hadoop fs -mkdir -p /apps/alchemy/workflows/scripts/
 hadoop fs -put /opt/alchemy-core/current/bin/run.pl /apps/alchemy/workflows/scripts/.
+hadoop fs -put /opt/alchemy-core/current/bin/ftp_upload.pl /apps/alchemy/workflows/scripts/.
