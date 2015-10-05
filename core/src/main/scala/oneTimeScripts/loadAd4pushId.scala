@@ -4,8 +4,8 @@ import java.io.File
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{DataFrame, SaveMode}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.{ DataFrame, SaveMode }
+import org.apache.spark.{ SparkConf, SparkContext }
 
 /**
  * Program to get all the ad4pushId firstTime.
