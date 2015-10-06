@@ -64,7 +64,7 @@ sub run_component {
 
 # spark path constants
 my $SPARK_HOME = "/ext/spark";
-my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
+my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component ";
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
@@ -87,10 +87,10 @@ if ($target eq "STAGE") {
     $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
     $EMAIL_PREFIX = "[PROD]";
 } elsif ($target eq "TEST-PROD") {
-     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-     $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
-     $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
-     $EMAIL_PREFIX = "[TEST-PROD]";
+    $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
+    $EMAIL_PREFIX = "[TEST-PROD]";
 } else {
     print "not a valid target\n";
     exit -1;
