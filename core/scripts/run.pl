@@ -59,6 +59,7 @@ sub run_component {
     print "$msg\n\n";
 
     send_mail($job_status, $subject, $msg);
+    return $status;
 }
 
 # spark path constants
@@ -66,7 +67,7 @@ my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component ";
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
-my $AMMUNITION = "--num-executors 18 --executor-memory 1G";
+my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # base params
 my $HDFS_BASE;
@@ -86,11 +87,11 @@ if ($target eq "STAGE") {
     $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
     $EMAIL_PREFIX = "[PROD]";
 } elsif ($target eq "TEST-PROD") {
-     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-     $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
-     $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
-     $EMAIL_PREFIX = "[TEST-PROD]";
-}else {
+    $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
+    $EMAIL_PREFIX = "[TEST-PROD]";
+} else {
     print "not a valid target\n";
     exit -1;
 }
@@ -112,11 +113,11 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
     run_component($component, $command);
 } elsif ($component eq "bobMerge") {
-    $AMMUNITION = "--num-executors 27 --executor-memory 1G";
+    $AMMUNITION = "--num-executors 12 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     run_component($component, $command);
 } elsif ($component eq "bobMergeMonthly") {
-    $AMMUNITION = "--num-executors 27 --executor-memory 1G";
+    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
     run_component($component, $command);
 # erp Acquisition
@@ -126,6 +127,7 @@ if ($component eq "bobAcqFull1") {
     run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
@@ -140,6 +142,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamSurf3Variable.json";
     run_component($component, $command);
 } elsif ($component eq "basicITR") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
     run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
