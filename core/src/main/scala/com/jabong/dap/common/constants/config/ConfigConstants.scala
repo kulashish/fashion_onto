@@ -23,4 +23,5 @@ object ConfigConstants {
 
   val ZONE_CITY_PINCODE_PATH = basePath + File.separator + "input/DWH/zone_city_pincode/full/2015/09/24/ZONE_CITY_PINCODE_DWH_DATA_DUMP.csv"
 
+  val ENV = AppConfig.config.env
 }
