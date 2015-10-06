@@ -62,34 +62,41 @@ sub run_component {
     return $status;
 }
 
-# base params
-my $HDFS_BASE;
-my $EMAIL_PREFIX;
-
-# target needs to be either stage or prod
-if ($target eq "STAGE") {
-    $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
-    $EMAIL_PREFIX = "[STAGE]";
-} elsif ($target eq "PROD") {
-    $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-    $EMAIL_PREFIX = "[PROD]";
-} elsif ($target eq "TEST-PROD") {
-     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-     $EMAIL_PREFIX = "[TEST-PROD]";
-} else {
-    print "not a valid target\n";
-    exit -1;
-}
-
 # spark path constants
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component ";
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
-my $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
-my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
-my $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
+
+# base params
+my $HDFS_BASE;
+my $EMAIL_PREFIX;
+my $HDFS_LIB;
+my $HDFS_CONF;
+
+# target needs to be either stage or prod
+if ($target eq "STAGE") {
+    $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
+    $EMAIL_PREFIX = "[STAGE]";
+} elsif ($target eq "PROD") {
+    $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
+    $EMAIL_PREFIX = "[PROD]";
+} elsif ($target eq "TEST-PROD") {
+    $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
+    $EMAIL_PREFIX = "[TEST-PROD]";
+} else {
+    print "not a valid target\n";
+    exit -1;
+}
+
+my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
 
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
@@ -125,7 +132,7 @@ if ($component eq "bobAcqFull1") {
     run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
     # for retarget campaign module
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
     run_component($component, $command);
 } elsif ($component eq "clickstreamYesterdaySession") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamYesterdaySession.json";
@@ -139,6 +146,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
     run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushInvalidCampaign --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
     run_component($component, $command);
 } elsif ($component eq "pushAbandonedCartCampaign") {
@@ -150,7 +158,6 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushWishlistCampaign --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
     run_component($component, $command);
 } elsif ($component eq "pushCampaignMerge") {
-    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --pushCampaignsJson $HDFS_CONF/pushCampaigns.json";
     run_component($component, $command);
 } elsif ($component eq "customerDeviceMapping") {
@@ -194,11 +201,10 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custWelcomeVoucher --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custWelcomeVoucher.json";
     run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
-    $AMMUNITION = "--num-executors 9 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
     run_component($component, $command);
 } else {
-     print "not a valid component\n";
+    print "not a valid component\n";
 }
 
 
