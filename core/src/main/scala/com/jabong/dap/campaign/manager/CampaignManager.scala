@@ -5,7 +5,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
@@ -375,8 +375,17 @@ object CampaignManager extends Serializable with Logging {
       if (campaignType == DataSets.PUSH_CAMPAIGNS) {
         val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
         val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
-        DataWriter.writeParquet(finalCampaign, writePath, saveMode)
-        CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
+        val iosDF = finalCampaign.filter(finalCampaign(CampaignMergedFields.DOMAIN) === DataSets.IOS)
+        val androidDF = finalCampaign.filter(finalCampaign(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).na.drop(Array(PageVisitVariables.ADD4PUSH))
+
+        val mergedAd4push = iosDF.unionAll(androidDF)
+        println("Starting write parquet after repartitioning and caching")
+        val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.CAMPAIGNS, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+        if (DataWriter.canWrite(saveMode, writePath))
+          DataWriter.writeParquet(mergedAd4push, writePath, saveMode)
+
+        //writing csv file
+        CampaignProcessor.splitFileToCSV(iosDF, androidDF, dateFolder)
       } else {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp = "temp"

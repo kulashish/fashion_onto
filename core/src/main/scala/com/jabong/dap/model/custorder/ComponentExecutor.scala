@@ -59,7 +59,7 @@ class ComponentExecutor extends Serializable with Logging {
       val isHistory = OptionUtils.getOptBoolVal(ParamJobConfig.paramJobInfo.isHistory)
 
       println("isHistory: " + isHistory)
-      println("ParamJobConfig.paramJobInfo:" + ParamJobConfig.paramJobInfo)    
+      println("ParamJobConfig.paramJobInfo:" + ParamJobConfig.paramJobInfo)
 
       for (paramJob <- ParamJobConfig.paramJobInfo.params) {
         ParamJobConfig.paramInfo = paramJob
