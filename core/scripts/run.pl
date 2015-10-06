@@ -76,7 +76,7 @@ if ($target eq "STAGE") {
 } elsif ($target eq "TEST-PROD") {
      $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
      $EMAIL_PREFIX = "[TEST-PROD]";
-}else {
+} else {
     print "not a valid target\n";
     exit -1;
 }
