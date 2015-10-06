@@ -91,7 +91,7 @@ if ($target eq "STAGE") {
      $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
      $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
      $EMAIL_PREFIX = "[TEST-PROD]";
-}else {
+} else {
     print "not a valid target\n";
     exit -1;
 }
