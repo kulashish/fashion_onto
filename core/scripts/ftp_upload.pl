@@ -55,7 +55,6 @@ if ($component eq "campaigns") {
     upload_email_campaigns_contactListMobile();
 } elsif ($component eq "email_campaigns") {
     upload_email_campaigns();
-    return upload_email_campaigns_contactListMobile();
 }
 
 
