@@ -41,6 +41,7 @@ class WishlistLowStockCampaign {
     //=======union both sku and sku simple==============================================================================
     val dfUnion = skuOnlyRecords.unionAll(skuSimpleOnlyRecords).select(
       col(CustomerProductShortlistVariables.FK_CUSTOMER),
+      col(CustomerProductShortlistVariables.EMAIL),
       col(CustomerProductShortlistVariables.SKU) as CustomerProductShortlistVariables.SKU_SIMPLE,
       col(CustomerProductShortlistVariables.SPECIAL_PRICE),
       col(ProductVariables.BRAND),

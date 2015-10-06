@@ -73,5 +73,6 @@ object SalesOrderVariables {
   val DAYS_SINCE_LAST_ORDER = "days_since_last_order"
   val FIRST_ORDER_DATE = "first_order_date"
   val ORDERS_COUNT = "orders_count"
+  val EMAIL = "email"
 
 }
