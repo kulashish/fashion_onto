@@ -307,9 +307,9 @@ sub upload_pricing_sku_data {
    system("hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/");
    my $status = $?;
    # gzipping the file
-   system("gzip -c /data/export/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/data/export/$date_with_zero/pricing_sku_data/$date_with_zero");
+   system("gzip -c /data/export/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/data/export/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
    # copying to slave location
-   system("scp /data/export/$date_with_zero/pricing_sku_data/$date_with_zero dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero");
+   system("scp /data/export/$date_with_zero/pricing_sku_data/$date_with_zero.gz dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
    $status ||= $?;
    system("rm -rf $base");
    return $status;
