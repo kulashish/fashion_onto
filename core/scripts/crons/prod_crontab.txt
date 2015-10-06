@@ -14,7 +14,7 @@
 
 40 3 * * * sh /opt/alchemy-core/current/bin/clickstream/clickstream_pipe.sh >>/opt/alchemy-core/logs/clickstream_logs.txt
 
-30 5 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/pushCampaignMerge/job.properties -run
+30 5 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/pushCampaignMerge/job.properties -run
 
 0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
