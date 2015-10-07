@@ -139,6 +139,15 @@
       "saveFormat": "parquet",
       "saveMode": "Ignore",
       "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_shipment",
+      "primaryKey": "id_sales_order_item_shipment",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
     }
   ]
 }
