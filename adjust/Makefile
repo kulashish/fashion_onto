@@ -1,6 +1,6 @@
 
 VERSION = $(shell grep version build.sbt | cut -d '=' -f 2 | tr -d ' '| sed 's/"//g')
-BASE = alchemy-core-$(VERSION)
+BASE = alchemy-adjust-$(VERSION)
 PKGNAME = $(BASE).tar.gz
 
 package:
