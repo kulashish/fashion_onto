@@ -5,9 +5,10 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
+import com.jabong.dap.model.order.variables.SalesOrder
 import grizzled.slf4j.{ Logging }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -48,8 +49,9 @@ object ItemOnDiscount extends Logging {
 
     var dfCustomerSelected: DataFrame = customerSelected
 
-    if (!customerSelected.schema.fieldNames.toList.contains(CustomerVariables.EMAIL)) {
-      dfCustomerSelected = customerSelected.withColumn(CustomerVariables.EMAIL, lit(null))
+    //for InvalidIODCampaign: In SalesOrder Variable customer_email rename as email
+    if (!customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.CUSTOMER_EMAIL)) {
+      dfCustomerSelected = customerSelected.withColumnRenamed(SalesOrderVariables.CUSTOMER_EMAIL, CustomerVariables.EMAIL)
     }
 
     //filter yesterday itrData from itr30dayData
