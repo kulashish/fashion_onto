@@ -138,7 +138,9 @@ object BasicITR extends Logging {
       ITR.SUPPLIER_STATUS,
       ITR.BRAND_NAME,
       ITR.ITR_DATE
-    ).cache()
+    ).
+      withColumn(ITR.DISCOUNT,((col(ITR.MRP_PRICE)-col(ITR.PRICE_ON_SITE))*100)/col(ITR.MRP_PRICE))
+      .cache()
 
     itrDF.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
 
@@ -154,12 +156,14 @@ object BasicITR extends Logging {
         first(ITR.ITR_DATE) as ITR.ITR_DATE,
         first(ITR.PRICE_BAND) as ITR.PRICE_BAND,
         first(ITR.GENDER) as ITR.GENDER,
+        first(ITR.COLOR) as ITR.COLOR,
         first(ITR.MVP) as ITR.MVP,
         first(ITR.BRICK) as ITR.BRICK,
         first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
         first(ITR.REPORTING_CATEGORY) as ITR.REPORTING_CATEGORY,
         count(ITR.SIMPLE_SKU) as ITR.NUMBER_SIMPLE_PER_SKU,
-        sum(ITR.QUANTITY) as ITR.QUANTITY
+        sum(ITR.QUANTITY) as ITR.QUANTITY,
+        avg(ITR.DISCOUNT) as ITR.DISCOUNT
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
     logger.info("Successfully written to path: " + getPath(true, incrDate))
