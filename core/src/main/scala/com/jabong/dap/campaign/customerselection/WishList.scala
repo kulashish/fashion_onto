@@ -47,10 +47,9 @@ class WishList extends LiveCustomerSelector with Logging {
 
     }
 
-    //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
     // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
-    val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
-      //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
+    val dfResult = dfCustomerProductShortlist.filter("(" + CustomerProductShortlistVariables.FK_CUSTOMER + " is not null or " +
+      CustomerProductShortlistVariables.EMAIL + " is not null ) and " +
       CustomerProductShortlistVariables.REMOVED_AT + " is null")
       .select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
