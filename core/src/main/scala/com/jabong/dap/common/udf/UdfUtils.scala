@@ -47,7 +47,10 @@ object UdfUtils {
   }
 
   def toLower(s: String): String = {
-    return s.toLowerCase()
+    if (null != s)
+      s.toLowerCase()
+    else
+      s
   }
 
   /**
