@@ -178,7 +178,7 @@ object CustomerDeviceMapping extends Logging {
           coalesce(grouped(PageVisitVariables.ADD4PUSH), prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
           coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP), prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     }
-    return res
+    res
   }
 
   /**
