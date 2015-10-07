@@ -79,6 +79,7 @@ object CustomerDeviceMapping extends Logging {
 
     val joined = nlsJoined.join(cmr, cmr(CustomerVariables.EMAIL) === nlsJoined(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
+        cmr(PageVisitVariables.UID),
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
         coalesce(nlsJoined(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -140,7 +141,9 @@ object CustomerDeviceMapping extends Logging {
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
-      DataWriter.writeParquet(res, savePath, saveMode)
+      val filledUid = UUIDGenerator.addUid(res)
+
+      DataWriter.writeParquet(filledUid, savePath, saveMode)
     }
   }
 
