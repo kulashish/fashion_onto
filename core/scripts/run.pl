@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use 5.010;
@@ -27,8 +27,7 @@ sub run_component {
 
     # set the perl environment variable YARN_CONF_DIR
     $ENV{'YARN_CONF_DIR'} = '/etc/hadoop/conf';
-    print $ENV{'YARN_CONF_DIR'};
-    print "\n";
+    print $ENV{'YARN_CONF_DIR'}."\n";
 
     system($command);
 
@@ -54,7 +53,7 @@ sub run_component {
     my $diff = $end - $start;
 
     my $msg = "\n";
-    $msg .= "Command: $YARN_CONF_DIR $command\n";
+    $msg .= "Command: $command\n";
     $msg .= sprintf("Time Taken: %.2f secs\n",$diff);
     $msg .= "start: " . localtime($start) . "\n";
     $msg .= "end: " . localtime($end) . "\n";
