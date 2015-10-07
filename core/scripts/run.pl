@@ -24,8 +24,12 @@ GetOptions (
 sub run_component {
     my ($component, $command) = @_;
     my $start = time();
-    my $YARN_CONF_DIR = "YARN_CONF_DIR=/etc/hadoop/conf ";
-    system($YARN_CONF_DIR . $command);
+
+    $ENV{'YARN_CONF_DIR'} = '/etc/hadoop/conf';
+    print $ENV{'YARN_CONF_DIR'}."\n";
+
+    system($command);
+
     my $status = $?;
     my $end = time();
 
