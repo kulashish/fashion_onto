@@ -28,7 +28,7 @@ object RecommendationUtils extends Serializable {
       (Recommendation.BRICK_PRICE_BAND_PIVOT, Schema.brickPriceBandRecommendationOutput, DataSets.BRICK_PRICE_BAND_RECOMMENDATIONS),
       (Recommendation.MVP_COLOR_PIVOT, Schema.mvpColorRecommendationOutput, DataSets.MVP_COLOR_RECOMMENDATIONS),
       (Recommendation.MVP_DISCOUNT_PIVOT, Schema.mvpDiscountRecommendationOutput, DataSets.MVP_DISCOUNT_RECOMMENDATIONS))
-    )
+  )
 
   var RecommendationGenderMap = new HashMap[String, String]
   RecommendationGenderMap += (
