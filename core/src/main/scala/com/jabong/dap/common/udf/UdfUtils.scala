@@ -47,7 +47,28 @@ object UdfUtils {
   }
 
   def toLower(s: String): String = {
-    return s.toLowerCase()
+    if (null != s)
+      s.toLowerCase()
+    else
+      s
+  }
+
+  def markDnd(mNo: String): String= {
+    var newId: String = null
+    if(null == mNo){
+      "0"
+    } else {
+      "1"
+    }
+  }
+
+  def markMps(mNo: String): String= {
+    var newId: String = null
+    if(null == mNo){
+      "i"
+    } else {
+      "o"
+    }
   }
 
   /**
