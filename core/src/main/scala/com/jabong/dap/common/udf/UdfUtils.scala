@@ -577,4 +577,20 @@ object UdfUtils {
   def addString(value: String, constant: String): String = {
     if (value == null) return null else constant + value + constant
   }
+
+  /**
+   * isEquals checks: if data of d1 and d2 values are equals
+   * @param d1
+   * @param d2
+   * @tparam T
+   * @return
+   */
+  def isEquals[T](d1: T, d2: T): Boolean = {
+    if (d1 == null || d2 == null)
+      return false
+    if (d1.equals(d2)) {
+      return true
+    }
+    return false
+  }
 }
