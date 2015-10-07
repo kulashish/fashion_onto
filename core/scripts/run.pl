@@ -17,15 +17,19 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug  --target|-t stage|prod --component|-c NAME\n";
+) or die "Usage: $0 --debug --target|-t stage|prod --component|-c NAME\n";
  
 
 # 
 sub run_component {
     my ($component, $command) = @_;
     my $start = time();
-    my $YARN_CONF_DIR = "YARN_CONF_DIR=/etc/hadoop/conf ";
-    system($YARN_CONF_DIR . $command);
+
+    $ENV{'YARN_CONF_DIR'} = '/etc/hadoop/conf';
+    print $ENV{'YARN_CONF_DIR'}."\n";
+
+    system($command);
+
     my $status = $?;
     my $end = time();
 
@@ -64,7 +68,7 @@ sub run_component {
 
 # spark path constants
 my $SPARK_HOME = "/ext/spark";
-my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component --driver-memory 3G";
+my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
