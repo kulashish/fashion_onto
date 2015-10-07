@@ -53,6 +53,24 @@ object UdfUtils {
       s
   }
 
+  def markDnd(mNo: String): String= {
+    var newId: String = null
+    if(null == mNo){
+      "0"
+    } else {
+      "1"
+    }
+  }
+
+  def markMps(mNo: String): String= {
+    var newId: String = null
+    if(null == mNo){
+      "i"
+    } else {
+      "o"
+    }
+  }
+
   /**
    * max of Timestamp t1 or t2
    * @param t1

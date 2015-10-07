@@ -461,7 +461,7 @@ object ContactListMobile extends Logging {
         cityJoined(SalesOrderItemVariables.FAV_BRAND),
         cityJoined(ContactListMobileVars.STATE_ZONE),
         cityJoined(ContactListMobileVars.CITY_TIER),
-        when(dndBc(DNDVariables.MOBILE_NUMBER).!==(null), "1").otherwise("0") as ContactListMobileVars.DND)
+        Udf.dnd(dndBc(DNDVariables.MOBILE_NUMBER)) as ContactListMobileVars.DND)
 
     val smsBc = Spark.getContext().broadcast(smsOptOut).value
 
@@ -492,7 +492,7 @@ object ContactListMobile extends Logging {
         dndMerged(ContactListMobileVars.STATE_ZONE),
         dndMerged(ContactListMobileVars.CITY_TIER),
         dndMerged(ContactListMobileVars.DND),
-        when(smsBc(DNDVariables.MOBILE_NUMBER).!==(null), "o").otherwise("i") as ContactListMobileVars.MOBILE_PERMISION_STATUS
+        Udf.mps(smsBc(DNDVariables.MOBILE_NUMBER)) as ContactListMobileVars.MOBILE_PERMISION_STATUS
       )
 
     res
