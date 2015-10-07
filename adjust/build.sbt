@@ -1,6 +1,6 @@
 name := "Alchemy"
 
-version := "0.1.13"
+version := "0.0.1"
 
 scalaVersion := "2.10.5"
 
@@ -38,7 +38,7 @@ libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
   "org.pegdown" % "pegdown" % "1.0.2")
 
 test in assembly := {}
-assemblyJarName in assembly := "Alchemy-assembly.jar"
+assemblyJarName in assembly := "Alchemy-adjust.jar"
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")

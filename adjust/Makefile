@@ -9,6 +9,6 @@ package:
 	sbt clean assembly
 	mkdir -p $(BASE)/bin
 	mkdir -p $(BASE)/jar
-	cp target/scala-2.10/Alchemy-assembly.jar $(BASE)/jar/
+	cp target/scala-2.10/Alchemy-adjust.jar $(BASE)/jar/
 	cp scripts/adjust.pl $(BASE)/bin/
 	tar -zcvf $(PKGNAME) $(BASE)

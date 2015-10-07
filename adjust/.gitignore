@@ -1,0 +1,5 @@
+# ignore project ide folders
+*.class
+*.log
+.idea
+*.iml
