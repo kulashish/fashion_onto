@@ -25,7 +25,9 @@ object LowStock extends Logging {
     val filteredSku = customerSkuData.join(
       itrDataFrame, customerSkuData(ProductVariables.SKU_SIMPLE) === itrDataFrame(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
+      .select(
+        customerSkuData(CustomerVariables.FK_CUSTOMER),
+        customerSkuData(CustomerVariables.EMAIL),
         customerSkuData(ProductVariables.SKU_SIMPLE),
         itrDataFrame(ProductVariables.SPECIAL_PRICE),
         itrDataFrame(ProductVariables.BRAND),

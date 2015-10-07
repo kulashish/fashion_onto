@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
@@ -142,12 +142,14 @@ object PastCampaignCheck extends Logging {
 
     val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays, DataSets.EMAIL_CAMPAIGNS)
 
+    var dfCustomerSkuSimpleSelected = customerSkuSimpleSelected
+
     if (!customerSkuSimpleSelected.schema.fieldNames.toList.contains(CustomerVariables.EMAIL)) {
-      customerSkuSimpleSelected.withColumn(CustomerVariables.EMAIL, lit(null))
+      dfCustomerSkuSimpleSelected = customerSkuSimpleSelected.withColumn(CustomerVariables.EMAIL, lit(null))
     }
 
-    val customerSkuSelected = customerSkuSimpleSelected.
-      withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
+    val customerSkuSelected = dfCustomerSkuSimpleSelected.
+      withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(dfCustomerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers,
