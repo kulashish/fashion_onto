@@ -157,9 +157,11 @@ object CustomerDeviceMapping extends Logging {
     val notNullAdd4push = clickstreamIncr
       .select(
         PageVisitVariables.BROWSER_ID,
+        PageVisitVariables.DOMAIN,
         PageVisitVariables.ADD4PUSH,
         PageVisitVariables.PAGE_TIMESTAMP
       )
+      .filter(col(PageVisitVariables.DOMAIN) === DataSets.ANDROID)
       .dropDuplicates()
       .na.drop(Array(PageVisitVariables.ADD4PUSH))
     val grouped = notNullAdd4push.orderBy(col(PageVisitVariables.BROWSER_ID), desc(PageVisitVariables.PAGE_TIMESTAMP))
