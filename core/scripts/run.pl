@@ -17,7 +17,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --target|-t stage|prod --component|-c NAME\n";
+) or die "Usage: $0 --debug --target|-t STAGE|PROD|TEST-PROD|DEV-PROD --component|-c <component name>\n";
  
 
 # 
@@ -79,6 +79,7 @@ my $EMAIL_PREFIX;
 my $HDFS_LIB;
 my $HDFS_CONF;
 
+
 # target needs to be either stage or prod
 if ($target eq "STAGE") {
     $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
@@ -96,8 +97,30 @@ if ($target eq "STAGE") {
     $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
     $EMAIL_PREFIX = "[TEST-PROD]";
 } else {
-    print "not a valid target\n";
-    exit -1;
+
+    my $hostname =  `hostname`;
+    chomp($hostname);
+
+    my $USER_NAME = `whoami`;
+    chomp($user);
+
+    if($hostname =~ /^bigdata/){
+        $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
+    }else  if($hostname =~ /^dataplatform/){
+        $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    }else{
+        print("Error: not supported platform");
+        exit(-1);
+    }
+
+    if (exists $ENV{"ALCHEMY_CORE_HOME"}) {
+      $HDFS_LIB = $ENV{"ALCHEMY_CORE_HOME"} . "/lib";
+    } else {
+     $HDFS_LIB = "/home/$USER_NAME/alchemy/current/lib";
+    }
+
+    $HDFS_CONF = "$HDFS_BASE/users/$USER_NAME/alchemy/conf";
+    $EMAIL_PREFIX = "[DEV]";
 }
 
 my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
