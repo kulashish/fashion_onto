@@ -300,7 +300,7 @@ object ContactListMobile extends Logging {
 
   }
 
-  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesAddrCalFull: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame): DataFrame = {
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesOrderAddrFavCalc: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame): DataFrame = {
     val customerNls = customerIncr.join(nls, customerIncr(CustomerVariables.EMAIL) === nls(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
       .select(
         coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -342,18 +342,18 @@ object ContactListMobile extends Logging {
         custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE)
       )
 
-    val salesOrderAddress = salesAddrCalFull.join(salesOrderCalcFull, salesAddrCalFull(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val salesOrderAddress = salesOrderAddrFavCalc.join(salesOrderCalcFull, salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
-        coalesce(salesAddrCalFull(SalesOrderVariables.FK_CUSTOMER), salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        salesAddrCalFull(SalesAddressVariables.CITY),
-        salesAddrCalFull(SalesAddressVariables.PHONE),
-        salesAddrCalFull(SalesAddressVariables.FIRST_NAME),
-        salesAddrCalFull(SalesAddressVariables.LAST_NAME),
+        coalesce(salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER), salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        salesOrderAddrFavCalc(SalesAddressVariables.CITY),
+        salesOrderAddrFavCalc(SalesAddressVariables.PHONE),
+        salesOrderAddrFavCalc(SalesAddressVariables.FIRST_NAME),
+        salesOrderAddrFavCalc(SalesAddressVariables.LAST_NAME),
         salesOrderCalcFull(ContactListMobileVars.LAST_ORDER_DATE),
         salesOrderCalcFull(SalesOrderVariables.UPDATED_AT)
       )
 
-    val salesMerged = salesOrderAddress.join(successfulOrdersIncr, successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val salesMerged = salesOrderAddress.join(successfulOrdersIncr, salesOrderAddress(SalesOrderVariables.FK_CUSTOMER) === successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         salesOrderAddress(SalesAddressVariables.CITY),
@@ -378,7 +378,7 @@ object ContactListMobile extends Logging {
         favBrandIncr(SalesOrderItemVariables.FAV_BRAND)
       )
 
-    val mergedIncr = customerMerged.join(brandMerged, brandMerged(SalesOrderVariables.FK_CUSTOMER) === customerMerged(CustomerVariables.ID_CUSTOMER))
+    val mergedIncr = customerMerged.join(brandMerged, customerMerged(CustomerVariables.ID_CUSTOMER) === brandMerged(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(customerMerged(CustomerVariables.ID_CUSTOMER), brandMerged(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         customerMerged(CustomerVariables.EMAIL),
@@ -406,7 +406,7 @@ object ContactListMobile extends Logging {
 
     val cityBc = Spark.getContext().broadcast(cityZone).value
 
-    val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(cityBc(ContactListMobileVars.CITY)) === Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
+    val cityJoined = mergedIncr.join(cityBc, Udf.toLowercase(mergedIncr(SalesAddressVariables.CITY)) === Udf.toLowercase(cityBc(ContactListMobileVars.CITY)), SQL.LEFT_OUTER)
       .select(
         mergedIncr(CustomerVariables.ID_CUSTOMER),
         mergedIncr(CustomerVariables.EMAIL),
@@ -435,7 +435,7 @@ object ContactListMobile extends Logging {
 
     val dndBc = Spark.getContext().broadcast(dnd).value
 
-    val dndMerged = cityJoined.join(dndBc, dndBc(DNDVariables.MOBILE_NUMBER) === cityJoined(SalesAddressVariables.PHONE), SQL.LEFT_OUTER)
+    val dndMerged = cityJoined.join(dndBc, cityJoined(SalesAddressVariables.PHONE) === dndBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
       .select(
         cityJoined(CustomerVariables.ID_CUSTOMER),
         cityJoined(CustomerVariables.EMAIL),
