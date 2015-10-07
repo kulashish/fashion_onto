@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
@@ -151,7 +151,7 @@ object PastCampaignCheck extends Logging {
 
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers,
-        (Udf.isEquals(customerSkuSelected(CustomerVariables.EMAIL), pastCampaignSendCustomers(CampaignMergedFields.EMAIL)) || Udf.isEquals(customerSkuSelected(CustomerVariables.FK_CUSTOMER), pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID)))
+        (Udf.isEquals(customerSkuSelected(CustomerVariables.EMAIL), pastCampaignSendCustomers(ContactListMobileVars.EMAIL)) || Udf.isEquals(customerSkuSelected(CustomerVariables.FK_CUSTOMER), pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID)))
           &&
           (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
           ||

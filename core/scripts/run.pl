@@ -103,11 +103,11 @@ if ($target eq "STAGE") {
     chomp($hostname);
 
     my $USER_NAME = `whoami`;
-    chomp($user);
+    chomp($USER_NAME);
 
     if($hostname =~ /^bigdata/){
         $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
-    }else  if($hostname =~ /^dataplatform/){
+    }elsif($hostname =~ /^dataplatform/){
         $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
     }else{
         print("Error: not supported platform");
@@ -115,12 +115,12 @@ if ($target eq "STAGE") {
     }
 
     if (exists $ENV{"ALCHEMY_CORE_HOME"}) {
-      $HDFS_LIB = $ENV{"ALCHEMY_CORE_HOME"} . "/lib";
+      $HDFS_LIB = $ENV{"ALCHEMY_CORE_HOME"} . "/jar";
     } else {
-     $HDFS_LIB = "/home/$USER_NAME/alchemy/current/lib";
+     $HDFS_LIB = "/home/$USER_NAME/alchemy/current/jar";
     }
 
-    $HDFS_CONF = "$HDFS_BASE/users/$USER_NAME/alchemy/conf";
+    $HDFS_CONF = "$HDFS_BASE/user/$USER_NAME/alchemy/conf";
     $EMAIL_PREFIX = "[DEV]";
 }
 

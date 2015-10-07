@@ -21,7 +21,9 @@ object Daily extends Logging {
     }
 
     val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
+      .select(
+        customerSkuData(CustomerVariables.FK_CUSTOMER),
+        customerSkuData(CustomerVariables.EMAIL),        
         customerSkuData(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         yesterdayItrData(ProductVariables.SPECIAL_PRICE),
         yesterdayItrData(ProductVariables.BRICK),
