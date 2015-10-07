@@ -1,0 +1,2 @@
+55 5 * * * perl /opt/alchemy-core/current/bin/adjust.pl  >>/opt/alchemy-core/logs/adjust.txt
+
