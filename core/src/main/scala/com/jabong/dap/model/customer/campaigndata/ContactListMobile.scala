@@ -152,10 +152,10 @@ object ContactListMobile extends Logging {
       DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
     }
 
-    val dfCsv = dfContactListMobileIncr.join(dfCmrFull, dfCmrFull(ContactListMobileVars.EMAIL) === dfContactListMobileIncr(ContactListMobileVars.EMAIL), SQL.LEFT_OUTER)
+    val dfCsv = dfContactListMobileIncr.join(dfCmrFull, dfCmrFull(CustomerVariables.EMAIL) === dfContactListMobileIncr(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
       .select(
         dfCmrFull(ContactListMobileVars.UID),
-        col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
+        dfCmrFull(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
         col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
