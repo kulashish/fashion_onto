@@ -17,7 +17,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug  --target|-t stage|prod --component|-c NAME\n";
+) or die "Usage: $0 --debug --target|-t stage|prod --component|-c NAME\n";
  
 
 # 
