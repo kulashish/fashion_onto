@@ -146,4 +146,8 @@ object Udf {
 
   val isEquals = udf((d1: Any, d2: Any) => UdfUtils.isEquals(d1: Any, d2: Any))
 
+  val dnd = udf((s: String) => UdfUtils.markDnd(s: String))
+
+  val mps = udf((s: String) => UdfUtils.markMps(s: String))
+
 }
