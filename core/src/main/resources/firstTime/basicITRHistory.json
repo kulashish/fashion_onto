@@ -3,7 +3,6 @@
   "params": [
     {
       "source": "basicITR",
-      "incrDate": "2015/09/26",
       "incrMode": "daily",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
