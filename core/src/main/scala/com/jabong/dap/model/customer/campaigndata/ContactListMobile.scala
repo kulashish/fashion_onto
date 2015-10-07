@@ -163,7 +163,7 @@ object ContactListMobile extends Logging {
         col(ContactListMobileVars.COUNTRY),
         col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
         col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
-        Udf.dateCsvFormat(col(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
+        col(ContactListMobileVars.DOB),
         col(ContactListMobileVars.MVP_TYPE),
         col(ContactListMobileVars.NET_ORDERS),
         Udf.dateCsvFormat(col(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.REG_DATE,
