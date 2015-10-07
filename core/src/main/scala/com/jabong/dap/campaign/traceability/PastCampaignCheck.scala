@@ -151,7 +151,7 @@ object PastCampaignCheck extends Logging {
 
     val pastCampaignNotSendCustomers = customerSkuSelected
       .join(pastCampaignSendCustomers,
-        (customerSkuSelected(CustomerVariables.EMAIL) === pastCampaignSendCustomers(CampaignMergedFields.EMAIL) || customerSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID))
+        (Udf.isEquals(customerSkuSelected(CustomerVariables.EMAIL), pastCampaignSendCustomers(CampaignMergedFields.EMAIL)) || Udf.isEquals(customerSkuSelected(CustomerVariables.FK_CUSTOMER), pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID)))
           &&
           (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
           ||
