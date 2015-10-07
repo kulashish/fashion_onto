@@ -19,4 +19,6 @@ object ProductVariables {
   val CREATED_AT = "created_at"
   val PRODUCT_NAME = "productName"
   val PRICE_BAND = "priceBand"
+  val COLOR = "color"
+  val DISCOUNT = "discount"
 }
