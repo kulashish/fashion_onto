@@ -53,11 +53,11 @@ for (my $day = 1; $day < 2; $day++) {
      's3_bucket' => "jabong-events-input",
      's3_file_format' => "$date_for_raw_files-*_ip-*_com.jabong.$app.log.gz",
      's3_profile' => "adjust",
-     'raw_files_download_path' => "/home/$user/adjust/rawData/$date_for_dirs/",
-     'hdfs_files_input_path' => "/user/$user/input/adjust/$date_for_dirs/",
-     'hdfs_files_output_path' => "/user/$user/output/adjust/$date_for_dirs/",
+     'raw_files_download_path' => "/data/adjust/rawData/$date_for_dirs/",
+     'hdfs_files_input_path' => "/data/input/adjust/$date_for_dirs/",
+     'hdfs_files_output_path' => "/data/output/adjust/$date_for_dirs/",
      'hdfs_job_jar_file' => "/opt/alchemy-adjust/current/jar/Alchemy-adjust.jar",
-     'ftp_files_input_path' => "/home/$user/adjust/csv/$date_for_dirs/",
+     'ftp_files_input_path' => "/data/adjust/csv/$date_for_dirs/",
      'ftp_files_output_path' => "/adjust/dap/csv/$date_for_dirs/",
      'ftp_location' =>   "61.16.155.203",
      'ftp_user' =>   "FT0072",
@@ -116,7 +116,7 @@ for (my $day = 1; $day < 2; $day++) {
 
 
     print "\n################### Start: Data Transformation ##################\n";
-    `/ext/spark-1.3.1-bin-hadoop2.6/bin/spark-submit --class "com.jabong.dap.adjust.CsvCreator"  --master yarn-cluster   --num-executors 10 --executor-memory 4G --conf spark.akka.frameSize=100 --verbose --jars /ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-core-3.2.10.jar,/ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark-1.3.1-bin-hadoop2.6/conf/hive-site.xml  "$config{'hdfs_job_jar_file'}" "$config{'hdfs_files_input_path'}"  "$config{'hdfs_files_output_path'}"`;
+    `/ext/spark/bin/spark-submit --class "com.jabong.dap.adjust.CsvCreator"  --master yarn-cluster   --num-executors 10 --executor-memory 4G --conf spark.akka.frameSize=100 --verbose --jars /ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-core-3.2.10.jar,/ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark-1.3.1-bin-hadoop2.6/conf/hive-site.xml  "$config{'hdfs_job_jar_file'}" "$config{'hdfs_files_input_path'}"  "$config{'hdfs_files_output_path'}"`;
     print "\n" . localtime(time()) . "\n";
 
     system("mkdir -p $config{'ftp_files_input_path'}");
