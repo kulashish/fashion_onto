@@ -37,23 +37,30 @@ print $date_with_hiphen . "\n";
 my $date_with_zero_today = strftime "%Y%m%d", localtime(time());
 print $date_with_zero_today . "\n";
 
+my $job_exit;
+
 if ($component eq "campaigns") {
-    uploadCampaign();
+    $job_exit = uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
-    upload_ad4push_customer_response();
+    $job_exit = upload_ad4push_customer_response();
 } elsif ($component eq "ad4push_device_merger") {
-    upload_ad4push_device_merger();
+    $job_exit = upload_ad4push_device_merger();
 } elsif ($component eq "dcf_feed") {
-    upload_dcf_feed();
+    $job_exit = upload_dcf_feed();
 } elsif ($component eq "pricing_sku_data") {
-    upload_pricing_sku_data();
+    $job_exit = upload_pricing_sku_data();
 } elsif ($component eq "custWelcomeVoucher") {
-    upload_email_campaigns_custWelcomeVoucher();
+    $job_exit = upload_email_campaigns_custWelcomeVoucher();
 } elsif ($component eq "custPreference") {
-    upload_email_campaigns_custPreference();
+    $job_exit = upload_email_campaigns_custPreference();
 } elsif ($component eq "contactListMobile") {
-    upload_email_campaigns_contactListMobile();
+    $job_exit = upload_email_campaigns_contactListMobile();
+} else {
+    print "not a valid component\n";
+    $job_exit = -1;
 }
+
+exit $job_exit;
 
 # upload ad4push customer response files
 # /data/tmp/ad4push/reactions_android_csv/full/2015/07/30/24/ad4push_customer_response_android_20150730.csv
