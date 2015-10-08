@@ -20,6 +20,12 @@ GetOptions (
 ) or die "Usage: $0 --debug --target|-t STAGE|PROD|TEST-PROD|DEV-PROD --component|-c <component name>\n";
  
 
+# base params
+my $HDFS_BASE;
+my $EMAIL_PREFIX;
+my $HDFS_LIB;
+my $HDFS_CONF;
+
 # 
 sub run_component {
     my ($component, $command) = @_;
@@ -76,13 +82,6 @@ my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.i
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
-
-# base params
-my $HDFS_BASE;
-my $EMAIL_PREFIX;
-my $HDFS_LIB;
-my $HDFS_CONF;
-
 
 # target needs to be either stage or prod
 if ($target eq "STAGE") {
