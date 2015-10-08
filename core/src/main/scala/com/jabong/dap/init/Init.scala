@@ -147,8 +147,11 @@ object Init {
       // all pushCampaign quality checks
       case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
 
-      //campaign quality check
-      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson)
+      //campaign quality check for mobile
+      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson, params.component)
+
+      //campaign quality check for mobile
+      case "emailCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson, params.component)
 
       //pricing sku data
       case DataSets.PRICING_SKU_DATA => new ComponentExecutor().start(params.paramJson)

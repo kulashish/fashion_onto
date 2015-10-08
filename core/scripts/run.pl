@@ -216,7 +216,10 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "mobilePushCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     run_component($component, $command);
-} elsif ($component eq "dcfFeedGenerate") {
+} elsif ($component eq "emailCampaignQuality") {
+      my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component emailCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
+      run_component($component, $command);
+}elsif ($component eq "dcfFeedGenerate") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
     run_component($component, $command);
 } elsif ($component eq "campaignQuality") {
