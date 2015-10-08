@@ -63,7 +63,10 @@ sub run_component {
     print "$subject\n\n";
     print "$msg\n\n";
 
-    send_mail($job_status, $subject, $msg);
+    if($EMAIL_PREFIX ne "[DEV]"){
+        send_mail($job_status, $subject, $msg);
+    }
+
     return $status;
 }
 

@@ -50,8 +50,10 @@ object ItemOnDiscount extends Logging {
     var dfCustomerSelected: DataFrame = customerSelected
 
     //for InvalidIODCampaign: In SalesOrder Variable customer_email rename as email
-    if (!customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.CUSTOMER_EMAIL)) {
+    if (customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.CUSTOMER_EMAIL)) {
       dfCustomerSelected = customerSelected.withColumnRenamed(SalesOrderVariables.CUSTOMER_EMAIL, CustomerVariables.EMAIL)
+    } else if (!customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.EMAIL)) {
+      dfCustomerSelected = customerSelected.withColumn(CustomerVariables.EMAIL, lit(null))
     }
 
     //filter yesterday itrData from itr30dayData
