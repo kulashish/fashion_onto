@@ -37,8 +37,6 @@ object UUIDGenerator {
   }
 
   def addUid(cmr: DataFrame): DataFrame ={
-    val x= cmr.select(when(cmr("uid") !== null, cmr("uid")).otherwise( lit("---")) as "uid")
-    x.collect().foreach(println)
     val res =cmr.select(addUids(cmr("uid")) as "uid", cmr("email"), cmr("browserid"), cmr("domain") )
     res
   }
