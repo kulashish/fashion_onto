@@ -116,7 +116,7 @@ for (my $day = 1; $day < 2; $day++) {
 
 
     print "\n################### Start: Data Transformation ##################\n";
-    `/ext/spark/bin/spark-submit --class "com.jabong.dap.adjust.CsvCreator"  --master yarn-cluster   --num-executors 10 --executor-memory 4G --conf spark.akka.frameSize=100 --verbose --jars /ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-core-3.2.10.jar,/ext/spark-1.3.1-bin-hadoop2.6/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark-1.3.1-bin-hadoop2.6/conf/hive-site.xml  "$config{'hdfs_job_jar_file'}" "$config{'hdfs_files_input_path'}"  "$config{'hdfs_files_output_path'}"`;
+    `/ext/spark/bin/spark-submit --class "com.jabong.dap.adjust.CsvCreator"  --master yarn-cluster   --num-executors 10 --executor-memory 4G --conf spark.akka.frameSize=100 --verbose --jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml  "$config{'hdfs_job_jar_file'}" "$config{'hdfs_files_input_path'}"  "$config{'hdfs_files_output_path'}"`;
     print "\n" . localtime(time()) . "\n";
 
     system("mkdir -p $config{'ftp_files_input_path'}");
