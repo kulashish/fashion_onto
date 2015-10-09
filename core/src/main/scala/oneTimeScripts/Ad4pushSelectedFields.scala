@@ -28,12 +28,12 @@ object Ad4pushSelectedFields {
       Udf.allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
       col(Ad4pushVariables.LASTOPEN),
       col(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS),
-      col(Ad4pushVariables.FEEDBACK)).dropDuplicates()
-    println ("before dropping the null loginUserId " + res.count())
-    //val res = res1.na.drop(Array(Ad4pushVariables.LOGIN_USER_ID))
+      col(Ad4pushVariables.FEEDBACK)
+    ).na.drop(Array(Ad4pushVariables.LOGIN_USER_ID)).dropDuplicates()
+
     val SELECTED = domain + "_selected"
     val csvFileName = "exportDevices_" + code + "_" + curDate
-//    println("writing file with recs: " + res.count())
+    println("writing file with recs: " + res.count())
     writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, "true", ";")
   }
 
