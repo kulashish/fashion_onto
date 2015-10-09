@@ -19,11 +19,11 @@ object Ad4pushSelectedFields {
     val devicesData = DataReader.getDataFrame(DataSets.AD4PUSH, domain, DataSets.FULL_MERGE_MODE, curDate)
     println("Starting for " + domain)
     println(devicesData.count())
-    val res = devicesData.select(allZero2Null(Ad4pushVariables.LOGIN_USER_ID),
-                                  Ad4pushVariables.LASTOPEN,
-                                  Ad4pushVariables.SYSTEM_OPTIN_NOTIFS,
-                                  Ad4pushVariables.FEEDBACK
-     ).na.drop(Array(Ad4pushVariables.LOGIN_USER_ID)).dropDuplicates()
+    val res = devicesData.select(allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)),
+      col(Ad4pushVariables.LASTOPEN),
+      col(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS),
+      col(Ad4pushVariables.FEEDBACK))
+      .na.drop(Array(Ad4pushVariables.LOGIN_USER_ID)).dropDuplicates()
     val SELECTED = domain + "_selected"
     val csvFileName = "exportDevices_" + code + "_" + curDate
     println("writing file with recs: " + res.count())
@@ -44,6 +44,6 @@ object Ad4pushSelectedFields {
     str
   }
 
-  val allZero2Null = udf((str: String) => allZero2Null(str: String))
+  val allZero2NullUdf = udf((str: String) => allZero2Null(str: String))
 
 }
