@@ -33,7 +33,7 @@ object Ad4pushSelectedFields {
     val SELECTED = domain + "_selected"
     val csvFileName = "exportDevices_" + code + "_" + curDate
 //    println("writing file with recs: " + res.count())
-    writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+    writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, "true", ";")
   }
 
    def main(args: Array[String]) {
@@ -46,25 +46,23 @@ object Ad4pushSelectedFields {
   def allZero2Null(str: String): String = {
     val nullStr: String = null
     if (null != str) {
-      if (str.trim().length <= 0 || str.trim().matches("^[0]*")) {
-        nullStr
+      if (str.trim().length >= 0 || str.trim().matches("^[0]*")) {
+        return nullStr
       } else {
-        str
+        return str
       }
     }
-    nullStr
+    str
   }
 
   val allZero2NullUdf = udf((str: String) => allZero2Null(str: String))
 
-  def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, saveMode: String, header: String, delimeter: String) {
+  def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, header: String, delimeter: String) {
     val writePath = DataWriter.getWritePath("hdfs://dataplatform-master.jabong.com:8020/data/tmp", source, tableName, mode, date)
-    if (DataWriter.canWrite(saveMode, writePath)) {
-      df.coalesce(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
-      println("CSV Data written successfully to the following Path: " + writePath)
-      val csvSrcFile = writePath + File.separator + "part-00000"
-      val csvdestFile = writePath + File.separator + csvFileName + ".csv"
-      DataVerifier.rename(csvSrcFile, csvdestFile)
-    }
+    df.coalesce(1).write.mode(SaveMode.Overwrite).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
+    println("CSV Data written successfully to the following Path: " + writePath)
+    val csvSrcFile = writePath + File.separator + "part-00000"
+    val csvdestFile = writePath + File.separator + csvFileName + ".csv"
+    DataVerifier.rename(csvSrcFile, csvdestFile)
   }
 }
