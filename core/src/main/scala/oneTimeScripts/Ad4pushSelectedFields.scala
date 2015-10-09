@@ -5,6 +5,7 @@ import java.io.File
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
@@ -24,7 +25,7 @@ object Ad4pushSelectedFields {
     println("Starting for " + domain)
     println(devicesData.count())
     val res = devicesData.select(
-      allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
+      Udf.allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
       col(Ad4pushVariables.LASTOPEN),
       col(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS),
       col(Ad4pushVariables.FEEDBACK)).dropDuplicates()
@@ -42,20 +43,6 @@ object Ad4pushSelectedFields {
      getSelectedFileds(DataSets.DEVICES_ANDROID, DataSets.ANDROID_CODE)
      getSelectedFileds(DataSets.DEVICES_IOS, DataSets.IOS_CODE)
    }
-
-  def allZero2Null(str: String): String = {
-    val nullStr: String = null
-    if (null != str) {
-      if (str.trim().length >= 0 || str.trim().matches("^[0]*")) {
-        return nullStr
-      } else {
-        return str
-      }
-    }
-    str
-  }
-
-  val allZero2NullUdf = udf((str: String) => allZero2Null(str: String))
 
   def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, header: String, delimeter: String) {
     val writePath = DataWriter.getWritePath("hdfs://dataplatform-master.jabong.com:8020/data/tmp", source, tableName, mode, date)

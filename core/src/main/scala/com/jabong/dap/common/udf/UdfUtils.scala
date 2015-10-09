@@ -535,4 +535,19 @@ object UdfUtils {
     }
   }
 
+  def allZero2Null(str: String): String = {
+    val nullStr: String = null
+    if (null != str) {
+      var str1 = str.trim()
+      if (str1.length <= 0 || str1.matches("^[0]*")) {
+        return nullStr
+      } else {
+        return str1
+      }
+    }
+    str
+  }
+
+
+
 }
