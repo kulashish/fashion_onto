@@ -17,8 +17,14 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --target|-t stage|prod --component|-c NAME\n";
+) or die "Usage: $0 --debug --target|-t STAGE|PROD|TEST-PROD|DEV-PROD --component|-c <component name>\n";
  
+
+# base params
+my $HDFS_BASE;
+my $EMAIL_PREFIX;
+my $HDFS_LIB;
+my $HDFS_CONF;
 
 # 
 sub run_component {
@@ -63,7 +69,10 @@ sub run_component {
     print "$subject\n\n";
     print "$msg\n\n";
 
-    send_mail($job_status, $subject, $msg);
+    if($EMAIL_PREFIX ne "[DEV]"){
+        send_mail($job_status, $subject, $msg);
+    }
+
     return $status;
 }
 
@@ -73,12 +82,6 @@ my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.i
 my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
-
-# base params
-my $HDFS_BASE;
-my $EMAIL_PREFIX;
-my $HDFS_LIB;
-my $HDFS_CONF;
 
 # target needs to be either stage or prod
 if ($target eq "STAGE") {
@@ -97,8 +100,30 @@ if ($target eq "STAGE") {
     $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
     $EMAIL_PREFIX = "[TEST-PROD]";
 } else {
-    print "not a valid target\n";
-    exit -1;
+
+    my $hostname =  `hostname`;
+    chomp($hostname);
+
+    my $USER_NAME = `whoami`;
+    chomp($USER_NAME);
+
+    if($hostname =~ /^bigdata/){
+        $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
+    }elsif($hostname =~ /^dataplatform/){
+        $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    }else{
+        print("Error: not supported platform");
+        exit(-1);
+    }
+
+    if (exists $ENV{"ALCHEMY_CORE_HOME"}) {
+      $HDFS_LIB = $ENV{"ALCHEMY_CORE_HOME"} . "/jar";
+    } else {
+     $HDFS_LIB = "/home/$USER_NAME/alchemy/current/jar";
+    }
+
+    $HDFS_CONF = "$HDFS_BASE/user/$USER_NAME/alchemy/conf";
+    $EMAIL_PREFIX = "[DEV]";
 }
 
 my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";

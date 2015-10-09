@@ -5,9 +5,10 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, ItrVariables, CustomerProductShortlistVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ UdfUtils, Udf }
+import com.jabong.dap.model.order.variables.SalesOrder
 import grizzled.slf4j.{ Logging }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -46,11 +47,21 @@ object ItemOnDiscount extends Logging {
       col(ProductVariables.PRODUCT_NAME) as ItrVariables.ITR_ + ProductVariables.PRODUCT_NAME
     )
 
+    var dfCustomerSelected: DataFrame = customerSelected
+
+    //for InvalidIODCampaign: In SalesOrder Variable customer_email rename as email
+    if (customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.CUSTOMER_EMAIL)) {
+      dfCustomerSelected = customerSelected.withColumnRenamed(SalesOrderVariables.CUSTOMER_EMAIL, CustomerVariables.EMAIL)
+    } else if (!customerSelected.schema.fieldNames.toList.contains(CustomerVariables.EMAIL)) {
+      dfCustomerSelected = customerSelected.withColumn(CustomerVariables.EMAIL, lit(null))
+    }
+
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
-    val updatedCustomerSelected = customerSelected.select(
+    val updatedCustomerSelected = dfCustomerSelected.select(
       Udf.yyyymmdd(customerSelected(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
       col(CustomerVariables.FK_CUSTOMER),
+      col(CustomerVariables.EMAIL),
       col (ProductVariables.SKU_SIMPLE)
     )
 
@@ -67,7 +78,7 @@ object ItemOnDiscount extends Logging {
       .filter(ItrVariables.SPECIAL_PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
       .select(
         col(CustomerVariables.FK_CUSTOMER),
-        //col(CustomerVariables.EMAIL),
+        col(CustomerVariables.EMAIL),
         col(ItrVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
         col(ItrVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE,
         col(ItrVariables.ITR_ + ItrVariables.BRAND) as ProductVariables.BRAND,
@@ -116,7 +127,7 @@ object ItemOnDiscount extends Logging {
 
     val dfResult = joinDf.select(
       CustomerProductShortlistVariables.FK_CUSTOMER,
-      //CustomerProductShortlistVariables.EMAIL,
+      CustomerProductShortlistVariables.EMAIL,
       CustomerProductShortlistVariables.SKU_SIMPLE,
       CustomerProductShortlistVariables.SPECIAL_PRICE
     )
