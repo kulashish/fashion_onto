@@ -32,7 +32,7 @@ object Ad4pushSelectedFields {
     val SELECTED = domain + "_selected"
     val csvFileName = "exportDevices_" + code + "_" + curDate
     println("writing file with recs: " + res.count())
-    DataWriter.writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+    writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, DataSets.OVERWRITE_SAVEMODE, "true", ";")
   }
 
    def main(args: Array[String]) {
