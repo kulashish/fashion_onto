@@ -163,7 +163,7 @@ object BasicITR extends Logging {
         first(ITR.REPORTING_SUBCATEGORY) as ITR.REPORTING_SUBCATEGORY,
         first(ITR.REPORTING_CATEGORY) as ITR.REPORTING_CATEGORY,
         count(ITR.SIMPLE_SKU) as ITR.NUMBER_SIMPLE_PER_SKU,
-        sum(ITR.QUANTITY) as ITR.QUANTITY
+        sum(ITR.QUANTITY) as ITR.QUANTITY,
         avg(ITR.DISCOUNT) as ITR.DISCOUNT
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
