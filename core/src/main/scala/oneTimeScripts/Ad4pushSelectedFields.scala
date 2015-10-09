@@ -19,7 +19,8 @@ object Ad4pushSelectedFields {
     val devicesData = DataReader.getDataFrame("hdfs://dataplatform-master.jabong.com:8020/data/output", DataSets.AD4PUSH, domain, DataSets.FULL_MERGE_MODE, curDate)
     println("Starting for " + domain)
     println(devicesData.count())
-    val res = devicesData.select(allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)),
+    val res = devicesData.select(
+      allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
       col(Ad4pushVariables.LASTOPEN),
       col(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS),
       col(Ad4pushVariables.FEEDBACK))
