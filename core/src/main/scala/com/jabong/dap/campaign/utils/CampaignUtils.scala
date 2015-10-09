@@ -310,10 +310,10 @@ object CampaignUtils extends Logging {
       )
 
     val skuSimpleNotBoughtTillNow = inputData.join(successfulSalesData,
-      (inputData(SalesOrderVariables.EMAIL) === successfulSalesData(SUCCESS_ + SalesOrderVariables.CUSTOMER_EMAIL) || inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER))
+      (inputData(CustomerVariables.EMAIL) === successfulSalesData(SUCCESS_ + SalesOrderVariables.CUSTOMER_EMAIL) || inputData(SalesOrderVariables.FK_CUSTOMER) === successfulSalesData(SUCCESS_ + SalesOrderVariables.FK_CUSTOMER))
         && inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
-      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(SalesOrderVariables.EMAIL), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT)).dropDuplicates()
+      .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(CustomerVariables.EMAIL), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT)).dropDuplicates()
 
     logger.info("Filtered all the sku simple which has been bought")
 
