@@ -93,13 +93,7 @@ object CampaignQuality extends Logging {
 
     val content = ScalaMail.generateHTML(df)
 
-    var subject = "Mobile Push Campaign Quality Report"
-
-    if (campaignType.equals("emailCampaignQuality")) {
-      subject = "Email Campaign Quality Report"
-    }
-
-    ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", subject, content)
+    ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", campaignType, content)
 
   }
 
