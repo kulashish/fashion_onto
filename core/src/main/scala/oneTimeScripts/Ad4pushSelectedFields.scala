@@ -23,12 +23,13 @@ object Ad4pushSelectedFields {
     val devicesData = DataReader.getDataFrame("hdfs://dataplatform-master.jabong.com:8020/data/output", DataSets.AD4PUSH, domain, DataSets.FULL_MERGE_MODE, curDate)
     println("Starting for " + domain)
     println(devicesData.count())
-    val res = devicesData.select(
+    val res1 = devicesData.select(
       allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
       col(Ad4pushVariables.LASTOPEN),
       col(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS),
-      col(Ad4pushVariables.FEEDBACK))
-      .na.drop(Array(Ad4pushVariables.LOGIN_USER_ID)).dropDuplicates()
+      col(Ad4pushVariables.FEEDBACK)).dropDuplicates()
+    println ("before dropping the null loginUserId " + res1.count())
+    val res = res1.na.drop(Array(Ad4pushVariables.LOGIN_USER_ID))
     val SELECTED = domain + "_selected"
     val csvFileName = "exportDevices_" + code + "_" + curDate
     println("writing file with recs: " + res.count())
@@ -43,10 +44,12 @@ object Ad4pushSelectedFields {
    }
 
   def allZero2Null(str: String): String = {
+    val nullStr: String = null
     if (null != str && (0 < str.length || str.matches("^[0]*"))) {
-      return null
+      nullStr
+    } else {
+      str
     }
-    str
   }
 
   val allZero2NullUdf = udf((str: String) => allZero2Null(str: String))
