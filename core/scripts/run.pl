@@ -212,7 +212,7 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } else {
     print "not a valid component\n";
-    exit -1;
+    $job_exit = -1;
 }
 
 exit $job_exit;

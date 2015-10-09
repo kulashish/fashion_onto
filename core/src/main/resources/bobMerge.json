@@ -41,6 +41,13 @@
       "primaryKey": "id_customer",
       "mergeMode": "full",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_shipment",
+      "primaryKey": "id_sales_order_item_shipment",
+      "mergeMode": "full",
+      "saveMode": "Ignore"
     }
   ]
 }
