@@ -482,6 +482,7 @@ class UdfUtilsTest extends FlatSpec {
     assert(day.equals("Sunday"))
   }
 
+  //===============================removeAllZero=========================================================
   "removeAllZero" should "be empty String" in {
     val str = UdfUtils.removeAllZero("000000")
     assert(str.equals(""))
@@ -489,6 +490,34 @@ class UdfUtilsTest extends FlatSpec {
 
   "removeAllZero" should "be same as input string" in {
     val str = UdfUtils.removeAllZero("DE683C47-06E5-4817-BE06-066DEEBA8E4D")
+    assert(str.equals("DE683C47-06E5-4817-BE06-066DEEBA8E4D"))
+  }
+
+  //===============================allZero2Null=========================================================
+
+  "allZero2Null" should "be null String 1" in {
+    val str = UdfUtils.allZero2Null("000000")
+    assert(str == null)
+  }
+
+  "allZero2Null" should "be null String 2" in {
+    val str = UdfUtils.allZero2Null("")
+    assert(str == null)
+  }
+
+  "allZero2Null" should "be null String 3" in {
+    val str = UdfUtils.allZero2Null("  ")
+    assert(str == null)
+  }
+
+  "allZero2Null" should "be null String 4" in {
+    val in: String = null
+    val str = UdfUtils.allZero2Null(in)
+    assert(str == null)
+  }
+
+  "allZero2Null" should "be same as input string" in {
+    val str = UdfUtils.allZero2Null("DE683C47-06E5-4817-BE06-066DEEBA8E4D")
     assert(str.equals("DE683C47-06E5-4817-BE06-066DEEBA8E4D"))
   }
 
