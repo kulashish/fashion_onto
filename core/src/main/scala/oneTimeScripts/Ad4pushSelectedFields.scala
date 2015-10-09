@@ -1,7 +1,6 @@
 package oneTimeScripts
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.DataReader
@@ -17,7 +16,7 @@ object Ad4pushSelectedFields {
 
   def getSelectedFileds(domain: String, code: String) = {
     val curDate = TimeUtils.yesterday(TimeConstants.DATE_FORMAT)
-    val devicesData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.AD4PUSH, domain, DataSets.FULL_MERGE_MODE, curDate)
+    val devicesData = DataReader.getDataFrame("hdfs://dataplatform-master.jabong.com:8020/data/input", DataSets.AD4PUSH, domain, DataSets.FULL_MERGE_MODE, curDate)
     println("Starting for " + domain)
     println(devicesData.count())
     val res = devicesData.select(allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)),
