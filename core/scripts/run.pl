@@ -83,12 +83,6 @@ my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
-# base params
-my $HDFS_BASE;
-my $EMAIL_PREFIX;
-my $HDFS_LIB;
-my $HDFS_CONF;
-
 # target needs to be either stage or prod
 if ($target eq "STAGE") {
     $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
