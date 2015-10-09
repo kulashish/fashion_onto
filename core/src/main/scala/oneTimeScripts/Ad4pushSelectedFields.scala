@@ -1,12 +1,16 @@
 package oneTimeScripts
 
+import java.io.File
+
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.{SaveMode, DataFrame}
 import org.apache.spark.sql.functions._
 
 /**
@@ -47,4 +51,14 @@ object Ad4pushSelectedFields {
 
   val allZero2NullUdf = udf((str: String) => allZero2Null(str: String))
 
+  def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, saveMode: String, header: String, delimeter: String) {
+    val writePath = DataWriter.getWritePath("hdfs://dataplatform-master.jabong.com:8020/data/tmp", source, tableName, mode, date)
+    if (DataWriter.canWrite(saveMode, writePath)) {
+      df.coalesce(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("header", header).option("delimiter", delimeter).save(writePath)
+      println("CSV Data written successfully to the following Path: " + writePath)
+      val csvSrcFile = writePath + File.separator + "part-00000"
+      val csvdestFile = writePath + File.separator + csvFileName + ".csv"
+      DataVerifier.rename(csvSrcFile, csvdestFile)
+    }
+  }
 }
