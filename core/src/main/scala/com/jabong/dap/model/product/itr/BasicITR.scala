@@ -61,6 +61,7 @@ object BasicITR extends Logging {
         ITR.MARGIN -> 0.00,
         ITR.SPECIAL_PRICE -> 0.00,
         ITR.PRICE_ON_SITE -> 0.00,
+        ITR.MRP_PRICE -> 0.00,
         ITR.QUANTITY -> 0
       ))
     val mvpUDF = udf(mvp)
@@ -139,7 +140,7 @@ object BasicITR extends Logging {
       ITR.BRAND_NAME,
       ITR.ITR_DATE
     ).
-      //withColumn(ITR.DISCOUNT,((col(ITR.MRP_PRICE)-col(ITR.PRICE_ON_SITE))*100)/col(ITR.MRP_PRICE)).
+      withColumn(ITR.DISCOUNT,when(col(ITR.MRP_PRICE) === 0.00,lit(0)).otherwise(((col(ITR.MRP_PRICE)-col(ITR.PRICE_ON_SITE))*100)/col(ITR.MRP_PRICE))).
       cache()
 
     itrDF.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
@@ -163,7 +164,7 @@ object BasicITR extends Logging {
         first(ITR.REPORTING_CATEGORY) as ITR.REPORTING_CATEGORY,
         count(ITR.SIMPLE_SKU) as ITR.NUMBER_SIMPLE_PER_SKU,
         sum(ITR.QUANTITY) as ITR.QUANTITY
-        //avg(ITR.DISCOUNT) as ITR.DISCOUNT
+        avg(ITR.DISCOUNT) as ITR.DISCOUNT
       ).write.mode(saveMode).format(DataSets.ORC).save(getPath(true, incrDate))
 
     logger.info("Successfully written to path: " + getPath(true, incrDate))
