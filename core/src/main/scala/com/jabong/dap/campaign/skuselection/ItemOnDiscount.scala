@@ -52,7 +52,7 @@ object ItemOnDiscount extends Logging {
     //for InvalidIODCampaign: In SalesOrder Variable customer_email rename as email
     if (customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.CUSTOMER_EMAIL)) {
       dfCustomerSelected = customerSelected.withColumnRenamed(SalesOrderVariables.CUSTOMER_EMAIL, CustomerVariables.EMAIL)
-    } else if (!customerSelected.schema.fieldNames.toList.contains(SalesOrderVariables.EMAIL)) {
+    } else if (!customerSelected.schema.fieldNames.toList.contains(CustomerVariables.EMAIL)) {
       dfCustomerSelected = customerSelected.withColumn(CustomerVariables.EMAIL, lit(null))
     }
 
