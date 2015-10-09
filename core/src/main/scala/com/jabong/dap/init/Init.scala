@@ -7,7 +7,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.custorder.ComponentExecutor
 import com.jabong.dap.model.product.itr.Itr
-import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
+import com.jabong.dap.quality.campaign.CampaignQuality
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf._
@@ -148,10 +148,10 @@ object Init {
       case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
 
       //campaign quality check for mobile
-      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson, params.component)
+      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
 
       //campaign quality check for mobile
-      case "emailCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson, params.component)
+      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
 
       //pricing sku data
       case DataSets.PRICING_SKU_DATA => new ComponentExecutor().start(params.paramJson)
