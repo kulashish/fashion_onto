@@ -2,12 +2,11 @@ package oneTimeScripts
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
@@ -15,21 +14,36 @@ import org.apache.spark.sql.functions._
  */
 object Ad4pushSelectedFields {
 
-  def getSelectedFileds(readPath: String, savePath: String) ={
-    val devicesData= DataReader.getDataFrame4mCsv(readPath, "true", ";")
-    val res = devicesData.select(Ad4pushVariables.LOGIN_USER_ID,
+  def getSelectedFileds(domain: String, code: String) = {
+    val curDate = TimeUtils.yesterday(TimeConstants.DATE_FORMAT)
+    val devicesData = DataReader.getDataFrame(DataSets.AD4PUSH, domain, DataSets.FULL_MERGE_MODE, curDate)
+    println("Starting for " + domain)
+    println(devicesData.count())
+    val res = devicesData.select(allZero2Null(Ad4pushVariables.LOGIN_USER_ID),
                                   Ad4pushVariables.LASTOPEN,
                                   Ad4pushVariables.SYSTEM_OPTIN_NOTIFS,
                                   Ad4pushVariables.FEEDBACK
      ).na.drop(Array(Ad4pushVariables.LOGIN_USER_ID)).dropDuplicates()
-    val curDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)
-    DataWriter.writeCsv(res, DataSets.AD4PUSH, DataSets.DEVICES_ANDROID, DataSets.FULL_MERGE_MODE, curDate, savePath, DataSets.FULL_MERGE_MODE, "true", ";")
+    val SELECTED = domain + "_selected"
+    val csvFileName = "exportDevices_" + code + "_" + curDate
+    println("writing file with recs: " + res.count())
+    DataWriter.writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, DataSets.OVERWRITE_SAVEMODE, "true", ";")
   }
 
    def main(args: Array[String]) {
-     val conf = new SparkConf().setAppName("SparkExamples")
+     val conf = new SparkConf().setAppName("Ad4pushSelectedFields")
      Spark.init(conf)
-     getSelectedFileds(args(1), args(2))
-     }
+     getSelectedFileds(DataSets.DEVICES_ANDROID, DataSets.ANDROID_CODE)
+     getSelectedFileds(DataSets.DEVICES_IOS, DataSets.IOS_CODE)
+   }
+
+  def allZero2Null(str: String): String = {
+    if (null != str && (0 < str.length || str.matches("^[0]*"))) {
+      return null
+    }
+    str
+  }
+
+  val allZero2Null = udf((str: String) => allZero2Null(str: String))
 
 }
