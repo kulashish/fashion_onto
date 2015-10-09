@@ -45,11 +45,14 @@ object Ad4pushSelectedFields {
 
   def allZero2Null(str: String): String = {
     val nullStr: String = null
-    if (null != str && (0 < str.length || str.matches("^[0]*"))) {
-      nullStr
-    } else {
-      str
+    if (null != str) {
+      if (str.trim().length <= 0 || str.trim().matches("^[0]*")) {
+        nullStr
+      } else {
+        str
+      }
     }
+    nullStr
   }
 
   val allZero2NullUdf = udf((str: String) => allZero2Null(str: String))
