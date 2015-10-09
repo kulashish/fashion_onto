@@ -44,13 +44,12 @@ class Invalid extends LiveCustomerSelector with Logging {
     // get successful Orders of last days sales item
     val successfulSku = getSuccessfulOrders(salesOrderItemData)
 
-
     //for InvalidIODCampaign: In SalesOrder Variable customer_email rename as email
     //   if (customerOrderData.schema.fieldNames.toList.contains(SalesOrderVariables.CUSTOMER_EMAIL)) {
-//      dfCustomerSelected = customerOrderData.withColumnRenamed(SalesOrderVariables.CUSTOMER_EMAIL, CustomerVariables.EMAIL)
-//    } else if (!customerOrderData.schema.fieldNames.toList.contains(SalesOrderVariables.EMAIL)) {
-//      dfCustomerSelected = customerOrderData.withColumn(CustomerVariables.EMAIL, lit(null))
-//    }
+    //      dfCustomerSelected = customerOrderData.withColumnRenamed(SalesOrderVariables.CUSTOMER_EMAIL, CustomerVariables.EMAIL)
+    //    } else if (!customerOrderData.schema.fieldNames.toList.contains(SalesOrderVariables.EMAIL)) {
+    //      dfCustomerSelected = customerOrderData.withColumn(CustomerVariables.EMAIL, lit(null))
+    //    }
 
     // 2. inner join it with sales_order: short data
     // Now we have customers with invalid orders in last n days
