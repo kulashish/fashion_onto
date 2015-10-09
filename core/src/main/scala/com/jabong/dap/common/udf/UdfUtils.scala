@@ -591,6 +591,21 @@ object UdfUtils {
     if (i >= strings.size) "" else strings(i)
   }
 
+  def allZero2Null(str: String): String = {
+    val nullStr: String = null
+    if (null != str) {
+      var str1 = str.trim()
+      if (str1.length <= 0 || str1.matches("^[0]*")) {
+        return nullStr
+      } else {
+        return str1
+      }
+    }
+    str
+  }
+
+
+
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
