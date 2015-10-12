@@ -1,31 +1,29 @@
 package com.jabong.dap.quality.campaign
 
-import java.io.File
-
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.mail.ScalaMail
-import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.mail.ScalaMail
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.{ DbConnection, CampaignInfo }
+import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.data.acq.common.{ CampaignInfo, DbConnection }
 import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ SaveMode, DataFrame, Row }
-import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{ DataFrame, Row, SaveMode }
 
 import scala.collection.mutable.ListBuffer
 
 /**
  * Created by raghu on 3/8/15.
  */
-object MobilePushCampaignQuality extends Logging {
+object CampaignQuality extends Logging {
   val TRUE = true
   val zero: Long = 0
   val ANDROID = "Android"
@@ -48,9 +46,9 @@ object MobilePushCampaignQuality extends Logging {
     StructField(WINDOWS, LongType, TRUE)
   ))
 
-  def start(campaignsConfig: String) = {
+  def start(campaignsConfig: String, campaignType: String) = {
 
-    logger.info("Calling method start inside MobilePushCampaignQuality........")
+    logger.info("Calling method start inside CampaignQuality........")
 
     if (CampaignManager.initCampaignsConfigJson(campaignsConfig)) {
 
@@ -63,8 +61,6 @@ object MobilePushCampaignQuality extends Logging {
         list.appendAll(getCampaignQuality(campaignDetails.campaignName, dateYesterday))
       }
 
-      logger.info("Saving data frame of MOBILE_PUSH_CAMPAIGN_QUALITY........")
-
       val rdd = Spark.getContext().parallelize[Row](list.toSeq)
       val dfCampaignQuality = Spark.getSqlContext().createDataFrame(rdd, schema)
 
@@ -72,37 +68,41 @@ object MobilePushCampaignQuality extends Logging {
         .agg(sum(TOTALCOUNT) as TOTALCOUNT, sum(CUSTID_ZERO) as CUSTID_ZERO, sum(CUSTID_NONZERO) as CUSTID_NONZERO, sum(PRIORITYMERGE) as PRIORITYMERGE, sum(ANDROID) as ANDROID, sum(IOS) as IOS, sum(WINDOWS) as WINDOWS)
         .sort(CAMPAIGNNAME).cache()
 
-      CampaignOutput.saveCampaignDataForYesterday(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
+      if (campaignType.equals("mobilePushCampaignQuality")) {
 
-      DataWriter.writeCsv(cachedfCampaignQuality, DataSets.CAMPAIGNS, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.DAILY_MODE, dateYesterday, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+        writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dateYesterday)
+        writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
 
-      //A column added with a date
-      writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))))
+      } else if (campaignType.equals("emailCampaignQuality")) {
 
-      logger.info("MOBILE_PUSH_CAMPAIGN_QUALITY Data write successfully on this path :"
-        + ConfigConstants.WRITE_OUTPUT_PATH + File.separator
-        + DataSets.CAMPAIGNS + File.separator
-        + CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY + File.separator
-        + DataSets.DAILY_MODE + File.separator
-        + dateYesterday
-      )
-
-      val emailSubscribers = OptionUtils.getOptValue(CampaignInfo.campaigns.emailSubscribers, "tech.dap@jabong.com")
-
-      val content = ScalaMail.generateHTML(cachedfCampaignQuality)
-
-      ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", "Mobile Push Campaign Quality Report", content)
+        writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.EMAIL_CAMPAIGN_QUALITY, dateYesterday)
+        writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
+      }
 
     }
 
   }
 
-  def writeForJDaRe(df: DataFrame) = {
+  def writeDataAndSendMail(df: DataFrame, campaignType: String, date: String) = {
+
+    CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
+
+    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+
+    val emailSubscribers = OptionUtils.getOptValue(CampaignInfo.campaigns.emailSubscribers, "tech.dap@jabong.com")
+
+    val content = ScalaMail.generateHTML(df)
+
+    ScalaMail.sendMessage("tech.dap@jabong.com", emailSubscribers, "", "tech.dap@jabong.com", campaignType, content)
+
+  }
+
+  def writeForJDaRe(df: DataFrame, campaignType: String) = {
     val dbConn = new DbConnection(CampaignCommon.J_DARE_SOURCE)
     val dateNow = new java.util.Date
     val tsString = new java.sql.Timestamp(dateNow.getTime).toString
     val dfWithInsertedOn = df.withColumn("created_at", lit(tsString))
-    dfWithInsertedOn.write.mode(SaveMode.Append).jdbc(dbConn.getConnectionString, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dbConn.getConnectionProperties)
+    dfWithInsertedOn.write.mode(SaveMode.Append).jdbc(dbConn.getConnectionString, campaignType, dbConn.getConnectionProperties)
   }
 
   def getCampaignQuality(campaignName: String, dateYesterday: String): ListBuffer[Row] = {
