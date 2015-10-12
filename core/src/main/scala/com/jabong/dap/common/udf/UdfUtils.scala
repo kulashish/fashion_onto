@@ -548,6 +548,4 @@ object UdfUtils {
     str
   }
 
-
-
 }
