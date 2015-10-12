@@ -178,6 +178,8 @@ abstract class CommonRecommendation extends Logging {
     require(dataFrameSchema != null, "dataFrameSchema cannot be null ")
     require(numRecs != 0, "numRecs cannot be zero ")
 
+    recommendationInput.printSchema()
+    println(pivotArray(0))
     val mappedRecommendationInput = recommendationInput.rdd.keyBy(row => createKey(row, pivotArray))
     if (mappedRecommendationInput == null || mappedRecommendationInput.keys == null) {
       return null
