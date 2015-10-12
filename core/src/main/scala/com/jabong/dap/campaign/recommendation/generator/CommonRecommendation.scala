@@ -115,7 +115,7 @@ abstract class CommonRecommendation extends Logging {
         Recommendation.NUMBER_LAST_30_DAYS_ORDERED,
         Recommendation.WEEKLY_AVERAGE_SALE,
         Recommendation.LAST_SOLD_DATE).
-        withColumn(Recommendation.DISCOUNT_STATUS, when(col(ProductVariables.DISCOUNT) >= Recommendation.DISCOUNT_THRESHOLD, lit("true")).otherwise(lit("false")))
+        withColumn(Recommendation.DISCOUNT_STATUS, when(col(ProductVariables.DISCOUNT) >= Recommendation.DISCOUNT_THRESHOLD, lit(true)).otherwise(lit(false)))
 
     return RecommendationInput
   }
