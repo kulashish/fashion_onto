@@ -84,7 +84,7 @@ sub fetchCampaign {
 
 
 sub uploadCampaign {
-    my $base = "/data/export/$date_with_zero/campaigns";
+    my $base = "/tmp/$date_with_zero/campaigns";
     print "directory is $base\n";
     system("mkdir -p $base");
     #system("mkdir -p $base/tmp");
@@ -161,12 +161,12 @@ sub uploadCampaign {
     my $status = $?;
     system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
     $status ||= $?;
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
 sub upload_ad4push_customer_response {
-    my $base = "/data/export/$date_with_zero/ad4push_response";
+    my $base = "/tmp/$date_with_zero/ad4push_response";
     print "ad4push customer response directory is $base\n";
     system("mkdir -p $base");
 
@@ -179,12 +179,12 @@ sub upload_ad4push_customer_response {
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
    # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
    $status ||= $?;
-   system("rm -rf $base");
+   system("rm -rf /tmp/$date_with_zero");
    return $status;
 }
 
 sub upload_ad4push_device_merger {
-    my $base = "/data/export/$date_with_zero/ad4push_devices";
+    my $base = "/tmp/$date_with_zero/ad4push_devices";
     print "ad4push devices directory is $base\n";
     system("mkdir -p $base");
 
@@ -202,12 +202,12 @@ sub upload_ad4push_device_merger {
    $status ||= $?;
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
    $status ||= $?;
-   system("rm -rf $base");
+   system("rm -rf /tmp/$date_with_zero");
    return $status;
 }
 
 sub upload_dcf_feed {
-     my $base = "/data/export/$date_with_zero/dcf_feed/clickstream_merged_feed";
+     my $base = "/tmp/$date_with_zero/dcf_feed/clickstream_merged_feed";
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 
@@ -223,7 +223,7 @@ sub upload_dcf_feed {
      $status ||= $?;
      system("lftp -c \"open -u shortlistdump,dumpshortlist 54.254.101.71 ;  mput -O webhistory_data/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
      $status ||= $?;
-     system("rm -rf $base");
+     system("rm -rf /tmp/$date_with_zero");
      return $status;
 }
 
@@ -323,7 +323,7 @@ sub dcf_file_format_change{
  }
 
 sub upload_pricing_sku_data {
-    my $base = "/data/export/$date_with_zero/pricing_sku_data";
+    my $base = "/tmp/$date_with_zero/pricing_sku_data";
     print "pricing sku data directory is $base\n";
     system("mkdir -p $base");
 
@@ -334,11 +334,11 @@ sub upload_pricing_sku_data {
    system("hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/");
    my $status = $?;
    # gzipping the file
-   system("gzip -c /data/export/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/data/export/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
+   system("gzip -c /tmp/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
    # copying to slave location
-   system("scp /data/export/$date_with_zero/pricing_sku_data/$date_with_zero.gz dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
+   system("scp /tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
    $status ||= $?;
-   system("rm -rf $base");
+   system("rm -rf /tmp/$date_with_zero");
    return $status;
 }
 
