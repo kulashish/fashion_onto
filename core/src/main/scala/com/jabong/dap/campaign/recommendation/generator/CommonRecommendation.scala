@@ -127,9 +127,10 @@ abstract class CommonRecommendation extends Logging {
    */
   def createKey(row: Row, fields: Array[String]): Row = {
     if (row == null || fields == null || fields.length == 0) {
+      println("VALUES are null"+row+"\t"+fields+"\t"+fields.length)
       return null
     }
-    logger.info(row.schema)
+    logger.info("ROW SCHEMA"+row.schema)
     var sequence: Seq[Any] = Seq()
     for (field <- fields) {
       try {
