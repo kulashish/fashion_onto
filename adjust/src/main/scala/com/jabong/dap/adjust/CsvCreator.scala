@@ -1,4 +1,4 @@
-package main.scala.com.jabong.dap.adjust
+package com.jabong.dap.adjust
 
 import java.net.URLDecoder
 import org.apache.hadoop.io.NullWritable
