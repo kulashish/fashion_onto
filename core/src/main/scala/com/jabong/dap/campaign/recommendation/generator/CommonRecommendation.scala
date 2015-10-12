@@ -129,9 +129,11 @@ abstract class CommonRecommendation extends Logging {
     if (row == null || fields == null || fields.length == 0) {
       return null
     }
+    logger.info(row.schema)
     var sequence: Seq[Any] = Seq()
     for (field <- fields) {
       try {
+        logger.info("FIELDS"+"\t"+field)
         sequence = sequence :+ (row(row.fieldIndex(field)))
       } catch {
         case ex: IllegalArgumentException => {
@@ -180,6 +182,7 @@ abstract class CommonRecommendation extends Logging {
 
     recommendationInput.printSchema()
     println(pivotArray(0))
+    recommendationInput.show(100)
     val mappedRecommendationInput = recommendationInput.rdd.keyBy(row => createKey(row, pivotArray))
     if (mappedRecommendationInput == null || mappedRecommendationInput.keys == null) {
       return null
