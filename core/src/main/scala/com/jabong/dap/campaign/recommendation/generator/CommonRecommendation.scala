@@ -191,6 +191,7 @@ abstract class CommonRecommendation extends Logging {
     //println(recommendationOutput.toDebugString)
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
+    recommendationOutput.saveAsTextFile("/user/rahulaneja/AlchemyTest/mvp_discount_test")
     val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1).take(numRecs)))) }
     //println(recommendations.toDebugString)
     val recommendDataFrame = sqlContext.createDataFrame(recommendations, dataFrameSchema)
