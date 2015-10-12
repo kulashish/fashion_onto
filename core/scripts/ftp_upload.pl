@@ -342,3 +342,19 @@ sub upload_pricing_sku_data {
    return $status;
 }
 
+#this method will remove double quiets from header and remove null from content
+sub removeNull {
+
+    #read input file path
+    my ($inputFile) = @_;
+
+    #rename file
+    system("mv $inputFile $inputFile._old");
+
+    #remove double quiets from header and remove null from content
+    system("cat $inputFile._old | sed -n '1p' | sed -e 's/\"//g' >> $inputFile | cat $inputFile._old | sed -n '1, 1!p' | sed -e 's/\;null;/;;/g' | sed -e 's/^null;/;/g' | sed -e 's/\;null\$/;/g' >> $inputFile");
+
+    #remove old file
+    system("rm $inputFile._old");
+}
+
