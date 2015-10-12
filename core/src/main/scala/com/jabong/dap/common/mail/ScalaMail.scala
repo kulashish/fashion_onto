@@ -23,7 +23,7 @@ object ScalaMail extends java.io.Serializable {
     message = createMessage
     message.setFrom(new InternetAddress(from))
     message.setSentDate(new Date())
-    message.setSubject("["+ConfigConstants.ENV+"] - "+subject)
+    message.setSubject("[" + ConfigConstants.ENV + "] - " + subject)
     // message.setText(content)
     val mbp3 = new MimeBodyPart()
     mbp3.setContent(content, "text/html")
