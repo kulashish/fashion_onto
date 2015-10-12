@@ -186,6 +186,7 @@ abstract class CommonRecommendation extends Logging {
 
     // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
+    mappedRecommendationInput.saveAsTextFile("/user/rahulaneja/AlchemyTest/mvp_discount_test_tmp")
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
     //val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
     //println(recommendationOutput.toDebugString)

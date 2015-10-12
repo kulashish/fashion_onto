@@ -152,4 +152,7 @@ object Udf {
 
   val mps = udf((s: String) => UdfUtils.markMps(s: String))
 
+  val BigDecimalToDouble = udf((value: java.math.BigDecimal) => UdfUtils.BigDecimalToLong(value: java.math.BigDecimal))
+
+
 }

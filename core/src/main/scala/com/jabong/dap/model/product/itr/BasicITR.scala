@@ -6,6 +6,7 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -140,7 +141,7 @@ object BasicITR extends Logging {
       ITR.BRAND_NAME,
       ITR.ITR_DATE
     ).
-      withColumn(ITR.DISCOUNT,when(col(ITR.MRP_PRICE) === 0.00,lit(0)).otherwise(((col(ITR.MRP_PRICE)-col(ITR.PRICE_ON_SITE))*100)/col(ITR.MRP_PRICE))).
+      withColumn(ITR.DISCOUNT,when(col(ITR.MRP_PRICE) === 0.00,lit(0.0)).otherwise(Udf.BigDecimalToDouble(((col(ITR.MRP_PRICE)-col(ITR.PRICE_ON_SITE))*100)/col(ITR.MRP_PRICE)))).
       cache()
 
     itrDF.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
