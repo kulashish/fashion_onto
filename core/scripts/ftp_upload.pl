@@ -240,8 +240,10 @@ sub upload_email_campaigns_custWelcomeVoucher {
 
     # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
     system("hadoop fs -get /data/test/output/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
-
     my $status = $?;
+
+    $status ||= removeNull($base/$filename);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
     system("rm -rf $base");
@@ -261,8 +263,10 @@ sub upload_email_campaigns_custPreference {
 
     # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
     system("hadoop fs -get /data/test/output/tmp/variables/custPreference/daily/$date/$filename $base/");
-
     my $status = $?;
+
+    $status ||= removeNull($base/$filename);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $status;
     system("rm -rf $base");
