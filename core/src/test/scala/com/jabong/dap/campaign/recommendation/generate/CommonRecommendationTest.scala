@@ -162,7 +162,6 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     assert(recommendations.length == 1)
   }
 
-
   "5 recommendation input skus" should "create recommendation based on mvp,discount and gender" in {
     val dataFrameSchema = StructType(Array(
       StructField(ProductVariables.MVP, StringType, false),
@@ -179,7 +178,6 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
       .select(CampaignMergedFields.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
     assert(recommendations.length == 1)
   }
-
 
   "Given a row and array of keys" should "create a dynamic row with those keys" in {
     val keys = Array(ProductVariables.BRICK, ProductVariables.MVP)
