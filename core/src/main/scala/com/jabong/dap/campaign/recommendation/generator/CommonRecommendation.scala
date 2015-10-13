@@ -126,9 +126,10 @@ abstract class CommonRecommendation extends Logging {
   @returns row with only those fields
    */
   def createKey(row: Row, fields: Array[String]): Row = {
+    println("WTF\t"+row+"\t"+fields+"\t"+fields.length)
     if (row == null || fields == null || fields.length == 0) {
-      println("VALUES are null"+row+"\t"+fields+"\t"+fields.length)
-      return null
+      println("NULL ROW\t"+row+"\t"+fields+"\t"+fields.length)
+       return null
     }
     logger.info("ROW SCHEMA"+row.schema)
     var sequence: Seq[Any] = Seq()
@@ -188,6 +189,7 @@ abstract class CommonRecommendation extends Logging {
     if (mappedRecommendationInput == null || mappedRecommendationInput.keys == null) {
       return null
     }
+    println("KEYS"+mappedRecommendationInput.keys.take(10))
     //mappedRecommendationInput.collect().foreach(println)
 
     // import sqlContext.implicits._
