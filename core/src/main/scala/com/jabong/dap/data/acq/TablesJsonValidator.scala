@@ -19,7 +19,7 @@ object TablesJsonValidator {
   }
 
   def validatePossibleValues(table: TableInfo) = {
-    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.CRM, DataSets.UNICOMMERCE, DataSets.NEXTBEE)
+    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.CRM, DataSets.UNICOMMERCE)
     val possibleModes = Array(DataSets.FULL, DataSets.MONTHLY_MODE, DataSets.DAILY_MODE, DataSets.HOURLY_MODE)
     val possibleSaveFormats = Array(DataSets.ORC, DataSets.PARQUET)
     val possibleSaveModes = Array(DataSets.OVERWRITE_SAVEMODE, DataSets.APPEND_SAVEMODE, DataSets.IGNORE_SAVEMODE, DataSets.ERROR_SAVEMODE)
@@ -47,14 +47,6 @@ object TablesJsonValidator {
       )
     }
 
-    // Check if rangeStart doesn't have a value for hourly mode.
-    // rangeEnd doesn't need to be checked as it will have a value if rangeStart has a value.
-    if (table.mode == DataSets.HOURLY_MODE) {
-      require(
-        !OptionUtils.optStringEmpty(table.rangeStart),
-        "Range should be provided for hourly mode"
-      )
-    }
   }
 
   def validateRanges(rngStart: String, rngEnd: String, mode: String) = {
