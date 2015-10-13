@@ -19,7 +19,7 @@ object TablesJsonValidator {
   }
 
   def validatePossibleValues(table: TableInfo) = {
-    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.CRM, DataSets.UNICOMMERCE, DataSets.NEXTBEE)
+    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.CRM, DataSets.UNICOMMERCE)
     val possibleModes = Array(DataSets.FULL, DataSets.MONTHLY_MODE, DataSets.DAILY_MODE, DataSets.HOURLY_MODE)
     val possibleSaveFormats = Array(DataSets.ORC, DataSets.PARQUET)
     val possibleSaveModes = Array(DataSets.OVERWRITE_SAVEMODE, DataSets.APPEND_SAVEMODE, DataSets.IGNORE_SAVEMODE, DataSets.ERROR_SAVEMODE)

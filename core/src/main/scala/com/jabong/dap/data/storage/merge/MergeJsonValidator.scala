@@ -19,7 +19,7 @@ object MergeJsonValidator {
   }
 
   private def validatePossibleValues(mergeJob: MergeInfo) = {
-    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.UNICOMMERCE, DataSets.NEXTBEE)
+    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.UNICOMMERCE, DataSets.CRM)
     val possibleMergeModes = Array(DataSets.FULL, DataSets.MONTHLY_MODE)
     val possibleSaveModes = Array(DataSets.OVERWRITE_SAVEMODE, DataSets.APPEND_SAVEMODE, DataSets.IGNORE_SAVEMODE, DataSets.ERROR_SAVEMODE)
 
