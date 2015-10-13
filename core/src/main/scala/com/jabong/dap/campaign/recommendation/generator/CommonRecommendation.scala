@@ -126,16 +126,12 @@ abstract class CommonRecommendation extends Logging {
   @returns row with only those fields
    */
   def createKey(row: Row, fields: Array[String]): Row = {
-    println("WTF\t"+row+"\t"+fields+"\t"+fields.length)
     if (row == null || fields == null || fields.length == 0) {
-      println("NULL ROW\t"+row+"\t"+fields+"\t"+fields.length)
        return null
     }
-    logger.info("ROW SCHEMA"+row.schema)
     var sequence: Seq[Any] = Seq()
     for (field <- fields) {
       try {
-        logger.info("FIELDS"+"\t"+field)
         sequence = sequence :+ (row(row.fieldIndex(field)))
       } catch {
         case ex: IllegalArgumentException => {
@@ -182,25 +178,19 @@ abstract class CommonRecommendation extends Logging {
     require(dataFrameSchema != null, "dataFrameSchema cannot be null ")
     require(numRecs != 0, "numRecs cannot be zero ")
 
-    recommendationInput.printSchema()
-    println(pivotArray(0))
-    recommendationInput.show(100)
     val mappedRecommendationInput = recommendationInput.rdd.keyBy(row => createKey(row, pivotArray))
     if (mappedRecommendationInput == null || mappedRecommendationInput.keys == null) {
       return null
     }
-    println("KEYS"+mappedRecommendationInput.keys.take(10))
     //mappedRecommendationInput.collect().foreach(println)
 
     // import sqlContext.implicits._
     //  val recommendationOutput = mappedRecommendationInput.reduceByKey((x,y)=>generateSku(x,y))
-    mappedRecommendationInput.saveAsTextFile("/user/rahulaneja/AlchemyTest/mvp_discount_test_tmp")
     val recommendationOutput = mappedRecommendationInput.groupByKey().map{ case (key, value) => (key, genSku(value).toList) }
     //val recommendationOutput = mappedRecommendationInput.map{case (key,value) => (key,Array(value))}.reduceByKey(_++_).map{ case (key, value) => (key, genSku(value).toList) }
     //println(recommendationOutput.toDebugString)
     //recommendationOutput.flatMapValues(identity).collect().foreach(println)
     // val recommendations = recommendationOutput.flatMap{case(key,value)=>(value.map( value => (key._1.toString,key._2.asInstanceOf[Long],value._1,value._2.sortBy(-_._1))))}
-    recommendationOutput.saveAsTextFile("/user/rahulaneja/AlchemyTest/mvp_discount_test")
     val recommendations = recommendationOutput.flatMap{ case (key, value) => (value.map(value => createRow(key, value._1, value._2.sortBy(-_._1).take(numRecs)))) }
     //println(recommendations.toDebugString)
     val recommendDataFrame = sqlContext.createDataFrame(recommendations, dataFrameSchema)
