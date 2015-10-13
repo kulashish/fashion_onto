@@ -50,7 +50,7 @@ object PathBuilder {
       case DataSets.HOURLY_MODE =>
         if (rangeStart == null && rangeEnd == null) {
           val dateNow = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)
-          val hr = TimeUtils.getHour(null, TimeConstants.DATE_FORMAT)-1
+          val hr = TimeUtils.getHour(null, TimeConstants.DATE_FORMAT) - 1
           "%s/%s/%s/%s/%s/%s".format(ConfigConstants.INPUT_PATH, source, tableName, DataSets.HOURLY_MODE, dateNow, hr)
         } else {
           val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
