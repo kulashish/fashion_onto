@@ -101,7 +101,6 @@ object DataSets {
   val CRM = "crm"
   val JDARESOURCE = "jDaReSource"
   val UNICOMMERCE = "unicommerce"
-  val NEXTBEE = "nextbee"
   val RESPONSYS = "responsys"
 
   val DEVICE_MAPPING = "device_mapping"
