@@ -305,8 +305,6 @@ object TimeUtils extends Logging {
     cal.get(Calendar.HOUR_OF_DAY)
   }
 
-
-
   /**
    *
    * @param dt
