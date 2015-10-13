@@ -148,6 +148,15 @@
       "saveFormat": "parquet",
       "saveMode": "Ignore",
       "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config_additional_info",
+      "primaryKey": "id_catalog_config_additional_info",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
     }
   ]
 }

@@ -46,7 +46,7 @@ class MergeDelegator extends Serializable with Logging {
       for (mergeJob <- MergeJobConfig.mergeJobInfo.merge) {
         MergeJobConfig.mergeInfo = mergeJob
         mergeJob.source match {
-          case DataSets.ERP | DataSets.BOB | DataSets.UNICOMMERCE => new Merger().merge(isHistory)
+          case DataSets.ERP | DataSets.BOB | DataSets.UNICOMMERCE | DataSets.CRM => new Merger().merge(isHistory)
           case _ => logger.error("Unknown table source.")
         }
       }

@@ -246,7 +246,7 @@ sub upload_email_campaigns_custWelcomeVoucher {
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
@@ -269,7 +269,7 @@ sub upload_email_campaigns_custPreference {
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $status;
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
@@ -293,7 +293,7 @@ sub upload_email_campaigns_contactListMobile {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
 
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
@@ -314,7 +314,7 @@ sub upload_email_campaigns {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
 
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 

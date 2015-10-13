@@ -79,7 +79,7 @@ sub run_component {
 # spark path constants
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
-my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
+my $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
@@ -160,6 +160,23 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "erpMerge") {
     $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
+    $job_exit = run_component($component, $command);
+# crm acquisition
+} elsif ($component eq "crmAcqIncr") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqIncr.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "crmAcqFull") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqFull.json";
+    $job_exit = run_component($component, $command);
+#crm Merge
+} elsif ($component eq "crmMerge") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/crmMerge.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
     # for retarget campaign module
