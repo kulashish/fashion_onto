@@ -3,7 +3,7 @@
     {
       "source": "crm",
       "tableName": "tblProductAttributeMaster",
-      "primaryKey": "sku",
+      "primaryKey": null,
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
@@ -30,7 +30,7 @@
     {
       "source": "crm",
       "tableName": "tblOrderDetails",
-      "primaryKey": "OrderNo",
+      "primaryKey": null,
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
