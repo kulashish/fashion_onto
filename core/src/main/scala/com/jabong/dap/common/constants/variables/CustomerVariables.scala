@@ -63,7 +63,6 @@ object CustomerVariables {
   val CUSTOMER_ALL_ORDER_TIMESLOT = "customer_all_order_timeslot"
   val CUSTOMER_PREFERRED_ORDER_TIMESLOT = "customer_preferred_order_timeslot"
   val LAST_UPDATED_AT = "last_updated_at"
-  val FK_CUSTOMER_CPOT = "fk_customer_cpot"
   val NLS_UPDATED_AT = "nls_updated_at"
 
   //for renaming column name
