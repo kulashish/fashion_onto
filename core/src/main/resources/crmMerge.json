@@ -11,28 +11,28 @@
       "source": "crm",
       "tableName": "tblTicketDetails",
       "primaryKey": "TicketID",
-      "mode": "full",
+      "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblOrderDetails",
       "primaryKey": "OrderNo",
-      "mode": "full",
+      "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblProductDetails",
       "primaryKey": "ProductId",
-      "mode": "full",
+      "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblTicketProducts",
       "primaryKey": "TicketProductsID",
-      "mode": "full",
+      "mergeMode": "full",
       "saveMode": "Ignore"
     }
   ]
