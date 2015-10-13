@@ -228,7 +228,7 @@ sub upload_dcf_feed {
 }
 
 sub upload_email_campaigns_custWelcomeVoucher {
-    my $base = "/data/test/export/$date_with_zero/custWelcomeVoucher";
+    my $base = "/tmp/$date_with_zero/custWelcomeVoucher";
     print "custWelcomeVoucher directory is $base\n";
     system("mkdir -p $base");
 
@@ -240,16 +240,18 @@ sub upload_email_campaigns_custWelcomeVoucher {
 
     # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
     system("hadoop fs -get /data/test/output/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
-
     my $status = $?;
+
+    $status ||= removeNull($base/$filename);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
 sub upload_email_campaigns_custPreference {
-    my $base = "/data/test/export/$date_with_zero/custPreference";
+    my $base = "/tmp/$date_with_zero/custPreference";
     print "custWelcomeVoucher directory is $base\n";
     system("mkdir -p $base");
 
@@ -261,16 +263,18 @@ sub upload_email_campaigns_custPreference {
 
     # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
     system("hadoop fs -get /data/test/output/tmp/variables/custPreference/daily/$date/$filename $base/");
-
     my $status = $?;
+
+    $status ||= removeNull($base/$filename);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $status;
-    system("rm -rf $base");
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
 sub upload_email_campaigns_contactListMobile {
-    my $base = "/data/test/export/$date_with_zero/contactListMobile";
+    my $base = "/tmp/$date_with_zero/contactListMobile";
     print "contactListMobile directory is $base\n";
     system("mkdir -p $base");
 
@@ -283,15 +287,19 @@ sub upload_email_campaigns_contactListMobile {
     # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
     system("hadoop fs -get /data/test/output/tmp/variables/contactListMobile/daily/$date/$filename $base/");
     my $status = $?;
+
+    $status ||= removeNull($base/$filename);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
-    system("rm -rf $base");
+
+    system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
 
 sub upload_email_campaigns {
-    my $base = "/data/test/export/$date_with_zero/campaigns/email_campaigns";
+    my $base = "/tmp/$date_with_zero/campaigns/email_campaigns";
 
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
@@ -301,8 +309,13 @@ sub upload_email_campaigns {
     print "hadoop fs -get /data/test/output/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
     system("hadoop fs -get /data/test/output/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
+    my $status = $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    $status ||= $?;
+
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
 }
 
 sub dcf_file_format_change{
@@ -340,5 +353,26 @@ sub upload_pricing_sku_data {
    $status ||= $?;
    system("rm -rf /tmp/$date_with_zero");
    return $status;
+}
+
+#this method will remove double quiets from header and remove null from content
+sub removeNull {
+
+    #read input file path
+    my ($inputFile) = @_;
+
+    #rename file
+    system("mv $inputFile $inputFile._old");
+    my $status = $?;
+
+    #remove double quiets from header and remove null from content
+    system("cat $inputFile._old | sed -n '1p' | sed -e 's/\"//g' >> $inputFile | cat $inputFile._old | sed -n '1, 1!p' | sed -e 's/\;null;/;;/g' | sed -e 's/^null;/;/g' | sed -e 's/\;null\$/;/g' >> $inputFile");
+    $status ||= $?;
+
+    #remove old file
+    system("rm $inputFile._old");
+    $status ||= $?;
+
+    return $status;
 }
 
