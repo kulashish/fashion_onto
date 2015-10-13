@@ -291,6 +291,23 @@ object TimeUtils extends Logging {
   }
 
   /**
+   * Return hour of the current date as a string in the given date format.
+   * @param dateFormat
+   * @return hour of the day.
+   */
+  def getHour(dt: String, dateFormat: String): Int = {
+    val cal = Calendar.getInstance()
+    if (!StringUtils.isEmpty(dt)) {
+      val sdf = new SimpleDateFormat(dateFormat)
+      val date = sdf.parse(dt)
+      cal.setTime(date)
+    }
+    cal.get(Calendar.HOUR_OF_DAY)
+  }
+
+
+
+  /**
    *
    * @param dt
    * @param dateFormat
