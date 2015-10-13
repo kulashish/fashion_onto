@@ -94,6 +94,22 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
+        <ok to="dcfFeedFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="dcfFeedFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>dcf_feed</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
         <ok to="endJoin"/>
         <error to="fail"/>
     </action>
@@ -108,6 +124,22 @@
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="pricingSKUDataFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="pricingSKUDataFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pricing_sku_data</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
             <capture-output/>
         </shell>
         <ok to="endJoin"/>

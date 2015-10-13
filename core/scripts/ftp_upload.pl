@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-
 use strict;
 use 5.010;
 use warnings;
@@ -12,12 +11,17 @@ use Mail::Sendmail;
 
 my $debug;
 my $component;
-
+my $target;
 GetOptions (
+    'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
 ) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed | pricing_sku_data\n";
 
+if ($target ne "PROD") {
+    print "Will upload files only for PROD\n";
+    exit -1;
+}
 
 use POSIX qw(strftime);
 
@@ -33,26 +37,30 @@ print $date_with_hiphen . "\n";
 my $date_with_zero_today = strftime "%Y%m%d", localtime(time());
 print $date_with_zero_today . "\n";
 
+my $job_exit;
+
 if ($component eq "campaigns") {
-    uploadCampaign();
+    $job_exit = uploadCampaign();
 } elsif ($component eq "ad4push_customer_response") {
-    upload_ad4push_customer_response();
+    $job_exit = upload_ad4push_customer_response();
 } elsif ($component eq "ad4push_device_merger") {
-    upload_ad4push_device_merger();
+    $job_exit = upload_ad4push_device_merger();
 } elsif ($component eq "dcf_feed") {
-    upload_dcf_feed();
+    $job_exit = upload_dcf_feed();
 } elsif ($component eq "pricing_sku_data") {
-    upload_pricing_sku_data();
+    $job_exit = upload_pricing_sku_data();
 } elsif ($component eq "custWelcomeVoucher") {
-    upload_email_campaigns_custWelcomeVoucher();
+    $job_exit = upload_email_campaigns_custWelcomeVoucher();
 } elsif ($component eq "custPreference") {
-    upload_email_campaigns_custPreference();
+    $job_exit = upload_email_campaigns_custPreference();
 } elsif ($component eq "contactListMobile") {
-    upload_email_campaigns_contactListMobile();
+    $job_exit = upload_email_campaigns_contactListMobile();
+} else {
+    print "not a valid component\n";
+    $job_exit = -1;
 }
 
-
-
+exit $job_exit;
 
 # upload ad4push customer response files
 # /data/tmp/ad4push/reactions_android_csv/full/2015/07/30/24/ad4push_customer_response_android_20150730.csv
@@ -74,7 +82,7 @@ sub fetchCampaign {
 
 
 sub uploadCampaign {
-    my $base = "/data/export/$date_with_zero/campaigns";
+    my $base = "/tmp/$date_with_zero/campaigns";
     print "directory is $base\n";
     system("mkdir -p $base");
     #system("mkdir -p $base/tmp");
@@ -146,13 +154,17 @@ sub uploadCampaign {
        $cname = "surf671";
        fetchCampaign($id, $cname, $base);
     }
-       
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_campaigns/ $base/*; bye\"");
+    my $status = $?;
     system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
+    $status ||= $?;
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
 }
 
 sub upload_ad4push_customer_response {
-    my $base = "/data/export/$date_with_zero/ad4push_response";
+    my $base = "/tmp/$date_with_zero/ad4push_response";
     print "ad4push customer response directory is $base\n";
     system("mkdir -p $base");
 
@@ -161,14 +173,16 @@ sub upload_ad4push_customer_response {
 
    # /data/tmp/ad4push/customer_response/full/2015/07/30/part-00000
    system("hadoop fs -get /data/tmp/ad4push/customer_response/full/$date/ad4push_customer_response_$date_with_zero.csv $base/");
-
+   my $status = $?;
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_customer_response/ $base/*; bye\"");
    # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
-
+   $status ||= $?;
+   system("rm -rf /tmp/$date_with_zero");
+   return $status;
 }
 
 sub upload_ad4push_device_merger {
-    my $base = "/data/export/$date_with_zero/ad4push_devices";
+    my $base = "/tmp/$date_with_zero/ad4push_devices";
     print "ad4push devices directory is $base\n";
     system("mkdir -p $base");
 
@@ -177,36 +191,42 @@ sub upload_ad4push_device_merger {
 
    # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
    system("hadoop fs -get /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero.csv $base/");
-
+   my $status = $?;
    # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
    print "hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/\n";
 
    # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
    system("hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero.csv $base/");
-
+   $status ||= $?;
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
-
+   $status ||= $?;
+   system("rm -rf /tmp/$date_with_zero");
+   return $status;
 }
 
 sub upload_dcf_feed {
-     my $base = "/data/export/$date_with_zero/dcf_feed/clickstream_merged_feed";
+     my $base = "/tmp/$date_with_zero/dcf_feed/clickstream_merged_feed";
      print "dcf feed directory is $base\n";
      system("mkdir -p $base");
 
      print "hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/\n";
 
      system("hadoop fs -get /data/tmp/dcf_feed/clickstream_merged_feed/full/$date/webhistory_$date_with_hiphen"."_1.csv $base/");
-
+     my $status = $?;
      dcf_file_format_change("$base/webhistory_$date_with_hiphen"."_1.csv","$base/webhistory_$date_with_hiphen.csv");
      print("gzip $base/webhistory_$date_with_hiphen.csv\n");
      system("gzip $base/webhistory_$date_with_hiphen.csv");
 
      system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O dcf_feed/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
+     $status ||= $?;
      system("lftp -c \"open -u shortlistdump,dumpshortlist 54.254.101.71 ;  mput -O webhistory_data/ $base/webhistory_$date_with_hiphen.csv.gz; bye\"");
+     $status ||= $?;
+     system("rm -rf /tmp/$date_with_zero");
+     return $status;
 }
 
 sub upload_email_campaigns_custWelcomeVoucher {
-    my $base = "/data/export/$date_with_zero/custWelcomeVoucher";
+    my $base = "/tmp/$date_with_zero/custWelcomeVoucher";
     print "custWelcomeVoucher directory is $base\n";
     system("mkdir -p $base");
 
@@ -218,12 +238,15 @@ sub upload_email_campaigns_custWelcomeVoucher {
 
     # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
     system("hadoop fs -get /data/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
-
+    my $status = $?;
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    $status ||= $?;
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
 }
 
 sub upload_email_campaigns_custPreference {
-    my $base = "/data/export/$date_with_zero/custPreference";
+    my $base = "/tmp/$date_with_zero/custPreference";
     print "custWelcomeVoucher directory is $base\n";
     system("mkdir -p $base");
 
@@ -235,12 +258,15 @@ sub upload_email_campaigns_custPreference {
 
     # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
     system("hadoop fs -get /data/tmp/variables/custPreference/daily/$date/$filename $base/");
-
+    my $status = $?;
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    $status ||= $status;
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
 }
 
 sub upload_email_campaigns_contactListMobile {
-    my $base = "/data/export/$date_with_zero/contactListMobile";
+    my $base = "/tmp/$date_with_zero/contactListMobile";
     print "contactListMobile directory is $base\n";
     system("mkdir -p $base");
 
@@ -252,8 +278,11 @@ sub upload_email_campaigns_contactListMobile {
 
     # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
     system("hadoop fs -get /data/tmp/variables/contactListMobile/daily/$date/$filename $base/");
-
+    my $status = $?;
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    $status ||= $?;
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
 }
 
 sub dcf_file_format_change{
@@ -274,7 +303,7 @@ sub dcf_file_format_change{
  }
 
 sub upload_pricing_sku_data {
-    my $base = "/data/export/$date_with_zero/pricing_sku_data";
+    my $base = "/tmp/$date_with_zero/pricing_sku_data";
     print "pricing sku data directory is $base\n";
     system("mkdir -p $base");
 
@@ -283,11 +312,13 @@ sub upload_pricing_sku_data {
 
    # /data/tmp/sku_data/pricing/daily/2015/08/19/part-00000
    system("hadoop fs -get /data/tmp/sku_data/pricing/daily/$date/sku_data_pricing_$date_with_zero.csv $base/");
-
+   my $status = $?;
    # gzipping the file
-   system("gzip -c /data/export/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/data/export/$date_with_zero/pricing_sku_data/$date_with_zero");
-
+   system("gzip -c /tmp/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
    # copying to slave location
-   system("scp /data/export/$date_with_zero/pricing_sku_data/$date_with_zero dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero");
+   system("scp /tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
+   $status ||= $?;
+   system("rm -rf /tmp/$date_with_zero");
+   return $status;
 }
 

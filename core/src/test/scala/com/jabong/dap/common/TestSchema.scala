@@ -38,7 +38,7 @@ object TestSchema {
 
   val accRegDateAndUpdatedAt = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.REG_DATE, TimestampType, true),
+    StructField(ContactListMobileVars.REG_DATE, TimestampType, true),
     StructField(CustomerVariables.UPDATED_AT, TimestampType, true)
   ))
 
