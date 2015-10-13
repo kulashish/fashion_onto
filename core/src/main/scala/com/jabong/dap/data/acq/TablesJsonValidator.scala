@@ -47,14 +47,6 @@ object TablesJsonValidator {
       )
     }
 
-    // Check if rangeStart doesn't have a value for hourly mode.
-    // rangeEnd doesn't need to be checked as it will have a value if rangeStart has a value.
-    if (table.mode == DataSets.HOURLY_MODE) {
-      require(
-        !OptionUtils.optStringEmpty(table.rangeStart),
-        "Range should be provided for hourly mode"
-      )
-    }
   }
 
   def validateRanges(rngStart: String, rngEnd: String, mode: String) = {

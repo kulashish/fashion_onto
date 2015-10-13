@@ -5,35 +5,35 @@
       "tableName": "tblProductAttributeMaster",
       "primaryKey": "sku",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblTicketDetails",
       "primaryKey": "TicketID",
       "mode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblOrderDetails",
       "primaryKey": "OrderNo",
       "mode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblProductDetails",
       "primaryKey": "ProductId",
       "mode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblTicketProducts",
       "primaryKey": "TicketProductsID",
       "mode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     }
   ]
 }

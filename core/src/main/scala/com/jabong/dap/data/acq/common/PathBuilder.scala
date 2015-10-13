@@ -48,14 +48,20 @@ object PathBuilder {
               TimeUtils.withLeadingZeros(end.get(Calendar.DATE)))
         }
       case DataSets.HOURLY_MODE =>
-        val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
-        val start = Calendar.getInstance()
-        val end = Calendar.getInstance()
-        start.setTime(format.parse(rangeStart))
-        end.setTime(format.parse(rangeEnd))
-        "%s/%s/%s/%s/%s/%s/%s/%s"
-          .format(ConfigConstants.INPUT_PATH, source, tableName, DataSets.HOURLY_MODE, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
-            TimeUtils.withLeadingZeros(end.get(Calendar.DATE)), TimeUtils.withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+        if (rangeStart == null && rangeEnd == null) {
+          val dateNow = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER)
+          val hr = TimeUtils.getHour(null, TimeConstants.DATE_FORMAT)-1
+          "%s/%s/%s/%s/%s/%s".format(ConfigConstants.INPUT_PATH, source, tableName, DataSets.HOURLY_MODE, dateNow, hr)
+        } else {
+          val format = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT)
+          val start = Calendar.getInstance()
+          val end = Calendar.getInstance()
+          start.setTime(format.parse(rangeStart))
+          end.setTime(format.parse(rangeEnd))
+          "%s/%s/%s/%s/%s/%s/%s/%s"
+            .format(ConfigConstants.INPUT_PATH, source, tableName, DataSets.HOURLY_MODE, end.get(Calendar.YEAR), TimeUtils.withLeadingZeros(end.get(Calendar.MONTH) + 1),
+              TimeUtils.withLeadingZeros(end.get(Calendar.DATE)), TimeUtils.withLeadingZeros(end.get(Calendar.HOUR_OF_DAY)))
+        }
       case _ => ""
     }
   }
