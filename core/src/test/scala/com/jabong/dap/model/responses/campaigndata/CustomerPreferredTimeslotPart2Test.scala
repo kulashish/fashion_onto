@@ -1,4 +1,4 @@
-package com.jabong.dap.model.campaigndata
+package com.jabong.dap.model.responses.campaigndata
 
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
