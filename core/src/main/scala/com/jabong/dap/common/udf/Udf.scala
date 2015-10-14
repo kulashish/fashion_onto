@@ -154,5 +154,5 @@ object Udf {
 
   val BigDecimalToDouble = udf((value: java.math.BigDecimal) => UdfUtils.BigDecimalToLong(value: java.math.BigDecimal))
 
-
+  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 }

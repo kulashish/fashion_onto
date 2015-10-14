@@ -9,9 +9,7 @@ import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
-import com.jabong.dap.model.customer.campaigndata.ContactListMobile
-import com.jabong.dap.model.customer.campaigndata.CustWelcomeVoucher
-import com.jabong.dap.model.customer.campaigndata.CustPreference
+import com.jabong.dap.model.customer.campaigndata.{ CustomerPreferredTimeslotPart2, ContactListMobile, CustWelcomeVoucher, CustPreference }
 import com.jabong.dap.model.customer.data.DNDMerger
 import com.jabong.dap.model.customer.data.SmsOptOut
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
@@ -71,6 +69,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.PRICING_SKU_DATA => SkuData.start(paramJob)
           case DataSets.DCF_FEED_GENERATE => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
+          case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
           case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)

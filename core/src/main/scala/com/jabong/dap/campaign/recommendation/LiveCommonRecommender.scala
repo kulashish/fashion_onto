@@ -5,6 +5,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ Row, DataFrame }
@@ -69,7 +70,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(CustomerVariables.FK_CUSTOMER),
       // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
       recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
-      completeRefSku(CampaignMergedFields.REF_SKU),
+      Udf.skuFromSimpleSku(completeRefSku(CampaignMergedFields.REF_SKU)) as CampaignMergedFields.REF_SKU,
       completeRefSku(ProductVariables.BRAND) as CampaignMergedFields.LIVE_BRAND,
       completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_BRICK,
       completeRefSku(ProductVariables.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
