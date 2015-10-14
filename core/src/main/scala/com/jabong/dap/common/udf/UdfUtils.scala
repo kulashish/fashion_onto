@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -628,5 +629,17 @@ object UdfUtils {
       return true
     }
     return false
+  }
+
+  def followUpCampaignMailTypes(mailType:Int): Int ={
+    val followUpCampaignMap = collection.immutable.HashMap(
+      56 -> 72,
+      57 -> 73,
+      58 -> 74,
+      71 -> 75,
+      46 -> 76,
+      47 -> 77)
+
+    return followUpCampaignMap.getOrElse(mailType,0)
   }
 }
