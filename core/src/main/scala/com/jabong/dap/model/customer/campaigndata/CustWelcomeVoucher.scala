@@ -46,7 +46,8 @@ object CustWelcomeVoucher extends Logging {
           welCodes(SalesRuleVariables.CODE2),
           Udf.dateCsvFormat(welCodes(SalesRuleVariables.CODE2_CREATION_DATE)) as SalesRuleVariables.CODE2_CREATION_DATE,
           Udf.dateCsvFormat(welCodes(SalesRuleVariables.CODE2_VALID_DATE)) as SalesRuleVariables.CODE2_VALID_DATE)
-        .filter(welCodes(SalesRuleVariables.CODE1_VALID_DATE).isNotNull.geq(TimeUtils.getTimeStamp()) && welCodes(SalesRuleVariables.CODE2_VALID_DATE).isNotNull.geq(TimeUtils.getTimeStamp()))
+        .filter((welCodes(SalesRuleVariables.CODE1_VALID_DATE).isNotNull && welCodes(SalesRuleVariables.CODE1_VALID_DATE).geq(TimeUtils.getTimeStamp()))
+          || (welCodes(SalesRuleVariables.CODE2_VALID_DATE).isNotNull && welCodes(SalesRuleVariables.CODE2_VALID_DATE).geq(TimeUtils.getTimeStamp())))
         .na.fill("")
       logger.info("after filter on date")
 
