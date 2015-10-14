@@ -117,7 +117,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
       // Apply the schema to the RDD.
       val dfFullFinal = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart2)
 
-      (dfInc, dfFullFinal)
+      (dfFull.except(dfFullCPOTPart2), dfFullFinal)
     } else {
       (dfInc, dfInc)
     }
