@@ -124,14 +124,15 @@ object CustomerPreferredTimeslotPart2 extends Logging {
 
     if (paths != null) {
 
+      val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL, incrDate)
+
+      (dfIncSalesOrder, null)
+    } else {
+
       val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
       val dfFullCPOTPart2 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
 
       (dfIncSalesOrder, dfFullCPOTPart2)
-    } else {
-
-      val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL, incrDate)
-      (dfIncSalesOrder, null)
     }
   }
 
