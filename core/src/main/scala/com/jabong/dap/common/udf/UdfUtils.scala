@@ -53,21 +53,29 @@ object UdfUtils {
       s
   }
 
-  def markDnd(mNo: String): String= {
+  def markDnd(mNo: String): String = {
     var newId: String = null
-    if(null == mNo){
+    if (null == mNo) {
       "0"
     } else {
       "1"
     }
   }
 
-  def markMps(mNo: String): String= {
+  def markMps(mNo: String): String = {
     var newId: String = null
-    if(null == mNo){
-      "i"
+    if (null == mNo) {
+      "I"
     } else {
-      "o"
+      "O"
+    }
+  }
+
+  def platinumStatus(rewardType: String): Int = {
+    if (null != rewardType && "Platinum".equalsIgnoreCase(rewardType)) {
+      1
+    } else {
+      0
     }
   }
 
@@ -603,8 +611,6 @@ object UdfUtils {
     }
     str
   }
-
-
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))

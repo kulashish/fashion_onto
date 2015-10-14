@@ -152,4 +152,6 @@ object Udf {
 
   val mps = udf((s: String) => UdfUtils.markMps(s: String))
 
+  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
+
 }
