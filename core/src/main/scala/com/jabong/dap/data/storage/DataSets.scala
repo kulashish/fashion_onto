@@ -138,11 +138,10 @@ object DataSets {
   val MVP_COLOR_RECOMMENDATIONS = "mvp_color"
   val MVP_DISCOUNT_RECOMMENDATIONS = "mvp_discount"
 
-
-
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
+  val NEWSLETTER_DATA_LIST = "newsletterDataList"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"

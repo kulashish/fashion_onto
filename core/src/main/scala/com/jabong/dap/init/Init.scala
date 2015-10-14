@@ -142,6 +142,7 @@ object Init {
       case DataSets.CUST_PREFERENCE => new ComponentExecutor().start(params.paramJson)
       case DataSets.CONTACT_LIST_MOBILE => new ComponentExecutor().start(params.paramJson)
       case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => new ComponentExecutor().start(params.paramJson)
+      case DataSets.NEWSLETTER_DATA_LIST => new ComponentExecutor().start(params.paramJson)
 
       case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
 
