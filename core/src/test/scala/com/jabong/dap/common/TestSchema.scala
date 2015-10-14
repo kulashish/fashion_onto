@@ -1,7 +1,8 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.types._
 
 /**
@@ -38,7 +39,7 @@ object TestSchema {
 
   val accRegDateAndUpdatedAt = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.REG_DATE, TimestampType, true),
+    StructField(ContactListMobileVars.REG_DATE, TimestampType, true),
     StructField(CustomerVariables.UPDATED_AT, TimestampType, true)
   ))
 
@@ -118,6 +119,102 @@ object TestSchema {
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
+
+  val inventoryCheckInput = StructType(Array(
+    StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.CATEGORY, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
+    StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
+    StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
+  ))
+
+  val skuCompleteInput = StructType(Array(
+    StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
+    StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
+    StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
+  ))
+
+  val basicItr = StructType(Array(
+    StructField(ProductVariables.SKU, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.CATEGORY, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.CREATED_AT, StringType, true)
+  ))
+
+  val recommendationSku = StructType(Array(
+    StructField(Recommendation.SALES_ORDER_ITEM_SKU, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
+    StructField(TestConstants.TEST_CASE_FILTER, LongType, true)
+  ))
+
+  val referenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
+  ))
+
+  val finalReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.BRICK, StringType, true),
+      StructField(ProductVariables.MVP, StringType, true), StructField(ProductVariables.BRAND, StringType, true), StructField(ProductVariables.SKU_SIMPLE, StringType, true), StructField(ProductVariables.GENDER, StringType, true), StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false)))
+
+  val genRecInput = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CampaignMergedFields.REF_SKU, StringType, false),
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true),
+    StructField(CampaignMergedFields.REC_SKUS, ArrayType(StructType(Array(StructField(ProductVariables.SKU, StringType, true)))), false),
+    StructField(TestConstants.TEST_CASE_FILTER, LongType, true)))
+
+  val refSkuInput = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, false),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.MVP, StringType, false),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true)))
+
+  val basicSimpleItr = StructType(Array(
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.CATEGORY, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),
+    StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
 
   val salesOrderPaybackEarn = StructType(Array(StructField(PaybackCustomerVariables.FK_SALES_ORDER, IntegerType, true)))

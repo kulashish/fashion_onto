@@ -2,8 +2,12 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.CancelReTarget
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
+import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, SkuSelection }
+import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.data.read.PathBuilder
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -11,24 +15,22 @@ import org.apache.spark.sql.DataFrame
  */
 class LiveCancelReTargetCampaign {
 
-  def runCampaign(targetCustomersWithOrderItems: DataFrame): Unit = {
+  def runCampaign(targetCustomersWithOrderItems: DataFrame, yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
     // targetCustomersWithOrderItems = (id_customer, id_sales_order, item_status, unit_price, updated_at, sku_simple)
 
     // filter only by return status
     // FIXME: filter by campaign -- i.e., campaign shount not have gone to customer in last 30 days
     // find list of (customers, ref skus)
-    val cancelRetargetSkuSelector = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.CANCEL_RETARGET)
-    val refSkus = cancelRetargetSkuSelector.skuFilter(targetCustomersWithOrderItems)
-
-    // create recommendations
-    //  val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender("Null")
-    // val recommendations = recommender.recommend(refSkus)
+    val filteredSkus = CancelReTarget.skuFilter(targetCustomersWithOrderItems)
 
     // save 2 ref skus + 8 recommendation per customer (null allowed for mobile push)
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.CANCEL_RETARGET_CAMPAIGN)
+    val filteredSkuJoinedItr = CampaignUtils.yesterdayItrJoin(filteredSkus, yesterdayItrData).cache()
 
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.CANCEL_RETARGET_CAMPAIGN)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.CANCEL_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false)
+
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.CANCEL_RETARGET_CAMPAIGN, filteredSkuJoinedItr, false, brickMvpRecommendations)
 
   }
 

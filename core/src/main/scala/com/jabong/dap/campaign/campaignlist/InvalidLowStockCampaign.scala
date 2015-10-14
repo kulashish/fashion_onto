@@ -2,9 +2,11 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.LowStock
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -17,7 +19,7 @@ class InvalidLowStockCampaign {
    * @param orderItemData
    * @param itrData
    */
-  def runCampaign(past30DayCampaignMergedData: DataFrame, customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame): Unit = {
+  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
@@ -25,24 +27,14 @@ class InvalidLowStockCampaign {
     //FIXME:Filter the order items data for last 30 days
     val selectedCustomers = invalidCustomerSelector.customerSelection(customerOrderData, orderItemData)
 
-    var custFiltered = selectedCustomers
-
-    if (past30DayCampaignMergedData != null) {
-      //past campaign check whether the campaign has been sent to customer in last 30 days
-      val pastCampaignCheck = new PastCampaignCheck()
-      custFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
-        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, 1000), 30)
-
-    }
-
     //sku selection
-    val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = lowStock.skuFilter(custFiltered, itrData)
+    val filteredSku = LowStock.skuFilter(selectedCustomers, itrData).cache()
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku)
 
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN)
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 }

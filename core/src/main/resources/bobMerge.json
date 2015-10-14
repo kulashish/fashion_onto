@@ -5,42 +5,56 @@
       "tableName": "sales_order",
       "primaryKey": "id_sales_order",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
       "tableName": "sales_order_item",
       "primaryKey": "id_sales_order_item",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
       "tableName": "sales_order_address",
       "primaryKey": "id_sales_order_address",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
       "tableName": "catalog_config",
       "primaryKey": "id_catalog_config",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
       "tableName": "catalog_simple",
       "primaryKey": "id_catalog_simple",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
     },
     {
       "source": "bob",
       "tableName": "customer",
       "primaryKey": "id_customer",
       "mergeMode": "full",
-      "saveMode": "Overwrite"
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_shipment",
+      "primaryKey": "id_sales_order_item_shipment",
+      "mergeMode": "full",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config_additional_info",
+      "primaryKey": "id_catalog_config_additional_info",
+      "mergeMode": "full",
+      "saveMode": "Ignore"
     }
   ]
 }

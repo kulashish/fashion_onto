@@ -1,26 +1,36 @@
-18 0 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/acquisition/job.properties -run
+18 0 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/acquisition/job.properties -run
 
 0 2 * * * bash /opt/webClickstream_pipeline/clickstream/bin/start-mr.sh /opt/webClickstream_pipeline/clickstream/conf/desktop.properties 1 PROD
 
-15 2 * * * bash /opt/artemisClickstream_pipeline/clickstream/bin/start-mr.sh /opt/artemisClickstream_pipeline/clickstream/conf/artemis.properties 1 PROD
+9 2 * * * bash /opt/artemisClickstream_pipeline/clickstream/bin/start-mr.sh /opt/artemisClickstream_pipeline/clickstream/conf/artemis.properties 1 PROD
 
-30 2 * * * bash /opt/appClickstream_pipeline/clickstream/bin/start-mr.sh /opt/appClickstream_pipeline/clickstream/conf/apps.properties 1 PROD
+18 2 * * * bash /opt/appClickstream_pipeline/clickstream/bin/start-mr.sh /opt/appClickstream_pipeline/clickstream/conf/apps.properties 1 PROD
 
 0 3 * * * bash /opt/webClickstream_pipeline/clickstream/bin/mergeAllDesktop.sh /opt/webClickstream_pipeline/clickstream/conf/desktop.properties 1 PROD
 
 20 3 * * * bash /opt/webClickstream_pipeline/clickstream/bin/mergeScript.sh /opt/webClickstream_pipeline/clickstream/conf/desktop.properties 1 PROD
 
-0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c clickstreamDataQualityCheck >>/opt/alchemy-core/logs/clickstreamDataQualityCheck_logs.txt
+30 7 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c clickstreamDataQualityCheck >>/opt/alchemy-core/logs/clickstreamDataQualityCheck_logs.txt
 
 40 3 * * * sh /opt/alchemy-core/current/bin/clickstream/clickstream_pipe.sh >>/opt/alchemy-core/logs/clickstream_logs.txt
 
-30 5 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/pushCampaignMerge/job.properties -run
+30 4 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c dcf_feed >>/opt/alchemy-core/logs/dcf_feed.txt
+
+0 5 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c pricing_sku_data >>/opt/alchemy-core/logs/pricing_sku_data.txt
+
+30 5 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/pushCampaignMerge/job.properties -run
+
+30 6 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
 
 0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
 0 11 * * * perl /opt/alchemy-core/current/bin/ad4push_device_merger.pl  >>/opt/alchemy-core/logs/ad4pushDevices_logs.txt
 
-30 11 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
+0 18 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
 
-0 8 * * * sh /opt/alchemy-core/current/bin/emailCampaignVariables.sh >>/opt/alchemy-core/logs/emailCampaignVariables.txt
+# CRM Tables
+09 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqFull >>/opt/alchemy-core/logs/crmAcqFull_logs.txt
 
+0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqIncr >>/opt/alchemy-core/logs/crmAcqIncr_logs.txt
+
+30 13 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmMerge >>/opt/alchemy-core/logs/crmMerge_logs.txt

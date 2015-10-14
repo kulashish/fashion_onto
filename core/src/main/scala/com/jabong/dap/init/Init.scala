@@ -7,7 +7,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
 import com.jabong.dap.model.custorder.ComponentExecutor
 import com.jabong.dap.model.product.itr.Itr
-import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
+import com.jabong.dap.quality.campaign.CampaignQuality
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf._
@@ -30,7 +30,7 @@ object Init {
     tableJson: String = null,
     mergeJson: String = null,
     paramJson: String = null,
-    pushCampaignsJson: String = null,
+    campaignsJson: String = null,
     config: String = null)
 
   def main(args: Array[String]) {
@@ -69,9 +69,9 @@ object Init {
         .text("Path to customer and Order variables merge job json config file.")
         .action((x, c) => c.copy(paramJson = x))
 
-      opt[String]("pushCampaignsJson")
-        .text("Path to push Campaigns priority config file.")
-        .action((x, c) => c.copy(pushCampaignsJson = x))
+      opt[String]("campaignsJson")
+        .text("Path to Campaigns priority config file.")
+        .action((x, c) => c.copy(campaignsJson = x))
 
     }
 
@@ -122,11 +122,13 @@ object Init {
       case DataSets.AD4PUSH_CUSTOMER_RESPONSE => new ComponentExecutor().start(params.paramJson)
       case DataSets.AD4PUSH_DEVICE_MERGER => new ComponentExecutor().start(params.paramJson)
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
-      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.pushCampaignsJson)
-      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.pushCampaignsJson)
-      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns(params.pushCampaignsJson)
-      case "pushCampaignMerge" => CampaignManager.startPushCampaignMerge(params.pushCampaignsJson)
-      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.pushCampaignsJson)
+      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.campaignsJson)
+      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.campaignsJson)
+      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns(params.campaignsJson)
+      case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
+      case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
+      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
+      case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
 
       // clickstream use cases
       case DataSets.CLICKSTREAM_YESTERDAY_SESSION => new ComponentExecutor().start(params.paramJson)
@@ -140,16 +142,25 @@ object Init {
       case DataSets.CUST_PREFERENCE => new ComponentExecutor().start(params.paramJson)
       case DataSets.CONTACT_LIST_MOBILE => new ComponentExecutor().start(params.paramJson)
 
-      //campaign quality check
       case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
-      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.pushCampaignsJson)
+
+      // all pushCampaign quality checks
       case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
+
+      //campaign quality check for mobile
+      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
+
+      //campaign quality check for mobile
+      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
 
       //pricing sku data
       case DataSets.PRICING_SKU_DATA => new ComponentExecutor().start(params.paramJson)
 
       // dcf feed
       case DataSets.DCF_FEED_GENERATE => new ComponentExecutor().start(params.paramJson)
+
+      // generate recommendations
+      case "recommendations" => new ComponentExecutor().start(params.paramJson)
     }
   }
 }

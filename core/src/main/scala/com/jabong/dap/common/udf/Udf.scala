@@ -2,6 +2,7 @@ package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
 
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable.ArrayBuffer
@@ -25,16 +26,6 @@ object Udf {
    * latestTimestamp will return latest Timestamp value
    */
   val latestTimestamp = udf((a1: Timestamp, a2: Timestamp) => UdfUtils.getLatest(a1: Timestamp, a2: Timestamp))
-
-  /**
-   * latestInt will return latest Integer value
-   */
-  val latestInt = udf((a1: Integer, a2: Integer) => UdfUtils.getLatest(a1: Integer, a2: Integer))
-
-  /**
-   * latestBool will return latest Boolean value
-   */
-  val latestBool = udf((a1: Boolean, a2: Boolean) => UdfUtils.getLatest(a1: Boolean, a2: Boolean))
 
   /**
    * latestDecimal will return latest Decimal value
@@ -118,6 +109,8 @@ object Udf {
    */
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
 
+  val allZero2NullUdf = udf((str: String) => UdfUtils.allZero2Null(str: String))
+
   /**
    * For populating empty email id from dcf data as _app_deviceid
    */
@@ -128,6 +121,10 @@ object Udf {
    */
   val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
 
+  val bigDecimal2Double = udf((d: java.math.BigDecimal) => UdfUtils.bigDecimal2Double(d: java.math.BigDecimal))
+
+  val udfEmailOptInStatus = udf((nls_email: String, status: String) => UdfUtils.getEmailOptInStatus(nls_email: String, status: String))
+
   /**
    * email will return s1 if either s is empty or null
    */
@@ -137,8 +134,24 @@ object Udf {
 
   val domain = udf((s: String, s1: String) => UdfUtils.domain(s: String, s1: String))
 
-  val successOrder = udf((i: Int) => UdfUtils.successOrder(i: Int))
+  val successOrder = udf((i: Long) => UdfUtils.successOrder(i: Long))
+
+  val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a: ArrayBuffer[String], i: Int))
+
+  val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: ArrayBuffer[(Row)], i: Int, value: Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
+
+  val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
+
+  val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
+
+  val isEquals = udf((d1: Any, d2: Any) => UdfUtils.isEquals(d1: Any, d2: Any))
+
+  val dnd = udf((s: String) => UdfUtils.markDnd(s: String))
+
+  val mps = udf((s: String) => UdfUtils.markMps(s: String))
+
+  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
 }

@@ -21,10 +21,15 @@ object ConditionBuilder {
       "AND %s".format(filterCondition)
     }
 
-    if (rangeStart == null && rangeEnd == null && mode == DataSets.DAILY_MODE) {
+    if (null == rangeStart && null == rangeEnd && DataSets.DAILY_MODE == mode) {
       val prevDayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
       "WHERE t1.%s >= '%s %s' AND t1.%s <= '%s %s' %s".format(dateColumn, prevDayDate, TimeConstants.START_TIME,
         dateColumn, prevDayDate, TimeConstants.END_TIME, tempFilterCondition)
+    } else if (null == rangeStart && null == rangeEnd && DataSets.HOURLY_MODE == mode) {
+      val dateNow = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
+      val hr = TimeUtils.getHour(null, TimeConstants.DATE_FORMAT) - 1
+      "WHERE t1.%s >= '%s %s:%s' AND t1.%s <= '%s %s:%s' %s".format(dateColumn, dateNow, hr, TimeConstants.START_MIN,
+        dateColumn, dateNow, hr, TimeConstants.END_MIN, tempFilterCondition)
     } else if (mode == DataSets.FULL && filterCondition == null) {
       ""
     } else if (mode == DataSets.FULL && filterCondition != null) {

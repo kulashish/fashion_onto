@@ -19,8 +19,6 @@ import org.apache.spark.sql.functions._
  *    - list of [(id_customer, sku_simple, sku, created_at(timestamp))]*
  */
 class WishList extends LiveCustomerSelector with Logging {
-  // not used
-  override def customerSelection(wishlistData: DataFrame): DataFrame = ???
 
   // not used
   override def customerSelection(customerData: DataFrame, orderItemData: DataFrame): DataFrame = ???
@@ -28,22 +26,13 @@ class WishList extends LiveCustomerSelector with Logging {
   /**
    * This method will return DataFrame with column(fk_customer, sku, domain, user_device_type, created_at) from last n days
    * @param dfCustomerProductShortlist
-   * @param ndays
    * @return DataFrame
    */
-  override def customerSelection(dfCustomerProductShortlist: DataFrame, ndays: Int): DataFrame = {
+  override def customerSelection(dfCustomerProductShortlist: DataFrame): DataFrame = {
 
     if (dfCustomerProductShortlist == null) {
 
       logger.error("Data frame should not be null")
-
-      return null
-
-    }
-
-    if (ndays <= 0) {
-
-      logger.error("ndays should not be negative value")
 
       return null
 
@@ -58,20 +47,10 @@ class WishList extends LiveCustomerSelector with Logging {
 
     }
 
-    val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS)
-
-    val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
-
-    val yesterdayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT_MS)
-
-    val endTimeStamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
-
-    //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
     // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
-    val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
-      //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
-      CustomerProductShortlistVariables.REMOVED_AT + " is null and " +
-      "'" + startTimestamp + "'" + " <= " + CustomerProductShortlistVariables.CREATED_AT + " and " + CustomerProductShortlistVariables.CREATED_AT + " <= " + "'" + endTimeStamp + "'")
+    val dfResult = dfCustomerProductShortlist.filter("(" + CustomerProductShortlistVariables.FK_CUSTOMER + " is not null or " +
+      CustomerProductShortlistVariables.EMAIL + " is not null ) and " +
+      CustomerProductShortlistVariables.REMOVED_AT + " is null")
       .select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),
         col(CustomerProductShortlistVariables.EMAIL),
@@ -88,4 +67,6 @@ class WishList extends LiveCustomerSelector with Logging {
   override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 
   override def customerSelection(inData: DataFrame, inData2: DataFrame, inData3: DataFrame): DataFrame = ???
+
+  override def customerSelection(inData: DataFrame, ndays: Int): DataFrame = ???
 }

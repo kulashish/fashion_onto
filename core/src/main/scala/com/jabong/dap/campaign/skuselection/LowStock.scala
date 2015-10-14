@@ -12,12 +12,12 @@ import org.apache.spark.sql.DataFrame
  * 3. pick n ref based on special price (descending)
  * 4. This campaign should not have gone to the customer in the past 30 days for the same Ref SKU
  */
-class LowStock extends SkuSelector with Logging {
+object LowStock extends Logging {
 
   // input will be [(id_customer, sku simple)] or [(id_customer, sku)]
   // case 1: only sku simple
   // case 2: only sku
-  override def skuFilter(customerSkuData: DataFrame, itrDataFrame: DataFrame): DataFrame = {
+  def skuFilter(customerSkuData: DataFrame, itrDataFrame: DataFrame): DataFrame = {
     if (customerSkuData == null || itrDataFrame == null) {
       return null
     }
@@ -25,21 +25,20 @@ class LowStock extends SkuSelector with Logging {
     val filteredSku = customerSkuData.join(
       itrDataFrame, customerSkuData(ProductVariables.SKU_SIMPLE) === itrDataFrame(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .filter(ProductVariables.STOCK + " <= " + CampaignCommon.LOW_STOCK_VALUE)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
+      .select(
+        customerSkuData(CustomerVariables.FK_CUSTOMER),
+        customerSkuData(CustomerVariables.EMAIL),
         customerSkuData(ProductVariables.SKU_SIMPLE),
-        itrDataFrame(ProductVariables.SPECIAL_PRICE))
+        itrDataFrame(ProductVariables.SPECIAL_PRICE),
+        itrDataFrame(ProductVariables.BRAND),
+        itrDataFrame(ProductVariables.BRICK),
+        itrDataFrame(ProductVariables.MVP),
+        itrDataFrame(ProductVariables.GENDER),
+        itrDataFrame(ProductVariables.PRODUCT_NAME))
 
-    val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    //  val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return refSkus
+    return filteredSku
   }
-
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, campaignName: String): DataFrame = ???
-  override def skuFilter(inDataFrame: DataFrame, inDataFrame2: DataFrame, inDataFrame3: DataFrame): DataFrame = ???
-  override def skuFilter(inDataFrame: DataFrame): DataFrame = ???
-
-  override def skuFilter(dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame): DataFrame = ???
-
-  override def skuFilter(pastCampaignData: DataFrame, dfCustomerPageVisit: DataFrame, dfItrData: DataFrame, dfCustomer: DataFrame, dfSalesOrder: DataFrame, dfSalesOrderItem: DataFrame, campaignName: String): DataFrame = ???
 
 }

@@ -1,5 +1,7 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.DataSets

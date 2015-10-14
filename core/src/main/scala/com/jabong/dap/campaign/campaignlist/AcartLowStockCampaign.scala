@@ -2,9 +2,11 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.LowStock
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -12,30 +14,24 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartLowStockCampaign {
 
-  def runCampaign(past30DayCampaignMergedData: DataFrame, last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame): Unit = {
+  def runCampaign(last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
     //FIXME:Filter the order items data for last day
     val selectedCustomers = acartCustomerSelector.customerSelection(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData)
 
-    var custFiltered = selectedCustomers
-
-    if (past30DayCampaignMergedData != null) {
-      //past campaign check whether the campaign has been sent to customer in last 30 days
-      val pastCampaignCheck = new PastCampaignCheck()
-      custFiltered = pastCampaignCheck.campaignRefSkuCheck(past30DayCampaignMergedData, selectedCustomers,
-        CampaignCommon.campaignMailTypeMap.getOrElse(CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, 1000), 30)
-    }
-
+    CampaignUtils.debug(selectedCustomers, "AcartLowStockCampaigns selected Customer ")
     //sku selection
-    val lowStock = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.LOW_STOCK)
-    val refSkus = lowStock.skuFilter(custFiltered, yesterdayItrData)
+    //filter sku based on lowstock filter
+    val filteredSku = LowStock.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN)
+    CampaignUtils.debug(filteredSku, "AcartLowStockCampaigns filteredSku ")
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku)
 
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN)
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
 
   }
 

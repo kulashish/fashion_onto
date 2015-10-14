@@ -1,0 +1,22 @@
+{
+  "acquisition": [
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_shipment",
+      "primaryKey": "id_sales_order_item_shipment",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Overwrite",
+      "filterCondition": "updated_at <= '2015-10-07 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config_additional_info",
+      "primaryKey": "id_catalog_config_additional_info",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Overwrite",
+      "filterCondition": "updated_at <= '2015-10-11 23:59:59'"
+    }
+  ]
+}

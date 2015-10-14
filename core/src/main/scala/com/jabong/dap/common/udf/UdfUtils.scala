@@ -3,11 +3,13 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.util.Date
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
+import org.apache.spark.sql.Row
 
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
@@ -16,6 +18,10 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
  * Created by raghu on 3/7/15.
  */
 object UdfUtils {
+
+  def csvDateFormat(s: Timestamp): String = {
+    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
+  }
 
   /**
    * min of Timestamp t1 or t2
@@ -41,7 +47,36 @@ object UdfUtils {
   }
 
   def toLower(s: String): String = {
-    return s.toLowerCase()
+    if (null != s)
+      s.toLowerCase()
+    else
+      s
+  }
+
+  def markDnd(mNo: String): String = {
+    var newId: String = null
+    if (null == mNo) {
+      "0"
+    } else {
+      "1"
+    }
+  }
+
+  def markMps(mNo: String): String = {
+    var newId: String = null
+    if (null == mNo) {
+      "I"
+    } else {
+      "O"
+    }
+  }
+
+  def platinumStatus(rewardType: String): Int = {
+    if (null != rewardType && "Platinum".equalsIgnoreCase(rewardType)) {
+      1
+    } else {
+      0
+    }
   }
 
   /**
@@ -468,6 +503,26 @@ object UdfUtils {
   }
 
   /**
+   * EMAIL_SUBSCRIPTION_STATUS
+   * iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
+   * @param nls_email
+   * @param status
+   * @return String
+   */
+  def getEmailOptInStatus(nls_email: String, status: String): String = {
+
+    if (nls_email == null) {
+      return "O"
+    }
+
+    status match {
+      case "subscribed" => "I"
+      case "unsubscribed" => "U"
+    }
+
+  }
+
+  /**
    * Returns empty string if the string contains all zeros or null.
    * @param str
    * @return String
@@ -485,7 +540,6 @@ object UdfUtils {
    * @return
    */
   def getToLong(str: String): Long = {
-
     if (str == null) {
       return 0
     }
@@ -497,6 +551,13 @@ object UdfUtils {
         return 0
       }
     }
+  }
+
+  def bigDecimal2Double(bd: java.math.BigDecimal): Double = {
+    if (null == bd) {
+      return 0.0
+    }
+    bd.doubleValue()
   }
 
   /**
@@ -526,13 +587,52 @@ object UdfUtils {
     if (null != s && (s.contains(DataSets.WINDOWS) || s.contains(DataSets.ANDROID) | s.contains(DataSets.IOS))) s else s1
   }
 
-  def successOrder(i: Int): Int = {
+  def successOrder(i: Long): Int = {
     val successCodes = Array(3, 4, 5, 6, 7, 11, 17, 24, 33, 34)
     if (successCodes.contains(i)) {
-      return 1
+      1
     } else {
-      return 0
+      0
     }
   }
+  def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
+    if (i >= strings.size) "" else strings(i)
+  }
 
+  def allZero2Null(str: String): String = {
+    val nullStr: String = null
+    if (null != str) {
+      var str1 = str.trim()
+      if (str1.length <= 0 || str1.matches("^[0]*")) {
+        return nullStr
+      } else {
+        return str1
+      }
+    }
+    str
+  }
+
+  def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
+    if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+  }
+
+  def addString(value: String, constant: String): String = {
+    if (value == null) return null else constant + value + constant
+  }
+
+  /**
+   * isEquals checks: if data of d1 and d2 values are equals
+   * @param d1
+   * @param d2
+   * @tparam T
+   * @return
+   */
+  def isEquals[T](d1: T, d2: T): Boolean = {
+    if (d1 == null || d2 == null)
+      return false
+    if (d1.equals(d2)) {
+      return true
+    }
+    return false
+  }
 }

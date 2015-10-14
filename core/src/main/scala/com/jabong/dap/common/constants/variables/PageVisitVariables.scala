@@ -28,5 +28,4 @@ object PageVisitVariables {
   val PARTITION_MONTH = "month1"
   val PARTITION_YEAR = "year1"
   val ADD4PUSH = "add4push"
-  val UID ="uid"
 }

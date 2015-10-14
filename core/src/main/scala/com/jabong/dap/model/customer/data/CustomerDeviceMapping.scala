@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.data
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -79,7 +79,7 @@ object CustomerDeviceMapping extends Logging {
 
     val joined = nlsJoined.join(cmr, cmr(CustomerVariables.EMAIL) === nlsJoined(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        cmr(PageVisitVariables.UID),
+        cmr(ContactListMobileVars.UID),
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
         coalesce(nlsJoined(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,

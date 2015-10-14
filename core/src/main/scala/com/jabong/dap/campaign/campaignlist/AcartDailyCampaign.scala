@@ -2,8 +2,10 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.skuselection.Daily
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -11,7 +13,7 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartDailyCampaign {
 
-  def runCampaign(yesterdayAcartData: DataFrame, yesterdaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame): Unit = {
+  def runCampaign(yesterdayAcartData: DataFrame, yesterdaySalesOrderData: DataFrame, yesterdaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
 
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
@@ -19,13 +21,14 @@ class AcartDailyCampaign {
     val selectedCustomers = acartCustomerSelector.customerSelection(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData)
 
     //sku selection
-    val daily = CampaignProducer.getFactory(CampaignCommon.SKU_SELECTOR).getSkuSelector(SkuSelection.DAILY)
-    val refSkus = daily.skuFilter(selectedCustomers, yesterdayItrData)
+    //filter sku based on daily filter
+    val filteredSku = Daily.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
-    val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, CampaignCommon.ACART_DAILY_CAMPAIGN)
-    //save campaign Output
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, CampaignCommon.ACART_DAILY_CAMPAIGN)
+    // ***** mobile push use case
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_DAILY_CAMPAIGN, filteredSku, false)
 
+    // ***** email use case
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_DAILY_CAMPAIGN, filteredSku, false, brickMvpRecommendations)
   }
 }
 

@@ -18,6 +18,7 @@ object CampaignCommon {
   val RETURN_RETARGET_CAMPAIGN = "return_retarget"
   val INVALID_FOLLOWUP_CAMPAIGN = "invalid_followup"
   val INVALID_LOWSTOCK_CAMPAIGN = "invalid_lowstock"
+  val INVALID_IOD_CAMPAIGN = "invalid_iod"
   val ACART_FOLLOWUP_CAMPAIGN = "acart_followup"
   val ACART_DAILY_CAMPAIGN = "acart_daily"
   val ACART_LOWSTOCK_CAMPAIGN = "acart_lowstock"
@@ -41,10 +42,17 @@ object CampaignCommon {
 
   val PRIORITY = "priority"
 
+  val ACART_BASE_URL = "www.jabong.com/cart/addmulti?skus="
   //add following source name with other params in AppConfig.config.credentials
   val J_DARE_SOURCE = "jDaReSource"
 
   val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
+  val EMAIL_CAMPAIGN_QUALITY = "email_campaign_quality"
+
+  val MIPR_CAMPAIGN = "mipr"
+  val NEW_ARRIVALS_BRAND = "new_arrivals_brand"
+  val SHORTLIST_REMINDER = "shortlist_reminder"
+  val COUNT_NEW_ARRIVALS = 4
 
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
@@ -61,7 +69,10 @@ object CampaignCommon {
     "invalid_followup" -> 48,
     "invalid_lowstock" -> 49,
     "surf1" -> 56,
-    "surf3" -> 58
+    "surf3" -> 58,
+    "mipr" -> 67,
+    "new_arrivals_brand" -> 68,
+    "shortlist_reminder" -> 53,
+    "invalid_iod" -> 100
   )
-
 }

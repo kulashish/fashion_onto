@@ -43,7 +43,6 @@ object BasicBob {
       withColumnRenamed("barcode_ean", ITR.BARCODE_EAN)
 
     // direct stock from catalog stock table (without reserved calculations)
-
     val quantityDF = simpleDF.join(
       Model.catalogStock.select("fk_catalog_simple", "quantity"),
       simpleDF.col(ITR.ID_CATALOG_SIMPLE) === Model.catalogStock.col("fk_catalog_simple"),
