@@ -124,7 +124,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
 
     if (paths != null) {
 
-      val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL, incrDate)
+      val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
 
       (dfIncSalesOrder, null)
     } else {
