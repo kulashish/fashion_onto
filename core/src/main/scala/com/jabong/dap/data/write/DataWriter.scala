@@ -37,7 +37,8 @@ object DataWriter extends Logging {
    * @param writePath
    */
   private def writeCsv(df: DataFrame, writePath: String, saveMode: String, header: String, delimeter: String) {
-    df.coalesce(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("quote", "").option("header", header).option("delimiter", delimeter).save(writePath)
+    val quote = ""
+    df.coalesce(1).write.mode(SaveMode.valueOf(saveMode)).format("com.databricks.spark.csv").option("quote", quote).option("header", header).option("delimiter", delimeter).save(writePath)
     println("CSV Data written successfully to the following Path: " + writePath)
   }
 
