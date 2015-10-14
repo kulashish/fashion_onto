@@ -11,12 +11,12 @@ import scala.collection.mutable.ListBuffer
  */
 object UUIDGenerator {
 
-  var uidsList= scala.collection.mutable.ListBuffer[String]()
+  var uidsList = scala.collection.mutable.ListBuffer[String]()
 
-  def getUid(uids: ListBuffer[String]): String={
+  def getUid(uids: ListBuffer[String]): String = {
     var id = ""
     id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase() // 7f97d378-4c73-4428-90ec-1dac34f7d6a7 -> 145E6C95AF9B4ED393E3AF387FD74972
-    while(uids.contains(id)){
+    while (uids.contains(id)) {
       id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase()
     }
     id
@@ -24,9 +24,9 @@ object UUIDGenerator {
 
   val addUids = udf((s: String) => addUid(s: String))
 
-  def addUid(uid: String): String= {
+  def addUid(uid: String): String = {
     var newId: String = null
-    if(null == uid){
+    if (null == uid) {
       newId = getUid(uidsList)
       uidsList += newId
       return newId
@@ -36,8 +36,8 @@ object UUIDGenerator {
     }
   }
 
-  def addUid(cmr: DataFrame): DataFrame ={
-    val res =cmr.select(addUids(cmr("uid")) as "uid", cmr("email"), cmr("browserid"), cmr("domain") )
+  def addUid(cmr: DataFrame): DataFrame = {
+    val res = cmr.select(addUids(cmr("uid")) as "uid", cmr("email"), cmr("browserid"), cmr("domain"))
     res
   }
 

@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer
 
-import com.jabong.dap.common.{SharedSparkContext}
+import com.jabong.dap.common.{ SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.customer.data.UUIDGenerator
@@ -20,7 +20,6 @@ class UUIDGeneratorTest extends FlatSpec with SharedSparkContext {
     cmr = JsonUtils.readFromJson(DataSets.EXTRAS, "cmr_uid")
 
     //cmr.collect().foreach(println)
-
 
   }
 
