@@ -32,20 +32,22 @@ class SalesOrderTest extends FlatSpec with SharedSparkContext {
     assert(ordersCount.collect.size == 3)
   }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Name of variable: id_customer, CUSTOMERS PREFERRED ORDER TIMESLOT
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  "getCustomersPreferredOrderTimeslot: Data Frame" should "match to resultant Data Frame" in {
+  "getCPOT: Data Frame" should "match to resultant Data Frame" in {
 
     val result = SalesOrder.getCPOT(dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
 
-    //            result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+    //result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
 
     val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
-      CustVarSchema.customersPreferredOrderTimeslot)
+      CustVarSchema.customersPreferredOrderTimeslotPart2)
       .collect().toSet
+
+    //    result.collect().foreach(println)
+    //    result.printSchema()
+    //
+    //    dfCustomersPreferredOrderTimeslot.collect().foreach(println)
+    //    dfCustomersPreferredOrderTimeslot.printSchema()
 
     assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
 

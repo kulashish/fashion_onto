@@ -22,7 +22,7 @@ class FollowUpCampaignsTest extends FeatureSpec with GivenWhenThen with SharedSp
     super.beforeAll()
     CampaignOutput.setTestMode(true)
     sqlContext = Spark.getSqlContext()
-    salesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "sales_order_data", Schema.salesOrder)
+    salesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "sales_order_data",)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "basic_sku_itr", TestSchema.basicItr)
     emailCampaignMergedData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "email_campaign_merged")
   }

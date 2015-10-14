@@ -137,6 +137,7 @@ object DataSets {
 
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
+  val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
