@@ -24,7 +24,7 @@ object NewsletterDataList {
     val dfContactListMobile = readDF(paths, incrDate)
 
     val dfNlDataList = dfContactListMobile.select(
-      col(ContactListMobileVars.EMAIL),
+      col(CustomerVariables.EMAIL),
       col(CustomerVariables.ID_CUSTOMER) as NewsletterVariables.CUSTOMER_ID,
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as NewsletterVariables.EMAIL_SUBSCRIPTION_STATUS,
       col(NewsletterVariables.STATUS) as NewsletterVariables.CUR_NL_STATUS
