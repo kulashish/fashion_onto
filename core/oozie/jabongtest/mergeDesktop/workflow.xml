@@ -51,7 +51,7 @@
 					<name>hive.execution.engine</name>
 					<value>mr</value>
 				</property>
-			</configuration>>
+			</configuration>
 			<script>${clickstreamPipeline_desktopMerge_mergeDesktopScript}</script>
 			<param>hivedb=${clickstreamPipeline_partitionedDb}</param>
 			<param>DesktopMergeDir=${clickstreamPipeline_desktopMerge_DesktopMergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
@@ -75,45 +75,6 @@
 			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
 			<param>tableName=${clickstreamPipeline_desktopMergePartitionTable}</param>
 		</hive>
-		<ok to='hive_priority_reports' />
-		<error to='mail_on_error' />
-	</action>
-	<action name='hive_priority_reports'>
-		<hive xmlns="uri:oozie:hive-action:0.5">
-			<configuration>
-				<property>
-					<name>hive.exec.reducers.bytes.per.reducer</name>
-					<value>1000000000</value>
-				</property>
-				<property>
-					<name>hive.optimize.reducededuplication</name>
-					<value>false</value>
-				</property>
-			</configuration>
-			<script>${clickstreamPipeline_desktopMerge_desktopMainReportsScript}</script>
-			<param>hivedb=${clickstreamPipeline_hivedb2}</param>
-			<param>FieldSeparator=${clickstreamPipeline_fieldSeparator}</param>
-			<param>OUTPUT=${wf:actionData('prepare_variables')['DesktopMergeOutput']}/reports</param>
-			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
-			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
-			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
-			<param>pagevisitDB=${clickstreamPipeline_partitionedDb}</param>
-			<param>pagevisitTable=${clickstreamPipeline_desktopMergePartitionTable}</param>
-		</hive>
-		<ok to='mail_on_success' />
-		<error to='mail_on_error' />
-	</action>
-	<action name='ftp_priority_reports'>
-		<shell xmlns="uri:oozie:shell-action:0.3">
-			<exec>${clickstreamPipeline_desktopMerge_ftpPriorityReportsScript}</exec>
-			<argument>${wf:actionData('prepare_variables')['ftp_date']}</argument>
-			<argument>${clickstreamPipeline_FTP_HOST}</argument>
-			<argument>${clickstreamPipeline_FTP_USER}</argument>
-			<argument>${clickstreamPipeline_FTP_PASSWD}</argument>
-			<argument>${clickstreamPipeline_REMOTE_PATH}</argument>
-			<argument>${wf:actionData('prepare_variables')['DailyHiveOutput']}</argument>
-			<file>${clickstreamPipeline_desktopMerge_ftpPriorityReportsScript}</file>
-		</shell>
 		<ok to='mail_on_success' />
 		<error to='mail_on_error' />
 	</action>
