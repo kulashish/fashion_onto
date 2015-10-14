@@ -162,6 +162,23 @@ class CommonRecommendationTest extends FlatSpec with SharedSparkContext with Mat
     assert(recommendations.length == 1)
   }
 
+  "5 recommendation input skus" should "create recommendation based on mvp,discount and gender" in {
+    val dataFrameSchema = StructType(Array(
+      StructField(ProductVariables.MVP, StringType, false),
+      StructField(Recommendation.DISCOUNT_STATUS, BooleanType, false),
+      StructField(ProductVariables.GENDER, StringType, false),
+      StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(ProductVariables.QUANTITY, LongType), StructField(ProductVariables.SKU, StringType))), true))
+    ))
+    val pivotKeys = Array(ProductVariables.MVP, Recommendation.DISCOUNT_STATUS)
+
+    val recOut = commonRecommendation.genRecommend(inventoryCheckInput, pivotKeys, dataFrameSchema, 8)
+
+    recOut.show(100)
+    val recommendations = recOut.filter(ProductVariables.GENDER + "='UNISEX'")
+      .select(CampaignMergedFields.RECOMMENDATIONS).collect()(0)(0).asInstanceOf[mutable.MutableList[(Long, String)]]
+    assert(recommendations.length == 1)
+  }
+
   "Given a row and array of keys" should "create a dynamic row with those keys" in {
     val keys = Array(ProductVariables.BRICK, ProductVariables.MVP)
     val expectedRow: Seq[Any] = Seq("test", "mass")

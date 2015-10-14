@@ -19,7 +19,15 @@ object RecommendationUtils extends Serializable {
   recommendationType += (
     "brick_mvp" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS)),
     "brand_mvp" -> Array((Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS)),
-    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS), (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRAND_MVP_RECOMMENDATIONS))
+    "brick_price_band" -> Array((Recommendation.BRICK_PRICE_BAND_PIVOT, Schema.brickPriceBandRecommendationOutput, DataSets.BRICK_PRICE_BAND_RECOMMENDATIONS)),
+    "mvp_color" -> Array((Recommendation.MVP_COLOR_PIVOT, Schema.mvpColorRecommendationOutput, DataSets.MVP_COLOR_RECOMMENDATIONS)),
+    "mvp_discount" -> Array((Recommendation.MVP_DISCOUNT_PIVOT, Schema.mvpDiscountRecommendationOutput, DataSets.MVP_DISCOUNT_RECOMMENDATIONS)),
+
+    "all" -> Array((Recommendation.BRICK_MVP_PIVOT, Schema.brickMvpRecommendationOutput, DataSets.BRICK_MVP_RECOMMENDATIONS),
+      (Recommendation.BRAND_MVP_PIVOT, Schema.brandMvpRecommendationOutput, DataSets.BRAND_MVP_RECOMMENDATIONS),
+      (Recommendation.BRICK_PRICE_BAND_PIVOT, Schema.brickPriceBandRecommendationOutput, DataSets.BRICK_PRICE_BAND_RECOMMENDATIONS),
+      (Recommendation.MVP_COLOR_PIVOT, Schema.mvpColorRecommendationOutput, DataSets.MVP_COLOR_RECOMMENDATIONS),
+      (Recommendation.MVP_DISCOUNT_PIVOT, Schema.mvpDiscountRecommendationOutput, DataSets.MVP_DISCOUNT_RECOMMENDATIONS))
   )
 
   var RecommendationGenderMap = new HashMap[String, String]
