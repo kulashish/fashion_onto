@@ -74,7 +74,6 @@ object CustomerDeviceMapping extends Logging {
         joinedDf(PageVisitVariables.BROWSER_ID),
         joinedDf(PageVisitVariables.DOMAIN)
 
-
       )
 
     val joined = nlsJoined.join(cmr, cmr(CustomerVariables.EMAIL) === nlsJoined(CustomerVariables.EMAIL), SQL.FULL_OUTER)
