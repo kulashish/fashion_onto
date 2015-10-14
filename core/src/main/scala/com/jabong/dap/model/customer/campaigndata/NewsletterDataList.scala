@@ -8,6 +8,7 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 /**
@@ -18,10 +19,11 @@ object NewsletterDataList {
   def start(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val paths = OptionUtils.getOptValue(params.path)
 
-    val dfIncContactListMobile = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
+    val dfContactListMobile = readDF(paths, incrDate)
 
-    val dfNlDataList = dfIncContactListMobile.select(
+    val dfNlDataList = dfContactListMobile.select(
       col(ContactListMobileVars.EMAIL),
       col(CustomerVariables.ID_CUSTOMER) as NewsletterVariables.CUSTOMER_ID,
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as NewsletterVariables.EMAIL_SUBSCRIPTION_STATUS,
@@ -31,6 +33,19 @@ object NewsletterDataList {
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(dfNlDataList, DataSets.VARIABLES, DataSets.NEWSLETTER_DATA_LIST, DataSets.DAILY_MODE, incrDate, "53699_83297_" + fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
 
+  }
+
+  def readDF(paths: String, incrDate: String): (DataFrame) = {
+
+    if (paths != null) {
+
+      val dfIncContactListMobile = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
+      (dfIncContactListMobile)
+    } else {
+
+      val dfIncContactListMobile = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
+      (dfIncContactListMobile)
+    }
   }
 
 }
