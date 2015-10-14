@@ -6,6 +6,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.campaigndata.CustomerPreferredTimeslotPart2
 import com.jabong.dap.model.customer.schema.CustVarSchema
+import com.jabong.dap.model.order.variables.SalesOrder
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
@@ -24,7 +25,7 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
 
   "getCPOT: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = CustomerPreferredTimeslotPart2.getCPOT(dfSalesOrder: DataFrame)
+    val result = SalesOrder.getCPOT(dfSalesOrder: DataFrame)
       .limit(30).collect().toSet
 
     //result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")

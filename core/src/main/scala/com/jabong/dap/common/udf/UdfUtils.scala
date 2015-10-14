@@ -632,8 +632,6 @@ object UdfUtils extends Logging {
     str
   }
 
-
-
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
