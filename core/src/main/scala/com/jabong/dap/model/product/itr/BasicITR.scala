@@ -141,7 +141,7 @@ object BasicITR extends Logging {
       ITR.BRAND_NAME,
       ITR.ITR_DATE
     ).
-      withColumn(ITR.DISCOUNT,when(col(ITR.MRP_PRICE) === 0.00,lit(0.0)).otherwise(Udf.BigDecimalToDouble(((col(ITR.MRP_PRICE)-col(ITR.PRICE_ON_SITE))*100)/col(ITR.MRP_PRICE)))).
+      withColumn(ITR.DISCOUNT, when(col(ITR.MRP_PRICE) === 0.00, lit(0.0)).otherwise(Udf.BigDecimalToDouble(((col(ITR.MRP_PRICE) - col(ITR.PRICE_ON_SITE)) * 100) / col(ITR.MRP_PRICE)))).
       cache()
 
     itrDF.write.mode(saveMode).format(DataSets.ORC).save(getPath(false, incrDate))
