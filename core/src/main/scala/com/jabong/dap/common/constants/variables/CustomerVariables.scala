@@ -58,7 +58,6 @@ object CustomerVariables {
   val IS_PAYBACK_EARN = "is_payback_earn"
   val ZONE = "ZONE"
   val TIER1 = "TIER1"
-  val REG_DATE = "reg_date"
 
   //variables name
   val CUSTOMER_ALL_ORDER_TIMESLOT = "customer_all_order_timeslot"
