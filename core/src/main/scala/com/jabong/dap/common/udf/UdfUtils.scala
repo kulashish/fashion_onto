@@ -656,7 +656,7 @@ object UdfUtils extends Logging {
     return false
   }
 
-  def BigDecimalToLong(value: java.math.BigDecimal): Double ={
+  def BigDecimalToDouble(value: java.math.BigDecimal): Double ={
     if(value ==null) return 0.0
     return value.doubleValue()
   }
