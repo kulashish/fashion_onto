@@ -140,9 +140,10 @@ object CustomerDeviceMapping extends Logging {
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
-      val filledUid = UUIDGenerator.addUid(res)
+      //val filledUid = UUIDGenerator.addUid(res)
 
-      DataWriter.writeParquet(filledUid, savePath, saveMode)
+      //DataWriter.writeParquet(filledUid, savePath, saveMode)
+      DataWriter.writeParquet(res, savePath, saveMode)
     }
   }
 
