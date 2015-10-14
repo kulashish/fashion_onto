@@ -30,6 +30,9 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var dfItr30DayData: DataFrame = _
   @transient var dfYesterdayItrData: DataFrame = _
 
+  @transient var emailCampaignMergedData: DataFrame = _
+  @transient var salesOrderFollowUp: DataFrame = _
+
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
@@ -46,6 +49,9 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     dfCustomerProductShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.RESULT_CUSTOMER_PRODUCT_SHORTLIST, TestSchema.resultCustomerProductShortlist)
     dfItr30DayData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.ITR_30_DAY_DATA, Schema.itr)
     dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
+    emailCampaignMergedData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "email_campaign_merged")
+    salesOrderFollowUp = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "sales_order_data")
+
 
   }
 
@@ -196,7 +202,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     //    val dfShortListSkuFilter = JsonUtils.readFromJson(DataSets.CAMPAIGN + File.separator + DataSets.SKU_SELECTION + File.separator + DataSets.ITEM_ON_DISCOUNT, "result_shortlist_sku_filter", Schema.resultSkuFilter)
     //      .collect().toSet
 
-    assert(result.count() == 4)
+    assert(result.count() == 2)
 
   }
 
@@ -229,5 +235,10 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     //val expectedData = Row(200.0, "VA613SH24VHFINDFAS-3716539")
     assert(refSkuFirst.size === 2)
     //  assert(refSkuFirst.head._2 == "VA613SH24VHFINDFAS-3716539")
+  }
+
+  "Get follow up campaigns from merged campaign output " should "return surf campaign" in {
+    val followUpCampaigns = CampaignUtils.campaignFollowUpSelection(emailCampaignMergedData, salesOrder)
+    assert(followUpCampaigns.count === 2)
   }
 }

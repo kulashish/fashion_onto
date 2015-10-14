@@ -13,11 +13,11 @@ class FollowUpCampaigns {
 
   def runCampaign(campaignMergedData: DataFrame, salesOrderLast3Days: DataFrame, itrSkuSimpleYesterdayData: DataFrame): Unit = {
 
-    val selectedData = CampaignUtils.campaignSelection(campaignMergedData, salesOrderLast3Days)
+    val selectedData = CampaignUtils.campaignFollowUpSelection(campaignMergedData, salesOrderLast3Days)
 
-    val refSku1Out = CampaignUtils.campaignSkuStockSelection(selectedData, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU1, 3)
-    val refSku2Out = CampaignUtils.campaignSkuStockSelection(refSku1Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "2", 3)
-    val refSku3Out = CampaignUtils.campaignSkuStockSelection(refSku2Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "3", 3)
+    val refSku1Out = CampaignUtils.campaignSkuStockFilter(selectedData, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU1, 3)
+    val refSku2Out = CampaignUtils.campaignSkuStockFilter(refSku1Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "2", 3)
+    val refSku3Out = CampaignUtils.campaignSkuStockFilter(refSku2Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "3", 3)
 
     CampaignOutput.saveCampaignDataForYesterday(refSku3Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS)
   }
