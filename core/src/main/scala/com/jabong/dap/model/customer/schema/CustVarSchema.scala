@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, ContactListMobileVars, CustomerVariables }
 import org.apache.spark.sql.types._
 
 /**
@@ -11,10 +11,21 @@ object CustVarSchema {
   //customer variable schemas
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  val customersPreferredOrderTimeslot = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER_CPOT, LongType, true),
-    StructField(CustomerVariables.CUSTOMER_ALL_ORDER_TIMESLOT, StringType, true),
-    StructField(CustomerVariables.CUSTOMER_PREFERRED_ORDER_TIMESLOT, IntegerType, true)
+  val customersPreferredOrderTimeslotPart2 = StructType(Array(
+    StructField(SalesOrderVariables.CUSTOMER_ID, LongType, true),
+    StructField(SalesOrderVariables.ORDER_0, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_1, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_2, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_3, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_4, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_5, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_6, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_7, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_8, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_9, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_10, IntegerType, true),
+    StructField(SalesOrderVariables.ORDER_11, IntegerType, true),
+    StructField(SalesOrderVariables.PREFERRED_ORDER_TIMESLOT, IntegerType, true)
   ))
 
   val resultCustomer = StructType(Array(
