@@ -31,6 +31,6 @@
 # CRM Tables
 09 0 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqFull >>/opt/alchemy-core/logs/crmAcqFull_logs.txt
 
-0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqIncr >>/opt/alchemy-core/logs/crmAcqIncr_logs.txt
+15 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqIncr >>/opt/alchemy-core/logs/crmAcqIncr_logs.txt
 
-30 13 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmMerge >>/opt/alchemy-core/logs/crmMerge_logs.txt
+0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmMerge >>/opt/alchemy-core/logs/crmMerge_logs.txt

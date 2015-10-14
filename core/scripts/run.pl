@@ -139,7 +139,7 @@ if ($component eq "bobAcqFull1") {
 # crm acquisition
 } elsif ($component eq "crmAcqIncr") {
     $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
-    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+    $AMMUNITION = "--num-executors 3 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqIncr.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "crmAcqFull") {
