@@ -6,7 +6,6 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.model.customer.campaigndata.CustomerPreferredTimeslotPart2
 import com.jabong.dap.model.customer.schema.CustVarSchema
-import com.jabong.dap.model.order.variables.SalesOrder
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
