@@ -19,7 +19,6 @@ object Recommendation {
 
   val BRICK_PRICE_BAND_SUB_TYPE = "brick_price_band"
 
-
   val INVENTORY_FILTER = "inventory_filter"
 
   val WEEKLY_AVERAGE_SALE = "weekly_average_sale"
