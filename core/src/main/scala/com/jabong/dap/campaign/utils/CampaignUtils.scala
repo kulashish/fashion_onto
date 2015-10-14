@@ -721,25 +721,25 @@ object CampaignUtils extends Logging {
     dfResult
   }
 
-  def campaignSelection(campaignMergedData: DataFrame, salesOrderData: DataFrame): DataFrame ={
-    require(campaignMergedData !=null,"campaign merged data cannot be null")
-    require(salesOrderData !=null,"sales order data cannot be null")
+  def campaignSelection(campaignMergedData: DataFrame, salesOrderData: DataFrame): DataFrame = {
+    require(campaignMergedData != null, "campaign merged data cannot be null")
+    require(salesOrderData != null, "sales order data cannot be null")
 
     val campaignMergedOutData = campaignMergedData.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, Udf.followUpCampaignMailType(col(CampaignMergedFields.LIVE_MAIL_TYPE)))
-      .filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE+"!= 0")
+      .filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + "!= 0")
       .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
-      .withColumnRenamed(CampaignMergedFields.CAMPAIGN_MAIL_TYPE,CampaignMergedFields.LIVE_MAIL_TYPE)
+      .withColumnRenamed(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_MAIL_TYPE)
 
-   val filteredCampaignCustomerNotBought =  campaignMergedOutData.join(salesOrderData,campaignMergedData(CampaignMergedFields.CUSTOMER_ID) === salesOrderData(SalesOrderVariables.FK_CUSTOMER),SQL.LEFT_OUTER)
-      .filter(SalesOrderVariables.FK_CUSTOMER +" is null")
+    val filteredCampaignCustomerNotBought = campaignMergedOutData.join(salesOrderData, campaignMergedData(CampaignMergedFields.CUSTOMER_ID) === salesOrderData(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
+      .filter(SalesOrderVariables.FK_CUSTOMER + " is null")
       .select(campaignMergedData("*"))
 
     return filteredCampaignCustomerNotBought
   }
 
-  def campaignSkuStockSelection(selectedData: DataFrame, itrData: DataFrame,simpleField:String, stockValue:Int): DataFrame ={
-    require(selectedData !=null,"selectedData cannot be null")
-    require(itrData !=null,"itrData cannot be null")
+  def campaignSkuStockSelection(selectedData: DataFrame, itrData: DataFrame, simpleField: String, stockValue: Int): DataFrame = {
+    require(selectedData != null, "selectedData cannot be null")
+    require(itrData != null, "itrData cannot be null")
 
     val filteredSku = selectedData.join(itrData, selectedData(simpleField) === itrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .filter(ProductVariables.STOCK + " >= " + stockValue)

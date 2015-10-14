@@ -468,13 +468,12 @@ object CampaignInput extends Logging {
    * @param nDays
    * @return
    */
-  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS,nDays: Int = -1 ): DataFrame = {
+  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, nDays: Int = -1): DataFrame = {
     val date = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT_FOLDER)
     val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
 
     mergedCampaignData
   }
-
 
   def loadYesterdayMobilePushCampaignQualityData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)

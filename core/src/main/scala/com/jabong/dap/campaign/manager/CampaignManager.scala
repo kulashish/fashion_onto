@@ -286,12 +286,12 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
     val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
-    val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
+    val itrSkYesterdayData = CampaignInput.loadYesterdayItrSkuData()
 
     val ThirdDayCampaignMergedData = CampaignInput.loadNthDayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS,3)
     //Start: FollowUp email Campaign
     val followUpCampaigns = new FollowUpCampaigns()
-    followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, )
+    followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData,itrSkYesterdayData )
   }
 
 
