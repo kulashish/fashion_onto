@@ -29,6 +29,12 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
 
     val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfCPOTFull)
 
+    //    dfInc.collect().foreach(println)
+    //    dfInc.printSchema()
+    //
+    //    dfFullFinal.collect().foreach(println)
+    //    dfFullFinal.printSchema()
+
     assert(dfInc.count() == 5)
     assert(dfFullFinal.count() == 5)
 

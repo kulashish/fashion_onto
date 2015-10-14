@@ -661,54 +661,18 @@ object UdfUtils extends Logging {
     return value.doubleValue()
   }
 
-  def getMaxSlotValue(tuple: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)): Int = {
+  def getMaxSlotValue(slotArray: ArrayBuffer[Int]): Int = {
 
     var maxSlot = 0
-    var max = tuple._1
+    var max = -1
 
-    if (tuple._2 > max) {
-      max = tuple._2
-      maxSlot = 1
-    }
-    if (tuple._3 > max) {
-      max = tuple._3
-      maxSlot = 2
-    }
-    if (tuple._4 > max) {
-      max = tuple._4
-      maxSlot = 3
-    }
-    if (tuple._5 > max) {
-      max = tuple._5
-      maxSlot = 4
-    }
-    if (tuple._6 > max) {
-      max = tuple._6
-      maxSlot = 5
-    }
-    if (tuple._7 > max) {
-      max = tuple._7
-      maxSlot = 6
-    }
-    if (tuple._8 > max) {
-      max = tuple._8
-      maxSlot = 7
-    }
-    if (tuple._9 > max) {
-      max = tuple._9
-      maxSlot = 8
-    }
-    if (tuple._10 > max) {
-      max = tuple._10
-      maxSlot = 9
-    }
-    if (tuple._11 > max) {
-      max = tuple._11
-      maxSlot = 10
-    }
-    if (tuple._12 > max) {
-      max = tuple._12
-      maxSlot = 11
+    for (i <- 0 until slotArray.length) {
+
+      if (slotArray(i) > max) {
+        max = slotArray(i)
+        maxSlot = i
+      }
+
     }
 
     return maxSlot

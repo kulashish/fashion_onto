@@ -1,5 +1,7 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import java.util
+
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
@@ -15,6 +17,8 @@ import com.jabong.dap.model.order.variables.SalesOrder
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by raghu on 13/10/15.
@@ -86,19 +90,20 @@ object CustomerPreferredTimeslotPart2 extends Logging {
         r(10),
         r(11),
         r(12),
-        UdfUtils.getMaxSlotValue((
-          r(1).asInstanceOf[Int],
-          r(2).asInstanceOf[Int],
-          r(3).asInstanceOf[Int],
-          r(4).asInstanceOf[Int],
-          r(5).asInstanceOf[Int],
-          r(6).asInstanceOf[Int],
-          r(7).asInstanceOf[Int],
-          r(8).asInstanceOf[Int],
-          r(9).asInstanceOf[Int],
-          r(10).asInstanceOf[Int],
-          r(11).asInstanceOf[Int],
-          r(12).asInstanceOf[Int]))))
+        UdfUtils.getMaxSlotValue(
+          ArrayBuffer(
+            r(1).asInstanceOf[Int],
+            r(2).asInstanceOf[Int],
+            r(3).asInstanceOf[Int],
+            r(4).asInstanceOf[Int],
+            r(5).asInstanceOf[Int],
+            r(6).asInstanceOf[Int],
+            r(7).asInstanceOf[Int],
+            r(8).asInstanceOf[Int],
+            r(9).asInstanceOf[Int],
+            r(10).asInstanceOf[Int],
+            r(11).asInstanceOf[Int],
+            r(12).asInstanceOf[Int]))))
       )
 
       // Apply the schema to the RDD.
