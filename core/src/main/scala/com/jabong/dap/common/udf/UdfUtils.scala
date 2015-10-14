@@ -66,9 +66,17 @@ object UdfUtils extends Logging {
   def markMps(mNo: String): String = {
     var newId: String = null
     if (null == mNo) {
-      "i"
+      "I"
     } else {
-      "o"
+      "O"
+    }
+  }
+
+  def platinumStatus(rewardType: String): Int = {
+    if (null != rewardType && "Platinum".equalsIgnoreCase(rewardType)) {
+      1
+    } else {
+      0
     }
   }
 
@@ -623,6 +631,8 @@ object UdfUtils extends Logging {
     }
     str
   }
+
+
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
