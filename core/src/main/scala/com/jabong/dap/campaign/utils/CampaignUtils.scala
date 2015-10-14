@@ -738,12 +738,12 @@ object CampaignUtils extends Logging {
     val filteredCampaignCustomerNotBought = campaignMergedOutData.join(salesOrderData, campaignMergedData(CampaignMergedFields.CUSTOMER_ID) === salesOrderData(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
       .filter(SalesOrderVariables.FK_CUSTOMER + " is null")
       .select(campaignMergedData("*"))
-    
+
     return filteredCampaignCustomerNotBought
   }
 
   /**
-   * 
+   *
    * @param selectedData
    * @param itrData
    * @param simpleField
