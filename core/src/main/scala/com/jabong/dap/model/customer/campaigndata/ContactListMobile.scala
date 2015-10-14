@@ -187,6 +187,7 @@ object ContactListMobile extends Logging {
 
   }
 
+  
   /**
    *
    * @param dfCustomerIncr Bob's customer table data for the yesterday's date
