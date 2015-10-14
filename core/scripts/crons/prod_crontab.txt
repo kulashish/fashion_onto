@@ -29,8 +29,8 @@
 0 18 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
 
 # CRM Tables
-15 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqFull >>/opt/alchemy-core/logs/crmAcqFull_logs.txt
+# 15 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqFull >>/opt/alchemy-core/logs/crmAcqFull_logs.txt
 
-50 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqIncr >>/opt/alchemy-core/logs/crmAcqIncr_logs.txt
+# 50 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqIncr >>/opt/alchemy-core/logs/crmAcqIncr_logs.txt
 
-0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmMerge >>/opt/alchemy-core/logs/crmMerge_logs.txt
+# 0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmMerge >>/opt/alchemy-core/logs/crmMerge_logs.txt
