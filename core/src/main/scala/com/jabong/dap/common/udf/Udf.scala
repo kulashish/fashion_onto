@@ -154,4 +154,6 @@ object Udf {
 
   val followUpCampaignMailType = udf((mailType: Int) => UdfUtils.followUpCampaignMailTypes(mailType: Int))
 
+  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
+
 }

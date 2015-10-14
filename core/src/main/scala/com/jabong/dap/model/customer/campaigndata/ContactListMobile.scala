@@ -313,7 +313,7 @@ object ContactListMobile extends Logging {
         customerIncr(CustomerVariables.PHONE),
         customerIncr(CustomerVariables.IS_CONFIRMED) as ContactListMobileVars.VERIFICATION_STATUS,
         Udf.age(customerIncr(CustomerVariables.BIRTHDAY)) as ContactListMobileVars.AGE,
-        customerIncr(CustomerVariables.REWARD_TYPE) as ContactListMobileVars.PLATINUM_STATUS,
+        Udf.platinumStatus(customerIncr(CustomerVariables.REWARD_TYPE)) as ContactListMobileVars.PLATINUM_STATUS,
         Udf.udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
         nls(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
