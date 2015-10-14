@@ -242,7 +242,7 @@ sub upload_email_campaigns_custWelcomeVoucher {
     system("hadoop fs -get /data/test/output/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
     my $status = $?;
 
-    # $status ||= removeNull($base/$filename);
+    $status ||= removeNull($base/$filename);
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
@@ -265,7 +265,7 @@ sub upload_email_campaigns_custPreference {
     system("hadoop fs -get /data/test/output/tmp/variables/custPreference/daily/$date/$filename $base/");
     my $status = $?;
 
-    # $status ||= removeNull($base/$filename);
+    $status ||= removeNull($base/$filename);
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $status;
@@ -288,7 +288,7 @@ sub upload_email_campaigns_contactListMobile {
     system("hadoop fs -get /data/test/output/tmp/variables/contactListMobile/daily/$date/$filename $base/");
     my $status = $?;
 
-    # $status ||= removeNull($base/$filename);
+    $status ||= removeNull($base/$filename);
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
