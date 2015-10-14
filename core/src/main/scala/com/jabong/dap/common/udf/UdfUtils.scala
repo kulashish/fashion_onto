@@ -656,6 +656,11 @@ object UdfUtils extends Logging {
     return false
   }
 
+  def BigDecimalToDouble(value: java.math.BigDecimal): Double ={
+    if(value ==null) return 0.0
+    return value.doubleValue()
+  }
+
   def getMaxSlotValue(tuple: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)): Int = {
 
     var maxSlot = 0

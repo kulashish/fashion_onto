@@ -17,13 +17,24 @@ object Recommendation {
 
   val BRAND_MVP_SUB_TYPE = "brand_mvp"
 
+  val BRICK_PRICE_BAND_SUB_TYPE = "brick_price_band"
+
+
   val INVENTORY_FILTER = "inventory_filter"
 
   val WEEKLY_AVERAGE_SALE = "weekly_average_sale"
 
+  val DISCOUNT_STATUS = "discount_status"
+
   val BRICK_MVP_PIVOT = Array(ProductVariables.BRICK, ProductVariables.MVP)
   val BRAND_MVP_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP)
+  val BRICK_PRICE_BAND_PIVOT = Array(ProductVariables.BRAND, ProductVariables.PRICE_BAND)
+  val MVP_COLOR_PIVOT = Array(ProductVariables.MVP, ProductVariables.COLOR)
+  val MVP_DISCOUNT_PIVOT = Array(ProductVariables.MVP, Recommendation.DISCOUNT_STATUS)
+
   val ORDER_ITEM_DAYS = 30
 
   val NUM_REC_SKU_REF_SKU = 8
+
+  val DISCOUNT_THRESHOLD = 35
 }
