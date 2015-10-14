@@ -37,10 +37,8 @@ object CustomerPreferredTimeslotPart2 extends Logging {
       DataWriter.writeParquet(dfFullFinal, pathCustomerPreferredTimeslotPart2Full, saveMode)
     }
 
-    val pathCustomerPreferredTimeslotPart2Inc = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate)
-    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Inc)) {
-      DataWriter.writeParquet(dfInc, pathCustomerPreferredTimeslotPart2Inc, saveMode)
-    }
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(dfInc, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, "53699_70806_" + fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 
@@ -106,7 +104,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
       // Apply the schema to the RDD.
       val dfFullFinal = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart2)
 
-      (dfFull.except(dfFullCPOTPart2), dfFullFinal)
+      (dfFullFinal.except(dfFullCPOTPart2), dfFullFinal)
     } else {
       (dfInc, dfInc)
     }
