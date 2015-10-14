@@ -2,7 +2,7 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{SalesRuleVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables, SalesRuleSetVariables}
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -315,6 +315,55 @@ object SalesOrderItem {
     res
   }
 
+  /*
+   MIN_COUPON_VALUE_USED - coupon_money_value is available at order_item level and
+   coupon_code is available at order level.
+   Need to map coupon_code with sales_rule to get fk_sales_rule_set which is then mapped to
+   sales_rule_set table to get discount_type.
+   Need to take sum(coupon_money_value) group by id_sales_order where this discount_type is fixed.
+   Then need to get the amount which is min. till date at order level.
+   This is used as a proxy to discount score at times
+
+   MAX_COUPON_VALUE_USED -
+   AVG_COUPON_VALUE_USED -
+   MIN_DISCOUNT_USED -
+
+   MAX_DISCOUNT_USED - coupon_money_value is available at order_item level and coupon_code is available at order level.
+   Need to map coupon_code with sales_rule to get fk_sales_rule_set which is then mapped
+   to sales_rule_set table to get discount_type. Need to take discount_percentage wherever discount_type=percent.
+   Then need to get the percentage which is max. till date at order level. This is used as a proxy to discount score at times
+   AVERAGE_DISCOUNT_USED -> coupon_money_value is available at order_item level and
+   coupon_code is available at order level.
+   Need to map coupon_code with sales_rule to
+   get fk_sales_rule_set which is then mapped to
+   sales_rule_set table to get discount_type.
+   Need to take discount_percentage wherever discount_type=percent.
+   Then need to take average of all such percentage till date to arrive at avg_discount_used.
+   This is used as a proxy to discount score at times
+
+   */
+  def getCouponDisc(salesOrderItem: DataFrame, salesOrder: DataFrame, salesRuleFull: DataFrame, salesRuleSet: DataFrame): DataFrame = {
+    val salesRuleJoined = salesOrder.join(salesRuleFull, salesOrder(SalesOrderVariables.COUPON_CODE) === salesRuleFull(SalesRuleVariables.CODE)).select(
+      salesOrder(SalesOrderVariables.FK_CUSTOMER),
+      salesOrder(SalesOrderVariables.ID_SALES_ORDER),
+      salesRuleFull(SalesRuleVariables.CODE),
+      salesRuleFull(SalesRuleVariables.FK_SALES_RULE_SET)
+    )
+    val salesSetJoined = salesRuleJoined.join(salesRuleSet, salesRuleSet(SalesRuleSetVariables.ID_SALES_RULE_SET) === salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET))
+                          .select(salesRuleJoined(SalesOrderVariables.FK_CUSTOMER),
+                                  salesRuleJoined(SalesOrderVariables.ID_SALES_ORDER),
+                                  salesRuleJoined(SalesRuleVariables.CODE),
+                                  salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET),
+                                  salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE))
+
+    val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
+    val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
+    val disc = percent.groupBy(SalesOrderVariables.ID_SALES_ORDER)
+                .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+                     min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as )
+
+
+  }
   /**
    * def main(args: Array[String]) {
    * val conf = new SparkConf().setAppName("SparkExamples")
