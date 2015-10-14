@@ -114,16 +114,6 @@
       "incrDate": "2014-03-01",
       "fullDate": "2014/02/28",
       "saveMode": "Ignore"
-    },
-    {
-      "source": "bob",
-      "tableName": "customer_segments",
-      "primaryKey": "id_customer_segments",
-      "mergeMode": "full",
-      "dateColumn": "updated_at",
-      "incrDate": "2013-11-01",
-      "fullDate": "2013/10/31",
-      "saveMode": "Ignore"
     }
   ]
 }

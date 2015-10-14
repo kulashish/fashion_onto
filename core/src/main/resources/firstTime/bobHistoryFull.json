@@ -17,6 +17,15 @@
       "saveFormat": "parquet",
       "saveMode": "Overwrite",
       "filterCondition": "updated_at <= '2015-10-11 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "customer_segments",
+      "primaryKey": "id_customer_segments",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Overwrite",
+      "filterCondition": "updated_at <= '2015-10-12 23:59:59'"
     }
   ]
 }
