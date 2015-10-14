@@ -28,8 +28,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
-    val dfFullCPOTPart2 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
+    val (dfIncSalesOrder, dfFullCPOTPart2) = readDF(paths, incrDate, prevDate)
 
     val (dfInc, dfFullFinal) = getCPOTPart2(dfIncSalesOrder, dfFullCPOTPart2)
 
@@ -45,6 +44,12 @@ object CustomerPreferredTimeslotPart2 extends Logging {
 
   }
 
+  /**
+   *
+   * @param dfIncSalesOrder
+   * @param dfFullCPOTPart2
+   * @return
+   */
   def getCPOTPart2(dfIncSalesOrder: DataFrame, dfFullCPOTPart2: DataFrame): (DataFrame, DataFrame) = {
 
     val dfInc = SalesOrder.getCPOT(dfIncSalesOrder)
@@ -106,6 +111,28 @@ object CustomerPreferredTimeslotPart2 extends Logging {
       (dfInc, dfInc)
     }
 
+  }
+
+  /**
+   *
+   * @param paths
+   * @param incrDate
+   * @param prevDate
+   * @return
+   */
+  def readDF(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame) = {
+
+    if (paths != null) {
+
+      val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
+      val dfFullCPOTPart2 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
+
+      (dfIncSalesOrder, dfFullCPOTPart2)
+    } else {
+
+      val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL, incrDate)
+      (dfIncSalesOrder, null)
+    }
   }
 
 }
