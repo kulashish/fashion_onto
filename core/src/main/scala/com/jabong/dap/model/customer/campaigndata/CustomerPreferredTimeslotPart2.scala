@@ -1,10 +1,15 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.config.ConfigConstants
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
+import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.data.read.DataReader
+import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
@@ -14,6 +19,30 @@ import org.apache.spark.sql.{ DataFrame, Row }
  * Created by raghu on 13/10/15.
  */
 object CustomerPreferredTimeslotPart2 extends Logging {
+
+  def start(params: ParamInfo) = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+    val saveMode = params.saveMode
+    val paths = OptionUtils.getOptValue(params.path)
+    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+
+    val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
+    val dfFullCPOTPart2 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
+
+    val (dfInc, dfFullFinal) = getCPOTPart2(dfIncSalesOrder, dfFullCPOTPart2)
+
+    val pathCustomerPreferredTimeslotPart2Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Full)) {
+      DataWriter.writeParquet(dfFullFinal, pathCustomerPreferredTimeslotPart2Full, saveMode)
+    }
+
+    val pathCustomerPreferredTimeslotPart2Inc = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Inc)) {
+      DataWriter.writeParquet(dfInc, pathCustomerPreferredTimeslotPart2Inc, saveMode)
+    }
+
+  }
 
   /**
    * CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
