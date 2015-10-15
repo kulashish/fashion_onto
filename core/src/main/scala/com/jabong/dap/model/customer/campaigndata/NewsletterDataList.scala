@@ -14,21 +14,21 @@ object NewsletterDataList {
 
   def writeNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame, incrDate: String) = {
 
-    val dfSelectContactListMobileFull = dfContactListMobileFull.select(
+    val dfNLDataListFull = dfContactListMobileFull.select(
       col(CustomerVariables.EMAIL),
       col(CustomerVariables.ID_CUSTOMER),
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
       col(NewsletterVariables.STATUS)
     )
 
-    val dfSelectContactListMobilePrevFull = dfContactListMobilePrevFull.select(
+    val dfNLDataListPrevFull = dfContactListMobilePrevFull.select(
       col(CustomerVariables.EMAIL),
       col(CustomerVariables.ID_CUSTOMER),
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
       col(NewsletterVariables.STATUS)
     )
 
-    val dfNlDataList = dfSelectContactListMobileFull.except(dfSelectContactListMobilePrevFull).select(
+    val dfNlDataList = dfNLDataListFull.except(dfNLDataListPrevFull).select(
       col(CustomerVariables.EMAIL),
       col(CustomerVariables.ID_CUSTOMER) as NewsletterVariables.CUSTOMER_ID,
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as NewsletterVariables.EMAIL_SUBSCRIPTION_STATUS,

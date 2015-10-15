@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.variables.{ PageVisitVariables, ContactListMobileVars, NewsletterVariables, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -20,25 +21,25 @@ object AppEmailFeed {
 
   def writeAppEmailFeed(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame, incrDate: String) = {
 
-    val dfSelectContactListMobileFull = dfContactListMobileFull.select(
+    val dfAppEmailFeedFull = dfContactListMobileFull.select(
       col(ContactListMobileVars.UID),
-      col(PageVisitVariables.BROWSER_ID),
+      col(CampaignMergedFields.DEVICE_ID),
       col(CustomerVariables.EMAIL),
       col(ContactListMobileVars.NET_ORDERS),
       col(ContactListMobileVars.REG_DATE)
     )
 
-    val dfSelectContactListMobilePrevFull = dfContactListMobilePrevFull.select(
+    val dfAppEmailFeedPrevFull = dfContactListMobilePrevFull.select(
       col(ContactListMobileVars.UID),
-      col(PageVisitVariables.BROWSER_ID),
+      col(CampaignMergedFields.DEVICE_ID),
       col(CustomerVariables.EMAIL),
       col(ContactListMobileVars.NET_ORDERS),
       col(ContactListMobileVars.REG_DATE)
     )
 
-    val dfAppEmailFeed = dfSelectContactListMobileFull.except(dfSelectContactListMobilePrevFull).select(
+    val dfAppEmailFeed = dfAppEmailFeedFull.except(dfAppEmailFeedPrevFull).select(
       col(ContactListMobileVars.UID) as UID,
-      col(PageVisitVariables.BROWSER_ID) as DEVICE_ID,
+      col(CampaignMergedFields.DEVICE_ID) as DEVICE_ID,
       col(CustomerVariables.EMAIL),
       col(ContactListMobileVars.NET_ORDERS) as NET_ORDERS,
       col(ContactListMobileVars.REG_DATE) as REG_DATE

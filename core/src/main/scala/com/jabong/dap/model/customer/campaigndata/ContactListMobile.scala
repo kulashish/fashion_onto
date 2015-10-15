@@ -2,6 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, _ }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -246,7 +247,7 @@ object ContactListMobile extends Logging {
 
         coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.UID), joinDF(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + PageVisitVariables.BROWSER_ID), joinDF(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+        coalesce(joinDF(CustomerVariables.NEW_ + CampaignMergedFields.DEVICE_ID), joinDF(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID,
 
         Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
@@ -534,7 +535,10 @@ object ContactListMobile extends Logging {
         dfJoined(ContactListMobileVars.DND),
         dfJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
         dfCmrFull(ContactListMobileVars.UID),
-        dfCmrFull(PageVisitVariables.BROWSER_ID)
+        when(dfCmrFull(PageVisitVariables.DOMAIN) === DataSets.ANDROID
+          || dfCmrFull(PageVisitVariables.DOMAIN) === DataSets.IOS
+          || dfCmrFull(PageVisitVariables.DOMAIN) === DataSets.WINDOWS,
+          dfCmrFull(PageVisitVariables.BROWSER_ID)).otherwise(null) as CampaignMergedFields.DEVICE_ID
 
       )
 
