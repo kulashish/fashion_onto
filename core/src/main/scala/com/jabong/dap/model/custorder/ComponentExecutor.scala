@@ -70,7 +70,6 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DCF_FEED_GENERATE => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
-          case DataSets.NEWSLETTER_DATA_LIST => NewsletterDataList.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
           case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)

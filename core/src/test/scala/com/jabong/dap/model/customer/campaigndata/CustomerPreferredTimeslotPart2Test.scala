@@ -1,10 +1,9 @@
-package com.jabong.dap.model.responses.campaigndata
+package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.campaigndata.CustomerPreferredTimeslotPart2
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
