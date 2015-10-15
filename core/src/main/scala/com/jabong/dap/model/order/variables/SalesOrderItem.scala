@@ -2,8 +2,10 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -409,16 +411,128 @@ object SalesOrderItem {
     }
     }
   /*
-   8,12,32,35,36,37,38 are returned orderitem states. Would need to check count of order_items at orderlevel which are in these states. Then would need to compare this again count of orderitems at orderlevel. Need to get final count of orders where returned orderitem count matches total orderitem count
-   14,15,16,23,25,26,27,28 are cancelled orderitem states. Would need to check count of order_items at orderlevel which are in these states. Then would need to compare this again count of orderitems at orderlevel. Need to get final count of orders where cancelled orderitem count matches total orderitem count
-   10 is the only invalid orderitem state. Would need to check count of order_items at orderlevel which are in these states. Then would need to compare this again count of orderitems at orderlevel. Need to get final count of orders where invalid orderitem count matches total orderitem count
+   COUNT_OF_RET_ORDERS - 8,12,32,35,36,37,38 are returned orderitem states.
+   Would need to check count of order_items at orderlevel which are in these states.
+   Then would need to compare this again count of orderitems at orderlevel.
+   Need to get final count of orders where returned orderitem count matches total orderitem count
+   COUNT_OF_CNCLD_ORDERS - 14,15,16,23,25,26,27,28 are cancelled orderitem states.
+   Would need to check count of order_items at orderlevel which are in these states.
+   Then would need to compare this again count of orderitems at orderlevel.
+   Need to get final count of orders where cancelled orderitem count matches total orderitem count
+   COUNT_OF_INVLD_ORDERS - 10 is the only invalid orderitem state.
+   Would need to check count of order_items at orderlevel which are in these states.
+   Then would need to compare this again count of orderitems at orderlevel.
+   Need to get final count of orders where invalid orderitem count matches total orderitem count
    */
 
-  def getInvalidCancelOrders(salesOrderItem: DataFrame): DataFrame={
-    val
-    null
+  def getInvalidCancelOrders(salesOrder: DataFrame, salesOrderItem: DataFrame, prevCal: DataFrame): DataFrame={
+    val joinedMap = salesOrder.join(salesOrderItem, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER))
+                        .select(salesOrder(SalesOrderVariables.ID_SALES_ORDER),
+                                salesOrder(SalesOrderVariables.FK_CUSTOMER),
+                                salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)
+                                ).map(e => (e(0).asInstanceOf[LongType],e(1).asInstanceOf[LongType]) -> (e(2).asInstanceOf[Int])).groupByKey()
+    val orderType = joinedMap.map(e => (e._1, findOrderType(e._2.toList))).map(e => (e._1._1, e._1._2 , e._2))
+
+    val ordersDf = Spark.getSqlContext().createDataFrame(orderType).withColumnRenamed("_1", SalesOrderVariables.ID_SALES_ORDER)
+                                                      .withColumnRenamed("_2", SalesOrderVariables.FK_CUSTOMER)
+                                                       .withColumnRenamed("_3", "type")
+
+    val canOrders = ordersDf.select(ordersDf(SalesOrderVariables.ID_SALES_ORDER),
+                                    ordersDf(SalesOrderVariables.FK_CUSTOMER),
+                                    when(ordersDf("type") === 10, 1).otherwise(0) as "invalid" ,
+                                    when(ordersDf("type") === 20, 1).otherwise(0) as "cancel" ,
+                                    when(ordersDf("type") === 30, 1).otherwise(0) as "return"
+                                    )
+    val res = canOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
+              .agg( count("invalid") as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
+                    count("cancel") as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
+                    count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
+                  )
+    if(null == prevCal){
+      res
+    } else{
+      prevCal.join(res, prevCal(SalesOrderVariables.FK_CUSTOMER) === res(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+              .select(coalesce(prevCal(SalesOrderVariables.FK_CUSTOMER), res(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                      prevCal(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
+                      prevCal(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
+                      prevCal(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
+                      )
+    }
   }
 
+
+
+  def findOrderType(list: List[Int]): Int ={
+    var f = 0
+    var g = 0
+    var h = 0
+    list.foreach(
+        e =>
+        if(OrderStatus.INVALID != e){
+            f=1
+        }
+        else if(OrderStatus.CANCELLED.contains(e)){
+            g=1
+          }
+        else if(OrderStatus.RETURN.contains(e)){
+            h=1
+        }
+    )
+    if (f==0){
+      return 10
+    } else if(g ==0){
+      return 20
+    } else if (h ==0){
+      return 30
+    } else{
+      return 0
+    }
+
+  }
+
+  /*
+  CATEGORY_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by reportingcategory
+  BRICK_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by brick
+  */
+
+  def getItrPen(salesOrder: DataFrame, salesOrderItem: DataFrame, itr: DataFrame, prevJoined: DataFrame): (DataFrame, DataFrame)={
+    val joined = salesOrder.join(salesOrderItem, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER))
+                          .select(salesOrder(SalesOrderVariables.ID_SALES_ORDER),
+                            salesOrder(SalesOrderVariables.FK_CUSTOMER),
+                            salesOrderItem(SalesOrderItemVariables.SKU)
+                            )
+    val incrJoined = joined.join(itr, joined(SalesOrderItemVariables.SKU) === itr(ITR.CONFIG_SKU))
+                          .select(joined(SalesOrderVariables.ID_SALES_ORDER),
+                                  joined(SalesOrderVariables.FK_CUSTOMER),
+                                  joined(SalesOrderItemVariables.SKU),
+                                  itr(ITR.REPORTING_CATEGORY),
+                                  itr(ITR.BRICK)
+                              )
+    var fullJoined: DataFrame = null
+    if (null == prevJoined){
+      fullJoined = incrJoined
+    } else{
+      fullJoined = incrJoined.unionAll(prevJoined)
+    }
+
+    val cat = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.REPORTING_CATEGORY)
+      .agg(count(ITR.REPORTING_CATEGORY) as "count")
+      .groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(max("count") as SalesOrderVariables.CATEGORY_PENETRATION)
+
+    val brick = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.BRICK)
+      .agg(count(ITR.BRICK) as "count")
+      .groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(max("count") as SalesOrderVariables.BRICK_PENETRATION)
+
+    val res = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER)).
+                select(cat(SalesOrderVariables.FK_CUSTOMER),
+                       cat(SalesOrderVariables.CATEGORY_PENETRATION),
+                       brick(SalesOrderVariables.BRICK_PENETRATION)
+                    )
+
+    return (res, fullJoined)
+  }
 
 
   /**

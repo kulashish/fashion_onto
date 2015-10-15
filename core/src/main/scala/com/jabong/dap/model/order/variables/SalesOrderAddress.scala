@@ -1,8 +1,10 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.variables.{SalesAddressVariables, ContactListMobileVars, SalesOrderVariables}
 import com.jabong.dap.model.order.schema.OrderVarSchema
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
@@ -93,6 +95,51 @@ object SalesOrderAddress {
     }
 
     (fCity, fMobile, fName, lName)
+  }
+
+  /*
+  FIRST_SHIPPING_CITY
+  FIRST_SHIPPING_CITY_TIER
+  LAST_SHIPPING_CITY
+  LAST_SHIPPING_CITY_TIER
+  */
+
+  def getFirstShippingCity(salesOrder: DataFrame, salesOrderAddress: DataFrame, prevCalc: DataFrame, cityZone: DataFrame): DataFrame ={
+        val joinedDf = salesOrder.join(salesOrderAddress, salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS))
+                        .select(salesOrder(SalesOrderVariables.FK_CUSTOMER),
+                                salesOrder(SalesOrderVariables.CREATED_AT),
+                                salesOrderAddress(SalesAddressVariables.CITY))
+                                .orderBy(desc(SalesOrderVariables.CREATED_AT)).groupBy(SalesOrderVariables.FK_CUSTOMER)
+                                  .agg(first(SalesAddressVariables.CITY) as SalesAddressVariables.LAST_SHIPPING_CITY,
+                                       last(SalesAddressVariables.CITY) as SalesAddressVariables.FIRST_SHIPPING_CITY
+                                      )
+        val cityBc = Spark.getContext().broadcast(cityZone).value
+        val joinedZoneLast = joinedDf.join(cityBc, joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY) === cityBc(ContactListMobileVars.CITY))
+                              .select(joinedDf(SalesOrderVariables.FK_CUSTOMER),
+                                      joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY),
+                                      joinedDf(SalesAddressVariables.FIRST_SHIPPING_CITY),
+                                      cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
+                                      )
+        val res = joinedZoneLast.join(cityBc, cityBc(ContactListMobileVars.CITY) === joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY))
+                                .select(joinedZoneLast(SalesOrderVariables.FK_CUSTOMER),
+                                        joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY),
+                                        joinedZoneLast(SalesAddressVariables.FIRST_SHIPPING_CITY),
+                                        joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),
+                                        cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
+                                      )
+    if(null == prevCalc){
+      res
+    } else{
+      res.join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+            .select(
+                  coalesce(res(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                  coalesce(res(SalesAddressVariables.LAST_SHIPPING_CITY), prevCalc(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
+                  coalesce(res(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), prevCalc(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
+                  coalesce(prevCalc(SalesAddressVariables.FIRST_SHIPPING_CITY), res(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
+                  coalesce(prevCalc(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), res(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
+                  )
+    }
+
   }
 
   /**
