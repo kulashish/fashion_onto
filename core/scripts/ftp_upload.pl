@@ -315,8 +315,12 @@ sub upload_pricing_sku_data {
    my $status = $?;
    # gzipping the file
    system("gzip -c /tmp/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
+   $status ||= $?;
+   # encrypting
+   system("gpg --batch -c --passphrase kJFdvnkl\@25293kD\$gj -o /tmp/$date_with_zero/pricing_sku_data/$date_with_zero /tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
+   $status ||= $?;
    # copying to slave location
-   system("scp /tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz 172.16.84.192:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
+   system("scp /tmp/$date_with_zero/pricing_sku_data/$date_with_zero 172.16.84.192:/var/www/html/data/sku-pageview-summary/$date_with_zero");
    $status ||= $?;
    system("rm -rf /tmp/$date_with_zero");
    return $status;
