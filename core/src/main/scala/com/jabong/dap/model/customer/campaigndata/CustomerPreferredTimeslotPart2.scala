@@ -4,7 +4,7 @@ import java.util
 
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.{ OptionUtils, Spark }
-import com.jabong.dap.common.constants.variables.SalesOrderVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.data.acq.common.ParamInfo
@@ -59,22 +59,22 @@ object CustomerPreferredTimeslotPart2 extends Logging {
     if (dfFullCPOTPart2 != null) {
 
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfInc, dfFullCPOTPart2, SalesOrderVariables.CUSTOMER_ID)
+      val joinDF = MergeUtils.joinOldAndNewDF(dfInc, dfFullCPOTPart2, CustomerVariables.CUSTOMER_ID)
 
       val dfFull = joinDF.select(
-        coalesce(joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.CUSTOMER_ID), joinDF(SalesOrderVariables.CUSTOMER_ID)) as SalesOrderVariables.CUSTOMER_ID,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_0).+(joinDF(SalesOrderVariables.ORDER_0)) as SalesOrderVariables.ORDER_0,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_1).+(joinDF(SalesOrderVariables.ORDER_1)) as SalesOrderVariables.ORDER_1,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_2).+(joinDF(SalesOrderVariables.ORDER_2)) as SalesOrderVariables.ORDER_2,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_3).+(joinDF(SalesOrderVariables.ORDER_3)) as SalesOrderVariables.ORDER_3,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_4).+(joinDF(SalesOrderVariables.ORDER_4)) as SalesOrderVariables.ORDER_4,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_5).+(joinDF(SalesOrderVariables.ORDER_5)) as SalesOrderVariables.ORDER_5,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_6).+(joinDF(SalesOrderVariables.ORDER_6)) as SalesOrderVariables.ORDER_6,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_7).+(joinDF(SalesOrderVariables.ORDER_7)) as SalesOrderVariables.ORDER_7,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_8).+(joinDF(SalesOrderVariables.ORDER_8)) as SalesOrderVariables.ORDER_8,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_9).+(joinDF(SalesOrderVariables.ORDER_9)) as SalesOrderVariables.ORDER_9,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_10).+(joinDF(SalesOrderVariables.ORDER_10)) as SalesOrderVariables.ORDER_10,
-        joinDF(SalesOrderVariables.NEW_ + SalesOrderVariables.ORDER_11).+(joinDF(SalesOrderVariables.ORDER_11)) as SalesOrderVariables.ORDER_11)
+        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.CUSTOMER_ID), joinDF(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_0).+(joinDF(CustomerVariables.ORDER_0)) as CustomerVariables.ORDER_0,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_1).+(joinDF(CustomerVariables.ORDER_1)) as CustomerVariables.ORDER_1,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_2).+(joinDF(CustomerVariables.ORDER_2)) as CustomerVariables.ORDER_2,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_3).+(joinDF(CustomerVariables.ORDER_3)) as CustomerVariables.ORDER_3,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_4).+(joinDF(CustomerVariables.ORDER_4)) as CustomerVariables.ORDER_4,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_5).+(joinDF(CustomerVariables.ORDER_5)) as CustomerVariables.ORDER_5,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_6).+(joinDF(CustomerVariables.ORDER_6)) as CustomerVariables.ORDER_6,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_7).+(joinDF(CustomerVariables.ORDER_7)) as CustomerVariables.ORDER_7,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_8).+(joinDF(CustomerVariables.ORDER_8)) as CustomerVariables.ORDER_8,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_9).+(joinDF(CustomerVariables.ORDER_9)) as CustomerVariables.ORDER_9,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_10).+(joinDF(CustomerVariables.ORDER_10)) as CustomerVariables.ORDER_10,
+        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_11).+(joinDF(CustomerVariables.ORDER_11)) as CustomerVariables.ORDER_11)
 
       val rowRDD = dfFull.map(r => (Row(
         r(0),

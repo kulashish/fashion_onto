@@ -170,4 +170,7 @@ object DataSets {
 
   val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
 
+  val OPEN = "open"
+  val CLICK = "click"
+
 }
