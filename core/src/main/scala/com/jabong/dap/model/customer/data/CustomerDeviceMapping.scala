@@ -63,7 +63,7 @@ object CustomerDeviceMapping extends Logging {
     // joinedDf.printSchema()
     // joinedDf.show(10)
 
-    val nlsUnq = nlsIncr.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).filter(nlsIncr(CustomerVariables.ID_CUSTOMER).isNull)
+    val nlsUnq = nlsIncr.select(CustomerVariables.FK_CUSTOMER, CustomerVariables.EMAIL).filter(nlsIncr(CustomerVariables.FK_CUSTOMER).isNull)
 
     val nlsbc = Spark.getContext().broadcast(nlsUnq).value
 
