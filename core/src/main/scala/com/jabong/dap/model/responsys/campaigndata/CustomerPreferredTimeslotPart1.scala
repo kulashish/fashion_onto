@@ -21,11 +21,8 @@ object CustomerPreferredTimeslotPart1 {
   def start(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val saveMode = params.saveMode
-    val paths = OptionUtils.getOptValue(params.path)
-    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (dfOpen, dfClick) = readDF(paths, incrDate, prevDate)
+    val (dfOpen, dfClick) = readDF(incrDate)
 
     val (dfCPTPart1) = getCPOTPart1(dfOpen, dfClick)
 
@@ -123,12 +120,10 @@ object CustomerPreferredTimeslotPart1 {
 
   /**
    *
-   * @param paths
    * @param incrDate
-   * @param prevDate
    * @return
    */
-  def readDF(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame) = {
+  def readDF(incrDate: String): (DataFrame, DataFrame) = {
 
     val dfOpen = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE, incrDate)
     val dfClick = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate)
