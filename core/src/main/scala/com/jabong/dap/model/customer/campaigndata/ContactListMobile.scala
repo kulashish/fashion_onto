@@ -535,10 +535,7 @@ object ContactListMobile extends Logging {
         dfJoined(ContactListMobileVars.DND),
         dfJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
         dfCmrFull(ContactListMobileVars.UID),
-        when(dfCmrFull(PageVisitVariables.DOMAIN) === DataSets.ANDROID
-          || dfCmrFull(PageVisitVariables.DOMAIN) === DataSets.IOS
-          || dfCmrFull(PageVisitVariables.DOMAIN) === DataSets.WINDOWS,
-          dfCmrFull(PageVisitVariables.BROWSER_ID)).otherwise(null) as CampaignMergedFields.DEVICE_ID
+        Udf.device(dfCmrFull(PageVisitVariables.DOMAIN), dfCmrFull(PageVisitVariables.BROWSER_ID), null) as CampaignMergedFields.DEVICE_ID
 
       )
 
