@@ -274,11 +274,11 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerPreferredTimeslotPart2") {
-      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
-      $job_exit = run_component($component, $command);
-}else {
-        print "not a valid component\n";
-        $job_exit = -1;
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
+    $job_exit = run_component($component, $command);
+} else {
+    print "not a valid component\n";
+    $job_exit = -1;
 }
 
 exit $job_exit;
