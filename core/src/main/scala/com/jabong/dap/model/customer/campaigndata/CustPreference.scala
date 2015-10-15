@@ -11,7 +11,6 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.variables.NewsletterPreferences
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 4/9/15.
@@ -52,7 +51,7 @@ object CustPreference {
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE),
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARIVALS),
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ))
-
+        .na.fill("")
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.DAILY_MODE, incrDate, "53699_28335_" + fileDate + "_CUST_PREFERENCE", DataSets.IGNORE_SAVEMODE, "true", ";")
     }

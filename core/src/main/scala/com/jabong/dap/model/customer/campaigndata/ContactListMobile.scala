@@ -181,7 +181,7 @@ object ContactListMobile extends Logging {
         col(ContactListMobileVars.STATE_ZONE),
         col(CustomerSegmentsVariables.DISCOUNT_SCORE) as ContactListMobileVars.DISCOUNT_SCORE,
         col(ContactListMobileVars.DND)
-      )
+      ).na.fill("")
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, "53699_28334_" + fileDate + "_CONTACTS_LIST_MOBILE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
@@ -285,6 +285,8 @@ object ContactListMobile extends Logging {
 
         Udf.latestString(joinDF(ContactListMobileVars.UNSUB_KEY), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
 
+        coalesce(joinDF(NewsletterVariables.STATUS), joinDF(CustomerVariables.NEW_ + NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
+
         coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.CITY_TIER), joinDF(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
 
         coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.STATE_ZONE), joinDF(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE,
@@ -317,6 +319,7 @@ object ContactListMobile extends Logging {
         Udf.udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
         nls(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
         nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
+        nls(NewsletterVariables.STATUS),
         Udf.maxTimestamp(customerIncr(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT
       )
 
@@ -336,6 +339,7 @@ object ContactListMobile extends Logging {
         customerNls(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         customerNls(ContactListMobileVars.NL_SUB_DATE),
         customerNls(ContactListMobileVars.UNSUB_KEY),
+        customerNls(NewsletterVariables.STATUS),
         customerNls(CustomerVariables.UPDATED_AT),
         custSegCalcIncr(ContactListMobileVars.MVP_TYPE),
         custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
@@ -394,6 +398,7 @@ object ContactListMobile extends Logging {
         customerMerged(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         customerMerged(ContactListMobileVars.NL_SUB_DATE),
         customerMerged(ContactListMobileVars.UNSUB_KEY),
+        customerMerged(NewsletterVariables.STATUS),
         brandMerged(SalesAddressVariables.CITY),
         coalesce(customerMerged(CustomerVariables.FIRST_NAME), brandMerged(SalesAddressVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
         coalesce(customerMerged(CustomerVariables.LAST_NAME), brandMerged(SalesAddressVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
@@ -422,6 +427,7 @@ object ContactListMobile extends Logging {
         mergedIncr(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         mergedIncr(ContactListMobileVars.NL_SUB_DATE),
         mergedIncr(ContactListMobileVars.UNSUB_KEY),
+        mergedIncr(NewsletterVariables.STATUS),
         mergedIncr(SalesAddressVariables.CITY),
         mergedIncr(SalesAddressVariables.FIRST_NAME),
         mergedIncr(CustomerVariables.LAST_NAME),
@@ -451,6 +457,7 @@ object ContactListMobile extends Logging {
         cityJoined(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         cityJoined(ContactListMobileVars.NL_SUB_DATE),
         cityJoined(ContactListMobileVars.UNSUB_KEY),
+        cityJoined(NewsletterVariables.STATUS),
         cityJoined(SalesAddressVariables.CITY),
         cityJoined(SalesAddressVariables.FIRST_NAME),
         cityJoined(CustomerVariables.LAST_NAME),
@@ -481,6 +488,7 @@ object ContactListMobile extends Logging {
         dndMerged(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         dndMerged(ContactListMobileVars.NL_SUB_DATE),
         dndMerged(ContactListMobileVars.UNSUB_KEY),
+        dndMerged(NewsletterVariables.STATUS),
         dndMerged(SalesAddressVariables.CITY),
         dndMerged(SalesAddressVariables.FIRST_NAME),
         dndMerged(CustomerVariables.LAST_NAME),

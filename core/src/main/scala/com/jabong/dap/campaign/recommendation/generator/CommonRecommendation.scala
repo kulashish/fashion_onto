@@ -109,9 +109,13 @@ abstract class CommonRecommendation extends Logging {
         ProductVariables.GENDER,
         ProductVariables.SPECIAL_PRICE,
         ProductVariables.STOCK,
+        ProductVariables.PRICE_BAND,
+        ProductVariables.COLOR,
+        ProductVariables.DISCOUNT,
         Recommendation.NUMBER_LAST_30_DAYS_ORDERED,
         Recommendation.WEEKLY_AVERAGE_SALE,
-        Recommendation.LAST_SOLD_DATE)
+        Recommendation.LAST_SOLD_DATE).
+        withColumn(Recommendation.DISCOUNT_STATUS, when(col(ProductVariables.DISCOUNT) >= Recommendation.DISCOUNT_THRESHOLD, lit(true)).otherwise(lit(false)))
 
     return RecommendationInput
   }
@@ -269,6 +273,7 @@ abstract class CommonRecommendation extends Logging {
         inputData(Recommendation.SALES_ORDER_ITEM_SKU),
         inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
         inputData(Recommendation.LAST_SOLD_DATE),
+        inputData(Recommendation.DISCOUNT_STATUS),
         inputData(ProductVariables.CATEGORY),
         inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
         inputData(ProductVariables.STOCK),
@@ -276,6 +281,8 @@ abstract class CommonRecommendation extends Logging {
         inputData(ProductVariables.BRICK),
         inputData(ProductVariables.MVP),
         inputData(ProductVariables.GENDER),
+        inputData(ProductVariables.PRICE_BAND),
+        inputData(ProductVariables.COLOR),
         inputData(ProductVariables.SPECIAL_PRICE)
       )
       .filter(Recommendation.INVENTORY_FILTER + " = true")

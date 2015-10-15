@@ -134,9 +134,13 @@ object DataSets {
   val RECOMMENDATIONS = "recommendations"
   val BRICK_MVP_RECOMMENDATIONS = "brick_mvp"
   val BRAND_MVP_RECOMMENDATIONS = "brand_mvp"
+  val BRICK_PRICE_BAND_RECOMMENDATIONS = "brick_price_band"
+  val MVP_COLOR_RECOMMENDATIONS = "mvp_color"
+  val MVP_DISCOUNT_RECOMMENDATIONS = "mvp_discount"
 
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
+  val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
