@@ -4,9 +4,8 @@ import java.sql.Timestamp
 import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ ArrayUtils, StringUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{ArrayUtils, StringUtils}
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -14,7 +13,7 @@ import net.liftweb.json._
 import org.apache.spark.sql.Row
 
 import scala.collection.mutable
-import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
  * Created by raghu on 3/7/15.
@@ -657,8 +656,12 @@ object UdfUtils extends Logging {
     return false
   }
 
-
-  def followUpCampaignMailTypes(mailType:Int): Int ={
+  /**
+   * follow up campaign map
+   * @param mailType
+   * @return
+   */
+  def followUpCampaignMailTypes(mailType:Int): Int = {
     val followUpCampaignMap = collection.immutable.HashMap(
       56 -> 72,
       57 -> 73,
@@ -667,7 +670,12 @@ object UdfUtils extends Logging {
       46 -> 76,
       47 -> 77)
 
-    return followUpCampaignMap.getOrElse(mailType,0)
+    return followUpCampaignMap.getOrElse(mailType, 0)
+  }
+
+    def BigDecimalToDouble(value: java.math.BigDecimal): Double = {
+      if (value == null) return 0.0
+      return value.doubleValue()
   }
 
   def getMaxSlotValue(tuple: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)): Int = {

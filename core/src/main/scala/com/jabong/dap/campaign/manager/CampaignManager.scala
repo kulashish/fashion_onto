@@ -396,7 +396,7 @@ object CampaignManager extends Serializable with Logging {
 
         val mergedAd4push = iosDF.unionAll(androidDF)
         println("Starting write parquet after repartitioning and caching")
-        val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH,campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+        val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
         if (DataWriter.canWrite(saveMode, writePath))
           DataWriter.writeParquet(mergedAd4push, writePath, saveMode)
 

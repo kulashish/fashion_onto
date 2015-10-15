@@ -154,6 +154,7 @@ object Udf {
 
   val followUpCampaignMailType = udf((mailType: Int) => UdfUtils.followUpCampaignMailTypes(mailType: Int))
 
-  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
+  val BigDecimalToDouble = udf((value: java.math.BigDecimal) => UdfUtils.BigDecimalToDouble(value: java.math.BigDecimal))
 
+  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 }
