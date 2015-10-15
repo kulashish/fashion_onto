@@ -2,7 +2,7 @@ package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{SalesRuleVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables, SalesRuleSetVariables}
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -342,7 +342,7 @@ object SalesOrderItem {
    This is used as a proxy to discount score at times
 
    */
-  def getCouponDisc(salesOrderItem: DataFrame, salesOrder: DataFrame, salesRuleFull: DataFrame, salesRuleSet: DataFrame): DataFrame = {
+  def getCouponDisc(salesOrderItem: DataFrame, salesOrder: DataFrame, salesRuleFull: DataFrame, salesRuleSet: DataFrame, prevCalcu: DataFrame): DataFrame = {
     val salesRuleJoined = salesOrder.join(salesRuleFull, salesOrder(SalesOrderVariables.COUPON_CODE) === salesRuleFull(SalesRuleVariables.CODE)).select(
       salesOrder(SalesOrderVariables.FK_CUSTOMER),
       salesOrder(SalesOrderVariables.ID_SALES_ORDER),
@@ -358,12 +358,69 @@ object SalesOrderItem {
 
     val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
     val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
+    var discCalc: DataFrame = null
     val disc = percent.groupBy(SalesOrderVariables.ID_SALES_ORDER)
-                .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
-                     min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as )
+                    .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+                           min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
+                           max(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
+                           sum(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_sum",
+                           count(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_count")
+    val coup = fixed.groupBy(SalesOrderVariables.ID_SALES_ORDER)
+                    .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+                           min(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+                           max(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
+                           sum(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_sum",
+                           count(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_count")
 
+    val joined = disc.join(coup, coup(SalesOrderVariables.FK_CUSTOMER) === disc(SalesOrderVariables.FK_CUSTOMER))
+                    .select(coalesce(coup(SalesOrderVariables.FK_CUSTOMER), disc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                            coup(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+                            coup(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+                            coup(SalesRuleSetVariables.COUPON_COUNT),
+                            coup(SalesRuleSetVariables.COUPON_SUM),
+                            disc(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+                            disc(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+                            disc(SalesRuleSetVariables.DISCOUNT_SUM),
+                            disc(SalesRuleSetVariables.DISCOUNT_COUNT)
+      )
 
+    if(null == prevCalcu){
+      return joined.select(joined(SalesOrderVariables.FK_CUSTOMER),
+        joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        joined(SalesRuleSetVariables.COUPON_SUM),
+        joined(SalesRuleSetVariables.COUPON_COUNT),
+        joined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        joined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        joined(SalesRuleSetVariables.DISCOUNT_SUM),
+        joined(SalesRuleSetVariables.DISCOUNT_COUNT))
+    } else {
+      prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER))
+          .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        when(joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+        when(joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+        joined(SalesRuleSetVariables.COUPON_SUM) + prevCalcu(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
+        joined(SalesRuleSetVariables.COUPON_COUNT) + prevCalcu(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.COUPON_COUNT,
+        when(joined(SalesRuleSetVariables.MIN_DISCOUNT_USED) < prevCalcu(SalesRuleSetVariables.MIN_DISCOUNT_USED), joined(SalesRuleSetVariables.MIN_DISCOUNT_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_DISCOUNT_USED)) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
+        when(joined(SalesRuleSetVariables.MAX_DISCOUNT_USED) < prevCalcu(SalesRuleSetVariables.MAX_DISCOUNT_USED), joined(SalesRuleSetVariables.MAX_DISCOUNT_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_DISCOUNT_USED)) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
+        joined(SalesRuleSetVariables.DISCOUNT_SUM) + prevCalcu(SalesRuleSetVariables.DISCOUNT_SUM) as SalesRuleSetVariables.DISCOUNT_SUM,
+        joined(SalesRuleSetVariables.DISCOUNT_COUNT) + prevCalcu(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.DISCOUNT_COUNT
+        )
+    }
+    }
+  /*
+   8,12,32,35,36,37,38 are returned orderitem states. Would need to check count of order_items at orderlevel which are in these states. Then would need to compare this again count of orderitems at orderlevel. Need to get final count of orders where returned orderitem count matches total orderitem count
+   14,15,16,23,25,26,27,28 are cancelled orderitem states. Would need to check count of order_items at orderlevel which are in these states. Then would need to compare this again count of orderitems at orderlevel. Need to get final count of orders where cancelled orderitem count matches total orderitem count
+   10 is the only invalid orderitem state. Would need to check count of order_items at orderlevel which are in these states. Then would need to compare this again count of orderitems at orderlevel. Need to get final count of orders where invalid orderitem count matches total orderitem count
+   */
+
+  def getInvalidCancelOrders(salesOrderItem: DataFrame): DataFrame={
+    val
+    null
   }
+
+
+
   /**
    * def main(args: Array[String]) {
    * val conf = new SparkConf().setAppName("SparkExamples")

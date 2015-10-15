@@ -16,6 +16,10 @@ object SalesRuleSetVariables {
   val MIN_DISCOUNT_USED = "min_discount_used"
   val MAX_DISCOUNT_USED = "max_discount_used"
   val AVERAGE_DISCOUNT_USED = "average_discount_used"
+  val DISCOUNT_SUM = "discount_sum"
+  val DISCOUNT_COUNT = "discount_count"
+  val COUPON_SUM = "coupon_sum"
+  val COUPON_COUNT = "coupon_count"
 
 
 }
