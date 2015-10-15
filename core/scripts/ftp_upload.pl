@@ -316,7 +316,7 @@ sub upload_pricing_sku_data {
    # gzipping the file
    system("gzip -c /tmp/$date_with_zero/pricing_sku_data/sku_data_pricing_$date_with_zero.csv >>/tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz");
    # copying to slave location
-   system("scp /tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz dataplatform-slave4:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
+   system("scp /tmp/$date_with_zero/pricing_sku_data/$date_with_zero.gz 172.16.84.192:/var/www/html/data/sku-pageview-summary/$date_with_zero.gz");
    $status ||= $?;
    system("rm -rf /tmp/$date_with_zero");
    return $status;
