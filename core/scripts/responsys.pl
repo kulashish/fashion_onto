@@ -8,6 +8,10 @@ my $date = strftime "%Y/%m/%d", localtime(time());
 my $date_with_zero = strftime "%Y%m%d", localtime(time());
 #print $date_with_zero . "\n";
 
+my $date_with_zero_yesterday = strftime "%Y%m%d", localtime(time() - 60*60*24);
+#print $date_with_zero_yesterday . "\n";
+
+
 chdir("/data/responsys/");
 
 # getting SMS OPT OUT and DND files
@@ -38,3 +42,5 @@ system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sft
 # copy data to hdfs
 system("hadoop fs -mkdir -p /data/input/responsys/click/daily/$date/");
 system("hadoop fs -copyFromLocal 53699_CLICK_$date_with_zero" . "_*.txt /data/input/responsys/click/daily/$date/53699_CLICK_$date_with_zero" . ".txt");
+
+system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mget archive/53699_33838_$date_with_zero_yesterday" . "_LIVE_CAMPAIGN.csv.zip ;'");
