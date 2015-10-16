@@ -107,7 +107,7 @@ object DataReader extends Logging {
     logger.info(fetchPath)
     val saveFormat = FormatResolver.getFormat(fetchPath)
     val context = Spark.getContext(saveFormat)
-    if (saveFormat.equals(DataSets.CSV)) {
+    if (saveFormat.equals(DataSets.CSV) || saveFormat.equals(DataSets.TXT)) {
       context.read.format("com.databricks.spark.csv").load(fetchPath)
     } else {
       logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)

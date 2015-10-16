@@ -84,6 +84,7 @@ object DataSets {
   val PARQUET = "parquet"
   val ORC = "orc"
   val JSON = "json"
+  val TXT = "txt"
 
   // File Save modes
   val IGNORE_SAVEMODE = "Ignore"
