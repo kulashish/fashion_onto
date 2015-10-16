@@ -534,6 +534,7 @@ object ContactListMobile extends Logging {
         dfJoined(ContactListMobileVars.CITY_TIER),
         dfJoined(ContactListMobileVars.DND),
         dfJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
+        lit("IN") as ContactListMobileVars.COUNTRY,
         dfCmrFull(ContactListMobileVars.UID),
         Udf.device(dfCmrFull(PageVisitVariables.DOMAIN), dfCmrFull(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
 
