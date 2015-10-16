@@ -86,9 +86,7 @@ object CustomerPreferredTimeslotPart1 {
    */
   def getCPOT(dfIn: DataFrame, schema: StructType): DataFrame = {
 
-    val salesOrder = dfIn.select(
-      col("CUSTOMER_ID"),
-      Udf.changeDateFormat(col(CustomerVariables.EVENT_CAPTURED_DT), lit(TimeConstants.DD_MMM_YYYY_HH_MM_SS), lit(TimeConstants.DATE_TIME_FORMAT)) as CustomerVariables.EVENT_CAPTURED_DT)
+    val salesOrder = dfIn.select(col("CUSTOMER_ID"), Udf.ddmmmyyyyToyyyymmdd(col(CustomerVariables.EVENT_CAPTURED_DT)) as CustomerVariables.EVENT_CAPTURED_DT)
       .sort("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT)
 
     val soMapReduce = salesOrder.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)

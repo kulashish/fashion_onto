@@ -2,7 +2,6 @@ package com.jabong.dap.common.udf
 
 import java.sql.{ Date, Timestamp }
 
-import com.jabong.dap.common.time.TimeUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 
@@ -157,6 +156,6 @@ object Udf {
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
-  val changeDateFormat = udf((dateString: String, initialFormat: String, expectedFormat: String) => TimeUtils.changeDateFormat(dateString: String, initialFormat: String, expectedFormat: String))
+  val ddmmmyyyyToyyyymmdd = udf((dateString: String) => UdfUtils.ddmmmyyyyToyyyymmdd(dateString: String))
 
 }
