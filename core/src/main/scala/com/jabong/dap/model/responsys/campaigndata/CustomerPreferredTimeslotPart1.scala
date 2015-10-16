@@ -3,7 +3,7 @@ package com.jabong.dap.model.responsys.campaigndata
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.UdfUtils
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -80,13 +80,15 @@ object CustomerPreferredTimeslotPart1 {
 
   /**
    *
-   * @param dfSalesOrder
+   * @param dfIn
    * @param schema
    * @return
    */
-  def getCPOT(dfSalesOrder: DataFrame, schema: StructType): DataFrame = {
+  def getCPOT(dfIn: DataFrame, schema: StructType): DataFrame = {
 
-    val salesOrder = dfSalesOrder.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT)
+    val salesOrder = dfIn.select(
+      col("CUSTOMER_ID"),
+      Udf.changeDateFormat(col(CustomerVariables.EVENT_CAPTURED_DT), lit(TimeConstants.DD_MMM_YYYY_HH_MM_SS), lit(TimeConstants.DATE_TIME_FORMAT)) as CustomerVariables.EVENT_CAPTURED_DT)
       .sort("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT)
 
     val soMapReduce = salesOrder.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
