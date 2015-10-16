@@ -360,7 +360,6 @@ object CampaignInput extends Logging {
         col(ITR.GENDER) as ProductVariables.GENDER,
         col(ITR.BRAND_NAME) as ProductVariables.BRAND,
         col(ITR.PRICE_BAND),
-        col(ITR.COLOR),
         col(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
         col(ITR.BRICK),
         col(ITR.PRODUCT_NAME),
@@ -385,7 +384,6 @@ object CampaignInput extends Logging {
           col(ITR.GENDER) as ProductVariables.GENDER,
           col(ITR.BRAND_NAME) as ProductVariables.BRAND,
           col(ITR.PRICE_BAND),
-          col(ITR.COLOR),
           col(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
           col(ITR.BRICK),
           col(ITR.PRODUCT_NAME),
@@ -409,7 +407,6 @@ object CampaignInput extends Logging {
         col(ITR.BRAND_NAME) as ProductVariables.BRAND,
         col(ITR.BRICK) as ProductVariables.BRICK,
         col(ITR.PRICE_BAND),
-        col(ITR.COLOR),
         col(ITR.PRODUCT_NAME),
         col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
         col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
@@ -433,7 +430,6 @@ object CampaignInput extends Logging {
           col(ITR.BRAND_NAME) as ProductVariables.BRAND,
           col(ITR.BRICK) as ProductVariables.BRICK,
           col(ITR.PRICE_BAND),
-          col(ITR.COLOR),
           col(ITR.PRODUCT_NAME),
           col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
           col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))

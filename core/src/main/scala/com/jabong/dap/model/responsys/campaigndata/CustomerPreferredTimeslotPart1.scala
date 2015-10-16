@@ -1,4 +1,4 @@
-package com.jabong.dap.model.responses.campaigndata
+package com.jabong.dap.model.responsys.campaigndata
 
 /**
  * Created by raghu on 13/10/15.
