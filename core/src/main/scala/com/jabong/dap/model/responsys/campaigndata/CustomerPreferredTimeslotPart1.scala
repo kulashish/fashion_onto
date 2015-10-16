@@ -42,11 +42,11 @@ object CustomerPreferredTimeslotPart1 {
   def getCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): (DataFrame) = {
 
     val dfOpenCPOT = getCPOT(dfOpen, CustVarSchema.emailOpen)
-    val dfClickCPOT = getCPOT(dfClick, CustVarSchema.emailClick).withColumnRenamed(CustomerVariables.CUSTOMER_ID, "click" + CustomerVariables.CUSTOMER_ID)
+    val dfClickCPOT = getCPOT(dfClick, CustVarSchema.emailClick).withColumnRenamed(CustomerVariables.CUSTOMER_ID, "click_" + CustomerVariables.CUSTOMER_ID)
 
-    val dfCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfOpenCPOT("click" + CustomerVariables.CUSTOMER_ID))
+    val dfCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT("click_" + CustomerVariables.CUSTOMER_ID))
       .select(
-        coalesce(dfOpenCPOT(CustomerVariables.CUSTOMER_ID), dfOpenCPOT("click" + CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+        coalesce(dfOpenCPOT(CustomerVariables.CUSTOMER_ID), dfClickCPOT("click_" + CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
         dfOpenCPOT(CustomerVariables.OPEN_0),
         dfOpenCPOT(CustomerVariables.OPEN_1),
         dfOpenCPOT(CustomerVariables.OPEN_2),
