@@ -2,6 +2,7 @@ package com.jabong.dap.model.responsys.campaigndata
 
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -22,11 +23,12 @@ object CustomerPreferredTimeslotPart1 {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (dfOpen, dfClick) = readDF(incrDate)
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+
+    val (dfOpen, dfClick) = readDF(incrDate, fileDate)
 
     val (dfCPTPart1) = getCPOTPart1(dfOpen, dfClick)
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(dfCPTPart1.na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.DAILY_MODE, incrDate, "53699_70792_" + fileDate + "_Customer_PREFERRED_TIMESLOT_part1", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
@@ -123,10 +125,11 @@ object CustomerPreferredTimeslotPart1 {
    * @param incrDate
    * @return
    */
-  def readDF(incrDate: String): (DataFrame, DataFrame) = {
+  def readDF(incrDate: String, fileDate: String): (DataFrame, DataFrame) = {
 
-    val dfOpen = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE, incrDate)
-    val dfClick = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate)
+    val dfOpen = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE, incrDate, "53699_" + "OPEN_" + fileDate + ".txt", "true", ";")
+
+    val dfClick = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate, "53699_" + "CLICK_" + fileDate + ".txt", "true", ";")
 
     (dfOpen, dfClick)
   }

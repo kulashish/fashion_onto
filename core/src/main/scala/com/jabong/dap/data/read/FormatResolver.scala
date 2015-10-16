@@ -28,7 +28,7 @@ object FormatResolver {
             val filename: String = fileStatus.getPath.getName
             val file = new File(filename)
             val extension = getFileExtension(file)
-            if (extension == DataSets.ORC || extension == DataSets.PARQUET || extension == DataSets.CSV || extension == DataSets.JSON || extension == DataSets.TXT) {
+            if (extension == DataSets.ORC || extension == DataSets.PARQUET || extension == DataSets.CSV || extension == DataSets.JSON) {
               flag = extension
               break()
             }
