@@ -1,12 +1,10 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import java.util
-
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
+import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets

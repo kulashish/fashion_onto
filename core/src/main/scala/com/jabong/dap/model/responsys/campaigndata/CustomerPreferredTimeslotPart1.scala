@@ -2,7 +2,6 @@ package com.jabong.dap.model.responsys.campaigndata
 
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
-import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -11,6 +10,7 @@ import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustVarSchema
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{ DataFrame, Row }
 
@@ -46,7 +46,7 @@ object CustomerPreferredTimeslotPart1 {
 
     val dfCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfOpenCPOT("click" + CustomerVariables.CUSTOMER_ID))
       .select(
-        dfOpenCPOT(CustomerVariables.CUSTOMER_ID),
+        coalesce(dfOpenCPOT(CustomerVariables.CUSTOMER_ID), dfOpenCPOT("click" + CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
         dfOpenCPOT(CustomerVariables.OPEN_0),
         dfOpenCPOT(CustomerVariables.OPEN_1),
         dfOpenCPOT(CustomerVariables.OPEN_2),
