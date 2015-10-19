@@ -34,7 +34,8 @@ object CustomerDeviceMapping extends Logging {
     // clickStreamInc.printSchema()
     // clickStreamInc.show(10)
 
-    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
+    val clickStream = clickStreamInc.filter(!(col("userid").startsWith("_app_")))
+      .filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.USER_ID)
       .agg(
@@ -236,7 +237,7 @@ object CustomerDeviceMapping extends Logging {
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
-        ).dropDuplicates()
+        ).dropDuplicates().filter(col(CustomerVariables.ID_CUSTOMER).isNotNull && col(CustomerVariables.ID_CUSTOMER).cast(LongType).geq(1))
 
       println("Total recs after correction: ") // + res.count())
       // res.printSchema()
