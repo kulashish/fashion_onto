@@ -29,6 +29,7 @@ object AddingUidColumn {
   }
 
   def main(args: Array[String]) {
+
     Spark.init(new SparkConf().setAppName("AddingUidColumn"))
 
     val date = args(0).trim
