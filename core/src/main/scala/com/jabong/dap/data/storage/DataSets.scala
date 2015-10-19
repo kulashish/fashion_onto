@@ -130,7 +130,20 @@ object DataSets {
   //Campaign Quality
   val CAMPAIGN_QUALITY = "campaignQuality"
 
+  //recommendations
+  val RECOMMENDATIONS = "recommendations"
+  val BRICK_MVP_RECOMMENDATIONS = "brick_mvp"
+  val BRAND_MVP_RECOMMENDATIONS = "brand_mvp"
+  val BRICK_PRICE_BAND_RECOMMENDATIONS = "brick_price_band"
+  val MVP_COLOR_RECOMMENDATIONS = "mvp_color"
+  val MVP_DISCOUNT_RECOMMENDATIONS = "mvp_discount"
+
+  // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
+  val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
+  val CUSTOMER_PREFERRED_TIMESLOT_PART1 = "customerPreferredTimeslotPart1"
+  val NL_DATA_LIST = "NL_data_list"
+  val APP_EMAIL_FEED = "app_email_feed"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
@@ -142,6 +155,10 @@ object DataSets {
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
   val SOLUTIONS_INFINITI = "solutionsInfiniti"
 
+  // type of campaigns
+  val PUSH_CAMPAIGNS = "push_campaigns"
+  val EMAIL_CAMPAIGNS = "email_campaigns"
+
   val AD4PUSH_ID = "ad4pushId"
   //Clickstream Data Quality
 
@@ -152,5 +169,8 @@ object DataSets {
   val CLICKSTREAM_SURF3_VARIABLE = "clickstreamSurf3Variable"
 
   val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
+
+  val OPEN = "open"
+  val CLICK = "click"
 
 }

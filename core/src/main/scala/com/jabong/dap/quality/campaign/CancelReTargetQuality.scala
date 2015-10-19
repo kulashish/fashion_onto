@@ -6,6 +6,7 @@ import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -67,7 +68,7 @@ object CancelReTargetQuality extends BaseCampaignQuality {
 
     val orderDF = CampaignQualityEntry.last30DaysOrderData
 
-    val cancelRetargetDF = CampaignInput.getCampaignData(CampaignCommon.CANCEL_RETARGET_CAMPAIGN, date)
+    val cancelRetargetDF = CampaignInput.getCampaignData(CampaignCommon.CANCEL_RETARGET_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
     return (orderItemDF, orderDF, cancelRetargetDF)
   }
 

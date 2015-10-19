@@ -2,6 +2,7 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 
+import org.apache.spark.sql.Row
 import org.scalatest.FlatSpec
 
 /**
@@ -549,6 +550,38 @@ class UdfUtilsTest extends FlatSpec {
     val result = UdfUtils.getToLong(str)
 
     assert(result == 3)
+
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Name of variable: EMAIL_OPT_IN_STATUS
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  "getEmailOptInStatus: getStatusValue " should "O" in {
+
+    val result = UdfUtils.getEmailOptInStatus(null, null)
+
+    assert(result == "O")
+
+  }
+
+  "getEmailOptInStatus: getStatusValue " should "I" in {
+
+    val row = Row("", "subscribed")
+
+    val result = UdfUtils.getEmailOptInStatus("1", "subscribed")
+
+    assert(result == "I")
+
+  }
+
+  "getEmailOptInStatus: getStatusValue " should "U" in {
+
+    val row = Row("", "unsubscribed")
+
+    val result = UdfUtils.getEmailOptInStatus("1", "unsubscribed")
+
+    assert(result == "U")
 
   }
 

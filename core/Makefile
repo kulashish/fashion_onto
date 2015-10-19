@@ -14,7 +14,7 @@ package:
 	cp target/scala-2.10/Alchemy-assembly.jar $(BASE)/jar/
 	cp src/main/resources/*.json $(BASE)/conf/
 	cp scripts/confInit.sh $(BASE)/bin/
-
+	cp scripts/confInit_jabongtest.sh $(BASE)/bin/
 	cp scripts/run.pl $(BASE)/bin/
 	cp scripts/ftp_upload.pl $(BASE)/bin/
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/

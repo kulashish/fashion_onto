@@ -17,25 +17,25 @@ object Model {
 
   def getItrInputs(date: String) {
 
-    config = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CONFIG, DataSets.FULL_MERGE_MODE)
+    config = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CONFIG, DataSets.FULL_MERGE_MODE, date)
 
-    simple = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_SIMPLE, DataSets.FULL_MERGE_MODE)
+    simple = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_SIMPLE, DataSets.FULL_MERGE_MODE, date)
 
-    supplier = Spark.getContext().broadcast(DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_SUPPLIER, DataSets.FULL_FETCH_MODE))
+    supplier = Spark.getContext().broadcast(DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_SUPPLIER, DataSets.FULL_FETCH_MODE, date))
 
-    brand = Spark.getContext().broadcast(DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_BRAND, DataSets.FULL_FETCH_MODE))
+    brand = Spark.getContext().broadcast(DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_BRAND, DataSets.FULL_FETCH_MODE, date))
 
-    salesOrderItem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE)
+    salesOrderItem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.FULL_MERGE_MODE, date)
 
-    catalogStock = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_STOCK, DataSets.FULL_FETCH_MODE)
+    catalogStock = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_STOCK, DataSets.FULL_FETCH_MODE, date)
 
-    productImage = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_PRODUCT_IMAGE, DataSets.FULL_FETCH_MODE)
+    productImage = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_PRODUCT_IMAGE, DataSets.FULL_FETCH_MODE, date)
 
-    category = Spark.getContext().broadcast(DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CATEGORY, DataSets.FULL_FETCH_MODE))
+    category = Spark.getContext().broadcast(DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CATEGORY, DataSets.FULL_FETCH_MODE, date))
 
-    categoryMapping = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CONFIG_HAS_CATALOG_CATEGORY, DataSets.FULL_FETCH_MODE)
+    categoryMapping = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_CONFIG_HAS_CATALOG_CATEGORY, DataSets.FULL_FETCH_MODE, date)
 
-    itemMaster = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.ERP, DataSets.ITEM_MASTER_COMPLETE_DUMP, DataSets.FULL_MERGE_MODE)
+    itemMaster = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.ERP, DataSets.ITEM_MASTER_COMPLETE_DUMP, DataSets.FULL_MERGE_MODE, date)
 
   }
 }

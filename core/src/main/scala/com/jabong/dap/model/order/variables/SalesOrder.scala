@@ -5,8 +5,8 @@ import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, SalesO
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.model.customer.schema.CustVarSchema
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by jabong on 24/6/15.
@@ -36,13 +36,14 @@ object SalesOrder {
       salesOrderCalcIncr
     } else {
       val joinedDF = salesOrderCalcFull.unionAll(salesOrderCalcIncr)
-      val salesOrderCalcNewFull = joinedDF.groupBy(SalesOrderVariables.FK_CUSTOMER).agg(
-        max(ContactListMobileVars.LAST_ORDER_DATE) as ContactListMobileVars.LAST_ORDER_DATE,
-        max(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.UPDATED_AT,
-        min(SalesOrderVariables.FIRST_ORDER_DATE) as SalesOrderVariables.FIRST_ORDER_DATE,
-        sum(SalesOrderVariables.ORDERS_COUNT) as SalesOrderVariables.ORDERS_COUNT,
-        min(SalesOrderVariables.DAYS_SINCE_LAST_ORDER) + 1 as SalesOrderVariables.DAYS_SINCE_LAST_ORDER
-      )
+      val salesOrderCalcNewFull = joinedDF.groupBy(SalesOrderVariables.FK_CUSTOMER)
+        .agg(
+          max(ContactListMobileVars.LAST_ORDER_DATE) as ContactListMobileVars.LAST_ORDER_DATE,
+          max(SalesOrderVariables.UPDATED_AT) as SalesOrderVariables.UPDATED_AT,
+          min(SalesOrderVariables.FIRST_ORDER_DATE) as SalesOrderVariables.FIRST_ORDER_DATE,
+          sum(SalesOrderVariables.ORDERS_COUNT) as SalesOrderVariables.ORDERS_COUNT,
+          min(SalesOrderVariables.DAYS_SINCE_LAST_ORDER) + 1 as SalesOrderVariables.DAYS_SINCE_LAST_ORDER
+        )
       salesOrderCalcNewFull
     }
   }
@@ -54,6 +55,8 @@ object SalesOrder {
    */
   def getCPOT(dfSalesOrder: DataFrame): DataFrame = {
 
+    //    logger.info("Enter in  getCPOTPart2")
+
     val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
       .sort(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
 
@@ -61,15 +64,33 @@ object SalesOrder {
 
     val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 
-    val soGrouped = soNewMap.groupByKey()
+    val soGrouped = soNewMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
 
-    val finalData = soGrouped.map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
-
-    val rowRDD = finalData.map({ case (key, value) => Row(key.toInt, value._1, value._2) })
+    val rowRDD = soGrouped.map({
+      case (key, value) =>
+        Row(
+          key.toLong,
+          value._1,
+          value._2,
+          value._3,
+          value._4,
+          value._5,
+          value._6,
+          value._7,
+          value._8,
+          value._9,
+          value._10,
+          value._11,
+          value._12,
+          value._13)
+    })
 
     // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslot)
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart2)
+
+    //    logger.info("Exit from  getCPOTPart2")
 
     df
+
   }
 }

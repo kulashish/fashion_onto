@@ -1,0 +1,8 @@
+{"sales_order_item_sku":"ES418WA79UAUINDFAS","brick":"test","mvp":"mass","brand":"adidas","category":"MEN FOOTWEAR","gender":"WOMEN","number_last_30_days_ordered":1,"test_case_filter":1}
+{"sales_order_item_sku":"SO596WA65JLIINDFAS","brick":"test","mvp":"premium","brand":"adidas","category":"MEN FOOTWEAR","gender":"WOMEN","number_last_30_days_ordered":6,"test_case_filter":1}
+{"sales_order_item_sku":"SO596WA65JLIINDFAS","brick":"test","mvp":"mass","brand":"adidas","category":"MEN FOOTWEAR","gender":"UNISEX","number_last_30_days_ordered":1,"test_case_filter":1}
+{"sales_order_item_sku":"ES418WA79UAUINDFAS","brick":"test","mvp":"premium","brand":"adidas","category":"MEN FOOTWEAR","gender":"MEN","number_last_30_days_ordered":6,"test_case_filter":1}
+{"sales_order_item_sku":"ES418WA79UAUINDFAS","brick":"shoes","mvp":"mass","brand":"adidas","category":"MEN FOOTWEAR","gender":"WOMEN","number_last_30_days_ordered":1,"test_case_filter":2}
+{"sales_order_item_sku":"SO596WA65JLIINDFAS","brick":"shirts","mvp":"premium","brand":"adidas","category":"MEN FOOTWEAR","gender":"BOYS","number_last_30_days_ordered":6,"test_case_filter":2}
+{"sales_order_item_sku":"SO596WA65JLIINDFAS","brick":"shirts","mvp":"premium","brand":"adidas","category":"MEN FOOTWEAR","gender":"UNISEX","number_last_30_days_ordered":1,"test_case_filter":2}
+{"sales_order_item_sku":"ES418WA79UAUINDFAS","brick":"shirts","mvp":"premium","brand":"adidas","category":"MEN FOOTWEAR","gender":"UNKNOWN","number_last_30_days_ordered":6,"test_case_filter":2}

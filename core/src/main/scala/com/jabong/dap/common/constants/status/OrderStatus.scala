@@ -14,4 +14,6 @@ object OrderStatus {
   val RETURN = 8
   val RETURN_PAYMENT_PENDING = 18
   val INVALID = 10
+  val CLOSED_ORDER = 6
+
 }

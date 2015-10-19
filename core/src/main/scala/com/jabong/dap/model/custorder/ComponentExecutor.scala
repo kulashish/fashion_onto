@@ -1,5 +1,6 @@
 package com.jabong.dap.model.custorder
 
+import com.jabong.dap.campaign.recommendation.generator.RecommendationGenerator
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
@@ -8,13 +9,12 @@ import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
-import com.jabong.dap.model.customer.campaigndata.ContactListMobile
-import com.jabong.dap.model.customer.campaigndata.CustWelcomeVoucher
-import com.jabong.dap.model.customer.campaigndata.CustPreference
+import com.jabong.dap.model.customer.campaigndata._
 import com.jabong.dap.model.customer.data.DNDMerger
 import com.jabong.dap.model.customer.data.SmsOptOut
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
+import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
 import com.jabong.dap.quality.campaign.CampaignQualityEntry
 import grizzled.slf4j.Logging
@@ -28,6 +28,7 @@ import org.apache.hadoop.fs.{ FileSystem, Path }
  */
 class ComponentExecutor extends Serializable with Logging {
 
+  @throws(classOf[Exception])
   def start(paramJsonPath: String) = {
     val validated = try {
       val conf = new Configuration()
@@ -55,6 +56,10 @@ class ComponentExecutor extends Serializable with Logging {
 
     if (validated) {
       val isHistory = OptionUtils.getOptBoolVal(ParamJobConfig.paramJobInfo.isHistory)
+
+      println("isHistory: " + isHistory)
+      println("ParamJobConfig.paramJobInfo:" + ParamJobConfig.paramJobInfo)
+
       for (paramJob <- ParamJobConfig.paramJobInfo.params) {
         ParamJobConfig.paramInfo = paramJob
         paramJob.source match {
@@ -65,7 +70,10 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.PRICING_SKU_DATA => SkuData.start(paramJob)
           case DataSets.DCF_FEED_GENERATE => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
+          case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
+          case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
+          case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
           case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
           case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)

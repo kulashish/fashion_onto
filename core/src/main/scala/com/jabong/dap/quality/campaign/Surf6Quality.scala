@@ -5,6 +5,7 @@ import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Campaign
 import com.jabong.dap.common.constants.variables.{ PageVisitVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -79,7 +80,7 @@ object Surf6Quality extends BaseCampaignQuality with Logging {
 
     val surf6Data = CampaignQualityEntry.yestSessionData
 
-    val surf6Campaign = CampaignInput.getCampaignData(CampaignCommon.SURF6_CAMPAIGN, date)
+    val surf6Campaign = CampaignInput.getCampaignData(CampaignCommon.SURF6_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)
 
     return (surf6Data, surf6Campaign)
   }

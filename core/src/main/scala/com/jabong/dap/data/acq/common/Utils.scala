@@ -85,6 +85,7 @@ case class ParamInfo(
   fullDate: Option[String],
   incrDate: Option[String],
   path: Option[String],
+  subType: Option[String],
   incrMode: Option[String],
   saveFormat: String,
   saveMode: String,
@@ -154,12 +155,11 @@ case class CampaignDetail(
 
 /**
  *
- * @param pushBasePath
  * @param pushCampaignList
+ * @param emailSubscribers
  */
 //case class for campaignConfig expects path and campaign List
 case class CampaignConfig(
-  var pushBasePath: String,
   var pushCampaignList: List[CampaignDetail],
   var emailSubscribers: Option[String])
 

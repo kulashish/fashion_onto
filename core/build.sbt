@@ -1,6 +1,6 @@
 name := "Alchemy"
 
-version := "0.1.14"
+version := "0.1.15"
 
 scalaVersion := "2.10.5"
 
@@ -43,5 +43,5 @@ assemblyJarName in assembly := "Alchemy-assembly.jar"
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-oT")
 
-
+scalacOptions ++= Seq( "-Xelide-below", "INFO" ) // elide
 //seq(lsSettings :_*)

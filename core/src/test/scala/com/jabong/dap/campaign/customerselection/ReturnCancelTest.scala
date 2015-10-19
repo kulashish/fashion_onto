@@ -45,6 +45,6 @@ class ReturnCancelTest extends FlatSpec with SharedSparkContext {
   "Last days order data of customer id 2898599" should "will get filtered because order has been placed after the item has been cancelled" in {
     val customerSelectedData = returnCancel.customerSelection(orderData, orderItemDataFrame)
     val value = customerSelectedData.filter(CustomerVariables.FK_CUSTOMER + "=2898599")
-    assert(value.count() == 0)
+    assert(value.count() == 2)
   }
 }

@@ -55,4 +55,8 @@ object ITR {
   val PRICE = "price"
   val PRICE_ON_SITE = "priceOnSite"
   val ITR_DATE = "itrDate"
+
+  /* user defined columns **/
+  val NUMBER_SIMPLE_PER_SKU = "number_simple_per_sku"
+  val DISCOUNT = "discount"
 }
