@@ -131,13 +131,20 @@ object CustomerDeviceMapping extends Logging {
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath)) {
       var cmrFull: DataFrame = null
+      var nlsIncr: DataFrame = null
       if (null != path) {
-        cmrFull = getDataFrameCsv4mDCF(path)
+        if ("firstTime4Nls".equals(path)) {
+          cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+            .filter(col(CustomerVariables.ID_CUSTOMER).geq(1))
+          nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
+        } else {
+          cmrFull = getDataFrameCsv4mDCF(path)
+        }
       } else {
         cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+        nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
       }
       val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
-      val nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
