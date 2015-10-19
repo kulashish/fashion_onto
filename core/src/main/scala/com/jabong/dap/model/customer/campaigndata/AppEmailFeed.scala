@@ -37,13 +37,17 @@ object AppEmailFeed {
       col(ContactListMobileVars.REG_DATE)
     )
 
+    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
+    val todayStartDate = todayDate + " " + TimeConstants.START_TIME
+
     val dfAppEmailFeed = dfAppEmailFeedFull.except(dfAppEmailFeedPrevFull).select(
       col(ContactListMobileVars.UID) as UID,
       col(CampaignMergedFields.DEVICE_ID) as DEVICE_ID,
       col(CustomerVariables.EMAIL),
       col(ContactListMobileVars.NET_ORDERS) as NET_ORDERS,
-      col(ContactListMobileVars.REG_DATE) as REG_DATE
-    ).withColumn(PROCESSED_DATE, lit(TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT))).na.fill("")
+      col(ContactListMobileVars.REG_DATE) as REG_DATE,
+      lit(todayStartDate) as PROCESSED_DATE
+    ).na.fill("")
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(dfAppEmailFeed, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate, "53699_80036_" + fileDate + "_app_email_feed", DataSets.IGNORE_SAVEMODE, "true", ";")
