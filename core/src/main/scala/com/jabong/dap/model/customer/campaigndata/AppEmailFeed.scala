@@ -37,8 +37,8 @@ object AppEmailFeed {
       col(ContactListMobileVars.REG_DATE)
     )
 
-    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT)
-    val todayStartDate = todayDate.substring(0, todayDate.indexOf(" ") + 1) + TimeConstants.START_TIME
+    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
+    val todayStartDate = todayDate + " " + TimeConstants.START_TIME
 
     val dfAppEmailFeed = dfAppEmailFeedFull.except(dfAppEmailFeedPrevFull).select(
       col(ContactListMobileVars.UID) as UID,

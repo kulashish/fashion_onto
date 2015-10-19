@@ -162,11 +162,11 @@ object CustomerPreferredTimeslotPart1 {
   def getIncCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): DataFrame = {
 
     val dfOpenCPOT = getCPOT(dfOpen, CustVarSchema.emailOpen)
-    val dfClickCPOT = getCPOT(dfClick, CustVarSchema.emailClick).withColumnRenamed(CustomerVariables.CUSTOMER_ID, "click_" + CustomerVariables.CUSTOMER_ID)
+    val dfClickCPOT = getCPOT(dfClick, CustVarSchema.emailClick)
 
-    val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT("click_" + CustomerVariables.CUSTOMER_ID))
+    val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT(CustomerVariables.CUSTOMER_ID))
       .select(
-        coalesce(dfOpenCPOT(CustomerVariables.CUSTOMER_ID), dfClickCPOT("click_" + CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+        coalesce(dfOpenCPOT(CustomerVariables.CUSTOMER_ID), dfClickCPOT(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
         dfOpenCPOT(CustomerVariables.OPEN_0),
         dfOpenCPOT(CustomerVariables.OPEN_1),
         dfOpenCPOT(CustomerVariables.OPEN_2),
@@ -206,16 +206,16 @@ object CustomerPreferredTimeslotPart1 {
    */
   def getCPOT(dfIn: DataFrame, schema: StructType): DataFrame = {
 
-    val salesOrder = dfIn.select(col("CUSTOMER_ID"), Udf.ddmmmyyyyToyyyymmdd(col(CustomerVariables.EVENT_CAPTURED_DT)) as CustomerVariables.EVENT_CAPTURED_DT)
+    val dfSelect = dfIn.select(col("CUSTOMER_ID"), col(CustomerVariables.EVENT_CAPTURED_DT))
       .sort("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT)
 
-    val soMapReduce = salesOrder.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
+    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DD_MMM_YYYY_HH_MM_SS)), 1)).reduceByKey(_ + _)
 
-    val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
+    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 
-    val soGrouped = soNewMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
+    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
 
-    val rowRDD = soGrouped.map({
+    val rowRDD = grouped.map({
       case (key, value) =>
         Row(
           key,
