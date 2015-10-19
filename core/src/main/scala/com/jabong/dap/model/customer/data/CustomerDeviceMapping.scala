@@ -34,7 +34,8 @@ object CustomerDeviceMapping extends Logging {
     // clickStreamInc.printSchema()
     // clickStreamInc.show(10)
 
-    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
+    val clickStream = clickStreamInc.filter(!(col("userid").startsWith("_app_")))
+      .filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.USER_ID)
       .agg(
@@ -130,13 +131,20 @@ object CustomerDeviceMapping extends Logging {
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath)) {
       var cmrFull: DataFrame = null
+      var nlsIncr: DataFrame = null
       if (null != path) {
-        cmrFull = getDataFrameCsv4mDCF(path)
+        if ("firstTime4Nls".equals(path)) {
+          cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+            .filter(col(CustomerVariables.ID_CUSTOMER).geq(1))
+          nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
+        } else {
+          cmrFull = getDataFrameCsv4mDCF(path)
+        }
       } else {
         cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+        nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
       }
       val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
-      val nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
@@ -236,7 +244,7 @@ object CustomerDeviceMapping extends Logging {
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
-        ).dropDuplicates()
+        ).dropDuplicates().filter(col(CustomerVariables.ID_CUSTOMER).isNotNull && col(CustomerVariables.ID_CUSTOMER).cast(LongType).geq(1))
 
       println("Total recs after correction: ") // + res.count())
       // res.printSchema()
