@@ -42,7 +42,7 @@ import org.apache.spark.sql.DataFrame
   MAX_DISCOUNT_USED - sales_order_item, sales_order, sales_rule, sales_rule_set
   AVERAGE_DISCOUNT_USED - sales_order_item, sales_order, sales_rule, sales_rule_set
   */
-class CustomerOrders {
+object CustomerOrders {
 
   def start(vars: ParamInfo) = {
     val saveMode = vars.saveMode
@@ -53,11 +53,14 @@ class CustomerOrders {
   }
 
   def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame) = {
-    var salesOrder: DataFrame = null
-    var salesOrderItem: DataFrame = null
-    salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
-    salesOrderItem = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, prevDate)
 
+    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
+    val salesOrderItem = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, prevDate)
+    val salesRule = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_RULE, DataSets.FULL_MERGE_MODE, prevDate)
+    val salesRuleSet = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_RULE, DataSets.FULL_MERGE_MODE, prevDate)
+    val salesAddress = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
+    val itr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.BASIC_ITR, DataSets.FULL_MERGE_MODE, prevDate)
+    val cityZone = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
     (salesOrder, salesOrderItem)
   }
 

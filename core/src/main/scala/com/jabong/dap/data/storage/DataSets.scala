@@ -11,6 +11,7 @@ object DataSets {
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
+  val SALES_RULE_SET = "sales_rule_set"
 
   //customer
   val CUSTOMER = "customer"

@@ -534,6 +534,52 @@ object SalesOrderItem {
     return (res, fullJoined)
   }
 
+  /*
+  MAX_ORDER_BASKET_VALUE - max of sum(unit_price) at order level & customer level.
+  we need sum of special price (which is unit_price) at order level.
+  Need to retrieve this for order having max. sum of special price.
+  MAX_ORDER_ITEM_VALUE - max(unit_price) group by fk_customer. need to join sales_order to sales_order_item on id_sales_order.
+  Do max(unit_price)group by fk_customer to get max.sp paid till date by that’s customer
+  AVG_ORDER_VALUE - avg of sum(unit_price) at order level for a customer.
+  we need sum of special price (which is unit_price) at order level.
+  Need to take avg of this sum(unit_price) for all orders placed till date by that customer
+  AVG_ORDER_ITEM_VALUE - avg(unit_price) group by fk_customer.
+  need to join sales_order to sales_order_item on id_sales_order.
+  Do avg(unit_price)group by fk_customer to get avg.sp paid till date by that’s customer
+  */
+
+  def getOrderValue(salesOrder: DataFrame, salesOrderItem: DataFrame, prevCalc: DataFrame): DataFrame={
+    val salesJoined = salesOrder.join(salesOrderItem, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER))
+                        .select(salesOrder(SalesOrderVariables.ID_SALES_ORDER),
+                                  salesOrder(SalesOrderVariables.FK_CUSTOMER),
+                                  salesOrderItem(SalesOrderItemVariables.UNIT_PRICE)
+                                  )
+    val orderGrp = salesJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
+                      .agg(sum(SalesOrderItemVariables.UNIT_PRICE) as "basket_value",
+                            max(SalesOrderItemVariables.UNIT_PRICE) as "max_item",
+                            count(SalesOrderItemVariables.UNIT_PRICE) as "item_count")
+    val orderValue = orderGrp.groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(max("basket_value") as "MAX_ORDER_BASKET_VALUE",
+        sum("basket_value") as "sum_basket_value",
+        count("basket_value") as  "count_basket_value",
+        max("max_item") as "MAX_ORDER_ITEM_VALUE",
+        sum("item_count") as "order_item_count")
+
+    if (null == prevCalc ){
+      orderValue
+    } else{
+      orderValue.join(prevCalc, orderValue(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+                .select(coalesce(orderValue(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                        when(orderValue("MAX_ORDER_BASKET_VALUE")> prevCalc("MAX_ORDER_BASKET_VALUE"),orderValue("MAX_ORDER_BASKET_VALUE")).otherwise(prevCalc("MAX_ORDER_BASKET_VALUE")),
+                        when(orderValue("MAX_ORDER_ITEM_VALUE")> prevCalc("MAX_ORDER_ITEM_VALUE"),orderValue("MAX_ORDER_ITEM_VALUE")).otherwise(prevCalc("MAX_ORDER_ITEM_VALUE")),
+                        orderValue("sum_basket_value")+ prevCalc("sum_basket_value") as "sum_basket_value",
+                        orderValue("count_basket_value")+ prevCalc("count_basket_value") as "count_basket_value",
+                        orderValue("order_item_count")+ prevCalc("order_item_count") as "order_item_count"
+                      )
+    }
+
+
+  }
 
   /**
    * def main(args: Array[String]) {
