@@ -51,11 +51,10 @@ object CustomerDeviceMapping extends Logging {
     // id_customer, email, browser_id, domain
     val custUnq = customer.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
 
-    val broCust = Spark.getContext().broadcast(custUnq).value
-    val joinedDf = clickStream.join(broCust, broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
+    val joinedDf = clickStream.join(custUnq, custUnq(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
       .select(
-        coalesce(broCust(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
-        broCust(CustomerVariables.ID_CUSTOMER),
+        coalesce(custUnq(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
+        custUnq(CustomerVariables.ID_CUSTOMER),
         clickStream(PageVisitVariables.BROWSER_ID),
         clickStream(PageVisitVariables.DOMAIN)
       )
@@ -70,7 +69,7 @@ object CustomerDeviceMapping extends Logging {
 
     val nlsJoined = joinedDf.join(nlsbc, nlsbc(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        coalesce(broCust(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        coalesce(nlsbc(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         joinedDf(CustomerVariables.ID_CUSTOMER),
         joinedDf(PageVisitVariables.BROWSER_ID),
         joinedDf(PageVisitVariables.DOMAIN)
