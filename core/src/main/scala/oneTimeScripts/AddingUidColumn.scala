@@ -1,10 +1,12 @@
 package oneTimeScripts
 
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, PageVisitVariables}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -27,6 +29,8 @@ object AddingUidColumn {
   }
 
   def main(args: Array[String]) {
+    Spark.init(new SparkConf().setAppName("AddingUidColumn"))
+
     val date = args(0).trim
 
     val fullPath = args(1).trim
