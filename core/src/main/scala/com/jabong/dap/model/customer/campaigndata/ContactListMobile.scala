@@ -161,7 +161,7 @@ object ContactListMobile extends Logging {
       col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
       col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
       col(CustomerVariables.CITY) as ContactListMobileVars.CITY,
-      col(ContactListMobileVars.COUNTRY),
+      lit("IN") as ContactListMobileVars.COUNTRY,
       col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
       col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
       col(ContactListMobileVars.DOB),
@@ -534,7 +534,6 @@ object ContactListMobile extends Logging {
         dfJoined(ContactListMobileVars.CITY_TIER),
         dfJoined(ContactListMobileVars.DND),
         dfJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
-        lit("IN") as ContactListMobileVars.COUNTRY,
         dfCmrFull(ContactListMobileVars.UID),
         Udf.device(dfCmrFull(PageVisitVariables.DOMAIN), dfCmrFull(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
 
