@@ -16,7 +16,7 @@ object AddingUidColumn {
 
   def addUId(cmr: DataFrame, contactList: DataFrame): DataFrame = {
 
-    val res = cmr.join(contactList, cmr(CustomerVariables.EMAIL) === contactList(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
+    val res = cmr.join(contactList, cmr(CustomerVariables.EMAIL) === contactList(ContactListMobileVars.EMAIL), SQL.LEFT_OUTER)
                 .select(
                       cmr(CustomerVariables.RESPONSYS_ID),
                       cmr(CustomerVariables.ID_CUSTOMER),
@@ -44,7 +44,7 @@ object AddingUidColumn {
 
     val savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, saveDate)
 
-    val contactList = DataReader.getDataFrame4mCsv(fullPath, "true", ";")
+    val contactList = DataReader.getDataFrame4mCsv(fullPath, "true", "|")
 
     val cmr = DataReader.getDataFrame(READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
   
