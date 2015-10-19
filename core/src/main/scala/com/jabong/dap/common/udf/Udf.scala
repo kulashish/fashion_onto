@@ -156,6 +156,4 @@ object Udf {
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
-  val ddmmmyyyyToyyyymmdd = udf((dateString: String) => UdfUtils.ddmmmyyyyToyyyymmdd(dateString: String))
-
 }

@@ -679,10 +679,4 @@ object UdfUtils extends Logging {
 
   }
 
-  def ddmmmyyyyToyyyymmdd(dateString: String): String = {
-
-    TimeUtils.changeDateFormat(dateString, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT)
-
-  }
-
 }
