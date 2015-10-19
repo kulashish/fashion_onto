@@ -42,15 +42,15 @@ object AddingUidColumn {
 
     val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
 
-    val savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, saveDate)
-
     val contactList = DataReader.getDataFrame4mCsv(fullPath, "true", "|")
 
     val cmr = DataReader.getDataFrame(READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
   
     val uid = addUId(cmr, contactList)
 
-    DataWriter.writeParquet(uid, savePath, DataSets.FULL_MERGE_MODE)
+    val savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, saveDate)
+
+    DataWriter.writeParquet(uid, savePath, DataSets.IGNORE_SAVEMODE)
 
   }
 
