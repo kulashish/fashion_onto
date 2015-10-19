@@ -161,7 +161,7 @@ object ContactListMobile extends Logging {
       col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
       col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
       col(CustomerVariables.CITY) as ContactListMobileVars.CITY,
-      lit("IN") as ContactListMobileVars.COUNTRY,
+      col(ContactListMobileVars.COUNTRY),
       col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
       col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
       col(ContactListMobileVars.DOB),
@@ -251,7 +251,7 @@ object ContactListMobile extends Logging {
 
         Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
-        lit("IN") as ContactListMobileVars.COUNTRY,
+        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.COUNTRY), joinDF(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
 
         Udf.latestString(joinDF(CustomerVariables.FIRST_NAME), joinDF(CustomerVariables.NEW_ + CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
 
@@ -523,6 +523,7 @@ object ContactListMobile extends Logging {
         dfJoined(ContactListMobileVars.UNSUB_KEY),
         dfJoined(NewsletterVariables.STATUS),
         dfJoined(SalesAddressVariables.CITY),
+        lit("IN") as ContactListMobileVars.COUNTRY,
         dfJoined(SalesAddressVariables.FIRST_NAME),
         dfJoined(CustomerVariables.LAST_NAME),
         dfJoined(SalesAddressVariables.PHONE),
