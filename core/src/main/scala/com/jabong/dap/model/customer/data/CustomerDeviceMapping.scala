@@ -52,6 +52,7 @@ object CustomerDeviceMapping extends Logging {
     val custUnq = customer.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
 
     val nlsUnq = nlsIncr.select(CustomerVariables.FK_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
+      .filter(col(CustomerVariables.FK_CUSTOMER).equalTo(0) || col(CustomerVariables.FK_CUSTOMER).isNull)
 
     val nlsJoined = custUnq.join(nlsUnq, custUnq(CustomerVariables.EMAIL) === nlsUnq(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
