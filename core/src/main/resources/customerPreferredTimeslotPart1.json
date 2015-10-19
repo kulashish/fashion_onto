@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "customerPreferredTimeslotPart1",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

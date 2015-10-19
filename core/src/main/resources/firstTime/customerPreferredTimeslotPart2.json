@@ -7,6 +7,13 @@
       "incrDate": "2015/10/16",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
+    },
+    {
+      "source": "customerPreferredTimeslotPart2",
+      "fullDate": "2015/10/16",
+      "incrDate": "2015/10/17",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
     }
   ]
 }
