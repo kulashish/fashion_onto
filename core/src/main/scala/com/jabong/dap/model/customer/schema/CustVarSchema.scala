@@ -12,22 +12,85 @@ object CustVarSchema {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   val customersPreferredOrderTimeslotPart2 = StructType(Array(
-    StructField(SalesOrderVariables.CUSTOMER_ID, LongType, true),
-    StructField(SalesOrderVariables.ORDER_0, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_1, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_2, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_3, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_4, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_5, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_6, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_7, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_8, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_9, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_10, IntegerType, true),
-    StructField(SalesOrderVariables.ORDER_11, IntegerType, true),
-    StructField(SalesOrderVariables.PREFERRED_ORDER_TIMESLOT, IntegerType, true)
+    StructField(CustomerVariables.CUSTOMER_ID, LongType, true),
+    StructField(CustomerVariables.ORDER_0, IntegerType, true),
+    StructField(CustomerVariables.ORDER_1, IntegerType, true),
+    StructField(CustomerVariables.ORDER_2, IntegerType, true),
+    StructField(CustomerVariables.ORDER_3, IntegerType, true),
+    StructField(CustomerVariables.ORDER_4, IntegerType, true),
+    StructField(CustomerVariables.ORDER_5, IntegerType, true),
+    StructField(CustomerVariables.ORDER_6, IntegerType, true),
+    StructField(CustomerVariables.ORDER_7, IntegerType, true),
+    StructField(CustomerVariables.ORDER_8, IntegerType, true),
+    StructField(CustomerVariables.ORDER_9, IntegerType, true),
+    StructField(CustomerVariables.ORDER_10, IntegerType, true),
+    StructField(CustomerVariables.ORDER_11, IntegerType, true),
+    StructField(CustomerVariables.PREFERRED_ORDER_TIMESLOT, IntegerType, true)
   ))
 
+  val customersPreferredOrderTimeslotPart1 = StructType(Array(
+    StructField(CustomerVariables.CUSTOMER_ID, StringType, true),
+    StructField(CustomerVariables.OPEN_0, IntegerType, true),
+    StructField(CustomerVariables.OPEN_1, IntegerType, true),
+    StructField(CustomerVariables.OPEN_2, IntegerType, true),
+    StructField(CustomerVariables.OPEN_3, IntegerType, true),
+    StructField(CustomerVariables.OPEN_4, IntegerType, true),
+    StructField(CustomerVariables.OPEN_5, IntegerType, true),
+    StructField(CustomerVariables.OPEN_6, IntegerType, true),
+    StructField(CustomerVariables.OPEN_7, IntegerType, true),
+    StructField(CustomerVariables.OPEN_8, IntegerType, true),
+    StructField(CustomerVariables.OPEN_9, IntegerType, true),
+    StructField(CustomerVariables.OPEN_10, IntegerType, true),
+    StructField(CustomerVariables.OPEN_11, IntegerType, true),
+    StructField(CustomerVariables.CLICK_0, IntegerType, true),
+    StructField(CustomerVariables.CLICK_1, IntegerType, true),
+    StructField(CustomerVariables.CLICK_2, IntegerType, true),
+    StructField(CustomerVariables.CLICK_3, IntegerType, true),
+    StructField(CustomerVariables.CLICK_4, IntegerType, true),
+    StructField(CustomerVariables.CLICK_5, IntegerType, true),
+    StructField(CustomerVariables.CLICK_6, IntegerType, true),
+    StructField(CustomerVariables.CLICK_7, IntegerType, true),
+    StructField(CustomerVariables.CLICK_8, IntegerType, true),
+    StructField(CustomerVariables.CLICK_9, IntegerType, true),
+    StructField(CustomerVariables.CLICK_10, IntegerType, true),
+    StructField(CustomerVariables.CLICK_11, IntegerType, true),
+    StructField(CustomerVariables.PREFERRED_OPEN_TIMESLOT, IntegerType, true),
+    StructField(CustomerVariables.PREFERRED_CLICK_TIMESLOT, IntegerType, true)
+  ))
+
+  val emailOpen = StructType(Array(
+    StructField(CustomerVariables.CUSTOMER_ID, StringType, true),
+    StructField(CustomerVariables.OPEN_0, IntegerType, true),
+    StructField(CustomerVariables.OPEN_1, IntegerType, true),
+    StructField(CustomerVariables.OPEN_2, IntegerType, true),
+    StructField(CustomerVariables.OPEN_3, IntegerType, true),
+    StructField(CustomerVariables.OPEN_4, IntegerType, true),
+    StructField(CustomerVariables.OPEN_5, IntegerType, true),
+    StructField(CustomerVariables.OPEN_6, IntegerType, true),
+    StructField(CustomerVariables.OPEN_7, IntegerType, true),
+    StructField(CustomerVariables.OPEN_8, IntegerType, true),
+    StructField(CustomerVariables.OPEN_9, IntegerType, true),
+    StructField(CustomerVariables.OPEN_10, IntegerType, true),
+    StructField(CustomerVariables.OPEN_11, IntegerType, true),
+    StructField(CustomerVariables.PREFERRED_OPEN_TIMESLOT, IntegerType, true)
+  ))
+
+  val emailClick = StructType(Array(
+    StructField(CustomerVariables.CUSTOMER_ID, StringType, true),
+    StructField(CustomerVariables.CLICK_0, IntegerType, true),
+    StructField(CustomerVariables.CLICK_1, IntegerType, true),
+    StructField(CustomerVariables.CLICK_2, IntegerType, true),
+    StructField(CustomerVariables.CLICK_3, IntegerType, true),
+    StructField(CustomerVariables.CLICK_4, IntegerType, true),
+    StructField(CustomerVariables.CLICK_5, IntegerType, true),
+    StructField(CustomerVariables.CLICK_6, IntegerType, true),
+    StructField(CustomerVariables.CLICK_7, IntegerType, true),
+    StructField(CustomerVariables.CLICK_8, IntegerType, true),
+    StructField(CustomerVariables.CLICK_9, IntegerType, true),
+    StructField(CustomerVariables.CLICK_10, IntegerType, true),
+    StructField(CustomerVariables.CLICK_11, IntegerType, true),
+    StructField(CustomerVariables.PREFERRED_CLICK_TIMESLOT, IntegerType, true)
+  ))
   val resultCustomer = StructType(Array(
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(CustomerVariables.GIFTCARD_CREDITS_AVAILABLE, DecimalType(10, 2), true),
