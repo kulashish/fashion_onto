@@ -1,13 +1,11 @@
 package oneTimeScripts
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, PageVisitVariables, CustomerVariables}
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, PageVisitVariables}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 19/10/15.
@@ -35,11 +33,15 @@ object AddingUidColumn {
 
     val saveDate = args(2).trim
 
-    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, saveDate)
+    val READ_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/output"
+
+    val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
+
+    val savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, saveDate)
 
     val contactList = DataReader.getDataFrame4mCsv(fullPath, "true", ";")
 
-    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
+    val cmr = DataReader.getDataFrame(READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
   
     val uid = addUId(cmr, contactList)
 
