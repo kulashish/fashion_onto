@@ -580,8 +580,8 @@ object SalesOrderItem {
       .groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(max("count") as SalesOrderVariables.BRICK_PENETRATION)
 
-    val res = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER)).
-                select(cat(SalesOrderVariables.FK_CUSTOMER),
+    val res = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
+                select(coalesce(cat(SalesOrderVariables.FK_CUSTOMER),brick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER ,
                        cat(SalesOrderVariables.CATEGORY_PENETRATION),
                        brick(SalesOrderVariables.BRICK_PENETRATION)
                     )
