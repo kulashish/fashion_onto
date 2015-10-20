@@ -1,8 +1,8 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 

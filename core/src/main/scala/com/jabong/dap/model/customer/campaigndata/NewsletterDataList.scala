@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, NewsletterVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, NewsletterVariables }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -9,7 +9,7 @@ import org.apache.spark.sql.functions._
  */
 object NewsletterDataList {
 
-  def getNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame) : DataFrame = {
+  def getNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
 
     val dfNLDataListFull = dfContactListMobileFull.select(
       col(CustomerVariables.EMAIL),
