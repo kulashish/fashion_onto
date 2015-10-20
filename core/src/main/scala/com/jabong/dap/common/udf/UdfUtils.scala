@@ -675,7 +675,7 @@ object UdfUtils extends Logging {
 
     val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 
-    val grouped = newMap.groupByKey().map{ case (key, value) => (key, UdfUtils.getCompleteSlotData(value)) }
+    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
 
     val rowRDD = grouped.map({
       case (key, value) =>
@@ -699,7 +699,7 @@ object UdfUtils extends Logging {
     // Apply the schema to the RDD.
     val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
 
-    df
+    df.dropDuplicates()
   }
 
 }

@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -29,9 +29,9 @@ object CustomerPreferredTimeslotPart2 extends Logging {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
-    val (dfIncSalesOrder, dfFullCPOTPart2) = readDF(paths, incrDate, prevDate)
+    val (dfIncSalesOrder, dfFullCPOTPart2, dfCmr) = readDF(paths, incrDate, prevDate)
 
-    val (dfInc, dfFullFinal) = getCPOTPart2(dfIncSalesOrder, dfFullCPOTPart2)
+    val (dfInc, dfFullFinal) = getCPOTPart2(dfIncSalesOrder, dfFullCPOTPart2, dfCmr)
 
     val pathCustomerPreferredTimeslotPart2Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Full)) {
@@ -49,9 +49,28 @@ object CustomerPreferredTimeslotPart2 extends Logging {
    * @param dfFullCPOTPart2
    * @return
    */
-  def getCPOTPart2(dfIncSalesOrder: DataFrame, dfFullCPOTPart2: DataFrame): (DataFrame, DataFrame) = {
+  def getCPOTPart2(dfIncSalesOrder: DataFrame, dfFullCPOTPart2: DataFrame, dfCmrFull: DataFrame): (DataFrame, DataFrame) = {
 
-    val dfInc = UdfUtils.getCPOT(dfIncSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER) as "ID", col(SalesOrderVariables.CREATED_AT) as "DATE"), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+    val dfCPOT = UdfUtils.getCPOT(dfIncSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER) as "ID", col(SalesOrderVariables.CREATED_AT) as "DATE"), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+
+    val dfCmr = dfCmrFull.select(ContactListMobileVars.UID, CustomerVariables.ID_CUSTOMER)
+
+    val dfInc = dfCPOT.join(dfCmr, dfCmr(CustomerVariables.ID_CUSTOMER) === dfCPOT(CustomerVariables.CUSTOMER_ID), SQL.LEFT_OUTER)
+      .select(
+        col(ContactListMobileVars.UID) as CustomerVariables.CUSTOMER_ID,
+        col(CustomerVariables.ORDER_0),
+        col(CustomerVariables.ORDER_1),
+        col(CustomerVariables.ORDER_2),
+        col(CustomerVariables.ORDER_3),
+        col(CustomerVariables.ORDER_4),
+        col(CustomerVariables.ORDER_5),
+        col(CustomerVariables.ORDER_6),
+        col(CustomerVariables.ORDER_7),
+        col(CustomerVariables.ORDER_8),
+        col(CustomerVariables.ORDER_9),
+        col(CustomerVariables.ORDER_10),
+        col(CustomerVariables.ORDER_11)
+      )
 
     if (dfFullCPOTPart2 != null) {
       val dfIncrVarBC = Spark.getContext().broadcast(dfInc).value
@@ -122,19 +141,21 @@ object CustomerPreferredTimeslotPart2 extends Logging {
    * @param prevDate
    * @return
    */
-  def readDF(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame) = {
+  def readDF(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame) = {
+
+    val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
 
     if (paths != null) {
 
       val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
 
-      (dfIncSalesOrder, null)
+      (dfIncSalesOrder, null, dfCmr)
     } else {
 
       val dfIncSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
       val dfFullCPOTPart2 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
 
-      (dfIncSalesOrder, dfFullCPOTPart2)
+      (dfIncSalesOrder, dfFullCPOTPart2, dfCmr)
     }
   }
 
