@@ -55,7 +55,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
 
     val dfCmr = dfCmrFull.select(ContactListMobileVars.UID, CustomerVariables.ID_CUSTOMER)
 
-    val dfInc = dfCPOT.join(dfCmr, dfCmr(CustomerVariables.ID_CUSTOMER) === dfCPOT(CustomerVariables.CUSTOMER_ID), SQL.LEFT_OUTER)
+    val dfInc = dfCPOT.join(dfCmr, dfCmr(CustomerVariables.ID_CUSTOMER).cast(toString) === dfCPOT(CustomerVariables.CUSTOMER_ID), SQL.LEFT_OUTER)
       .select(
         col(ContactListMobileVars.UID) as CustomerVariables.CUSTOMER_ID,
         col(CustomerVariables.ORDER_0),

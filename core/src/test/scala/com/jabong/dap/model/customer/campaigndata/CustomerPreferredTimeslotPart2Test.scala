@@ -26,7 +26,7 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     val dfCPOTFull = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
       CustVarSchema.customersPreferredOrderTimeslotPart2)
 
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfCPOTFull)
+    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfCPOTFull, null)
 
     //    dfInc.collect().foreach(println)
     //    dfInc.printSchema()
