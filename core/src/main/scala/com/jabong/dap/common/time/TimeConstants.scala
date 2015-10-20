@@ -22,4 +22,6 @@ object TimeConstants {
 
   val START_TIME_MS = "00:00:00.0"
   val END_TIME_MS = "23:59:59.9"
+
+  val DD_MMM_YYYY_HH_MM_SS = "dd-MMM-yyyy HH:mm:ss"
 }

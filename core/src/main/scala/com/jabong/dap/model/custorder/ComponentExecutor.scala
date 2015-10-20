@@ -14,6 +14,7 @@ import com.jabong.dap.model.customer.data.DNDMerger
 import com.jabong.dap.model.customer.data.SmsOptOut
 import com.jabong.dap.model.customer.data.CustomerDeviceMapping
 import com.jabong.dap.model.product.itr.BasicITR
+import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
 import com.jabong.dap.quality.campaign.CampaignQualityEntry
 import grizzled.slf4j.Logging
@@ -70,6 +71,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.DCF_FEED_GENERATE => DcfFeedGenerator.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
+          case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
           case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
