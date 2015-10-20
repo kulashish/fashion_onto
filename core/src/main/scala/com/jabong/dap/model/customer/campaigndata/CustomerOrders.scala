@@ -52,7 +52,7 @@ object CustomerOrders {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (salesOrder, salesOrderItem, salesRule, salesRuleSet, salesAddress, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, custOrdersPrevFull) = readDf(incrDate, prevDate)
+    val (salesOrder, salesOrderItem, salesRule, salesRuleSet, salesAddress, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc) = readDf(incrDate, prevDate)
 
     val salesOrderNew = salesOrder.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
@@ -83,18 +83,18 @@ object CustomerOrders {
     DataWriter.writeParquet(salesOrderValue, savePath, DataSets.DAILY_MODE)
 
 
-    val mergedVariables = merger(salesRevenueVariables, salesDiscount, salesInvalid, salesCatBrick, salesOrderValue, custOrdersPrevFull)
+    val mergedVariables = merger(salesRevenueVariables, salesDiscount, salesInvalid, salesCatBrick, salesOrderValue)
 
 
   }
 
 
-  def merger(salesRevenueVariables: DataFrame, salesDiscount: DataFrame, salesInvalid: DataFrame, salesCatBrick: DataFrame, salesOrderValue: DataFrame, prevFUll: DataFrame):DataFrame={
+  def merger(salesRevenueVariables: DataFrame, salesDiscount: DataFrame, salesInvalid: DataFrame, salesCatBrick: DataFrame, salesOrderValue: DataFrame):DataFrame={
 
     null
   }
 
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
     val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
     val salesOrderItem = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.FULL_MERGE_MODE, prevDate)
@@ -123,9 +123,8 @@ object CustomerOrders {
 
     val salesOrderValueCalc = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_ORDERS_VALUE, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
 
-    (salesOrder, salesOrderItem, salesRule, salesRuleSet, salesAddress, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, custOrdersPrevFull)
+    (salesOrder, salesOrderItem, salesRule, salesRuleSet, salesAddress, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc)
   }
 
 }
