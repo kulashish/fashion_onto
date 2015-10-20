@@ -1,19 +1,19 @@
 package com.jabong.dap.model.responsys.campaigndata
 
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.UdfUtils
-import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.common.{OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -55,37 +55,39 @@ object CustomerPreferredTimeslotPart1 {
 
     if (dfPrevFullCPOTPart1 != null) {
 
+      val dfIncrVarBC = Spark.getContext().broadcast(dfIncCPOTPart1).value
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfIncCPOTPart1, dfPrevFullCPOTPart1, CustomerVariables.CUSTOMER_ID)
+      val joinDF = dfPrevFullCPOTPart1.join(dfIncrVarBC, dfPrevFullCPOTPart1(CustomerVariables.CUSTOMER_ID) === dfIncrVarBC(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
+        //MergeUtils.joinOldAndNewDF(dfIncrVarBC, dfPrevFullCPOTPart1, CustomerVariables.CUSTOMER_ID)
 
       val dfFull = joinDF.select(
-        coalesce(joinDF(MergeUtils.NEW_ + CustomerVariables.CUSTOMER_ID), joinDF(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_0).+(joinDF(CustomerVariables.OPEN_0)) as CustomerVariables.OPEN_0,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_1).+(joinDF(CustomerVariables.OPEN_1)) as CustomerVariables.OPEN_1,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_2).+(joinDF(CustomerVariables.OPEN_2)) as CustomerVariables.OPEN_2,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_3).+(joinDF(CustomerVariables.OPEN_3)) as CustomerVariables.OPEN_3,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_4).+(joinDF(CustomerVariables.OPEN_4)) as CustomerVariables.OPEN_4,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_5).+(joinDF(CustomerVariables.OPEN_5)) as CustomerVariables.OPEN_5,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_6).+(joinDF(CustomerVariables.OPEN_6)) as CustomerVariables.OPEN_6,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_7).+(joinDF(CustomerVariables.OPEN_7)) as CustomerVariables.OPEN_7,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_8).+(joinDF(CustomerVariables.OPEN_8)) as CustomerVariables.OPEN_8,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_9).+(joinDF(CustomerVariables.OPEN_9)) as CustomerVariables.OPEN_9,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_10).+(joinDF(CustomerVariables.OPEN_10)) as CustomerVariables.OPEN_10,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.OPEN_11).+(joinDF(CustomerVariables.OPEN_11)) as CustomerVariables.OPEN_11,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_0).+(joinDF(CustomerVariables.CLICK_0)) as CustomerVariables.CLICK_0,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_1).+(joinDF(CustomerVariables.CLICK_1)) as CustomerVariables.CLICK_1,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_2).+(joinDF(CustomerVariables.CLICK_2)) as CustomerVariables.CLICK_2,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_3).+(joinDF(CustomerVariables.CLICK_3)) as CustomerVariables.CLICK_3,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_4).+(joinDF(CustomerVariables.CLICK_4)) as CustomerVariables.CLICK_4,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_5).+(joinDF(CustomerVariables.CLICK_5)) as CustomerVariables.CLICK_5,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_6).+(joinDF(CustomerVariables.CLICK_6)) as CustomerVariables.CLICK_6,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_7).+(joinDF(CustomerVariables.CLICK_7)) as CustomerVariables.CLICK_7,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_8).+(joinDF(CustomerVariables.CLICK_8)) as CustomerVariables.CLICK_8,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_9).+(joinDF(CustomerVariables.CLICK_9)) as CustomerVariables.CLICK_9,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_10).+(joinDF(CustomerVariables.CLICK_10)) as CustomerVariables.CLICK_10,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.CLICK_11).+(joinDF(CustomerVariables.CLICK_11)) as CustomerVariables.CLICK_11,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.PREFERRED_OPEN_TIMESLOT).+(joinDF(CustomerVariables.PREFERRED_OPEN_TIMESLOT)) as CustomerVariables.PREFERRED_OPEN_TIMESLOT,
-        joinDF(MergeUtils.NEW_ + CustomerVariables.PREFERRED_CLICK_TIMESLOT).+(joinDF(CustomerVariables.PREFERRED_CLICK_TIMESLOT)) as CustomerVariables.PREFERRED_CLICK_TIMESLOT)
+        coalesce(dfIncrVarBC(CustomerVariables.CUSTOMER_ID), dfPrevFullCPOTPart1(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+        dfIncrVarBC(CustomerVariables.OPEN_0)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_0) as CustomerVariables.OPEN_0,
+        dfIncrVarBC(CustomerVariables.OPEN_1)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_1) as CustomerVariables.OPEN_1,
+        dfIncrVarBC(CustomerVariables.OPEN_2)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_2) as CustomerVariables.OPEN_2,
+        dfIncrVarBC(CustomerVariables.OPEN_3)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_3) as CustomerVariables.OPEN_3,
+        dfIncrVarBC(CustomerVariables.OPEN_4)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_4) as CustomerVariables.OPEN_4,
+        dfIncrVarBC(CustomerVariables.OPEN_5)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_5) as CustomerVariables.OPEN_5,
+        dfIncrVarBC(CustomerVariables.OPEN_6)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_6) as CustomerVariables.OPEN_6,
+        dfIncrVarBC(CustomerVariables.OPEN_7)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_7) as CustomerVariables.OPEN_7,
+        dfIncrVarBC(CustomerVariables.OPEN_8)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_8) as CustomerVariables.OPEN_8,
+        dfIncrVarBC(CustomerVariables.OPEN_9)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_9) as CustomerVariables.OPEN_9,
+        dfIncrVarBC(CustomerVariables.OPEN_10)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_10) as CustomerVariables.OPEN_10,
+        dfIncrVarBC(CustomerVariables.OPEN_11)+dfPrevFullCPOTPart1(CustomerVariables.OPEN_11) as CustomerVariables.OPEN_11,
+        dfIncrVarBC(CustomerVariables.CLICK_0)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_0) as CustomerVariables.CLICK_0,
+        dfIncrVarBC(CustomerVariables.CLICK_1)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_1) as CustomerVariables.CLICK_1,
+        dfIncrVarBC(CustomerVariables.CLICK_2)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_2) as CustomerVariables.CLICK_2,
+        dfIncrVarBC(CustomerVariables.CLICK_3)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_3) as CustomerVariables.CLICK_3,
+        dfIncrVarBC(CustomerVariables.CLICK_4)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_4) as CustomerVariables.CLICK_4,
+        dfIncrVarBC(CustomerVariables.CLICK_5)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_5) as CustomerVariables.CLICK_5,
+        dfIncrVarBC(CustomerVariables.CLICK_6)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_6) as CustomerVariables.CLICK_6,
+        dfIncrVarBC(CustomerVariables.CLICK_7)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_7) as CustomerVariables.CLICK_7,
+        dfIncrVarBC(CustomerVariables.CLICK_8)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_8) as CustomerVariables.CLICK_8,
+        dfIncrVarBC(CustomerVariables.CLICK_9)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_9) as CustomerVariables.CLICK_9,
+        dfIncrVarBC(CustomerVariables.CLICK_10)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_10) as CustomerVariables.CLICK_10,
+        dfIncrVarBC(CustomerVariables.CLICK_11)+dfPrevFullCPOTPart1(CustomerVariables.CLICK_11) as CustomerVariables.CLICK_11,
+        dfIncrVarBC(CustomerVariables.PREFERRED_OPEN_TIMESLOT)+dfPrevFullCPOTPart1(CustomerVariables.PREFERRED_OPEN_TIMESLOT) as CustomerVariables.PREFERRED_OPEN_TIMESLOT,
+        dfIncrVarBC(CustomerVariables.PREFERRED_CLICK_TIMESLOT)+dfPrevFullCPOTPart1(CustomerVariables.PREFERRED_CLICK_TIMESLOT) as CustomerVariables.PREFERRED_CLICK_TIMESLOT)
 
       val rowRDD = dfFull.map(r => (Row(
         r(0),
