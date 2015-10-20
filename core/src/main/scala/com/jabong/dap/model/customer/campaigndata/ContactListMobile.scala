@@ -153,40 +153,43 @@ object ContactListMobile extends Logging {
       DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
     }
 
-    val dfCsv = dfContactListMobileIncr.select(
-      col(ContactListMobileVars.UID),
-      col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
-      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
-      col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
-      col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
-      col(CustomerVariables.CITY) as ContactListMobileVars.CITY,
-      col(ContactListMobileVars.COUNTRY),
-      col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
-      col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
-      col(ContactListMobileVars.DOB),
-      col(ContactListMobileVars.MVP_TYPE),
-      col(ContactListMobileVars.NET_ORDERS),
-      Udf.dateCsvFormat(col(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
-      col(CustomerVariables.GENDER) as ContactListMobileVars.GENDER,
-      Udf.dateCsvFormat(col(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
-      col(CustomerSegmentsVariables.SEGMENT) as ContactListMobileVars.SEGMENT,
-      col(ContactListMobileVars.AGE),
-      col(ContactListMobileVars.PLATINUM_STATUS),
-      col(ContactListMobileVars.IS_REFERED),
-      Udf.dateCsvFormat(col(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
-      col(ContactListMobileVars.VERIFICATION_STATUS),
-      Udf.dateCsvFormat(col(CustomerVariables.LAST_UPDATED_AT)) as ContactListMobileVars.LAST_UPDATE_DATE,
-      col(ContactListMobileVars.UNSUB_KEY),
-      col(ContactListMobileVars.CITY_TIER),
-      col(ContactListMobileVars.STATE_ZONE),
-      col(CustomerSegmentsVariables.DISCOUNT_SCORE) as ContactListMobileVars.DISCOUNT_SCORE
-    ).na.fill("")
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
+    if (null != dfContactListMobilePrevFull) {
+      val dfCsv = dfContactListMobileIncr.select(
+        col(ContactListMobileVars.UID),
+        col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
+        col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
+        col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
+        col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
+        col(CustomerVariables.CITY) as ContactListMobileVars.CITY,
+        col(ContactListMobileVars.COUNTRY),
+        col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
+        col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
+        col(ContactListMobileVars.DOB),
+        col(ContactListMobileVars.MVP_TYPE),
+        col(ContactListMobileVars.NET_ORDERS),
+        Udf.dateCsvFormat(col(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
+        col(CustomerVariables.GENDER) as ContactListMobileVars.GENDER,
+        Udf.dateCsvFormat(col(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
+        col(CustomerSegmentsVariables.SEGMENT) as ContactListMobileVars.SEGMENT,
+        col(ContactListMobileVars.AGE),
+        col(ContactListMobileVars.PLATINUM_STATUS),
+        col(ContactListMobileVars.IS_REFERED),
+        Udf.dateCsvFormat(col(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
+        col(ContactListMobileVars.VERIFICATION_STATUS),
+        Udf.dateCsvFormat(col(CustomerVariables.LAST_UPDATED_AT)) as ContactListMobileVars.LAST_UPDATE_DATE,
+        col(ContactListMobileVars.UNSUB_KEY),
+        col(ContactListMobileVars.CITY_TIER),
+        col(ContactListMobileVars.STATE_ZONE),
+        col(CustomerSegmentsVariables.DISCOUNT_SCORE) as ContactListMobileVars.DISCOUNT_SCORE
+      ).na.fill("")
 
-    NewsletterDataList.writeNLDataList(dfContactListMobileFull, dfContactListMobilePrevFull, incrDate)
+      val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    AppEmailFeed.writeAppEmailFeed(dfContactListMobileFull, dfContactListMobilePrevFull, incrDate)
+      NewsletterDataList.writeNLDataList(dfContactListMobileFull, dfContactListMobilePrevFull, incrDate)
+
+      AppEmailFeed.writeAppEmailFeed(dfContactListMobileFull, dfContactListMobilePrevFull, incrDate)
+    }
 
   }
 
