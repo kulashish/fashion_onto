@@ -248,49 +248,49 @@ object ContactListMobile extends Logging {
 
         coalesce(dfIncrVarBC(ContactListMobileVars.UID), dfContactListMobilePrevFull(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
 
-        Udf.latestString(dfContactListMobilePrevFull(CustomerVariables.EMAIL), dfIncrVarBC(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        coalesce(dfIncrVarBC(CustomerVariables.EMAIL), dfContactListMobilePrevFull(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
 
-        Udf.latestString(dfContactListMobilePrevFull(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), dfIncrVarBC(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        coalesce(dfIncrVarBC(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), dfContactListMobilePrevFull(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
 
-        Udf.latestString(dfContactListMobilePrevFull(CustomerVariables.PHONE), dfIncrVarBC(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+        coalesce(dfIncrVarBC(CustomerVariables.PHONE), dfContactListMobilePrevFull(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.MOBILE_PERMISION_STATUS), dfContactListMobilePrevFull(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
 
-        Udf.latestString(dfContactListMobilePrevFull(CustomerVariables.CITY), dfIncrVarBC(CustomerVariables.CITY)) as CustomerVariables.CITY,
+        coalesce(dfIncrVarBC(CustomerVariables.CITY), dfContactListMobilePrevFull(CustomerVariables.CITY)) as CustomerVariables.CITY,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.COUNTRY), dfContactListMobilePrevFull(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
 
-        Udf.latestString(dfContactListMobilePrevFull(CustomerVariables.FIRST_NAME), dfIncrVarBC(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+        coalesce(dfIncrVarBC(CustomerVariables.FIRST_NAME), dfContactListMobilePrevFull(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
 
-        Udf.latestString(dfContactListMobilePrevFull(CustomerVariables.LAST_NAME), dfIncrVarBC(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+        coalesce(dfIncrVarBC(CustomerVariables.LAST_NAME), dfContactListMobilePrevFull(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
 
-        Udf.latestDate(dfContactListMobilePrevFull(ContactListMobileVars.DOB), dfIncrVarBC(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
+        coalesce(dfIncrVarBC(ContactListMobileVars.DOB), dfContactListMobilePrevFull(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.MVP_TYPE), dfContactListMobilePrevFull(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
 
-        dfIncrVarBC(ContactListMobileVars.NET_ORDERS) + dfContactListMobilePrevFull(ContactListMobileVars.NET_ORDERS) as ContactListMobileVars.NET_ORDERS,
+        dfIncrVarBC(ContactListMobileVars.NET_ORDERS).+(dfContactListMobilePrevFull(ContactListMobileVars.NET_ORDERS)) as ContactListMobileVars.NET_ORDERS,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.LAST_ORDER_DATE), dfContactListMobilePrevFull(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
 
-        Udf.latestString(dfContactListMobilePrevFull(CustomerVariables.GENDER), dfIncrVarBC(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
+        coalesce(dfIncrVarBC(CustomerVariables.GENDER), dfContactListMobilePrevFull(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
 
-        Udf.minTimestamp(dfContactListMobilePrevFull(ContactListMobileVars.REG_DATE), dfIncrVarBC(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
+        Udf.minTimestamp(dfIncrVarBC(ContactListMobileVars.REG_DATE), dfContactListMobilePrevFull(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
 
         coalesce(dfIncrVarBC(CustomerSegmentsVariables.SEGMENT), dfContactListMobilePrevFull(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.AGE), dfContactListMobilePrevFull(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
 
-        Udf.latestString(dfContactListMobilePrevFull(ContactListMobileVars.PLATINUM_STATUS), dfIncrVarBC(ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
+        coalesce(dfIncrVarBC(ContactListMobileVars.PLATINUM_STATUS), dfContactListMobilePrevFull(ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.IS_REFERED), dfContactListMobilePrevFull(ContactListMobileVars.IS_REFERED)) as ContactListMobileVars.IS_REFERED, //IS_REFERRED
 
-        Udf.latestTimestamp(dfContactListMobilePrevFull(ContactListMobileVars.NL_SUB_DATE), dfIncrVarBC(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
+        coalesce(dfIncrVarBC(ContactListMobileVars.NL_SUB_DATE), dfContactListMobilePrevFull(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.VERIFICATION_STATUS), dfContactListMobilePrevFull(ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
 
-        Udf.maxTimestamp(dfContactListMobilePrevFull(CustomerVariables.LAST_UPDATED_AT), dfIncrVarBC(CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
+        Udf.maxTimestamp(dfIncrVarBC(CustomerVariables.LAST_UPDATED_AT), dfContactListMobilePrevFull(CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
 
-        Udf.latestString(dfContactListMobilePrevFull(ContactListMobileVars.UNSUB_KEY), dfIncrVarBC(ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
+        coalesce(dfIncrVarBC(ContactListMobileVars.UNSUB_KEY), dfContactListMobilePrevFull(ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.CITY_TIER), dfContactListMobilePrevFull(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
 
@@ -304,7 +304,7 @@ object ContactListMobile extends Logging {
 
         coalesce(dfIncrVarBC(SalesOrderItemVariables.FAV_BRAND), dfContactListMobilePrevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
 
-        coalesce(dfContactListMobilePrevFull(NewsletterVariables.STATUS), dfIncrVarBC(NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
+        coalesce(dfIncrVarBC(NewsletterVariables.STATUS), dfContactListMobilePrevFull(NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.DND), dfContactListMobilePrevFull(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
       )
