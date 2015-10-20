@@ -75,4 +75,6 @@ object SalesOrderVariables {
   val ORDERS_COUNT = "orders_count"
   val CATEGORY_PENETRATION  = "CATEGORY_PENETRATION"
   val BRICK_PENETRATION = "BRICK_PENETRATION"
+
+  val NEW_ = "new_"
 }

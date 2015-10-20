@@ -21,5 +21,8 @@ object NewsletterVariables {
   val SRC_SUB = "src_sub"
   val SRC_UNSUB = "src_unsub"
   val FREQUENCY = "frequency"
+  val CUSTOMER_ID = "customer_id"
+  val EMAIL_SUBSCRIPTION_STATUS = "email_subscription_status"
+  val CUR_NL_STATUS = "cur_nl_status"
 
 }

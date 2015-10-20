@@ -13,10 +13,15 @@ object TimeConstants {
   val START_TIME = "00:00:00"
   val END_TIME = "23:59:59"
 
+  val START_MIN = "00:00"
+  val END_MIN = "59:59"
+
   val YYYYMMDD = "yyyyMMdd"
   //used for day name
   val EEEE = "EEEE"
 
   val START_TIME_MS = "00:00:00.0"
   val END_TIME_MS = "23:59:59.9"
+
+  val DD_MMM_YYYY_HH_MM_SS = "dd-MMM-yyyy HH:mm:ss"
 }

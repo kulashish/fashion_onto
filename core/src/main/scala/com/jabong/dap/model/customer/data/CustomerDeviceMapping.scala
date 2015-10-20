@@ -28,7 +28,7 @@ object CustomerDeviceMapping extends Logging {
    * @param customer customer incremental data
    * @return master customer device mapping with the last used device by the customer
    */
-  def getLatestDevice(clickStreamInc: DataFrame, cmr: DataFrame, customer: DataFrame): DataFrame = {
+  def getLatestDevice(clickStreamInc: DataFrame, cmr: DataFrame, customer: DataFrame, nlsIncr: DataFrame): DataFrame = {
     // val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
     println("clickStreamInc: ") // + clickStreamInc.count())
     // clickStreamInc.printSchema()
@@ -49,6 +49,7 @@ object CustomerDeviceMapping extends Logging {
     // outerjoin with customer table one day increment on userid = email
     // id_customer, email, browser_id, domain
     val custUnq = customer.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
+
     val broCust = Spark.getContext().broadcast(custUnq).value
     val joinedDf = clickStream.join(broCust, broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
       .select(
@@ -62,14 +63,27 @@ object CustomerDeviceMapping extends Logging {
     // joinedDf.printSchema()
     // joinedDf.show(10)
 
-    val joined = joinedDf.join(cmr, cmr(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), SQL.FULL_OUTER)
+    val nlsUnq = nlsIncr.select(CustomerVariables.FK_CUSTOMER, CustomerVariables.EMAIL).filter(nlsIncr(CustomerVariables.FK_CUSTOMER).isNull)
+
+    val nlsbc = Spark.getContext().broadcast(nlsUnq).value
+
+    val nlsJoined = joinedDf.join(nlsbc, nlsbc(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
+        coalesce(broCust(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        joinedDf(CustomerVariables.ID_CUSTOMER),
+        joinedDf(PageVisitVariables.BROWSER_ID),
+        joinedDf(PageVisitVariables.DOMAIN)
+
+      )
+
+    val joined = nlsJoined.join(cmr, cmr(CustomerVariables.EMAIL) === nlsJoined(CustomerVariables.EMAIL), SQL.FULL_OUTER)
+      .select(
+        cmr(ContactListMobileVars.UID),
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
-        cmr(ContactListMobileVars.UID),
-        coalesce(joinedDf(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
-        coalesce(joinedDf(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
-        coalesce(joinedDf(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
+        coalesce(nlsJoined(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(nlsJoined(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
+        coalesce(nlsJoined(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
       )
 
     println("After outer join with dcf or prev days data for device Mapping: " + joined.count())
@@ -122,8 +136,13 @@ object CustomerDeviceMapping extends Logging {
         cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
       }
       val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
-      val res = getLatestDevice(clickIncr, cmrFull, customerIncr)
+      val nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
 
+      val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
+
+      //val filledUid = UUIDGenerator.addUid(res)
+
+      //DataWriter.writeParquet(filledUid, savePath, saveMode)
       DataWriter.writeParquet(res, savePath, saveMode)
     }
   }

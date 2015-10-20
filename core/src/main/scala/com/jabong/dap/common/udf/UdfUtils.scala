@@ -7,6 +7,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
+import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.spark.sql.Row
@@ -17,7 +18,7 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 /**
  * Created by raghu on 3/7/15.
  */
-object UdfUtils {
+object UdfUtils extends Logging {
 
   def csvDateFormat(s: Timestamp): String = {
     return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
@@ -53,21 +54,29 @@ object UdfUtils {
       s
   }
 
-  def markDnd(mNo: String): String= {
+  def markDnd(mNo: String): String = {
     var newId: String = null
-    if(null == mNo){
+    if (null == mNo) {
       "0"
     } else {
       "1"
     }
   }
 
-  def markMps(mNo: String): String= {
+  def markMps(mNo: String): String = {
     var newId: String = null
-    if(null == mNo){
-      "i"
+    if (null == mNo) {
+      "I"
     } else {
-      "o"
+      "O"
+    }
+  }
+
+  def platinumStatus(rewardType: String): Int = {
+    if (null != rewardType && "Platinum".equalsIgnoreCase(rewardType)) {
+      1
+    } else {
+      0
     }
   }
 
@@ -224,20 +233,39 @@ object UdfUtils {
    * @param iterable
    * @return Tuple2[String, Int]
    */
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple2[String, Int] = {
+  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
 
-    var timeSlotArray = new Array[Int](12)
+    logger.info("Enter in getCompleteSlotData:")
 
-    var maxSlot: Int = -1
+    val timeSlotArray = new Array[Int](12)
 
-    var max: Int = -1
+    var maxSlot: Int = 0
+
+    var max: Int = 0
 
     iterable.foreach {
       case (slot, value) =>
         if (value > max) { maxSlot = slot; max = value };
-        timeSlotArray(slot - 1) = value
+        timeSlotArray(slot) = value
     }
-    new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
+
+    logger.info("Exit from  getCompleteSlotData: ")
+
+    new Tuple13(
+      timeSlotArray(0),
+      timeSlotArray(1),
+      timeSlotArray(2),
+      timeSlotArray(3),
+      timeSlotArray(4),
+      timeSlotArray(5),
+      timeSlotArray(6),
+      timeSlotArray(7),
+      timeSlotArray(8),
+      timeSlotArray(9),
+      timeSlotArray(10),
+      timeSlotArray(11),
+      maxSlot)
+
   }
 
   /**
@@ -604,8 +632,6 @@ object UdfUtils {
     str
   }
 
-
-
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
@@ -629,4 +655,28 @@ object UdfUtils {
     }
     return false
   }
+
+  def BigDecimalToDouble(value: java.math.BigDecimal): Double = {
+    if (value == null) return 0.0
+    return value.doubleValue()
+  }
+
+  def getMaxSlotValue(slotArray: ArrayBuffer[Int]): Int = {
+
+    var maxSlot = 0
+    var max = -1
+
+    for (i <- 0 until slotArray.length) {
+
+      if (slotArray(i) > max) {
+        max = slotArray(i)
+        maxSlot = i
+      }
+
+    }
+
+    return maxSlot
+
+  }
+
 }

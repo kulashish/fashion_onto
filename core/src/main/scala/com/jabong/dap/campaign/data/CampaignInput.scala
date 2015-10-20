@@ -141,6 +141,7 @@ object CampaignInput extends Logging {
       itrData(ITR.BRAND_NAME) as ProductVariables.BRAND,
       itrData(ITR.BRICK) as ProductVariables.BRICK,
       itrData(ITR.PRODUCT_NAME),
+      itrData(ITR.COLOR),
       itrData(ITR.PRICE_BAND),
       itrData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT)
@@ -160,6 +161,8 @@ object CampaignInput extends Logging {
       itrData(ITR.GENDER) as ProductVariables.GENDER,
       itrData(ITR.BRAND_NAME) as ProductVariables.BRAND,
       itrData(ITR.PRICE_BAND),
+      itrData(ITR.COLOR),
+      itrData(ITR.DISCOUNT),
       itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
       itrData(ITR.BRICK),
       itrData(ITR.PRODUCT_NAME),

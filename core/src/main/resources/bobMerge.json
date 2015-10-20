@@ -48,6 +48,13 @@
       "primaryKey": "id_sales_order_item_shipment",
       "mergeMode": "full",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config_additional_info",
+      "primaryKey": "id_catalog_config_additional_info",
+      "mergeMode": "full",
+      "saveMode": "Ignore"
     }
   ]
 }

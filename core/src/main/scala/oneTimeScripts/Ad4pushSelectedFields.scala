@@ -4,14 +4,14 @@ import java.io.File
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.Ad4pushVariables
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SaveMode, DataFrame}
+import org.apache.spark.sql.{ SaveMode, DataFrame }
 import org.apache.spark.sql.functions._
 
 /**
@@ -37,12 +37,12 @@ object Ad4pushSelectedFields {
     writeCsv(res, DataSets.AD4PUSH, SELECTED, DataSets.FULL_MERGE_MODE, curDate, csvFileName, "true", ";")
   }
 
-   def main(args: Array[String]) {
-     val conf = new SparkConf().setAppName("Ad4pushSelectedFields")
-     Spark.init(conf)
-     getSelectedFileds(DataSets.DEVICES_ANDROID, DataSets.ANDROID_CODE)
-     getSelectedFileds(DataSets.DEVICES_IOS, DataSets.IOS_CODE)
-   }
+  def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("Ad4pushSelectedFields")
+    Spark.init(conf)
+    getSelectedFileds(DataSets.DEVICES_ANDROID, DataSets.ANDROID_CODE)
+    getSelectedFileds(DataSets.DEVICES_IOS, DataSets.IOS_CODE)
+  }
 
   def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String, header: String, delimeter: String) {
     val writePath = DataWriter.getWritePath("hdfs://dataplatform-master.jabong.com:8020/data/tmp", source, tableName, mode, date)
