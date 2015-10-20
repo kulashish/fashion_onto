@@ -261,7 +261,7 @@ object CustomerPreferredTimeslotPart1 {
       (dfOpen, dfClick, null)
     } else {
 
-      val dfFullCPOTPart1 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
+      val dfFullCPOTPart1 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
 
       (dfOpen, dfClick, dfFullCPOTPart1)
     }
