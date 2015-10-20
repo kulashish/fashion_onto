@@ -2,13 +2,29 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 
-import org.apache.spark.sql.Row
+import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.constants.variables.SalesOrderVariables
+import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeConstants
+import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.model.customer.schema.CustVarSchema
+import com.jabong.dap.model.order.schema.OrderVarSchema
+import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.functions._
 import org.scalatest.FlatSpec
 
 /**
  * Created by raghu on 3/7/15.
  */
-class UdfUtilsTest extends FlatSpec {
+class UdfUtilsTest extends FlatSpec with SharedSparkContext {
+
+  @transient var dfSalesOrder: DataFrame = _
+
+  override def beforeAll() {
+    super.beforeAll()
+    dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order", Schema.salesOrder)
+  }
 
   //===============================getMin()=============================================================================
   "getMin(): timestamp t1 and t2 value " should "be null" in {
@@ -533,6 +549,27 @@ class UdfUtilsTest extends FlatSpec {
     val result = UdfUtils.getEmailOptInStatus("1", "unsubscribed")
 
     assert(result == "U")
+
+  }
+
+  "getCPOT: Data Frame" should "match to resultant Data Frame" in {
+
+    val result = UdfUtils.getCPOT(dfSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER) as "ID", col(SalesOrderVariables.CREATED_AT) as "DATE"), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+      .limit(30).collect().toSet
+
+    //result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")
+
+    val dfCustomersPreferredOrderTimeslot = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot",
+      CustVarSchema.customersPreferredOrderTimeslotPart2)
+      .collect().toSet
+
+    //    result.collect().foreach(println)
+    //    result.printSchema()
+    //
+    //    dfCustomersPreferredOrderTimeslot.collect().foreach(println)
+    //    dfCustomersPreferredOrderTimeslot.printSchema()
+
+    assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
 
   }
 

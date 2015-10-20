@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.UdfUtils
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -52,7 +52,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
    */
   def getCPOTPart2(dfIncSalesOrder: DataFrame, dfFullCPOTPart2: DataFrame): (DataFrame, DataFrame) = {
 
-    val dfInc = SalesOrder.getCPOT(dfIncSalesOrder).dropDuplicates()
+    val dfInc = UdfUtils.getCPOT(dfIncSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER) as "ID", col(SalesOrderVariables.CREATED_AT) as "DATE"), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
 
     if (dfFullCPOTPart2 != null) {
       val dfIncrVarBC = Spark.getContext().broadcast(dfInc).value
