@@ -54,9 +54,8 @@ object CustomerPreferredTimeslotPart2 extends Logging {
 
     val dfInc = SalesOrder.getCPOT(dfIncSalesOrder).dropDuplicates()
 
-    val dfIncrVar = Spark.getContext().broadcast(dfInc).value
-
     if (dfFullCPOTPart2 != null) {
+      val dfIncrVar = Spark.getContext().broadcast(dfInc).value
 
       //join old and new data frame
       val joinDF = dfFullCPOTPart2.join(dfIncrVar, dfFullCPOTPart2(CustomerVariables.CUSTOMER_ID) === dfIncrVar(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
