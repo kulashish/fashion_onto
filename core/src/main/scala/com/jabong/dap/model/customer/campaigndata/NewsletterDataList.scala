@@ -1,9 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, NewsletterVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, NewsletterVariables}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -12,7 +9,7 @@ import org.apache.spark.sql.functions._
  */
 object NewsletterDataList {
 
-  def writeNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame, incrDate: String) = {
+  def getNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame) : DataFrame = {
 
     val dfNLDataListFull = dfContactListMobileFull.select(
       col(CustomerVariables.EMAIL),
@@ -35,8 +32,7 @@ object NewsletterDataList {
       col(NewsletterVariables.STATUS) as NewsletterVariables.CUR_NL_STATUS
     ).na.fill("")
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfNlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, "53699_83297_" + fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
+    dfNlDataList
 
   }
 
