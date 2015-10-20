@@ -227,7 +227,7 @@ object ContactListMobile extends Logging {
 
     val dfSmsOptOutMerged = dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER).unionAll(dfBlockedNumbers.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged, dfCmrFull)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged, dfCmrFull).cache()
 
     if (null != dfContactListMobilePrevFull) {
 
