@@ -143,6 +143,7 @@ object DataSets {
   val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
   val CUSTOMER_PREFERRED_TIMESLOT_PART1 = "customerPreferredTimeslotPart1"
   val NL_DATA_LIST = "NL_data_list"
+  val CONTACT_LIST_PLUS = "Contact_list_Plus"
   val APP_EMAIL_FEED = "app_email_feed"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"

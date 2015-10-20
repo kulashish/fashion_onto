@@ -103,7 +103,7 @@ object MergeUtils extends MergeData {
    * @param primaryKey
    * @return DataFrame
    */
-  def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
+  private def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
 
     var dfIncrVar = dfIncr.dropDuplicates()
 

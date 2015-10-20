@@ -104,19 +104,6 @@ object UdfUtils extends Logging {
   }
 
   /**
-   * It will return latest value
-   * @param a1
-   * @param a2
-   * @tparam T
-   * @return T
-   */
-  def getLatest[T](a1: T, a2: T): T = {
-
-    if (a2 == null) a1 else a2
-
-  }
-
-  /**
    * This will merge two slots data
    * @param oldSlot
    * @param newSlot

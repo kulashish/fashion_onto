@@ -259,55 +259,6 @@ class UdfUtilsTest extends FlatSpec {
     assert(result == 5)
 
   }
-  //
-  //  //===============================getLatest()============================================================================
-  //  "getLatest(): timestamp t1 and t2 value " should "be null" in {
-  //
-  //    val t1 = null
-  //
-  //    val t2 = null
-  //
-  //    val result = UdfUtils.getLatest(t1, t2)
-  //
-  //    assert(result == t1)
-  //
-  //  }
-
-  "getLatest(): timestamp t1" should "be null" in {
-
-    val t1 = null
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val result = UdfUtils.getLatest(t1, t2)
-
-    assert(result == t2)
-
-  }
-
-  "getLatest(): timestamp t2" should "be null" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val t2 = null
-
-    val result = UdfUtils.getLatest(t1, t2)
-
-    assert(result == t1)
-
-  }
-
-  "getLatest(): return timestamp " should "t2" in {
-
-    val t1 = Timestamp.valueOf("2015-04-30 00:05:07.0")
-
-    val t2 = Timestamp.valueOf("2015-04-30 00:05:09.0")
-
-    val result = UdfUtils.getLatest(t1, t2)
-
-    assert(result == t2)
-
-  }
 
   //===============================getMergeSlots()======================================================================
   "getMergeSlots(): oldSlot and newSlot value " should "be null" in {

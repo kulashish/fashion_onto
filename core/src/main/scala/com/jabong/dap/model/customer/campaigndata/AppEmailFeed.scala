@@ -1,10 +1,8 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ PageVisitVariables, ContactListMobileVars, NewsletterVariables, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -19,7 +17,7 @@ object AppEmailFeed {
   val UID = "uid"
   val DEVICE_ID = "deviceid"
 
-  def writeAppEmailFeed(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame, incrDate: String) = {
+  def getAppEmailFeed(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
 
     val dfAppEmailFeedFull = dfContactListMobileFull.select(
       col(ContactListMobileVars.UID),
@@ -49,8 +47,7 @@ object AppEmailFeed {
       lit(todayStartDate) as PROCESSED_DATE
     ).na.fill("")
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfAppEmailFeed, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate, "53699_80036_" + fileDate + "_app_email_feed", DataSets.IGNORE_SAVEMODE, "true", ";")
+    dfAppEmailFeed
 
   }
 
