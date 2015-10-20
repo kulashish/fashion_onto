@@ -28,7 +28,7 @@ object Ad4pushDeviceMerger extends Logging {
     if (null != path) {
       paths = path.split(";")
     }
-    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
     if (isHistory && null == path && null == OptionUtils.getOptValue(params.fullDate)) {
       logger.error("First full csv path and prev full date both cannot be empty")

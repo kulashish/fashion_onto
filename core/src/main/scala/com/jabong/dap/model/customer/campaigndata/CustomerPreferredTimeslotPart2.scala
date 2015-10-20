@@ -28,7 +28,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val paths = OptionUtils.getOptValue(params.path)
-    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
     val (dfIncSalesOrder, dfFullCPOTPart2) = readDF(paths, incrDate, prevDate)
 
