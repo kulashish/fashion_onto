@@ -60,19 +60,19 @@ object CustomerPreferredTimeslotPart2 extends Logging {
       val joinDF = MergeUtils.joinOldAndNewDF(dfInc, dfFullCPOTPart2, CustomerVariables.CUSTOMER_ID)
 
       val dfFull = joinDF.select(
-        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.CUSTOMER_ID), joinDF(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_0).+(joinDF(CustomerVariables.ORDER_0)) as CustomerVariables.ORDER_0,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_1).+(joinDF(CustomerVariables.ORDER_1)) as CustomerVariables.ORDER_1,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_2).+(joinDF(CustomerVariables.ORDER_2)) as CustomerVariables.ORDER_2,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_3).+(joinDF(CustomerVariables.ORDER_3)) as CustomerVariables.ORDER_3,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_4).+(joinDF(CustomerVariables.ORDER_4)) as CustomerVariables.ORDER_4,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_5).+(joinDF(CustomerVariables.ORDER_5)) as CustomerVariables.ORDER_5,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_6).+(joinDF(CustomerVariables.ORDER_6)) as CustomerVariables.ORDER_6,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_7).+(joinDF(CustomerVariables.ORDER_7)) as CustomerVariables.ORDER_7,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_8).+(joinDF(CustomerVariables.ORDER_8)) as CustomerVariables.ORDER_8,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_9).+(joinDF(CustomerVariables.ORDER_9)) as CustomerVariables.ORDER_9,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_10).+(joinDF(CustomerVariables.ORDER_10)) as CustomerVariables.ORDER_10,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.ORDER_11).+(joinDF(CustomerVariables.ORDER_11)) as CustomerVariables.ORDER_11)
+        coalesce(joinDF(MergeUtils.NEW_ + CustomerVariables.CUSTOMER_ID), joinDF(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_0).+(joinDF(CustomerVariables.ORDER_0)) as CustomerVariables.ORDER_0,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_1).+(joinDF(CustomerVariables.ORDER_1)) as CustomerVariables.ORDER_1,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_2).+(joinDF(CustomerVariables.ORDER_2)) as CustomerVariables.ORDER_2,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_3).+(joinDF(CustomerVariables.ORDER_3)) as CustomerVariables.ORDER_3,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_4).+(joinDF(CustomerVariables.ORDER_4)) as CustomerVariables.ORDER_4,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_5).+(joinDF(CustomerVariables.ORDER_5)) as CustomerVariables.ORDER_5,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_6).+(joinDF(CustomerVariables.ORDER_6)) as CustomerVariables.ORDER_6,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_7).+(joinDF(CustomerVariables.ORDER_7)) as CustomerVariables.ORDER_7,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_8).+(joinDF(CustomerVariables.ORDER_8)) as CustomerVariables.ORDER_8,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_9).+(joinDF(CustomerVariables.ORDER_9)) as CustomerVariables.ORDER_9,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_10).+(joinDF(CustomerVariables.ORDER_10)) as CustomerVariables.ORDER_10,
+        joinDF(MergeUtils.NEW_ + CustomerVariables.ORDER_11).+(joinDF(CustomerVariables.ORDER_11)) as CustomerVariables.ORDER_11)
 
       val rowRDD = dfFull.map(r => (Row(
         r(0),
