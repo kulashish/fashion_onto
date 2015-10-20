@@ -143,6 +143,8 @@ object ContactListMobile extends Logging {
       dfZoneCity,
       dfCmrFull)
 
+    dfContactListMobileIncr.cache()
+
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobileFull)) {
       DataWriter.writeParquet(dfContactListMobileFull, pathContactListMobileFull, saveMode)
@@ -186,9 +188,14 @@ object ContactListMobile extends Logging {
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      NewsletterDataList.writeNLDataList(dfContactListMobileFull, dfContactListMobilePrevFull, incrDate)
+      val dfNlDataList = NewsletterDataList.getNLDataList(dfContactListMobileFull, dfContactListMobilePrevFull)
+      DataWriter.writeCsv(dfNlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      AppEmailFeed.writeAppEmailFeed(dfContactListMobileFull, dfContactListMobilePrevFull, incrDate)
+      val dfAppEmailFeed = AppEmailFeed.getAppEmailFeed(dfContactListMobileFull, dfContactListMobilePrevFull)
+      DataWriter.writeCsv(dfAppEmailFeed, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate, fileDate + "_app_email_feed", DataSets.IGNORE_SAVEMODE, "true", ";")
+
+      val dfContactListPlus = ContactListPlus.getContactListPlus(dfContactListMobileFull, dfContactListMobilePrevFull)
+      DataWriter.writeCsv(dfContactListPlus, DataSets.VARIABLES, DataSets.CONTACT_LIST_PLUS, DataSets.DAILY_MODE, incrDate, fileDate + "_Contact_list_Plus", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
 
   }

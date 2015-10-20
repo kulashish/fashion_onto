@@ -3,7 +3,7 @@
     {
       "source": "contactListMobile",
       "path": "first time",
-      "incrDate": "2015/10/17",
+      "incrDate": "2015/10/16",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
