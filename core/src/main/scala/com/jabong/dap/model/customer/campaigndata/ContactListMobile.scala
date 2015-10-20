@@ -235,67 +235,67 @@ object ContactListMobile extends Logging {
 
       //merge old and new data frame
       val dfFull = joinDF.select(
-        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.UID), joinDF(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
 
-        Udf.latestString(joinDF(CustomerVariables.EMAIL), joinDF(CustomerVariables.NEW_ + CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        Udf.latestString(joinDF(CustomerVariables.EMAIL), joinDF(MergeUtils.NEW_ + CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
 
-        Udf.latestString(joinDF(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        Udf.latestString(joinDF(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), joinDF(MergeUtils.NEW_ + ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
 
-        Udf.latestString(joinDF(CustomerVariables.PHONE), joinDF(CustomerVariables.NEW_ + CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+        Udf.latestString(joinDF(CustomerVariables.PHONE), joinDF(MergeUtils.NEW_ + CustomerVariables.PHONE)) as CustomerVariables.PHONE,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.MOBILE_PERMISION_STATUS), joinDF(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.MOBILE_PERMISION_STATUS), joinDF(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.UID), joinDF(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
+        Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(MergeUtils.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + CampaignMergedFields.DEVICE_ID), joinDF(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.COUNTRY), joinDF(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
 
-        Udf.latestString(joinDF(CustomerVariables.CITY), joinDF(CustomerVariables.NEW_ + CustomerVariables.CITY)) as CustomerVariables.CITY,
+        Udf.latestString(joinDF(CustomerVariables.FIRST_NAME), joinDF(MergeUtils.NEW_ + CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.COUNTRY), joinDF(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
+        Udf.latestString(joinDF(CustomerVariables.LAST_NAME), joinDF(MergeUtils.NEW_ + CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
 
-        Udf.latestString(joinDF(CustomerVariables.FIRST_NAME), joinDF(CustomerVariables.NEW_ + CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+        Udf.latestDate(joinDF(ContactListMobileVars.DOB), joinDF(MergeUtils.NEW_ + ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
 
-        Udf.latestString(joinDF(CustomerVariables.LAST_NAME), joinDF(CustomerVariables.NEW_ + CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.MVP_TYPE), joinDF(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
 
-        Udf.latestDate(joinDF(ContactListMobileVars.DOB), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
+        joinDF(MergeUtils.NEW_ + ContactListMobileVars.NET_ORDERS) + joinDF(ContactListMobileVars.NET_ORDERS) as ContactListMobileVars.NET_ORDERS,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.MVP_TYPE), joinDF(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.LAST_ORDER_DATE), joinDF(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
 
-        joinDF(CustomerVariables.NEW_ + ContactListMobileVars.NET_ORDERS) + joinDF(ContactListMobileVars.NET_ORDERS) as ContactListMobileVars.NET_ORDERS,
+        Udf.latestString(joinDF(CustomerVariables.GENDER), joinDF(MergeUtils.NEW_ + CustomerVariables.GENDER)) as CustomerVariables.GENDER,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + SalesOrderItemVariables.FAV_BRAND), joinDF(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
+        Udf.minTimestamp(joinDF(ContactListMobileVars.REG_DATE), joinDF(MergeUtils.NEW_ + ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.LAST_ORDER_DATE), joinDF(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
+        coalesce(joinDF(MergeUtils.NEW_ + CustomerSegmentsVariables.SEGMENT), joinDF(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
 
-        Udf.latestString(joinDF(CustomerVariables.GENDER), joinDF(CustomerVariables.NEW_ + CustomerVariables.GENDER)) as CustomerVariables.GENDER,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.AGE), joinDF(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
 
-        Udf.minTimestamp(joinDF(ContactListMobileVars.REG_DATE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
+        Udf.latestString(joinDF(ContactListMobileVars.PLATINUM_STATUS), joinDF(MergeUtils.NEW_ + ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.SEGMENT), joinDF(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.IS_REFERED), joinDF(ContactListMobileVars.IS_REFERED)) as ContactListMobileVars.IS_REFERED, //IS_REFERRED
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.AGE), joinDF(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
+        Udf.latestTimestamp(joinDF(ContactListMobileVars.NL_SUB_DATE), joinDF(MergeUtils.NEW_ + ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
 
-        Udf.latestString(joinDF(ContactListMobileVars.PLATINUM_STATUS), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.VERIFICATION_STATUS), joinDF(ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
 
-        lit("") as ContactListMobileVars.IS_REFERED, //IS_REFERRED
+        Udf.maxTimestamp(joinDF(CustomerVariables.LAST_UPDATED_AT), joinDF(MergeUtils.NEW_ + CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
 
-        Udf.latestTimestamp(joinDF(ContactListMobileVars.NL_SUB_DATE), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
+        Udf.latestString(joinDF(ContactListMobileVars.UNSUB_KEY), joinDF(MergeUtils.NEW_ + ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.VERIFICATION_STATUS), joinDF(ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.CITY_TIER), joinDF(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
 
-        Udf.maxTimestamp(joinDF(CustomerVariables.LAST_UPDATED_AT), joinDF(CustomerVariables.NEW_ + CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.STATE_ZONE), joinDF(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE,
 
-        Udf.latestString(joinDF(ContactListMobileVars.UNSUB_KEY), joinDF(CustomerVariables.NEW_ + ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
+        coalesce(joinDF(MergeUtils.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
 
-        coalesce(joinDF(NewsletterVariables.STATUS), joinDF(CustomerVariables.NEW_ + NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
+        coalesce(joinDF(MergeUtils.NEW_ + CustomerVariables.ID_CUSTOMER), joinDF(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.CITY_TIER), joinDF(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
+        coalesce(joinDF(MergeUtils.NEW_ + CampaignMergedFields.DEVICE_ID), joinDF(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.STATE_ZONE), joinDF(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE,
+        coalesce(joinDF(MergeUtils.NEW_ + SalesOrderItemVariables.FAV_BRAND), joinDF(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + CustomerSegmentsVariables.DISCOUNT_SCORE), joinDF(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
+        coalesce(joinDF(NewsletterVariables.STATUS), joinDF(MergeUtils.NEW_ + NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
 
-        coalesce(joinDF(CustomerVariables.NEW_ + ContactListMobileVars.DND), joinDF(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
+        coalesce(joinDF(MergeUtils.NEW_ + ContactListMobileVars.DND), joinDF(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
       )
       (dfFull.except(dfContactListMobilePrevFull), dfFull)
     } else {
@@ -509,32 +509,33 @@ object ContactListMobile extends Logging {
       .select(
         dfJoined(CustomerVariables.ID_CUSTOMER),
         dfJoined(CustomerVariables.EMAIL),
-        dfJoined(ContactListMobileVars.DOB),
-        dfJoined(CustomerVariables.GENDER),
-        dfJoined(ContactListMobileVars.REG_DATE),
-        dfJoined(ContactListMobileVars.VERIFICATION_STATUS),
-        dfJoined(ContactListMobileVars.AGE),
-        dfJoined(ContactListMobileVars.PLATINUM_STATUS),
-        dfJoined(ContactListMobileVars.MVP_TYPE),
-        dfJoined(CustomerSegmentsVariables.SEGMENT),
-        dfJoined(CustomerSegmentsVariables.DISCOUNT_SCORE),
         dfJoined(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
-        dfJoined(ContactListMobileVars.NL_SUB_DATE),
-        dfJoined(ContactListMobileVars.UNSUB_KEY),
-        dfJoined(NewsletterVariables.STATUS),
+        dfJoined(SalesAddressVariables.PHONE),
+        dfJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
         dfJoined(SalesAddressVariables.CITY),
         lit("IN") as ContactListMobileVars.COUNTRY,
         dfJoined(SalesAddressVariables.FIRST_NAME),
         dfJoined(CustomerVariables.LAST_NAME),
-        dfJoined(SalesAddressVariables.PHONE),
-        dfJoined(ContactListMobileVars.LAST_ORDER_DATE),
-        dfJoined(CustomerVariables.LAST_UPDATED_AT),
+        dfJoined(ContactListMobileVars.DOB),
+        dfJoined(ContactListMobileVars.MVP_TYPE),
         dfJoined(ContactListMobileVars.NET_ORDERS),
-        dfJoined(SalesOrderItemVariables.FAV_BRAND),
-        dfJoined(ContactListMobileVars.STATE_ZONE),
+        dfJoined(ContactListMobileVars.LAST_ORDER_DATE),
+        dfJoined(CustomerVariables.GENDER),
+        dfJoined(ContactListMobileVars.REG_DATE),
+        dfJoined(CustomerSegmentsVariables.SEGMENT),
+        dfJoined(ContactListMobileVars.AGE),
+        dfJoined(ContactListMobileVars.PLATINUM_STATUS),
+        lit("") as ContactListMobileVars.IS_REFERED,
+        dfJoined(ContactListMobileVars.NL_SUB_DATE),
+        dfJoined(ContactListMobileVars.VERIFICATION_STATUS),
+        dfJoined(CustomerVariables.LAST_UPDATED_AT),
+        dfJoined(ContactListMobileVars.UNSUB_KEY),
         dfJoined(ContactListMobileVars.CITY_TIER),
+        dfJoined(ContactListMobileVars.STATE_ZONE),
+        dfJoined(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        dfJoined(NewsletterVariables.STATUS),
+        dfJoined(SalesOrderItemVariables.FAV_BRAND),
         dfJoined(ContactListMobileVars.DND),
-        dfJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
         dfCmrFull(ContactListMobileVars.UID),
         Udf.device(dfCmrFull(PageVisitVariables.DOMAIN), dfCmrFull(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
 
