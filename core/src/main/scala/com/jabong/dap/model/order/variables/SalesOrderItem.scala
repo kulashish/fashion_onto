@@ -526,10 +526,10 @@ object SalesOrderItem {
         if(OrderStatus.INVALID != e){
             f=1
         }
-        else if(OrderStatus.CANCELLED.contains(e)){
+        else if(!OrderStatus.CANCELLED.contains(e)){
             g=1
           }
-        else if(OrderStatus.RETURN.contains(e)){
+        else if(!OrderStatus.RETURN.contains(e)){
             h=1
         }
     )
