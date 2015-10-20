@@ -180,6 +180,7 @@ object DataSets {
   val SALES_ITEM_INVALID_CANCEL = "sales_order_invalid_cancel"
   val SALES_ITEM_CAT_BRICK_PEN = "sales_item_cat_brick_pen"
   val SALES_ITEM_ORDERS_VALUE = "sales_item_orders_value"
+  val SALES_ADDRESS_FIRST = "sales_address_first"
   val CUSTOMER_ORDERS = "customer_orders"
 
 

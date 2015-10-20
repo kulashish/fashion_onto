@@ -615,22 +615,22 @@ object SalesOrderItem {
                             max(SalesOrderItemVariables.UNIT_PRICE) as "max_item",
                             count(SalesOrderItemVariables.UNIT_PRICE) as "item_count")
     val orderValue = orderGrp.groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("basket_value") as "MAX_ORDER_BASKET_VALUE",
-        sum("basket_value") as "sum_basket_value",
-        count("basket_value") as  "count_basket_value",
-        max("max_item") as "MAX_ORDER_ITEM_VALUE",
-        sum("item_count") as "order_item_count")
+      .agg(max("basket_value") as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
+        sum("basket_value") as SalesOrderVariables.SUM_BASKET_VALUE,
+        count("basket_value") as  SalesOrderVariables.COUNT_BASKET_VALUE,
+        max("max_item") as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
+        sum("item_count") as SalesOrderVariables.ORDER_ITEM_COUNT)
 
     if (null == prevCalc ){
       orderValue
     } else{
       orderValue.join(prevCalc, orderValue(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
                 .select(coalesce(orderValue(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                        when(orderValue("MAX_ORDER_BASKET_VALUE")> prevCalc("MAX_ORDER_BASKET_VALUE"),orderValue("MAX_ORDER_BASKET_VALUE")).otherwise(prevCalc("MAX_ORDER_BASKET_VALUE")),
-                        when(orderValue("MAX_ORDER_ITEM_VALUE")> prevCalc("MAX_ORDER_ITEM_VALUE"),orderValue("MAX_ORDER_ITEM_VALUE")).otherwise(prevCalc("MAX_ORDER_ITEM_VALUE")),
-                        orderValue("sum_basket_value")+ prevCalc("sum_basket_value") as "sum_basket_value",
-                        orderValue("count_basket_value")+ prevCalc("count_basket_value") as "count_basket_value",
-                        orderValue("order_item_count")+ prevCalc("order_item_count") as "order_item_count"
+                        when(orderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)> prevCalc(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),orderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(prevCalc(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)),
+                        when(orderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)> prevCalc(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),orderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(prevCalc(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)),
+                        orderValue(SalesOrderVariables.SUM_BASKET_VALUE)+ prevCalc(SalesOrderVariables.SUM_BASKET_VALUE) as SalesOrderVariables.SUM_BASKET_VALUE,
+                        orderValue(SalesOrderVariables.COUNT_BASKET_VALUE)+ prevCalc(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.COUNT_BASKET_VALUE,
+                        orderValue(SalesOrderVariables.ORDER_ITEM_COUNT)+ prevCalc(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.ORDER_ITEM_COUNT
                       )
     }
 
