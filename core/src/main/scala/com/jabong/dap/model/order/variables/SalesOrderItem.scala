@@ -44,33 +44,20 @@ object SalesOrderItem {
     val web = getRevenueOrders(webOrders, "_web")
     val mWeb = getRevenueOrders(mWebOrders, "_mweb")
     val joinedData = joinDataFrames(app, web, mWeb)
-    var res7: DataFrame = null
-    var res30: DataFrame = null
-    var res: DataFrame = null
-    if (null == prevFull){
-      val res = addColumnsforBeforeData(joinedData)
-      (joinedData, res)
-    }
-    else{
-      val mergedData = merge(joinedData, prevFull)
-      if(null == before7){
-        res = mergedData
-      }
-      if(null != before7  && null == before30){
-        val res7 = getRevenueDays(before7, mergedData, 7, 30, 90)
-        res= res7
-      }
-      if(null != before7  && null != before30 && null == before90) {
-        val res30 = getRevenueDays(before30, res7, 30, 7, 90)
-        res =res30
-      } else{
-        val res = getRevenueDays(before90, res30, 90, 7, 30)
-      }
-      (joinedData, res)
-    }
+    val mergedData = merge(joinedData, prevFull)
+
+    val res7 = getRevenueDays(before7, mergedData, 7, 30, 90)
+
+    val res30 = getRevenueDays(before30, res7, 30, 7, 90)
+
+    val res = getRevenueDays(before90, res30, 90, 7, 30)
+
+    (joinedData, res)
+
 
   }
 
+  //TODO change this method
   def addColumnsforBeforeData(salesRevenue: DataFrame): DataFrame = {
     salesRevenue.withColumn(SalesOrderItemVariables.ORDERS_COUNT_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
                 .withColumn(SalesOrderItemVariables.ORDERS_COUNT_APP_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
@@ -169,6 +156,9 @@ object SalesOrderItem {
    * @return merged full dataframe
    */
   def merge(inc: DataFrame, full: DataFrame): DataFrame = {
+    if(null==full){
+      addColumnsforBeforeData(inc)
+    }
     val bcInc = Spark.getContext().broadcast(inc).value
     val joinedData = full.join(bcInc, bcInc(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
     val res = joinedData.select(
@@ -325,14 +315,17 @@ object SalesOrderItem {
   }
 
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
-    val bcCurr = Spark.getContext().broadcast(prev)
-    val joinedData = prev.join(bcCurr.value, bcCurr.value(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    if(null == curr){
+      return prev
+    }
+    val bcCurr = Spark.getContext().broadcast(prev).value
+    val joinedData = prev.join(bcCurr, bcCurr(SalesOrderVariables.FK_CUSTOMER) === prev(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
     val res = joinedData.select(
       coalesce(
         prev(SalesOrderVariables.FK_CUSTOMER),
-        bcCurr.value(SalesOrderVariables.FK_CUSTOMER)
+        bcCurr(SalesOrderVariables.FK_CUSTOMER)
       ) as SalesOrderVariables.FK_CUSTOMER,
-      joinedData(SalesOrderItemVariables.ORDERS_COUNT + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT + "_" + days,
+      prev(SalesOrderItemVariables.ORDERS_COUNT + "_" + days) - bcCurr(SalesOrderItemVariables.ORDERS_COUNT_LIFE) as SalesOrderItemVariables.ORDERS_COUNT + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB + "_" + days,
       joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB + "_" + days) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB + "_" + days,
