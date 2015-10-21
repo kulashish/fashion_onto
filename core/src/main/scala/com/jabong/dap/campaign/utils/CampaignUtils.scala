@@ -835,9 +835,9 @@ object CampaignUtils extends Logging {
 
     val campaignData = if (!(campaign.schema.fieldNames.contains(CustomerVariables.EMAIL))) campaign.withColumn(CustomerVariables.EMAIL, lit(null)) else campaign
 
-    val campaignEmailNull = campaignData.filter(CustomerVariables.EMAIL + "is  null").drop(CustomerVariables.EMAIL)
+    val campaignEmailNull = campaignData.filter(CustomerVariables.EMAIL + " is  null").drop(CustomerVariables.EMAIL)
 
-    val campaignEmailNotNull = campaignData.filter(CustomerVariables.EMAIL + "is not null")
+    val campaignEmailNotNull = campaignData.filter(CustomerVariables.EMAIL + " is not null")
       .select(col(CustomerVariables.FK_CUSTOMER),
         col(CustomerVariables.EMAIL),
         col(ProductVariables.SKU_SIMPLE),
