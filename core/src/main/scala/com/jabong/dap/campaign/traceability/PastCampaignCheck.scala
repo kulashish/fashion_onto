@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
@@ -84,7 +84,7 @@ object PastCampaignCheck extends Logging {
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       pastCampaignData = past30DayEmailCampaignMergedData
-      return  emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
+      return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
       pastCampaignData = past30DayMobileCampaignMergedData
       return pushCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
@@ -151,44 +151,43 @@ object PastCampaignCheck extends Logging {
     val customerSkuSelected = dfCustomerSkuSimpleSelected.
       withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(dfCustomerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
-    val customerSkuSelectedEmail = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER +" is null or "+CustomerVariables.FK_CUSTOMER+" < 1" )
+    val customerSkuSelectedEmail = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is null or " + CustomerVariables.FK_CUSTOMER + " < 1")
 
-    val customerSkuSelectedId = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER +" is not null or "+CustomerVariables.FK_CUSTOMER+" >= 1" )
-
+    val customerSkuSelectedId = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is not null or " + CustomerVariables.FK_CUSTOMER + " >= 1")
 
     val pastCampaignNotSendEmail = customerSkuSelectedEmail
-          .join(pastCampaignSendCustomers,
-            (customerSkuSelectedEmail(CustomerVariables.EMAIL) === pastCampaignSendCustomers(ContactListMobileVars.EMAIL))
-              &&
-              ((customerSkuSelectedEmail("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
-                ||
-                (customerSkuSelectedEmail("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
-                ||
-                (customerSkuSelectedEmail("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
-          .filter(
-            CampaignMergedFields.EMAIL + " is null "
-          )
-          .select(
+      .join(pastCampaignSendCustomers,
+        (customerSkuSelectedEmail(CustomerVariables.EMAIL) === pastCampaignSendCustomers(ContactListMobileVars.EMAIL))
+          &&
+          ((customerSkuSelectedEmail("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
+            ||
+            (customerSkuSelectedEmail("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
+            ||
+            (customerSkuSelectedEmail("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
+      .filter(
+        CampaignMergedFields.EMAIL + " is null "
+      )
+      .select(
         customerSkuSelectedEmail("*")
-          )
+      )
 
-        val pastCampaignNotSendCustomersId = customerSkuSelectedId
-          .join(pastCampaignSendCustomers,
-            (customerSkuSelectedId(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID))
-              &&
-              ((customerSkuSelectedId("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
-                ||
-                (customerSkuSelectedId("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
-                ||
-                (customerSkuSelectedId("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
-          .filter(
-            CampaignMergedFields.CUSTOMER_ID + " is null "
-          )
-          .select(
-            customerSkuSelectedId("*")
-          )
+    val pastCampaignNotSendCustomersId = customerSkuSelectedId
+      .join(pastCampaignSendCustomers,
+        (customerSkuSelectedId(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID))
+          &&
+          ((customerSkuSelectedId("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
+            ||
+            (customerSkuSelectedId("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
+            ||
+            (customerSkuSelectedId("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
+      .filter(
+        CampaignMergedFields.CUSTOMER_ID + " is null "
+      )
+      .select(
+        customerSkuSelectedId("*")
+      )
 
-    val pastCampaignNotSendCustomers =  pastCampaignNotSendEmail.unionAll(pastCampaignNotSendCustomersId)
+    val pastCampaignNotSendCustomers = pastCampaignNotSendEmail.unionAll(pastCampaignNotSendCustomersId)
 
     return pastCampaignNotSendCustomers
   }
