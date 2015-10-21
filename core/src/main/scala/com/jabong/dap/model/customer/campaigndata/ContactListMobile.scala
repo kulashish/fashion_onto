@@ -143,7 +143,7 @@ object ContactListMobile extends Logging {
       dfZoneCity,
       dfCmrFull)
 
-    dfContactListMobileIncr.cache()
+    val dfContactListMobileIncrCached = dfContactListMobileIncr.cache()
 
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobileFull)) {
@@ -152,11 +152,11 @@ object ContactListMobile extends Logging {
 
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobile)) {
-      DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
+      DataWriter.writeParquet(dfContactListMobileIncrCached, pathContactListMobile, saveMode)
     }
 
     if (null != dfContactListMobilePrevFull) {
-      val dfCsv = dfContactListMobileIncr.select(
+      val dfCsv = dfContactListMobileIncrCached.select(
         col(ContactListMobileVars.UID),
         col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
@@ -188,13 +188,13 @@ object ContactListMobile extends Logging {
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val dfNlDataList = NewsletterDataList.getNLDataList(dfContactListMobileIncr, dfContactListMobilePrevFull)
+      val dfNlDataList = NewsletterDataList.getNLDataList(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfNlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val dfAppEmailFeed = AppEmailFeed.getAppEmailFeed(dfContactListMobileIncr, dfContactListMobilePrevFull)
+      val dfAppEmailFeed = AppEmailFeed.getAppEmailFeed(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfAppEmailFeed, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate, fileDate + "_app_email_feed", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val dfContactListPlus = ContactListPlus.getContactListPlus(dfContactListMobileIncr, dfContactListMobilePrevFull)
+      val dfContactListPlus = ContactListPlus.getContactListPlus(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfContactListPlus, DataSets.VARIABLES, DataSets.CONTACT_LIST_PLUS, DataSets.DAILY_MODE, incrDate, fileDate + "_Contact_list_Plus", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
 
