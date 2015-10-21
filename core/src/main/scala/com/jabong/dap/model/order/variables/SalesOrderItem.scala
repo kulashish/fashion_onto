@@ -205,8 +205,9 @@ object SalesOrderItem {
 
     if (null != dfFavBrandCalcPrevFull) {
       mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr).dropDuplicates()
-      mostPrefBrandIncr = mostPrefBrandUnion.join(mostPrefBrandJoinedIncr,
-        mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER))
+      val fkCustList = mostPrefBrandJoinedIncr.select(SalesOrderVariables.FK_CUSTOMER).distinct
+      mostPrefBrandIncr = mostPrefBrandUnion.join(fkCustList,
+        fkCustList(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER))
         .select(
           mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
           mostPrefBrandUnion(SalesOrderVariables.ID_SALES_ORDER),
