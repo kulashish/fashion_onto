@@ -102,7 +102,7 @@ object ContactListMobile extends Logging {
     }
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
     val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr)).cache()
-    //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT, FIRST_ORDER_DATE, ORDERS_COUNT, DAYS_SINCE_LAST_ORDER
+    //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT
 
     //SalesOrderItem.getSucessfulOrders for NET_ORDERS for variable
     val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
