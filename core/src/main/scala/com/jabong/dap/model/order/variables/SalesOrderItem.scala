@@ -179,7 +179,7 @@ object SalesOrderItem {
 
     val (favBrandIncr, favBrandUnion) = getMostPreferredBrand(salesOrderJoined, dfFavBrandCalcPrevFull, yestItr)
 
-    (ordersCount.cache(), successOrdersUnion, favBrandIncr.cache(), favBrandUnion)
+    (ordersCount, successOrdersUnion, favBrandIncr, favBrandUnion)
   }
 
   def getMostPreferredBrand(salesOrderJoined: DataFrame, dfFavBrandCalcPrevFull: DataFrame, yestItr: DataFrame): (DataFrame, DataFrame) = {
@@ -204,7 +204,7 @@ object SalesOrderItem {
     var mostPrefBrandUnion = mostPrefBrandJoinedIncr
 
     if (null != dfFavBrandCalcPrevFull) {
-      mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr)
+      mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr).dropDuplicates()
       mostPrefBrandIncr = mostPrefBrandJoinedIncr.join(mostPrefBrandUnion,
         mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
         SQL.LEFT_OUTER)
@@ -219,11 +219,11 @@ object SalesOrderItem {
     val SUM_SPECIAL_PRICE = "sum_special_price"
     val COUNT_BRAND = "count_brand"
 
-    val favBrandIncr = mostPrefBrandIncr.groupBy(SalesOrderVariables.FK_CUSTOMER, ProductVariables.BRAND)
+    val favBrandIncr = (mostPrefBrandIncr.groupBy(SalesOrderVariables.FK_CUSTOMER, ProductVariables.BRAND)
       .agg(count(ProductVariables.BRAND) as COUNT_BRAND, sum(ProductVariables.SPECIAL_PRICE) as SUM_SPECIAL_PRICE)
       .sort(COUNT_BRAND, SUM_SPECIAL_PRICE)
       .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(last(ProductVariables.BRAND) as SalesOrderItemVariables.FAV_BRAND)
+      .agg(last(ProductVariables.BRAND) as SalesOrderItemVariables.FAV_BRAND)).cache()
 
     (favBrandIncr, mostPrefBrandUnion)
   }
@@ -247,8 +247,8 @@ object SalesOrderItem {
       newOrders = successOrdersJoined.except(dfSalesOrderItemCalcPrevFull)
       successOrdersUnion = dfSalesOrderItemCalcPrevFull.unionAll(newOrders)
     }
-    val ordersCount = newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)
+    val ordersCount = (newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)).cache()
 
     (ordersCount, successOrdersUnion)
   }

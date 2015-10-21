@@ -28,10 +28,10 @@ object SalesOrderAddress {
       SalesAddressVariables.LAST_NAME)
     var jData = curFav
     if (null != prevFav) {
-      jData = prevFav.unionAll(curFav)
+      jData = (prevFav.unionAll(curFav)).cache()
     }
 
-    ((getFav(jData)).cache(), jData)
+    (getFav(jData), jData)
   }
 
   def convert2String(str: Any): String = {
