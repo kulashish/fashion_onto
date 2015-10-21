@@ -1,4 +1,4 @@
- package com.jabong.dap.common.constants.variables
+package com.jabong.dap.common.constants.variables
 
 /**
  * Created by samatha on 13/10/15.
@@ -17,7 +17,7 @@ object EmailResponseVariables {
   val LAST_CLICK_DATE = "LAST_CLICK_DATE"
   val OPENS_LIFETIME = "OPENS_LIFETIME"
   val CLICKS_LIFETIME = "CLICKS_LIFETIME"
-  val CUSTOMER_ID= "CUSTOMER_ID"
+  val CUSTOMER_ID = "CUSTOMER_ID"
   val EVENT_CAPTURED_DT = "EVENT_CAPTURED_DT"
   val EVENT_STORED_DT = "EVENT_STORED_DT"
   val LAST_7OPEN_DATE = "LAST_7OPEN_DATE"

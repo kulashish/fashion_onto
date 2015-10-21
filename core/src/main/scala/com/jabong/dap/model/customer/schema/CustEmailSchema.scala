@@ -24,7 +24,7 @@ object CustEmailSchema {
   ))
 
   val effectiveSchema = StructType(Array(
-  StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
+    StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
     StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.LAST_CLICK_DATE, StringType, true),
     StructField(EmailResponseVariables.OPENS_LIFETIME, IntegerType, true),
@@ -38,7 +38,6 @@ object CustEmailSchema {
     StructField(EmailResponseVariables.CLICKS_LIFETIME, IntegerType, true),
     StructField(EmailResponseVariables.CLICK_7DAYS, IntegerType, true),
     StructField(EmailResponseVariables.OPEN_7DAYS, IntegerType, true)
-
 
   ))
 
