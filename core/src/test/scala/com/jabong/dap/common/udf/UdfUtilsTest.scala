@@ -554,7 +554,7 @@ class UdfUtilsTest extends FlatSpec with SharedSparkContext {
 
   "getCPOT: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = UdfUtils.getCPOT(dfSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER) as "ID", col(SalesOrderVariables.CREATED_AT) as "DATE"), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+    val result = UdfUtils.getCPOT(dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
       .limit(30).collect().toSet
 
     //result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")

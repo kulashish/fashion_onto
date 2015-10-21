@@ -162,8 +162,8 @@ object CustomerPreferredTimeslotPart1 {
    */
   def getIncCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): DataFrame = {
 
-    val dfOpenCPOT = UdfUtils.getCPOT(dfOpen.select(col("CUSTOMER_ID") as "ID", col(CustomerVariables.EVENT_CAPTURED_DT) as "DATE"), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
-    val dfClickCPOT = UdfUtils.getCPOT(dfClick.select(col("CUSTOMER_ID") as "ID", col(CustomerVariables.EVENT_CAPTURED_DT) as "DATE"), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfOpenCPOT = UdfUtils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfClickCPOT = UdfUtils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
 
     val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT(CustomerVariables.CUSTOMER_ID))
       .select(

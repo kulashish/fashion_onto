@@ -51,7 +51,7 @@ object CustomerPreferredTimeslotPart2 extends Logging {
    */
   def getCPOTPart2(dfIncSalesOrder: DataFrame, dfFullCPOTPart2: DataFrame, dfCmrFull: DataFrame): (DataFrame, DataFrame) = {
 
-    val dfCPOT = UdfUtils.getCPOT(dfIncSalesOrder.select(col(SalesOrderVariables.FK_CUSTOMER) as "ID", col(SalesOrderVariables.CREATED_AT) as "DATE"), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+    val dfCPOT = UdfUtils.getCPOT(dfIncSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
 
     val dfCmr = dfCmrFull.select(
       dfCmrFull(ContactListMobileVars.UID),

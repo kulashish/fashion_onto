@@ -12,6 +12,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
@@ -669,7 +670,7 @@ object UdfUtils extends Logging {
 
   def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
 
-    val dfSelect = dfIn.sort("ID", "DATE")
+    val dfSelect = dfIn.sort(dfIn.columns(0), dfIn.columns(1))
 
     val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
 
