@@ -84,7 +84,7 @@ object PastCampaignCheck extends Logging {
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       pastCampaignData = past30DayEmailCampaignMergedData
-      return  emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
+      return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
       pastCampaignData = past30DayMobileCampaignMergedData
       return pushCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
