@@ -175,7 +175,7 @@ object CampaignUtils extends Logging {
 
     val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
-      .select(col(CustomerVariables.FK_CUSTOMER),
+      .select(col(CustomerVariables.EMAIL),
         col(ProductVariables.SKU_SIMPLE),
         col(ProductVariables.SPECIAL_PRICE),
         col(ProductVariables.BRICK),
