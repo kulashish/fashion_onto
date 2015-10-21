@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.{Utils, OptionUtils}
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderVariables, SalesRuleSetVariables, SalesOrderItemVariables}
@@ -55,45 +55,46 @@ object CustomerOrders {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (salesOrder, salesOrderItem, salesRule, salesRuleSet, salesAddress, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc) = readDf(incrDate, prevDate)
+    val (salesOrderIncr, salesOrderItemIncr, salesRuleFull, salesRuleSetFull, salesAddressFUll, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull) = readDf(incrDate, prevDate)
 
-    val salesOrderNew = salesOrder.na.fill(Map(
+    val salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val salesOrderNew = salesOrderincr.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
-    val saleOrderJoined = salesOrderNew.join(salesOrderItem, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderVariables.FK_SALES_ORDER))
+    val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
 
     val (joinedData, salesRevenueVariables) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90)
     var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(salesRevenueVariables, savePath, DataSets.DAILY_MODE)
+    DataWriter.writeParquet(salesRevenueVariables, savePath, saveMode)
 
 
-    val salesDiscount = SalesOrderItem.getCouponDisc(salesOrder, salesRule, salesRuleSet, salesRuleCalc)
+    val salesDiscount = SalesOrderItem.getCouponDisc(salesOrderIncr, salesRuleFull, salesRuleSetFull, salesRuleCalc)
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_COUPON_DISC, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(salesDiscount, savePath, DataSets.DAILY_MODE)
+    DataWriter.writeParquet(salesDiscount, savePath, saveMode)
 
     val salesInvalid = SalesOrderItem.getInvalidCancelOrders(saleOrderJoined, salesItemInvalidCalc)
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(salesInvalid, savePath, DataSets.DAILY_MODE)
+    DataWriter.writeParquet(salesInvalid, savePath, saveMode)
 
     val (salesCatBrick, joined) = SalesOrderItem.getCatBrickPen(saleOrderJoined, itr, salesCatBrickCalc)
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(joined, savePath, DataSets.DAILY_MODE)
+    DataWriter.writeParquet(joined, savePath, saveMode)
 
     val salesOrderValue = SalesOrderItem.getOrderValue(saleOrderJoined, salesOrderValueCalc)
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_ORDERS_VALUE, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(salesOrderValue, savePath, DataSets.DAILY_MODE)
+    DataWriter.writeParquet(salesOrderValue, savePath, saveMode)
 
-    val salesAddressFirst = SalesOrderAddress.getFirstShippingCity(salesOrder, salesAddress, salesAddressCalc, cityZone)
+    val salesAddressFirst = SalesOrderAddress.getFirstShippingCity(salesOrderIncr, salesAddressFUll, salesAddressCalc, cityZone)
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ADDRESS_FIRST, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(salesAddressFirst, savePath, DataSets.DAILY_MODE)
+    DataWriter.writeParquet(salesAddressFirst, savePath, saveMode)
 
     val mergedVariables = merger(salesRevenueVariables, salesDiscount, salesInvalid, salesCatBrick, salesOrderValue, salesAddressFirst)
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(mergedVariables, savePath, DataSets.DAILY_MODE)
-
+    DataWriter.writeParquet(mergedVariables, savePath, saveMode)
 
   }
 
@@ -201,25 +202,30 @@ object CustomerOrders {
     res
   }
 
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
-    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
-    val salesOrderItem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, prevDate)
-    val salesRule = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, prevDate)
-    val salesRuleSet = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.DAILY_MODE, prevDate)
-    val salesAddress = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.DAILY_MODE, prevDate)
-    val itr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.BASIC_ITR, DataSets.DAILY_MODE, prevDate)
+    val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, prevDate)
+    var mode:String = DataSets.DAILY_MODE
+    if(null == custOrdersPrevFull){
+      mode = DataSets.FULL
+    }
+    val salesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    val salesOrderItemFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, prevDate)
+    val salesRuleFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL, prevDate)
+    val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL, prevDate)
+    val salesAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL, prevDate)
+    val itr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.BASIC_ITR, mode, prevDate)
     val cityZone = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
 
     val salesRevenuePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, prevDate)
 
-    val before7 = TimeUtils.getDateAfterNDays(7, prevDate)
+    val before7 = TimeUtils.getDateAfterNDays(-7, prevDate)
     val salesRevenue7 = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before7)
 
-    val before30 = TimeUtils.getDateAfterNDays(30, prevDate)
+    val before30 = TimeUtils.getDateAfterNDays(-30, prevDate)
     val salesRevenue30 = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before30)
 
-    val before90 = TimeUtils.getDateAfterNDays(90, prevDate)
+    val before90 = TimeUtils.getDateAfterNDays(-90, prevDate)
     val salesRevenue90 = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before90)
 
     val salesRuleCalc = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_COUPON_DISC, DataSets.DAILY_MODE, prevDate)
@@ -232,7 +238,7 @@ object CustomerOrders {
 
     val salesAddressCalc = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ADDRESS_FIRST, DataSets.DAILY_MODE, prevDate)
 
-    (salesOrder, salesOrderItem, salesRule, salesRuleSet, salesAddress, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc)
+    (salesOrderFull, salesOrderItemFull, salesRuleFull, salesRuleSetFull, salesAddressFull, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull)
   }
 
 }

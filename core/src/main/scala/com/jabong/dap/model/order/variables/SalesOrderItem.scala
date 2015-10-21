@@ -157,7 +157,7 @@ object SalesOrderItem {
    */
   def merge(inc: DataFrame, full: DataFrame): DataFrame = {
     if(null==full){
-      addColumnsforBeforeData(inc)
+      return addColumnsforBeforeData(inc)
     }
     val bcInc = Spark.getContext().broadcast(inc).value
     val joinedData = full.join(bcInc, bcInc(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
@@ -433,17 +433,9 @@ object SalesOrderItem {
       )
 
     if(null == prevCalcu){
-      return joined.select(joined(SalesOrderVariables.FK_CUSTOMER),
-        joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-        joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-        joined(SalesRuleSetVariables.COUPON_SUM),
-        joined(SalesRuleSetVariables.COUPON_COUNT),
-        joined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-        joined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-        joined(SalesRuleSetVariables.DISCOUNT_SUM),
-        joined(SalesRuleSetVariables.DISCOUNT_COUNT))
+      return joined
     } else {
-      prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER))
+      prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
           .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         when(joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
         when(joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
