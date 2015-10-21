@@ -173,5 +173,6 @@ object DataSets {
 
   val OPEN = "open"
   val CLICK = "click"
+  val CUST_EMAIL_RESPONSE = "custEmailResponse"
 
 }

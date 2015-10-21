@@ -79,6 +79,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
+          case DataSets.CUST_EMAIL_RESPONSE => CustEmailResponse.start(paramJob)
 
           //Clickstream data moved from Init.scala
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)
