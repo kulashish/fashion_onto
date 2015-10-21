@@ -101,7 +101,7 @@ object ContactListMobile extends Logging {
       DataWriter.writeParquet(dfSalesOrderAddrFavFull, pathSalesOrderFavFull, saveMode)
     }
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
-    val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr)).cache()
+    val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
     //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT
 
     //SalesOrderItem.getSucessfulOrders for NET_ORDERS for variable
