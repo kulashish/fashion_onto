@@ -103,7 +103,7 @@ object ContactListMobile extends Logging {
     }
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
     //TODO Check logic. Seems to be incorrect
-    val dfSalesOrderCalcFull = SalesOrder.processVariables(dfSalesOrderCalcPrevFull, dfSalesOrderIncr).cache()
+    val dfSalesOrderCalcFull = (SalesOrder.processVariables(dfSalesOrderCalcPrevFull, dfSalesOrderIncr)).cache()
     //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT, FIRST_ORDER_DATE, ORDERS_COUNT, DAYS_SINCE_LAST_ORDER
 
     val pathSalesOrderCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)

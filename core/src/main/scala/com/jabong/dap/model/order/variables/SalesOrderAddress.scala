@@ -31,7 +31,7 @@ object SalesOrderAddress {
       jData = prevFav.unionAll(curFav)
     }
 
-    (getFav(jData), jData)
+    ((getFav(jData)).cache(), jData)
   }
 
   def convert2String(str: Any): String = {

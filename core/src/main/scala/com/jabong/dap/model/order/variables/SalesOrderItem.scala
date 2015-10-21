@@ -179,7 +179,7 @@ object SalesOrderItem {
 
     val (favBrandIncr, favBrandUnion) = getMostPreferredBrand(salesOrderJoined, dfFavBrandCalcPrevFull, yestItr)
 
-    (ordersCount, successOrdersUnion, favBrandIncr, favBrandUnion)
+    (ordersCount.cache(), successOrdersUnion, favBrandIncr.cache(), favBrandUnion)
   }
 
   def getMostPreferredBrand(salesOrderJoined: DataFrame, dfFavBrandCalcPrevFull: DataFrame, yestItr: DataFrame): (DataFrame, DataFrame) = {
