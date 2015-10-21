@@ -205,17 +205,16 @@ object SalesOrderItem {
 
     if (null != dfFavBrandCalcPrevFull) {
       mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr).dropDuplicates()
-//      mostPrefBrandIncr = mostPrefBrandJoinedIncr.join(mostPrefBrandUnion,
-//        mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
-//        SQL.LEFT_OUTER)
-//        .select(
-//          mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
-//          mostPrefBrandUnion(SalesOrderVariables.ID_SALES_ORDER),
-//          mostPrefBrandUnion(SalesOrderItemVariables.SKU),
-//          mostPrefBrandUnion(ProductVariables.BRAND),
-//          mostPrefBrandUnion(ProductVariables.SPECIAL_PRICE))
+      mostPrefBrandIncr = mostPrefBrandUnion.join(mostPrefBrandJoinedIncr,
+        mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER))
+        .select(
+          mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
+          mostPrefBrandUnion(SalesOrderVariables.ID_SALES_ORDER),
+          mostPrefBrandUnion(SalesOrderItemVariables.SKU),
+          mostPrefBrandUnion(ProductVariables.BRAND),
+          mostPrefBrandUnion(ProductVariables.SPECIAL_PRICE))
 
-      mostPrefBrandIncr = mostPrefBrandUnion.filter(col(SalesOrderVariables.FK_CUSTOMER).contains(mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER)))
+//      mostPrefBrandIncr = mostPrefBrandUnion.filter(mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER).contains(mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER)))
     }
 
     val SUM_SPECIAL_PRICE = "sum_special_price"
