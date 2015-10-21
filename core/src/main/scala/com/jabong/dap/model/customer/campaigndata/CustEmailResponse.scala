@@ -113,7 +113,7 @@ object CustEmailResponse extends Logging {
         col(EmailResponseVariables.OPENS_LIFETIME),
         col(EmailResponseVariables.CLICKS_LIFETIME)
       )
-      val fileName = "53699_28344_" + TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "CUST_EMAIL_RESPONSE"
+      val fileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
 
       DataWriter.writeCsv(result, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
 
@@ -148,6 +148,7 @@ object CustEmailResponse extends Logging {
         EmailResponseVariables.CLICK_7DAYS -> 0,
         EmailResponseVariables.OPEN_7DAYS -> 0,
         MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME -> 0,
+
         MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME -> 0
       ))
 
@@ -206,7 +207,8 @@ object CustEmailResponse extends Logging {
 
     val aggOpenData = reduce(dfOpenData, EmailResponseVariables.LAST_OPEN_DATE, EmailResponseVariables.OPENS_TODAY)
 
-    val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, aggOpenData, EmailResponseVariables.CUSTOMER_ID)
+    val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData,CustEmailSchema.effectiveSchema,
+      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
         col(EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE,
         col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPENS_TODAY,

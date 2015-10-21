@@ -9,6 +9,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
+import com.jabong.dap.model.customer.schema.CustEmailSchema
 import org.apache.spark.sql.functions._
 import org.scalatest.FlatSpec
 
@@ -33,7 +34,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     assert(selDf.get(2).toString.equalsIgnoreCase("2"))
 
     val dfOpenData = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN,
-      DataSets.DAILY_MODE, "2015/10/10", "53699_OPEN_20151009.txt", "true", ";")
+      DataSets.DAILY_MODE, "2015/10/09", "53699_OPEN_20151009.txt", "true", ";")
 
     val aggOpenData = reduce(dfOpenData, EmailResponseVariables.LAST_OPEN_DATE, EmailResponseVariables.OPENS_TODAY)
     assert(aggOpenData != null)
@@ -44,7 +45,8 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     // click counts
     assert(selOpenDf.get(2).toString.equalsIgnoreCase("2"))
 
-    val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, aggOpenData, EmailResponseVariables.CUSTOMER_ID)
+    val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
+      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
         col(EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE,
         col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPENS_TODAY,
