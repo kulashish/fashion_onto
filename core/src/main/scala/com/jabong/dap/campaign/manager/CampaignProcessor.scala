@@ -113,18 +113,18 @@ object CampaignProcessor {
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
     val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.FK_CUSTOMER) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
+    val emailData = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.EMAIL) === cmrn(CustomerVariables.EMAIL), SQL.INNER)
       .select(
-        cmr(ContactListMobileVars.UID),
-        bcCampaign(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
+        cmrn(ContactListMobileVars.UID),
+        cmrn(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
         bcCampaign(CampaignMergedFields.REC_SKUS),
         bcCampaign(CampaignCommon.PRIORITY),
         bcCampaign(CampaignMergedFields.LIVE_CART_URL),
-        Udf.email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL
+        bcCampaign(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL
       )
-    campaignDevice
+    emailData
   }
   /**
    * takes union input of all campaigns and return merged campaign list
