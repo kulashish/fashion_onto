@@ -67,6 +67,9 @@ object ContactListMobile extends Logging {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
+    println("incrDate: " + incrDate)
+    println("prevDate: " + prevDate)
+
     //read Data Frames
     val (
       dfCustomerIncr,
