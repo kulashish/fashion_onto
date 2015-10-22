@@ -23,7 +23,7 @@ import org.apache.spark.sql.types.{ DateType, IntegerType }
 object CustEmailResponse extends Logging {
 
   def start(params: ParamInfo) = {
-    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT_FOLDER))
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT))
     val saveMode = params.saveMode
     val path = OptionUtils.getOptValue(params.path)
     emailResponse(incrDate, saveMode, path)
