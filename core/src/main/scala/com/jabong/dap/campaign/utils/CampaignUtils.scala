@@ -784,7 +784,7 @@ object CampaignUtils extends Logging {
       custFilteredWithEmail = custFiltered.filter(!col(CustomerVariables.EMAIL) like ("_app%"))
     }
 
-    var custFilteredPastCampaign: DataFrame = null
+    var custFilteredPastCampaign: DataFrame = custFilteredWithEmail
 
     if (pastCampaignCheck && !testMode) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
