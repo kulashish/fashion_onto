@@ -155,15 +155,18 @@ object PastCampaignCheck extends Logging {
 //
 //    val customerSkuSelectedId = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is not null or " + CustomerVariables.FK_CUSTOMER + " >= 1")
 
+    val customerSkuSelected = customerSkuSimpleSelected.
+      withColumn(ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
+
     val pastCampaignNotSendEmail = customerSkuSimpleSelected
       .join(pastCampaignSendCustomers,
-        (customerSkuSimpleSelected(CustomerVariables.EMAIL) === pastCampaignSendCustomers(ContactListMobileVars.EMAIL))
+        (customerSkuSelected(CustomerVariables.EMAIL) === pastCampaignSendCustomers(ContactListMobileVars.EMAIL))
           &&
-          ((customerSkuSimpleSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
+          ((customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
             ||
-            (customerSkuSimpleSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
+            (customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
             ||
-            (customerSkuSimpleSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
+            (customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
       .filter(
         CampaignMergedFields.EMAIL + " is null "
       )
