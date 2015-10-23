@@ -728,20 +728,10 @@ object CampaignUtils extends Logging {
    */
   def campaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, pastCampaignCheck: Boolean = true, recommendations: DataFrame = null) = {
 
-    var custFiltered = filteredSku
-
-    if (pastCampaignCheck && !testMode) {
-      //past campaign check whether the campaign has been sent to customer in last 30 days
-      custFiltered = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, filteredSku,
-        CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
-    }
-
-    debug(custFiltered, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
-
     if (campaignType.equalsIgnoreCase(DataSets.PUSH_CAMPAIGNS)) {
-      pushCampaignPostProcess(campaignType, campaignName, custFiltered)
+      pushCampaignPostProcess(campaignType, campaignName, filteredSku, pastCampaignCheck)
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
-      emailCampaignPostProcess(campaignType, campaignName, custFiltered, recommendations)
+      emailCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, pastCampaignCheck)
     }
 
   }
@@ -752,14 +742,23 @@ object CampaignUtils extends Logging {
    * @param campaignName
    * @param custFiltered
    */
-  def pushCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame) = {
+  def pushCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, pastCampaignCheck: Boolean) = {
 
     var refSkus: DataFrame = null
+    var custFilteredPastCampaign: DataFrame = null
+
+    if (pastCampaignCheck && !testMode) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      custFilteredPastCampaign = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, custFiltered,
+        CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
+    }
+
+    debug(custFiltered, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
 
     if (campaignName.startsWith("surf")) {
-      refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
+      refSkus = CampaignUtils.generateReferenceSkuForSurf(custFilteredPastCampaign, 1)
     } else {
-      refSkus = CampaignUtils.generateReferenceSku(custFiltered, CampaignCommon.NUMBER_REF_SKUS)
+      refSkus = CampaignUtils.generateReferenceSku(custFilteredPastCampaign, CampaignCommon.NUMBER_REF_SKUS)
     }
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
@@ -776,7 +775,7 @@ object CampaignUtils extends Logging {
    * @param campaignName
    * @param custFiltered
    */
-  def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame) = {
+  def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame, pastCampaignCheck:Boolean) = {
     var custFilteredWithEmail = custFiltered
     if (!testMode && !campaignName.startsWith("surf")) {
       val cmr = CampaignInput.loadCustomerMasterData()
@@ -784,16 +783,25 @@ object CampaignUtils extends Logging {
     } else if (campaignName.startsWith("surf")) {
       custFilteredWithEmail = custFiltered.filter(!col(CustomerVariables.EMAIL) like ("_app%"))
     }
+
+    var custFilteredPastCampaign: DataFrame = null
+
+    if (pastCampaignCheck && !testMode) {
+      //past campaign check whether the campaign has been sent to customer in last 30 days
+      custFilteredPastCampaign = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, custFilteredWithEmail,
+        CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
+    }
+
     var refSkus: DataFrame = null
     if (campaignName.startsWith("acart")) {
       //generate reference sku for acart with acart url
-      refSkus = CampaignUtils.generateReferenceSkusForAcart(custFilteredWithEmail, CampaignCommon.NUMBER_REF_SKUS)
+      refSkus = CampaignUtils.generateReferenceSkusForAcart(custFilteredPastCampaign, CampaignCommon.NUMBER_REF_SKUS)
     } //FIXME: need to handle null customer id for surf campaigns
     //else if (campaignName.startsWith("surf")) {
     // refSkus = CampaignUtils.generateReferenceSkuForSurf(custFiltered, 1)
     //}
     else {
-      refSkus = CampaignUtils.generateReferenceSkus(custFilteredWithEmail, CampaignCommon.NUMBER_REF_SKUS)
+      refSkus = CampaignUtils.generateReferenceSkus(custFilteredPastCampaign, CampaignCommon.NUMBER_REF_SKUS)
     }
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
