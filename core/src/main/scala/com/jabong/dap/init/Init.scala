@@ -35,6 +35,7 @@ object Init {
 
   def main(args: Array[String]) {
     options(args)
+
   }
 
   /**

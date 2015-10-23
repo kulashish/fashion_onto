@@ -136,4 +136,7 @@ object Udf {
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
+  val outputCsvFormat = udf((s: String) => UdfUtils.outputDateFormat(s: String))
+
+
 }

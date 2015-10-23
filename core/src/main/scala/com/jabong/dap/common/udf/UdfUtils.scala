@@ -24,6 +24,9 @@ object UdfUtils extends Logging {
     return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
   }
 
+  def outputDateFormat(s: String): String = {
+    return TimeUtils.changeDateFormat(s, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT)
+  }
   /**
    * min of Timestamp t1 or t2
    * @param t1

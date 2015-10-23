@@ -4,8 +4,9 @@ import java.util.Date
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.EmailResponseVariables
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, EmailResponseVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -34,7 +35,7 @@ object CustEmailResponse extends Logging {
       -1
     else {
 
-      val date = TimeUtils.getDate(value, "dd-MMM-yyyy HH:mm:ss")
+      val date = TimeUtils.getDate(value, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
       val time4mToday = TimeUtils.daysFromToday(date)
       var segment = -1
       if (time4mToday < 15) {
@@ -108,8 +109,8 @@ object CustEmailResponse extends Logging {
         col(EmailResponseVariables.CLICK_7DAYS),
         col(EmailResponseVariables.CLICK_15DAYS),
         col(EmailResponseVariables.CLICK_30DAYS),
-        col(EmailResponseVariables.LAST_OPEN_DATE),
-        col(EmailResponseVariables.LAST_CLICK_DATE),
+        Udf.outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
+        Udf.outputCsvFormat(col(EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE,
         col(EmailResponseVariables.OPENS_LIFETIME),
         col(EmailResponseVariables.CLICKS_LIFETIME)
       )
