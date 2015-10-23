@@ -158,7 +158,7 @@ object PastCampaignCheck extends Logging {
     val customerSkuSelected = customerSkuSimpleSelected.
       withColumn(ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
-    val pastCampaignNotSendEmail = customerSkuSimpleSelected
+    val pastCampaignNotSendEmail = customerSkuSelected
       .join(pastCampaignSendCustomers,
         (customerSkuSelected(CustomerVariables.EMAIL) === pastCampaignSendCustomers(ContactListMobileVars.EMAIL))
           &&
