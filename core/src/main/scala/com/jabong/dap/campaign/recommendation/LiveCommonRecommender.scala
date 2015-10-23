@@ -77,7 +77,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
-    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
