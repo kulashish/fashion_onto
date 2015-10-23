@@ -745,7 +745,7 @@ object CampaignUtils extends Logging {
   def pushCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, pastCampaignCheck: Boolean) = {
 
     var refSkus: DataFrame = null
-    var custFilteredPastCampaign: DataFrame = null
+    var custFilteredPastCampaign: DataFrame = custFiltered
 
     if (pastCampaignCheck && !testMode) {
       //past campaign check whether the campaign has been sent to customer in last 30 days
@@ -753,7 +753,7 @@ object CampaignUtils extends Logging {
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
 
-    debug(custFiltered, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
+    debug(custFilteredPastCampaign, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
 
     if (campaignName.startsWith("surf")) {
       refSkus = CampaignUtils.generateReferenceSkuForSurf(custFilteredPastCampaign, 1)
