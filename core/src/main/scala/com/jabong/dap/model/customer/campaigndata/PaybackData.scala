@@ -68,14 +68,14 @@ object PaybackData {
         lit(1) as "burn_points"
       )
 
-    val dfIciciEarn = dfIcici.join(dfEarn, dfIcici(CustomerVariables.ID_CUSTOMER) === dfEarn(SalesOrderVariables.FK_CUSTOMER))
+    val dfIciciEarn = dfIcici.join(dfEarn, dfIcici(CustomerVariables.ID_CUSTOMER) === dfEarn(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(dfIcici(CustomerVariables.ID_CUSTOMER), dfEarn(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         dfIcici("icici_debitcard"),
         dfEarn("earn_points")
       )
 
-    val dfIciciEarnBurn = dfIciciEarn.join(dfBurn, dfIciciEarn(CustomerVariables.ID_CUSTOMER) === dfBurn(SalesOrderVariables.FK_CUSTOMER))
+    val dfIciciEarnBurn = dfIciciEarn.join(dfBurn, dfIciciEarn(CustomerVariables.ID_CUSTOMER) === dfBurn(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         coalesce(dfIcici(CustomerVariables.ID_CUSTOMER), dfEarn(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         dfIcici("icici_debitcard"),
@@ -99,7 +99,17 @@ object PaybackData {
 
     if (privFullPayback != null) {
 
-      val df = dfInc.filter(dfInc(ContactListMobileVars.UID) !== privFullPayback(ContactListMobileVars.UID))
+      val privPayback = privFullPayback.withColumnRenamed(ContactListMobileVars.UID, "old_" + ContactListMobileVars.UID)
+
+      val df = dfInc.join(dfInc, dfInc(ContactListMobileVars.UID) === privPayback("old_" + ContactListMobileVars.UID), SQL.FULL_OUTER)
+        .filter("old_" + ContactListMobileVars.UID + " is null")
+        .select(
+          dfInc(ContactListMobileVars.UID),
+          dfInc("icici_debitcard"),
+          dfInc("earn_points"),
+          dfInc("burn_points"),
+          dfInc("payback")
+        )
 
       (df, privFullPayback.unionAll(df))
     }
