@@ -93,11 +93,6 @@ object CampaignProcessor {
   def mapEmailCampaignWithCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
 
-    val notNullCampaign = campaign.filter(!(col(CustomerVariables.FK_CUSTOMER) === 0))
-
-    println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
-
-    println("Starting the CMR: ") // + cmr.count())
 
     val cmrn = cmr
       .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
@@ -112,11 +107,11 @@ object CampaignProcessor {
 
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
-    val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
+    val bcCampaign = Spark.getContext().broadcast(campaign).value
     val emailData = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.EMAIL) === cmrn(CustomerVariables.EMAIL), SQL.INNER)
       .select(
         cmrn(ContactListMobileVars.UID),
-        cmrn(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
+        cmrn(CustomerVariables.ID_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
         bcCampaign(CampaignMergedFields.REC_SKUS),
