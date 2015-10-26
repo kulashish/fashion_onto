@@ -77,9 +77,9 @@ object PaybackData {
 
     val dfIciciEarnBurn = dfIciciEarn.join(dfBurn, dfIciciEarn(CustomerVariables.ID_CUSTOMER) === dfBurn(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
-        coalesce(dfIcici(CustomerVariables.ID_CUSTOMER), dfEarn(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
-        dfIcici("icici_debitcard"),
-        dfEarn("earn_points"),
+        coalesce(dfIciciEarn(CustomerVariables.ID_CUSTOMER), dfBurn(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        dfIciciEarn("icici_debitcard"),
+        dfIciciEarn("earn_points"),
         dfBurn("burn_points")
       ).na.fill(0)
 
