@@ -128,8 +128,8 @@ object PaybackData {
 
       val dfSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
       val dfPaymentPrepaidTransactionData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.PAYMENT_PREPAID_TRANSACTION_DATA, DataSets.FULL_MERGE_MODE, incrDate)
-      val dfPaybackEarn = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_EARN, DataSets.FULL_MERGE_MODE, incrDate)
-      val dfPaybackRedeem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_REDEEM, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfPaybackEarn = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_EARN, DataSets.MONTHLY_MODE, incrDate)
+      val dfPaybackRedeem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_REDEEM, DataSets.MONTHLY_MODE, incrDate)
 
       (dfSalesOrder, dfPaymentPrepaidTransactionData, dfPaymentBankPriority, dfPaybackEarn, dfPaybackRedeem, dfCmrFull, null)
     } else {
