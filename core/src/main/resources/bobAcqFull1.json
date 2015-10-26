@@ -167,6 +167,30 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "payment_bank_priority",
+      "primaryKey": "id_payment_bank_priority",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_category_has_catalog_segment",
+      "primaryKey": "id_catalog_category_has_catalog_segment",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_segment",
+      "primaryKey": "id_catalog_segment",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
     }
   ]
 }
