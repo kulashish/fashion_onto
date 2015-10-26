@@ -160,7 +160,7 @@ object PastCampaignCheck extends Logging {
       .select(
         customerSkuSimpleSelected("*")
       )
-    
+
     return pastCampaignNotSendEmail
   }
 

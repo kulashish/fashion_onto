@@ -775,7 +775,7 @@ object CampaignUtils extends Logging {
    * @param campaignName
    * @param custFiltered
    */
-  def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame, pastCampaignCheck:Boolean) = {
+  def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame, pastCampaignCheck: Boolean) = {
     var custFilteredWithEmail = custFiltered
     if (!testMode && !campaignName.startsWith("surf")) {
       val cmr = CampaignInput.loadCustomerMasterData()
