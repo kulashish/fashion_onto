@@ -20,7 +20,7 @@ GetOptions (
 
 if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
     print "Will upload files only for PROD\n";
-    exit -1;
+    exit 0;
 }
 
 use POSIX qw(strftime);
