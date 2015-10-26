@@ -80,7 +80,7 @@ object PaybackData {
         coalesce(dfIcici(CustomerVariables.ID_CUSTOMER), dfEarn(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         dfIcici("icici_debitcard"),
         dfEarn("earn_points"),
-        dfEarn("burn_points")
+        dfBurn("burn_points")
       ).na.fill(0)
 
     val dfCmr = dfCmrFull.select(
