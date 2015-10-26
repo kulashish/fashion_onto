@@ -821,7 +821,7 @@ object CampaignUtils extends Logging {
   }
 
   /**
-   *
+   * Gets email from customer master data for each email campaign before merging
    * @param cmr
    * @param campaign
    * @return
