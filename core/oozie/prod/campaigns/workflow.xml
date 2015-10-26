@@ -106,6 +106,7 @@
         <path start="invalidCampaign" />
         <path start="abandonedCartCampaign" />
         <path start="wishlistCampaign" />
+        <path start="miscellaneousCampaigns" />
     </fork>
 
     <action name="surfCampaign">
@@ -177,6 +178,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>pushWishlistCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="miscellaneousCampaigns">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>miscellaneousCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
