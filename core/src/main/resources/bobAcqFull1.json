@@ -178,6 +178,14 @@
     },
     {
       "source": "bob",
+      "tableName": "sales_rule_set",
+      "primaryKey": "id_sales_rule_set",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
       "tableName": "catalog_category_has_catalog_segment",
       "primaryKey": "id_catalog_category_has_catalog_segment",
       "mode": "full",
