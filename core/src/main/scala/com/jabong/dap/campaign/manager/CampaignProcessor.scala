@@ -85,7 +85,7 @@ object CampaignProcessor {
   }
 
   /**
-   *
+   * Gets customer id  from customer master data for merged email campaigns
    * @param cmr
    * @param campaign
    * @return
