@@ -108,20 +108,9 @@ object PaybackData {
 
       val privPayback = privFullPayback.select(privFullPayback(ContactListMobileVars.UID) as (OLD_ + ContactListMobileVars.UID))
 
-      println("privFullPayback:" + privFullPayback.printSchema())
-      println("privPayback:" + privPayback.printSchema())
-      println("dfInc:" + dfInc.printSchema())
-
-
-      val dfJoined = dfInc.join(dfInc, dfInc(ContactListMobileVars.UID) === privPayback(OLD_ + ContactListMobileVars.UID), SQL.FULL_OUTER)
-
-      val df = dfJoined.filter(OLD_ + ContactListMobileVars.UID + " is null")
-        .select(
-          ContactListMobileVars.UID,
-          ICICI_DEBITCARD,
-          EARN_POINTS,
-          BURN_POINTS,
-          PAYBACK)
+      val df = privPayback.join(dfInc, dfInc(ContactListMobileVars.UID) === privPayback(OLD_ + ContactListMobileVars.UID), SQL.FULL_OUTER)
+        .filter(OLD_ + ContactListMobileVars.UID + " is null")
+        .select(dfInc("*"))
 
       (df, privFullPayback.unionAll(df))
     }
