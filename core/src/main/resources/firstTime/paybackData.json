@@ -1,0 +1,19 @@
+{
+  "params": [
+    {
+      "source": "paybackData",
+      "path": "first time",
+      "mode": "full",
+      "incrDate": "2015/10/23",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "paybackData",
+      "fullDate": "2015/10/23",
+      "incrDate": "2015/10/24",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
