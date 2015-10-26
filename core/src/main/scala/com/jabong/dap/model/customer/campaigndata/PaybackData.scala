@@ -119,23 +119,25 @@ object PaybackData {
    */
   def readDF(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
-    val dateDiffFormat = TimeUtils.changeDateFormat("2015/10/25", TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+    val dateDiffFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
 
     val dfPaymentBankPriority = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.PAYMENT_BANK_PRIORITY, DataSets.FULL_FETCH_MODE, dateDiffFormat)
     val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
-    val dfPaybackEarn = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_EARN, DataSets.DAILY_MODE, incrDate)
-    val dfPaybackRedeem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_REDEEM, DataSets.DAILY_MODE, incrDate)
 
     if (paths != null) {
 
       val dfSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
       val dfPaymentPrepaidTransactionData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.PAYMENT_PREPAID_TRANSACTION_DATA, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfPaybackEarn = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_EARN, DataSets.FULL_MERGE_MODE, incrDate)
+      val dfPaybackRedeem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_REDEEM, DataSets.FULL_MERGE_MODE, incrDate)
 
       (dfSalesOrder, dfPaymentPrepaidTransactionData, dfPaymentBankPriority, dfPaybackEarn, dfPaybackRedeem, dfCmrFull, null)
     } else {
 
       val dfSalesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
       val dfPaymentPrepaidTransactionData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.PAYMENT_PREPAID_TRANSACTION_DATA, DataSets.DAILY_MODE, incrDate)
+      val dfPaybackEarn = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_EARN, DataSets.DAILY_MODE, incrDate)
+      val dfPaybackRedeem = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_PAYBACK_REDEEM, DataSets.DAILY_MODE, incrDate)
 
       val dfPrivFullPayback = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.FULL_MERGE_MODE, prevDate)
 
