@@ -25,18 +25,17 @@ object SalesOrderItem {
   def getRevenueOrdersCount(salesOrderJoined: DataFrame, prevFull: DataFrame, before7: DataFrame, before30: DataFrame, before90: DataFrame): (DataFrame, DataFrame) = {
     val salesJoinedDF = salesOrderJoined
       .select(
-      SalesOrderVariables.FK_CUSTOMER,
-      SalesOrderVariables.COD_CHARGE,
-      SalesOrderVariables.GW_AMOUNT,
-      SalesOrderVariables.SHIPPING_AMOUNT,
-      SalesOrderVariables.ID_SALES_ORDER,
-      SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE,
-      SalesOrderItemVariables.PAYBACK_CREDITS_VALUE,
-      SalesOrderItemVariables.PAID_PRICE,
-      SalesOrderItemVariables.STORE_CREDITS_VALUE,
-      SalesOrderVariables.DOMAIN
+        salesOrderJoined(SalesOrderVariables.FK_CUSTOMER).cast(LongType) as SalesOrderVariables.FK_CUSTOMER,
+        salesOrderJoined(SalesOrderVariables.COD_CHARGE),
+        salesOrderJoined(SalesOrderVariables.GW_AMOUNT),
+        salesOrderJoined(SalesOrderVariables.SHIPPING_AMOUNT),
+        salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER).cast(LongType) as SalesOrderVariables.ID_SALES_ORDER,
+        salesOrderJoined(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE),
+        salesOrderJoined(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE),
+        salesOrderJoined(SalesOrderItemVariables.PAID_PRICE),
+        salesOrderJoined(SalesOrderItemVariables.STORE_CREDITS_VALUE),
+        salesOrderJoined(SalesOrderVariables.DOMAIN)
     )
-    salesJoinedDF.printSchema()
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
@@ -44,6 +43,7 @@ object SalesOrderItem {
     val web = getRevenueOrders(webOrders, "_web")
     val mWeb = getRevenueOrders(mWebOrders, "_mweb")
     val joinedData = joinDataFrames(app, web, mWeb)
+
     val mergedData = merge(joinedData, prevFull)
 
     val res7 = getRevenueDays(before7, mergedData, 7, 30, 90)
@@ -89,8 +89,9 @@ object SalesOrderItem {
       .withColumnRenamed(SalesOrderItemVariables.REVENUE_APP, SalesOrderItemVariables.REVENUE_APP_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.REVENUE_WEB, SalesOrderItemVariables.REVENUE_WEB_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.REVENUE_MWEB, SalesOrderItemVariables.REVENUE_MWEB_LIFE)
-      .withColumn(SalesOrderItemVariables.ORDERS_COUNT_LIFE, col(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE)+col(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE)+col(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE))
-      .withColumn(SalesOrderItemVariables.ORDERS_COUNT_LIFE, col(SalesOrderItemVariables.REVENUE_APP_LIFE)+col(SalesOrderItemVariables.REVENUE_WEB_LIFE)+col(SalesOrderItemVariables.REVENUE_MWEB_LIFE))
+      .withColumnRenamed(SalesOrderItemVariables.REVENUE, SalesOrderItemVariables.REVENUE_LIFE)
+      .withColumnRenamed(SalesOrderItemVariables.ORDERS_COUNT, SalesOrderItemVariables.ORDERS_COUNT_LIFE)
+
   }
 
   /**
@@ -115,8 +116,6 @@ object SalesOrderItem {
         bcapp(SalesOrderItemVariables.ORDERS_COUNT_APP),
         bcapp(SalesOrderItemVariables.REVENUE_APP)
       )
-    appJoined.printSchema()
-    appJoined.show(5)
     val joinedData = appJoined.join(bcmweb, bcmweb(SalesOrderVariables.FK_CUSTOMER) === appJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
       select(
         coalesce(
@@ -144,6 +143,7 @@ object SalesOrderItem {
         SalesOrderItemVariables.ORDERS_COUNT,
         joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB)
       )
+
     res.printSchema()
     res.show(5)
     res
@@ -307,7 +307,7 @@ object SalesOrderItem {
   def getRevenueOrders(salesOrderItem: DataFrame, domain: String): DataFrame = {
     val resultDF = salesOrderItem.groupBy(SalesOrderVariables.FK_CUSTOMER).agg((first(SalesOrderVariables.SHIPPING_AMOUNT) + first(SalesOrderVariables.COD_CHARGE) + first(SalesOrderVariables.GW_AMOUNT) + sum(SalesOrderItemVariables.PAID_PRICE) + sum(SalesOrderItemVariables.GIFTCARD_CREDITS_VALUE) + sum(SalesOrderItemVariables.STORE_CREDITS_VALUE) + sum(SalesOrderItemVariables.PAYBACK_CREDITS_VALUE)) as SalesOrderItemVariables.REVENUE, countDistinct(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ORDERS_COUNT)
     val newRdd = resultDF.rdd
-    val schema = StructType(Array(StructField(SalesOrderVariables.FK_CUSTOMER, IntegerType, true), StructField(SalesOrderItemVariables.REVENUE + domain, DecimalType.apply(16, 2), true), StructField(SalesOrderVariables.ORDERS_COUNT + domain, LongType, true)))
+    val schema = StructType(Array(StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true), StructField(SalesOrderItemVariables.REVENUE + domain, DecimalType.apply(16, 2), true), StructField(SalesOrderVariables.ORDERS_COUNT + domain, LongType, true)))
     val res = Spark.getSqlContext().createDataFrame(newRdd, schema)
     res.printSchema()
     res.show(5)
@@ -316,6 +316,8 @@ object SalesOrderItem {
 
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
     if(null == curr){
+      prev.printSchema()
+      prev.show(5)
       return prev
     }
     val bcCurr = Spark.getContext().broadcast(prev).value
@@ -546,7 +548,9 @@ object SalesOrderItem {
                                   joined(SalesOrderVariables.FK_CUSTOMER),
                                   joined(SalesOrderItemVariables.SKU),
                                   itr(ITR.REPORTING_CATEGORY),
-                                  itr(ITR.BRICK)
+                                  itr(ITR.BRICK),
+                                  itr(ITR.BRAND_NAME),
+                                  itr(ITR.PRICE)
                               )
     var fullJoined: DataFrame = null
     if (null == prevJoined){
@@ -565,14 +569,26 @@ object SalesOrderItem {
       .groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(max("count") as SalesOrderVariables.BRICK_PENETRATION)
 
-    val res = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
+    val brand = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.BRAND_NAME)
+      .agg(count(ITR.BRAND_NAME) as "count")
+      .groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(max("count") as SalesOrderItemVariables.FAV_BRAND)
+
+    val catBrick = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
                 select(coalesce(cat(SalesOrderVariables.FK_CUSTOMER),brick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER ,
                        cat(SalesOrderVariables.CATEGORY_PENETRATION),
                        brick(SalesOrderVariables.BRICK_PENETRATION)
-                    )
+                      )
+    val res = catBrick.join(brand, brand(SalesOrderVariables.FK_CUSTOMER) === catBrick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+                  .select(coalesce(brand(SalesOrderVariables.FK_CUSTOMER),catBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER ,
+                          catBrick(SalesOrderVariables.CATEGORY_PENETRATION),
+                          catBrick(SalesOrderVariables.BRICK_PENETRATION),
+                          brand(SalesOrderItemVariables.FAV_BRAND)
+                        )
 
     return (res, fullJoined)
   }
+
 
   /*
   MAX_ORDER_BASKET_VALUE - max of sum(unit_price) at order level & customer level.

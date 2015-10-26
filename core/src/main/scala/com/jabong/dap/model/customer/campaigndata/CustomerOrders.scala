@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.{Utils, OptionUtils}
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -91,11 +92,21 @@ object CustomerOrders {
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ADDRESS_FIRST, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(salesAddressFirst, savePath, saveMode)
 
-    val mergedVariables = merger(salesRevenueVariables, salesDiscount, salesInvalid, salesCatBrick, salesOrderValue, salesAddressFirst)
+    val custOrdersincr = merger(salesRevenueVariables, salesDiscount, salesInvalid, salesCatBrick, salesOrderValue, salesAddressFirst)
+
+    val custOrderFull = joinCustOrder(custOrdersincr, custOrdersPrevFull)
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(mergedVariables, savePath, saveMode)
+    DataWriter.writeParquet(custOrdersincr, savePath, saveMode)
 
+
+  }
+
+  def joinCustOrder(incr: DataFrame, prevFull: DataFrame): DataFrame={
+    if(null == prevFull){
+      return incr
+    }
+    return null
   }
 
 
@@ -197,7 +208,7 @@ object CustomerOrders {
                                       salesAddressFirst(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER),
                                       salesAddressFirst(SalesAddressVariables.LAST_SHIPPING_CITY),
                                       salesAddressFirst(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)
-                                        )
+                                      )
 
     res
   }
@@ -209,12 +220,12 @@ object CustomerOrders {
     if(null == custOrdersPrevFull){
       mode = DataSets.FULL
     }
-    val salesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
-    val salesOrderItemFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, prevDate)
-    val salesRuleFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL, prevDate)
-    val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL, prevDate)
-    val salesAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL, prevDate)
-    val itr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.BASIC_ITR, mode, prevDate)
+    val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
+    val salesRuleFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL, incrDate)
+    val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL, incrDate)
+    val salesAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL, incrDate)
+    val itr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
     val cityZone = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
 
     val salesRevenuePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, prevDate)
@@ -238,7 +249,7 @@ object CustomerOrders {
 
     val salesAddressCalc = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ADDRESS_FIRST, DataSets.DAILY_MODE, prevDate)
 
-    (salesOrderFull, salesOrderItemFull, salesRuleFull, salesRuleSetFull, salesAddressFull, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull)
+    (salesOrderIncr, salesOrderItemIncr, salesRuleFull, salesRuleSetFull, salesAddressFull, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull)
   }
 
 }
