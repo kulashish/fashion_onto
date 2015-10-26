@@ -99,7 +99,7 @@ object PaybackData {
 
     if (privFullPayback != null) {
 
-      val privPayback = privFullPayback.withColumnRenamed(ContactListMobileVars.UID, "old_" + ContactListMobileVars.UID)
+      val privPayback = privFullPayback.select(col(ContactListMobileVars.UID) as "old_" + ContactListMobileVars.UID)
 
       val df = dfInc.join(dfInc, dfInc(ContactListMobileVars.UID) === privPayback("old_" + ContactListMobileVars.UID), SQL.FULL_OUTER)
         .filter("old_" + ContactListMobileVars.UID + " is null")
