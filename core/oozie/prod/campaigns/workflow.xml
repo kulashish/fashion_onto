@@ -1,4 +1,5 @@
-<workflow-app xmlns="uri:oozie:workflow:0.5" name="dap-clickstream-wf">
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="dap-campaigns-wf">
+
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
@@ -10,7 +11,44 @@
         </configuration>
     </global>
 
-    <start to='clickstreamYesterdaySession' />
+    <start to='ItrCmrFork' />
+
+    <fork name="ItrCmrFork">
+        <path start="basicITR" />
+        <path start="clickstreamYesterdaySession" />
+    </fork>
+
+    <action name="basicITR">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>basicITR</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="recommendations"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="recommendations">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>recommendations</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="ItrCmrJoin"/>
+        <error to="fail"/>
+    </action>
 
     <action name="clickstreamYesterdaySession">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -56,13 +94,206 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="afterClickstreamVars"/>
+        <ok to="ItrCmrJoin"/>
         <error to="fail"/>
     </action>
 
-    <fork name="afterClickstreamVars">
+    <join name="ItrCmrJoin" to="campaignsStart"/>
+
+    <fork name="campaignsStart">
+        <path start="surfCampaign" />
+        <path start="retargetCampaign" />
+        <path start="invalidCampaign" />
+        <path start="abandonedCartCampaign" />
+        <path start="wishlistCampaign" />
+    </fork>
+
+    <action name="surfCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pushSurfCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="retargetCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pushRetargetCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="invalidCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pushInvalidCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin"/>
+        <error to="fail"/>
+    </action>
+    <action name="abandonedCartCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pushAbandonedCartCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin"/>
+        <error to="fail"/>
+    </action>
+    <action name="wishlistCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pushWishlistCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="campaignsJoin" to="campaignMerge"/>
+
+
+    <fork name="campaignMerge">
+        <path start="pushCampaignMerge" />
+        <path start="emailCampaignMerge" />
+    </fork>
+
+    <action name="pushCampaignMerge">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pushCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="pushCampaignFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="pushCampaignFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>campaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="mobilePushCampaignQuality"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="mobilePushCampaignQuality">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>mobilePushCampaignQuality</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignMergeJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignMerge">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>email_campaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignQuality"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignQuality">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignQuality</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignMergeJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="campaignMergeJoin" to="feedFilesFork"/>
+
+    <fork name="feedFilesFork">
         <path start="emailCampaignVars" />
-        <path start="pushSurfCampaign" />
         <path start="dcfFeedGenerate" />
         <path start="pricingSKUData" />
     </fork>
@@ -170,22 +401,6 @@
     </action>
 
     <join name="joinEmailCampaignVars" to="endJoin"/>
-
-    <action name="pushSurfCampaign">
-        <shell xmlns="uri:oozie:shell-action:0.3">
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>pushSurfCampaign</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="endJoin"/>
-        <error to="fail"/>
-    </action>
 
     <action name="dcfFeedGenerate">
         <shell xmlns="uri:oozie:shell-action:0.3">
