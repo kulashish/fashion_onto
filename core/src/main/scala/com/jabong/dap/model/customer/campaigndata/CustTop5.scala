@@ -160,11 +160,11 @@ object CustTop5 {
   def getTop5(top5PrevFull: DataFrame, saleOrderJoined: DataFrame, itr: DataFrame): DataFrame = {
     val joinedItr = saleOrderJoined.join(itr, saleOrderJoined(SalesOrderItemVariables.SKU) === itr(ProductVariables.SKU_SIMPLE), SQL.LEFT_OUTER)
       .select(saleOrderJoined(SalesOrderVariables.FK_CUSTOMER),
-        itr(ITR.BRAND_NAME),
-        itr(ITR.REPORTING_CATEGORY),
-        itr(ITR.BRICK),
-        itr(ITR.COLOR),
-        itr(ITR.SPECIAL_PRICE).cast(DoubleType) as ITR.SPECIAL_PRICE,
+        itr(ProductVariables.BRAND),
+        itr(ProductVariables.CATEGORY),
+        itr(ProductVariables.BRICK),
+        itr(ProductVariables.COLOR),
+        itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ITR.SPECIAL_PRICE,
         saleOrderJoined(SalesOrderVariables.CREATED_AT)
       )
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], e(6).toString))).groupByKey()
