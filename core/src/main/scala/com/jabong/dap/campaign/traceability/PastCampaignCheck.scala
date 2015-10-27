@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
@@ -17,8 +17,8 @@ import org.apache.spark.sql.functions._
  */
 object PastCampaignCheck extends Logging {
 
-  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS)
-  val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS)
+  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS).cache()
+  val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS).cache()
 
   /**
    *
@@ -84,7 +84,7 @@ object PastCampaignCheck extends Logging {
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       pastCampaignData = past30DayEmailCampaignMergedData
-      return  emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
+      return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
       pastCampaignData = past30DayMobileCampaignMergedData
       return pushCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
@@ -142,32 +142,26 @@ object PastCampaignCheck extends Logging {
 
     val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays, DataSets.EMAIL_CAMPAIGNS)
 
-    var dfCustomerSkuSimpleSelected = customerSkuSimpleSelected
+    val customerSkuSelected = customerSkuSimpleSelected.
+      withColumn(ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
-    if (!customerSkuSimpleSelected.schema.fieldNames.toList.contains(CustomerVariables.EMAIL)) {
-      dfCustomerSkuSimpleSelected = customerSkuSimpleSelected.withColumn(CustomerVariables.EMAIL, lit(null))
-    }
-
-    val customerSkuSelected = dfCustomerSkuSimpleSelected.
-      withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(dfCustomerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
-
-    val pastCampaignNotSendCustomers = customerSkuSelected
+    val pastCampaignNotSendEmail = customerSkuSelected
       .join(pastCampaignSendCustomers,
-        (Udf.isEquals(customerSkuSelected(CustomerVariables.EMAIL), pastCampaignSendCustomers(ContactListMobileVars.EMAIL)) || Udf.isEquals(customerSkuSelected(CustomerVariables.FK_CUSTOMER), pastCampaignSendCustomers(CampaignMergedFields.CUSTOMER_ID)))
+        (customerSkuSelected(CustomerVariables.EMAIL) === pastCampaignSendCustomers(ContactListMobileVars.EMAIL))
           &&
-          ((customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
+          ((customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1))
             ||
-            (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
+            (customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "2"))
             ||
-            (customerSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
+            (customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
       .filter(
-        CampaignMergedFields.CUSTOMER_ID + " is null "
+        CampaignMergedFields.EMAIL + " is null "
       )
       .select(
-        customerSkuSelected("*")
+        customerSkuSimpleSelected("*")
       )
 
-    return pastCampaignNotSendCustomers
+    return pastCampaignNotSendEmail
   }
 
   def getLastNDaysData(n: Int): DataFrame = {
