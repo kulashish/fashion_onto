@@ -2,29 +2,8 @@
   "params": [
     {
       "source": "custPreference",
-      "path": "/data/input/bob/newsletter_subscription/full/2015/09/23/24",
-      "incrDate": "2015/09/23",
-      "saveMode": "Overwrite",
-      "saveFormat": "parquet"
-    },
-    {
-      "source": "custPreference",
-      "fullDate": "2015/09/23",
-      "incrDate": "2015/09/24",
-      "saveMode": "Overwrite",
-      "saveFormat": "parquet"
-    },
-    {
-      "source": "custPreference",
-      "fullDate": "2015/09/24",
-      "incrDate": "2015/09/25",
-      "saveMode": "Overwrite",
-      "saveFormat": "parquet"
-    },
-    {
-      "source": "custPreference",
-      "fullDate": "2015/09/25",
-      "incrDate": "2015/09/26",
+      "path": "/data/input/bob/newsletter_subscription/full/2015/10/25/24",
+      "incrDate": "2015/10/25",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
