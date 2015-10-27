@@ -111,7 +111,10 @@ object PastCampaignCheck extends Logging {
     val customerSkuSelected = customerSkuSimpleSelected.
       withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
-    var customerNotNullSkuSelected: DataFrame = customerSkuSelected
+    val customerNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is null")
+
+    val customerNotNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is not null and " + CustomerVariables.FK_CUSTOMER + " != 0")
+
     var pastCampaignNullSendCustomers: DataFrame = null
 
     val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays).withColumnRenamed(CustomerVariables.FK_CUSTOMER, "pastCampaign_" + CustomerVariables.FK_CUSTOMER)
@@ -119,10 +122,6 @@ object PastCampaignCheck extends Logging {
     val surfStatus: Boolean = customerSkuSelected.schema.fieldNames.contains(PageVisitVariables.BROWSER_ID)
 
     if (surfStatus) {
-      val customerNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is null")
-
-      customerNotNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is not null and " + CustomerVariables.FK_CUSTOMER + " != 0")
-
       pastCampaignNullSendCustomers = customerNullSkuSelected
         .join(pastCampaignSendCustomers, customerNullSkuSelected(PageVisitVariables.BROWSER_ID) === pastCampaignSendCustomers(CampaignMergedFields.deviceId)
           &&
