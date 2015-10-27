@@ -43,7 +43,8 @@ object PastCampaignCheck extends Logging {
     if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
       mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
         .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
-          pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1))
+          pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1),
+          pastCampaignData(CampaignMergedFields.DEVICE_ID))
     } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.LAST_UPDATED_DATE + " >= '" + filterDate + "'")
     }
@@ -118,7 +119,7 @@ object PastCampaignCheck extends Logging {
     val surfStatus: Boolean = customerSkuSelected.schema.fieldNames.contains(PageVisitVariables.BROWSER_ID)
 
     customerSkuSelected.printSchema()
-    
+
     println("surfStatus:-"+ surfStatus)
 
     if(surfStatus){
