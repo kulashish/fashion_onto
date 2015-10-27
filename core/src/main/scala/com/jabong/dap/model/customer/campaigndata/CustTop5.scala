@@ -234,14 +234,14 @@ object CustTop5 {
         brand.put(l, (count+1)+";"+ (sum + p))
       }
       else{
-        brand.put(m, (1+";"+ p))
+        brand.put(l, (1+";"+ p))
       }
       if(cat.contains(m)){
         val (count, sum) = getCountSum(cat(m))
         cat.put(m, (count+1)+";"+ (sum + p))
       }
       else{
-        cat.put(l, (1+";"+ p))
+        cat.put(m, (1+";"+ p))
       }
       if(brick.contains(n)){
         val (count, sum) = getCountSum(brand(n))
