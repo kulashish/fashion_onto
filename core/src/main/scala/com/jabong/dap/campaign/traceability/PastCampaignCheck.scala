@@ -111,9 +111,9 @@ object PastCampaignCheck extends Logging {
     val customerSkuSelected = customerSkuSimpleSelected.
       withColumn("temp_" + ProductVariables.SKU, Udf.skuFromSimpleSku(customerSkuSimpleSelected(ProductVariables.SKU_SIMPLE)))
 
-    val customerNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is null")
+    val customerNullSkuSelected = customerSkuSelected.filter(col(CustomerVariables.FK_CUSTOMER).isNull)
 
-    val customerNotNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is not null and " + CustomerVariables.FK_CUSTOMER + " != 0")
+    val customerNotNullSkuSelected = customerSkuSelected.filter(col(CustomerVariables.FK_CUSTOMER).geq(0))
 
     var pastCampaignNullSendCustomers: DataFrame = null
 
