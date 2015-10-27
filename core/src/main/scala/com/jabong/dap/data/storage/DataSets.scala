@@ -11,6 +11,8 @@ object DataSets {
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
+  val PAYMENT_PREPAID_TRANSACTION_DATA = "payment_prepaid_transaction_data"
+  val PAYMENT_BANK_PRIORITY = "payment_bank_priority"
 
   //customer
   val CUSTOMER = "customer"
@@ -145,6 +147,8 @@ object DataSets {
   val NL_DATA_LIST = "NL_data_list"
   val CONTACT_LIST_PLUS = "Contact_list_Plus"
   val APP_EMAIL_FEED = "app_email_feed"
+  val CUSTOMER_JC_DETAILS = "customerJCDetails"
+  val PAYBACK_DATA = "paybackData"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
