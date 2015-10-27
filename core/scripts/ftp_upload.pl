@@ -244,17 +244,17 @@ sub upload_email_campaigns_feedFiles {
     # 20150927_CUST_WELCOME_VOUCHERS.csv
     my $filename = "$date_with_zero_today"."_CUST_WELCOME_VOUCHERS.csv";
     my $folderName = "custWelcomeVoucher";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150927_CUST_PREFERENCE.csv
     $filename = "$date_with_zero_today"."_CUST_PREFERENCE.csv";
     $folderName = "custPreference";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150927_payback_data.csv
     $filename = "$date_with_zero_today"."_payback_data.csv";
     $folderName = "paybackData";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_CONTACTS_LIST_MOBILE.csv
     # $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
