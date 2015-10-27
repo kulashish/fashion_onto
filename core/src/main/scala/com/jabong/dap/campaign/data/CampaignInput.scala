@@ -286,11 +286,10 @@ object CampaignInput extends Logging {
               )
           } else {
             result = res.select(
-              res(CustomerVariables.FK_CUSTOMER),
+              res(CustomerVariables.EMAIL),
               res(CampaignMergedFields.REF_SKUS),
               res(CampaignMergedFields.REC_SKUS),
               res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-              res(CustomerVariables.EMAIL),
               res(CampaignCommon.PRIORITY),
               res(CampaignMergedFields.LIVE_CART_URL)
             )

@@ -1,9 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, NewsletterVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -12,9 +9,13 @@ import org.apache.spark.sql.functions._
  */
 object NewsletterDataList {
 
-  def writeNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame, incrDate: String) = {
+  val CUSTOMER_ID = "customer_id"
+  val EMAIL_SUBSCRIPTION_STATUS = "email_subscription_status"
+  val CUR_NL_STATUS = "cur_nl_status"
 
-    val dfNLDataListFull = dfContactListMobileFull.select(
+  def getNLDataList(dfContactListMobileIncr: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
+
+    val dfNLDataListIncr = dfContactListMobileIncr.select(
       col(CustomerVariables.EMAIL),
       col(CustomerVariables.ID_CUSTOMER),
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
@@ -28,15 +29,14 @@ object NewsletterDataList {
       col(NewsletterVariables.STATUS)
     )
 
-    val dfNlDataList = dfNLDataListFull.except(dfNLDataListPrevFull).select(
+    val dfNlDataList = dfNLDataListIncr.except(dfNLDataListPrevFull).select(
       col(CustomerVariables.EMAIL),
-      col(CustomerVariables.ID_CUSTOMER) as NewsletterVariables.CUSTOMER_ID,
-      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as NewsletterVariables.EMAIL_SUBSCRIPTION_STATUS,
-      col(NewsletterVariables.STATUS) as NewsletterVariables.CUR_NL_STATUS
+      col(CustomerVariables.ID_CUSTOMER) as CUSTOMER_ID,
+      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as EMAIL_SUBSCRIPTION_STATUS,
+      col(NewsletterVariables.STATUS) as CUR_NL_STATUS
     ).na.fill("")
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfNlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, "53699_83297_" + fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
+    dfNlDataList
 
   }
 

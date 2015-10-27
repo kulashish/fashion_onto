@@ -308,11 +308,10 @@ object Schema {
   ))
 
   val emailCampaignSchema = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true),
-    StructField(CustomerVariables.EMAIL, StringType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true)
   ))
 
   val campaign = StructType(Array(
@@ -381,7 +380,7 @@ object Schema {
   ))
 
   val finalReferenceSku = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, false),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
 
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(
@@ -395,7 +394,7 @@ object Schema {
   ))
 
   val expectedFinalReferenceSku = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
 
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(
@@ -412,7 +411,7 @@ object Schema {
   ))
 
   val finalReferenceSkuWithACartUrl = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
 
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(

@@ -13,6 +13,9 @@ object DataSets {
   val SALES_CART = "sales_cart"
   val SALES_RULE_SET = "sales_rule_set"
 
+  val PAYMENT_PREPAID_TRANSACTION_DATA = "payment_prepaid_transaction_data"
+  val PAYMENT_BANK_PRIORITY = "payment_bank_priority"
+
   //customer
   val CUSTOMER = "customer"
   val CUSTOMER_STORECREDITS_HISTORY = "customer_storecredits_history"
@@ -144,7 +147,10 @@ object DataSets {
   val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
   val CUSTOMER_PREFERRED_TIMESLOT_PART1 = "customerPreferredTimeslotPart1"
   val NL_DATA_LIST = "NL_data_list"
+  val CONTACT_LIST_PLUS = "Contact_list_Plus"
   val APP_EMAIL_FEED = "app_email_feed"
+  val CUSTOMER_JC_DETAILS = "customerJCDetails"
+  val PAYBACK_DATA = "paybackData"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"

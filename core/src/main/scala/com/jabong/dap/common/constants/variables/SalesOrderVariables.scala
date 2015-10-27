@@ -85,4 +85,5 @@ object SalesOrderVariables {
   val ORDER_ITEM_COUNT = "order_item_count"
 
   val NEW_ = "new_"
+
 }
