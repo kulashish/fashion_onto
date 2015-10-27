@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{PageVisitVariables, CustomerVariables, ContactListMobileVars, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ PageVisitVariables, CustomerVariables, ContactListMobileVars, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
@@ -118,26 +118,26 @@ object PastCampaignCheck extends Logging {
 
     val surfStatus: Boolean = customerSkuSelected.schema.fieldNames.contains(PageVisitVariables.BROWSER_ID)
 
-    if(surfStatus){
-      val customerNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER +" is null")
+    if (surfStatus) {
+      val customerNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is null")
 
-      customerNotNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER +" is not null and "+CustomerVariables.FK_CUSTOMER +" != 0")
+      customerNotNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER + " is not null and " + CustomerVariables.FK_CUSTOMER + " != 0")
 
-       pastCampaignNullSendCustomers =  customerNullSkuSelected
+      pastCampaignNullSendCustomers = customerNullSkuSelected
         .join(pastCampaignSendCustomers, customerNullSkuSelected(PageVisitVariables.BROWSER_ID) === pastCampaignSendCustomers(CampaignMergedFields.deviceId)
-        &&
-         customerNullSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), SQL.LEFT_OUTER)
+          &&
+          customerNullSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), SQL.LEFT_OUTER)
         .filter(
-           CampaignMergedFields.deviceId + " is null"
+          CampaignMergedFields.deviceId + " is null"
         ).select(
-           customerNullSkuSelected("*")
-        )
+            customerNullSkuSelected("*")
+          )
     }
 
     val pastCampaignNotNullSendCustomers = customerNotNullSkuSelected
       .join(pastCampaignSendCustomers, customerNotNullSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CustomerVariables.FK_CUSTOMER)
         &&
-      customerNotNullSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), SQL.LEFT_OUTER)
+        customerNotNullSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), SQL.LEFT_OUTER)
       .filter(
         "pastCampaign_" + CustomerVariables.FK_CUSTOMER + " is null"
       )
@@ -146,7 +146,7 @@ object PastCampaignCheck extends Logging {
       )
     var pastCampaignNotSendCustomers: DataFrame = pastCampaignNotNullSendCustomers
 
-    if(surfStatus) pastCampaignNotSendCustomers = pastCampaignNotSendCustomers.unionAll(pastCampaignNullSendCustomers)
+    if (surfStatus) pastCampaignNotSendCustomers = pastCampaignNotSendCustomers.unionAll(pastCampaignNullSendCustomers)
 
     return pastCampaignNotSendCustomers
   }
