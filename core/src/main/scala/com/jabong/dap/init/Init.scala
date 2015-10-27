@@ -151,10 +151,10 @@ object Init {
       case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
 
       //campaign quality check for mobile
-      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
+      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
 
       //campaign quality check for mobile
-      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
+      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
 
       //pricing sku data
       case DataSets.PRICING_SKU_DATA => new ComponentExecutor().start(params.paramJson)

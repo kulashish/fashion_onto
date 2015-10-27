@@ -55,10 +55,10 @@ object CampaignQuality extends Logging {
       val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
       val list: ListBuffer[Row] = new ListBuffer()
 
-      list.appendAll(getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday))
+      list.appendAll(getCampaignQuality(CampaignCommon.MERGED_CAMPAIGN, dateYesterday, campaignType))
 
       for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-        list.appendAll(getCampaignQuality(campaignDetails.campaignName, dateYesterday))
+        list.appendAll(getCampaignQuality(campaignDetails.campaignName, dateYesterday, campaignType))
       }
 
       val rdd = Spark.getContext().parallelize[Row](list.toSeq)
@@ -68,12 +68,12 @@ object CampaignQuality extends Logging {
         .agg(sum(TOTALCOUNT) as TOTALCOUNT, sum(CUSTID_ZERO) as CUSTID_ZERO, sum(CUSTID_NONZERO) as CUSTID_NONZERO, sum(PRIORITYMERGE) as PRIORITYMERGE, sum(ANDROID) as ANDROID, sum(IOS) as IOS, sum(WINDOWS) as WINDOWS)
         .sort(CAMPAIGNNAME).cache()
 
-      if (campaignType.equals("mobilePushCampaignQuality")) {
+      if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
 
         writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dateYesterday)
         writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
 
-      } else if (campaignType.equals("emailCampaignQuality")) {
+      } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
 
         writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.EMAIL_CAMPAIGN_QUALITY, dateYesterday)
         writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
@@ -105,11 +105,11 @@ object CampaignQuality extends Logging {
     dfWithInsertedOn.write.mode(SaveMode.Append).jdbc(dbConn.getConnectionString, campaignType, dbConn.getConnectionProperties)
   }
 
-  def getCampaignQuality(campaignName: String, dateYesterday: String): ListBuffer[Row] = {
+  def getCampaignQuality(campaignName: String, dateYesterday: String, campaignType: String): ListBuffer[Row] = {
 
     logger.info("Calling method getCampaignQuality........")
 
-    val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, DataSets.PUSH_CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+    val path = PathBuilder.buildPath(ConfigConstants.READ_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
     val dataExits = DataVerifier.dataExists(path)
 
