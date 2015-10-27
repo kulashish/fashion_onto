@@ -112,10 +112,10 @@ object PaybackData {
         .filter(prevPayback(ContactListMobileVars.UID).isNull)
         .select(dfInc("*"))
 
-      (df, prevFullPayback.unionAll(df))
+      return (df, prevFullPayback.unionAll(df))
     }
 
-    (dfInc, dfInc)
+    return (dfInc, dfInc)
   }
 
   /**
