@@ -16,7 +16,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | ad4push_customer_response | dcf_feed | pricing_sku_data | contactListMobile | custPreference | custWelcomeVoucher | email_campaigns\n";
+) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | email_campaigns \n";
 
 if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
     print "Will upload files only for PROD\n";
@@ -49,12 +49,8 @@ if ($component eq "campaigns") {
     $job_exit = upload_dcf_feed();
 } elsif ($component eq "pricing_sku_data") {
     $job_exit = upload_pricing_sku_data();
-} elsif ($component eq "custWelcomeVoucher") {
-    $job_exit = upload_email_campaigns_custWelcomeVoucher();
-} elsif ($component eq "custPreference") {
-    $job_exit = upload_email_campaigns_custPreference();
-} elsif ($component eq "contactListMobile") {
-    $job_exit = upload_email_campaigns_contactListMobile();
+} elsif ($component eq "feedFiles") {
+    $job_exit = upload_email_campaigns_feedFiles();
 } elsif ($component eq "email_campaigns") {
     $job_exit = upload_email_campaigns();
 } else {
@@ -63,10 +59,6 @@ if ($component eq "campaigns") {
 }
 
 exit $job_exit;
-
-# upload ad4push customer response files
-# /data/tmp/ad4push/reactions_android_csv/full/2015/07/30/24/ad4push_customer_response_android_20150730.csv
-# /data/tmp/ad4push/reactions_ios_csv/full/2015/07/30/24/ad4push_customer_response_ios_20150730.csv
 
 sub fetchCampaign {
    my ($id, $cname, $base) = @_;
@@ -227,76 +219,55 @@ sub upload_dcf_feed {
      return $status;
 }
 
-sub upload_email_campaigns_custWelcomeVoucher {
-    my $base = "/tmp/$date_with_zero/custWelcomeVoucher";
-    print "custWelcomeVoucher directory is $base\n";
+sub fetchFeedFile {
+   my ($filename, $folderName, $base) = @_;
+
+   # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/20150927_CUST_WELCOME_VOUCHERS.csv
+   print "hadoop fs -get /data/test/tmp/variables/$folderName/daily/$date/$filename $base/\n";
+
+   # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/20150927_CUST_WELCOME_VOUCHERS.csv
+   system("hadoop fs -get /data/test/tmp/variables/$folderName/daily/$date/$filename $base/");
+   my $status = $?;
+
+   $status ||= removeNull("$base/$filename");
+
+   return $status;
+}
+
+
+sub upload_email_campaigns_feedFiles {
+    my $base = "/tmp/$date_with_zero/feedFiles";
+    print "directory is $base\n";
     system("mkdir -p $base");
-
-    # 53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
-    my $filename = "53699_28346_$date_with_zero_today"."_CUST_WELCOME_VOUCHERS.csv";
-
-    # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
-    print "hadoop fs -get /data/test/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/\n";
-
-    # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/53699_28346_20150927_CUST_WELCOME_VOUCHERS.csv
-    system("hadoop fs -get /data/test/tmp/variables/custWelcomeVoucher/daily/$date/$filename $base/");
     my $status = $?;
 
-    $status ||= removeNull("$base/$filename");
+    # 20150927_CUST_WELCOME_VOUCHERS.csv
+    my $filename = "$date_with_zero_today"."_CUST_WELCOME_VOUCHERS.csv";
+    my $folderName = "custWelcomeVoucher";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    # 20150927_CUST_PREFERENCE.csv
+    $filename = "$date_with_zero_today"."_CUST_PREFERENCE.csv";
+    $folderName = "custPreference";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150927_payback_data.csv
+    $filename = "$date_with_zero_today"."_payback_data.csv";
+    $folderName = "paybackData";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150928_CONTACTS_LIST_MOBILE.csv
+    # $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
+    # $folderName = "contactListMobile";
+    # $status ||= fetchFeedFile($fname, $folderName, $base);
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
+    # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
+    # $status ||= $?;
     system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
-
-sub upload_email_campaigns_custPreference {
-    my $base = "/tmp/$date_with_zero/custPreference";
-    print "custWelcomeVoucher directory is $base\n";
-    system("mkdir -p $base");
-
-    # 53699_28335_20150927_CUST_PREFERENCE.csv
-    my $filename = "53699_28335_$date_with_zero_today"."_CUST_PREFERENCE.csv";
-
-    # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
-    print "hadoop fs -get /data/test/tmp/variables/custPreference/daily/$date/$filename $base/\n";
-
-    # /data/tmp/variables/custPreference/daily/2015/09/26/53699_28335_20150927_CUST_PREFERENCE.csv
-    system("hadoop fs -get /data/test/tmp/variables/custPreference/daily/$date/$filename $base/");
-    my $status = $?;
-
-    $status ||= removeNull("$base/$filename");
-
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
-    $status ||= $status;
-    system("rm -rf /tmp/$date_with_zero");
-    return $status;
-}
-
-sub upload_email_campaigns_contactListMobile {
-    my $base = "/tmp/$date_with_zero/contactListMobile";
-    print "contactListMobile directory is $base\n";
-    system("mkdir -p $base");
-
-    # 53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
-    my $filename = "53699_28334_$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
-
-    # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
-    print "hadoop fs -get /data/test/tmp/variables/contactListMobile/daily/$date/$filename $base/\n";
-
-    # /data/tmp/variables/contactListMobile/daily/2015/09/27/53699_28334_20150928_CONTACTS_LIST_MOBILE.csv
-    system("hadoop fs -get /data/test/tmp/variables/contactListMobile/daily/$date/$filename $base/");
-    my $status = $?;
-
-    $status ||= removeNull("$base/$filename");
-
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
-    $status ||= $?;
-
-    system("rm -rf /tmp/$date_with_zero");
-    return $status;
-}
-
 
 sub upload_email_campaigns {
     my $base = "/tmp/$date_with_zero/campaigns/email_campaigns";
