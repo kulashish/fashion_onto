@@ -122,7 +122,7 @@ object CampaignQuality extends Logging {
 
       logger.info("Reading a Data Frame of: " + campaignName + " for Quality check")
 
-      val dataFrame = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.PUSH_CAMPAIGNS, campaignName, DataSets.DAILY_MODE, dateYesterday)
+      val dataFrame = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
