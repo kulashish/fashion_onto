@@ -31,9 +31,9 @@ object PaybackData {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
-    val (salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, privFullPayback) = readDF(paths, incrDate, prevDate)
+    val (salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, prevFullPayback) = readDF(paths, incrDate, prevDate)
 
-    val (incPaybackData, fullPaybackData) = getPaybackData(salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, privFullPayback)
+    val (incPaybackData, fullPaybackData) = getPaybackData(salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, prevFullPayback)
 
     val pathPaybackDataFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathPaybackDataFull)) {
@@ -54,7 +54,7 @@ object PaybackData {
    * @param soPaybackRedeem
    * @return
    */
-  def getPaybackData(salesOrder: DataFrame, paymentPrepaidTransactionData: DataFrame, paymentBankPriority: DataFrame, soPaybackEarn: DataFrame, soPaybackRedeem: DataFrame, dfCmrFull: DataFrame, privFullPayback: DataFrame): (DataFrame, DataFrame) = {
+  def getPaybackData(salesOrder: DataFrame, paymentPrepaidTransactionData: DataFrame, paymentBankPriority: DataFrame, soPaybackEarn: DataFrame, soPaybackRedeem: DataFrame, dfCmrFull: DataFrame, prevFullPayback: DataFrame): (DataFrame, DataFrame) = {
 
     val dfIcici = salesOrder.join(paymentPrepaidTransactionData, salesOrder(SalesOrderVariables.ID_SALES_ORDER) === paymentPrepaidTransactionData(SalesOrderVariables.FK_SALES_ORDER), SQL.INNER)
       .join(paymentBankPriority, paymentPrepaidTransactionData(BANK_CODE) === paymentBankPriority(BANK_CODE), SQL.INNER)
@@ -104,15 +104,15 @@ object PaybackData {
         lit(1) as PAYBACK
       ).distinct
 
-    if (privFullPayback != null) {
+    if (prevFullPayback != null) {
 
-      val privPayback = privFullPayback.select(privFullPayback(ContactListMobileVars.UID) as (OLD_ + ContactListMobileVars.UID))
+      val prevPayback = prevFullPayback.select(ContactListMobileVars.UID)
 
-      val df = privPayback.join(dfInc, dfInc(ContactListMobileVars.UID) === privPayback(OLD_ + ContactListMobileVars.UID), SQL.FULL_OUTER)
-        .filter(OLD_ + ContactListMobileVars.UID + " is null")
+      val df = dfInc.join(prevPayback, dfInc(ContactListMobileVars.UID) === prevPayback(ContactListMobileVars.UID), SQL.LEFT_OUTER)
+        .filter(prevPayback(ContactListMobileVars.UID).isNull)
         .select(dfInc("*"))
 
-      (df, privFullPayback.unionAll(df))
+      (df, prevFullPayback.unionAll(df))
     }
 
     (dfInc, dfInc)
