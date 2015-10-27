@@ -4,8 +4,8 @@ import java.sql.Timestamp
 import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ ArrayUtils, StringUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{ArrayUtils, StringUtils}
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -13,7 +13,7 @@ import net.liftweb.json._
 import org.apache.spark.sql.Row
 
 import scala.collection.mutable
-import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
  * Created by raghu on 3/7/15.
@@ -27,6 +27,7 @@ object UdfUtils extends Logging {
   def outputDateFormat(s: String): String = {
     return TimeUtils.changeDateFormat(s, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT)
   }
+
   /**
    * min of Timestamp t1 or t2
    * @param t1
@@ -235,7 +236,10 @@ object UdfUtils extends Logging {
 
     iterable.foreach {
       case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value };
+        if (value > max) {
+          maxSlot = slot;
+          max = value
+        };
         timeSlotArray(slot) = value
     }
 
@@ -273,6 +277,21 @@ object UdfUtils extends Logging {
 
   }
 
+  def latestDate(dates: String*): String = {
+    var maxDateString: String = "2001-01-01 00:00:00"
+    var i: Int = 0;
+    var maxDate: Date = TimeUtils.getDate(maxDateString, TimeConstants.DATE_TIME_FORMAT)
+    for (dateString <- dates) {
+      if (null != dateString) {
+        var date = TimeUtils.getDate(dateString, TimeConstants.DATE_TIME_FORMAT)
+        if (date.after(maxDate)) {
+          maxDate = date
+        }
+      }
+    }
+    (maxDateString)
+  }
+
   /**
    * getAppUserId  creates new userid for users not having any userid
    * by using the browserid prepended with a constant
@@ -289,6 +308,7 @@ object UdfUtils extends Logging {
     }
     return app_user_id
   }
+
   /**
    * This will return Timestamp into YYYYMMDD format
    * @param t1
@@ -324,7 +344,7 @@ object UdfUtils extends Logging {
   }
 
   /**
-   *  getSimpleSkuFromExtraData will extract data from extraData
+   * getSimpleSkuFromExtraData will extract data from extraData
    * @param extraData
    * @return
    */
@@ -605,6 +625,7 @@ object UdfUtils extends Logging {
       0
     }
   }
+
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
     if (i >= strings.size) "" else strings(i)
   }
