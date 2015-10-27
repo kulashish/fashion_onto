@@ -12,6 +12,7 @@ import com.jabong.dap.common.time.{TimeUtils, TimeConstants}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
 import jdk.nashorn.internal.ir.annotations.Immutable
 import org.apache.hadoop.hdfs.util.Diff.ListType
@@ -104,6 +105,10 @@ object CustTop5 {
     ))
     val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
     val top5Full  = getTop5(top5PrevFull, saleOrderJoined, itr)
+
+    val fullPath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.writeParquet(top5Full, fullPath, saveMode)
+
     val top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS)
 
     val favTop5Map = top5Incr.map(e=> (e(0).asInstanceOf[Long]->(getTop5FavList(e(1).asInstanceOf[HashMap[String, Map[Int, Double]]]), getTop5FavList(e(2).asInstanceOf[HashMap[String, Map[Int, Double]]]), getTop5FavList(e(3).asInstanceOf[HashMap[String, Map[Int, Double]]]), getTop5FavList(e(4).asInstanceOf[HashMap[String, Map[Int, Double]]]))))
@@ -115,6 +120,8 @@ object CustTop5 {
 
     val fav = Spark.getSqlContext().createDataFrame(favTop5, cusTop5)
 
+   val top5Path =  DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.writeParquet(fav, top5Path, saveMode)
 
   }
 
@@ -158,11 +165,11 @@ object CustTop5 {
     }
     else{
       val top5Joined = top5PrevFull.join(top5incr, top5PrevFull(SalesOrderVariables.FK_CUSTOMER) === top5incr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                              .select(coalesce(top5PrevFull(SalesOrderVariables.FK_CUSTOMER), top5incr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                                joinMaps(top5PrevFull("brand_list"), top5incr("brand_list")),
-                                joinMaps(top5PrevFull("catagory_list"), top5incr("catagory_list")),
-                                joinMaps(top5PrevFull("brick_list"), top5incr("brick_list")),
-                                joinMaps(top5PrevFull("color_list"), top5incr("color_list")),
+                              .select(coalesce(top5incr(SalesOrderVariables.FK_CUSTOMER), top5PrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                                joinMaps(top5incr("brand_list"), top5PrevFull("brand_list")),
+                                joinMaps(top5incr("catagory_list"), top5PrevFull("catagory_list")),
+                                joinMaps(top5incr("brick_list"), top5PrevFull("brick_list")),
+                                joinMaps(top5incr("color_list"), top5PrevFull("color_list")),
                                 coalesce(top5incr("last_orders_created_at"), top5PrevFull("last_orders_created_at")) as "last_orders_created_at"
 
 
@@ -173,40 +180,40 @@ object CustTop5 {
 
   val joinMaps = udf((map1: HashMap[String, Map[Int, Double]], map2 : HashMap[String, Map[Int, Double]]) => joinMaps(map1, map2))
 
-  def joinMaps(map1: HashMap[String, Map[Int, Double]], map2 : HashMap[String, Map[Int, Double]]): HashMap[String, Map[Int, Double]] ={
-    if(null == map1 && null == map2){
+  def joinMaps(mapIncr: HashMap[String, Map[Int, Double]], mapFull : HashMap[String, Map[Int, Double]]): HashMap[String, Map[Int, Double]] ={
+    if(null == mapFull && null == mapIncr){
       return null
     }
-    else if(null == map1){
-      return map2
+    else if(null == mapFull){
+      return mapIncr
     }
-    else if(null == map2){
-      return map1
+    else if(null == mapIncr){
+      return mapFull
     }
 
-    val keys = map2.keySet
+    val keys = mapIncr.keySet
     keys.foreach{
       e =>
       var count = 0
       var sum = 0.0
-      map2.get(e).foreach { e => val (k, j) = e
+      mapIncr.get(e).foreach { e => val (k, j) = e
         count = k
         sum = j
       }
-      if(map1.contains(e)){
+      if(mapFull.contains(e)){
         var count1 = 0
         var sum1 = 0.0
-        map1.get(e).foreach { e => val (x, y) = e
+        mapFull.get(e).foreach { e => val (x, y) = e
             count1 = x
             sum1 = y
         }
-        map1.put(e, Map(count+count1, sum + sum1))
+        mapFull.put(e, Map(count+count1, sum + sum1))
         }
         else{
-            map1.put(e, Map(count, sum))
+            mapFull.put(e, Map(count, sum))
         }
     }
-    return map1
+    return mapFull
   }
 
   def getTop5Count(list: List[(String, String, String, String, Double, String)]): (HashMap[String, Map[Int, Double]], HashMap[String, Map[Int, Double]], HashMap[String, Map[Int, Double]], HashMap[String, Map[Int, Double]], String)={
