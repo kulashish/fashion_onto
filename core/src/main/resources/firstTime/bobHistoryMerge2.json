@@ -100,7 +100,6 @@
       "tableName": "sales_rule",
       "primaryKey": "id_sales_rule",
       "mergeMode": "full",
-      "dateColumn": "updated_at",
       "incrDate": "2013-06-01",
       "fullDate": "2012/11/30",
       "saveMode": "Ignore"
