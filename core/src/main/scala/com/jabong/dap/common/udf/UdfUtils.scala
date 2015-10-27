@@ -5,12 +5,14 @@ import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ ArrayUtils, StringUtils }
+import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
@@ -664,6 +666,41 @@ object UdfUtils extends Logging {
 
     return maxSlot
 
+  }
+
+  def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
+
+    val dfSelect = dfIn.sort(dfIn.columns(0), dfIn.columns(1))
+
+    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
+
+    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
+
+    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
+
+    val rowRDD = grouped.map({
+      case (key, value) =>
+        Row(
+          key,
+          value._1,
+          value._2,
+          value._3,
+          value._4,
+          value._5,
+          value._6,
+          value._7,
+          value._8,
+          value._9,
+          value._10,
+          value._11,
+          value._12,
+          value._13)
+    })
+
+    // Apply the schema to the RDD.
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+
+    df.dropDuplicates()
   }
 
 }

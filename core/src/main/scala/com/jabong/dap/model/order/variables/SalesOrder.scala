@@ -55,49 +55,4 @@ object SalesOrder {
 //    }
 //  }
 
-  /**
-   * CustomersPreferredOrderTimeslot: Time slot: 2 hrs each, start from 7 am. total 12 slots (1 to 12)
-   * @param dfSalesOrder
-   * @return DataFrame
-   */
-  def getCPOT(dfSalesOrder: DataFrame): DataFrame = {
-
-    //    logger.info("Enter in  getCPOTPart2")
-
-    val salesOrder = dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
-      .sort(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT)
-
-    val soMapReduce = salesOrder.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DATE_TIME_FORMAT)), 1)).reduceByKey(_ + _)
-
-    val soNewMap = soMapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
-
-    val soGrouped = soNewMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
-
-    val rowRDD = soGrouped.map({
-      case (key, value) =>
-        Row(
-          key.toLong,
-          value._1,
-          value._2,
-          value._3,
-          value._4,
-          value._5,
-          value._6,
-          value._7,
-          value._8,
-          value._9,
-          value._10,
-          value._11,
-          value._12,
-          value._13)
-    })
-
-    // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart2)
-
-    //    logger.info("Exit from  getCPOTPart2")
-
-    df
-
-  }
 }
