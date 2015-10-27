@@ -230,7 +230,7 @@ sub upload_dcf_feed {
 }
 
 sub upload_email_campaigns_custWelcomeVoucher {
-    my $base = "/tmp/$date_with_zero/custWelcomeVoucher";
+    my $base = "/tmp/$date_with_zero";
     print "custWelcomeVoucher directory is $base\n";
     system("mkdir -p $base");
 
@@ -253,7 +253,7 @@ sub upload_email_campaigns_custWelcomeVoucher {
 }
 
 sub upload_email_campaigns_custPreference {
-    my $base = "/tmp/$date_with_zero/custPreference";
+    my $base = "/tmp/$date_with_zero";
     print "custPreference directory is $base\n";
     system("mkdir -p $base");
 
@@ -276,7 +276,7 @@ sub upload_email_campaigns_custPreference {
 }
 
 sub upload_email_campaigns_paybackData {
-    my $base = "/tmp/$date_with_zero/paybackData";
+    my $base = "/tmp/$date_with_zero";
     print "paybackData directory is $base\n";
     system("mkdir -p $base");
 
@@ -299,7 +299,7 @@ sub upload_email_campaigns_paybackData {
 }
 
 sub upload_email_campaigns_contactListMobile {
-    my $base = "/tmp/$date_with_zero/contactListMobile";
+    my $base = "/tmp/$date_with_zero";
     print "contactListMobile directory is $base\n";
     system("mkdir -p $base");
 
