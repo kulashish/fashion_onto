@@ -106,11 +106,13 @@ object CustTop5 {
     val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
     val top5Full  = getTop5(top5PrevFull, saleOrderJoined, itr)
 
-    val fullPath = DataWriter.getWritePath(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(top5Full, fullPath, saveMode)
 
-    val top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS)
-
+    var top5Incr = top5Full
+    if(null != top5PrevFull){
+      top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    }
     val favTop5Map = top5Incr.map(e=> (e(0).asInstanceOf[Long]->(getTop5FavList(e(1).asInstanceOf[HashMap[String, Map[Int, Double]]]), getTop5FavList(e(2).asInstanceOf[HashMap[String, Map[Int, Double]]]), getTop5FavList(e(3).asInstanceOf[HashMap[String, Map[Int, Double]]]), getTop5FavList(e(4).asInstanceOf[HashMap[String, Map[Int, Double]]]))))
 
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
@@ -120,7 +122,7 @@ object CustTop5 {
 
     val fav = Spark.getSqlContext().createDataFrame(favTop5, cusTop5)
 
-   val top5Path =  DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+   val top5Path =  DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_TOP5, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(fav, top5Path, saveMode)
 
   }
