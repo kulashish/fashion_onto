@@ -90,10 +90,15 @@ object CustTop5 {
   def start(vars: ParamInfo) = {
     val saveMode = vars.saveMode
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
     val (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr) = readDF(incrDate, prevDate)
-    val salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-    val salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    var salesOrderincr: DataFrame = salesOrderIncr
+    var salesOrderItemincr: DataFrame = salesOrderItemIncr
+    if(null != top5PrevFull){
+       salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+       salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+
+    }
     val salesOrderNew = salesOrderincr.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
@@ -153,12 +158,12 @@ object CustTop5 {
     }
     else{
       val top5Joined = top5PrevFull.join(top5incr, top5PrevFull(SalesOrderVariables.FK_CUSTOMER) === top5incr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                              .select(coalesce(top5PrevFull(SalesOrderVariables.FK_CUSTOMER), top5PrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                                joinMaps(top5PrevFull("brand_list"), top5PrevFull("brand_list")),
-                                joinMaps(top5PrevFull("catagory_list"), top5PrevFull("catagory_list")),
-                                joinMaps(top5PrevFull("brick_list"), top5PrevFull("brick_list")),
-                                joinMaps(top5PrevFull("color_list"), top5PrevFull("color_list")),
-                                Udf.latestTimestamp(top5PrevFull("last_orders_created_at"), top5PrevFull("last_orders_created_at"))
+                              .select(coalesce(top5PrevFull(SalesOrderVariables.FK_CUSTOMER), top5incr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                                joinMaps(top5PrevFull("brand_list"), top5incr("brand_list")),
+                                joinMaps(top5PrevFull("catagory_list"), top5incr("catagory_list")),
+                                joinMaps(top5PrevFull("brick_list"), top5incr("brick_list")),
+                                joinMaps(top5PrevFull("color_list"), top5incr("color_list")),
+                                coalesce(top5incr("last_orders_created_at"), top5PrevFull("last_orders_created_at")) as "last_orders_created_at"
 
 
         )
@@ -263,7 +268,7 @@ object CustTop5 {
     val top5PrevFull =  DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
     var mode:String = DataSets.DAILY_MODE
     if(null == top5PrevFull){
-      mode = DataSets.FULL
+      mode = DataSets.FULL_MERGE_MODE
     }
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
