@@ -204,13 +204,13 @@ object CustTop5 {
         cat.put(m, (1, p))
       }
       if (brick.contains(n)) {
-        val (count, sum) = brand(n)
+        val (count, sum) = brick(n)
         brick.put(n, ((count + 1), (sum + p)))
       } else {
         brick.put(n, (1, p))
       }
       if (color.contains(o)) {
-        val (count, sum) = brand(o)
+        val (count, sum) = color(o)
         color.put(o, ((count + 1), (sum + p)))
       } else {
         color.put(o, (1, p))
