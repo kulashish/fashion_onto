@@ -176,10 +176,10 @@ object CustTop5 {
 
         }
     }
-    return mapFull
+    mapFull
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], String) = {
+  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Timestamp) = {
     val brand = Map[String, (Int, Double)]()
     val cat = Map[String, (Int, Double)]()
     val brick = Map[String, (Int, Double)]()
@@ -215,7 +215,7 @@ object CustTop5 {
         color.put(o, (1, p))
       }
     }
-    return (brand, cat, brick, color, maxDate.toString)
+    (brand, cat, brick, color, maxDate)
 
   }
 
