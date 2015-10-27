@@ -115,8 +115,10 @@ object PastCampaignCheck extends Logging {
 
     val pastCampaignSendCustomers = getCampaignCustomers(pastCampaignData, campaignMailType, nDays).withColumnRenamed(CustomerVariables.FK_CUSTOMER, "pastCampaign_" + CustomerVariables.FK_CUSTOMER)
 
-    val surfStatus: Boolean = customerSkuSelected.schema.contains(PageVisitVariables.BROWSER_ID)
+    val surfStatus: Boolean = customerSkuSelected.schema.fieldNames.contains(PageVisitVariables.BROWSER_ID)
 
+    customerSkuSelected.printSchema()
+    
     println("surfStatus:-"+ surfStatus)
 
     if(surfStatus){
