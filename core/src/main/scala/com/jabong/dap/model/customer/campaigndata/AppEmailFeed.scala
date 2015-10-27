@@ -17,9 +17,9 @@ object AppEmailFeed {
   val UID = "uid"
   val DEVICE_ID = "deviceid"
 
-  def getAppEmailFeed(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
+  def getAppEmailFeed(dfContactListMobileIncr: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
 
-    val dfAppEmailFeedFull = dfContactListMobileFull.select(
+    val dfAppEmailFeedIncr = dfContactListMobileIncr.select(
       col(ContactListMobileVars.UID),
       col(CampaignMergedFields.DEVICE_ID),
       col(CustomerVariables.EMAIL),
@@ -35,10 +35,9 @@ object AppEmailFeed {
       col(ContactListMobileVars.REG_DATE)
     )
 
-    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
-    val todayStartDate = todayDate + " " + TimeConstants.START_TIME
+    val todayStartDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT) + " " + TimeConstants.START_TIME
 
-    val dfAppEmailFeed = dfAppEmailFeedFull.except(dfAppEmailFeedPrevFull).select(
+    val dfAppEmailFeed = dfAppEmailFeedIncr.except(dfAppEmailFeedPrevFull).select(
       col(ContactListMobileVars.UID) as UID,
       col(CampaignMergedFields.DEVICE_ID) as DEVICE_ID,
       col(CustomerVariables.EMAIL),

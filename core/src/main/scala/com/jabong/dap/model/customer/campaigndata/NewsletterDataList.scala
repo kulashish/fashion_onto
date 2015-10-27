@@ -9,9 +9,13 @@ import org.apache.spark.sql.functions._
  */
 object NewsletterDataList {
 
-  def getNLDataList(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
+  val CUSTOMER_ID = "customer_id"
+  val EMAIL_SUBSCRIPTION_STATUS = "email_subscription_status"
+  val CUR_NL_STATUS = "cur_nl_status"
 
-    val dfNLDataListFull = dfContactListMobileFull.select(
+  def getNLDataList(dfContactListMobileIncr: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
+
+    val dfNLDataListIncr = dfContactListMobileIncr.select(
       col(CustomerVariables.EMAIL),
       col(CustomerVariables.ID_CUSTOMER),
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
@@ -25,11 +29,11 @@ object NewsletterDataList {
       col(NewsletterVariables.STATUS)
     )
 
-    val dfNlDataList = dfNLDataListFull.except(dfNLDataListPrevFull).select(
+    val dfNlDataList = dfNLDataListIncr.except(dfNLDataListPrevFull).select(
       col(CustomerVariables.EMAIL),
-      col(CustomerVariables.ID_CUSTOMER) as NewsletterVariables.CUSTOMER_ID,
-      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as NewsletterVariables.EMAIL_SUBSCRIPTION_STATUS,
-      col(NewsletterVariables.STATUS) as NewsletterVariables.CUR_NL_STATUS
+      col(CustomerVariables.ID_CUSTOMER) as CUSTOMER_ID,
+      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as EMAIL_SUBSCRIPTION_STATUS,
+      col(NewsletterVariables.STATUS) as CUR_NL_STATUS
     ).na.fill("")
 
     dfNlDataList

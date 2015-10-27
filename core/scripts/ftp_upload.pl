@@ -20,7 +20,7 @@ GetOptions (
 
 if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
     print "Will upload files only for PROD\n";
-    exit -1;
+    exit 0;
 }
 
 use POSIX qw(strftime);
@@ -304,7 +304,7 @@ sub upload_email_campaigns {
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
 
-    my $filename = "53699_33838_$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
+    my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
 
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 

@@ -67,6 +67,9 @@ object ContactListMobile extends Logging {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
+    println("incrDate: " + incrDate)
+    println("prevDate: " + prevDate)
+
     //read Data Frames
     val (
       dfCustomerIncr,
@@ -78,7 +81,6 @@ object ContactListMobile extends Logging {
       dfSalesOrderAddrFull,
       dfSalesOrderAddrFavPrevFull,
       dfSalesOrderItemIncr,
-      dfSalesOrderCalcPrevFull,
       dfSuccessOrdersCalcPrevFull,
       dfFavBrandCalcPrevFull,
       dfYestItr,
@@ -102,14 +104,8 @@ object ContactListMobile extends Logging {
       DataWriter.writeParquet(dfSalesOrderAddrFavFull, pathSalesOrderFavFull, saveMode)
     }
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
-    //TODO Check logic. Seems to be incorrect
-    val dfSalesOrderCalcFull = SalesOrder.processVariables(dfSalesOrderCalcPrevFull, dfSalesOrderIncr).cache()
-    //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT, FIRST_ORDER_DATE, ORDERS_COUNT, DAYS_SINCE_LAST_ORDER
-
-    val pathSalesOrderCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
-    if (DataWriter.canWrite(saveMode, pathSalesOrderCalcFull)) {
-      DataWriter.writeParquet(dfSalesOrderCalcFull, pathSalesOrderCalcFull, saveMode)
-    }
+    val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
+    //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT
 
     //SalesOrderItem.getSucessfulOrders for NET_ORDERS for variable
     val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
@@ -134,7 +130,7 @@ object ContactListMobile extends Logging {
       dfCustSegCalcIncr,
       dfNLSIncr,
       dfSalesOrderAddrFavCalc,
-      dfSalesOrderCalcFull,
+      dfSalesOrderCalcIncr,
       dfSuccessfulOrders,
       dfFavBrandIncr,
       dfDND,
@@ -143,7 +139,7 @@ object ContactListMobile extends Logging {
       dfZoneCity,
       dfCmrFull)
 
-    dfContactListMobileIncr.cache()
+    val dfContactListMobileIncrCached = dfContactListMobileIncr.cache()
 
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobileFull)) {
@@ -152,11 +148,11 @@ object ContactListMobile extends Logging {
 
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobile)) {
-      DataWriter.writeParquet(dfContactListMobileIncr, pathContactListMobile, saveMode)
+      DataWriter.writeParquet(dfContactListMobileIncrCached, pathContactListMobile, saveMode)
     }
 
     if (null != dfContactListMobilePrevFull) {
-      val dfCsv = dfContactListMobileIncr.select(
+      val dfCsv = dfContactListMobileIncrCached.select(
         col(ContactListMobileVars.UID),
         col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
@@ -188,13 +184,13 @@ object ContactListMobile extends Logging {
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val dfNlDataList = NewsletterDataList.getNLDataList(dfContactListMobileFull, dfContactListMobilePrevFull)
+      val dfNlDataList = NewsletterDataList.getNLDataList(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfNlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val dfAppEmailFeed = AppEmailFeed.getAppEmailFeed(dfContactListMobileFull, dfContactListMobilePrevFull)
+      val dfAppEmailFeed = AppEmailFeed.getAppEmailFeed(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfAppEmailFeed, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate, fileDate + "_app_email_feed", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val dfContactListPlus = ContactListPlus.getContactListPlus(dfContactListMobileFull, dfContactListMobilePrevFull)
+      val dfContactListPlus = ContactListPlus.getContactListPlus(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfContactListPlus, DataSets.VARIABLES, DataSets.CONTACT_LIST_PLUS, DataSets.DAILY_MODE, incrDate, fileDate + "_Contact_list_Plus", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
 
@@ -207,7 +203,7 @@ object ContactListMobile extends Logging {
    * @param dfCustSegCalcIncr
    * @param dfNLSIncr
    * @param dfSalesOrderAddrFavCalc
-   * @param dfSalesOrderCalcFull
+   * @param dfSalesOrderCalcIncr
    * @param dfSuccessfulOrders
    * @param dfZoneCity
    * @return
@@ -218,7 +214,7 @@ object ContactListMobile extends Logging {
     dfCustSegCalcIncr: DataFrame,
     dfNLSIncr: DataFrame,
     dfSalesOrderAddrFavCalc: DataFrame,
-    dfSalesOrderCalcFull: DataFrame,
+    dfSalesOrderCalcIncr: DataFrame,
     dfSuccessfulOrders: DataFrame,
     dfFavBrandIncr: DataFrame,
     dfDND: DataFrame,
@@ -234,7 +230,7 @@ object ContactListMobile extends Logging {
 
     val dfSmsOptOutMerged = dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER).unionAll(dfBlockedNumbers.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfSalesOrderAddrFavCalc, dfSalesOrderCalcFull, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged, dfCmrFull)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfSalesOrderAddrFavCalc, dfSalesOrderCalcIncr, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged, dfCmrFull)
 
     if (null != dfContactListMobilePrevFull) {
 
@@ -270,7 +266,7 @@ object ContactListMobile extends Logging {
 
         dfIncrVarBC(ContactListMobileVars.NET_ORDERS).+(dfContactListMobilePrevFull(ContactListMobileVars.NET_ORDERS)) as ContactListMobileVars.NET_ORDERS,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.LAST_ORDER_DATE), dfContactListMobilePrevFull(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
+        Udf.maxTimestamp(dfIncrVarBC(ContactListMobileVars.LAST_ORDER_DATE), dfContactListMobilePrevFull(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
 
         coalesce(dfIncrVarBC(CustomerVariables.GENDER), dfContactListMobilePrevFull(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
 
@@ -315,7 +311,7 @@ object ContactListMobile extends Logging {
 
   }
 
-  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesOrderAddrFavCalc: DataFrame, salesOrderCalcFull: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, dfCmrFull: DataFrame): DataFrame = {
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesOrderAddrFavCalc: DataFrame, salesOrderCalcIncr: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, dfCmrFull: DataFrame): DataFrame = {
     val customerNls = customerIncr.join(nls, customerIncr(CustomerVariables.EMAIL) === nls(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
       .select(
         coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -359,15 +355,15 @@ object ContactListMobile extends Logging {
         customerNls(NewsletterVariables.STATUS)
       )
 
-    val salesOrderAddress = salesOrderAddrFavCalc.join(salesOrderCalcFull, salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val salesOrderAddress = salesOrderAddrFavCalc.join(salesOrderCalcIncr, salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
-        coalesce(salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER), salesOrderCalcFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        coalesce(salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER), salesOrderCalcIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         salesOrderAddrFavCalc(SalesAddressVariables.PHONE),
         salesOrderAddrFavCalc(SalesAddressVariables.CITY),
         salesOrderAddrFavCalc(SalesAddressVariables.FIRST_NAME),
         salesOrderAddrFavCalc(SalesAddressVariables.LAST_NAME),
-        salesOrderCalcFull(ContactListMobileVars.LAST_ORDER_DATE),
-        salesOrderCalcFull(SalesOrderVariables.UPDATED_AT)
+        salesOrderCalcIncr(ContactListMobileVars.LAST_ORDER_DATE),
+        salesOrderCalcIncr(SalesOrderVariables.UPDATED_AT)
       )
 
     val salesMerged = salesOrderAddress.join(successfulOrdersIncr, salesOrderAddress(SalesOrderVariables.FK_CUSTOMER) === successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
@@ -560,7 +556,7 @@ object ContactListMobile extends Logging {
    * @param incrDate
    * @return
    */
-  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
     val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, incrDate)
     val dfCustomerListMobilePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, prevDate)
@@ -574,8 +570,6 @@ object ContactListMobile extends Logging {
     val dfSalesOrderAddrFavPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
 
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
-
-    val dfSalesOrderCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, prevDate)
 
     val dfSuccessOrdersCalcPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SUCCESSFUL_ORDERS_COUNT, DataSets.FULL_MERGE_MODE, prevDate)
 
@@ -602,7 +596,6 @@ object ContactListMobile extends Logging {
       dfSalesOrderAddrFull,
       dfSalesOrderAddrFavPrevFull,
       dfSalesOrderItemIncr,
-      dfSalesOrderCalcPrevFull,
       dfSuccessOrdersCalcPrevFull,
       dfFavBrandCalcPrevFull,
       dfYestItr,
@@ -613,7 +606,7 @@ object ContactListMobile extends Logging {
       dfCmr)
   }
 
-  def readDf(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def readDf(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
     if (null != paths) {
       val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, incrDate)
       val dfCustomerSegmentsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_SEGMENTS, DataSets.FULL_MERGE_MODE, incrDate)
@@ -646,7 +639,6 @@ object ContactListMobile extends Logging {
         dfSalesOrderAddrFull,
         null,
         dfSalesOrderItemIncr,
-        null,
         null,
         null,
         dfYestItr,

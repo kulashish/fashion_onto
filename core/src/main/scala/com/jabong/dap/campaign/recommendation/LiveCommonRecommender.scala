@@ -34,7 +34,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     }
 
     val refSkuExploded = refSkusUpdatedSchema.select(
-      refSkusUpdatedSchema(CustomerVariables.FK_CUSTOMER),
+      refSkusUpdatedSchema(CustomerVariables.EMAIL),
       refSkusUpdatedSchema(CampaignMergedFields.REF_SKU1),
       refSkusUpdatedSchema(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       refSkusUpdatedSchema(CampaignMergedFields.LIVE_CART_URL),
@@ -43,7 +43,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     //FIXME: To check if there is any ref sku in recommended sku
     //FIXME: add column as rec skus instead of passing entire data to genRecSkus function
     val completeRefSku = refSkuExploded.select(
-      refSkuExploded(CustomerVariables.FK_CUSTOMER),
+      refSkuExploded(CustomerVariables.EMAIL),
       refSkuExploded(CampaignMergedFields.REF_SKU1),
       refSkuExploded(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       refSkuExploded(CampaignMergedFields.LIVE_CART_URL),
@@ -67,7 +67,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     }
 
     val recommendationSelected = recommendationJoined.select(
-      completeRefSku(CustomerVariables.FK_CUSTOMER),
+      completeRefSku(CustomerVariables.EMAIL),
       // recommendedSkus(completeRefSku(CampaignMergedFields.REF_SKU), recommendations(CampaignMergedFields.RECOMMENDATIONS)) as CampaignMergedFields.REC_SKUS,
       recommendations(CampaignMergedFields.RECOMMENDATIONS + "." + ProductVariables.SKU) as CampaignMergedFields.REC_SKUS,
       Udf.skuFromSimpleSku(completeRefSku(CampaignMergedFields.REF_SKU)) as CampaignMergedFields.REF_SKU,
@@ -77,12 +77,12 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
-    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[Long], getRecSkus(value)) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
-    val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKUS,
+    val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
     return campaignDataWithRecommendations
