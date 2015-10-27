@@ -118,10 +118,6 @@ object PastCampaignCheck extends Logging {
 
     val surfStatus: Boolean = customerSkuSelected.schema.fieldNames.contains(PageVisitVariables.BROWSER_ID)
 
-    customerSkuSelected.printSchema()
-
-    println("surfStatus:-"+ surfStatus)
-
     if(surfStatus){
       val customerNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER +" is null")
 
@@ -137,7 +133,6 @@ object PastCampaignCheck extends Logging {
            customerNullSkuSelected("*")
         )
     }
-
 
     val pastCampaignNotNullSendCustomers = customerNotNullSkuSelected
       .join(pastCampaignSendCustomers, customerNotNullSkuSelected(CustomerVariables.FK_CUSTOMER) === pastCampaignSendCustomers("pastCampaign_" + CustomerVariables.FK_CUSTOMER)
