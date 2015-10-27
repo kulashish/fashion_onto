@@ -279,9 +279,6 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "customerPreferredTimeslotPart1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart1 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart1.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "customerJCDetails") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerJCDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerJCDetails.json";
-    $job_exit = run_component($component, $command);
 } elsif ($component eq "paybackData") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
     $job_exit = run_component($component, $command);
