@@ -130,7 +130,7 @@ object CustTop5 {
     )
     val fav = Spark.getSqlContext().createDataFrame(favTop5, cusTop5)
 
-    val top5Path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_TOP5, DataSets.DAILY_MODE, incrDate)
+    val top5Path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(fav, top5Path, saveMode)
 
   }
