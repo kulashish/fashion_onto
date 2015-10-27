@@ -113,7 +113,7 @@ object PastCampaignCheck extends Logging {
 
     val customerNullSkuSelected = customerSkuSelected.filter(col(CustomerVariables.FK_CUSTOMER).isNull)
 
-    val customerNotNullSkuSelected = customerSkuSelected.filter(col(CustomerVariables.FK_CUSTOMER).geq(0))
+    val customerNotNullSkuSelected = customerSkuSelected.filter(col(CustomerVariables.FK_CUSTOMER).gt(0))
 
     var pastCampaignNullSendCustomers: DataFrame = null
 
