@@ -428,14 +428,14 @@ object Schema {
 
   val customerFavList = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
-    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("catagory_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("catagory_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
     StructField("last_orders_created_at", TimestampType, true)
 
   ))
