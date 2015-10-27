@@ -129,11 +129,15 @@ object CampaignQuality extends Logging {
         for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
           val campDF = dataFrame.filter("LIVE_MAIL_TYPE" + " = " + campaignDetails.mailType)
           val count = campDF.count()
-          val countAndroid = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.ANDROID + "'").count()
-          val countIos = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.IOS + "'").count()
-          val countWindows = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.WINDOWS + "'").count()
 
-          row = Row(campaignDetails.campaignName, zero, zero, zero, count, countAndroid, countIos, countWindows)
+          if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
+            val countAndroid = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.ANDROID + "'").count()
+            val countIos = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.IOS + "'").count()
+            val countWindows = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.WINDOWS + "'").count()
+            row = Row(campaignDetails.campaignName, zero, zero, zero, count, countAndroid, countIos, countWindows)
+          } else {
+            row = Row(campaignDetails.campaignName, zero, zero, zero, count, zero, zero, zero)
+          }
           list += row
 
         }
