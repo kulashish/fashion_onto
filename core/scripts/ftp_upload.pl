@@ -304,7 +304,7 @@ sub upload_email_campaigns {
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
 
-    my $filename = "53699_33838_$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
+    my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
 
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
