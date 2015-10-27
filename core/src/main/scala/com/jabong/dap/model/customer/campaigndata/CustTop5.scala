@@ -96,12 +96,16 @@ object CustTop5 {
     if (null != top5PrevFull) {
       salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
       salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-
     }
     val salesOrderNew = salesOrderincr.na.fill(scala.collection.immutable.Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
     val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
+      .select(
+        salesOrderNew(SalesOrderVariables.FK_CUSTOMER),
+        salesOrderItemincr(SalesOrderItemVariables.SKU),
+        salesOrderNew(SalesOrderVariables.CREATED_AT)
+      )
     val top5Full = getTop5(top5PrevFull, saleOrderJoined, itr)
 
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
