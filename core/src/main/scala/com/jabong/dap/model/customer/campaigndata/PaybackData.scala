@@ -41,7 +41,7 @@ object PaybackData {
     }
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(incPaybackData.na.fill(""), DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.DAILY_MODE, incrDate, "53699_78384_" + fileDate + "_payback_data", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(incPaybackData.na.fill(""), DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.DAILY_MODE, incrDate, fileDate + "_payback_data", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 
