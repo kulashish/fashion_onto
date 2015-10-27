@@ -26,6 +26,10 @@ class CustomerPreferredTimeslotPart1Test extends FlatSpec with SharedSparkContex
 
   "getCPOTPart1: Data Frame" should "match to resultant Data Frame" in {
 
-  }
+    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart1.getCPOTPart1(dfEmailOpen, dfEmailClick, null)
 
+    assert(dfInc.count() == 10)
+    assert(dfFullFinal.count() == 10)
+
+  }
 }
