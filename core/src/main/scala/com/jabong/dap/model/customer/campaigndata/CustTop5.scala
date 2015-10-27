@@ -4,7 +4,6 @@ import java.util.Date
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ Spark, Utils, OptionUtils }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
@@ -14,7 +13,6 @@ import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
-import org.apache.hadoop.hdfs.util.Diff.ListType
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
