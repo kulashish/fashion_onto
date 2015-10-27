@@ -76,7 +76,7 @@ object CustTop5 {
 
     var top5Incr = top5Full
     if (null != top5PrevFull) {
-      top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+      top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
     val favTop5Map = top5Incr.map(e =>
       (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[Map[String, (Int, Double)]]),
@@ -134,7 +134,7 @@ object CustTop5 {
       .na.fill("", Array(ProductVariables.BRAND, ProductVariables.CATEGORY, ProductVariables.BRICK, ProductVariables.COLOR))
 
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], e(6).toString))).groupByKey()
-    val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, TimeUtils.getTimeStamp(e._2._5, TimeConstants.DD_MMM_YYYY_HH_MM_SS)))
+    val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, TimeUtils.getTimeStamp(e._2._5, TimeConstants.DATE_TIME_FORMAT_MS)))
 
     val top5incr = Spark.getSqlContext().createDataFrame(top5, Schema.customerFavList)
     if (null == top5PrevFull) {
@@ -184,10 +184,10 @@ object CustTop5 {
     val cat = Map[String, (Int, Double)]()
     val brick = Map[String, (Int, Double)]()
     val color = Map[String, (Int, Double)]()
-    var maxDate: Date = TimeUtils.getDate(TimeUtils.getDateAfterNDays(-100, TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    var maxDate: Date = TimeUtils.MIN_DATE
     list.foreach{ e =>
       val (l, m, n, o, p, date) = e
-      var dat = TimeUtils.getDate(date, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+      var dat = TimeUtils.getDate(date, TimeConstants.DATE_TIME_FORMAT_MS)
       if (maxDate.before(dat)) {
         maxDate = dat
       }
