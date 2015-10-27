@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import java.util.Date
+import java.sql.Timestamp
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
@@ -133,8 +133,8 @@ object CustTop5 {
       )
       .na.fill("", Array(ProductVariables.BRAND, ProductVariables.CATEGORY, ProductVariables.BRICK, ProductVariables.COLOR))
 
-    val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], e(6).toString))).groupByKey()
-    val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, TimeUtils.getTimeStamp(e._2._5, TimeConstants.DATE_TIME_FORMAT_MS)))
+    val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], Timestamp.valueOf(e(6).toString)))).groupByKey()
+    val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
 
     val top5incr = Spark.getSqlContext().createDataFrame(top5, Schema.customerFavList)
     if (null == top5PrevFull) {
@@ -179,17 +179,16 @@ object CustTop5 {
     return mapFull
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, String)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], String) = {
+  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], String) = {
     val brand = Map[String, (Int, Double)]()
     val cat = Map[String, (Int, Double)]()
     val brick = Map[String, (Int, Double)]()
     val color = Map[String, (Int, Double)]()
-    var maxDate: Date = TimeUtils.MIN_DATE
+    var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
     list.foreach{ e =>
       val (l, m, n, o, p, date) = e
-      var dat = TimeUtils.getDate(date, TimeConstants.DATE_TIME_FORMAT_MS)
-      if (maxDate.before(dat)) {
-        maxDate = dat
+      if (maxDate.before(date)) {
+        maxDate = date
       }
       if (brand.contains(l)) {
         val (count, sum) = brand(l)
