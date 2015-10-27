@@ -4,22 +4,19 @@ import java.util.Date
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.{ Spark, Utils, OptionUtils }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
-import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
+import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark, Utils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.product.itr.BasicITR
-import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{ DataFrame, Row }
+
 import scala.collection.mutable.{ ListBuffer, Map }
-
-
 
 /**
  * Created by mubarak on 20/10/15.
@@ -136,12 +133,12 @@ object CustTop5 {
 
   }
 
-  def getTop5FavList(map: Map[String, (Int, Double)]): List[String]={
+  def getTop5FavList(map: Map[String, (Int, Double)]): List[String] = {
     val a = ListBuffer[(String, Int, Double)]()
     val keys = map.keySet
     keys.foreach{
       t =>
-        val (k,j)=  map(t)
+        val (k, j) = map(t)
         val x = Tuple3(t, k, j)
         a.+=:(x)
     }
@@ -164,7 +161,7 @@ object CustTop5 {
         itr(ProductVariables.CATEGORY),
         itr(ProductVariables.BRICK),
         itr(ProductVariables.COLOR),
-        itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ITR.SPECIAL_PRICE,
+        itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE,
         saleOrderJoined(SalesOrderVariables.CREATED_AT)
       )
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], e(6).toString))).groupByKey()
@@ -187,10 +184,10 @@ object CustTop5 {
     }
   }
 
-  val mergeMapCols = udf((map1: Map[String, (Int, Double)], map2 : Map[String, (Int, Double)]) => joinMaps(map1, map2))
+  val mergeMapCols = udf((map1: Map[String, (Int, Double)], map2: Map[String, (Int, Double)]) => joinMaps(map1, map2))
 
-  def joinMaps(mapIncr: Map[String, (Int, Double)], mapFull : Map[String, (Int, Double)]): Map[String, (Int, Double)] ={
-    if(null == mapFull && null == mapIncr){
+  def joinMaps(mapIncr: Map[String, (Int, Double)], mapFull: Map[String, (Int, Double)]): Map[String, (Int, Double)] = {
+    if (null == mapFull && null == mapIncr) {
       return null
     } else if (null == mapFull) {
       return mapIncr
@@ -201,20 +198,19 @@ object CustTop5 {
     val keys = mapIncr.keySet
     keys.foreach{
       e =>
-       var (count, sum) = mapIncr(e)
-      if(mapFull.contains(e)){
-        val (count1, sum1) = mapFull(e)
-        mapFull.put(e, ((count+count1) ,(sum + sum1)))
-        }
-        else{
-            mapFull.put(e, (count, sum))
+        var (count, sum) = mapIncr(e)
+        if (mapFull.contains(e)) {
+          val (count1, sum1) = mapFull(e)
+          mapFull.put(e, ((count + count1), (sum + sum1)))
+        } else {
+          mapFull.put(e, (count, sum))
 
         }
     }
     return mapFull
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, String)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], String)={
+  def getTop5Count(list: List[(String, String, String, String, Double, String)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], String) = {
     val brand = Map[String, (Int, Double)]()
     val cat = Map[String, (Int, Double)]()
     val brick = Map[String, (Int, Double)]()
@@ -226,37 +222,32 @@ object CustTop5 {
       if (maxDate.before(dat)) {
         maxDate = dat
       }
-      if(brand.contains(l)){
+      if (brand.contains(l)) {
         val (count, sum) = brand(l)
-        brand.put(l, ((count+1), (sum + p)))
-      }
-      else{
+        brand.put(l, ((count + 1), (sum + p)))
+      } else {
         brand.put(l, (1, p))
       }
-      if(cat.contains(m)){
+      if (cat.contains(m)) {
         val (count, sum) = cat(m)
-        cat.put(m, ((count+1), (sum + p)))
-      }
-      else{
+        cat.put(m, ((count + 1), (sum + p)))
+      } else {
         cat.put(m, (1, p))
       }
-      if(brick.contains(n)){
+      if (brick.contains(n)) {
         val (count, sum) = brand(n)
-        brick.put(n, ((count+1), (sum + p)))
-      }
-      else{
+        brick.put(n, ((count + 1), (sum + p)))
+      } else {
         brick.put(n, (1, p))
       }
-      if(color.contains(o)){
+      if (color.contains(o)) {
         val (count, sum) = brand(o)
-        color.put(o, ((count+1), (sum + p)))
-      }
-      else{
+        color.put(o, ((count + 1), (sum + p)))
+      } else {
         color.put(o, (1, p))
       }
-      }
-    return (brand,cat,brick,color, maxDate.toString)
-
+    }
+    return (brand, cat, brick, color, maxDate.toString)
 
   }
 
