@@ -12,8 +12,6 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.product.itr.BasicITR
-import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
@@ -164,7 +162,7 @@ object CustTop5 {
         itr(ProductVariables.CATEGORY),
         itr(ProductVariables.BRICK),
         itr(ProductVariables.COLOR),
-        itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ITR.SPECIAL_PRICE,
+        itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE,
         saleOrderJoined(SalesOrderVariables.CREATED_AT)
       )
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], e(6).toString))).groupByKey()
