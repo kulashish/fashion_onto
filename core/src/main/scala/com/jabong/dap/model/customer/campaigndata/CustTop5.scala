@@ -6,12 +6,13 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.{ Spark, Utils, OptionUtils }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ Row, DataFrame }
@@ -157,7 +158,7 @@ object CustTop5 {
   }
 
   def getTop5(top5PrevFull: DataFrame, saleOrderJoined: DataFrame, itr: DataFrame): DataFrame = {
-    val joinedItr = saleOrderJoined.join(itr, saleOrderJoined(SalesOrderItemVariables.SKU) === itr(ITR.SIMPLE_SKU), SQL.LEFT_OUTER)
+    val joinedItr = saleOrderJoined.join(itr, saleOrderJoined(SalesOrderItemVariables.SKU) === itr(ProductVariables.SKU_SIMPLE), SQL.LEFT_OUTER)
       .select(saleOrderJoined(SalesOrderVariables.FK_CUSTOMER),
         itr(ITR.BRAND_NAME),
         itr(ITR.REPORTING_CATEGORY),
