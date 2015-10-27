@@ -44,7 +44,7 @@ object PastCampaignCheck extends Logging {
       mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.END_OF_DATE + " >= '" + filterDate + "'")
         .select(pastCampaignData(CampaignMergedFields.CUSTOMER_ID) as CustomerVariables.FK_CUSTOMER,
           pastCampaignData(CampaignMergedFields.LIVE_REF_SKU1),
-          pastCampaignData(CampaignMergedFields.DEVICE_ID))
+          pastCampaignData(CampaignMergedFields.deviceId))
     } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
       mailTypeCustomers = pastCampaignData.filter(CampaignMergedFields.LIVE_MAIL_TYPE + " = " + campaignMailType + " and " + CampaignMergedFields.LAST_UPDATED_DATE + " >= '" + filterDate + "'")
     }
@@ -124,11 +124,11 @@ object PastCampaignCheck extends Logging {
       customerNotNullSkuSelected = customerSkuSelected.filter(CustomerVariables.FK_CUSTOMER +" is not null and "+CustomerVariables.FK_CUSTOMER +" != 0")
 
        pastCampaignNullSendCustomers =  customerNullSkuSelected
-        .join(pastCampaignSendCustomers, customerNullSkuSelected(PageVisitVariables.BROWSER_ID) === pastCampaignSendCustomers(CampaignMergedFields.DEVICE_ID)
+        .join(pastCampaignSendCustomers, customerNullSkuSelected(PageVisitVariables.BROWSER_ID) === pastCampaignSendCustomers(CampaignMergedFields.deviceId)
         &&
          customerNullSkuSelected("temp_" + ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU1), SQL.LEFT_OUTER)
         .filter(
-          CampaignMergedFields.DEVICE_ID + " is null"
+           CampaignMergedFields.deviceId + " is null"
         ).select(
            customerNullSkuSelected("*")
         )
