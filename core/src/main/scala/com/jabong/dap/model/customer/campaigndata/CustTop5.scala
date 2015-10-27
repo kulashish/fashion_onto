@@ -11,6 +11,7 @@ import com.jabong.dap.common.{ OptionUtils, Spark, Utils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -47,44 +48,6 @@ import scala.collection.mutable.{ ListBuffer, Map }
  * COLOR_5
  */
 object CustTop5 {
-
-  val customerFavList = StructType(Array(
-    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
-    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("catagory_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", LongType),
-      StructField("sum_price", StringType)))), true),
-    StructField("last_orders_created_at", TimestampType, true)
-
-  ))
-
-  val cusTop5 = StructType(Array(
-    StructField("fk_customer", LongType, true),
-    StructField("BRAND_1", StringType, true),
-    StructField("BRAND_2", StringType, true),
-    StructField("BRAND_3", StringType, true),
-    StructField("BRAND_4", StringType, true),
-    StructField("BRAND_5", StringType, true),
-    StructField("CAT_1", StringType, true),
-    StructField("CAT_2", StringType, true),
-    StructField("CAT_3", StringType, true),
-    StructField("CAT_4", StringType, true),
-    StructField("CAT_5", StringType, true),
-    StructField("BRICK_1", StringType, true),
-    StructField("BRICK_2", StringType, true),
-    StructField("BRICK_3", StringType, true),
-    StructField("BRICK_4", StringType, true),
-    StructField("BRICK_5", StringType, true),
-    StructField("COLOR_1", StringType, true),
-    StructField("COLOR_2", StringType, true),
-    StructField("COLOR_3", StringType, true),
-    StructField("COLOR_4", StringType, true),
-    StructField("COLOR_5", StringType, true)
-  ))
 
   def start(vars: ParamInfo) = {
     val saveMode = vars.saveMode
@@ -130,7 +93,7 @@ object CustTop5 {
       e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4) //color
     )
     )
-    val fav = Spark.getSqlContext().createDataFrame(favTop5, cusTop5)
+    val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
 
     val top5Path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(fav, top5Path, saveMode)
@@ -173,7 +136,7 @@ object CustTop5 {
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], e(6).toString))).groupByKey()
     val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, TimeUtils.getTimeStamp(e._2._5, TimeConstants.DD_MMM_YYYY_HH_MM_SS)))
 
-    val top5incr = Spark.getSqlContext().createDataFrame(top5, customerFavList)
+    val top5incr = Spark.getSqlContext().createDataFrame(top5, Schema.customerFavList)
     if (null == top5PrevFull) {
       return top5incr
     } else {
