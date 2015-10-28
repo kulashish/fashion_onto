@@ -143,7 +143,6 @@ object CustTop5 {
         getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
       )
       )
-
     )
 
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
@@ -186,7 +185,10 @@ object CustTop5 {
     catagories.foreach{
       e=>
         if(map.contains(e)){
-          val (count, sum) = map(e)
+          val tuple = map(e)
+          val count = tuple._1
+          val sum = tuple._2
+          //val (count, sum) = map(e)
           val ele = Tuple2(count, (sum/count))
           list.+=(ele)
         }
@@ -204,7 +206,9 @@ object CustTop5 {
     val keys = map.keySet
     keys.foreach{
       t =>
-        val (k, j) = map(t)
+        val tup = map(t)
+        val k = tup._1
+        val j = tup._2
         val x = Tuple3(t, k, j)
         a.+=:(x)
     }
