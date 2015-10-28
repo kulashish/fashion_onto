@@ -160,8 +160,26 @@
     },
     {
       "source": "bob",
+      "tableName": "payment_prepaid_transaction_data",
+      "primaryKey": "id_payment_prepaid_transaction_data",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "order_created_at"
+    },
+    {
+      "source": "bob",
       "tableName": "catalog_config_additional_info",
       "primaryKey": "id_catalog_config_additional_info",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_status_history",
+      "primaryKey": "id_sales_order_item_status_history",
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "Ignore",

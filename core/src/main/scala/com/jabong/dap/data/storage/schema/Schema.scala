@@ -178,6 +178,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
     StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.USER_SHORTLIST_KEY, StringType, true),
+    StructField(CustomerProductShortlistVariables.USER_TOKEN,StringType,true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
     StructField(CustomerProductShortlistVariables.EXTRA_DATA, StringType, true),

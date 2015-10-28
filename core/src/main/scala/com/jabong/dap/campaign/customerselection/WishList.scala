@@ -3,10 +3,8 @@ package com.jabong.dap.campaign.customerselection
 import java.sql.Timestamp
 
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -49,14 +47,14 @@ class WishList extends LiveCustomerSelector with Logging {
 
     }
 
-    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
-
-      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
-
-      logger.error("schema should be this :" + Schema.customerProductShortlist)
-      return null
-
-    }
+//    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
+//
+//      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
+//
+//      logger.error("schema should be this :" + Schema.customerProductShortlist)
+//      return null
+//
+//    }
 
     val dateBeforeNdays = TimeUtils.getDateAfterNDays(-ndays, TimeConstants.DATE_TIME_FORMAT_MS)
 
