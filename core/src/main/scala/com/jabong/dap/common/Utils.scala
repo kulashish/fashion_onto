@@ -8,7 +8,7 @@ import org.apache.spark.sql.DataFrame
 /**
  * Created by mubarak on 21/10/15.
  */
-object Utils extends Logging{
+object Utils extends Logging {
 
   /**
    * Filtered Data based on before time to after Time yyyy-mm-dd HH:MM:SS.s
@@ -40,15 +40,13 @@ object Utils extends Logging{
     return filteredData
   }
 
-
   def getOneDayData(inData: DataFrame, timeField: String, date: String, dateFormat: String): DataFrame = {
-    if (inData == null || timeField == null ||date == null) {
+    if (inData == null || timeField == null || date == null) {
       logger.error("Any of the value in getTimeBasedDataFrame is null")
       return null
     }
 
-
-    val start =  TimeUtils.getStartTimestampMS(TimeUtils.getTimeStamp(date, dateFormat))
+    val start = TimeUtils.getStartTimestampMS(TimeUtils.getTimeStamp(date, dateFormat))
 
     val end = TimeUtils.getEndTimestampMS(TimeUtils.getTimeStamp(date, dateFormat))
 

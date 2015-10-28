@@ -1,25 +1,24 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.{Utils, OptionUtils}
+import com.jabong.dap.common.{ Utils, OptionUtils }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderVariables, SalesRuleSetVariables, SalesOrderItemVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderVariables, SalesRuleSetVariables, SalesOrderItemVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.sql.functions._
 
-import com.jabong.dap.model.order.variables.{SalesOrderAddress, SalesOrderItem}
+import com.jabong.dap.model.order.variables.{ SalesOrderAddress, SalesOrderItem }
 
 import org.apache.spark.sql.DataFrame
 
 /**
  * Created by mubarak on 12/10/15.
  */
-
 
 /*
   UID - CMR
@@ -69,7 +68,6 @@ object CustomerOrders {
     var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(salesRevenueVariables, savePath, saveMode)
 
-
     val salesDiscount = SalesOrderItem.getCouponDisc(salesOrderIncr, salesRuleFull, salesRuleSetFull, salesRuleCalc)
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_COUPON_DISC, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(salesDiscount, savePath, saveMode)
@@ -99,116 +97,114 @@ object CustomerOrders {
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custOrdersincr, savePath, saveMode)
 
-
   }
 
-  def joinCustOrder(incr: DataFrame, prevFull: DataFrame): DataFrame={
-    if(null == prevFull){
+  def joinCustOrder(incr: DataFrame, prevFull: DataFrame): DataFrame = {
+    if (null == prevFull) {
       return incr
     }
     return null
   }
 
-
-  def merger(salesRevenueVariables: DataFrame, salesDiscount: DataFrame, salesInvalid: DataFrame, salesCatBrick: DataFrame, salesOrderValue: DataFrame, salesAddressFirst:DataFrame):DataFrame={
+  def merger(salesRevenueVariables: DataFrame, salesDiscount: DataFrame, salesInvalid: DataFrame, salesCatBrick: DataFrame, salesOrderValue: DataFrame, salesAddressFirst: DataFrame): DataFrame = {
 
     val revJoined = salesRevenueVariables.join(salesDiscount, salesDiscount(SalesOrderVariables.FK_CUSTOMER) === salesRevenueVariables(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                      .select(coalesce(salesDiscount(SalesOrderVariables.FK_CUSTOMER), salesRevenueVariables(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                              salesRevenueVariables(SalesOrderItemVariables.REVENUE_7),
-                              salesRevenueVariables(SalesOrderItemVariables.REVENUE_30),
-                              salesRevenueVariables(SalesOrderItemVariables.REVENUE_LIFE),
-                              salesRevenueVariables(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
-                              salesDiscount(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-                              salesDiscount(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-                              salesDiscount(SalesRuleSetVariables.COUPON_SUM)/salesDiscount(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.AVG_COUPON_VALUE_USED,
-                              salesDiscount(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-                              salesDiscount(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-                              salesDiscount(SalesRuleSetVariables.DISCOUNT_SUM)/salesDiscount(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.AVERAGE_DISCOUNT_USED)
+      .select(coalesce(salesDiscount(SalesOrderVariables.FK_CUSTOMER), salesRevenueVariables(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        salesRevenueVariables(SalesOrderItemVariables.REVENUE_7),
+        salesRevenueVariables(SalesOrderItemVariables.REVENUE_30),
+        salesRevenueVariables(SalesOrderItemVariables.REVENUE_LIFE),
+        salesRevenueVariables(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
+        salesDiscount(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        salesDiscount(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        salesDiscount(SalesRuleSetVariables.COUPON_SUM) / salesDiscount(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.AVG_COUPON_VALUE_USED,
+        salesDiscount(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        salesDiscount(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        salesDiscount(SalesRuleSetVariables.DISCOUNT_SUM) / salesDiscount(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.AVERAGE_DISCOUNT_USED)
 
     val invalidJoined = revJoined.join(salesInvalid, salesInvalid(SalesOrderVariables.FK_CUSTOMER) === revJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                          .select(coalesce(revJoined(SalesOrderVariables.FK_CUSTOMER), salesInvalid(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                              revJoined(SalesOrderItemVariables.REVENUE_7),
-                              revJoined(SalesOrderItemVariables.REVENUE_30),
-                              revJoined(SalesOrderItemVariables.REVENUE_LIFE),
-                              revJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
-                              revJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-                              revJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-                              revJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
-                              revJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-                              revJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-                              revJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
-                              salesInvalid(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
-                              salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
-                              salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS)
-                              )
+      .select(coalesce(revJoined(SalesOrderVariables.FK_CUSTOMER), salesInvalid(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        revJoined(SalesOrderItemVariables.REVENUE_7),
+        revJoined(SalesOrderItemVariables.REVENUE_30),
+        revJoined(SalesOrderItemVariables.REVENUE_LIFE),
+        revJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
+        revJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        revJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        revJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
+        revJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        revJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        revJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
+        salesInvalid(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
+        salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
+        salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS)
+      )
 
-    val catBrickJoined = invalidJoined.join(salesCatBrick, salesCatBrick(SalesOrderVariables.FK_CUSTOMER)=== invalidJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                            .select(coalesce(invalidJoined(SalesOrderVariables.FK_CUSTOMER), salesCatBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                                invalidJoined(SalesOrderItemVariables.REVENUE_7),
-                                invalidJoined(SalesOrderItemVariables.REVENUE_30),
-                                invalidJoined(SalesOrderItemVariables.REVENUE_LIFE),
-                                invalidJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
-                                invalidJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-                                invalidJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-                                invalidJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
-                                invalidJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-                                invalidJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-                                invalidJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
-                                invalidJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
-                                invalidJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
-                                invalidJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
-                                salesCatBrick(SalesOrderVariables.CATEGORY_PENETRATION),
-                                salesCatBrick(SalesOrderVariables.BRICK_PENETRATION)
-                                )
+    val catBrickJoined = invalidJoined.join(salesCatBrick, salesCatBrick(SalesOrderVariables.FK_CUSTOMER) === invalidJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+      .select(coalesce(invalidJoined(SalesOrderVariables.FK_CUSTOMER), salesCatBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        invalidJoined(SalesOrderItemVariables.REVENUE_7),
+        invalidJoined(SalesOrderItemVariables.REVENUE_30),
+        invalidJoined(SalesOrderItemVariables.REVENUE_LIFE),
+        invalidJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
+        invalidJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        invalidJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        invalidJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
+        invalidJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        invalidJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        invalidJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
+        invalidJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
+        invalidJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
+        invalidJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        salesCatBrick(SalesOrderVariables.CATEGORY_PENETRATION),
+        salesCatBrick(SalesOrderVariables.BRICK_PENETRATION)
+      )
     val salesValueJoined = salesOrderValue.join(catBrickJoined, catBrickJoined(SalesOrderVariables.FK_CUSTOMER) === salesOrderValue(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                              .select(coalesce(catBrickJoined(SalesOrderVariables.FK_CUSTOMER), salesOrderValue(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                                    catBrickJoined(SalesOrderItemVariables.REVENUE_7),
-                                    catBrickJoined(SalesOrderItemVariables.REVENUE_30),
-                                    catBrickJoined(SalesOrderItemVariables.REVENUE_LIFE),
-                                    catBrickJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
-                                    catBrickJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-                                    catBrickJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-                                    catBrickJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
-                                    catBrickJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-                                    catBrickJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-                                    catBrickJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
-                                    catBrickJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
-                                    catBrickJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
-                                    catBrickJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
-                                    catBrickJoined(SalesOrderVariables.CATEGORY_PENETRATION),
-                                    catBrickJoined(SalesOrderVariables.BRICK_PENETRATION),
-                                    salesOrderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
-                                    salesOrderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
-                                    salesOrderValue(SalesOrderVariables.SUM_BASKET_VALUE)/salesOrderValue(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.AVG_ORDER_VALUE,
-                                    salesOrderValue(SalesOrderVariables.SUM_BASKET_VALUE)/salesOrderValue(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.AVG_ORDER_ITEM_VALUE
-                                    )
+      .select(coalesce(catBrickJoined(SalesOrderVariables.FK_CUSTOMER), salesOrderValue(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        catBrickJoined(SalesOrderItemVariables.REVENUE_7),
+        catBrickJoined(SalesOrderItemVariables.REVENUE_30),
+        catBrickJoined(SalesOrderItemVariables.REVENUE_LIFE),
+        catBrickJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
+        catBrickJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        catBrickJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        catBrickJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
+        catBrickJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        catBrickJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        catBrickJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
+        catBrickJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
+        catBrickJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
+        catBrickJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        catBrickJoined(SalesOrderVariables.CATEGORY_PENETRATION),
+        catBrickJoined(SalesOrderVariables.BRICK_PENETRATION),
+        salesOrderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
+        salesOrderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
+        salesOrderValue(SalesOrderVariables.SUM_BASKET_VALUE) / salesOrderValue(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.AVG_ORDER_VALUE,
+        salesOrderValue(SalesOrderVariables.SUM_BASKET_VALUE) / salesOrderValue(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.AVG_ORDER_ITEM_VALUE
+      )
 
     val res = salesValueJoined.join(salesAddressFirst, salesValueJoined(SalesOrderVariables.FK_CUSTOMER) === salesAddressFirst(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                                  .select(coalesce(salesAddressFirst(SalesOrderVariables.FK_CUSTOMER), salesAddressFirst(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                                      salesValueJoined(SalesOrderItemVariables.REVENUE_7),
-                                      salesValueJoined(SalesOrderItemVariables.REVENUE_30),
-                                      salesValueJoined(SalesOrderItemVariables.REVENUE_LIFE),
-                                      salesValueJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
-                                      salesValueJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-                                      salesValueJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-                                      salesValueJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
-                                      salesValueJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-                                      salesValueJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-                                      salesValueJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
-                                      salesValueJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
-                                      salesValueJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
-                                      salesValueJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
-                                      salesValueJoined(SalesOrderVariables.CATEGORY_PENETRATION),
-                                      salesValueJoined(SalesOrderVariables.BRICK_PENETRATION),
-                                      salesValueJoined(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
-                                      salesValueJoined(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
-                                      salesValueJoined(SalesOrderVariables.AVG_ORDER_VALUE),
-                                      salesValueJoined(SalesOrderVariables.AVG_ORDER_ITEM_VALUE),
-                                      salesAddressFirst(SalesAddressVariables.FIRST_SHIPPING_CITY),
-                                      salesAddressFirst(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER),
-                                      salesAddressFirst(SalesAddressVariables.LAST_SHIPPING_CITY),
-                                      salesAddressFirst(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)
-                                      )
+      .select(coalesce(salesAddressFirst(SalesOrderVariables.FK_CUSTOMER), salesAddressFirst(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        salesValueJoined(SalesOrderItemVariables.REVENUE_7),
+        salesValueJoined(SalesOrderItemVariables.REVENUE_30),
+        salesValueJoined(SalesOrderItemVariables.REVENUE_LIFE),
+        salesValueJoined(SalesOrderItemVariables.ORDERS_COUNT_LIFE),
+        salesValueJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        salesValueJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        salesValueJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
+        salesValueJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        salesValueJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        salesValueJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
+        salesValueJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
+        salesValueJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
+        salesValueJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        salesValueJoined(SalesOrderVariables.CATEGORY_PENETRATION),
+        salesValueJoined(SalesOrderVariables.BRICK_PENETRATION),
+        salesValueJoined(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
+        salesValueJoined(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
+        salesValueJoined(SalesOrderVariables.AVG_ORDER_VALUE),
+        salesValueJoined(SalesOrderVariables.AVG_ORDER_ITEM_VALUE),
+        salesAddressFirst(SalesAddressVariables.FIRST_SHIPPING_CITY),
+        salesAddressFirst(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER),
+        salesAddressFirst(SalesAddressVariables.LAST_SHIPPING_CITY),
+        salesAddressFirst(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)
+      )
 
     res
   }
@@ -216,8 +212,8 @@ object CustomerOrders {
   def readDf(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
 
     val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, prevDate)
-    var mode:String = DataSets.DAILY_MODE
-    if(null == custOrdersPrevFull){
+    var mode: String = DataSets.DAILY_MODE
+    if (null == custOrdersPrevFull) {
       mode = DataSets.FULL
     }
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)

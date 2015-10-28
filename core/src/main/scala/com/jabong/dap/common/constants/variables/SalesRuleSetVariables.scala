@@ -9,7 +9,6 @@ object SalesRuleSetVariables {
   val DISCOUNT_PERCENTAGE = "discount_percentage"
   val DISCOUNT_AMOUNT_DEFAULT = "discount_amount_default"
 
-
   val MIN_COUPON_VALUE_USED = "min_coupon_value_used"
   val MAX_COUPON_VALUE_USED = "max_coupon_value_used"
   val AVG_COUPON_VALUE_USED = "avg_coupon_value_used"
@@ -20,6 +19,5 @@ object SalesRuleSetVariables {
   val DISCOUNT_COUNT = "discount_count"
   val COUPON_SUM = "coupon_sum"
   val COUPON_COUNT = "coupon_count"
-
 
 }
