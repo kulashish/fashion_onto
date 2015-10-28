@@ -60,7 +60,7 @@ abstract class CommonRecommendation extends Logging {
     }
 
     val orderPlacedData = lastSevenDaysOrderItemsData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " not in ( " + OrderStatus.CANCEL_PAYMENT_ERROR + " , " +
-      OrderStatus.CANCELLED + " , " + OrderStatus.INVALID + " , " + OrderStatus.EXPORTABLE_CANCEL_CUST + " , " + OrderStatus.CANCELLED_CC_ITEM + " ) ")
+      OrderStatus.CANCELLED + " , " + OrderStatus.INVALID + " , " + OrderStatus.EXPORTABLE_CANCEL_CUST + " , " + OrderStatus.CANCELLED_CC + " ) ")
 
     val orderItemswithWeeklyAverage = orderPlacedData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(orderPlacedData(SalesOrderItemVariables.SKU)))
       .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)

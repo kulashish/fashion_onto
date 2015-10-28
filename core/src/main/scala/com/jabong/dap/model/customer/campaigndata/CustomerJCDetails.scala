@@ -24,7 +24,7 @@ object CustomerJCDetails {
     val (dfCustomerJCDetails) = getCustomerJCDetails(dfCustomer, dfCustomerStorecreditsHistory)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfCustomerJCDetails.na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_JC_DETAILS, DataSets.DAILY_MODE, incrDate, "53699_76602_" + fileDate + "_Customer_JC_details", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(dfCustomerJCDetails.na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_JC_DETAILS, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_JC_details", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 

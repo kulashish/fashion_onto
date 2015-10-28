@@ -145,7 +145,8 @@ object CampaignInput extends Logging {
       itrData(ITR.COLOR),
       itrData(ITR.PRICE_BAND),
       itrData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT)
+      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+      itrData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
     filteredItr
   }
