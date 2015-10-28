@@ -134,44 +134,51 @@ object CustTop5 {
       top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
     val favTop5Map = top5Incr.map(e =>
-      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
-      )
-      )
+//      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+//        getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+//        getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+//        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+//        getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
+//      ))
+      (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]],
+        e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]],
+        e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]],
+        e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]
+      ))
     )
 
-    val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
-      e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
-      e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
-      e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
+    val path1 = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
+    favTop5Map.saveAsTextFile(path1)
 
-    val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
-      e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
-      e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
-      e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
+//    val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
+//      e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
+//      e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
+//      e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
+//
+//    val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
+//      e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
+//      e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
+//      e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
+//
+//    val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
+//      e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
+//      e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
+//      e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
 
-    val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
-      e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
-      e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
-      e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
+//    val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
+//
+//    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+//    DataWriter.writeCsv(fav.na.fill(""), DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+//
+//    val categoryCount = Spark.getSqlContext().createDataFrame(catCount, Schema.catCount)
+//
+//    val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
+//    DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
+//
+//    val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
 
-    val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
-
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(fav.na.fill(""), DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
-
-    val categoryCount = Spark.getSqlContext().createDataFrame(catCount, Schema.catCount)
-
-    val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
-
-    val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
-
-    val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
+//    val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
+//    DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
 
   }
 
@@ -180,9 +187,7 @@ object CustTop5 {
     catagories.foreach{
       e=>
         if(map.contains(e)){
-          val tuple = map(e)
-          val count = tuple._1
-          val sum = tuple._2
+          val (count, sum) = map.get(e).getOrElse((0,0.0))
           //val (count, sum) = map(e)
           val ele = Tuple2(count, (sum/count))
 
@@ -201,8 +206,7 @@ object CustTop5 {
     val keys = map.keySet
     keys.foreach{
       t =>
-        val k = map(t)._1
-        val j = map(t)._2
+        val (k,j) = map.get(t).getOrElse((0,0.0))
         val x = Tuple3(t, k, j)
         a.+=:(x)
     }
