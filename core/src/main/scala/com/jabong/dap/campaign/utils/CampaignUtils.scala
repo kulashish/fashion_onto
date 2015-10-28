@@ -3,21 +3,21 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
+import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
@@ -33,7 +33,7 @@ object CampaignUtils extends Logging {
 
   val sqlContext = Spark.getSqlContext()
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    CampaignUtils.debug(skuData,"AcartDaily:-after ref sku generation")
+    CampaignUtils.debug(skuData, "AcartDaily:-after ref sku generation")
 
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -42,24 +42,23 @@ object CampaignUtils extends Logging {
         Udf.skuFromSimpleSku(skuData(ProductVariables.SKU_SIMPLE)) as (ProductVariables.SKU),
         skuData(ProductVariables.SPECIAL_PRICE)
       )
-//    val customerRefSku = customerFilteredData
-//      //.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
-//      .orderBy(desc(CustomerVariables.FK_CUSTOMER),desc(ProductVariables.SPECIAL_PRICE))
-//      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
-//        as (CampaignMergedFields.REF_SKU1))
+    //    val customerRefSku = customerFilteredData
+    //      //.orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
+    //      .orderBy(desc(CustomerVariables.FK_CUSTOMER),desc(ProductVariables.SPECIAL_PRICE))
+    //      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
+    //        as (CampaignMergedFields.REF_SKU1))
 
-    val refSkus = customerFilteredData.map(row => ((row.getLong(0)),(row.getString(1),row(2).asInstanceOf[BigDecimal].doubleValue())))
-      .groupByKey().map{ case (key, value) => (key, value.toList.sortBy(-_._2).take(NumberSku)) }.map(x=>(x._1,x._2(0)._1))
+    val refSkus = customerFilteredData.map(row => ((row.getLong(0)), (row.getString(1), row(2).asInstanceOf[BigDecimal].doubleValue())))
+      .groupByKey().map{ case (key, value) => (key, value.toList.sortBy(-_._2).take(NumberSku)) }.map(x => (x._1, x._2(0)._1))
 
     import sqlContext.implicits._
-    val customerRefSku = refSkus.toDF(CustomerVariables.FK_CUSTOMER,CampaignMergedFields.REF_SKU1)
+    val customerRefSku = refSkus.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
 
-    CampaignUtils.debug(customerRefSku,"AcartDaily:-after ref sku generation")
+    CampaignUtils.debug(customerRefSku, "AcartDaily:-after ref sku generation")
 
     customerRefSku
 
   }
-
 
   /**
    * generate ref skus for Acart campaigns

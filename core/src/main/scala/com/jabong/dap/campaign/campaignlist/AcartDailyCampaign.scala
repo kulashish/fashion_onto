@@ -20,12 +20,12 @@ class AcartDailyCampaign {
     //FIXME:Filter the order items data for last 1 day
     val selectedCustomers = acartCustomerSelector.customerSelection(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData)
 
-    CampaignUtils.debug(selectedCustomers,"AcartDaily:-after customer selection")
+    CampaignUtils.debug(selectedCustomers, "AcartDaily:-after customer selection")
     //sku selection
     //filter sku based on daily filter
     val filteredSku = Daily.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
-    CampaignUtils.debug(filteredSku,"AcartDaily:-after filteredSku")
+    CampaignUtils.debug(filteredSku, "AcartDaily:-after filteredSku")
 
     // ***** mobile push use case
     CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_DAILY_CAMPAIGN, filteredSku, false)
