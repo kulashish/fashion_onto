@@ -1,6 +1,6 @@
 name := "Alchemy"
 
-version := "0.1.15"
+version := "0.1.16"
 
 scalaVersion := "2.10.5"
 
