@@ -187,7 +187,7 @@ object CustTop5 {
       e=>
         if(map.contains(e)){
           val (count, sum) = map(e)
-          val ele = Tuple2(count, (sum/count))
+          val ele = Tuple2(count, sum/count)
           list.+=(ele)
         }
         else{
@@ -195,7 +195,7 @@ object CustTop5 {
           list.+=(ele)
         }
     }
-    return list.toList
+    list.toList
   }
 
   def getTop5FavList(map: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
@@ -210,12 +210,12 @@ object CustTop5 {
 
     val list = a.sortBy(r => (r._2.toInt, r._3.toDouble))(Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)
     if (list.size >= 5) {
-      return list.toList.take(5)
+      list.toList.take(5)
     } else {
       while (list.size < 5) {
         list += ""
       }
-      return list.toList
+      list.toList
     }
   }
 
