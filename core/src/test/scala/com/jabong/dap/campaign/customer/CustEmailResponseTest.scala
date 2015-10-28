@@ -1,15 +1,18 @@
 
 package com.jabong.dap.campaign.customer
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.EmailResponseVariables
+import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
 import com.jabong.dap.model.customer.schema.CustEmailSchema
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 import org.scalatest.FlatSpec
 
@@ -56,11 +59,56 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     assert(joinedDf.count() == 15)
 
   }
-
-  "testReadDataFrame" should "match with expected data" in {
-    //val joinedDf = readDataFrame("2015-10-09", DataSets.DAILY_MODE)
-    CustEmailResponse.emailResponse("2015-10-09", DataSets.OVERWRITE_SAVEMODE, null)
-    //val expectedDf = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.CUSTOMER, DataSets.CSV, DataSets.DAILY_MODE, "2015/10/10", "53699_CLICK_20151009.txt", "true", ";")
-    //assert(joinedDf === expectedDf)
+  //
+  //  "testReadDataFrame" should "match with expected data" in {
+  //    //val joinedDf = readDataFrame("2015-10-09", DataSets.DAILY_MODE)
+  //    CustEmailResponse.emailResponse("2015-10-09", DataSets.OVERWRITE_SAVEMODE, null)
+  //
+  //  }
+  //
+  "testMergeAllDataFrame" should "match expected values" in {
+    val incremental = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "today_incr_csv", CustEmailSchema.todayDf)
+    val yesterdayDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "yes_full_email", CustEmailSchema.resCustomerEmail)
+    val effective7 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective7_email", CustEmailSchema.reqCsvDf)
+    val effective15 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective15_email", CustEmailSchema.reqCsvDf)
+    val effective30 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective30_email", CustEmailSchema.reqCsvDf)
+    val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
+    val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_result_all", CustEmailSchema.effective_Smry_Schema)
+    assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
+
+  "testMergeTodayWithEmpty7Df" should "match expected values" in {
+    val incremental = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "today_incr_csv", CustEmailSchema.todayDf)
+    val yesterdayDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "yes_full_email", CustEmailSchema.resCustomerEmail)
+    val effective7 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.reqCsvDf)
+    val effective15 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective15_email", CustEmailSchema.reqCsvDf)
+    val effective30 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective30_email", CustEmailSchema.reqCsvDf)
+    val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
+    val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo7", CustEmailSchema.effective_Smry_Schema)
+    assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
+  }
+
+  "testMergeTodayWithEmpty7_15Df" should "match expected values" in {
+    val incremental = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "today_incr_csv", CustEmailSchema.todayDf)
+    val yesterdayDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "yes_full_email", CustEmailSchema.resCustomerEmail)
+    val effective7 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.reqCsvDf)
+    val effective15 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.reqCsvDf)
+    val effective30 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective30_email", CustEmailSchema.reqCsvDf)
+    val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
+    val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo7_15", CustEmailSchema.effective_Smry_Schema)
+    assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
+  }
+
+  "testMergeTodayWithEmpty7_15_30" should "match expected values" in {
+    val incremental = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "today_incr_csv", CustEmailSchema.todayDf)
+    val yesterdayDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "yes_full_email", CustEmailSchema.resCustomerEmail)
+    //    val yesTodayDf = CustEmailResponse.joinDataFrames(incremental, yesterdayDf)
+    val effective7 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.todayDf)
+    val effective15 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.todayDf)
+    val effective30 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.todayDf)
+    val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
+    val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo_any", CustEmailSchema.effective_Smry_Schema)
+    assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
+  }
+
 }

@@ -138,5 +138,5 @@ object Udf {
 
   val outputCsvFormat = udf((s: String) => UdfUtils.outputDateFormat(s: String))
 
-  val getLatestDate = udf((s :String, s1:String) => UdfUtils.latestDate(s :String, s1:String))
+  val getLatestDate = udf((s: String, s1: String) => UdfUtils.latestDate(s: String, s1: String))
 }

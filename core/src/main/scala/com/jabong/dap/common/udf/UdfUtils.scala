@@ -1,11 +1,12 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{ArrayUtils, StringUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -13,7 +14,7 @@ import net.liftweb.json._
 import org.apache.spark.sql.Row
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -282,14 +283,17 @@ object UdfUtils extends Logging {
     var i: Int = 0;
     var maxDate: Date = TimeUtils.getDate(maxDateString, TimeConstants.DATE_TIME_FORMAT)
     for (dateString <- dates) {
-      if (null != dateString) {
+      if (null != dateString && dateString.trim.length > 0) {
         var date = TimeUtils.getDate(dateString, TimeConstants.DATE_TIME_FORMAT)
+        logger.info("Passed Date:" + dateString)
         if (date.after(maxDate)) {
           maxDate = date
+          logger.info("Max Date:" + dateString)
         }
       }
     }
-    (maxDateString)
+
+    TimeUtils.dateStringFromDate(maxDate, TimeConstants.DATE_TIME_FORMAT)
   }
 
   /**

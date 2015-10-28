@@ -486,5 +486,11 @@ object TimeUtils extends Logging {
     }
   }
 
+  def dateStringFromDate(date: Date, dateFormat: String): String = {
+    val format = new SimpleDateFormat(dateFormat)
+    format.format(date)
+  }
+
   case class MonthYear(val month: Int, val year: Int, val day: Int)
+
 }

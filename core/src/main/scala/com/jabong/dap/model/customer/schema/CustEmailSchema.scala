@@ -59,16 +59,16 @@ object CustEmailSchema {
 
   val effective_Smry_Schema = StructType(Array(
     StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
-    StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.LAST_CLICK_DATE, StringType, true),
+    StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.CLICK_7DAYS, IntegerType, true),
-    StructField(EmailResponseVariables.OPEN_7DAYS, IntegerType, true),
     StructField(EmailResponseVariables.CLICK_15DAYS, IntegerType, true),
-    StructField(EmailResponseVariables.OPEN_15DAYS, IntegerType, true),
     StructField(EmailResponseVariables.CLICK_30DAYS, IntegerType, true),
+    StructField(EmailResponseVariables.OPEN_7DAYS, IntegerType, true),
+    StructField(EmailResponseVariables.OPEN_15DAYS, IntegerType, true),
     StructField(EmailResponseVariables.OPEN_30DAYS, IntegerType, true),
-      StructField(EmailResponseVariables.OPENS_LIFETIME, IntegerType, true),
-    StructField(EmailResponseVariables.CLICKS_LIFETIME, IntegerType, true)
+    StructField(EmailResponseVariables.CLICKS_LIFETIME, IntegerType, true),
+    StructField(EmailResponseVariables.OPENS_LIFETIME, IntegerType, true)
   ))
 
 }

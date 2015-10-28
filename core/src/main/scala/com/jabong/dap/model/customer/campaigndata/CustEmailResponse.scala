@@ -3,7 +3,7 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.EmailResponseVariables
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -38,44 +38,33 @@ object CustEmailResponse extends Logging {
       "-1"
     else {
 
-      val date = TimeUtils.getDate(value, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+      val date = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
       val time4mToday = TimeUtils.daysFromToday(date)
       val segment = {
 
         if (0 > time4mToday && time4mToday <= 15) {
           15
-        }
-        else if (15 > time4mToday && time4mToday <= 30) {
+        } else if (15 > time4mToday && time4mToday <= 30) {
           30
-        }
-        else if (30 > time4mToday && time4mToday <= 60) {
+        } else if (30 > time4mToday && time4mToday <= 60) {
           60
-        }
-        else if (60 > time4mToday && time4mToday <= 120) {
+        } else if (60 > time4mToday && time4mToday <= 120) {
           120
-        }
-        else if (120 > time4mToday && time4mToday <= 180) {
+        } else if (120 > time4mToday && time4mToday <= 180) {
           180
-        }
-        else if (180 > time4mToday && time4mToday <= 210) {
+        } else if (180 > time4mToday && time4mToday <= 210) {
           210
-        }
-        else if (210 > time4mToday && time4mToday <= 240) {
+        } else if (210 > time4mToday && time4mToday <= 240) {
           240
-        }
-        else if (240 > time4mToday && time4mToday <= 270) {
+        } else if (240 > time4mToday && time4mToday <= 270) {
           270
-        }
-        else if (270 > time4mToday && time4mToday <= 300) {
+        } else if (270 > time4mToday && time4mToday <= 300) {
           300
-        }
-        else if (300 > time4mToday && time4mToday <= 330) {
+        } else if (300 > time4mToday && time4mToday <= 330) {
           330
-        }
-        else if (330 > time4mToday && time4mToday <= 360) {
+        } else if (330 > time4mToday && time4mToday <= 360) {
           360
-        }
-        else if (time4mToday > 360) {
+        } else if (time4mToday > 360) {
           "NO"
         }
       }
@@ -84,19 +73,18 @@ object CustEmailResponse extends Logging {
   }
 
   val opens = (opens: Integer, clicks: Integer) => {
-    if(opens == null ){
+    if (opens == null) {
       (clicks)
-    }else{
+    } else {
       (opens)
     }
 
   }
 
-
   val openDate = (opens: String, clickDate: String) => {
-    if(opens == null ){
+    if (opens == null) {
       (clickDate)
-    }else{
+    } else {
       (opens)
     }
   }
@@ -147,8 +135,8 @@ object CustEmailResponse extends Logging {
         col(EmailResponseVariables.CLICK_7DAYS),
         col(EmailResponseVariables.CLICK_15DAYS),
         col(EmailResponseVariables.CLICK_30DAYS),
-        Udf.outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
-        Udf.outputCsvFormat(col(EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE,
+        col(EmailResponseVariables.LAST_OPEN_DATE),
+        col(EmailResponseVariables.LAST_CLICK_DATE),
         col(EmailResponseVariables.OPENS_LIFETIME),
         col(EmailResponseVariables.CLICKS_LIFETIME)
       )
@@ -169,7 +157,6 @@ object CustEmailResponse extends Logging {
 
   }
 
-
   def effectiveDFFull(incremental: DataFrame, full: DataFrame, effective7: DataFrame, effective15: DataFrame, effective30: DataFrame): DataFrame = {
 
     if (incremental == null) {
@@ -180,27 +167,25 @@ object CustEmailResponse extends Logging {
     val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, CustEmailSchema.reqCsvDf,
       effective7, CustEmailSchema.reqCsvDf, EmailResponseVariables.CUSTOMER_ID)
 
-
     val joined_7_15_summary = joined_7_15.select(
       coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
       col(EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICK_7DAYS,
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICK_15DAYS,
-    col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPEN_7DAYS,
-    col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPEN_15DAYS)
+      col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPEN_7DAYS,
+      col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPEN_15DAYS)
       .withColumn(EmailResponseVariables.OPEN_7DAYS, findOpen(col(EmailResponseVariables.OPEN_7DAYS), col(EmailResponseVariables.CLICK_7DAYS)))
       .withColumn(EmailResponseVariables.OPEN_15DAYS, findOpen(col(EmailResponseVariables.OPEN_15DAYS), col(EmailResponseVariables.CLICK_15DAYS)))
-
 
     val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, CustEmailSchema.reqCsvDf,
       joined_7_15_summary, CustEmailSchema.effective7_15Schema, EmailResponseVariables.CUSTOMER_ID)
       .na.fill(Map(
-      EmailResponseVariables.CLICK_15DAYS -> 0,
-      EmailResponseVariables.OPEN_15DAYS -> 0,
-      EmailResponseVariables.CLICK_7DAYS -> 0,
-      EmailResponseVariables.OPEN_7DAYS -> 0,
-      MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY -> 0,
-      MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY -> 0
-    ))
+        EmailResponseVariables.CLICK_15DAYS -> 0,
+        EmailResponseVariables.OPEN_15DAYS -> 0,
+        EmailResponseVariables.CLICK_7DAYS -> 0,
+        EmailResponseVariables.OPEN_7DAYS -> 0,
+        MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY -> 0,
+        MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY -> 0
+      ))
 
     val joined_7_15_30_summary = joined_7_15_30.select(
       coalesce(col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID), col(EmailResponseVariables.CUSTOMER_ID))
@@ -216,15 +201,15 @@ object CustEmailResponse extends Logging {
     val joinedIncr = MergeUtils.joinOldAndNewDF(incremental, CustEmailSchema.resCustomerEmail,
       joined_7_15_30_summary, CustEmailSchema.resCustomerEmail, EmailResponseVariables.CUSTOMER_ID)
       .na.fill(Map(
-      EmailResponseVariables.CLICK_15DAYS -> 0,
-      EmailResponseVariables.OPEN_15DAYS -> 0,
-      EmailResponseVariables.CLICK_7DAYS -> 0,
-      EmailResponseVariables.OPEN_7DAYS -> 0,
-      EmailResponseVariables.CLICK_30DAYS -> 0,
-      EmailResponseVariables.OPEN_30DAYS -> 0,
-      MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY -> 0,
-      MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY -> 0
-    ))
+        EmailResponseVariables.CLICK_15DAYS -> 0,
+        EmailResponseVariables.OPEN_15DAYS -> 0,
+        EmailResponseVariables.CLICK_7DAYS -> 0,
+        EmailResponseVariables.OPEN_7DAYS -> 0,
+        EmailResponseVariables.CLICK_30DAYS -> 0,
+        EmailResponseVariables.OPEN_30DAYS -> 0,
+        MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY -> 0,
+        MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY -> 0
+      ))
 
     val joinedIncrSummary = joinedIncr.select(
       coalesce(col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID), col(EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
@@ -242,39 +227,44 @@ object CustEmailResponse extends Logging {
 
     val fullDf = MergeUtils.joinOldAndNewDF(joinedIncrSummary, CustEmailSchema.effective_Smry_Schema, full, CustEmailSchema.resCustomerEmail, EmailResponseVariables.CUSTOMER_ID)
       .na.fill(
-      Map(
-        EmailResponseVariables.CLICKS_LIFETIME -> 0,
-        EmailResponseVariables.OPENS_LIFETIME -> 0,
-        EmailResponseVariables.CLICK_7DAYS -> 0,
-        EmailResponseVariables.CLICK_15DAYS -> 0,
-        EmailResponseVariables.CLICK_30DAYS -> 0,
-        EmailResponseVariables.OPEN_7DAYS -> 0,
-        EmailResponseVariables.OPEN_15DAYS -> 0,
-        EmailResponseVariables.OPEN_30DAYS -> 0
+        Map(
+          EmailResponseVariables.CLICKS_LIFETIME -> 0,
+          EmailResponseVariables.OPENS_LIFETIME -> 0,
+          EmailResponseVariables.CLICK_7DAYS -> 0,
+          EmailResponseVariables.CLICK_15DAYS -> 0,
+          EmailResponseVariables.CLICK_30DAYS -> 0,
+          EmailResponseVariables.OPEN_7DAYS -> 0,
+          EmailResponseVariables.OPEN_15DAYS -> 0,
+          EmailResponseVariables.OPEN_30DAYS -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.CLICK_7DAYS -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.CLICK_15DAYS -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.CLICK_30DAYS -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.OPEN_7DAYS -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.OPEN_15DAYS -> 0,
+          MergeUtils.NEW_ + EmailResponseVariables.OPEN_30DAYS -> 0
 
-      ))
+        ))
 
     val fullSummary = fullDf.select(
       coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
-      col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) + col(EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) as EmailResponseVariables.CLICKS_LIFETIME,
-      col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) + col(EmailResponseVariables.OPENS_LIFETIME) as EmailResponseVariables.OPENS_LIFETIME,
-      when(col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME) > 0, col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE))
+      Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE), col(EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE,
+      when(col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) > 0 or col(EmailResponseVariables.OPENS_LIFETIME) > 0,
+        Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_OPEN_DATE), col(EmailResponseVariables.LAST_OPEN_DATE)))
         .otherwise(
-          when(col(EmailResponseVariables.LAST_CLICK_DATE) !== null, col(EmailResponseVariables.LAST_CLICK_DATE))
-            .otherwise("01-Jan-2001 00:00:00")) as EmailResponseVariables.LAST_CLICK_DATE,
-      when(col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) > 0,
-        Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_OPEN_DATE),col(EmailResponseVariables.LAST_OPEN_DATE)))
-        .otherwise(
-          Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE),col(EmailResponseVariables.LAST_CLICK_DATE))
+          Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE), col(EmailResponseVariables.LAST_CLICK_DATE))
 
-    )
-        as EmailResponseVariables.LAST_OPEN_DATE,
+        )
+          as EmailResponseVariables.LAST_OPEN_DATE,
       col(EmailResponseVariables.CLICK_7DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.CLICK_7DAYS) as EmailResponseVariables.CLICK_7DAYS,
       col(EmailResponseVariables.CLICK_15DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.CLICK_15DAYS) as EmailResponseVariables.CLICK_15DAYS,
       col(EmailResponseVariables.CLICK_30DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.CLICK_30DAYS) as EmailResponseVariables.CLICK_30DAYS,
       col(EmailResponseVariables.OPEN_7DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_7DAYS) as EmailResponseVariables.OPEN_7DAYS,
       col(EmailResponseVariables.OPEN_15DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_15DAYS) as EmailResponseVariables.OPEN_15DAYS,
-      col(EmailResponseVariables.OPEN_30DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_30DAYS) as EmailResponseVariables.OPEN_30DAYS
+      col(EmailResponseVariables.OPEN_30DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_30DAYS) as EmailResponseVariables.OPEN_30DAYS,
+      col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) + col(EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) as EmailResponseVariables.CLICKS_LIFETIME,
+      col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) + col(EmailResponseVariables.OPENS_LIFETIME) as EmailResponseVariables.OPENS_LIFETIME
 
     )
     (fullSummary)
@@ -298,10 +288,10 @@ object CustEmailResponse extends Logging {
     val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
       aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
-        col(EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE,
-        col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPENS_TODAY,
-        col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICKS_TODAY,
-        col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE) as EmailResponseVariables.LAST_CLICK_DATE)
+        Udf.outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
+        col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
+        col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY).cast(IntegerType) as EmailResponseVariables.CLICKS_TODAY,
+        Udf.outputCsvFormat(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE)
       .withColumn(EmailResponseVariables.OPENS_TODAY, findOpen(col(EmailResponseVariables.OPENS_TODAY), col(EmailResponseVariables.CLICKS_TODAY)))
 
     (joinedDf)
