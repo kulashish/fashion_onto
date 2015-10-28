@@ -55,7 +55,7 @@ object CustomerOrders {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val (salesOrderIncr, salesOrderItemIncr, salesRuleFull, salesRuleSetFull, salesAddressFUll, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull) = readDf(incrDate, prevDate)
+    val (salesOrderIncr, salesOrderItemIncr, salesRuleFull, salesRuleSetFull, salesAddressFUll, custTop5, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull) = readDf(incrDate, prevDate)
 
     val salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     val salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
@@ -76,10 +76,7 @@ object CustomerOrders {
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(salesInvalid, savePath, saveMode)
-
-    val (salesCatBrick, joined) = SalesOrderItem.getCatBrickPen(saleOrderJoined, itr, salesCatBrickCalc)
-    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(joined, savePath, saveMode)
+    val salesCatBrick = custTop5.select(custTop5("CAT_1") as SalesOrderVariables.CATEGORY_PENETRATION, custTop5("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION)
 
     val salesOrderValue = SalesOrderItem.getOrderValue(saleOrderJoined, salesOrderValueCalc)
 
@@ -221,7 +218,7 @@ object CustomerOrders {
     val salesRuleFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL, incrDate)
     val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL, incrDate)
     val salesAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL, incrDate)
-    val itr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
+    val custTop5 = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
     val cityZone = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
 
     val salesRevenuePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, prevDate)
@@ -245,7 +242,7 @@ object CustomerOrders {
 
     val salesAddressCalc = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ADDRESS_FIRST, DataSets.DAILY_MODE, prevDate)
 
-    (salesOrderIncr, salesOrderItemIncr, salesRuleFull, salesRuleSetFull, salesAddressFull, itr, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull)
+    (salesOrderIncr, salesOrderItemIncr, salesRuleFull, salesRuleSetFull, salesAddressFull, custTop5, cityZone, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90, salesRuleCalc, salesItemInvalidCalc, salesCatBrickCalc, salesOrderValueCalc, salesAddressCalc, custOrdersPrevFull)
   }
 
 }

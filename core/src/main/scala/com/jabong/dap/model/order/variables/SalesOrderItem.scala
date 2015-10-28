@@ -528,63 +528,6 @@ object SalesOrderItem {
   }
 
   /*
-  CATEGORY_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by reportingcategory
-  BRICK_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by brick
-  */
-
-  def getCatBrickPen(salesOrderjoined: DataFrame, itr: DataFrame, prevJoined: DataFrame): (DataFrame, DataFrame) = {
-    val joined = salesOrderjoined
-      .select(salesOrderjoined(SalesOrderVariables.ID_SALES_ORDER),
-        salesOrderjoined(SalesOrderVariables.FK_CUSTOMER),
-        salesOrderjoined(SalesOrderItemVariables.SKU)
-      )
-    val incrJoined = joined.join(itr, joined(SalesOrderItemVariables.SKU) === itr(ITR.CONFIG_SKU))
-      .select(joined(SalesOrderVariables.ID_SALES_ORDER),
-        joined(SalesOrderVariables.FK_CUSTOMER),
-        joined(SalesOrderItemVariables.SKU),
-        itr(ITR.REPORTING_CATEGORY),
-        itr(ITR.BRICK),
-        itr(ITR.BRAND_NAME),
-        itr(ITR.PRICE)
-      )
-    var fullJoined: DataFrame = null
-    if (null == prevJoined) {
-      fullJoined = incrJoined
-    } else {
-      fullJoined = incrJoined.unionAll(prevJoined)
-    }
-
-    val cat = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.REPORTING_CATEGORY)
-      .agg(count(ITR.REPORTING_CATEGORY) as "count")
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("count") as SalesOrderVariables.CATEGORY_PENETRATION)
-
-    val brick = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.BRICK)
-      .agg(count(ITR.BRICK) as "count")
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("count") as SalesOrderVariables.BRICK_PENETRATION)
-
-    val brand = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.BRAND_NAME)
-      .agg(count(ITR.BRAND_NAME) as "count")
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("count") as SalesOrderItemVariables.FAV_BRAND)
-
-    val catBrick = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
-      select(coalesce(cat(SalesOrderVariables.FK_CUSTOMER), brick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        cat(SalesOrderVariables.CATEGORY_PENETRATION),
-        brick(SalesOrderVariables.BRICK_PENETRATION)
-      )
-    val res = catBrick.join(brand, brand(SalesOrderVariables.FK_CUSTOMER) === catBrick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-      .select(coalesce(brand(SalesOrderVariables.FK_CUSTOMER), catBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        catBrick(SalesOrderVariables.CATEGORY_PENETRATION),
-        catBrick(SalesOrderVariables.BRICK_PENETRATION),
-        brand(SalesOrderItemVariables.FAV_BRAND)
-      )
-
-    return (res, fullJoined)
-  }
-
-  /*
   MAX_ORDER_BASKET_VALUE - max of sum(unit_price) at order level & customer level.
   we need sum of special price (which is unit_price) at order level.
   Need to retrieve this for order having max. sum of special price.

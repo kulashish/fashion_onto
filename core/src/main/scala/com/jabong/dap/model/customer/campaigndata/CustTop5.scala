@@ -163,8 +163,8 @@ object CustTop5 {
     } else if (null == map1) {
       return collection.mutable.Map(map2.toSeq: _*)
     }
-    val mapIncr = collection.mutable.Map(map1.toSeq: _*)
-    val mapFull = collection.mutable.Map(map2.toSeq: _*)
+    val mapIncr = collection.mutable.Map() ++ map1
+    val mapFull = collection.mutable.Map() ++ map2
 
     val keys = mapIncr.keySet
     keys.foreach{
@@ -192,29 +192,37 @@ object CustTop5 {
       if (maxDate.before(date)) {
         maxDate = date
       }
-      if (brand.contains(l)) {
+      if (brand.contains(l) && l.length > 0) {
         val (count, sum) = brand(l)
         brand.put(l, ((count + 1), (sum + p)))
       } else {
-        brand.put(l, (1, p))
+          if(l.length > 0){
+            brand.put(l, (1, p))
+          }
       }
-      if (cat.contains(m)) {
+      if (cat.contains(m) && m.length > 0) {
         val (count, sum) = cat(m)
         cat.put(m, ((count + 1), (sum + p)))
       } else {
-        cat.put(m, (1, p))
+          if(m.length > 0 ){
+            cat.put(m, (1, p))
+          }
       }
-      if (brick.contains(n)) {
+      if (brick.contains(n) && n.length > 0) {
         val (count, sum) = brick(n)
         brick.put(n, ((count + 1), (sum + p)))
       } else {
-        brick.put(n, (1, p))
+        if(n.length > 0){
+          brick.put(n, (1, p))
+        }
       }
-      if (color.contains(o)) {
+      if (color.contains(o) && o.length > 0) {
         val (count, sum) = color(o)
         color.put(o, ((count + 1), (sum + p)))
       } else {
-        color.put(o, (1, p))
+        if(o.length > 0){
+          color.put(o, (1, p))
+        }
       }
     }
     (brand, cat, brick, color, maxDate)
