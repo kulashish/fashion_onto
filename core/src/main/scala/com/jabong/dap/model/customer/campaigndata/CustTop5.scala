@@ -47,7 +47,63 @@ import scala.collection.mutable.{ ListBuffer, Map }
  * COLOR_4
  * COLOR_5
  */
+
+
+/**
+ * SUNGLASSES_COUNT
+ * WOMEN_FOOTWEAR_COUNT
+ * KIDS_APPAREL_COUNT
+ * WATCHES_COUNT
+ * BEAUTY_COUNT
+ * FURNITURE_COUNT
+ * SPORTS_EQUIPMENT_COUNT
+ * WOMEN_APPAREL_COUNT
+ * HOME_COUNT
+ * MEN_FOOTWEAR_COUNT
+ * MEN_APPAREL_COUNT
+ * JEWELLERY_COUNT
+ * FRAGRANCE_COUNT
+ * KIDS_FOOTWEAR_COUNT
+ * BAGS_COUNT
+ * TOYS_COUNT
+ */
+
+
+/**
+ * SUNGLASSES_AVG_ITEM_PRICE
+ * WOMEN_FOOTWEAR_AVG_ITEM_PRICE
+ * KIDS_APPAREL_AVG_ITEM_PRICE
+ * WATCHES_AVG_ITEM_PRICE
+ * BEAUTY_AVG_ITEM_PRICE
+ * FURNITURE_AVG_ITEM_PRICE
+ * SPORT_EQUIPMENT_AVG_ITEM_PRICE
+ * JEWELLERY_AVG_ITEM_PRICE
+ * WOMEN_APPAREL_AVG_ITEM_PRICE
+ * HOME_AVG_ITEM_PRICE
+ * MEN_FOOTWEAR_AVG_ITEM_PRICE
+ * MEN_APPAREL_AVG_ITEM_PRICE
+ * FRAGRANCE_AVG_ITEM_PRICE
+ * KIDS_FOOTWEAR_AVG_ITEM_PRICE
+ * TOYS_AVG_ITEM_PRICE
+ * BAGS_AVG_ITEM_PRICE
+ */
 object CustTop5 {
+  val catagories: List[String] = List("sunglasses",
+                                      "women_footwear",
+                                      "kids_apparel",
+                                      "watches",
+                                      "beauty",
+                                      "furniture",
+                                      "sport_equipment",
+                                      "jewellery",
+                                      "women_apparel",
+                                      "home",
+                                      "men_footwear",
+                                      "men_apparel",
+                                      "fragrance",
+                                      "kids",
+                                      "toys",
+                                      "bags")
 
   def start(vars: ParamInfo) = {
     val saveMode = vars.saveMode
@@ -83,20 +139,63 @@ object CustTop5 {
       (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
         getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
         getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
-      ))
+        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+        getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
+      )
+      )
+
     )
 
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
-      e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
-      e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
-      e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4) //color
-    ))
+                                              e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
+                                              e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
+                                              e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
+
+
+    val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
+                                              e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
+                                              e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
+                                              e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
+
+    val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
+                                              e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
+                                              e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
+                                              e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
+
+
     val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(fav.na.fill(""), DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
+    val categoryCount = Spark.getSqlContext().createDataFrame(catCount, Schema.catCount)
+
+    val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
+
+    val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
+
+    val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
+
+
+  }
+
+  def getCatCount(map: scala.collection.immutable.Map[String, (Int, Double)]): List[(Int, Double)] ={
+    var list = scala.collection.mutable.ListBuffer[(Int, Double)]()
+    catagories.foreach{
+      e=>
+        if(map.contains(e)){
+          val (count, sum) = map(e)
+          val ele = Tuple2(count, (sum/count))
+          list.+=(ele)
+        }
+        else{
+          val ele = Tuple2(0, 0.0)
+          list.+=(ele)
+        }
+    }
+    return list.toList
   }
 
   def getTop5FavList(map: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
