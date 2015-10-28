@@ -79,10 +79,10 @@ object CustTop5 {
       top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
     val favTop5Map = top5Incr.map(e =>
-      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[Map[String, (Int, Double)]]),
-        getTop5FavList(e(2).asInstanceOf[Map[String, (Int, Double)]]),
-        getTop5FavList(e(3).asInstanceOf[Map[String, (Int, Double)]]),
-        getTop5FavList(e(4).asInstanceOf[Map[String, (Int, Double)]])
+      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+        getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+        getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
+        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
       )
       )
     )
@@ -100,7 +100,7 @@ object CustTop5 {
 
   }
 
-  def getTop5FavList(map: Map[String, (Int, Double)]): List[String] = {
+  def getTop5FavList(map: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
     val a = ListBuffer[(String, Int, Double)]()
     val keys = map.keySet
     keys.foreach{
@@ -153,16 +153,18 @@ object CustTop5 {
     }
   }
 
-  val mergeMapCols = udf((map1: Map[String, (Int, Double)], map2: Map[String, (Int, Double)]) => joinMaps(map1, map2))
+  val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, (Int, Double)], map2: scala.collection.immutable.Map[String, (Int, Double)]) => joinMaps(map1, map2))
 
-  def joinMaps(mapIncr: Map[String, (Int, Double)], mapFull: Map[String, (Int, Double)]): Map[String, (Int, Double)] = {
-    if (null == mapFull && null == mapIncr) {
+  def joinMaps(map1: scala.collection.immutable.Map[String, (Int, Double)], map2: scala.collection.immutable.Map[String, (Int, Double)]): Map[String, (Int, Double)] = {
+    if (null == map1 && null == map2) {
       return null
-    } else if (null == mapFull) {
-      return mapIncr
-    } else if (null == mapIncr) {
-      return mapFull
+    } else if (null == map2) {
+      return collection.mutable.Map(map1.toSeq: _*)
+    } else if (null == map1) {
+      return collection.mutable.Map(map2.toSeq: _*)
     }
+    val mapIncr = collection.mutable.Map(map1.toSeq: _*)
+    val mapFull = collection.mutable.Map(map2.toSeq: _*)
 
     val keys = mapIncr.keySet
     keys.foreach{
