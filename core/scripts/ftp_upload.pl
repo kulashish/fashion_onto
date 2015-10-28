@@ -251,6 +251,16 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "custPreference";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20150927_Customer_PREFERRED_TIMESLOT_part1.csv
+    $filename = "$date_with_zero_today"."_Customer_PREFERRED_TIMESLOT_part1.csv";
+    $folderName = "customerPreferredTimeslotPart1";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150927_Customer_PREFERRED_TIMESLOT_part2.csv
+    $filename = "$date_with_zero_today"."_Customer_PREFERRED_TIMESLOT_part2.csv";
+    $folderName = "customerPreferredTimeslotPart2";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     # 20150927_payback_data.csv
     $filename = "$date_with_zero_today"."_payback_data.csv";
     $folderName = "paybackData";
