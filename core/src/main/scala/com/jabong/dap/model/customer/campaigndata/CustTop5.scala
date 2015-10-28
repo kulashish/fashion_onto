@@ -147,8 +147,8 @@ object CustTop5 {
 //      ))
     )
 
-    val path1 = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    favTop5Map.saveAsTextFile(path1)
+//    val path1 = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
+//    favTop5Map.saveAsTextFile(path1)
 
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
       e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
