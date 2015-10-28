@@ -141,9 +141,9 @@ object CampaignProcessor {
     val campaignMerged = inputCampaignsData
       .orderBy(CampaignCommon.PRIORITY)
       .groupBy(key)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+        first(CampaignCommon.PRIORITY) as CampaignCommon.PRIORITY,
+        first(CampaignMergedFields.REF_SKU1) as CampaignMergedFields.REF_SKU1,
         first(key1) as key1,
         first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
         first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
