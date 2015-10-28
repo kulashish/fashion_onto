@@ -19,6 +19,7 @@ import com.jabong.dap.common.Utils
 class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var sqlContext: SQLContext = _
   @transient var refSkuInput: DataFrame = _
+  @transient var refSkuInputPush: DataFrame = _
   @transient var customerSelected: DataFrame = _
   @transient var salesOrder: DataFrame = _
   @transient var salesOrderItem: DataFrame = _
@@ -35,6 +36,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input", TestSchema.refSkuInput)
+    refSkuInputPush = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input_push", TestSchema.refSkuInput)
     customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected")
     customerSelectedShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected_shortlist")
     salesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "sales_order_placed")
@@ -81,6 +83,15 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
     // assert(refSkuFirst.head === expectedData)
     assert(refSkuFirst.size == 1)
+  }
+
+
+  "Generate reference sku with refernce sku input " should "return only one reference sku per customer sorted with price" in {
+    val refSkus = CampaignUtils.generateReferenceSku(refSkuInputPush, 1)
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648")
+   // val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
+    // assert(refSkuFirst.head === expectedData)
+    assert(refSkuFirst.count == 1)
   }
 
   "No input Data for sku simple Not Bought" should "return null" in {

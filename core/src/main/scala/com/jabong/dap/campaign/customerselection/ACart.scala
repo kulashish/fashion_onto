@@ -28,7 +28,11 @@ class ACart extends LiveCustomerSelector with Logging {
         salesCartData(ACartVariables.UPDATED_AT)
       )
 
+    CampaignUtils.debug(acartCustomers,"Acart:- acartCustomers")
+
     val acartCustomerNotBought = CampaignUtils.skuSimpleNOTBoughtWithoutPrice(acartCustomers, salesOrder, salesOrderItemData)
+
+    CampaignUtils.debug(acartCustomerNotBought,"Acart:-acartCustomerNotBought")
 
     logger.info("Filtered abandoned cart customers with sku not bought")
     return acartCustomerNotBought
