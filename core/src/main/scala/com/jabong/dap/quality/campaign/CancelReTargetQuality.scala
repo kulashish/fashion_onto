@@ -45,7 +45,7 @@ object CancelReTargetQuality extends BaseCampaignQuality {
    */
   def validateOrderStatus(orderItemDF: DataFrame, orderDF: DataFrame, cancelRetargetDF: DataFrame): Boolean = {
     val cancelOrderItemDF = orderItemDF.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " in ("
-      + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC_ITEM + "," + OrderStatus.CANCEL_PAYMENT_ERROR
+      + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC + "," + OrderStatus.CANCEL_PAYMENT_ERROR
       + "," + OrderStatus.DECLINED + "," + OrderStatus.EXPORTABLE_CANCEL_CUST + "," + OrderStatus.EXPORTED_CANCEL_CUST + ")")
 
     val joinedOrder = orderDF.join(cancelOrderItemDF,

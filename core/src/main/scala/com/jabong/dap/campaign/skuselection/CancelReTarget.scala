@@ -24,7 +24,7 @@ object CancelReTarget {
     }
 
     val filteredSku = inDataFrame.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.CANCELLED
-      + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.CANCELLED_CC_ITEM
+      + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.CANCELLED_CC
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.CANCEL_PAYMENT_ERROR
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.DECLINED
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.EXPORTABLE_CANCEL_CUST
