@@ -435,7 +435,7 @@ object SalesOrderItem {
       )
 
     if (null == prevCalcu) {
-      return joined
+      joined
     } else {
       prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
@@ -516,13 +516,13 @@ object SalesOrderItem {
         }
     )
     if (f == 0) {
-      return 10
+      10
     } else if (g == 0) {
-      return 20
+      20
     } else if (h == 0) {
-      return 30
+      30
     } else {
-      return 0
+      0
     }
 
   }
