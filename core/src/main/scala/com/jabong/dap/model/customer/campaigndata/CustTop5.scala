@@ -48,7 +48,6 @@ import scala.collection.mutable.{ ListBuffer, Map }
  * COLOR_5
  */
 
-
 /**
  * SUNGLASSES_COUNT
  * WOMEN_FOOTWEAR_COUNT
@@ -67,7 +66,6 @@ import scala.collection.mutable.{ ListBuffer, Map }
  * BAGS_COUNT
  * TOYS_COUNT
  */
-
 
 /**
  * SUNGLASSES_AVG_ITEM_PRICE
@@ -89,21 +87,21 @@ import scala.collection.mutable.{ ListBuffer, Map }
  */
 object CustTop5 {
   val catagories: List[String] = List("sunglasses",
-                                      "women_footwear",
-                                      "kids_apparel",
-                                      "watches",
-                                      "beauty",
-                                      "furniture",
-                                      "sport_equipment",
-                                      "jewellery",
-                                      "women_apparel",
-                                      "home",
-                                      "men_footwear",
-                                      "men_apparel",
-                                      "fragrance",
-                                      "kids",
-                                      "toys",
-                                      "bags")
+    "women_footwear",
+    "kids_apparel",
+    "watches",
+    "beauty",
+    "furniture",
+    "sport_equipment",
+    "jewellery",
+    "women_apparel",
+    "home",
+    "men_footwear",
+    "men_apparel",
+    "fragrance",
+    "kids",
+    "toys",
+    "bags")
 
   def start(vars: ParamInfo) = {
     val saveMode = vars.saveMode
@@ -146,21 +144,19 @@ object CustTop5 {
     )
 
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
-                                              e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
-                                              e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
-                                              e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
-
+      e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
+      e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
+      e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
 
     val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
-                                              e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
-                                              e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
-                                              e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
+      e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
+      e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
+      e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
 
     val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
-                                              e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
-                                              e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
-                                              e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
-
+      e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
+      e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
+      e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
 
     val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
 
@@ -177,10 +173,9 @@ object CustTop5 {
     val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
 
-
   }
 
-  def getCatCount(map: scala.collection.immutable.Map[String, (Int, Double)]): List[(Int, Double)] ={
+  def getCatCount(map: scala.collection.immutable.Map[String, (Int, Double)]): List[(Int, Double)] = {
     var list = scala.collection.mutable.ListBuffer[(Int, Double)]()
     catagories.foreach{
       e=>
@@ -190,14 +185,14 @@ object CustTop5 {
           val sum = tuple._2
           //val (count, sum) = map(e)
           val ele = Tuple2(count, (sum/count))
+
           list.+=(ele)
-        }
-        else{
+        } else {
           val ele = Tuple2(0, 0.0)
           list.+=(ele)
         }
     }
-    return list.toList
+    list.toList
   }
 
   def getTop5FavList(mapList: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
@@ -215,12 +210,12 @@ object CustTop5 {
 
     val list = a.sortBy(r => (r._2.toInt, r._3.toDouble))(Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)
     if (list.size >= 5) {
-      return list.toList.take(5)
+      list.toList.take(5)
     } else {
       while (list.size < 5) {
         list += ""
       }
-      return list.toList
+      list.toList
     }
   }
 
