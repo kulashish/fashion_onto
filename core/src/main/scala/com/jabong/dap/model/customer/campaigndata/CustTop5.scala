@@ -195,23 +195,23 @@ object CustTop5 {
         val (count, sum) = brand(l)
         brand.put(l, ((count + 1), (sum + p)))
       } else {
-          if(l.length > 0){
-            brand.put(l, (1, p))
-          }
+        if (l.length > 0) {
+          brand.put(l, (1, p))
+        }
       }
       if (cat.contains(m) && m.length > 0) {
         val (count, sum) = cat(m)
         cat.put(m, ((count + 1), (sum + p)))
       } else {
-          if(m.length > 0 ){
-            cat.put(m, (1, p))
-          }
+        if (m.length > 0) {
+          cat.put(m, (1, p))
+        }
       }
       if (brick.contains(n) && n.length > 0) {
         val (count, sum) = brick(n)
         brick.put(n, ((count + 1), (sum + p)))
       } else {
-        if(n.length > 0){
+        if (n.length > 0) {
           brick.put(n, (1, p))
         }
       }
@@ -219,7 +219,7 @@ object CustTop5 {
         val (count, sum) = color(o)
         color.put(o, ((count + 1), (sum + p)))
       } else {
-        if(o.length > 0){
+        if (o.length > 0) {
           color.put(o, (1, p))
         }
       }

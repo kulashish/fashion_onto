@@ -1,9 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
-import java.sql.Timestamp
-
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -36,14 +33,14 @@ class WishList extends LiveCustomerSelector with Logging {
 
     }
 
-//    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
-//
-//      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
-//
-//      logger.error("schema should be this :" + Schema.customerProductShortlist)
-//      return null
-//
-//    }
+    //    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
+    //
+    //      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
+    //
+    //      logger.error("schema should be this :" + Schema.customerProductShortlist)
+    //      return null
+    //
+    //    }
 
     // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
     val dfResult = dfCustomerProductShortlist.filter("(" + CustomerProductShortlistVariables.FK_CUSTOMER + " is not null or " +
