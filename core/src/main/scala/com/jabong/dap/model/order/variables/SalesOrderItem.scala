@@ -4,7 +4,6 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
@@ -436,7 +435,7 @@ object SalesOrderItem {
       )
 
     if (null == prevCalcu) {
-      return joined
+      joined
     } else {
       prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
@@ -510,20 +509,20 @@ object SalesOrderItem {
       e =>
         if (OrderStatus.INVALID != e) {
           f = 1
-        } else if (!OrderStatus.CANCELLED.contains(e)) {
+        } else if (!OrderStatus.CANCELLED_ARRAY.contains(e)) {
           g = 1
-        } else if (!OrderStatus.RETURN.contains(e)) {
+        } else if (!OrderStatus.RETURN_ARRAY.contains(e)) {
           h = 1
         }
     )
     if (f == 0) {
-      return 10
+      10
     } else if (g == 0) {
-      return 20
+      20
     } else if (h == 0) {
-      return 30
+      30
     } else {
-      return 0
+      0
     }
 
   }

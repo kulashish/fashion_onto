@@ -17,6 +17,8 @@ object TimeUtils extends Logging {
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
 
+  val MIN_TIMESTAMP = new Timestamp(Long.MinValue)
+
   /**
    * Returns the total number of days between two given date inputs
    * @param date1
