@@ -124,6 +124,8 @@ object Udf {
 
   val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
 
+  val addInt = udf((i1: Int, i2: Int) => UdfUtils.addInt(i1: Int, i2: Int))
+
   val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
 
   val isEquals = udf((d1: Any, d2: Any) => UdfUtils.isEquals(d1: Any, d2: Any))
