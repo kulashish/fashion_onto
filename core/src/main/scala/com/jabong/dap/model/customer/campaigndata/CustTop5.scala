@@ -201,9 +201,8 @@ object CustTop5 {
     val keys = map.keySet
     keys.foreach{
       t =>
-        val tup = map(t)
-        val k = tup._1
-        val j = tup._2
+        val k = map(t)._1
+        val j = map(t)._2
         val x = Tuple3(t, k, j)
         a.+=:(x)
     }
