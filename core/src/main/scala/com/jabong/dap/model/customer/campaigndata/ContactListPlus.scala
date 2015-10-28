@@ -7,9 +7,9 @@ import org.apache.spark.sql.functions._
 
 object ContactListPlus extends Logging {
 
-  def getContactListPlus(dfContactListMobileFull: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
+  def getContactListPlus(dfContactListMobileIncr: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
 
-    val dfContactListPlusFull = dfContactListMobileFull.select(
+    val dfContactListPlusIncr = dfContactListMobileIncr.select(
       col(ContactListMobileVars.UID),
       col(CustomerVariables.PHONE),
       col(CustomerVariables.EMAIL),
@@ -25,7 +25,7 @@ object ContactListPlus extends Logging {
       col(ContactListMobileVars.COUNTRY)
     )
 
-    val dfContactListPlus = dfContactListPlusFull.except(dfContactListPlusPrevFull).select(
+    val dfContactListPlus = dfContactListPlusIncr.except(dfContactListPlusPrevFull).select(
       col(ContactListMobileVars.UID) as "uid",
       col(CustomerVariables.PHONE) as "mobile",
       col(CustomerVariables.EMAIL) as "email",

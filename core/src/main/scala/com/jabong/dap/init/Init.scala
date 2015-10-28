@@ -35,7 +35,6 @@ object Init {
 
   def main(args: Array[String]) {
     options(args)
-
   }
 
   /**
@@ -144,7 +143,6 @@ object Init {
       case DataSets.CONTACT_LIST_MOBILE => new ComponentExecutor().start(params.paramJson)
       case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => new ComponentExecutor().start(params.paramJson)
       case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CUST_EMAIL_RESPONSE => new ComponentExecutor().start(params.paramJson)
 
       case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
 

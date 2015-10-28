@@ -136,8 +136,8 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
-    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
-    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
+    $AMMUNITION = "--num-executors 3 --executor-memory 27G";
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
@@ -269,6 +269,9 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "custWelcomeVoucher") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custWelcomeVoucher --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custWelcomeVoucher.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "custTop5") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";

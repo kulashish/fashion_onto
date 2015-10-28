@@ -63,28 +63,48 @@ class ComponentExecutor extends Serializable with Logging {
       for (paramJob <- ParamJobConfig.paramJobInfo.params) {
         ParamJobConfig.paramInfo = paramJob
         paramJob.source match {
-          case DataSets.AD4PUSH_CUSTOMER_RESPONSE => DevicesReactions.start(paramJob)
-          case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(paramJob)
+          // Basic ITR
           case DataSets.BASIC_ITR => BasicITR.start(paramJob, isHistory)
-          case DataSets.CAMPAIGN_QUALITY => CampaignQualityEntry.start(paramJob)
+
+          // Customer Master Record
+          case DataSets.CUSTOMER_DEVICE_MAPPING => CustomerDeviceMapping.start(paramJob)
+
+          //pricing sku data
           case DataSets.PRICING_SKU_DATA => SkuData.start(paramJob)
+
+          // dcf feed
           case DataSets.DCF_FEED_GENERATE => DcfFeedGenerator.start(paramJob)
+
+          // Ad4push files
+          case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
+          case DataSets.AD4PUSH_CUSTOMER_RESPONSE => DevicesReactions.start(paramJob)
+
+          // generate recommendations
+          case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
+
+          // all pushCampaign quality checks
+          case DataSets.CAMPAIGN_QUALITY => CampaignQualityEntry.start(paramJob)
+
+          //email campaign feed files.
+          case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
+          case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
+          case DataSets.CUST_TOP5 => CustTop5.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
-          case DataSets.AD4PUSH_DEVICE_MERGER => Ad4pushDeviceMerger.start(paramJob, isHistory)
-          case DataSets.RECOMMENDATIONS => RecommendationGenerator.start(paramJob)
-          case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
-          case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
-          case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
+          case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
+
+          // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
           case DataSets.CUST_EMAIL_RESPONSE => CustEmailResponse.start(paramJob)
 
-          //Clickstream data moved from Init.scala
+          //// clickstream use cases
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)
           case DataSets.CLICKSTREAM_SURF3_VARIABLE => SurfVariablesMain.startSurf3Variable(paramJob)
           case DataSets.CLICKSTREAM_SURF3_MERGED_DATA30 => GetSurfVariables.getSurf3mergedForLast30Days(paramJob)
+          case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
+
           case _ => logger.error("Unknown source.")
 
         }

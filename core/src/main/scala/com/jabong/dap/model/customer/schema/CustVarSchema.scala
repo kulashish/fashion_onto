@@ -12,7 +12,7 @@ object CustVarSchema {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   val customersPreferredOrderTimeslotPart2 = StructType(Array(
-    StructField(CustomerVariables.CUSTOMER_ID, LongType, true),
+    StructField(CustomerVariables.CUSTOMER_ID, StringType, true),
     StructField(CustomerVariables.ORDER_0, IntegerType, true),
     StructField(CustomerVariables.ORDER_1, IntegerType, true),
     StructField(CustomerVariables.ORDER_2, IntegerType, true),

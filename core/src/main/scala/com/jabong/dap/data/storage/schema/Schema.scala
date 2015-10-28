@@ -308,11 +308,10 @@ object Schema {
   ))
 
   val emailCampaignSchema = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true),
-    StructField(CustomerVariables.EMAIL, StringType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true)
   ))
 
   val campaign = StructType(Array(
@@ -381,7 +380,7 @@ object Schema {
   ))
 
   val finalReferenceSku = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, false),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
 
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(
@@ -395,7 +394,7 @@ object Schema {
   ))
 
   val expectedFinalReferenceSku = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
 
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(
@@ -412,7 +411,7 @@ object Schema {
   ))
 
   val finalReferenceSkuWithACartUrl = StructType(Array(
-    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
 
     StructField(CampaignMergedFields.REF_SKUS, ArrayType(
@@ -425,6 +424,44 @@ object Schema {
         StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false),
 
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
+  ))
+
+  val customerFavList = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("catagory_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
+      StructField("sum_price", DoubleType)))), true),
+    StructField("last_orders_created_at", TimestampType, true)
+
+  ))
+
+  val cusTop5 = StructType(Array(
+    StructField("fk_customer", LongType, true),
+    StructField("BRAND_1", StringType, true),
+    StructField("BRAND_2", StringType, true),
+    StructField("BRAND_3", StringType, true),
+    StructField("BRAND_4", StringType, true),
+    StructField("BRAND_5", StringType, true),
+    StructField("CAT_1", StringType, true),
+    StructField("CAT_2", StringType, true),
+    StructField("CAT_3", StringType, true),
+    StructField("CAT_4", StringType, true),
+    StructField("CAT_5", StringType, true),
+    StructField("BRICK_1", StringType, true),
+    StructField("BRICK_2", StringType, true),
+    StructField("BRICK_3", StringType, true),
+    StructField("BRICK_4", StringType, true),
+    StructField("BRICK_5", StringType, true),
+    StructField("COLOR_1", StringType, true),
+    StructField("COLOR_2", StringType, true),
+    StructField("COLOR_3", StringType, true),
+    StructField("COLOR_4", StringType, true),
+    StructField("COLOR_5", StringType, true)
   ))
 
 }

@@ -11,6 +11,7 @@ import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
+import com.jabong.dap.common.Utils
 
 /**
  * Utilities test class
@@ -106,7 +107,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:58.0"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(null, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(null, field, after, before)
     assert(filteredData == null)
   }
 
@@ -114,21 +115,21 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:58"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
     assert(filteredData == null)
   }
 
   "null Field " should "return no filtered frame" in {
     val after = "2015-07-02 22:36:58"
     val before = "2015-07-12 22:36:58.0"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
     assert(filteredData == null)
   }
 
   "Field doesn't exist in data frame schema" should "return no filtered frame" in {
     val after = "2015-07-02 22:36:58"
     val before = "2015-07-12 22:36:58.0"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
     assert(filteredData == null)
   }
 
@@ -136,7 +137,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:58.0"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
     assert(filteredData.count == 2)
   }
 
@@ -144,7 +145,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:59.0"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
     assert(filteredData.count == 1)
   }
   //
