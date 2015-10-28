@@ -454,7 +454,7 @@ object Schema {
     StructField("CAT_4", StringType, true),
     StructField("CAT_5", StringType, true),
     StructField("BRICK_1", StringType, true),
-    StructField("BRICK_2", StringType,  true),
+    StructField("BRICK_2", StringType, true),
     StructField("BRICK_3", StringType, true),
     StructField("BRICK_4", StringType, true),
     StructField("BRICK_5", StringType, true),
