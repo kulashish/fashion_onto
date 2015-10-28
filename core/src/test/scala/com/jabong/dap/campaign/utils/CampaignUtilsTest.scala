@@ -13,7 +13,6 @@ import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
 import com.jabong.dap.common.Utils
 
-
 /**
  * Utilities test class
  */

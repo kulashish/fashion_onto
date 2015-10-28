@@ -51,7 +51,7 @@ class ReturnCancel extends LiveCustomerSelector {
     // 1. order_item (1 day): filter by required status
 
     val returnCancelSku = salesOrderItemData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " in (" + OrderStatus.RETURN
-      + "," + OrderStatus.RETURN_PAYMENT_PENDING + "," + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC_ITEM + "," + OrderStatus.CANCEL_PAYMENT_ERROR
+      + "," + OrderStatus.RETURN_PAYMENT_PENDING + "," + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC + "," + OrderStatus.CANCEL_PAYMENT_ERROR
       + "," + OrderStatus.DECLINED + "," + OrderStatus.EXPORTABLE_CANCEL_CUST + "," + OrderStatus.EXPORTED_CANCEL_CUST + ")")
       .select(salesOrderItemData(ProductVariables.SKU),
         salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),

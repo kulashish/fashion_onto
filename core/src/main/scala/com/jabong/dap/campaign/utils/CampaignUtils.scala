@@ -446,8 +446,6 @@ object CampaignUtils extends Logging {
     skuNotBoughtTillNow
   }
 
-
-
   /**
    *
    * @param mailType

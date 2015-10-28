@@ -73,7 +73,7 @@ object SalesOrderVariables {
   val DAYS_SINCE_LAST_ORDER = "days_since_last_order"
   val FIRST_ORDER_DATE = "first_order_date"
   val ORDERS_COUNT = "orders_count"
-  val CATEGORY_PENETRATION  = "CATEGORY_PENETRATION"
+  val CATEGORY_PENETRATION = "CATEGORY_PENETRATION"
   val BRICK_PENETRATION = "BRICK_PENETRATION"
 
   val MAX_ORDER_BASKET_VALUE = "MAX_ORDER_BASKET_VALUE"

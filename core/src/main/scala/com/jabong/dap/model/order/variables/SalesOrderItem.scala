@@ -4,7 +4,6 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
@@ -35,7 +34,7 @@ object SalesOrderItem {
         salesOrderJoined(SalesOrderItemVariables.PAID_PRICE),
         salesOrderJoined(SalesOrderItemVariables.STORE_CREDITS_VALUE),
         salesOrderJoined(SalesOrderVariables.DOMAIN)
-    )
+      )
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
@@ -54,13 +53,12 @@ object SalesOrderItem {
 
     (joinedData, res)
 
-
   }
 
   //TODO change this method
   def addColumnsforBeforeData(salesRevenue: DataFrame): DataFrame = {
     salesRevenue.withColumn(SalesOrderItemVariables.ORDERS_COUNT_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
-                .withColumn(SalesOrderItemVariables.ORDERS_COUNT_APP_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
+      .withColumn(SalesOrderItemVariables.ORDERS_COUNT_APP_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
       .withColumn(SalesOrderItemVariables.ORDERS_COUNT_WEB_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
       .withColumn(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
       .withColumn(SalesOrderItemVariables.REVENUE_7, salesRevenue(SalesOrderItemVariables.REVENUE_APP) - salesRevenue(SalesOrderItemVariables.REVENUE_APP))
@@ -156,7 +154,7 @@ object SalesOrderItem {
    * @return merged full dataframe
    */
   def merge(inc: DataFrame, full: DataFrame): DataFrame = {
-    if(null==full){
+    if (null == full) {
       return addColumnsforBeforeData(inc)
     }
     val bcInc = Spark.getContext().broadcast(inc).value
@@ -260,7 +258,7 @@ object SalesOrderItem {
           mostPrefBrandUnion(ProductVariables.BRAND),
           mostPrefBrandUnion(ProductVariables.SPECIAL_PRICE))
 
-//      mostPrefBrandIncr = mostPrefBrandUnion.filter(mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER).contains(mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER)))
+      //      mostPrefBrandIncr = mostPrefBrandUnion.filter(mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER).contains(mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER)))
     }
 
     val SUM_SPECIAL_PRICE = "sum_special_price"
@@ -317,7 +315,7 @@ object SalesOrderItem {
   }
 
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
-    if(null == curr){
+    if (null == curr) {
       prev.printSchema()
       prev.show(5)
       return prev
@@ -402,57 +400,56 @@ object SalesOrderItem {
       salesRuleFull(SalesRuleVariables.FK_SALES_RULE_SET)
     )
     val salesSetJoined = salesRuleJoined.join(salesRuleSet, salesRuleSet(SalesRuleSetVariables.ID_SALES_RULE_SET) === salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET))
-                          .select(salesRuleJoined(SalesOrderVariables.FK_CUSTOMER),
-                                  salesRuleJoined(SalesOrderVariables.ID_SALES_ORDER),
-                                  salesRuleJoined(SalesRuleVariables.CODE),
-                                  salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET),
-                                  salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE))
+      .select(salesRuleJoined(SalesOrderVariables.FK_CUSTOMER),
+        salesRuleJoined(SalesOrderVariables.ID_SALES_ORDER),
+        salesRuleJoined(SalesRuleVariables.CODE),
+        salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET),
+        salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE))
 
     val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
     val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
     var discCalc: DataFrame = null
     val disc = percent.groupBy(SalesOrderVariables.ID_SALES_ORDER)
-                    .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
-                           min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
-                           max(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
-                           sum(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_sum",
-                           count(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_count")
+      .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+        min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
+        max(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
+        sum(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_sum",
+        count(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_count")
     val coup = fixed.groupBy(SalesOrderVariables.ID_SALES_ORDER)
-                    .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
-                           min(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
-                           max(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
-                           sum(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_sum",
-                           count(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_count")
+      .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+        min(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+        max(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
+        sum(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_sum",
+        count(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_count")
 
     val joined = disc.join(coup, coup(SalesOrderVariables.FK_CUSTOMER) === disc(SalesOrderVariables.FK_CUSTOMER))
-                    .select(coalesce(coup(SalesOrderVariables.FK_CUSTOMER), disc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                            coup(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
-                            coup(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-                            coup(SalesRuleSetVariables.COUPON_COUNT),
-                            coup(SalesRuleSetVariables.COUPON_SUM),
-                            disc(SalesRuleSetVariables.MIN_DISCOUNT_USED),
-                            disc(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-                            disc(SalesRuleSetVariables.DISCOUNT_SUM),
-                            disc(SalesRuleSetVariables.DISCOUNT_COUNT)
+      .select(coalesce(coup(SalesOrderVariables.FK_CUSTOMER), disc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        coup(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        coup(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        coup(SalesRuleSetVariables.COUPON_COUNT),
+        coup(SalesRuleSetVariables.COUPON_SUM),
+        disc(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        disc(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        disc(SalesRuleSetVariables.DISCOUNT_SUM),
+        disc(SalesRuleSetVariables.DISCOUNT_COUNT)
       )
 
-    if(null == prevCalcu){
-      return joined
+    if (null == prevCalcu) {
+      joined
     } else {
       prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-          .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        when(joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
-        when(joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
-        joined(SalesRuleSetVariables.COUPON_SUM) + prevCalcu(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
-        joined(SalesRuleSetVariables.COUPON_COUNT) + prevCalcu(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.COUPON_COUNT,
-        when(joined(SalesRuleSetVariables.MIN_DISCOUNT_USED) < prevCalcu(SalesRuleSetVariables.MIN_DISCOUNT_USED), joined(SalesRuleSetVariables.MIN_DISCOUNT_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_DISCOUNT_USED)) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
-        when(joined(SalesRuleSetVariables.MAX_DISCOUNT_USED) < prevCalcu(SalesRuleSetVariables.MAX_DISCOUNT_USED), joined(SalesRuleSetVariables.MAX_DISCOUNT_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_DISCOUNT_USED)) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
-        joined(SalesRuleSetVariables.DISCOUNT_SUM) + prevCalcu(SalesRuleSetVariables.DISCOUNT_SUM) as SalesRuleSetVariables.DISCOUNT_SUM,
-        joined(SalesRuleSetVariables.DISCOUNT_COUNT) + prevCalcu(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.DISCOUNT_COUNT
+        .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          when(joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+          when(joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), joined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+          joined(SalesRuleSetVariables.COUPON_SUM) + prevCalcu(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
+          joined(SalesRuleSetVariables.COUPON_COUNT) + prevCalcu(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.COUPON_COUNT,
+          when(joined(SalesRuleSetVariables.MIN_DISCOUNT_USED) < prevCalcu(SalesRuleSetVariables.MIN_DISCOUNT_USED), joined(SalesRuleSetVariables.MIN_DISCOUNT_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MIN_DISCOUNT_USED)) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
+          when(joined(SalesRuleSetVariables.MAX_DISCOUNT_USED) < prevCalcu(SalesRuleSetVariables.MAX_DISCOUNT_USED), joined(SalesRuleSetVariables.MAX_DISCOUNT_USED)).otherwise(prevCalcu(SalesRuleSetVariables.MAX_DISCOUNT_USED)) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
+          joined(SalesRuleSetVariables.DISCOUNT_SUM) + prevCalcu(SalesRuleSetVariables.DISCOUNT_SUM) as SalesRuleSetVariables.DISCOUNT_SUM,
+          joined(SalesRuleSetVariables.DISCOUNT_COUNT) + prevCalcu(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.DISCOUNT_COUNT
         )
     }
-    }
-
+  }
 
   /*
    COUNT_OF_RET_ORDERS - 8,12,32,35,36,37,38 are returned orderitem states.
@@ -469,67 +466,63 @@ object SalesOrderItem {
    Need to get final count of orders where invalid orderitem count matches total orderitem count
    */
 
-  def getInvalidCancelOrders(salesOrderJoined: DataFrame, prevCal: DataFrame): DataFrame={
+  def getInvalidCancelOrders(salesOrderJoined: DataFrame, prevCal: DataFrame): DataFrame = {
     val joinedMap = salesOrderJoined.select(salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
-                            salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
-                            salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS))
-                            .map(e => (e(0).asInstanceOf[LongType],e(1).asInstanceOf[LongType]) -> (e(2).asInstanceOf[Int]))
-                            .groupByKey()
-    val orderType = joinedMap.map(e => (e._1, findOrderType(e._2.toList))).map(e => (e._1._1, e._1._2 , e._2))
+      salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
+      salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS))
+      .map(e => (e(0).asInstanceOf[LongType], e(1).asInstanceOf[LongType]) -> (e(2).asInstanceOf[Int]))
+      .groupByKey()
+    val orderType = joinedMap.map(e => (e._1, findOrderType(e._2.toList))).map(e => (e._1._1, e._1._2, e._2))
 
     val ordersDf = Spark.getSqlContext().createDataFrame(orderType).withColumnRenamed("_1", SalesOrderVariables.ID_SALES_ORDER)
-                                                      .withColumnRenamed("_2", SalesOrderVariables.FK_CUSTOMER)
-                                                       .withColumnRenamed("_3", "type")
+      .withColumnRenamed("_2", SalesOrderVariables.FK_CUSTOMER)
+      .withColumnRenamed("_3", "type")
 
     val canOrders = ordersDf.select(ordersDf(SalesOrderVariables.ID_SALES_ORDER),
-                                    ordersDf(SalesOrderVariables.FK_CUSTOMER),
-                                    when(ordersDf("type") === 10, 1).otherwise(0) as "invalid" ,
-                                    when(ordersDf("type") === 20, 1).otherwise(0) as "cancel" ,
-                                    when(ordersDf("type") === 30, 1).otherwise(0) as "return"
-                                    )
+      ordersDf(SalesOrderVariables.FK_CUSTOMER),
+      when(ordersDf("type") === 10, 1).otherwise(0) as "invalid",
+      when(ordersDf("type") === 20, 1).otherwise(0) as "cancel",
+      when(ordersDf("type") === 30, 1).otherwise(0) as "return"
+    )
     val res = canOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
-              .agg( count("invalid") as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
-                    count("cancel") as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-                    count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
-                  )
-    if(null == prevCal){
+      .agg(count("invalid") as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
+        count("cancel") as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
+        count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
+      )
+    if (null == prevCal) {
       res
-    } else{
+    } else {
       prevCal.join(res, prevCal(SalesOrderVariables.FK_CUSTOMER) === res(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-              .select(coalesce(prevCal(SalesOrderVariables.FK_CUSTOMER), res(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                      prevCal(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
-                      prevCal(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-                      prevCal(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
-                      )
+        .select(coalesce(prevCal(SalesOrderVariables.FK_CUSTOMER), res(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          prevCal(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
+          prevCal(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
+          prevCal(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + res(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
+        )
     }
   }
 
-
-
-  def findOrderType(list: List[Int]): Int ={
+  def findOrderType(list: List[Int]): Int = {
     var f = 0
     var g = 0
     var h = 0
     list.foreach(
-        e =>
-        if(OrderStatus.INVALID != e){
-            f=1
-        }
-        else if(!OrderStatus.CANCELLED.contains(e)){
-            g=1
-          }
-        else if(!OrderStatus.RETURN.contains(e)){
-            h=1
+      e =>
+        if (OrderStatus.INVALID != e) {
+          f = 1
+        } else if (!OrderStatus.CANCELLED_ARRAY.contains(e)) {
+          g = 1
+        } else if (!OrderStatus.RETURN_ARRAY.contains(e)) {
+          h = 1
         }
     )
-    if (f==0){
-      return 10
-    } else if(g ==0){
-      return 20
-    } else if (h ==0){
-      return 30
-    } else{
-      return 0
+    if (f == 0) {
+      10
+    } else if (g == 0) {
+      20
+    } else if (h == 0) {
+      30
+    } else {
+      0
     }
 
   }
@@ -539,25 +532,25 @@ object SalesOrderItem {
   BRICK_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by brick
   */
 
-  def getCatBrickPen(salesOrderjoined: DataFrame, itr: DataFrame, prevJoined: DataFrame): (DataFrame, DataFrame)={
+  def getCatBrickPen(salesOrderjoined: DataFrame, itr: DataFrame, prevJoined: DataFrame): (DataFrame, DataFrame) = {
     val joined = salesOrderjoined
-                          .select(salesOrderjoined(SalesOrderVariables.ID_SALES_ORDER),
-                            salesOrderjoined(SalesOrderVariables.FK_CUSTOMER),
-                            salesOrderjoined(SalesOrderItemVariables.SKU)
-                            )
+      .select(salesOrderjoined(SalesOrderVariables.ID_SALES_ORDER),
+        salesOrderjoined(SalesOrderVariables.FK_CUSTOMER),
+        salesOrderjoined(SalesOrderItemVariables.SKU)
+      )
     val incrJoined = joined.join(itr, joined(SalesOrderItemVariables.SKU) === itr(ITR.CONFIG_SKU))
-                          .select(joined(SalesOrderVariables.ID_SALES_ORDER),
-                                  joined(SalesOrderVariables.FK_CUSTOMER),
-                                  joined(SalesOrderItemVariables.SKU),
-                                  itr(ITR.REPORTING_CATEGORY),
-                                  itr(ITR.BRICK),
-                                  itr(ITR.BRAND_NAME),
-                                  itr(ITR.PRICE)
-                              )
+      .select(joined(SalesOrderVariables.ID_SALES_ORDER),
+        joined(SalesOrderVariables.FK_CUSTOMER),
+        joined(SalesOrderItemVariables.SKU),
+        itr(ITR.REPORTING_CATEGORY),
+        itr(ITR.BRICK),
+        itr(ITR.BRAND_NAME),
+        itr(ITR.PRICE)
+      )
     var fullJoined: DataFrame = null
-    if (null == prevJoined){
+    if (null == prevJoined) {
       fullJoined = incrJoined
-    } else{
+    } else {
       fullJoined = incrJoined.unionAll(prevJoined)
     }
 
@@ -577,20 +570,19 @@ object SalesOrderItem {
       .agg(max("count") as SalesOrderItemVariables.FAV_BRAND)
 
     val catBrick = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
-                select(coalesce(cat(SalesOrderVariables.FK_CUSTOMER),brick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER ,
-                       cat(SalesOrderVariables.CATEGORY_PENETRATION),
-                       brick(SalesOrderVariables.BRICK_PENETRATION)
-                      )
+      select(coalesce(cat(SalesOrderVariables.FK_CUSTOMER), brick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        cat(SalesOrderVariables.CATEGORY_PENETRATION),
+        brick(SalesOrderVariables.BRICK_PENETRATION)
+      )
     val res = catBrick.join(brand, brand(SalesOrderVariables.FK_CUSTOMER) === catBrick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                  .select(coalesce(brand(SalesOrderVariables.FK_CUSTOMER),catBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER ,
-                          catBrick(SalesOrderVariables.CATEGORY_PENETRATION),
-                          catBrick(SalesOrderVariables.BRICK_PENETRATION),
-                          brand(SalesOrderItemVariables.FAV_BRAND)
-                        )
+      .select(coalesce(brand(SalesOrderVariables.FK_CUSTOMER), catBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        catBrick(SalesOrderVariables.CATEGORY_PENETRATION),
+        catBrick(SalesOrderVariables.BRICK_PENETRATION),
+        brand(SalesOrderItemVariables.FAV_BRAND)
+      )
 
     return (res, fullJoined)
   }
-
 
   /*
   MAX_ORDER_BASKET_VALUE - max of sum(unit_price) at order level & customer level.
@@ -606,37 +598,36 @@ object SalesOrderItem {
   Do avg(unit_price)group by fk_customer to get avg.sp paid till date by that’s customer
   */
 
-  def getOrderValue(salesOrderJoined: DataFrame, prevCalc: DataFrame): DataFrame={
+  def getOrderValue(salesOrderJoined: DataFrame, prevCalc: DataFrame): DataFrame = {
     val salesJoined = salesOrderJoined
-                        .select(
-                          salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
-                          salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
-                          salesOrderJoined(SalesOrderItemVariables.UNIT_PRICE)
-                          )
+      .select(
+        salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
+        salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
+        salesOrderJoined(SalesOrderItemVariables.UNIT_PRICE)
+      )
     val orderGrp = salesJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
-                       .agg(sum(SalesOrderItemVariables.UNIT_PRICE) as "basket_value",
-                            max(SalesOrderItemVariables.UNIT_PRICE) as "max_item",
-                            count(SalesOrderItemVariables.UNIT_PRICE) as "item_count")
+      .agg(sum(SalesOrderItemVariables.UNIT_PRICE) as "basket_value",
+        max(SalesOrderItemVariables.UNIT_PRICE) as "max_item",
+        count(SalesOrderItemVariables.UNIT_PRICE) as "item_count")
     val orderValue = orderGrp.groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(max("basket_value") as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
         sum("basket_value") as SalesOrderVariables.SUM_BASKET_VALUE,
-        count("basket_value") as  SalesOrderVariables.COUNT_BASKET_VALUE,
+        count("basket_value") as SalesOrderVariables.COUNT_BASKET_VALUE,
         max("max_item") as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
         sum("item_count") as SalesOrderVariables.ORDER_ITEM_COUNT)
 
-    if (null == prevCalc ){
+    if (null == prevCalc) {
       orderValue
-    } else{
+    } else {
       orderValue.join(prevCalc, orderValue(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                .select(coalesce(orderValue(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                        when(orderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)> prevCalc(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),orderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(prevCalc(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)),
-                        when(orderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)> prevCalc(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),orderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(prevCalc(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)),
-                        orderValue(SalesOrderVariables.SUM_BASKET_VALUE)+ prevCalc(SalesOrderVariables.SUM_BASKET_VALUE) as SalesOrderVariables.SUM_BASKET_VALUE,
-                        orderValue(SalesOrderVariables.COUNT_BASKET_VALUE)+ prevCalc(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.COUNT_BASKET_VALUE,
-                        orderValue(SalesOrderVariables.ORDER_ITEM_COUNT)+ prevCalc(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.ORDER_ITEM_COUNT
-                      )
+        .select(coalesce(orderValue(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          when(orderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE) > prevCalc(SalesOrderVariables.MAX_ORDER_BASKET_VALUE), orderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(prevCalc(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)),
+          when(orderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE) > prevCalc(SalesOrderVariables.MAX_ORDER_ITEM_VALUE), orderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(prevCalc(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)),
+          orderValue(SalesOrderVariables.SUM_BASKET_VALUE) + prevCalc(SalesOrderVariables.SUM_BASKET_VALUE) as SalesOrderVariables.SUM_BASKET_VALUE,
+          orderValue(SalesOrderVariables.COUNT_BASKET_VALUE) + prevCalc(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.COUNT_BASKET_VALUE,
+          orderValue(SalesOrderVariables.ORDER_ITEM_COUNT) + prevCalc(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.ORDER_ITEM_COUNT
+        )
     }
-
 
   }
 
