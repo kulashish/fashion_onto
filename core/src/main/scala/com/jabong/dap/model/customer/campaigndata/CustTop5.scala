@@ -107,12 +107,13 @@ object CustTop5 {
 
   def start(vars: ParamInfo) = {
     val saveMode = vars.saveMode
+    val path = OptionUtils.getOptValue(vars.path)
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
-    val (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr) = readDF(incrDate, prevDate)
+    val (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr) = readDF(incrDate, prevDate, path)
     var salesOrderincr: DataFrame = salesOrderIncr
     var salesOrderItemincr: DataFrame = salesOrderItemIncr
-    if (null != top5PrevFull) {
+    if (null != path) {
       salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
       salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
@@ -131,7 +132,7 @@ object CustTop5 {
     DataWriter.writeParquet(top5Full, fullPath, saveMode)
 
     var top5Incr = top5Full
-    if (null != top5PrevFull) {
+    if (null != path) {
       top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
     val favTop5Map = top5Incr.map(e =>
@@ -142,32 +143,30 @@ object CustTop5 {
         getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
       )
       )
+
     )
 
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
-      e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
-      e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
-      e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4) //color
-    )
-    )
+                                              e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
+                                              e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
+                                              e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
+
 
     val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
                                               e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
                                               e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
-                                              e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1
-                                              ))
+                                              e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
 
     val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
                                               e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
                                               e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
-                                              e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2
-                                        ))
+                                              e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
 
 
     val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
 
-    val top5Path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(fav, top5Path, saveMode)
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(fav.na.fill(""), DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
     val categoryCount = Spark.getSqlContext().createDataFrame(catCount, Schema.catCount)
 
@@ -237,7 +236,7 @@ object CustTop5 {
 
     val top5incr = Spark.getSqlContext().createDataFrame(top5, Schema.customerFavList)
     if (null == top5PrevFull) {
-      return top5incr
+      top5incr
     } else {
       val top5Joined = top5PrevFull.join(top5incr, top5PrevFull(SalesOrderVariables.FK_CUSTOMER) === top5incr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(top5incr(SalesOrderVariables.FK_CUSTOMER), top5PrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
@@ -248,7 +247,7 @@ object CustTop5 {
           coalesce(top5incr("last_orders_created_at"), top5PrevFull("last_orders_created_at")) as "last_orders_created_at"
 
         )
-      return top5Joined
+      top5Joined
     }
   }
 
@@ -295,23 +294,23 @@ object CustTop5 {
         val (count, sum) = brand(l)
         brand.put(l, ((count + 1), (sum + p)))
       } else {
-          if(l.length > 0){
-            brand.put(l, (1, p))
-          }
+        if (l.length > 0) {
+          brand.put(l, (1, p))
+        }
       }
       if (cat.contains(m) && m.length > 0) {
         val (count, sum) = cat(m)
         cat.put(m, ((count + 1), (sum + p)))
       } else {
-          if(m.length > 0 ){
-            cat.put(m, (1, p))
-          }
+        if (m.length > 0) {
+          cat.put(m, (1, p))
+        }
       }
       if (brick.contains(n) && n.length > 0) {
         val (count, sum) = brick(n)
         brick.put(n, ((count + 1), (sum + p)))
       } else {
-        if(n.length > 0){
+        if (n.length > 0) {
           brick.put(n, (1, p))
         }
       }
@@ -319,7 +318,7 @@ object CustTop5 {
         val (count, sum) = color(o)
         color.put(o, ((count + 1), (sum + p)))
       } else {
-        if(o.length > 0){
+        if (o.length > 0) {
           color.put(o, (1, p))
         }
       }
@@ -335,11 +334,12 @@ object CustTop5 {
     (count, sum)
   }
 
-  def readDF(incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame, DataFrame) = {
-    val top5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
-    var mode: String = DataSets.DAILY_MODE
-    if (null == top5PrevFull) {
-      mode = DataSets.FULL_MERGE_MODE
+  def readDF(incrDate: String, prevDate: String, path: String): (DataFrame, DataFrame, DataFrame, DataFrame) = {
+    var mode: String = DataSets.FULL_MERGE_MODE
+    var top5PrevFull: DataFrame = null
+    if (null == path) {
+      top5PrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      mode = DataSets.DAILY_MODE
     }
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
