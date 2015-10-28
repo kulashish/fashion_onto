@@ -198,8 +198,9 @@ object CustTop5 {
     return list.toList
   }
 
-  def getTop5FavList(map: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
+  def getTop5FavList(mapList: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
     val a = ListBuffer[(String, Int, Double)]()
+    val map = collection.mutable.Map() ++ mapList
     val keys = map.keySet
     keys.foreach{
       t =>
@@ -257,9 +258,9 @@ object CustTop5 {
     if (null == map1 && null == map2) {
       return null
     } else if (null == map2) {
-      return collection.mutable.Map(map1.toSeq: _*)
+      return collection.mutable.Map() ++ map1
     } else if (null == map1) {
-      return collection.mutable.Map(map2.toSeq: _*)
+      return collection.mutable.Map() ++ map2
     }
     val mapIncr = collection.mutable.Map() ++ map1
     val mapFull = collection.mutable.Map() ++ map2
