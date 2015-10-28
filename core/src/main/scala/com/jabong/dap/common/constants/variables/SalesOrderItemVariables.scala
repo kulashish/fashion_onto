@@ -134,4 +134,8 @@ object SalesOrderItemVariables {
   val EXPECTED_SHIPPING_PARTNER = "expected_shipping_partner"
   val IS_MULTIPLE_SHIPMENTS = "is_multiple_shipments"
   val CORPORATE_CURRENCY_VALUE = "corporate_currency_value"
+
+  val COUNT_OF_RET_ORDERS ="COUNT_OF_RET_ORDERS"
+  val COUNT_OF_CNCLD_ORDERS = "COUNT_OF_CNCLD_ORDERS"
+  val COUNT_OF_INVLD_ORDERS = "COUNT_OF_INVLD_ORDERS"
 }

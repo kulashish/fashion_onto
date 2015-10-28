@@ -19,6 +19,7 @@ import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import com.jabong.dap.common.Utils
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -88,7 +89,7 @@ object CampaignInput extends Logging {
     val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
-    val lastNdaysOrderItemData = CampaignUtils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
+    val lastNdaysOrderItemData = Utils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
 
     lastNdaysOrderItemData
   }
@@ -108,7 +109,7 @@ object CampaignInput extends Logging {
     val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
-    val lastNdaysOrderData = CampaignUtils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
+    val lastNdaysOrderData = Utils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
     lastNdaysOrderData
   }
 
@@ -125,7 +126,7 @@ object CampaignInput extends Logging {
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
     val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
 
-    val nthDayOrderData = CampaignUtils.getTimeBasedDataFrame(last30daysAcartData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
+    val nthDayOrderData = Utils.getTimeBasedDataFrame(last30daysAcartData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
     nthDayOrderData
   }
 
@@ -511,7 +512,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
     val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
 
-    val nthDayShortlistData = CampaignUtils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nthDayShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nthDayShortlistData
   }
@@ -546,7 +547,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
     val endTimestamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
 
-    val nDaysShortlistData = CampaignUtils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nDaysShortlistData
   }
