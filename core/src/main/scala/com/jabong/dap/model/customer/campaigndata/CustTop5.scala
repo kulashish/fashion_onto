@@ -163,8 +163,8 @@ object CustTop5 {
     } else if (null == map1) {
       return collection.mutable.Map(map2.toSeq: _*)
     }
-    val mapIncr = collection.mutable.Map(map1.toSeq: _*)
-    val mapFull = collection.mutable.Map(map2.toSeq: _*)
+    val mapIncr = collection.mutable.Map() ++ map1
+    val mapFull = collection.mutable.Map() ++ map2
 
     val keys = mapIncr.keySet
     keys.foreach{
