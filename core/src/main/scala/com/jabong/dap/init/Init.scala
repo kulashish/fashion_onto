@@ -130,9 +130,10 @@ object Init {
       case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
 
       //campaign quality check for mobile
-      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
+      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
+
       //campaign quality check for email
-      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, params.component)
+      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
 
       case _ => new ComponentExecutor().start(params.paramJson)
     }
