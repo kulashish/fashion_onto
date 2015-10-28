@@ -3,7 +3,7 @@
     {
       "source": "custTop5",
       "path": "first time",
-      "incrDate": "2015/10/24",
+      "incrDate": "2015/10/25",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }

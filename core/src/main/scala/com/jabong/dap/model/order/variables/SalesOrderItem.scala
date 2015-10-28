@@ -4,7 +4,6 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
@@ -436,7 +435,7 @@ object SalesOrderItem {
       )
 
     if (null == prevCalcu) {
-      return joined
+      joined
     } else {
       prevCalcu.join(joined, joined(SalesOrderVariables.FK_CUSTOMER) === prevCalcu(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(joined(SalesOrderVariables.FK_CUSTOMER), prevCalcu(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
@@ -510,79 +509,22 @@ object SalesOrderItem {
       e =>
         if (OrderStatus.INVALID != e) {
           f = 1
-        } else if (!OrderStatus.CANCELLED.contains(e)) {
+        } else if (!OrderStatus.CANCELLED_ARRAY.contains(e)) {
           g = 1
-        } else if (!OrderStatus.RETURN.contains(e)) {
+        } else if (!OrderStatus.RETURN_ARRAY.contains(e)) {
           h = 1
         }
     )
     if (f == 0) {
-      return 10
+      10
     } else if (g == 0) {
-      return 20
+      20
     } else if (h == 0) {
-      return 30
+      30
     } else {
-      return 0
+      0
     }
 
-  }
-
-  /*
-  CATEGORY_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by reportingcategory
-  BRICK_PENETRATION - sales_order is at customer level. Need to join this to sales_order_item to get customerlevel list of order_items purchased tilldate. Join this list to itr on sku level to get count of order_items grouped by brick
-  */
-
-  def getCatBrickPen(salesOrderjoined: DataFrame, itr: DataFrame, prevJoined: DataFrame): (DataFrame, DataFrame) = {
-    val joined = salesOrderjoined
-      .select(salesOrderjoined(SalesOrderVariables.ID_SALES_ORDER),
-        salesOrderjoined(SalesOrderVariables.FK_CUSTOMER),
-        salesOrderjoined(SalesOrderItemVariables.SKU)
-      )
-    val incrJoined = joined.join(itr, joined(SalesOrderItemVariables.SKU) === itr(ITR.CONFIG_SKU))
-      .select(joined(SalesOrderVariables.ID_SALES_ORDER),
-        joined(SalesOrderVariables.FK_CUSTOMER),
-        joined(SalesOrderItemVariables.SKU),
-        itr(ITR.REPORTING_CATEGORY),
-        itr(ITR.BRICK),
-        itr(ITR.BRAND_NAME),
-        itr(ITR.PRICE)
-      )
-    var fullJoined: DataFrame = null
-    if (null == prevJoined) {
-      fullJoined = incrJoined
-    } else {
-      fullJoined = incrJoined.unionAll(prevJoined)
-    }
-
-    val cat = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.REPORTING_CATEGORY)
-      .agg(count(ITR.REPORTING_CATEGORY) as "count")
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("count") as SalesOrderVariables.CATEGORY_PENETRATION)
-
-    val brick = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.BRICK)
-      .agg(count(ITR.BRICK) as "count")
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("count") as SalesOrderVariables.BRICK_PENETRATION)
-
-    val brand = fullJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, ITR.BRAND_NAME)
-      .agg(count(ITR.BRAND_NAME) as "count")
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(max("count") as SalesOrderItemVariables.FAV_BRAND)
-
-    val catBrick = cat.join(brick, cat(SalesOrderVariables.FK_CUSTOMER) === brick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER).
-      select(coalesce(cat(SalesOrderVariables.FK_CUSTOMER), brick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        cat(SalesOrderVariables.CATEGORY_PENETRATION),
-        brick(SalesOrderVariables.BRICK_PENETRATION)
-      )
-    val res = catBrick.join(brand, brand(SalesOrderVariables.FK_CUSTOMER) === catBrick(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-      .select(coalesce(brand(SalesOrderVariables.FK_CUSTOMER), catBrick(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        catBrick(SalesOrderVariables.CATEGORY_PENETRATION),
-        catBrick(SalesOrderVariables.BRICK_PENETRATION),
-        brand(SalesOrderItemVariables.FAV_BRAND)
-      )
-
-    return (res, fullJoined)
   }
 
   /*
