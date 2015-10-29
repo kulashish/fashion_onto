@@ -629,6 +629,10 @@ object UdfUtils extends Logging {
     if (value == null) return null else constant + value + constant
   }
 
+  def addInt(i1: Int, i2: Int): Int = {
+    { if (null == i1) 0 else i1 } + { if (null == i2) 0 else i2 }
+  }
+
   /**
    * isEquals checks: if data of d1 and d2 values are equals
    * @param d1
