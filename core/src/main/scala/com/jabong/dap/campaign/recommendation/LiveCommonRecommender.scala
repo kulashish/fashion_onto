@@ -2,17 +2,16 @@ package com.jabong.dap.campaign.recommendation
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 /**
  * Created by rahul aneja on 21/8/15.
@@ -30,7 +29,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE) contains recType, "recommendation type is invalid")
     var refSkusUpdatedSchema: DataFrame = refSkus
     if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)) {
-      refSkusUpdatedSchema = SchemaUtils.changeSchema(refSkus, Schema.expectedFinalReferenceSku)
+      refSkusUpdatedSchema = SchemaUtils.addColumns(refSkus, Schema.expectedFinalReferenceSku)
     }
 
     val refSkuExploded = refSkusUpdatedSchema.select(
