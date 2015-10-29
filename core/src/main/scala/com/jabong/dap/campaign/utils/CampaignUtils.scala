@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
-import com.jabong.dap.common.{GroupedUtils, Spark}
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
@@ -49,13 +49,13 @@ object CampaignUtils extends Logging {
     //      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
     //        as (CampaignMergedFields.REF_SKU1))
 
-//    val refSkus = customerFilteredData.map(row => ((row.getLong(0)), (row.getString(1), row(2).asInstanceOf[BigDecimal].doubleValue())))
-//      .groupByKey().map{ case (key, value) => (key, value.toList.sortBy(-_._2).take(NumberSku)) }.map(x => (x._1, x._2(0)._1))
+    //    val refSkus = customerFilteredData.map(row => ((row.getLong(0)), (row.getString(1), row(2).asInstanceOf[BigDecimal].doubleValue())))
+    //      .groupByKey().map{ case (key, value) => (key, value.toList.sortBy(-_._2).take(NumberSku)) }.map(x => (x._1, x._2(0)._1))
 
-    val aggFields = Array(CustomerVariables.FK_CUSTOMER,ProductVariables.SKU)
+    val aggFields = Array(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU)
     val groupedFields = Array(CustomerVariables.FK_CUSTOMER)
 
-    val customerRefSku = GroupedUtils.orderGroupBy(customerFilteredData,groupedFields,aggFields,GroupedUtils.FIRST,Schema.pushReferenceSku,ProductVariables.SPECIAL_PRICE,GroupedUtils.DESC,DecimalType.apply())
+    val customerRefSku = GroupedUtils.orderGroupBy(customerFilteredData, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     CampaignUtils.debug(customerRefSku, "AcartDaily:-after ref sku generation")
 
