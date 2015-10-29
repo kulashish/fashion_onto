@@ -504,4 +504,9 @@ object Schema {
     StructField("BAGS_AVG_ITEM_PRICE", DoubleType, true)
   ))
 
+  val pushReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false)
+  ))
+
 }
