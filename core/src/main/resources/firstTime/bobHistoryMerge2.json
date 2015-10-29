@@ -100,7 +100,6 @@
       "tableName": "sales_rule",
       "primaryKey": "id_sales_rule",
       "mergeMode": "full",
-      "dateColumn": "updated_at",
       "incrDate": "2013-06-01",
       "fullDate": "2012/11/30",
       "saveMode": "Ignore"
@@ -110,7 +109,6 @@
       "tableName": "newsletter_subscription",
       "primaryKey": "id_newsletter_subscription",
       "mergeMode": "full",
-      "dateColumn": "updated_at",
       "incrDate": "2014-03-01",
       "fullDate": "2014/02/28",
       "saveMode": "Ignore"
@@ -120,7 +118,6 @@
       "tableName": "customer_segments",
       "primaryKey": "id_customer_segments",
       "mergeMode": "full",
-      "dateColumn": "updated_at",
       "incrDate": "2013-11-01",
       "fullDate": "2013/10/31",
       "saveMode": "Ignore"
