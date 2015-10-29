@@ -5,8 +5,8 @@ import java.math.BigDecimal
 import com.jabong.dap.campaign.utils.CampaignUtils._
 import com.jabong.dap.common.time.TimeUtils
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{Row, DataFrame}
-import org.apache.spark.sql.types.{DoubleType, IntegerType, DataType, StructType}
+import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.types.{ DoubleType, IntegerType, DataType, StructType }
 
 /**
  * Created by mubarak on 21/10/15.
@@ -76,15 +76,15 @@ object Utils extends Logging {
    * @param orderFieldType
    * @return
    */
-  def orderGroupBy(inputData : DataFrame, groupedFields: Array[String], aggFields : Array[String], aggFunction : String, outputSchema: StructType , orderField : String,order:String = "ASC", orderFieldType:DataType): DataFrame ={
+  def orderGroupBy(inputData: DataFrame, groupedFields: Array[String], aggFields: Array[String], aggFunction: String, outputSchema: StructType, orderField: String, order: String = "ASC", orderFieldType: DataType): DataFrame = {
     require(inputData != null, "inputData data cannot be null ")
     require(groupedFields != null, "groupedFields  cannot be null ")
     require(aggFields != null, "aggFields cannot be null ")
     require(outputSchema != null, "outputSchema cannot be null ")
     val keyRdd = inputData.rdd.keyBy(row => createKey(row, groupedFields))
-    val aggData =  keyRdd.groupByKey().map{ case (key, value) => (key, orderBySupporter(value,orderField,order,orderFieldType)) }.map{case (key,value) => (key,aggregateSupporter(value,aggFields,aggFunction))}
-    val finalRow = aggData.map{case (key,value) => (Row(key.toSeq ++value.toSeq))}
-    val orderGroupedData = sqlContext.createDataFrame(finalRow,outputSchema)
+    val aggData = keyRdd.groupByKey().map{ case (key, value) => (key, orderBySupporter(value, orderField, order, orderFieldType)) }.map{ case (key, value) => (key, aggregateSupporter(value, aggFields, aggFunction)) }
+    val finalRow = aggData.map{ case (key, value) => (Row(key.toSeq ++ value.toSeq)) }
+    val orderGroupedData = sqlContext.createDataFrame(finalRow, outputSchema)
     return orderGroupedData
   }
 
@@ -95,13 +95,13 @@ object Utils extends Logging {
    * @param aggFunction
    * @return
    */
-  def aggregateSupporter(list: List[Row], aggFields:Array[String], aggFunction:String): Row ={
-    var outRow:Row = null
+  def aggregateSupporter(list: List[Row], aggFields: Array[String], aggFunction: String): Row = {
+    var outRow: Row = null
     aggFunction match {
       case "first" => outRow = list(0)
-      case "last"  => outRow = list(list.size-1)
+      case "last" => outRow = list(list.size - 1)
     }
-    return createKey(outRow,aggFields)
+    return createKey(outRow, aggFields)
   }
 
   /**
@@ -112,21 +112,23 @@ object Utils extends Logging {
    * @param orderFieldDataType
    * @return
    */
-  def orderBySupporter(iterable: Iterable[Row],orderField : String,order:String, orderFieldDataType : DataType): List[Row] ={
+  def orderBySupporter(iterable: Iterable[Row], orderField: String, order: String, orderFieldDataType: DataType): List[Row] = {
     require(iterable != null, "iterable data cannot be null ")
     require(orderField != null, "orderField  cannot be null ")
-    if(orderField.toLowerCase.contains("price")){
-      var ordering:Ordering[Double] = null
-      if(order.equals("ASC")) ordering = Ordering.Double else ordering  = Ordering.Double.reverse
+    if (orderField.toLowerCase.contains("price")) {
+      var ordering: Ordering[Double] = null
+      if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
       return iterable.toList.sortBy(row => (row.fieldIndex(orderField).asInstanceOf[BigDecimal].doubleValue()))(ordering)
     }
     orderFieldDataType match {
-      case IntegerType =>  var ordering:Ordering[Int] = null
-        if(order.equals("ASC")) ordering = Ordering.Int else ordering  = Ordering.Int.reverse
+      case IntegerType =>
+        var ordering: Ordering[Int] = null
+        if (order.equals("ASC")) ordering = Ordering.Int else ordering = Ordering.Int.reverse
         return iterable.toList.sortBy(row => (row.fieldIndex(orderField)))(ordering)
 
-      case DoubleType => var ordering:Ordering[Double] = null
-        if(order.equals("ASC")) ordering = Ordering.Double else ordering  = Ordering.Double.reverse
+      case DoubleType =>
+        var ordering: Ordering[Double] = null
+        if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
         return iterable.toList.sortBy(row => (row.fieldIndex(orderField).asInstanceOf[Double]))(ordering)
     }
   }
@@ -155,6 +157,5 @@ input:- row  and fields: field array
     val data = Row.fromSeq(sequence)
     return data
   }
-
 
 }

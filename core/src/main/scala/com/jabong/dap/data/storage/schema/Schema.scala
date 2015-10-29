@@ -1,6 +1,6 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
