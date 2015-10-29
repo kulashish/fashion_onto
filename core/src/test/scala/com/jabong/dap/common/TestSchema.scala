@@ -227,7 +227,6 @@ object TestSchema {
   val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
 
-
   val groupTestOut = StructType(Array(
     StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),

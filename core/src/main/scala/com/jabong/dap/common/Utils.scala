@@ -64,8 +64,6 @@ object Utils extends Logging {
     return filteredData
   }
 
-
-
   /*
 Given a row  and fields in that row it will return new row with only those keys
 input:- row  and fields: field array

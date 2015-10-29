@@ -1,10 +1,10 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.types.{IntegerType, DecimalType}
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.types.{ IntegerType, DecimalType }
+import org.apache.spark.sql.{ DataFrame, SQLContext }
 import org.scalatest.FlatSpec
 
 /**
@@ -36,8 +36,5 @@ class GroupedUtilsTest extends FlatSpec with SharedSparkContext {
     assert(outputCount.count == 1)
   }
 
-
 }
-
-
 

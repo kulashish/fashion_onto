@@ -4,7 +4,7 @@ import java.math.BigDecimal
 
 import com.jabong.dap.campaign.utils.CampaignUtils._
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
 
 /**
@@ -12,31 +12,29 @@ import org.apache.spark.sql.types._
  */
 object GroupedUtils {
 
-
-
   /**
- * Common order group By function takes dataFrame and needed fields and return final dataFrame
- * @param inputData
- * @param groupedFields
- * @param aggFields
- * @param aggFunction
- * @param outputSchema
- * @param orderField
- * @param order
- * @param orderFieldType
- * @return
- */
-def orderGroupBy(inputData: DataFrame, groupedFields: Array[String], aggFields: Array[String], aggFunction: String, outputSchema: StructType, orderField: String, order: String = "ASC", orderFieldType: DataType): DataFrame = {
-  require(inputData != null, "inputData data cannot be null ")
-  require(groupedFields != null, "groupedFields  cannot be null ")
-  require(aggFields != null, "aggFields cannot be null ")
-  require(outputSchema != null, "outputSchema cannot be null ")
-  val keyRdd = inputData.rdd.keyBy(row => Utils.createKey(row, groupedFields))
-  val aggData = keyRdd.groupByKey().map{ case (key, value) => (key, orderBySupporter(value, orderField, order, orderFieldType)) }.map{ case (key, value) => (key, aggregateSupporter(value, aggFields, aggFunction)) }
-  val finalRow = aggData.map{ case (key, value) => (value) }
-  val orderGroupedData = sqlContext.createDataFrame(finalRow, outputSchema)
-  return orderGroupedData
-}
+   * Common order group By function takes dataFrame and needed fields and return final dataFrame
+   * @param inputData
+   * @param groupedFields
+   * @param aggFields
+   * @param aggFunction
+   * @param outputSchema
+   * @param orderField
+   * @param order
+   * @param orderFieldType
+   * @return
+   */
+  def orderGroupBy(inputData: DataFrame, groupedFields: Array[String], aggFields: Array[String], aggFunction: String, outputSchema: StructType, orderField: String, order: String = "ASC", orderFieldType: DataType): DataFrame = {
+    require(inputData != null, "inputData data cannot be null ")
+    require(groupedFields != null, "groupedFields  cannot be null ")
+    require(aggFields != null, "aggFields cannot be null ")
+    require(outputSchema != null, "outputSchema cannot be null ")
+    val keyRdd = inputData.rdd.keyBy(row => Utils.createKey(row, groupedFields))
+    val aggData = keyRdd.groupByKey().map{ case (key, value) => (key, orderBySupporter(value, orderField, order, orderFieldType)) }.map{ case (key, value) => (key, aggregateSupporter(value, aggFields, aggFunction)) }
+    val finalRow = aggData.map{ case (key, value) => (value) }
+    val orderGroupedData = sqlContext.createDataFrame(finalRow, outputSchema)
+    return orderGroupedData
+  }
 
   /**
    *
