@@ -19,6 +19,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.{ DataFrame, Row }
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -55,7 +56,7 @@ object GetSurfVariables extends java.io.Serializable with Logging {
     var today = "_daily"
     var explodedMergedData: DataFrame = null
     if (mergedData != null) {
-      explodedMergedData = mergedData.explode(PageVisitVariables.SKU_LIST, PageVisitVariables.SKU) { str: ArrayBuffer[String] => str.toList }
+      explodedMergedData = mergedData.explode(PageVisitVariables.SKU_LIST, PageVisitVariables.SKU) { str: mutable.WrappedArray[String] => str.toList }
       //explodedMergedData = mergedData.explode(PageVisitVariables.SKU_LIST, PageVisitVariables.SKU) { str: List[String] => str.toList }
 
       var joinResult = incremental.join(explodedMergedData, incremental(PageVisitVariables.USER_ID + today) === explodedMergedData(PageVisitVariables.USER_ID))
