@@ -118,18 +118,18 @@ object Utils extends Logging {
     if (orderField.toLowerCase.contains("price")) {
       var ordering: Ordering[Double] = null
       if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
-      return iterable.toList.sortBy(row => (row.fieldIndex(orderField).asInstanceOf[BigDecimal].doubleValue()))(ordering)
+      return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[BigDecimal].doubleValue()))(ordering)
     }
     orderFieldDataType match {
       case IntegerType =>
         var ordering: Ordering[Int] = null
         if (order.equals("ASC")) ordering = Ordering.Int else ordering = Ordering.Int.reverse
-        return iterable.toList.sortBy(row => (row.fieldIndex(orderField)))(ordering)
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[Int])(ordering)
 
       case DoubleType =>
         var ordering: Ordering[Double] = null
         if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
-        return iterable.toList.sortBy(row => (row.fieldIndex(orderField).asInstanceOf[Double]))(ordering)
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[Double]))(ordering)
     }
   }
 
