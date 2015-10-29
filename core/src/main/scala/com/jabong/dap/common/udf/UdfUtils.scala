@@ -290,7 +290,7 @@ object UdfUtils extends Logging {
     var date : Date = null
      if(null != openDate && openDate.length > 0){
         date = TimeUtils.getDate(openDate, TimeConstants.DATE_TIME_FORMAT)
-     }else if(null != yesOpenDate && openDate.length > 0) {
+     }else if(null != yesOpenDate && yesOpenDate.length > 0) {
        date = TimeUtils.getDate(yesOpenDate, TimeConstants.DATE_TIME_FORMAT)
      }
     if(date != null && date.after(maxDate)){
