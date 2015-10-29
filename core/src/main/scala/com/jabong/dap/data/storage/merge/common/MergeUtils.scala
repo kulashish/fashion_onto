@@ -22,9 +22,9 @@ object MergeUtils extends MergeData {
       return dfBase
 
     var dfBaseNew = dfBase
-      if (!SchemaUtils.isSchemaEqual(dfIncr.schema, dfBase.schema)) {
-        dfBaseNew = SchemaUtils.changeSchema(dfBase, dfIncr.schema)
-      }
+    if (!SchemaUtils.isSchemaEqual(dfIncr.schema, dfBase.schema)) {
+      dfBaseNew = SchemaUtils.changeSchema(dfBase, dfIncr.schema)
+    }
 
     // join on primary key
     val joinedDF = joinOldAndNewDF(dfIncr, dfBaseNew, primaryKey)
