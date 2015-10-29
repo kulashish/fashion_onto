@@ -20,7 +20,7 @@ object loadCampaignsData {
     val target_table_name = args(2).trim
 
     var temp = startDate
-    var dates = scala.collection.mutable.WrappedArray.empty[String]
+    val dates = scala.collection.mutable.ArrayBuffer.empty[String]
 
     val cal = Calendar.getInstance()
 
