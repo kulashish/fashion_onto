@@ -630,7 +630,7 @@ object UdfUtils extends Logging {
   }
 
   def addInt(i1: Int, i2: Int): Int = {
-    { if (null == i1) 0 else i1 } + { if (null == i2) 0 else i2 }
+    { if (null.asInstanceOf[Int] == i1) 0 else i1 } + { if (null.asInstanceOf[Int] == i2) 0 else i2 }
   }
 
   /**
