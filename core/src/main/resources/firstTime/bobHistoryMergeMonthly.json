@@ -1,0 +1,45 @@
+{
+  "isHistory": true,
+  "merge": [
+    {
+      "source": "bob",
+      "tableName": "sales_cart",
+      "primaryKey": "id_sales_cart",
+      "mergeMode": "monthly",
+      "dateColumn": "updated_at",
+      "incrDate": "2015-07-01",
+      "fullDate": "2015/06/30",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config",
+      "primaryKey": "id_catalog_config",
+      "mergeMode": "monthly",
+      "dateColumn": "updated_at",
+      "incrDate": "2015-09-01",
+      "fullDate": "2015/08/31",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_simple",
+      "primaryKey": "id_catalog_simple",
+      "mergeMode": "monthly",
+      "dateColumn": "updated_at",
+      "incrDate": "2015-09-01",
+      "fullDate": "2015/08/31",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item",
+      "primaryKey": "id_sales_order_item",
+      "mergeMode": "monthly",
+      "dateColumn": "updated_at",
+      "incrDate": "2015-09-01",
+      "fullDate": "2015/08/31",
+      "saveMode": "Ignore"
+    }
+  ]
+}
