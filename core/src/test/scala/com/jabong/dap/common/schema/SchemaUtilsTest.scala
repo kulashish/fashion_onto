@@ -37,7 +37,7 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
   }
 
   "changeSchema" should "add columns" in {
-    val res = SchemaUtils.changeSchema(campaignsOutData, Schema.campaignSchema)
+    val res = SchemaUtils.addColumns(campaignsOutData, Schema.campaignSchema)
     res.printSchema()
     res.collect().foreach(println)
     assert(res.columns.length == 7)
@@ -46,7 +46,7 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
   }
 
   "changeSchemaWithInteger" should "add columns" in {
-    val res = SchemaUtils.changeSchema(campaignsOutData, TestSchema.campaignPriorityOutput)
+    val res = SchemaUtils.addColumns(campaignsOutData, TestSchema.campaignPriorityOutput)
     res.printSchema()
     res.collect().foreach(println)
     assert(res.columns.length == 7)

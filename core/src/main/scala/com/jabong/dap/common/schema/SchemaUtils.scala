@@ -39,7 +39,7 @@ object SchemaUtils {
     return res
   }
 
-  def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
+  private def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
     if (schema.fieldNames.contains(key)) {
       return df
     } else {
@@ -53,7 +53,7 @@ object SchemaUtils {
    * @param schema
    * @return
    */
-  def changeSchema(df: DataFrame, schema: StructType): DataFrame = {
+  def addColumns(df: DataFrame, schema: StructType): DataFrame = {
     var res: DataFrame = df
     schema.foreach(e => (res = addColumn(res, e.name, e.dataType)))
     return res
