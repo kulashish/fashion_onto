@@ -68,7 +68,7 @@ sub run_component {
 }
 
 # spark path constants
-my $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
 my $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
@@ -106,33 +106,49 @@ my $job_exit;
 
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
     $job_exit = run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "bobMerge") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $AMMUNITION = "--num-executors 12 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "bobMergeMonthly") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
     $job_exit = run_component($component, $command);
 # erp Acquisition
 } elsif ($component eq "erpAcqIncr") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
+    $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
     $job_exit = run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
+    $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
     $job_exit = run_component($component, $command);
