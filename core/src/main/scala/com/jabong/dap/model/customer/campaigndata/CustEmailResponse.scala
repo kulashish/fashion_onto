@@ -1,8 +1,12 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.EmailResponseVariables
+import com.jabong.dap.common.time.TimeUtils._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
@@ -27,7 +31,7 @@ object CustEmailResponse extends Logging {
     emailResponse(incrDate, saveMode, path)
   }
 
-  val open_segment: String => String = (value: String) => {
+  def open_segment(value: String, incrDateStr:String) : String= {
     //TODO: currently we aren't  looking at the subscriber emails to get the update date
     /*select email, dg_start_date as update_date from (
     select nl.SUBSCRIBER_EMAIL as email,nl.dg_start_date,
@@ -38,31 +42,33 @@ object CustEmailResponse extends Logging {
       "-1"
     else {
 
-      val date = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
-      val time4mToday = TimeUtils.daysFromToday(date)
+      val lastOpenDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
+      val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT)
+      val time4mToday = TimeUtils.daysBetweenTwoDates(lastOpenDate, incrDate)
+
       val segment = {
 
-        if (0 > time4mToday && time4mToday <= 15) {
+        if (0 <= time4mToday && time4mToday <= 15) {
           15
-        } else if (15 > time4mToday && time4mToday <= 30) {
+        } else if (15 < time4mToday && time4mToday <= 30) {
           30
-        } else if (30 > time4mToday && time4mToday <= 60) {
+        } else if (30 < time4mToday && time4mToday <= 60) {
           60
-        } else if (60 > time4mToday && time4mToday <= 120) {
+        } else if (60 < time4mToday && time4mToday <= 120) {
           120
-        } else if (120 > time4mToday && time4mToday <= 180) {
+        } else if (120 < time4mToday && time4mToday <= 180) {
           180
-        } else if (180 > time4mToday && time4mToday <= 210) {
+        } else if (180 < time4mToday && time4mToday <= 210) {
           210
-        } else if (210 > time4mToday && time4mToday <= 240) {
+        } else if (210 < time4mToday && time4mToday <= 240) {
           240
-        } else if (240 > time4mToday && time4mToday <= 270) {
+        } else if (240 < time4mToday && time4mToday <= 270) {
           270
-        } else if (270 > time4mToday && time4mToday <= 300) {
+        } else if (270 < time4mToday && time4mToday <= 300) {
           300
-        } else if (300 > time4mToday && time4mToday <= 330) {
+        } else if (300 < time4mToday && time4mToday <= 330) {
           330
-        } else if (330 > time4mToday && time4mToday <= 360) {
+        } else if (330 < time4mToday && time4mToday <= 360) {
           360
         } else if (time4mToday > 360) {
           "NO"
@@ -118,12 +124,10 @@ object CustEmailResponse extends Logging {
       val days30Df = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
         DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, before30daysString)
 
-      //   val (yesIncrSelectDf: DataFrame) = joinDataFrames(incrDf, yesterdayDf)
-
-      val dtFunc2 = udf(open_segment)
+      val udfOpenSegFn = udf((s:String) => open_segment(s: String, incrDate))
 
       val resultSet = effectiveDFFull(incrDf, yesterdayDf, days7Df, days15Df, days30Df)
-        .withColumn(EmailResponseVariables.OPEN_SEGMENT, dtFunc2(col(EmailResponseVariables.LAST_OPEN_DATE)))
+        .withColumn(EmailResponseVariables.OPEN_SEGMENT, udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE)))
 
       //TODO: replace customer_id with the UUID generator
       def result = resultSet.select(
@@ -149,7 +153,7 @@ object CustEmailResponse extends Logging {
         DataWriter.writeParquet(incrDf, savePathIncr, saveMode)
       }
 
-      val fileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
+      val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
 
       DataWriter.writeCsv(result, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
 
@@ -249,14 +253,11 @@ object CustEmailResponse extends Logging {
 
     val fullSummary = fullDf.select(
       coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
-      Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE), col(EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE,
-      when(col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) > 0 or col(EmailResponseVariables.OPENS_LIFETIME) > 0,
-        Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_OPEN_DATE), col(EmailResponseVariables.LAST_OPEN_DATE)))
-        .otherwise(
-          Udf.getLatestDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE), col(EmailResponseVariables.LAST_CLICK_DATE))
-
-        )
-          as EmailResponseVariables.LAST_OPEN_DATE,
+      Udf.getLatestDate(lit(""), lit(""), col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE),
+        col(EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE,
+      Udf.getLatestDate(col(MergeUtils.NEW_ +  EmailResponseVariables.LAST_OPEN_DATE), col(EmailResponseVariables.LAST_OPEN_DATE),
+        col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE), col(EmailResponseVariables.LAST_CLICK_DATE))
+        as EmailResponseVariables.LAST_OPEN_DATE,
       col(EmailResponseVariables.CLICK_7DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.CLICK_7DAYS) as EmailResponseVariables.CLICK_7DAYS,
       col(EmailResponseVariables.CLICK_15DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.CLICK_15DAYS) as EmailResponseVariables.CLICK_15DAYS,
       col(EmailResponseVariables.CLICK_30DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.CLICK_30DAYS) as EmailResponseVariables.CLICK_30DAYS,
