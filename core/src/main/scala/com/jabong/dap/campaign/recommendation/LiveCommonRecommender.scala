@@ -2,14 +2,14 @@ package com.jabong.dap.campaign.recommendation
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation}
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.collection.mutable
 
