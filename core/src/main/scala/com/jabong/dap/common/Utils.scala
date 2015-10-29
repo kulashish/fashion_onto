@@ -64,74 +64,7 @@ object Utils extends Logging {
     return filteredData
   }
 
-  /**
-   * Common order group By function takes dataFrame and needed fields and return final dataFrame
-   * @param inputData
-   * @param groupedFields
-   * @param aggFields
-   * @param aggFunction
-   * @param outputSchema
-   * @param orderField
-   * @param order
-   * @param orderFieldType
-   * @return
-   */
-  def orderGroupBy(inputData: DataFrame, groupedFields: Array[String], aggFields: Array[String], aggFunction: String, outputSchema: StructType, orderField: String, order: String = "ASC", orderFieldType: DataType): DataFrame = {
-    require(inputData != null, "inputData data cannot be null ")
-    require(groupedFields != null, "groupedFields  cannot be null ")
-    require(aggFields != null, "aggFields cannot be null ")
-    require(outputSchema != null, "outputSchema cannot be null ")
-    val keyRdd = inputData.rdd.keyBy(row => createKey(row, groupedFields))
-    val aggData = keyRdd.groupByKey().map{ case (key, value) => (key, orderBySupporter(value, orderField, order, orderFieldType)) }.map{ case (key, value) => (key, aggregateSupporter(value, aggFields, aggFunction)) }
-    val finalRow = aggData.map{ case (key, value) => (Row(key.toSeq ++ value.toSeq)) }
-    val orderGroupedData = sqlContext.createDataFrame(finalRow, outputSchema)
-    return orderGroupedData
-  }
 
-  /**
-   *
-   * @param list
-   * @param aggFields
-   * @param aggFunction
-   * @return
-   */
-  def aggregateSupporter(list: List[Row], aggFields: Array[String], aggFunction: String): Row = {
-    var outRow: Row = null
-    aggFunction match {
-      case "first" => outRow = list(0)
-      case "last" => outRow = list(list.size - 1)
-    }
-    return createKey(outRow, aggFields)
-  }
-
-  /**
-   *
-   * @param iterable
-   * @param orderField
-   * @param order
-   * @param orderFieldDataType
-   * @return
-   */
-  def orderBySupporter(iterable: Iterable[Row], orderField: String, order: String, orderFieldDataType: DataType): List[Row] = {
-    require(iterable != null, "iterable data cannot be null ")
-    require(orderField != null, "orderField  cannot be null ")
-    if (orderField.toLowerCase.contains("price")) {
-      var ordering: Ordering[Double] = null
-      if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
-      return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[BigDecimal].doubleValue()))(ordering)
-    }
-    orderFieldDataType match {
-      case IntegerType =>
-        var ordering: Ordering[Int] = null
-        if (order.equals("ASC")) ordering = Ordering.Int else ordering = Ordering.Int.reverse
-        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[Int])(ordering)
-
-      case DoubleType =>
-        var ordering: Ordering[Double] = null
-        if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
-        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[Double]))(ordering)
-    }
-  }
 
   /*
 Given a row  and fields in that row it will return new row with only those keys
