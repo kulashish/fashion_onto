@@ -57,46 +57,6 @@
     },
     {
       "source": "bob",
-      "tableName": "sales_cart",
-      "primaryKey": "id_sales_cart",
-      "mergeMode": "monthly",
-      "dateColumn": "updated_at",
-      "incrDate": "2015-07-01",
-      "fullDate": "2015/06/30",
-      "saveMode": "Ignore"
-    },
-    {
-      "source": "bob",
-      "tableName": "catalog_config",
-      "primaryKey": "id_catalog_config",
-      "mergeMode": "monthly",
-      "dateColumn": "updated_at",
-      "incrDate": "2015-09-01",
-      "fullDate": "2015/08/31",
-      "saveMode": "Ignore"
-    },
-    {
-      "source": "bob",
-      "tableName": "catalog_simple",
-      "primaryKey": "id_catalog_simple",
-      "mergeMode": "monthly",
-      "dateColumn": "updated_at",
-      "incrDate": "2015-09-01",
-      "fullDate": "2015/08/31",
-      "saveMode": "Ignore"
-    },
-    {
-      "source": "bob",
-      "tableName": "sales_order_item",
-      "primaryKey": "id_sales_order_item",
-      "mergeMode": "monthly",
-      "dateColumn": "updated_at",
-      "incrDate": "2015-09-01",
-      "fullDate": "2015/08/31",
-      "saveMode": "Ignore"
-    },
-    {
-      "source": "bob",
       "tableName": "sales_rule",
       "primaryKey": "id_sales_rule",
       "mergeMode": "full",
@@ -106,20 +66,11 @@
     },
     {
       "source": "bob",
-      "tableName": "newsletter_subscription",
-      "primaryKey": "id_newsletter_subscription",
+      "tableName": "sales_order_item_status_history",
+      "primaryKey": "id_sales_order_item_status_history",
       "mergeMode": "full",
-      "incrDate": "2014-03-01",
-      "fullDate": "2014/02/28",
-      "saveMode": "Ignore"
-    },
-    {
-      "source": "bob",
-      "tableName": "customer_segments",
-      "primaryKey": "id_customer_segments",
-      "mergeMode": "full",
-      "incrDate": "2013-11-01",
-      "fullDate": "2013/10/31",
+      "incrDate": "2012-01-01",
+      "fullDate": "2011/12/31",
       "saveMode": "Ignore"
     }
   ]
