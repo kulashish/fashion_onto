@@ -178,6 +178,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
     StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.USER_SHORTLIST_KEY, StringType, true),
+    StructField(CustomerProductShortlistVariables.USER_TOKEN, StringType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
     StructField(CustomerProductShortlistVariables.EXTRA_DATA, StringType, true),
@@ -462,6 +463,45 @@ object Schema {
     StructField("COLOR_3", StringType, true),
     StructField("COLOR_4", StringType, true),
     StructField("COLOR_5", StringType, true)
+  ))
+
+  val catCount = StructType(Array(
+    StructField("fk_customer", LongType, true),
+    StructField("SUNGLASSES_COUNT", IntegerType, true),
+    StructField("WOMEN_FOOTWEAR_COUNT", IntegerType, true),
+    StructField("KIDS_APPAREL_COUNT", IntegerType, true),
+    StructField("WATCHES_COUNT", IntegerType, true),
+    StructField("BEAUTY_COUNT", IntegerType, true),
+    StructField("FURNITURE_COUNT", IntegerType, true),
+    StructField("SPORT_EQUIPMENT_COUNT", IntegerType, true),
+    StructField("JEWELLERY_COUNT", IntegerType, true),
+    StructField("WOMEN_APPAREL_COUNT", IntegerType, true),
+    StructField("HOME_COUNT", IntegerType, true),
+    StructField("MEN_FOOTWEAR_COUNT", IntegerType, true),
+    StructField("MEN_APPAREL_COUNT", IntegerType, true),
+    StructField("FRAGRANCE_COUNT", IntegerType, true),
+    StructField("KIDS_FOOTWEAR_COUNT", IntegerType, true),
+    StructField("TOYS_COUNT", IntegerType, true),
+    StructField("BAGS_COUNT", IntegerType, true)
+  ))
+  val catAvg = StructType(Array(
+    StructField("fk_customer", LongType, true),
+    StructField("SUNGLASSES_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("WOMEN_FOOTWEAR_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("KIDS_APPAREL_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("WATCHES_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("BEAUTY_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("FURNITURE_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("SPORT_EQUIPMENT_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("JEWELLERY_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("WOMEN_APPAREL_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("HOME_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("MEN_FOOTWEAR_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("MEN_APPAREL_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("FRAGRANCE_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("KIDS_FOOTWEAR_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("TOYS_AVG_ITEM_PRICE", DoubleType, true),
+    StructField("BAGS_AVG_ITEM_PRICE", DoubleType, true)
   ))
 
 }

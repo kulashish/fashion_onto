@@ -127,13 +127,13 @@ object CampaignQuality extends Logging {
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
         for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-          val campDF = dataFrame.filter("LIVE_MAIL_TYPE" + " = " + campaignDetails.mailType)
+          val campDF = dataFrame.filter(col("LIVE_MAIL_TYPE") === campaignDetails.mailType)
           val count = campDF.count()
 
           if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
-            val countAndroid = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.ANDROID + "'").count()
-            val countIos = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.IOS + "'").count()
-            val countWindows = campDF.filter(CampaignMergedFields.DOMAIN + " = '" + DataSets.WINDOWS + "'").count()
+            val countAndroid = campDF.filter(col(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).count()
+            val countIos = campDF.filter(col(CampaignMergedFields.DOMAIN) === DataSets.IOS).count()
+            val countWindows = campDF.filter(col(CampaignMergedFields.DOMAIN) === DataSets.WINDOWS).count()
             row = Row(campaignDetails.campaignName, zero, zero, zero, count, countAndroid, countIos, countWindows)
           } else {
             row = Row(campaignDetails.campaignName, zero, zero, zero, count, zero, zero, zero)
@@ -144,8 +144,8 @@ object CampaignQuality extends Logging {
 
       } else {
 
-        val countNonZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null").count()
-        val countZeroFkCustomer = dataFrame.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null").count()
+        val countNonZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
+        val countZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
 
         row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
         list += row
