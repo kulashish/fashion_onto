@@ -2,10 +2,10 @@ package com.jabong.dap.common.schema
 
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.{SharedSparkContext, TestSchema}
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{ FlatSpec, Matchers }
 
 /**
  * Created by pooja on 28/7/15.
@@ -21,10 +21,10 @@ class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with Shar
     campaignsOutDataFull = JsonUtils.readFromJson("campaigns/manager", "campaign_output", TestSchema.campaignOutput)
 
     campaignsOutData = campaignsOutDataFull.select(
-        CampaignMergedFields.CUSTOMER_ID,
-        CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-        CampaignMergedFields.REF_SKU1
-      )
+      CampaignMergedFields.CUSTOMER_ID,
+      CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+      CampaignMergedFields.REF_SKU1
+    )
 
     campaignsData = JsonUtils.readFromJson("campaigns/processor", "campaignInput", TestSchema.campaignPriorityOutput)
   }
