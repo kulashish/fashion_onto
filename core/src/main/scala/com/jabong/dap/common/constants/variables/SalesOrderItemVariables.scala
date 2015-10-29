@@ -134,4 +134,5 @@ object SalesOrderItemVariables {
   val EXPECTED_SHIPPING_PARTNER = "expected_shipping_partner"
   val IS_MULTIPLE_SHIPMENTS = "is_multiple_shipments"
   val CORPORATE_CURRENCY_VALUE = "corporate_currency_value"
+  val ORIGINAL_SHIPPING_CHARGE = "original_shipping_charge"
 }

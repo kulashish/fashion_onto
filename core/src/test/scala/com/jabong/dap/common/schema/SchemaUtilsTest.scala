@@ -1,12 +1,9 @@
 package com.jabong.dap.common.schema
 
-import com.jabong.dap.common.{ TestSchema, SharedSparkContext }
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{ SharedSparkContext, TestSchema }
 import com.jabong.dap.data.storage.schema.Schema
-import net.liftweb.json._
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.scalatest.{ FlatSpec, Matchers }
 
@@ -14,41 +11,71 @@ import org.scalatest.{ FlatSpec, Matchers }
  * Created by pooja on 28/7/15.
  */
 class SchemaUtilsTest extends FlatSpec with Matchers with Serializable with SharedSparkContext {
-  val jsonPath: String = JsonUtils.TEST_RESOURCES + "/campaigns/campaign_config/push_campaign_conf.json"
-  val conf1 = new Configuration()
-  val fileSystem = FileSystem.get(conf1)
-  implicit val formats = net.liftweb.json.DefaultFormats
-  val path = new Path(jsonPath)
-  val json = parse(scala.io.Source.fromInputStream(fileSystem.open(path)).mkString)
+
+  @transient var campaignsOutDataFull: DataFrame = _
   @transient var campaignsOutData: DataFrame = _
+  @transient var campaignsData: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
-    campaignsOutData = JsonUtils.readFromJson("campaigns/manager", "campaign_output", TestSchema.campaignOutput)
-      .select(
-        CampaignMergedFields.CUSTOMER_ID,
-        CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-        CampaignMergedFields.REF_SKU1
-      )
+    campaignsOutDataFull = JsonUtils.readFromJson("campaigns/manager", "campaign_output", TestSchema.campaignOutput)
+
+    campaignsOutData = campaignsOutDataFull.select(
+      CampaignMergedFields.CUSTOMER_ID,
+      CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+      CampaignMergedFields.REF_SKU1
+    )
+
+    campaignsData = JsonUtils.readFromJson("campaigns/processor", "campaignInput", TestSchema.campaignPriorityOutput)
+  }
+
+  "isSchemaEqual" should "return true" in {
+    SchemaUtils.isSchemaEqual(Schema.customer, Schema.customer) should be (true)
   }
 
   "isSchemaEqual" should "return false" in {
     SchemaUtils.isSchemaEqual(Schema.customer, Schema.nls) should be (false)
   }
 
-  "changeSchema" should "add columns" in {
-    val res = SchemaUtils.changeSchema(campaignsOutData, Schema.campaignSchema)
+  "addColumns" should "add columns" in {
+    val res = SchemaUtils.addColumns(campaignsOutData, TestSchema.campaignPriorityOutput)
     res.printSchema()
-    res.collect().foreach(println)
-    assert(res.columns.length == 6)
-    assert(SchemaUtils.isSchemaEqual(res.schema, Schema.campaignSchema))
-
+    println(TestSchema.campaignPriorityOutput.treeString)
+    assert(res.columns.length == 7)
+    assert(SchemaUtils.isSchemaEqual(res.schema, TestSchema.campaignPriorityOutput))
   }
 
-  "changeSchemaWithInteger" should "add columns" in {
+  "dropColumns" should "drop columns" in {
+    campaignsOutDataFull.printSchema()
+    val res = SchemaUtils.dropColumns(campaignsOutDataFull, campaignsOutData.schema)
+    println(campaignsOutData.printSchema())
+    res.printSchema()
+    assert(res.columns.length == 3)
+    assert(SchemaUtils.isSchemaEqual(res.schema, campaignsOutData.schema))
+  }
+
+  "changeSchema" should "add columns" in {
     val res = SchemaUtils.changeSchema(campaignsOutData, TestSchema.campaignPriorityOutput)
     res.printSchema()
-    res.collect().foreach(println)
+    println(TestSchema.campaignPriorityOutput.treeString)
+    assert(res.columns.length == 7)
+    assert(SchemaUtils.isSchemaEqual(res.schema, TestSchema.campaignPriorityOutput))
+  }
+
+  "changeSchema" should "drop columns" in {
+    campaignsOutDataFull.printSchema()
+    val res = SchemaUtils.changeSchema(campaignsOutDataFull, campaignsOutData.schema)
+    println(campaignsOutData.printSchema())
+    res.printSchema()
+    assert(res.columns.length == 3)
+    assert(SchemaUtils.isSchemaEqual(res.schema, campaignsOutData.schema))
+  }
+
+  "changeSchema" should "add and drop columns" in {
+    campaignsOutDataFull.printSchema()
+    println(TestSchema.campaignPriorityOutput.treeString)
+    val res = SchemaUtils.changeSchema(campaignsOutDataFull, TestSchema.campaignPriorityOutput)
+    res.printSchema()
     assert(res.columns.length == 7)
     assert(SchemaUtils.isSchemaEqual(res.schema, TestSchema.campaignPriorityOutput))
   }

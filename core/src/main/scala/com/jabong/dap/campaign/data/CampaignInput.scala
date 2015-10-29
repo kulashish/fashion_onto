@@ -246,7 +246,7 @@ object CampaignInput extends Logging {
         val campaignData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CAMPAIGNS, name, DataSets.DAILY_MODE, date)
           .withColumn(CampaignCommon.PRIORITY, lit(priority))
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, Schema.campaignSchema)) {
-          val res = SchemaUtils.changeSchema(campaignData, Schema.campaignSchema)
+          val res = SchemaUtils.addColumns(campaignData, Schema.campaignSchema)
           result = res
             .select(
               res(CustomerVariables.FK_CUSTOMER) as (CampaignMergedFields.CUSTOMER_ID),
@@ -405,7 +405,7 @@ object CampaignInput extends Logging {
           var newMergedCamapignData = mergedCampaignData
           if (!SchemaUtils.isSchemaEqual(mergedCampaignData.schema, campaignMerged30Day.schema)) {
             // added to add new column add4pushId for the old camaigns data
-            newMergedCamapignData = SchemaUtils.changeSchema(mergedCampaignData, campaignMerged30Day.schema)
+            newMergedCamapignData = SchemaUtils.addColumns(mergedCampaignData, campaignMerged30Day.schema)
           }
           campaignMerged30Day = campaignMerged30Day.unionAll(newMergedCamapignData)
         }

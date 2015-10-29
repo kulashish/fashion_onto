@@ -178,7 +178,7 @@ object Schema {
     StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
     StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
     StructField(CustomerProductShortlistVariables.USER_SHORTLIST_KEY, StringType, true),
-    StructField(CustomerProductShortlistVariables.USER_TOKEN,StringType,true),
+    StructField(CustomerProductShortlistVariables.USER_TOKEN, StringType, true),
     StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
     StructField(CustomerProductShortlistVariables.SKU, StringType, true),
     StructField(CustomerProductShortlistVariables.EXTRA_DATA, StringType, true),
@@ -280,7 +280,8 @@ object Schema {
     StructField(SalesOrderItemVariables.PROCESSED_BITMAP, IntegerType, true),
     StructField(SalesOrderItemVariables.EXPECTED_SHIPPING_PARTNER, StringType, true),
     StructField(SalesOrderItemVariables.IS_MULTIPLE_SHIPMENTS, IntegerType, true),
-    StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true)
+    StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.ORIGINAL_SHIPPING_CHARGE, DecimalType(10, 2), true)
   ))
 
   val itr = StructType(Array(

@@ -60,7 +60,7 @@ object Ad4pushDeviceMerger extends Logging {
       .dropDuplicates()
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
       if (!SchemaUtils.isSchemaEqual(newDF.schema, Ad4pushSchema.Ad4pushDeviceIOS)) {
-        newDF = SchemaUtils.changeSchema(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
+        newDF = SchemaUtils.addColumns(newDF, Ad4pushSchema.Ad4pushDeviceIOS)
       }
     }
 
@@ -68,7 +68,7 @@ object Ad4pushDeviceMerger extends Logging {
     if (null != fullcsv) {
       full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.UDID)
       if (!SchemaUtils.isSchemaEqual(full.schema, Ad4pushSchema.Ad4pushDeviceIOS)) {
-        full = SchemaUtils.changeSchema(full, Ad4pushSchema.Ad4pushDeviceIOS)
+        full = SchemaUtils.addColumns(full, Ad4pushSchema.Ad4pushDeviceIOS)
         full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceIOS).dropDuplicates()
       }
     } else {
