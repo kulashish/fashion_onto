@@ -85,11 +85,10 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     assert(refSkuFirst.size == 1)
   }
 
-
   "Generate reference sku with refernce sku input " should "return only one reference sku per customer sorted with price" in {
     val refSkus = CampaignUtils.generateReferenceSku(refSkuInputPush, 1)
     val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648")
-   // val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
+    // val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
     // assert(refSkuFirst.head === expectedData)
     assert(refSkuFirst.count == 1)
   }
