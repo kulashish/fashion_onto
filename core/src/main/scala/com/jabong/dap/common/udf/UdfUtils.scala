@@ -10,7 +10,7 @@ import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
+import scala.collection.mutable.{WrappedArray, ListBuffer}
 
 /**
  * Created by raghu on 3/7/15.
@@ -207,7 +207,7 @@ object UdfUtils {
 
     iterable.foreach {
       case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value };
+        if (value > max) { maxSlot = slot; max = value }
         timeSlotArray(slot - 1) = value
     }
     new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
@@ -366,7 +366,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getDistinctList[T](array: ArrayBuffer[T]): List[T] = {
+  def getDistinctList[T](array: WrappedArray[T]): List[T] = {
 
     if (array == null || array.isEmpty) {
       return null
@@ -384,7 +384,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getRepeatedSku[T](skuArray: ArrayBuffer[T]): List[T] = {
+  def getRepeatedSku[T](skuArray: WrappedArray[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
@@ -437,8 +437,8 @@ object UdfUtils {
    * @return
    */
   def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
-    var max = count1;
-    var index = 0;
+    var max = count1
+    var index = 0
 
     if (max < count2) {
       max = count2
