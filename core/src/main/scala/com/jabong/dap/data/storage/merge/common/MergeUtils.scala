@@ -2,6 +2,7 @@ package com.jabong.dap.data.storage.merge.common
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.schema.SchemaUtils
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.Row
@@ -20,8 +21,13 @@ object MergeUtils extends MergeData {
     else if (null == dfIncr)
       return dfBase
 
+    var dfBaseNew = dfBase
+      if (!SchemaUtils.isSchemaEqual(dfIncr.schema, dfBase.schema)) {
+        dfBaseNew = SchemaUtils.changeSchema(dfBase, dfIncr.schema)
+      }
+
     // join on primary key
-    val joinedDF = joinOldAndNewDF(dfIncr, dfBase, primaryKey)
+    val joinedDF = joinOldAndNewDF(dfIncr, dfBaseNew, primaryKey)
 
     //    //Commenting this code as this has functionality issue
     //    //when we have a data set with base as big and incr as very small.
@@ -43,9 +49,9 @@ object MergeUtils extends MergeData {
     //
     //    Spark.getSqlContext().createDataFrame(mergedDF, dfSchema)
 
-    var numPart = dfBase.rdd.partitions.length
+    var numPart = dfBaseNew.rdd.partitions.length
 
-    val df1 = joinedDF.filter(newpk + " IS NULL").select(dfBase("*"))
+    val df1 = joinedDF.filter(joinedDF(newpk).isNull).select(dfBaseNew("*"))
 
     df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)
   }
