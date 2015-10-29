@@ -416,7 +416,7 @@ object UdfUtils {
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: List[T]): Int = {
+  def getCountSku[T](skuList: WrappedArray[T]): Int = {
 
     if (skuList == null || skuList.isEmpty) {
       return 0
