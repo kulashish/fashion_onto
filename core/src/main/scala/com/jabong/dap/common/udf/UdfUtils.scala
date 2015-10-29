@@ -234,8 +234,6 @@ object UdfUtils extends Logging {
 
     iterable.foreach {
       case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value };
-        timeSlotArray(slot) = value
         if (value > max) { maxSlot = slot; max = value }
         timeSlotArray(slot - 1) = value
     }
