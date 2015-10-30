@@ -509,4 +509,11 @@ object Schema {
     StructField(CampaignMergedFields.REF_SKU1, StringType, false)
   ))
 
+  val pushSurfReferenceSku = StructType(Array(
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
+    StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
+
 }
