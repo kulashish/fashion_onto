@@ -16,13 +16,13 @@ libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "1.2.1"  % "provi
 
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "1.5.1" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "1.4.1" % "provided"
 
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.5.1" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.4.1" % "provided"
 
-libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.5.1" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.4.1" % "provided"
 
-libraryDependencies += "org.apache.spark" % "spark-launcher_2.10" % "1.5.1" % "provided"
+libraryDependencies += "org.apache.spark" % "spark-launcher_2.10" % "1.4.1" % "provided"
 
 libraryDependencies += "net.liftweb" %% "lift-json" % "2.6"
 
