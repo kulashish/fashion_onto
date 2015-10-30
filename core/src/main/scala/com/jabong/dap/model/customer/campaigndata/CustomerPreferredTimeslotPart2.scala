@@ -4,7 +4,7 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.UdfUtils
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -72,7 +72,8 @@ object CustomerPreferredTimeslotPart2 extends Logging {
         col(CustomerVariables.ORDER_8),
         col(CustomerVariables.ORDER_9),
         col(CustomerVariables.ORDER_10),
-        col(CustomerVariables.ORDER_11)
+        col(CustomerVariables.ORDER_11),
+        col(CustomerVariables.PREFERRED_ORDER_TIMESLOT)
       )
 
     if (dfFullCPOTPart2 != null) {
@@ -80,22 +81,21 @@ object CustomerPreferredTimeslotPart2 extends Logging {
 
       //join old and new data frame
       val joinDF = dfFullCPOTPart2.join(dfIncrVarBC, dfFullCPOTPart2(CustomerVariables.CUSTOMER_ID) === dfIncrVarBC(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
-      // MergeUtils.joinOldAndNewDF(dfInc, dfFullCPOTPart2, CustomerVariables.CUSTOMER_ID)
 
       val dfFull = joinDF.select(
         coalesce(dfIncrVarBC(CustomerVariables.CUSTOMER_ID), dfFullCPOTPart2(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
-        dfIncrVarBC(CustomerVariables.ORDER_0).+(dfFullCPOTPart2(CustomerVariables.ORDER_0)) as CustomerVariables.ORDER_0,
-        dfIncrVarBC(CustomerVariables.ORDER_1).+(dfFullCPOTPart2(CustomerVariables.ORDER_1)) as CustomerVariables.ORDER_1,
-        dfIncrVarBC(CustomerVariables.ORDER_2).+(dfFullCPOTPart2(CustomerVariables.ORDER_2)) as CustomerVariables.ORDER_2,
-        dfIncrVarBC(CustomerVariables.ORDER_3).+(dfFullCPOTPart2(CustomerVariables.ORDER_3)) as CustomerVariables.ORDER_3,
-        dfIncrVarBC(CustomerVariables.ORDER_4).+(dfFullCPOTPart2(CustomerVariables.ORDER_4)) as CustomerVariables.ORDER_4,
-        dfIncrVarBC(CustomerVariables.ORDER_5).+(dfFullCPOTPart2(CustomerVariables.ORDER_5)) as CustomerVariables.ORDER_5,
-        dfIncrVarBC(CustomerVariables.ORDER_6).+(dfFullCPOTPart2(CustomerVariables.ORDER_6)) as CustomerVariables.ORDER_6,
-        dfIncrVarBC(CustomerVariables.ORDER_7).+(dfFullCPOTPart2(CustomerVariables.ORDER_7)) as CustomerVariables.ORDER_7,
-        dfIncrVarBC(CustomerVariables.ORDER_8).+(dfFullCPOTPart2(CustomerVariables.ORDER_8)) as CustomerVariables.ORDER_8,
-        dfIncrVarBC(CustomerVariables.ORDER_9).+(dfFullCPOTPart2(CustomerVariables.ORDER_9)) as CustomerVariables.ORDER_9,
-        dfIncrVarBC(CustomerVariables.ORDER_10).+(dfFullCPOTPart2(CustomerVariables.ORDER_10)) as CustomerVariables.ORDER_10,
-        dfIncrVarBC(CustomerVariables.ORDER_11).+(dfFullCPOTPart2(CustomerVariables.ORDER_11)) as CustomerVariables.ORDER_11)
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_0), dfFullCPOTPart2(CustomerVariables.ORDER_0)) as CustomerVariables.ORDER_0,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_1), dfFullCPOTPart2(CustomerVariables.ORDER_1)) as CustomerVariables.ORDER_1,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_2), dfFullCPOTPart2(CustomerVariables.ORDER_2)) as CustomerVariables.ORDER_2,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_3), dfFullCPOTPart2(CustomerVariables.ORDER_3)) as CustomerVariables.ORDER_3,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_4), dfFullCPOTPart2(CustomerVariables.ORDER_4)) as CustomerVariables.ORDER_4,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_5), dfFullCPOTPart2(CustomerVariables.ORDER_5)) as CustomerVariables.ORDER_5,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_6), dfFullCPOTPart2(CustomerVariables.ORDER_6)) as CustomerVariables.ORDER_6,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_7), dfFullCPOTPart2(CustomerVariables.ORDER_7)) as CustomerVariables.ORDER_7,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_8), dfFullCPOTPart2(CustomerVariables.ORDER_8)) as CustomerVariables.ORDER_8,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_9), dfFullCPOTPart2(CustomerVariables.ORDER_9)) as CustomerVariables.ORDER_9,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_10), dfFullCPOTPart2(CustomerVariables.ORDER_10)) as CustomerVariables.ORDER_10,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_11), dfFullCPOTPart2(CustomerVariables.ORDER_11)) as CustomerVariables.ORDER_11)
 
       val rowRDD = dfFull.map(r => (Row(
         r(0),

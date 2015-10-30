@@ -280,7 +280,8 @@ object Schema {
     StructField(SalesOrderItemVariables.PROCESSED_BITMAP, IntegerType, true),
     StructField(SalesOrderItemVariables.EXPECTED_SHIPPING_PARTNER, StringType, true),
     StructField(SalesOrderItemVariables.IS_MULTIPLE_SHIPMENTS, IntegerType, true),
-    StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true)
+    StructField(SalesOrderItemVariables.CORPORATE_CURRENCY_VALUE, DecimalType(10, 2), true),
+    StructField(SalesOrderItemVariables.ORIGINAL_SHIPPING_CHARGE, DecimalType(10, 2), true)
   ))
 
   val itr = StructType(Array(

@@ -153,6 +153,16 @@
       "saveMode": "Ignore",
       "dateColumn": "updated_at",
       "rangeStart": "2012-04-01 00:00:00"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_status_history",
+      "primaryKey": "id_sales_order_item_status_history",
+      "mode": "monthly",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at",
+      "rangeStart": "2011-12-01 00:00:00"
     }
   ]
 }
