@@ -15,7 +15,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ WrappedArray, ListBuffer }
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -410,7 +410,7 @@ object UdfUtils extends Logging {
    * @tparam T
    * @return
    */
-  def getDistinctList[T](array: WrappedArray[T]): List[T] = {
+  def getDistinctList[T](array: ArrayBuffer[T]): List[T] = {
 
     if (array == null || array.isEmpty) {
       return null
@@ -428,7 +428,7 @@ object UdfUtils extends Logging {
    * @tparam T
    * @return
    */
-  def getRepeatedSku[T](skuArray: WrappedArray[T]): List[T] = {
+  def getRepeatedSku[T](skuArray: ArrayBuffer[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
@@ -460,7 +460,7 @@ object UdfUtils extends Logging {
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: WrappedArray[T]): Int = {
+  def getCountSku[T](skuList: List[T]): Int = {
 
     if (skuList == null || skuList.isEmpty) {
       return 0
