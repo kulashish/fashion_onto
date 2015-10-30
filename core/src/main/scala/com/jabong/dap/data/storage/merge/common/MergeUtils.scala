@@ -3,9 +3,8 @@ package com.jabong.dap.data.storage.merge.common
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.schema.SchemaUtils
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.Row
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */
@@ -15,7 +14,6 @@ object MergeUtils extends MergeData {
   val NEW_ = "new_"
 
   def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKey: String): DataFrame = {
-    val newpk = NEW_ + primaryKey
     if (null == dfBase)
       return dfIncr
     else if (null == dfIncr)
@@ -51,9 +49,30 @@ object MergeUtils extends MergeData {
 
     var numPart = dfBaseNew.rdd.partitions.length
 
-    val df1 = joinedDF.filter(joinedDF(newpk).isNull).select(dfBaseNew("*"))
+    val df1 = joinedDF.filter(dfIncr(primaryKey).isNull).select(dfBaseNew("*"))
 
     df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)
+  }
+
+  /**
+   * join old and new data frame
+   * @param dfIncr
+   * @param dfPrevVarFull
+   * @param primaryKey
+   * @return DataFrame
+   */
+  private def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
+
+    var dfIncrVar = dfIncr.dropDuplicates()
+
+    dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
+
+    val dfSchema = dfIncr.schema
+
+    // join old and new data frame on primary key
+    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(primaryKey), SQL.FULL_OUTER)
+
+    joinedDF
   }
 
   /**
@@ -98,30 +117,6 @@ object MergeUtils extends MergeData {
 
     // join old and new data frame on primary key
     val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
-
-    joinedDF
-  }
-
-  /**
-   * join old and new data frame
-   * @param dfIncr
-   * @param dfPrevVarFull
-   * @param primaryKey
-   * @return DataFrame
-   */
-  private def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey: String): DataFrame = {
-
-    var dfIncrVar = dfIncr.dropDuplicates()
-
-    dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
-
-    val dfSchema = dfIncr.schema
-
-    // rename dfIncr column names with new_ as prefix
-    dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
-
-    // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), SQL.FULL_OUTER)
 
     joinedDF
   }
