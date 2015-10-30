@@ -33,6 +33,7 @@ object CampaignCommon {
   val WISHLIST_LOWSTOCK_CAMPAIGN = "wishlist_lowstock"
   val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
   val PRICEPOINT_CAMPAIGN = "pricepoint"
+  val BRICK_AFFINITY = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
   val BEAUTY_CAMPAIGN = "beauty_campaign"
 
