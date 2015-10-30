@@ -8,6 +8,7 @@ object CustomerProductShortlistVariables {
   val ID_CUSTOMER_PRODUCT_SHORTLIST = "id_customer_product_shortlist"
   val FK_CUSTOMER = "fk_customer"
   val USER_SHORTLIST_KEY = "user_shortlist_key"
+  val USER_TOKEN = "user_token"
   val EMAIL = "email"
   val SKU = "sku"
   val SIMPLE_SKU = "simpleSku"

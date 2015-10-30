@@ -5,7 +5,7 @@ import java.sql.{ Date, Timestamp }
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.WrappedArray
 
 /**
  * Created by raghu on 3/7/15.
@@ -72,17 +72,17 @@ object Udf {
   /**
    * distinctSku will return list of distinct Sku
    */
-  val distinctList = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getDistinctList(skuArrayBuffer: ArrayBuffer[String]))
+  val distinctList = udf((skuArrayBuffer: WrappedArray[String]) => UdfUtils.getDistinctList(skuArrayBuffer: WrappedArray[String]))
 
   /**
    * repeatedSku will return list of repeated Sku
    */
-  val repeatedSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getRepeatedSku(skuArrayBuffer: ArrayBuffer[String]))
+  val repeatedSku = udf((skuArrayBuffer: WrappedArray[String]) => UdfUtils.getRepeatedSku(skuArrayBuffer: WrappedArray[String]))
 
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
+  val countSku = udf((skuArrayBuffer: WrappedArray[String]) => UdfUtils.getCountSku(skuArrayBuffer: WrappedArray[String]))
 
   /**
    * Removes all zeroes string and null string to emptyString.
@@ -123,6 +123,8 @@ object Udf {
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
   val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
+
+  val addInt = udf((i1: Int, i2: Int) => UdfUtils.addInt(i1: Int, i2: Int))
 
   val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
 

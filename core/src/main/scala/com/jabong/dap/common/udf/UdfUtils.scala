@@ -16,7 +16,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
+import scala.collection.mutable.{ WrappedArray, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -239,10 +239,7 @@ object UdfUtils extends Logging {
 
     iterable.foreach {
       case (slot, value) =>
-        if (value > max) {
-          maxSlot = slot;
-          max = value
-        };
+        if (value > max) { maxSlot = slot; max = value };
         timeSlotArray(slot) = value
     }
 
@@ -357,7 +354,7 @@ object UdfUtils extends Logging {
   }
 
   /**
-   * getSimpleSkuFromExtraData will extract data from extraData
+   *  getSimpleSkuFromExtraData will extract data from extraData
    * @param extraData
    * @return
    */
@@ -444,7 +441,7 @@ object UdfUtils extends Logging {
    * @tparam T
    * @return
    */
-  def getDistinctList[T](array: ArrayBuffer[T]): List[T] = {
+  def getDistinctList[T](array: WrappedArray[T]): List[T] = {
 
     if (array == null || array.isEmpty) {
       return null
@@ -462,7 +459,7 @@ object UdfUtils extends Logging {
    * @tparam T
    * @return
    */
-  def getRepeatedSku[T](skuArray: ArrayBuffer[T]): List[T] = {
+  def getRepeatedSku[T](skuArray: WrappedArray[T]): List[T] = {
 
     if (skuArray == null || skuArray.isEmpty) {
       return null
@@ -494,7 +491,7 @@ object UdfUtils extends Logging {
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: List[T]): Int = {
+  def getCountSku[T](skuList: WrappedArray[T]): Int = {
 
     if (skuList == null || skuList.isEmpty) {
       return 0
@@ -515,8 +512,8 @@ object UdfUtils extends Logging {
    * @return
    */
   def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
-    var max = count1;
-    var index = 0;
+    var max = count1
+    var index = 0
 
     if (max < count2) {
       max = count2
@@ -662,6 +659,10 @@ object UdfUtils extends Logging {
 
   def addString(value: String, constant: String): String = {
     if (value == null) return null else constant + value + constant
+  }
+
+  def addInt(i1: Int, i2: Int): Int = {
+    { if (null.asInstanceOf[Int] == i1) 0 else i1 } + { if (null.asInstanceOf[Int] == i2) 0 else i2 }
   }
 
   /**

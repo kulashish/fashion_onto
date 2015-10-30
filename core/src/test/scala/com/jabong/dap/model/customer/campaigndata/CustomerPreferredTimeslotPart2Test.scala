@@ -15,29 +15,46 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
 
   @transient var dfSalesOrder: DataFrame = _
   @transient var dfCmrFull: DataFrame = _
+  @transient var dfFullCPOTPart2: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
 
-    dfSalesOrder = JsonUtils.readFromJson(DataSets.SALES_ORDER, "sales_order", Schema.salesOrder)
-    dfCmrFull = JsonUtils.readFromJson(DataSets.CUSTOMER, "cmr")
+    dfSalesOrder = JsonUtils.readFromJson(DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, "sales_order", Schema.salesOrder)
+    dfCmrFull = JsonUtils.readFromJson(DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, "cmr")
+    dfFullCPOTPart2 = JsonUtils.readFromJson(DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, "cpotPart2", CustVarSchema.customersPreferredOrderTimeslotPart2)
 
   }
 
-  "getCPOTPart2: Data Frame" should "match to resultant Data Frame" in {
+  "getCPOTPart2: dfFullCPOTPart2" should "null" in {
 
     val dfCPOTFull = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot", CustVarSchema.customersPreferredOrderTimeslotPart2)
 
     val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, null, dfCmrFull)
 
-    //    dfInc.collect().foreach(println)
-    //    dfInc.printSchema()
+    //        dfInc.collect().foreach(println)
+    //        dfInc.printSchema()
     //
-    //    dfFullFinal.collect().foreach(println)
-    //    dfFullFinal.printSchema()
+    //        dfFullFinal.collect().foreach(println)
+    //        dfFullFinal.printSchema()
 
     assert(dfInc.count() == 5)
     assert(dfFullFinal.count() == 5)
+
+  }
+
+  "getCPOTPart2: dfFullFinal" should "6" in {
+
+    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfFullCPOTPart2, dfCmrFull)
+
+    //        dfInc.collect().foreach(println)
+    //        dfInc.printSchema()
+    //
+    //        dfFullFinal.collect().foreach(println)
+    //        dfFullFinal.printSchema()
+
+    assert(dfInc.count() == 1)
+    assert(dfFullFinal.count() == 6)
 
   }
 

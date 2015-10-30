@@ -2,8 +2,8 @@ package com.jabong.dap.campaign.data
 
 import java.io.File
 import java.sql.Timestamp
-import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.Spark
+
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -19,7 +19,6 @@ import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import com.jabong.dap.common.Utils
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -273,7 +272,7 @@ object CampaignInput extends Logging {
         val campaignSchema = if (DataSets.PUSH_CAMPAIGNS == campaignType) Schema.campaignSchema else Schema.emailCampaignSchema
 
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, campaignSchema)) {
-          val res = SchemaUtils.changeSchema(campaignData, campaignSchema)
+          val res = SchemaUtils.addColumns(campaignData, campaignSchema)
           if (DataSets.PUSH_CAMPAIGNS == campaignType) {
             result = res
               .select(
@@ -457,7 +456,7 @@ object CampaignInput extends Logging {
           var newMergedCamapignData = mergedCampaignData
           if (!SchemaUtils.isSchemaEqual(mergedCampaignData.schema, campaignMerged30Day.schema)) {
             // added to add new column add4pushId for the old camaigns data
-            newMergedCamapignData = SchemaUtils.changeSchema(mergedCampaignData, campaignMerged30Day.schema)
+            newMergedCamapignData = SchemaUtils.addColumns(mergedCampaignData, campaignMerged30Day.schema)
           }
           campaignMerged30Day = campaignMerged30Day.unionAll(newMergedCamapignData)
         }

@@ -19,7 +19,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.{ DataFrame, Row }
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.WrappedArray
 
 /**
  * Created by Divya on 15/7/15.
@@ -55,7 +55,7 @@ object GetSurfVariables extends java.io.Serializable with Logging {
     var today = "_daily"
     var explodedMergedData: DataFrame = null
     if (mergedData != null) {
-      explodedMergedData = mergedData.explode(PageVisitVariables.SKU_LIST, PageVisitVariables.SKU) { str: ArrayBuffer[String] => str.toList }
+      explodedMergedData = mergedData.explode(PageVisitVariables.SKU_LIST, PageVisitVariables.SKU) { str: WrappedArray[String] => str.toList }
       //explodedMergedData = mergedData.explode(PageVisitVariables.SKU_LIST, PageVisitVariables.SKU) { str: List[String] => str.toList }
 
       var joinResult = incremental.join(explodedMergedData, incremental(PageVisitVariables.USER_ID + today) === explodedMergedData(PageVisitVariables.USER_ID))
@@ -97,7 +97,7 @@ object GetSurfVariables extends java.io.Serializable with Logging {
     incremental.select("userid_daily", "sku_daily").registerTempTable("tempincremental")
 
     var IncrementalMerge = hiveContext.sql("select userid_daily as userid,collect_list(sku_daily) as skuList from tempincremental group by userid_daily")
-      .map(x => (x(0).toString, date.toString, x(1).asInstanceOf[ArrayBuffer[String]])).toDF(PageVisitVariables.USER_ID, "dt", PageVisitVariables.SKU_LIST)
+      .map(x => (x(0).toString, date.toString, x(1).asInstanceOf[WrappedArray[String]])).toDF(PageVisitVariables.USER_ID, "dt", PageVisitVariables.SKU_LIST)
 
     if (mergedData != null) {
       val yesterMerge = mergedData.filter("dt != '" + filterDate.toString + "'")
