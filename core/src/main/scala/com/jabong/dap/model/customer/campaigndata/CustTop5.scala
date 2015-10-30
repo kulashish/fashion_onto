@@ -70,15 +70,15 @@ object CustTop5 {
         salesOrderItemincr(SalesOrderItemVariables.SKU),
         salesOrderNew(SalesOrderVariables.CREATED_AT)
       )
-    val top5Full = getTop5(top5PrevFull, saleOrderJoined, itr)
+    val customerMapFull = getTop5(top5PrevFull, saleOrderJoined, itr)
 
-    top5Full.printSchema()
-    top5Full.show(5)
-    println("COUNT:-"+top5Full.count())
+    customerMapFull.printSchema()
+    customerMapFull.show(5)
+    println("COUNT:-"+customerMapFull.count())
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(top5Full, fullPath, saveMode)
+    DataWriter.writeParquet(customerMapFull, fullPath, saveMode)
 
-    val (fav, categoryCount, categoryAVG) = calcTop5(top5Full, incrDate)
+    val (fav, categoryCount, categoryAVG) = calcTop5(customerMapFull, path, incrDate)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(fav, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
@@ -92,10 +92,10 @@ object CustTop5 {
 
   }
 
-  def calcTop5(top5Full: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame)={
-    var top5Incr = top5Full
-    if (null != top5Full) {
-      top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+  def calcTop5(custMapFull: DataFrame, path: String, incrDate: String): (DataFrame, DataFrame, DataFrame)={
+    var top5Incr = custMapFull
+    if (null == path) {
+      top5Incr = Utils.getOneDayData(custMapFull, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
 
     val favTop5Map = top5Incr.map(e =>
