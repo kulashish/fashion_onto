@@ -1,6 +1,6 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.data.acq.common.{ParamInfo, ParamJobInfo}
+import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo }
 import com.jabong.dap.data.storage.DataSets
 
 /**

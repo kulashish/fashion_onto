@@ -4,7 +4,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.schema.SchemaUtils
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */

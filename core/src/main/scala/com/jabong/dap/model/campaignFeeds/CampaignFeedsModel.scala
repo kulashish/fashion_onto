@@ -1,7 +1,7 @@
 package com.jabong.dap.model.campaignFeeds
 
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import org.apache.spark.sql.DataFrame
 

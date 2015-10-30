@@ -3,9 +3,9 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, SalesOrderVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, SalesOrderVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -13,9 +13,9 @@ import com.jabong.dap.model.campaignFeeds.CampaignFeedsModel
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
-import scala.collection.mutable.{ArrayBuffer, HashMap}
+import scala.collection.mutable.{ ArrayBuffer, HashMap }
 
 /**
  * Created by raghu on 13/10/15.

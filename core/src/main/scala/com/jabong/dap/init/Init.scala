@@ -1,7 +1,7 @@
 package com.jabong.dap.init
 
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.{AppConfig, Config, Spark}
+import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
@@ -131,10 +131,10 @@ object Init {
    * @param config String Path of application config json file
    */
   case class Params(
-                     component: String = null,
-                     tableJson: String = null,
-                     mergeJson: String = null,
-                     paramJson: String = null,
-                     campaignsJson: String = null,
-                     config: String = null)
+    component: String = null,
+    tableJson: String = null,
+    mergeJson: String = null,
+    paramJson: String = null,
+    campaignsJson: String = null,
+    config: String = null)
 }
