@@ -111,7 +111,7 @@ object Udf {
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuArrayBuffer: ArrayBuffer[String]) => UdfUtils.getCountSku(skuArrayBuffer: ArrayBuffer[String]))
+  val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
 
   /**
    * Removes all zeroes string and null string to emptyString.
