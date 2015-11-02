@@ -1,4 +1,4 @@
-package com.jabong.dap.model.custorder
+package com.jabong.dap.init
 
 import com.jabong.dap.campaign.recommendation.generator.RecommendationGenerator
 import com.jabong.dap.common.OptionUtils
@@ -10,9 +10,7 @@ import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.DNDMerger
-import com.jabong.dap.model.customer.data.SmsOptOut
-import com.jabong.dap.model.customer.data.CustomerDeviceMapping
+import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, DNDMerger, SmsOptOut }
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods

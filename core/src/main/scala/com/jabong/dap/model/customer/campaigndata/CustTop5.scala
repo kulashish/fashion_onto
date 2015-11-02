@@ -7,17 +7,16 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ OptionUtils, Spark, Utils }
-import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
-
-import scala.collection.mutable.{ ListBuffer, Map }
+import scala.collection.mutable.{ HashMap, ListBuffer, Map }
 
 /**
  * Created by mubarak on 20/10/15.
@@ -48,168 +47,105 @@ import scala.collection.mutable.{ ListBuffer, Map }
  * COLOR_5
  */
 
-/**
- * SUNGLASSES_COUNT
- * WOMEN_FOOTWEAR_COUNT
- * KIDS_APPAREL_COUNT
- * WATCHES_COUNT
- * BEAUTY_COUNT
- * FURNITURE_COUNT
- * SPORTS_EQUIPMENT_COUNT
- * WOMEN_APPAREL_COUNT
- * HOME_COUNT
- * MEN_FOOTWEAR_COUNT
- * MEN_APPAREL_COUNT
- * JEWELLERY_COUNT
- * FRAGRANCE_COUNT
- * KIDS_FOOTWEAR_COUNT
- * BAGS_COUNT
- * TOYS_COUNT
- */
+object CustTop5 extends DataFeedsModel {
 
-/**
- * SUNGLASSES_AVG_ITEM_PRICE
- * WOMEN_FOOTWEAR_AVG_ITEM_PRICE
- * KIDS_APPAREL_AVG_ITEM_PRICE
- * WATCHES_AVG_ITEM_PRICE
- * BEAUTY_AVG_ITEM_PRICE
- * FURNITURE_AVG_ITEM_PRICE
- * SPORT_EQUIPMENT_AVG_ITEM_PRICE
- * JEWELLERY_AVG_ITEM_PRICE
- * WOMEN_APPAREL_AVG_ITEM_PRICE
- * HOME_AVG_ITEM_PRICE
- * MEN_FOOTWEAR_AVG_ITEM_PRICE
- * MEN_APPAREL_AVG_ITEM_PRICE
- * FRAGRANCE_AVG_ITEM_PRICE
- * KIDS_FOOTWEAR_AVG_ITEM_PRICE
- * TOYS_AVG_ITEM_PRICE
- * BAGS_AVG_ITEM_PRICE
- */
-object CustTop5 {
-  val catagories: List[String] = List("sunglasses",
-    "women_footwear",
-    "kids_apparel",
-    "watches",
-    "beauty",
-    "furniture",
-    "sport_equipment",
-    "jewellery",
-    "women_apparel",
-    "home",
-    "men_footwear",
-    "men_apparel",
-    "fragrance",
-    "kids",
-    "toys",
-    "bags")
+  def canProcess(incrDate: String, saveMode: String): Boolean = {
+    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.canWrite(saveMode, fullPath)
+  }
 
-  def start(vars: ParamInfo) = {
-    val saveMode = vars.saveMode
-    val path = OptionUtils.getOptValue(vars.path)
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
-    val (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr) = readDF(incrDate, prevDate, path)
-    var salesOrderincr: DataFrame = salesOrderIncr
-    var salesOrderItemincr: DataFrame = salesOrderItemIncr
-    if (null != path) {
-      salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-    }
-    val salesOrderNew = salesOrderincr.na.fill(scala.collection.immutable.Map(
+  def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
+    val top5PrevFull = dfMap("custTop5PrevFull")
+    var salesOrderIncr: DataFrame = dfMap("salesOrderIncr")
+    var salesOrderItemIncr: DataFrame = dfMap("salesOrderItemIncr")
+
+    val salesOrderNew = salesOrderIncr.na.fill(scala.collection.immutable.Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
-    val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
+    val saleOrderJoined = salesOrderNew.join(salesOrderItemIncr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER))
       .select(
         salesOrderNew(SalesOrderVariables.FK_CUSTOMER),
-        salesOrderItemincr(SalesOrderItemVariables.SKU),
+        salesOrderItemIncr(SalesOrderItemVariables.SKU),
         salesOrderNew(SalesOrderVariables.CREATED_AT)
       )
-    val top5Full = getTop5(top5PrevFull, saleOrderJoined, itr)
 
-    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(top5Full, fullPath, saveMode)
+    var writeMap = new HashMap[String, DataFrame]()
+    val custTop5Full = getTop5(top5PrevFull, saleOrderJoined, dfMap("yestItr"))
+    writeMap.put("custTop5Full", custTop5Full)
+    //println("Full COUNT:-" + custTop5Full.count())
+    writeMap.put("custTop5PrevFull", top5PrevFull)
+    writeMap
+  }
 
-    var top5Incr = top5Full
-    if (null != path) {
-      top5Incr = Utils.getOneDayData(top5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+  def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
+    val custTop5PrevFull = dfWrite("custTop5PrevFull")
+    val custTop5Full = dfWrite("custTop5Full")
+
+    var top5MapIncr = custTop5Full
+    if (null != custTop5PrevFull) {
+      top5MapIncr = Utils.getOneDayData(custTop5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
+    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
+
+    val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
+
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(custTop5Incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+
+    DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
+
+    DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
+
+  }
+
+  def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
     val favTop5Map = top5Incr.map(e =>
-      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]),
-        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
-      //        getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]])
-      ))
-    //      (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]],
-    //        e(2).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]],
-    //        e(3).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]],
-    //        e(4).asInstanceOf[scala.collection.immutable.Map[String, (Int, Double)]]
-    //      ))
+      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+        getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+        getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+        CustCatPurchase.getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]])
+      )
+      )
     )
-
-    //    val path1 = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    //    favTop5Map.saveAsTextFile(path1)
-
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
       e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
       e._2._3(0), e._2._3(1), e._2._3(2), e._2._3(3), e._2._3(4), //brick
       e._2._4(0), e._2._4(1), e._2._4(2), e._2._4(3), e._2._4(4))) //color
-
-    //    val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
-    //      e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
-    //      e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
-    //      e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
-    //
-    //    val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
-    //      e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
-    //      e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
-    //      e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
-
     val fav = Spark.getSqlContext().createDataFrame(favTop5, Schema.cusTop5)
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(fav.na.fill(""), DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", saveMode, "true", ";")
+    val catCount = favTop5Map.map(e => Row(e._1, e._2._5(0)._1, e._2._5(1)._1, e._2._5(2)._1, e._2._5(3)._1,
+      e._2._5(4)._1, e._2._5(5)._1, e._2._5(6)._1, e._2._5(7)._1,
+      e._2._5(8)._1, e._2._5(9)._1, e._2._5(10)._1, e._2._5(11)._1,
+      e._2._5(12)._1, e._2._5(13)._1, e._2._5(14)._1, e._2._5(15)._1))
 
-    //    val categoryCount = Spark.getSqlContext().createDataFrame(catCount, Schema.catCount)
-    //
-    //    val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
-    //    DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
-    //
-    //    val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
+    val catAvg = favTop5Map.map(e => Row(e._1, e._2._5(0)._2, e._2._5(1)._2, e._2._5(2)._2, e._2._5(3)._2,
+      e._2._5(4)._2, e._2._5(5)._2, e._2._5(6)._2, e._2._5(7)._2,
+      e._2._5(8)._2, e._2._5(9)._2, e._2._5(10)._2, e._2._5(11)._2,
+      e._2._5(12)._2, e._2._5(13)._2, e._2._5(14)._2, e._2._5(15)._2))
 
-    //    val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
-    //    DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
+    val categoryCount = Spark.getSqlContext().createDataFrame(catCount, Schema.catCount)
 
+    val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
+
+    (fav, categoryCount, categoryAVG)
   }
 
-  def getCatCount(map: scala.collection.immutable.Map[String, (Int, Double)]): List[(Int, Double)] = {
-    var list = scala.collection.mutable.ListBuffer[(Int, Double)]()
-    catagories.foreach{
-      e =>
-        if (map.contains(e)) {
-          val (count, sum) = map.get(e).getOrElse((0, 0.0))
-          //val (count, sum) = map(e)
-          val ele = Tuple2(count, (sum / count))
-
-          list.+=(ele)
-        } else {
-          val ele = Tuple2(0, 0.0)
-          list.+=(ele)
-        }
-    }
-    list.toList
-  }
-
-  def getTop5FavList(map: scala.collection.immutable.Map[String, (Int, Double)]): List[String] = {
+  def getTop5FavList(map: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): List[String] = {
     val a = ListBuffer[(String, Int, Double)]()
-    // val map = collection.mutable.Map() ++ mapList
-    println("map: " + map)
     val keys = map.keySet
     keys.foreach{
       t =>
-        println("printing map for a key: " + map(t))
-        val (k, j) = map(t)
-        val x = Tuple3(t, k, j)
+        var count = 0
+        var sum = 0.0
+        val m = map(t)
+        m.keys.foreach{
+          e =>
+            count = e
+            sum = m(e)
+        }
+        val x = Tuple3(t, count, sum)
         a.+=:(x)
     }
 
@@ -218,7 +154,7 @@ object CustTop5 {
       list.toList.take(5)
     } else {
       while (list.size < 5) {
-        list += ""
+        list.+=("")
       }
       list.toList
     }
@@ -234,7 +170,12 @@ object CustTop5 {
         itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE,
         saleOrderJoined(SalesOrderVariables.CREATED_AT)
       )
-      .na.fill("", Array(ProductVariables.BRAND, ProductVariables.CATEGORY, ProductVariables.BRICK, ProductVariables.COLOR))
+      .na.fill(scala.collection.immutable.Map(ProductVariables.BRAND -> "",
+        ProductVariables.CATEGORY -> "",
+        ProductVariables.BRICK -> "",
+        ProductVariables.COLOR -> "",
+        ProductVariables.SPECIAL_PRICE -> 0.0
+      )).filter(saleOrderJoined(SalesOrderVariables.CREATED_AT).isNotNull)
 
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], Timestamp.valueOf(e(6).toString)))).groupByKey()
     val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
@@ -256,100 +197,108 @@ object CustTop5 {
     }
   }
 
-  val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, (Int, Double)], map2: scala.collection.immutable.Map[String, (Int, Double)]) => joinMaps(map1, map2))
+  val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]) => joinMaps(map1, map2))
 
-  def joinMaps(map1: scala.collection.immutable.Map[String, (Int, Double)], map2: scala.collection.immutable.Map[String, (Int, Double)]): Map[String, (Int, Double)] = {
+  def joinMaps(map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]] = {
+    val mapFull = collection.mutable.Map[String, scala.collection.immutable.Map[Int, Double]]()
     if (null == map1 && null == map2) {
       return null
     } else if (null == map2) {
-      return collection.mutable.Map() ++ map1
+      return map1
     } else if (null == map1) {
-      return collection.mutable.Map() ++ map2
+      return map2
     }
-    val mapIncr = collection.mutable.Map() ++ map1
-    val mapFull = collection.mutable.Map() ++ map2
+    map2.keySet.foreach{
+      key => mapFull.put(key, map2(key))
+    }
 
-    val keys = mapIncr.keySet
+    val keys = map1.keySet
     keys.foreach{
-      e =>
-        var (count, sum) = mapIncr(e)
-        if (mapFull.contains(e)) {
-          val (count1, sum1) = mapFull(e)
-          mapFull.put(e, ((count + count1), (sum + sum1)))
-        } else {
-          mapFull.put(e, (count, sum))
+      key =>
+        val x = map1(key)
+        x.keys.foreach {
+          t =>
+            val count = t
+            val sum = x(t)
 
+            if (mapFull.contains(key)) {
+              val m = mapFull(key)
+              m.keys.foreach {
+                c =>
+                  val count1 = c
+                  val sum1 = m(c)
+                  val newMap = scala.collection.immutable.Map[Int, Double]((count1 + count) -> (sum + sum1))
+                  mapFull.put(key, newMap)
+              }
+            } else {
+              val newMap = scala.collection.immutable.Map[Int, Double](count -> sum)
+              mapFull.put(key, newMap)
+            }
         }
     }
-    mapFull
+    val finalMap = mapFull.map(kv => (kv._1, kv._2)).toMap
+    finalMap
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Map[String, (Int, Double)], Timestamp) = {
-    val brand = Map[String, (Int, Double)]()
-    val cat = Map[String, (Int, Double)]()
-    val brick = Map[String, (Int, Double)]()
-    val color = Map[String, (Int, Double)]()
+  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
+    val brand = Map[String, Map[Int, Double]]()
+    val cat = Map[String, Map[Int, Double]]()
+    val brick = Map[String, Map[Int, Double]]()
+    val color = Map[String, Map[Int, Double]]()
     var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
     list.foreach{ e =>
-      val (l, m, n, o, p, date) = e
+      val (brandName, catName, brickName, coloName, price, date) = e
       if (maxDate.before(date)) {
         maxDate = date
       }
-      if (brand.contains(l) && l.length > 0) {
-        val (count, sum) = brand(l)
-        brand.put(l, ((count + 1), (sum + p)))
-      } else {
-        if (l.length > 0) {
-          brand.put(l, (1, p))
-        }
-      }
-      if (cat.contains(m) && m.length > 0) {
-        val (count, sum) = cat(m)
-        cat.put(m, ((count + 1), (sum + p)))
-      } else {
-        if (m.length > 0) {
-          cat.put(m, (1, p))
-        }
-      }
-      if (brick.contains(n) && n.length > 0) {
-        val (count, sum) = brick(n)
-        brick.put(n, ((count + 1), (sum + p)))
-      } else {
-        if (n.length > 0) {
-          brick.put(n, (1, p))
-        }
-      }
-      if (color.contains(o) && o.length > 0) {
-        val (count, sum) = color(o)
-        color.put(o, ((count + 1), (sum + p)))
-      } else {
-        if (o.length > 0) {
-          color.put(o, (1, p))
-        }
-      }
+      updateMap(brand, brandName, price)
+      updateMap(cat, catName, price)
+      updateMap(brick, brickName, price)
+      updateMap(color, coloName, price)
     }
     (brand, cat, brick, color, maxDate)
 
   }
 
-  def getCountSum(st: String): (Int, Double) = {
-    val tk = st.split(";")
-    val count = Integer.parseInt(tk(0))
-    val sum = tk(1).toDouble
-    (count, sum)
-  }
-
-  def readDF(incrDate: String, prevDate: String, path: String): (DataFrame, DataFrame, DataFrame, DataFrame) = {
-    var mode: String = DataSets.FULL_MERGE_MODE
-    var top5PrevFull: DataFrame = null
-    if (null == path) {
-      top5PrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
-      mode = DataSets.DAILY_MODE
+  def updateMap(map: Map[String, Map[Int, Double]], key: String, price: Double): Map[String, Map[Int, Double]] = {
+    if (map.contains(key)) {
+      val countMap = map(key)
+      countMap.keys.foreach{
+        currentCount =>
+          val currentSum = countMap(currentCount)
+          val newMap = Map[Int, Double]()
+          newMap.put(currentCount + 1, price + currentSum)
+          //map.remove(key)
+          map.update(key, newMap)
+      }
+    } else {
+      if (key.length > 0) {
+        val newMap = Map[Int, Double]()
+        newMap.put(1, price)
+        map.put(key, newMap)
+      }
     }
-    val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
-    val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
-    val itr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
-    (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr)
+    map
   }
 
+  def readDF(incrDate: String, prevDate: String, path: String): HashMap[String, DataFrame] = {
+    var dfMap = new HashMap[String, DataFrame]()
+    var mode: String = DataSets.FULL_MERGE_MODE
+    if (null == path) {
+      mode = DataSets.DAILY_MODE
+      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custTop5PrevFull", custTop5PrevFull)
+    }
+    var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    var salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
+    if (null == path) {
+      salesOrderIncr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      salesOrderItemIncr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    }
+    dfMap.put("salesOrderIncr", salesOrderIncr)
+    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
+    val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
+    dfMap.put("yestItr", yestItr)
+    dfMap
+  }
 }
