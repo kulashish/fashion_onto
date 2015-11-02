@@ -89,6 +89,11 @@ object GroupedUtils {
         var ordering: Ordering[String] = null
         if (order.equals(ASC)) ordering = Ordering.String else ordering = Ordering.String.reverse
         return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[String])(ordering)
+
+      case TimestampType =>
+        var ordering: Ordering[Long] = null
+        if (order.equals(ASC)) ordering = Ordering.Long else ordering = Ordering.Long.reverse
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[java.sql.Timestamp].getTime)(ordering)
     }
   }
 }
