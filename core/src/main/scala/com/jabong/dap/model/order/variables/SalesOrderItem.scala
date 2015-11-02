@@ -1,12 +1,10 @@
 package com.jabong.dap.model.order.variables
 
-import com.jabong.dap.common.time.TimeConstants
-import com.jabong.dap.common.{Utils, Spark}
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -157,41 +155,41 @@ object SalesOrderItem {
     }
     val bcInc = Spark.getContext().broadcast(inc).value
     val res = full.join(bcInc, bcInc(SalesOrderVariables.FK_CUSTOMER) === full(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                  .select(
-                    coalesce(full(SalesOrderVariables.FK_CUSTOMER), bcInc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE,
-                    full(SalesOrderItemVariables.REVENUE_LIFE) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_LIFE,
-                    full(SalesOrderItemVariables.REVENUE_APP_LIFE) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_LIFE,
-                    full(SalesOrderItemVariables.REVENUE_WEB_LIFE) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_LIFE,
-                    full(SalesOrderItemVariables.REVENUE_MWEB_LIFE) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_LIFE,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_7,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_APP_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_7,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_WEB_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_7,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_7,
-                    full(SalesOrderItemVariables.REVENUE_7) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_7,
-                    full(SalesOrderItemVariables.REVENUE_APP_7) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_7,
-                    full(SalesOrderItemVariables.REVENUE_WEB_7) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_7,
-                    full(SalesOrderItemVariables.REVENUE_MWEB_7) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_7,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_30,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_APP_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_30,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_WEB_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_30,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_30,
-                    full(SalesOrderItemVariables.REVENUE_30) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_30,
-                    full(SalesOrderItemVariables.REVENUE_APP_30) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_30,
-                    full(SalesOrderItemVariables.REVENUE_WEB_30) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_30,
-                    full(SalesOrderItemVariables.REVENUE_MWEB_30) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_30,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_90,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_APP_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_90,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_WEB_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_90,
-                    full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_90,
-                    full(SalesOrderItemVariables.REVENUE_90) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_90,
-                    full(SalesOrderItemVariables.REVENUE_APP_90) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_90,
-                    full(SalesOrderItemVariables.REVENUE_WEB_90) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_90,
-                    full(SalesOrderItemVariables.REVENUE_MWEB_90) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_90,
-                    coalesce( bcInc(SalesOrderVariables.LAST_ORDER_DATE),   full(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
+      .select(
+        coalesce(full(SalesOrderVariables.FK_CUSTOMER), bcInc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        full(SalesOrderItemVariables.ORDERS_COUNT_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
+        full(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
+        full(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
+        full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE,
+        full(SalesOrderItemVariables.REVENUE_LIFE) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_LIFE,
+        full(SalesOrderItemVariables.REVENUE_APP_LIFE) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_LIFE,
+        full(SalesOrderItemVariables.REVENUE_WEB_LIFE) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_LIFE,
+        full(SalesOrderItemVariables.REVENUE_MWEB_LIFE) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_LIFE,
+        full(SalesOrderItemVariables.ORDERS_COUNT_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_7,
+        full(SalesOrderItemVariables.ORDERS_COUNT_APP_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_7,
+        full(SalesOrderItemVariables.ORDERS_COUNT_WEB_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_7,
+        full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_7,
+        full(SalesOrderItemVariables.REVENUE_7) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_7,
+        full(SalesOrderItemVariables.REVENUE_APP_7) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_7,
+        full(SalesOrderItemVariables.REVENUE_WEB_7) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_7,
+        full(SalesOrderItemVariables.REVENUE_MWEB_7) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_7,
+        full(SalesOrderItemVariables.ORDERS_COUNT_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_30,
+        full(SalesOrderItemVariables.ORDERS_COUNT_APP_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_30,
+        full(SalesOrderItemVariables.ORDERS_COUNT_WEB_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_30,
+        full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_30) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_30,
+        full(SalesOrderItemVariables.REVENUE_30) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_30,
+        full(SalesOrderItemVariables.REVENUE_APP_30) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_30,
+        full(SalesOrderItemVariables.REVENUE_WEB_30) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_30,
+        full(SalesOrderItemVariables.REVENUE_MWEB_30) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_30,
+        full(SalesOrderItemVariables.ORDERS_COUNT_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_90,
+        full(SalesOrderItemVariables.ORDERS_COUNT_APP_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_90,
+        full(SalesOrderItemVariables.ORDERS_COUNT_WEB_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_90,
+        full(SalesOrderItemVariables.ORDERS_COUNT_MWEB_90) + bcInc(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_90,
+        full(SalesOrderItemVariables.REVENUE_90) + bcInc(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_90,
+        full(SalesOrderItemVariables.REVENUE_APP_90) + bcInc(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_90,
+        full(SalesOrderItemVariables.REVENUE_WEB_90) + bcInc(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_90,
+        full(SalesOrderItemVariables.REVENUE_MWEB_90) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_90,
+        coalesce(bcInc(SalesOrderVariables.LAST_ORDER_DATE), full(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
       )
     res.printSchema()
     res.show(5)
@@ -430,7 +428,7 @@ object SalesOrderItem {
         disc(SalesRuleSetVariables.DISCOUNT_COUNT)
       )
 
-   incr
+    incr
   }
 
   /*
@@ -448,7 +446,8 @@ object SalesOrderItem {
    Need to get final count of orders where invalid orderitem count matches total orderitem count
    */
 
-  def getInvalidCancelOrders(salesOrderJoined: DataFrame): DataFrame = {
+  def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame): DataFrame = {
+    val salesOrderJoined = salesOrderFull.join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
     val joinedMap = salesOrderJoined.select(salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
       salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS))
@@ -472,8 +471,8 @@ object SalesOrderItem {
         count("cancel") as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
         count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
         count("success") as SalesOrderItemVariables.SUCCESSFUL_ORDERS
-        )
-      return res
+      )
+    return res
   }
 
   def findOrderType(list: List[Int]): Int = {
@@ -482,16 +481,16 @@ object SalesOrderItem {
     val succ = OrderStatus.SUCCESSFUL_ARRAY.toSet
     val ret = OrderStatus.RETURN_ARRAY.toSet
     val cancl = OrderStatus.CANCELLED_ARRAY.toSet
-    if (custStatus subsetOf(inval)) {
-     return 10
-    } else if (custStatus subsetOf(cancl)) {
-     return 20
-    } else if (custStatus subsetOf(ret)) {
-     return 30
-    } else if (custStatus subsetOf(succ)) {
+    if (custStatus subsetOf (inval)) {
+      return 10
+    } else if (custStatus subsetOf (cancl)) {
+      return 20
+    } else if (custStatus subsetOf (ret)) {
+      return 30
+    } else if (custStatus subsetOf (succ)) {
       return 40
     } else {
-     return 0
+      return 0
     }
 
   }
@@ -531,7 +530,7 @@ object SalesOrderItem {
         sum("item_count") as SalesOrderVariables.ORDER_ITEM_COUNT,
         max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.CREATED_AT)
 
-      return orderValue
+    return orderValue
     /*     val orderValueFull =
         )
       */
