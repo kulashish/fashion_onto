@@ -232,7 +232,7 @@ object CampaignUtils extends Logging {
     // Sales order skus with successful order status
     val successfulSku = salesOrderItemData
       .filter(SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.CANCEL_PAYMENT_ERROR + " and " +
-      SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.INVALID)
+        SalesOrderItemVariables.FK_SALES_ORDER_ITEM + " != " + OrderStatus.INVALID)
       .select(
         salesOrderItemData(ProductVariables.SKU),
         salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
@@ -433,7 +433,7 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.SKU),
         inputData(PageVisitVariables.BROWSER_ID),
         inputData(PageVisitVariables.DOMAIN)
-        //inputData(ProductVariables.SPECIAL_PRICE)
+      //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -698,10 +698,32 @@ object CampaignUtils extends Logging {
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
       emailCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, pastCampaignCheck)
     } else if (campaignType.equalsIgnoreCase(DataSets.CALENDAR_CAMPAIGNS)) {
-      //FIXME: add method for calendarCampaignPostProcess
-      // calendarCampaignPostProcess(campaignType, campaignName, custFiltered, recommendations)
+      calendarCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations)
     }
 
+  }
+
+  def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
+
+    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
+
+    val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
+
+    // create recommendations
+    val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
+
+    var campaignOutput: DataFrame = null
+
+    if (campaignName == CampaignCommon.PRICEPOINT_CAMPAIGN) {
+      campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, Recommendation.BRICK_PRICE_BAND_SUB_TYPE)
+
+    } else campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
+
+    debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
+    //save campaign Output for mobile
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
   }
 
   /**

@@ -53,17 +53,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.productName") as ProductVariables.PRODUCT_NAME,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
-    var recommendationJoined: DataFrame = null
-
-    if (recType.equalsIgnoreCase(Recommendation.BRICK_MVP_SUB_TYPE)) {
-      recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
-        && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
-        && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
-    } else {
-      recommendationJoined = completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
-        && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
-        && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
-    }
+    val recommendationJoined = joinToRecommendation(completeRefSku, recommendations, recType)
 
     val recommendationSelected = recommendationJoined.select(
       completeRefSku(CustomerVariables.EMAIL),
@@ -85,6 +75,29 @@ class LiveCommonRecommender extends Recommender with Logging {
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
     return campaignDataWithRecommendations
+  }
+
+  def joinToRecommendation(completeRefSku: DataFrame, recommendations: DataFrame, recType: String): DataFrame = {
+
+    val recommendationJoined = recType match {
+      case Recommendation.BRICK_MVP_SUB_TYPE => {
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
+          && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+          && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+      }
+      case Recommendation.BRICK_PRICE_BAND_SUB_TYPE => {
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
+          && completeRefSku(ProductVariables.PRICE_BAND) === recommendations(ProductVariables.PRICE_BAND)
+          && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+      }
+      case _ => {
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
+          && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+          && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+      }
+    }
+
+    return recommendationJoined
   }
 
   //  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))
