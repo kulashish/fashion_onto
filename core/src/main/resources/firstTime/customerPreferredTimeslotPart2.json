@@ -4,14 +4,14 @@
       "source": "customerPreferredTimeslotPart2",
       "path": "first time",
       "mode": "full",
-      "incrDate": "2015/10/29",
+      "incrDate": "2015/10/30",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "customerPreferredTimeslotPart2",
-      "fullDate": "2015/10/29",
-      "incrDate": "2015/10/30",
+      "fullDate": "2015/10/30",
+      "incrDate": "2015/10/31",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
