@@ -40,4 +40,11 @@ object OrderBySchema {
     StructField(PageVisitVariables.ADD4PUSH, StringType, true),
     StructField(PageVisitVariables.PAGE_TIMESTAMP, TimestampType, true)
   ))
+
+  val pushSurfReferenceSku = StructType(Array(
+    StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
 }

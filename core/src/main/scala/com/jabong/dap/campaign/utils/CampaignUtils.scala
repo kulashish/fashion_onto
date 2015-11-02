@@ -14,7 +14,7 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
@@ -137,13 +137,13 @@ object CampaignUtils extends Logging {
 
     val groupedFields = Array(PageVisitVariables.BROWSER_ID)
     val aggFields = Array(PageVisitVariables.BROWSER_ID, ProductVariables.SKU, CustomerVariables.FK_CUSTOMER, PageVisitVariables.DOMAIN)
-    val deviceOnlyRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
+    val deviceOnlyRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     // non zero FK_CUSTOMER
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
 
-    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
+    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     val customerRefSku = deviceOnlyRefSkus.unionAll(registeredRefSkus)
 
