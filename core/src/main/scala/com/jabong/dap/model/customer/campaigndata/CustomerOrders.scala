@@ -112,6 +112,7 @@ object CustomerOrders {
                         .drop(SalesRuleSetVariables.COUPON_COUNT)
                         .drop(SalesRuleSetVariables.DISCOUNT_SUM)
                         .drop(SalesRuleSetVariables.DISCOUNT_COUNT)
+                        .drop(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
     val custOrdersIncr = Utils.getOneDayData(custOrdersCsv, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
@@ -138,6 +139,7 @@ object CustomerOrders {
         prevFull(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + incr(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
         prevFull(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + incr(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
         prevFull(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + incr(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) as SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
+        prevFull(SalesOrderItemVariables.SUCCESSFUL_ORDERS) + incr(SalesOrderItemVariables.SUCCESSFUL_ORDERS) as SalesOrderItemVariables.SUCCESSFUL_ORDERS,
         when(incr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < prevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), incr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(prevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
         when(incr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > prevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), incr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(prevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
         incr(SalesRuleSetVariables.COUPON_SUM) + prevFull(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
@@ -191,7 +193,8 @@ object CustomerOrders {
         revJoined(SalesRuleSetVariables.DISCOUNT_COUNT),
         salesInvalid(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
         salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
-        salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS)
+        salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        salesInvalid(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
       )
 
     val catBrickJoined = invalidJoined.join(salesCatBrick, salesCatBrick(SalesOrderVariables.FK_CUSTOMER) === invalidJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
@@ -208,6 +211,7 @@ object CustomerOrders {
         invalidJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
         invalidJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
         invalidJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        invalidJoined(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
         invalidJoined(SalesRuleSetVariables.COUPON_SUM),
         invalidJoined(SalesRuleSetVariables.COUPON_COUNT),
         invalidJoined(SalesRuleSetVariables.DISCOUNT_SUM),
@@ -233,6 +237,7 @@ object CustomerOrders {
         catBrickJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
         catBrickJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
         catBrickJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        catBrickJoined(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
         catBrickJoined(SalesOrderVariables.CATEGORY_PENETRATION),
         catBrickJoined(SalesOrderVariables.BRICK_PENETRATION),
         salesOrderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
@@ -258,6 +263,7 @@ object CustomerOrders {
         salesValueJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
         salesValueJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
         salesValueJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        salesValueJoined(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
         salesValueJoined(SalesOrderVariables.CATEGORY_PENETRATION),
         salesValueJoined(SalesOrderVariables.BRICK_PENETRATION),
         salesValueJoined(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
