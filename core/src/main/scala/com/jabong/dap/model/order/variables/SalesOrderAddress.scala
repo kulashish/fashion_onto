@@ -127,18 +127,12 @@ object SalesOrderAddress {
         joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),
         cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
       )
-    if (null == prevCalc) {
-      res
-    } else {
-      res.join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    res
+      /*join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(
-          coalesce(res(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-          coalesce(res(SalesAddressVariables.LAST_SHIPPING_CITY), prevCalc(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
-          coalesce(res(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), prevCalc(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
-          coalesce(prevCalc(SalesAddressVariables.FIRST_SHIPPING_CITY), res(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
-          coalesce(prevCalc(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), res(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
+
         )
-    }
+    */
 
   }
 
