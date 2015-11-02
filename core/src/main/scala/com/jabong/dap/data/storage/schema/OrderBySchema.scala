@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.schema
 
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
-import com.jabong.dap.common.constants.variables.{ PageVisitVariables, ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.constants.campaign.{Recommendation, CampaignMergedFields}
+import com.jabong.dap.common.constants.variables.{ProductVariables, PageVisitVariables, ContactListMobileVars, CustomerVariables}
 import org.apache.spark.sql.types._
 
 /**
@@ -23,7 +23,7 @@ object OrderBySchema {
     StructField(CustomerVariables.EMAIL, StringType, false),
     StructField(ContactListMobileVars.UID, StringType, true),
     StructField(CampaignMergedFields.CUSTOMER_ID, LongType, true),
-    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StringType), true),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType), StructField(CampaignMergedFields.LIVE_BRAND, StringType),StructField(CampaignMergedFields.LIVE_BRICK, StringType),StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType))), false), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
