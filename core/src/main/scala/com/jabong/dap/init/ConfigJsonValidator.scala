@@ -11,10 +11,11 @@ object ConfigJsonValidator {
   def validateRequiredValues(config: Config) = {
     require(config.applicationName != null && config.applicationName != "", "Application name cannot be null or empty")
     require(config.basePath != null && config.basePath != "", "Base path cannot be null or empty")
+    require(config.env != null && config.env != "", "env cannot be null or empty")
   }
 
   def validateCredentials(credentials: Credentials) = {
-    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.CRM, DataSets.JDARESOURCE, DataSets.UNICOMMERCE, DataSets.NEXTBEE)
+    val possibleSources = Array(DataSets.BOB, DataSets.ERP, DataSets.CRM, DataSets.JDARESOURCE, DataSets.UNICOMMERCE)
     val possibleDrivers = Array(DataSets.MYSQL, DataSets.SQLSERVER)
 
     require(credentials.source != null && credentials.source != "", "Credential source cannot be null or empty")

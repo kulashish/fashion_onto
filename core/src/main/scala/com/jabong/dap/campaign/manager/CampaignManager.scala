@@ -5,7 +5,7 @@ import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
@@ -375,12 +375,22 @@ object CampaignManager extends Serializable with Logging {
       if (campaignType == DataSets.PUSH_CAMPAIGNS) {
         val ad4push = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.AD4PUSH_ID, DataSets.FULL_MERGE_MODE, dateFolder)
         val finalCampaign = CampaignProcessor.addAd4pushId(ad4push, mergedData)
-        DataWriter.writeParquet(finalCampaign, writePath, saveMode)
-        CampaignProcessor.splitFileToCSV(finalCampaign, dateFolder)
+        val iosDF = finalCampaign.filter(finalCampaign(CampaignMergedFields.DOMAIN) === DataSets.IOS)
+        val androidDF = finalCampaign.filter(finalCampaign(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).na.drop(Array(PageVisitVariables.ADD4PUSH))
+
+        val mergedAd4push = iosDF.unionAll(androidDF)
+        println("Starting write parquet after repartitioning and caching")
+        val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+        if (DataWriter.canWrite(saveMode, writePath))
+          DataWriter.writeParquet(mergedAd4push, writePath, saveMode)
+
+        //writing csv file
+        CampaignProcessor.splitFileToCSV(iosDF, androidDF, dateFolder)
       } else {
         val GARBAGE = "NA" //:TODO replace with correct value
-        val expectedDF = mergedData
-          .withColumn(ContactListMobileVars.UID, lit(GARBAGE))
+        val temp = "temp"
+        val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL, CampaignMergedFields.LIVE_CART_URL + temp)
+          .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
           .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
           .withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
           .withColumn(CampaignMergedFields.LIVE_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
@@ -399,21 +409,22 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(6)))
           .withColumn(CampaignMergedFields.LIVE_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
-          .withColumn(CampaignMergedFields.LIVE_CART_URL, col(CampaignMergedFields.LIVE_CART_URL))
+          .withColumn(CampaignMergedFields.LIVE_CART_URL, col(CampaignMergedFields.LIVE_CART_URL + temp))
           .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
           .withColumn(ContactListMobileVars.MOBILE, lit(GARBAGE))
           .withColumn(CampaignMergedFields.TYPO_MOBILE_PERMISION_STATUS, lit(GARBAGE))
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CampaignMergedFields.CUSTOMER_ID)
           .drop(CustomerVariables.EMAIL)
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+          .drop(CampaignMergedFields.LIVE_CART_URL + temp)
 
-        val emailCampaignFileName = "53699_33838_"+TimeUtils.getTodayDate(TimeConstants.YYYYMMDD)+"_LIVE_CAMPAIGN"
+        val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+          .drop(CampaignMergedFields.REF_SKUS)
+          .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
-        DataWriter.writeCsv(expectedDF, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName , saveMode, "true", ";")
+        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
       }
     }
   }

@@ -1,0 +1,12 @@
+{
+  "params": [
+    {
+      "source": "customerDeviceMapping",
+      "incrMode": "daily",
+      "incrDate": "2015/10/18",
+      "path": "firstTime4Nls",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}

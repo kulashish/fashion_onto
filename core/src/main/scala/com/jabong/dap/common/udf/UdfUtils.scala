@@ -5,11 +5,14 @@ import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ ArrayUtils, StringUtils }
+import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
+import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
@@ -17,7 +20,11 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 /**
  * Created by raghu on 3/7/15.
  */
-object UdfUtils {
+object UdfUtils extends Logging {
+
+  def csvDateFormat(s: Timestamp): String = {
+    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
+  }
 
   /**
    * min of Timestamp t1 or t2
@@ -43,7 +50,36 @@ object UdfUtils {
   }
 
   def toLower(s: String): String = {
-    return s.toLowerCase()
+    if (null != s)
+      s.toLowerCase()
+    else
+      s
+  }
+
+  def markDnd(mNo: String): String = {
+    var newId: String = null
+    if (null == mNo) {
+      "0"
+    } else {
+      "1"
+    }
+  }
+
+  def markMps(mNo: String): String = {
+    var newId: String = null
+    if (null == mNo) {
+      "I"
+    } else {
+      "O"
+    }
+  }
+
+  def platinumStatus(rewardType: String): Int = {
+    if (null != rewardType && "Platinum".equalsIgnoreCase(rewardType)) {
+      1
+    } else {
+      0
+    }
   }
 
   /**
@@ -66,19 +102,6 @@ object UdfUtils {
       t2
     else
       t1
-
-  }
-
-  /**
-   * It will return latest value
-   * @param a1
-   * @param a2
-   * @tparam T
-   * @return T
-   */
-  def getLatest[T](a1: T, a2: T): T = {
-
-    if (a2 == null) a1 else a2
 
   }
 
@@ -199,20 +222,39 @@ object UdfUtils {
    * @param iterable
    * @return Tuple2[String, Int]
    */
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple2[String, Int] = {
+  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
 
-    var timeSlotArray = new Array[Int](12)
+    logger.info("Enter in getCompleteSlotData:")
 
-    var maxSlot: Int = -1
+    val timeSlotArray = new Array[Int](12)
 
-    var max: Int = -1
+    var maxSlot: Int = 0
+
+    var max: Int = 0
 
     iterable.foreach {
       case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value };
-        timeSlotArray(slot - 1) = value
+        if (value > max) { maxSlot = slot; max = value }
+        timeSlotArray(slot) = value
     }
-    new Tuple2(ArrayUtils.arrayToString(timeSlotArray, 0), maxSlot)
+
+    logger.info("Exit from  getCompleteSlotData: ")
+
+    new Tuple13(
+      timeSlotArray(0),
+      timeSlotArray(1),
+      timeSlotArray(2),
+      timeSlotArray(3),
+      timeSlotArray(4),
+      timeSlotArray(5),
+      timeSlotArray(6),
+      timeSlotArray(7),
+      timeSlotArray(8),
+      timeSlotArray(9),
+      timeSlotArray(10),
+      timeSlotArray(11),
+      maxSlot)
+
   }
 
   /**
@@ -439,8 +481,8 @@ object UdfUtils {
    * @return
    */
   def getMaxClickDayName(count1: Int, count2: Int, count3: Int, count4: Int, count5: Int, count6: Int, count7: Int): String = {
-    var max = count1;
-    var index = 0;
+    var max = count1
+    var index = 0
 
     if (max < count2) {
       max = count2
@@ -470,6 +512,26 @@ object UdfUtils {
   }
 
   /**
+   * EMAIL_SUBSCRIPTION_STATUS
+   * iou - i: opt in(subscribed), o: opt out(when registering they have opted out), u: unsubscribed
+   * @param nls_email
+   * @param status
+   * @return String
+   */
+  def getEmailOptInStatus(nls_email: String, status: String): String = {
+
+    if (nls_email == null) {
+      return "O"
+    }
+
+    status match {
+      case "subscribed" => "I"
+      case "unsubscribed" => "U"
+    }
+
+  }
+
+  /**
    * Returns empty string if the string contains all zeros or null.
    * @param str
    * @return String
@@ -487,7 +549,6 @@ object UdfUtils {
    * @return
    */
   def getToLong(str: String): Long = {
-
     if (str == null) {
       return 0
     }
@@ -499,6 +560,13 @@ object UdfUtils {
         return 0
       }
     }
+  }
+
+  def bigDecimal2Double(bd: java.math.BigDecimal): Double = {
+    if (null == bd) {
+      return 0.0
+    }
+    bd.doubleValue()
   }
 
   /**
@@ -537,15 +605,106 @@ object UdfUtils {
     }
   }
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
-    if(i>=strings.size) "" else strings(i)
+    if (i >= strings.size) "" else strings(i)
   }
 
+  def allZero2Null(str: String): String = {
+    val nullStr: String = null
+    if (null != str) {
+      var str1 = str.trim()
+      if (str1.length <= 0 || str1.matches("^[0]*")) {
+        return nullStr
+      } else {
+        return str1
+      }
+    }
+    str
+  }
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
-    if(i>=strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+    if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
 
-  def addString(value:String ,constant:String): String = {
-    if(value == null) return null else constant+value+constant
+  def addString(value: String, constant: String): String = {
+    if (value == null) return null else constant + value + constant
   }
+
+  def addInt(i1: Int, i2: Int): Int = {
+    { if (null.asInstanceOf[Int] == i1) 0 else i1 } + { if (null.asInstanceOf[Int] == i2) 0 else i2 }
+  }
+
+  /**
+   * isEquals checks: if data of d1 and d2 values are equals
+   * @param d1
+   * @param d2
+   * @tparam T
+   * @return
+   */
+  def isEquals[T](d1: T, d2: T): Boolean = {
+    if (d1 == null || d2 == null)
+      return false
+    if (d1.equals(d2)) {
+      return true
+    }
+    return false
+  }
+
+  def BigDecimalToDouble(value: java.math.BigDecimal): Double = {
+    if (value == null) return 0.0
+    return value.doubleValue()
+  }
+
+  def getMaxSlotValue(slotArray: ArrayBuffer[Int]): Int = {
+
+    var maxSlot = 0
+    var max = -1
+
+    for (i <- 0 until slotArray.length) {
+
+      if (slotArray(i) > max) {
+        max = slotArray(i)
+        maxSlot = i
+      }
+
+    }
+
+    return maxSlot
+
+  }
+
+  def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
+
+    val dfSelect = dfIn.sort(dfIn.columns(0), dfIn.columns(1))
+
+    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
+
+    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
+
+    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
+
+    val rowRDD = grouped.map({
+      case (key, value) =>
+        Row(
+          key,
+          value._1,
+          value._2,
+          value._3,
+          value._4,
+          value._5,
+          value._6,
+          value._7,
+          value._8,
+          value._9,
+          value._10,
+          value._11,
+          value._12,
+          value._13)
+    })
+
+    // Apply the schema to the RDD.
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+
+    df.dropDuplicates()
+  }
+
 }

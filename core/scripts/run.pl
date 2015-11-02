@@ -17,15 +17,26 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug  --target|-t stage|prod --component|-c NAME\n";
+) or die "Usage: $0 --debug --target|-t STAGE|PROD|TEST-PROD|DEV-PROD --component|-c <component name>\n";
  
+
+# base params
+my $HDFS_BASE;
+my $EMAIL_PREFIX;
+my $HDFS_LIB;
+my $HDFS_CONF;
 
 # 
 sub run_component {
     my ($component, $command) = @_;
     my $start = time();
-    my $YARN_CONF_DIR = "YARN_CONF_DIR=/etc/hadoop/conf ";
-    system($YARN_CONF_DIR . $command);
+
+    # set the perl environment variable YARN_CONF_DIR
+    $ENV{'YARN_CONF_DIR'} = '/etc/hadoop/conf';
+    print $ENV{'YARN_CONF_DIR'}."\n";
+
+    system($command);
+
     my $status = $?;
     my $end = time();
 
@@ -48,7 +59,7 @@ sub run_component {
     my $diff = $end - $start;
 
     my $msg = "\n";
-    $msg .= "Command: $YARN_CONF_DIR $command\n";
+    $msg .= "Command: $command\n";
     $msg .= sprintf("Time Taken: %.2f secs\n",$diff);
     $msg .= "start: " . localtime($start) . "\n";
     $msg .= "end: " . localtime($end) . "\n";
@@ -58,21 +69,19 @@ sub run_component {
     print "$subject\n\n";
     print "$msg\n\n";
 
-    send_mail($job_status, $subject, $msg);
+    if($EMAIL_PREFIX ne "[DEV]"){
+        send_mail($job_status, $subject, $msg);
+    }
+
+    return $status;
 }
 
 # spark path constants
 my $SPARK_HOME = "/ext/spark";
-my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster ";
-my $HIVE_JARS = "--jars /ext/spark/lib/datanucleus-api-jdo-3.2.6.jar,/ext/spark/lib/datanucleus-core-3.2.10.jar,/ext/spark/lib/datanucleus-rdbms-3.2.9.jar --files /ext/spark/conf/hive-site.xml";
+my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
+my $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
 my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
-my $AMMUNITION = "--num-executors 3 --executor-memory 9G";
-
-# base params
-my $HDFS_BASE;
-my $EMAIL_PREFIX;
-my $HDFS_LIB;
-my $HDFS_CONF;
+my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # target needs to be either stage or prod
 if ($target eq "STAGE") {
@@ -86,131 +95,193 @@ if ($target eq "STAGE") {
     $HDFS_CONF = "$HDFS_BASE/apps/alchemy/conf";
     $EMAIL_PREFIX = "[PROD]";
 } elsif ($target eq "TEST-PROD") {
-     $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-     $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
-     $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
-     $EMAIL_PREFIX = "[TEST-PROD]";
-}else {
-    print "not a valid target\n";
-    exit -1;
+    $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    $HDFS_LIB = "$HDFS_BASE/apps/test/alchemy/workflows/lib";
+    $HDFS_CONF = "$HDFS_BASE/apps/test/alchemy/conf";
+    $EMAIL_PREFIX = "[TEST-PROD]";
+} else {
+
+    my $hostname =  `hostname`;
+    chomp($hostname);
+
+    my $USER_NAME = `whoami`;
+    chomp($USER_NAME);
+
+    if($hostname =~ /^bigdata/){
+        $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
+    }elsif($hostname =~ /^dataplatform/){
+        $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
+    }else{
+        print("Error: not supported platform");
+        exit(-1);
+    }
+
+    if (exists $ENV{"ALCHEMY_CORE_HOME"}) {
+      $HDFS_LIB = $ENV{"ALCHEMY_CORE_HOME"} . "/jar";
+    } else {
+     $HDFS_LIB = "/home/$USER_NAME/alchemy/current/jar";
+    }
+
+    $HDFS_CONF = "$HDFS_BASE/user/$USER_NAME/alchemy/conf";
+    $EMAIL_PREFIX = "[DEV]";
 }
 
 my $CORE_JAR = "$HDFS_LIB/Alchemy-assembly.jar";
+my $job_exit;
 
 # for bob Acq of first set of full tables
 if ($component eq "bobAcqFull1") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull1.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
-    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
-    run_component($component, $command);
+    $AMMUNITION = "--num-executors 3 --executor-memory 27G";
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "bobMerge") {
-    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
+    $AMMUNITION = "--num-executors 12 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "bobMergeMonthly") {
-    $AMMUNITION = "--num-executors 9 --executor-memory 9G";
+    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMergeMonthly.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 # erp Acquisition
 } elsif ($component eq "erpAcqIncr") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/erpAcqIncr.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 #erp Merge
 } elsif ($component eq "erpMerge") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/erpMerge.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
+# crm acquisition
+} elsif ($component eq "crmAcqIncr") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 18G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqIncr.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "crmAcqFull") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqFull.json";
+    $job_exit = run_component($component, $command);
+#crm Merge
+} elsif ($component eq "crmMerge") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/crmMerge.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushRetargetCampaign") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamYesterdaySession") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamYesterdaySession.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamSurf3Variable") {
     $AMMUNITION = "--num-executors 5 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamSurf3Variable.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "basicITR") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushInvalidCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushAbandonedCartCampaign") {
     $AMMUNITION = "--num-executors 10 --executor-memory 6G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushAbandonedCartCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushWishlistCampaign") {
     $AMMUNITION = "--num-executors 10 --executor-memory 6G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushWishlistCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "emailCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "customerDeviceMapping") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "ad4pushCustomerResponse") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component ad4pushCustomerResponse --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/ad4pushCustomerResponse.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "ad4pushDeviceMerger") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component ad4pushDeviceMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/ad4pushDeviceMerger.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushSurfCampaign") {
     $AMMUNITION = "--num-executors 7 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "miscellaneousCampaigns") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component miscellaneousCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "mobilePushCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    run_component($component, $command);
-} elsif ($component eq "dcfFeedGenerate") {
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "emailCampaignQuality") {
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component emailCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
+    $job_exit =run_component($component, $command);
+}elsif ($component eq "dcfFeedGenerate") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "campaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
  } elsif ($component eq "recommendations") {
     $AMMUNITION = "--num-executors 10 --executor-memory 500M";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component recommendations --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/recommendation.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamDataQualityCheck --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamDataQualityCheck.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "dndMerger") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component dndMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dndMerger.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "smsOptOutMerger") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component smsOptOutMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/smsOptOutMerger.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "custPreference") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custPreference --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custPreference.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "custWelcomeVoucher") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custWelcomeVoucher --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custWelcomeVoucher.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "custTop5") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
-    $AMMUNITION = "--num-executors 9 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
-    run_component($component, $command);
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "customerPreferredTimeslotPart2") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "customerPreferredTimeslotPart1") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart1 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart1.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "paybackData") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
+    $job_exit = run_component($component, $command);
 } else {
     print "not a valid component\n";
+    $job_exit = -1;
 }
+
+exit $job_exit;
 
 
 sub send_mail {

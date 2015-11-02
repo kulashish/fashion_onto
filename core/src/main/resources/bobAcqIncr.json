@@ -85,7 +85,7 @@
         {
           "name": "sales_order_gift_wrap",
           "foreignKey": "fk_sales_order",
-          "selectString": "j2.id_sales_order_gift_wrap, j2.gw_recipient_email, j2.gw_recipient_name, j2.gw_message, j2.gw_sender_name, j2.gw_amount, j2.gw_giftcard_credit, j2.gw_store_credit, j2.gw_paid_price, j2.gw_payback_credit, j2.occasion"
+          "selectString": "j2.id_sales_order_gift_wrap, j2.gw_recipient_email, j2.gw_recipient_name, j2.gw_message, j2.gw_sender_name, j2.gw_amount, j2.gw_giftcard_credit, j2.gw_store_credit, j2.gw_paid_price, j2.gw_payback_credit, j2.occasion, j2.corporate_currency_value as sogw_corporate_currency_value"
         }
       ]
     },
@@ -135,6 +135,51 @@
       "source": "bob",
       "tableName": "sales_rule",
       "primaryKey": "id_sales_rule",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_shipment",
+      "primaryKey": "id_sales_order_item_shipment",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "customer_session",
+      "primaryKey": "id_customer_session",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "payment_prepaid_transaction_data",
+      "primaryKey": "id_payment_prepaid_transaction_data",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "order_created_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_config_additional_info",
+      "primaryKey": "id_catalog_config_additional_info",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_status_history",
+      "primaryKey": "id_sales_order_item_status_history",
       "mode": "daily",
       "saveFormat": "parquet",
       "saveMode": "Ignore",

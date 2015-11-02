@@ -9,6 +9,7 @@ import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderI
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import com.jabong.dap.common.Utils
 
 /**
  * Returns a list of customers based on following conditions:
@@ -50,7 +51,7 @@ class ReturnCancel extends LiveCustomerSelector {
     // 1. order_item (1 day): filter by required status
 
     val returnCancelSku = salesOrderItemData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " in (" + OrderStatus.RETURN
-      + "," + OrderStatus.RETURN_PAYMENT_PENDING + "," + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC_ITEM + "," + OrderStatus.CANCEL_PAYMENT_ERROR
+      + "," + OrderStatus.RETURN_PAYMENT_PENDING + "," + OrderStatus.CANCELLED + "," + OrderStatus.CANCELLED_CC + "," + OrderStatus.CANCEL_PAYMENT_ERROR
       + "," + OrderStatus.DECLINED + "," + OrderStatus.EXPORTABLE_CANCEL_CUST + "," + OrderStatus.EXPORTED_CANCEL_CUST + ")")
       .select(salesOrderItemData(ProductVariables.SKU),
         salesOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS),
@@ -79,7 +80,7 @@ class ReturnCancel extends LiveCustomerSelector {
     val yesterdayOldStartTime = TimeUtils.getStartTimestampMS(yesterdayOldTime)
     val yesterdayOldEndTime = TimeUtils.getEndTimestampMS(yesterdayOldTime)
 
-    val yesterdayCustomerOrderData = CampaignUtils.getTimeBasedDataFrame(customerOrderData, SalesOrderVariables.CREATED_AT, yesterdayOldStartTime.toString, yesterdayOldEndTime.toString)
+    val yesterdayCustomerOrderData = Utils.getTimeBasedDataFrame(customerOrderData, SalesOrderVariables.CREATED_AT, yesterdayOldStartTime.toString, yesterdayOldEndTime.toString)
 
     val latestCustomerOrders = yesterdayCustomerOrderData
       // .orderBy($"${SalesOrderVariables.CREATED_AT}".desc).groupBy(SalesOrderVariables.FK_CUSTOMER).agg($"${SalesOrderVariables.FK_CUSTOMER}",

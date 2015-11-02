@@ -23,36 +23,6 @@ object Udf {
   val maxTimestamp = udf((t1: Timestamp, t2: Timestamp) => UdfUtils.getMax(t1: Timestamp, t2: Timestamp))
 
   /**
-   * latestTimestamp will return latest Timestamp value
-   */
-  val latestTimestamp = udf((a1: Timestamp, a2: Timestamp) => UdfUtils.getLatest(a1: Timestamp, a2: Timestamp))
-
-  /**
-   * latestInt will return latest Integer value
-   */
-  val latestInt = udf((a1: Integer, a2: Integer) => UdfUtils.getLatest(a1: Integer, a2: Integer))
-
-  /**
-   * latestBool will return latest Boolean value
-   */
-  val latestBool = udf((a1: Boolean, a2: Boolean) => UdfUtils.getLatest(a1: Boolean, a2: Boolean))
-
-  /**
-   * latestDecimal will return latest Decimal value
-   */
-  val latestDecimal = udf((a1: java.math.BigDecimal, a2: java.math.BigDecimal) => UdfUtils.getLatest(a1: java.math.BigDecimal, a2: java.math.BigDecimal))
-
-  /**
-   * latestDate will return latest Date value
-   */
-  val latestDate = udf((a1: Date, a2: Date) => UdfUtils.getLatest(a1: Date, a2: Date))
-
-  /**
-   * latestString will return latest String value
-   */
-  val latestString = udf((a1: String, a2: String) => UdfUtils.getLatest(a1: String, a2: String))
-
-  /**
    * mergeSlots will return merge two slots data
    */
   val mergeSlots = udf((oldSlot: Any, newSlot: Any) => UdfUtils.getMergeSlots(oldSlot: Any, newSlot: Any))
@@ -119,6 +89,8 @@ object Udf {
    */
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
 
+  val allZero2NullUdf = udf((str: String) => UdfUtils.allZero2Null(str: String))
+
   /**
    * For populating empty email id from dcf data as _app_deviceid
    */
@@ -128,6 +100,10 @@ object Udf {
    * toLong will convert String data to Long data
    */
   val toLong = udf((str: String) => UdfUtils.getToLong(str: String))
+
+  val bigDecimal2Double = udf((d: java.math.BigDecimal) => UdfUtils.bigDecimal2Double(d: java.math.BigDecimal))
+
+  val udfEmailOptInStatus = udf((nls_email: String, status: String) => UdfUtils.getEmailOptInStatus(nls_email: String, status: String))
 
   /**
    * email will return s1 if either s is empty or null
@@ -140,12 +116,26 @@ object Udf {
 
   val successOrder = udf((i: Long) => UdfUtils.successOrder(i: Long))
 
-  val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a:ArrayBuffer[String], i: Int))
+  val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a: ArrayBuffer[String], i: Int))
 
-  val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value:Int) => UdfUtils.getElementInTupleArray(a:ArrayBuffer[(Row)], i: Int,value:Int))
+  val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: ArrayBuffer[(Row)], i: Int, value: Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
-  val addString =  udf((s: String,constant: String) => UdfUtils.addString(s: String,constant: String))
+  val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
+
+  val addInt = udf((i1: Int, i2: Int) => UdfUtils.addInt(i1: Int, i2: Int))
+
+  val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
+
+  val isEquals = udf((d1: Any, d2: Any) => UdfUtils.isEquals(d1: Any, d2: Any))
+
+  val dnd = udf((s: String) => UdfUtils.markDnd(s: String))
+
+  val mps = udf((s: String) => UdfUtils.markMps(s: String))
+
+  val BigDecimalToDouble = udf((value: java.math.BigDecimal) => UdfUtils.BigDecimalToDouble(value: java.math.BigDecimal))
+
+  val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
 }

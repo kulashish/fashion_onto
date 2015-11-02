@@ -24,7 +24,9 @@ object FollowUp extends Logging {
 
     val filteredSku = customerSkuData.join(itrData, customerSkuData(ProductVariables.SKU_SIMPLE) === itrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .filter(ProductVariables.STOCK + " >= " + CampaignCommon.FOLLOW_UP_STOCK_VALUE)
-      .select(customerSkuData(CustomerVariables.FK_CUSTOMER),
+      .select(
+        customerSkuData(CustomerVariables.FK_CUSTOMER),
+        customerSkuData(CustomerVariables.EMAIL),
         customerSkuData(ProductVariables.SKU_SIMPLE),
         itrData(ProductVariables.SPECIAL_PRICE),
         itrData(ProductVariables.BRAND),

@@ -17,14 +17,22 @@ class ACart extends LiveCustomerSelector with Logging {
       logger.error("sales cart data is null ")
       return null
     }
-    //FIXME:Removed null customers, need to check for email also in future
-    val acartCustomers = salesCartData.na.drop(Array(ACartVariables.FK_CUSTOMER)).filter(ACartVariables.ACART_STATUS + " = 'active'")
-      .select(salesCartData(ACartVariables.FK_CUSTOMER),
+
+    val acartCustomers = salesCartData.filter("(" + ACartVariables.FK_CUSTOMER + " is not null or " +
+      ACartVariables.EMAIL + " is not null) and " + ACartVariables.ACART_STATUS + " = 'active'")
+      .select(
+        salesCartData(ACartVariables.FK_CUSTOMER),
+        salesCartData(ACartVariables.EMAIL),
         salesCartData(ACartVariables.SKU_SIMPLE) as (ProductVariables.SKU_SIMPLE),
         salesCartData(ACartVariables.CREATED_AT),
-        salesCartData(ACartVariables.UPDATED_AT))
+        salesCartData(ACartVariables.UPDATED_AT)
+      )
+
+    CampaignUtils.debug(acartCustomers, "Acart:- acartCustomers")
 
     val acartCustomerNotBought = CampaignUtils.skuSimpleNOTBoughtWithoutPrice(acartCustomers, salesOrder, salesOrderItemData)
+
+    CampaignUtils.debug(acartCustomerNotBought, "Acart:-acartCustomerNotBought")
 
     logger.info("Filtered abandoned cart customers with sku not bought")
     return acartCustomerNotBought

@@ -1,12 +1,7 @@
 package com.jabong.dap.campaign.customerselection
 
-import java.sql.Timestamp
-
 import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -38,19 +33,18 @@ class WishList extends LiveCustomerSelector with Logging {
 
     }
 
-    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
+    //    if (!SchemaUtils.isSchemaEqual(dfCustomerProductShortlist.schema, Schema.customerProductShortlist)) {
+    //
+    //      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
+    //
+    //      logger.error("schema should be this :" + Schema.customerProductShortlist)
+    //      return null
+    //
+    //    }
 
-      logger.error("schema attributes or data type mismatch:" + dfCustomerProductShortlist.schema)
-
-      logger.error("schema should be this :" + Schema.customerProductShortlist)
-      return null
-
-    }
-
-    //FIXME: We are filtering cases where fk_customer is null and we have to check cases where fk_customer is null and email is not null
     // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
-    val dfResult = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.FK_CUSTOMER + " is not null and " +
-      //col(CustomerProductShortlist.EMAIL) + " is not null ) and " +
+    val dfResult = dfCustomerProductShortlist.filter("(" + CustomerProductShortlistVariables.FK_CUSTOMER + " is not null or " +
+      CustomerProductShortlistVariables.EMAIL + " is not null ) and " +
       CustomerProductShortlistVariables.REMOVED_AT + " is null")
       .select(
         col(CustomerProductShortlistVariables.FK_CUSTOMER),

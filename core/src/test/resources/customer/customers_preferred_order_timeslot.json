@@ -1,5 +1,5 @@
-{"fk_customer_cpot":657444,"customer_all_order_timeslot":"0!0!0!0!0!1!0!0!0!0!0!0","customer_preferred_order_timeslot":6}
-{"fk_customer_cpot":909090,"customer_all_order_timeslot":"0!0!0!0!0!1!0!0!0!0!0!0","customer_preferred_order_timeslot":6}
-{"fk_customer_cpot":690661,"customer_all_order_timeslot":"0!0!0!0!0!1!0!0!0!0!0!0","customer_preferred_order_timeslot":6}
-{"fk_customer_cpot":3141790,"customer_all_order_timeslot":"0!0!0!0!0!1!0!0!0!0!0!0","customer_preferred_order_timeslot":6}
-{"fk_customer_cpot":1436938,"customer_all_order_timeslot":"0!0!0!0!0!1!0!0!0!0!0!0","customer_preferred_order_timeslot":6}
+{"customer_id":657444,"order_0":0, "order_1":0, "order_2":0, "order_3":0, "order_4":0, "order_5":1,  "order_6":0, "order_7":0, "order_8":0, "order_9":0, "order_10":0, "order_11":0,"preferred_order_timeslot":5}
+{"customer_id":909090,"order_0":0, "order_1":0, "order_2":0, "order_3":0, "order_4":0, "order_5":1,  "order_6":0, "order_7":0, "order_8":0, "order_9":0, "order_10":0, "order_11":0,"preferred_order_timeslot":5}
+{"customer_id":690661, "order_0":0, "order_1":0, "order_2":0, "order_3":0, "order_4":0, "order_5":1,  "order_6":0, "order_7":0, "order_8":0, "order_9":0, "order_10":0, "order_11":0,"preferred_order_timeslot":5}
+{"customer_id":3141790,"order_0":0, "order_1":0, "order_2":0, "order_3":0, "order_4":0, "order_5":1,  "order_6":0, "order_7":0, "order_8":0, "order_9":0, "order_10":0, "order_11":0,"preferred_order_timeslot":5}
+{"customer_id":1436938,"order_0":0, "order_1":0, "order_2":0, "order_3":0, "order_4":0, "order_5":1,  "order_6":0, "order_7":0, "order_8":0, "order_9":0, "order_10":0, "order_11":0,"preferred_order_timeslot":5}

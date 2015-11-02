@@ -1,0 +1,11 @@
+18 09 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opttest/alchemy-core/current/workflows/jabongtest/acquisition/job.properties -run
+
+48 09 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opttest/alchemy-core/current/workflows/jabongtest/campaigns/job.properties -run
+
+00 12 * * * perl /opttest/alchemy-core/current/bin/ftp_upload.pl -t TEST-PROD -c custWelcomeVoucher
+
+10 12 * * * perl /opttest/alchemy-core/current/bin/ftp_upload.pl -t TEST-PROD -c custPreference
+
+20 12 * * * perl /opttest/alchemy-core/current/bin/ftp_upload.pl -t TEST-PROD -c contactListMobile
+
+30 12 * * * perl /opttest/alchemy-core/current/bin/ftp_upload.pl -t TEST-PROD -c email_campaigns

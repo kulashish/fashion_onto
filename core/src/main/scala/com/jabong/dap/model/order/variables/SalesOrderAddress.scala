@@ -1,8 +1,10 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, ContactListMobileVars, SalesOrderVariables }
 import com.jabong.dap.model.order.schema.OrderVarSchema
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
@@ -26,14 +28,19 @@ object SalesOrderAddress {
       SalesAddressVariables.PHONE,
       SalesAddressVariables.FIRST_NAME,
       SalesAddressVariables.LAST_NAME)
-      .withColumnRenamed(SalesAddressVariables.PHONE, SalesAddressVariables.MOBILE)
-    var jData: DataFrame = null
-    if (null == prevFav) {
-      jData = curFav
-    } else {
-      jData = prevFav.unionAll(curFav)
+    var jData = curFav
+    if (null != prevFav) {
+      jData = (prevFav.unionAll(curFav)).cache()
     }
+
     (getFav(jData), jData)
+  }
+
+  def convert2String(str: Any): String = {
+    if (null == str) {
+      return ""
+    }
+    str.toString().trim()
   }
 
   /**
@@ -42,10 +49,10 @@ object SalesOrderAddress {
    * @return
    */
   def getFav(favData: DataFrame): DataFrame = {
-    val mapCity = favData.map(s => (s(0) -> (s(1).toString, s(2).toString, s(3).toString + ", " + s(4).toString)))
+    val mapCity = favData.map(s => (s(0) -> (convert2String(s(1)), convert2String(s(2)), convert2String(s(3)) + ", " + convert2String(s(4)))))
     val grouped = mapCity.groupByKey()
-    val x = grouped.map(s => (Row(s._1.toString, findMax(s._2.toList))))
-    return Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
+    val x = grouped.map(s => ((s._1.asInstanceOf[Long], findMax(s._2.toList)))).map(x => Row(x._1, x._2._1, x._2._2, x._2._3, x._2._4))
+    Spark.getSqlContext().createDataFrame(x, OrderVarSchema.salesOrderAddress)
   }
 
   /**
@@ -57,26 +64,82 @@ object SalesOrderAddress {
     val a = scala.collection.mutable.ListBuffer[String]()
     val b = scala.collection.mutable.ListBuffer[String]()
     val c = scala.collection.mutable.ListBuffer[String]()
+    val default = (-1, 0)
     list.foreach{ e =>
       val (l, m, n) = e
-      a += l
-      b += m
-      c += n
+      if (l.length() > 0) a += l
+      if (m.length() > 0) b += m
+      if (n.length() > 1) c += n
     }
-    val x = a.groupBy(identity).mapValues(_.length)
-    val amax = x.valuesIterator.max
-    val default = (-1, 0)
-    val fCity = x.find(_._2 == amax).getOrElse(default)._1.toString
-    val y = b.groupBy(identity).mapValues(_.length)
-    val bmax = y.valuesIterator.max
-    val fMobile = y.find(_._2 == bmax).getOrElse(default)._1.toString
-    val z = c.groupBy(identity).mapValues(_.length)
-    val cmax = z.valuesIterator.max
-    val fName = z.find(_._2 == cmax).getOrElse(default)._1.toString
+    var fCity = ""
+    if (a.size > 0) {
+      val x = a.groupBy(identity).mapValues(_.length)
+      val amax = x.valuesIterator.max
+      fCity = x.find(_._2 == amax).getOrElse(default)._1.toString
+    }
+    var fMobile: String = null
+    if (b.size > 0) {
+      val y = b.groupBy(identity).mapValues(_.length)
+      val bmax = y.valuesIterator.max
+      fMobile = y.find(_._2 == bmax).getOrElse(default)._1.toString
+    }
+    var fName = ""
+    var lName = ""
+    if (c.size > 0) {
+      val z = c.groupBy(identity).mapValues(_.length)
+      val cmax = z.valuesIterator.max
+      val name = z.find(_._2 == cmax).getOrElse(default)._1.toString
+      val nameArr = name.split(',')
+      fName = nameArr(0)
+      lName = nameArr(1)
+    }
 
-    val nameArr = fName.split(',')
+    (fCity, fMobile, fName, lName)
+  }
 
-    return (fCity, fMobile, nameArr(0), nameArr(1))
+  /*
+  FIRST_SHIPPING_CITY
+  FIRST_SHIPPING_CITY_TIER
+  LAST_SHIPPING_CITY
+  LAST_SHIPPING_CITY_TIER
+  */
+
+  def getFirstShippingCity(salesOrder: DataFrame, salesOrderAddress: DataFrame, prevCalc: DataFrame, cityZone: DataFrame): DataFrame = {
+    val joinedDf = salesOrder.join(salesOrderAddress, salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS))
+      .select(salesOrder(SalesOrderVariables.FK_CUSTOMER),
+        salesOrder(SalesOrderVariables.CREATED_AT),
+        salesOrderAddress(SalesAddressVariables.CITY))
+      .orderBy(desc(SalesOrderVariables.CREATED_AT)).groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(first(SalesAddressVariables.CITY) as SalesAddressVariables.LAST_SHIPPING_CITY,
+        last(SalesAddressVariables.CITY) as SalesAddressVariables.FIRST_SHIPPING_CITY
+      )
+    val cityBc = Spark.getContext().broadcast(cityZone).value
+    val joinedZoneLast = joinedDf.join(cityBc, joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY) === cityBc(ContactListMobileVars.CITY))
+      .select(joinedDf(SalesOrderVariables.FK_CUSTOMER),
+        joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY),
+        joinedDf(SalesAddressVariables.FIRST_SHIPPING_CITY),
+        cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
+      )
+    val res = joinedZoneLast.join(cityBc, cityBc(ContactListMobileVars.CITY) === joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY))
+      .select(joinedZoneLast(SalesOrderVariables.FK_CUSTOMER),
+        joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY),
+        joinedZoneLast(SalesAddressVariables.FIRST_SHIPPING_CITY),
+        joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),
+        cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
+      )
+    if (null == prevCalc) {
+      res
+    } else {
+      res.join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+        .select(
+          coalesce(res(SalesOrderVariables.FK_CUSTOMER), prevCalc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          coalesce(res(SalesAddressVariables.LAST_SHIPPING_CITY), prevCalc(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
+          coalesce(res(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), prevCalc(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
+          coalesce(prevCalc(SalesAddressVariables.FIRST_SHIPPING_CITY), res(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
+          coalesce(prevCalc(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), res(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
+        )
+    }
+
   }
 
   /**

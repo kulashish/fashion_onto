@@ -3,8 +3,10 @@ package com.jabong.dap.common.time
 import java.sql.Timestamp
 import java.text.{ DateFormatSymbols, SimpleDateFormat }
 import java.util.{ Arrays, Calendar, Date }
+
 import com.jabong.dap.common.StringUtils
 import grizzled.slf4j.Logging
+
 import scala.collection.immutable.HashMap
 
 /**
@@ -14,6 +16,8 @@ object TimeUtils extends Logging {
 
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
+
+  val MIN_TIMESTAMP = new Timestamp(Long.MinValue)
 
   /**
    * Returns the total number of days between two given date inputs
@@ -291,6 +295,21 @@ object TimeUtils extends Logging {
   }
 
   /**
+   * Return hour of the current date as a string in the given date format.
+   * @param dateFormat
+   * @return hour of the day.
+   */
+  def getHour(dt: String, dateFormat: String): Int = {
+    val cal = Calendar.getInstance()
+    if (!StringUtils.isEmpty(dt)) {
+      val sdf = new SimpleDateFormat(dateFormat)
+      val date = sdf.parse(dt)
+      cal.setTime(date)
+    }
+    cal.get(Calendar.HOUR_OF_DAY)
+  }
+
+  /**
    *
    * @param dt
    * @param dateFormat
@@ -314,8 +333,10 @@ object TimeUtils extends Logging {
    */
   def timeToSlot(dateString: String, dateFormat: String): Int = {
 
+    logger.info("Enter in  timeToSlot:")
+
     var timeToSlotMap = new HashMap[Int, Int]
-    timeToSlotMap += (7 -> 1, 8 -> 1, 9 -> 2, 10 -> 2, 11 -> 3, 12 -> 3, 13 -> 4, 14 -> 4, 15 -> 5, 16 -> 5, 17 -> 6, 18 -> 6, 19 -> 7, 20 -> 7, 21 -> 8, 22 -> 8, 23 -> 9, 0 -> 9, 1 -> 10, 2 -> 10, 3 -> 11, 4 -> 11, 5 -> 12, 6 -> 12)
+    timeToSlotMap += (7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
 
     val formatter = new SimpleDateFormat(dateFormat)
     var date: java.util.Date = null
@@ -325,6 +346,9 @@ object TimeUtils extends Logging {
     calendar.setTime(date)
     val hours = calendar.get(Calendar.HOUR_OF_DAY)
     val timeSlot = timeToSlotMap.getOrElse(hours, 0)
+
+    logger.info("Exit from  timeToSlot: ")
+
     timeSlot
   }
 

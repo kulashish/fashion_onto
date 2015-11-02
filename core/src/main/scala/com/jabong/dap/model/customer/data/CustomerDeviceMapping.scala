@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.data
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -28,13 +28,14 @@ object CustomerDeviceMapping extends Logging {
    * @param customer customer incremental data
    * @return master customer device mapping with the last used device by the customer
    */
-  def getLatestDevice(clickStreamInc: DataFrame, cmr: DataFrame, customer: DataFrame): DataFrame = {
+  def getLatestDevice(clickStreamInc: DataFrame, cmr: DataFrame, customer: DataFrame, nlsIncr: DataFrame): DataFrame = {
     // val filData = clickStreamInc.filter(!clickStreamInc(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))
     println("clickStreamInc: ") // + clickStreamInc.count())
     // clickStreamInc.printSchema()
     // clickStreamInc.show(10)
 
-    val clickStream = clickStreamInc.filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
+    val clickStream = clickStreamInc.filter(!(col("userid").startsWith("_app_")))
+      .filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
       .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
       .groupBy(PageVisitVariables.USER_ID)
       .agg(
@@ -49,11 +50,22 @@ object CustomerDeviceMapping extends Logging {
     // outerjoin with customer table one day increment on userid = email
     // id_customer, email, browser_id, domain
     val custUnq = customer.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
-    val broCust = Spark.getContext().broadcast(custUnq).value
-    val joinedDf = clickStream.join(broCust, broCust(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
+
+    val nlsUnq = nlsIncr.select(CustomerVariables.FK_CUSTOMER, CustomerVariables.EMAIL).dropDuplicates()
+      .filter(col(CustomerVariables.FK_CUSTOMER).equalTo(0) || col(CustomerVariables.FK_CUSTOMER).isNull)
+
+    val nlsJoined = custUnq.join(nlsUnq, custUnq(CustomerVariables.EMAIL) === nlsUnq(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        coalesce(broCust(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
-        broCust(CustomerVariables.ID_CUSTOMER),
+        coalesce(custUnq(CustomerVariables.EMAIL), nlsUnq(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        coalesce(custUnq(CustomerVariables.ID_CUSTOMER), nlsUnq(CustomerVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER
+      )
+
+    val nlsbc = Spark.getContext().broadcast(nlsJoined).value
+
+    val joinedDf = clickStream.join(nlsbc, nlsbc(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
+      .select(
+        coalesce(nlsbc(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
+        nlsbc(CustomerVariables.ID_CUSTOMER),
         clickStream(PageVisitVariables.BROWSER_ID),
         clickStream(PageVisitVariables.DOMAIN)
       )
@@ -64,6 +76,7 @@ object CustomerDeviceMapping extends Logging {
 
     val joined = joinedDf.join(cmr, cmr(CustomerVariables.EMAIL) === joinedDf(CustomerVariables.EMAIL), SQL.FULL_OUTER)
       .select(
+        cmr(ContactListMobileVars.UID),
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         cmr(CustomerVariables.RESPONSYS_ID),
         coalesce(joinedDf(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -115,14 +128,28 @@ object CustomerDeviceMapping extends Logging {
     val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, curDate)
     if (DataWriter.canWrite(saveMode, savePath)) {
       var cmrFull: DataFrame = null
+      var nlsIncr: DataFrame = null
+      var customerIncr: DataFrame = null
       if (null != path) {
-        cmrFull = getDataFrameCsv4mDCF(path)
+        if ("firstTime4Nls".equals(path)) {
+          cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+            .filter(col(CustomerVariables.ID_CUSTOMER).geq(1))
+          nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
+          customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
+        } else {
+          cmrFull = getDataFrameCsv4mDCF(path)
+        }
       } else {
         cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+        nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
+        customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
       }
-      val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
-      val res = getLatestDevice(clickIncr, cmrFull, customerIncr)
 
+      val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
+
+      //val filledUid = UUIDGenerator.addUid(res)
+
+      //DataWriter.writeParquet(filledUid, savePath, saveMode)
       DataWriter.writeParquet(res, savePath, saveMode)
     }
   }
@@ -140,9 +167,11 @@ object CustomerDeviceMapping extends Logging {
     val notNullAdd4push = clickstreamIncr
       .select(
         PageVisitVariables.BROWSER_ID,
+        PageVisitVariables.DOMAIN,
         PageVisitVariables.ADD4PUSH,
         PageVisitVariables.PAGE_TIMESTAMP
       )
+      .filter(col(PageVisitVariables.DOMAIN) === DataSets.ANDROID)
       .dropDuplicates()
       .na.drop(Array(PageVisitVariables.ADD4PUSH))
     val grouped = notNullAdd4push.orderBy(col(PageVisitVariables.BROWSER_ID), desc(PageVisitVariables.PAGE_TIMESTAMP))
@@ -153,13 +182,13 @@ object CustomerDeviceMapping extends Logging {
       )
     var res: DataFrame = grouped
     if (null != prevFull) {
-      res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID))
+      res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID), SQL.FULL_OUTER)
         .select(
           coalesce(prevFull(PageVisitVariables.BROWSER_ID), grouped(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(grouped(PageVisitVariables.ADD4PUSH), prevFull(PageVisitVariables.ADD4PUSH)) as PageVisitVariables.ADD4PUSH,
           coalesce(grouped(PageVisitVariables.PAGE_TIMESTAMP), prevFull(PageVisitVariables.PAGE_TIMESTAMP)) as PageVisitVariables.PAGE_TIMESTAMP)
     }
-    return res
+    res
   }
 
   /**
@@ -214,7 +243,7 @@ object CustomerDeviceMapping extends Logging {
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
           coalesce(correctRecs(NEW_DOMAIN), df(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
-        ).dropDuplicates()
+        ).dropDuplicates().filter(col(CustomerVariables.ID_CUSTOMER).isNotNull && col(CustomerVariables.ID_CUSTOMER).cast(LongType).geq(1))
 
       println("Total recs after correction: ") // + res.count())
       // res.printSchema()

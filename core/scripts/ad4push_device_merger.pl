@@ -26,4 +26,4 @@ system("hadoop fs -copyFromLocal cleaned/exportDevices_515_$date_with_zero.csv /
 system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c ad4pushDeviceMerger");
 
 # copy processed data to ftp location
-system("perl /opt/alchemy-core/current/bin/ftp_upload.pl -c ad4push_device_merger");
+system("perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c ad4push_device_merger");

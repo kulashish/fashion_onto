@@ -5,9 +5,8 @@ import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
-import com.jabong.dap.model.custorder.ComponentExecutor
 import com.jabong.dap.model.product.itr.Itr
-import com.jabong.dap.quality.campaign.MobilePushCampaignQuality
+import com.jabong.dap.quality.campaign.CampaignQuality
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf._
@@ -23,6 +22,7 @@ object Init {
    * @param component String Name of the component
    * @param tableJson String Path of data acquisition config json file
    * @param mergeJson String Path of merge job config json file
+   * @param paramJson String Path of component executor job config json file
    * @param config String Path of application config json file
    */
   case class Params(
@@ -115,12 +115,11 @@ object Init {
   def run(params: Params): Unit = {
     params.component match {
       case "itr" => new Itr().start()
-      case DataSets.BASIC_ITR => new ComponentExecutor().start(params.paramJson)
+
       case "acquisition" => new Delegator().start(params.tableJson) // do your stuff here
+
       case "merge" => new MergeDelegator().start(params.mergeJson)
-      case DataSets.CUSTOMER_DEVICE_MAPPING => new ComponentExecutor().start(params.paramJson)
-      case DataSets.AD4PUSH_CUSTOMER_RESPONSE => new ComponentExecutor().start(params.paramJson)
-      case DataSets.AD4PUSH_DEVICE_MERGER => new ComponentExecutor().start(params.paramJson)
+
       case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
       case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.campaignsJson)
       case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.campaignsJson)
@@ -130,34 +129,14 @@ object Init {
       case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
       case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
 
-      // clickstream use cases
-      case DataSets.CLICKSTREAM_YESTERDAY_SESSION => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CLICKSTREAM_SURF3_VARIABLE => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CLICKSTREAM_SURF3_MERGED_DATA30 => new ComponentExecutor().start(params.paramJson)
+      //campaign quality check for mobile
+      case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
 
-      // responsys files
-      case DataSets.DND_MERGER => new ComponentExecutor().start(params.paramJson)
-      case DataSets.SMS_OPT_OUT_MERGER => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CUST_WELCOME_VOUCHER => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CUST_PREFERENCE => new ComponentExecutor().start(params.paramJson)
-      case DataSets.CONTACT_LIST_MOBILE => new ComponentExecutor().start(params.paramJson)
+      //campaign quality check for email
+      case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
 
-      case DataSets.CLICKSTREAM_DATA_QUALITY => new ComponentExecutor().start(params.paramJson)
-
-      // all pushCampaign quality checks
-      case DataSets.CAMPAIGN_QUALITY => new ComponentExecutor().start(params.paramJson)
-      
-      //campaign quality check
-      case "mobilePushCampaignQuality" => MobilePushCampaignQuality.start(params.campaignsJson)
-
-      //pricing sku data
-      case DataSets.PRICING_SKU_DATA => new ComponentExecutor().start(params.paramJson)
-
-      // dcf feed
-      case DataSets.DCF_FEED_GENERATE => new ComponentExecutor().start(params.paramJson)
-
-      // generate recommendations
-      case "recommendations" => new ComponentExecutor().start(params.paramJson)
+      case _ => new ComponentExecutor().start(params.paramJson)
     }
   }
+
 }

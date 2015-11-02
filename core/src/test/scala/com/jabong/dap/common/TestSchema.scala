@@ -130,11 +130,14 @@ object TestSchema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ProductVariables.NUMBER_SIMPLE_PER_SKU, LongType, true),
+    StructField(ProductVariables.PRICE_BAND, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
     StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType, true),
     StructField(Recommendation.WEEKLY_AVERAGE_SALE, DoubleType, true),
-    StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true)
+    StructField(Recommendation.LAST_SOLD_DATE, TimestampType, true),
+    StructField(Recommendation.DISCOUNT_STATUS, StringType, true)
+
   ))
 
   val skuCompleteInput = StructType(Array(
@@ -224,5 +227,14 @@ object TestSchema {
 
   val paybackCustomer = StructType(Array(StructField(PaybackCustomerVariables.FK_CUSTOMER, LongType, true),
     StructField(PaybackCustomerVariables.IS_PAYBACK, BooleanType, true)))
+
+  val groupTestOut = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, false),
+    StructField(ProductVariables.MVP, StringType, false),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true)))
 
 }

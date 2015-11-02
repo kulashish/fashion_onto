@@ -31,7 +31,9 @@ case class Credentials(
  * @param readOutputPath String The output path for the location where the data will be read from.
  *                       The data here is the putput of some previous job.
  * @param writeOutputPath String The output path for the location where the data will be saved.
+ * @param tmpPath String The path where tmp csv files to be saved.
  * @param basePath String The base path for the location where the data will be read and written.
+ * @param env String prod/stage/test
  * @param credentials List[Credentials] List of credentials.
  */
 case class Config(
@@ -39,6 +41,8 @@ case class Config(
   basePath: String = null,
   readOutputPath: Option[String] = null,
   writeOutputPath: Option[String] = null,
+  tmpPath: Option[String] = null,
+  env: String = null,
   credentials: List[Credentials] = null) extends EmptyClass
 
 /**

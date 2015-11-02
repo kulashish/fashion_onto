@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.CampaignInfo
@@ -85,7 +85,7 @@ object CampaignProcessor {
   }
 
   /**
-   *
+   * Gets customer id  from customer master data for merged email campaigns
    * @param cmr
    * @param campaign
    * @return
@@ -93,15 +93,10 @@ object CampaignProcessor {
   def mapEmailCampaignWithCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
 
-    val notNullCampaign = campaign.filter(!(col(CustomerVariables.FK_CUSTOMER) === 0))
-
-    println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
-
-    println("Starting the CMR: ") // + cmr.count())
-
     val cmrn = cmr
       .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
       .select(
+        cmr(ContactListMobileVars.UID),
         cmr(CustomerVariables.EMAIL),
         cmr(CustomerVariables.RESPONSYS_ID),
         cmr(CustomerVariables.ID_CUSTOMER),
@@ -111,18 +106,19 @@ object CampaignProcessor {
 
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
-    val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.FK_CUSTOMER) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
+    val bcCampaign = Spark.getContext().broadcast(campaign).value
+    val emailData = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.EMAIL) === cmrn(CustomerVariables.EMAIL), SQL.INNER)
       .select(
-        bcCampaign(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
+        cmrn(ContactListMobileVars.UID),
+        cmrn(CustomerVariables.ID_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
         bcCampaign(CampaignMergedFields.REC_SKUS),
         bcCampaign(CampaignCommon.PRIORITY),
         bcCampaign(CampaignMergedFields.LIVE_CART_URL),
-        Udf.email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL
+        bcCampaign(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL
       )
-    campaignDevice
+    emailData
   }
   /**
    * takes union input of all campaigns and return merged campaign list
@@ -145,9 +141,9 @@ object CampaignProcessor {
     val campaignMerged = inputCampaignsData
       .orderBy(CampaignCommon.PRIORITY)
       .groupBy(key)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
+      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
+        first(CampaignCommon.PRIORITY) as CampaignCommon.PRIORITY,
+        first(CampaignMergedFields.REF_SKU1) as CampaignMergedFields.REF_SKU1,
         first(key1) as key1,
         first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
         first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
@@ -232,7 +228,8 @@ object CampaignProcessor {
 
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
     allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
-      .agg(first(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
+      .agg(first(ContactListMobileVars.UID) as ContactListMobileVars.UID,
+        first(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
         first(CampaignMergedFields.REF_SKUS) as CampaignMergedFields.REF_SKUS,
         first(CampaignMergedFields.REC_SKUS) as CampaignMergedFields.REC_SKUS,
         first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
@@ -240,14 +237,11 @@ object CampaignProcessor {
   }
   /**
    *
-   * @param df
+   * @param iosDF
    * @param date
    * @param saveMode
    */
-  def splitFileToCSV(df: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
-    val iosDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.IOS)
-    val androidDF = df.filter(df(CampaignMergedFields.DOMAIN) === DataSets.ANDROID).na.drop(Array(PageVisitVariables.ADD4PUSH))
-
+  def splitFileToCSV(iosDF: DataFrame, androidDF: DataFrame, date: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER), saveMode: String = DataSets.OVERWRITE_SAVEMODE) {
     exportCampaignCSV(iosDF, date, DataSets.IOS_CODE, saveMode)
     exportCampaignCSV(androidDF, date, DataSets.ANDROID_CODE, saveMode)
 

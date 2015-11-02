@@ -8,6 +8,7 @@ import com.jabong.dap.common.constants.variables.SalesOrderVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.storage.StorageLevel
+import com.jabong.dap.common.Utils
 
 /**
  * Created by rahul  on 27/8/15.
@@ -31,7 +32,7 @@ object RecommendationInput {
 
     val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
-    val lastDaysData = CampaignUtils.getTimeBasedDataFrame(inputDataFrame, SalesOrderVariables.CREATED_AT, ndaysOldStartTime.toString, dateEndTime.toString)
+    val lastDaysData = Utils.getTimeBasedDataFrame(inputDataFrame, SalesOrderVariables.CREATED_AT, ndaysOldStartTime.toString, dateEndTime.toString)
 
     return lastDaysData
   }
