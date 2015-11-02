@@ -1,20 +1,22 @@
 package com.jabong.dap.model.customer.data
 
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.common.{GroupedUtils, OptionUtils, Spark}
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.{ DataNotFound, DataReader, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
+import com.jabong.dap.data.storage.schema.OrderBySchema
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.LongType
+import org.apache.spark.sql.types.{TimestampType, IntegerType, LongType}
 
 /**
  * Created by mubarak on 15/7/15.
@@ -33,15 +35,13 @@ object CustomerDeviceMapping extends Logging {
     println("clickStreamInc: ") // + clickStreamInc.count())
     // clickStreamInc.printSchema()
     // clickStreamInc.show(10)
-
     val clickStream = clickStreamInc.filter(!(col("userid").startsWith("_app_")))
-      .filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
-      .orderBy(desc(PageVisitVariables.PAGE_TIMESTAMP))
-      .groupBy(PageVisitVariables.USER_ID)
-      .agg(
-        first(PageVisitVariables.BROWSER_ID) as PageVisitVariables.BROWSER_ID,
-        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
-      )
+        .filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
+
+    val groupedFields = Array(PageVisitVariables.USER_ID)
+    val aggFields = Array(PageVisitVariables.BROWSER_ID,PageVisitVariables.DOMAIN)
+
+    val latestDeviceData = GroupedUtils.orderGroupBy(clickStream,groupedFields,aggFields,GroupedUtils.FIRST,OrderBySchema.latestDeviceSchema,PageVisitVariables.PAGE_TIMESTAMP,GroupedUtils.DESC,TimestampType)
 
     println("clickStream after aggregation and filtering: ") // + clickStream.count())
     // clickStream.printSchema()
@@ -62,12 +62,12 @@ object CustomerDeviceMapping extends Logging {
 
     val nlsbc = Spark.getContext().broadcast(nlsJoined).value
 
-    val joinedDf = clickStream.join(nlsbc, nlsbc(CustomerVariables.EMAIL) === clickStream(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
+    val joinedDf = latestDeviceData.join(nlsbc, nlsbc(CustomerVariables.EMAIL) === latestDeviceData(PageVisitVariables.USER_ID), SQL.FULL_OUTER)
       .select(
-        coalesce(nlsbc(CustomerVariables.EMAIL), clickStream(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
+        coalesce(nlsbc(CustomerVariables.EMAIL), latestDeviceData(PageVisitVariables.USER_ID)) as CustomerVariables.EMAIL,
         nlsbc(CustomerVariables.ID_CUSTOMER),
-        clickStream(PageVisitVariables.BROWSER_ID),
-        clickStream(PageVisitVariables.DOMAIN)
+        latestDeviceData(PageVisitVariables.BROWSER_ID),
+        latestDeviceData(PageVisitVariables.DOMAIN)
       )
 
     println("After outer join with customer table: ") // + joinedDf.count())
@@ -174,12 +174,18 @@ object CustomerDeviceMapping extends Logging {
       .filter(col(PageVisitVariables.DOMAIN) === DataSets.ANDROID)
       .dropDuplicates()
       .na.drop(Array(PageVisitVariables.ADD4PUSH))
-    val grouped = notNullAdd4push.orderBy(col(PageVisitVariables.BROWSER_ID), desc(PageVisitVariables.PAGE_TIMESTAMP))
-      .groupBy(PageVisitVariables.BROWSER_ID)
-      .agg(
-        first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
-        first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
-      )
+
+    val groupedFields = Array(PageVisitVariables.BROWSER_ID)
+    val aggFields = Array(PageVisitVariables.ADD4PUSH,PageVisitVariables.PAGE_TIMESTAMP)
+
+    val grouped = GroupedUtils.orderGroupBy(notNullAdd4push,groupedFields,aggFields,GroupedUtils.FIRST,OrderBySchema.ad4PushIntermediateSchema,PageVisitVariables.PAGE_TIMESTAMP,GroupedUtils.DESC,TimestampType)
+
+//    val grouped = notNullAdd4push.orderBy(col(PageVisitVariables.BROWSER_ID), desc(PageVisitVariables.PAGE_TIMESTAMP))
+//      .groupBy(PageVisitVariables.BROWSER_ID)
+//      .agg(
+//        first(PageVisitVariables.ADD4PUSH) as PageVisitVariables.ADD4PUSH,
+//        first(PageVisitVariables.PAGE_TIMESTAMP) as PageVisitVariables.PAGE_TIMESTAMP
+//      )
     var res: DataFrame = grouped
     if (null != prevFull) {
       res = prevFull.join(grouped, prevFull(PageVisitVariables.BROWSER_ID) === grouped(PageVisitVariables.BROWSER_ID), SQL.FULL_OUTER)
