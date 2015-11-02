@@ -32,12 +32,12 @@ object OrderBySchema {
   val latestDeviceSchema = StructType(Array(
     StructField(PageVisitVariables.USER_ID, StringType, true),
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
-    StructField(CampaignMergedFields.CUSTOMER_ID, LongType, true)
+    StructField(CampaignMergedFields.DOMAIN, StringType, true)
   ))
 
   val ad4PushIntermediateSchema = StructType(Array(
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
     StructField(PageVisitVariables.ADD4PUSH, StringType, true),
-    StructField(CampaignMergedFields.CUSTOMER_ID, LongType, true)
+    StructField(PageVisitVariables.PAGE_TIMESTAMP, TimestampType, true)
   ))
 }
