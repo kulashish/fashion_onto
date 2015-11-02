@@ -98,6 +98,9 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
 
+    val dfCustTop5Incr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate)
+    dfMap.put("custTop5Incr", dfCustTop5Incr)
+
     val dfDndFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
     dfMap.put("dndFull", dfDndFull)
 
