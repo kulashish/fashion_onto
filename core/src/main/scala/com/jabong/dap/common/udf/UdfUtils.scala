@@ -235,7 +235,7 @@ object UdfUtils extends Logging {
     iterable.foreach {
       case (slot, value) =>
         if (value > max) { maxSlot = slot; max = value }
-        timeSlotArray(slot - 1) = value
+        timeSlotArray(slot) = value
     }
 
     logger.info("Exit from  getCompleteSlotData: ")
