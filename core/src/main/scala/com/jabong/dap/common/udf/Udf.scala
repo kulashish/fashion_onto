@@ -138,4 +138,6 @@ object Udf {
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
+  val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
+
 }

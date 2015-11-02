@@ -707,4 +707,12 @@ object UdfUtils extends Logging {
     df.dropDuplicates()
   }
 
+  def nextPriceBand(priceBand: String): String = {
+    if (priceBand.equals("E")) {
+      return priceBand
+    } else {
+      return (priceBand.charAt(0) + 1).toChar.toString
+    }
+  }
+
 }
