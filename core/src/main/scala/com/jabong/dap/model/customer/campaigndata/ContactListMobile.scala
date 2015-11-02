@@ -4,15 +4,15 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, _}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, _ }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.variables.CustomerSegments
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
-import com.jabong.dap.model.order.variables.{SalesOrder, SalesOrderAddress}
+import com.jabong.dap.model.order.variables.{ SalesOrder, SalesOrderAddress }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -141,21 +141,21 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
     //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT
 
-//    //SalesOrderItem.getSucessfulOrders for NET_ORDERS variable
-//    val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
-//    val (dfSuccessfulOrders, successOrdersCalcFull, dfFavBrandIncr, favBrandCalcFull) = SalesOrderItem.getSuccessfullOrdersBrand (
-//      dfSalesOrderItemIncr, salesOrderFull, dfSuccessOrdersCalcPrevFull, dfFavBrandCalcPrevFull, dfYestItr)
-//    //ORDERS_COUNT_SUCCESSFUL, FAV_BRAND
-//
-//    val pathSuccessOrdersCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SUCCESSFUL_ORDERS_COUNT, DataSets.FULL_MERGE_MODE, incrDate)
-//    if (DataWriter.canWrite(saveMode, pathSuccessOrdersCalcFull)) {
-//      DataWriter.writeParquet(successOrdersCalcFull, pathSuccessOrdersCalcFull, saveMode)
-//    }
-//
-//    val pathFavBrandCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.FAV_BRAND, DataSets.FULL_MERGE_MODE, incrDate)
-//    if (DataWriter.canWrite(saveMode, pathFavBrandCalcFull)) {
-//      DataWriter.writeParquet(favBrandCalcFull, pathFavBrandCalcFull, saveMode)
-//    }
+    //    //SalesOrderItem.getSucessfulOrders for NET_ORDERS variable
+    //    val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
+    //    val (dfSuccessfulOrders, successOrdersCalcFull, dfFavBrandIncr, favBrandCalcFull) = SalesOrderItem.getSuccessfullOrdersBrand (
+    //      dfSalesOrderItemIncr, salesOrderFull, dfSuccessOrdersCalcPrevFull, dfFavBrandCalcPrevFull, dfYestItr)
+    //    //ORDERS_COUNT_SUCCESSFUL, FAV_BRAND
+    //
+    //    val pathSuccessOrdersCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SUCCESSFUL_ORDERS_COUNT, DataSets.FULL_MERGE_MODE, incrDate)
+    //    if (DataWriter.canWrite(saveMode, pathSuccessOrdersCalcFull)) {
+    //      DataWriter.writeParquet(successOrdersCalcFull, pathSuccessOrdersCalcFull, saveMode)
+    //    }
+    //
+    //    val pathFavBrandCalcFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.FAV_BRAND, DataSets.FULL_MERGE_MODE, incrDate)
+    //    if (DataWriter.canWrite(saveMode, pathFavBrandCalcFull)) {
+    //      DataWriter.writeParquet(favBrandCalcFull, pathFavBrandCalcFull, saveMode)
+    //    }
 
     val dfCustomerIncr = dfMap("customerIncr")
     val dfContactListMobilePrevFull = dfMap("contactListMobilePrevFull")

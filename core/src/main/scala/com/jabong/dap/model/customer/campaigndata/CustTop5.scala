@@ -16,7 +16,7 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
-import scala.collection.mutable.{HashMap, ListBuffer, Map}
+import scala.collection.mutable.{ HashMap, ListBuffer, Map }
 
 /**
  * Created by mubarak on 20/10/15.
@@ -106,8 +106,8 @@ object CustTop5 extends DataFeedsModel {
         getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         CustCatPurchase.getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]])
-        )
-        )
+      )
+      )
     )
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
       e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
@@ -132,17 +132,16 @@ object CustTop5 extends DataFeedsModel {
     (fav, categoryCount, categoryAVG)
   }
 
-
   def getTop5FavList(map: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): List[String] = {
     val a = ListBuffer[(String, Int, Double)]()
     val keys = map.keySet
     keys.foreach{
       t =>
-        var count =0
+        var count = 0
         var sum = 0.0
         val m = map(t)
         m.keys.foreach{
-          e=>
+          e =>
             count = e
             sum = m(e)
         }
@@ -171,12 +170,12 @@ object CustTop5 extends DataFeedsModel {
         itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE,
         saleOrderJoined(SalesOrderVariables.CREATED_AT)
       )
-      .na.fill(scala.collection.immutable.Map(ProductVariables.BRAND->"",
-      ProductVariables.CATEGORY->"",
-      ProductVariables.BRICK->"",
-      ProductVariables.COLOR->"",
-      ProductVariables.SPECIAL_PRICE->0.0
-    )).filter(saleOrderJoined(SalesOrderVariables.CREATED_AT).isNotNull)
+      .na.fill(scala.collection.immutable.Map(ProductVariables.BRAND -> "",
+        ProductVariables.CATEGORY -> "",
+        ProductVariables.BRICK -> "",
+        ProductVariables.COLOR -> "",
+        ProductVariables.SPECIAL_PRICE -> 0.0
+      )).filter(saleOrderJoined(SalesOrderVariables.CREATED_AT).isNotNull)
 
     val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], Timestamp.valueOf(e(6).toString)))).groupByKey()
     val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
@@ -202,7 +201,7 @@ object CustTop5 extends DataFeedsModel {
 
   def joinMaps(map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]] = {
     val mapFull = collection.mutable.Map[String, scala.collection.immutable.Map[Int, Double]]()
-    if (null == map1&& null == map2) {
+    if (null == map1 && null == map2) {
       return null
     } else if (null == map2) {
       return map1
@@ -237,7 +236,7 @@ object CustTop5 extends DataFeedsModel {
             }
         }
     }
-    val finalMap = mapFull.map(kv => (kv._1,kv._2)).toMap
+    val finalMap = mapFull.map(kv => (kv._1, kv._2)).toMap
     finalMap
   }
 
@@ -261,19 +260,19 @@ object CustTop5 extends DataFeedsModel {
 
   }
 
-  def updateMap(map: Map[String, Map[Int, Double]], key:String, price: Double): Map[String, Map[Int, Double]]={
+  def updateMap(map: Map[String, Map[Int, Double]], key: String, price: Double): Map[String, Map[Int, Double]] = {
     if (map.contains(key)) {
       val countMap = map(key)
       countMap.keys.foreach{
-        currentCount=>
+        currentCount =>
           val currentSum = countMap(currentCount)
           val newMap = Map[Int, Double]()
-          newMap.put(currentCount+1, price+currentSum)
+          newMap.put(currentCount + 1, price + currentSum)
           //map.remove(key)
           map.update(key, newMap)
       }
     } else {
-      if(key.length > 0){
+      if (key.length > 0) {
         val newMap = Map[Int, Double]()
         newMap.put(1, price)
         map.put(key, newMap)
