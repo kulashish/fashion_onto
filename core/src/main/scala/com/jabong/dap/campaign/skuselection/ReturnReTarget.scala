@@ -23,7 +23,6 @@ object ReturnReTarget {
 
     val filteredSku = orderItemDataFrame.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " in (" + OrderStatus.RETURN
       + "," + OrderStatus.RETURN_PAYMENT_PENDING + ")")
-      .orderBy(SalesOrderItemVariables.UNIT_PRICE)
       .select(
         orderItemDataFrame(CustomerVariables.FK_CUSTOMER),
         orderItemDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
