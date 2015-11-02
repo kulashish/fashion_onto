@@ -129,6 +129,11 @@ object CampaignInput extends Logging {
     nthDayOrderData
   }
 
+  /**
+   * load yesterdays itr sku simle data
+   * @param dateYesterday
+   * @return
+   */
   def loadYesterdayItrSimpleData(dateYesterday: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)) = {
     logger.info("Reading last day basic itr simple data from hdfs")
     val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
@@ -550,5 +555,17 @@ object CampaignInput extends Logging {
     val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nDaysShortlistData
+  }
+
+
+  /**
+   *
+   * @param tableName
+   * @param incrDateHour
+   * @return
+   */
+  def loadNthHourTableData(tableName: String,incrDateHour: String = TimeUtils.getDateAfterHours(-1, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
+    val tableData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
+    return tableData
   }
 }
