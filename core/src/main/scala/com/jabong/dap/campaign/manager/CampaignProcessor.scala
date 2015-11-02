@@ -218,7 +218,7 @@ object CampaignProcessor {
     val groupedFields = Array(CampaignMergedFields.EMAIL)
     val aggFields = Array(CampaignMergedFields.EMAIL,ContactListMobileVars.UID, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKUS, CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
-    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, StringType)
+    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
 
     campaignMerged
   }
