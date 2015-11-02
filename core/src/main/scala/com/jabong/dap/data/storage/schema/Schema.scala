@@ -430,16 +430,11 @@ object Schema {
 
   val customerFavList = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
-    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
-      StructField("sum_price", DoubleType)))), true),
-    StructField("catagory_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
-      StructField("sum_price", DoubleType)))), true),
-    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
-      StructField("sum_price", DoubleType)))), true),
-    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType),
-      StructField("sum_price", DoubleType)))), true),
+    StructField("brand_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("catagory_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("brick_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("color_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
     StructField("last_orders_created_at", TimestampType, true)
-
   ))
 
   val cusTop5 = StructType(Array(
@@ -503,6 +498,18 @@ object Schema {
     StructField("KIDS_FOOTWEAR_AVG_ITEM_PRICE", DoubleType, true),
     StructField("TOYS_AVG_ITEM_PRICE", DoubleType, true),
     StructField("BAGS_AVG_ITEM_PRICE", DoubleType, true)
+  ))
+
+  val pushReferenceSku = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false)
+  ))
+
+  val pushSurfReferenceSku = StructType(Array(
+    StructField(CampaignMergedFields.REF_SKU1, StringType, false),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
+    StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
 
 }
