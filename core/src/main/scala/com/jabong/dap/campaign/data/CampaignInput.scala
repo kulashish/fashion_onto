@@ -25,6 +25,8 @@ import org.apache.spark.sql.functions._
  */
 object CampaignInput extends Logging {
 
+  val SALES_HOUR_DIFF = 1
+
   def readCustomerData(path: String, date: String): DataFrame = {
 
     return null
@@ -557,15 +559,43 @@ object CampaignInput extends Logging {
     return nDaysShortlistData
   }
 
+  /**
+   *
+   * @param tableName
+   * @param lastHour
+   * @return
+   */
+  def loadNthHourTableData(tableName: String, lastHour: Int): DataFrame = {
+    val incrDateHour: String = TimeUtils.getDateAfterHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+    val tableData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
+    return tableData
+  }
 
   /**
    *
    * @param tableName
-   * @param incrDateHour
+   * @param lastHour
    * @return
    */
-  def loadNthHourTableData(tableName: String,incrDateHour: String = TimeUtils.getDateAfterHours(-1, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
-    val tableData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
-    return tableData
+  def loadNHoursTableData(tableName: String, lastHour: Int): DataFrame = {
+
+    var tableNameUnionData: DataFrame = null
+
+    for (i <- lastHour to lastHour + SALES_HOUR_DIFF) {
+
+      val incrDateHour: String = TimeUtils.getDateAfterHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+
+      logger.info("Reading last " + lastHour + " day " + tableName + "data from hdfs")
+
+      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
+      if (null != tableNameData) {
+        if (tableNameUnionData == null) {
+          tableNameUnionData = tableNameData
+        } else {
+          tableNameUnionData = tableNameUnionData.unionAll(tableNameData)
+        }
+      }
+    }
+    tableNameUnionData
   }
 }

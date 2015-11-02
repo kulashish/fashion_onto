@@ -11,7 +11,7 @@ import org.scalatest.{ GivenWhenThen, FeatureSpec }
 /**
  * Created by rahul on 18/9/15.
  */
-class AcartDailyCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkContext {
+class AcartHourlyDailyCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
   @transient var salesOrderItemData: DataFrame = _
@@ -34,7 +34,7 @@ class AcartDailyCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
   feature("Run acart daily campaigns") {
     scenario("Customer has abondoned the cart yesterday") {
       Given("salescartData,salesOrder, salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
-      val acartDailyCampaign = new AcartDailyCampaign()
+      val acartDailyCampaign = new AcartHourlyDailyCampaign()
       acartDailyCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
       val acartPushCampaignOut = CampaignOutput.testData.head
       val acartEmailCamapignOut = CampaignOutput.testData(1)

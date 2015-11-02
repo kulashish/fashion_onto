@@ -9,7 +9,7 @@ import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{ParamInfo, CampaignConfig, CampaignInfo}
+import com.jabong.dap.data.acq.common.{ ParamInfo, CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -112,7 +112,6 @@ object CampaignManager extends Serializable with Logging {
     invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations)
   }
 
-
   /**
    *
    * @param campaignsConfig
@@ -136,7 +135,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayAcartData = CampaignInput.loadNthdayAcartData(1, last30DayAcartData)
     val yesterdaySalesOrderItemData = CampaignInput.loadYesterdayOrderItemData() // created_at
     val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
-    val acartDaily = new AcartDailyCampaign()
+    val acartDaily = new AcartHourlyDailyCampaign()
     acartDaily.runCampaign(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
     // acart followup - only = 3rd days acart, still not bought ref skus, qty >= 10, yesterdayItrData
@@ -177,19 +176,18 @@ object CampaignManager extends Serializable with Logging {
    *
    * @param params
    */
-  def startAcartHourlyCampaign(params: ParamInfo) ={
-    val incrDateWithHour =  OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterHours(-2,TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER))
-    val salesCartHourly =   CampaignInput.loadNthHourTableData(DataSets.SALES_CART,incrDateWithHour)
-    val salesOrderHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER,incrDateWithHour)
-    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM,incrDateWithHour)
+  def startAcartHourlyCampaign(params: ParamInfo) = {
+    val incrDateWithHour = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterHours(-2, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER))
+    val lastHour = TimeUtils.getHour(TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER), TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER) - TimeUtils.getHour(incrDateWithHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+    val salesCartHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_CART, -lastHour)
+    val salesOrderHourly = CampaignInput.loadNHoursTableData(DataSets.SALES_ORDER, -lastHour)
+    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM, -lastHour)
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
+    val acartHourly = new AcartHourlyDailyCampaign()
 
-    val acartHourly = new AcartDailyCampaign()
-
-    acartHourly.runCampaign(salesCartHourly,salesOrderHourly,salesOrderItemHourly,yesterdayItrData,brickMvpRecommendations)
-
+    acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations, CampaignCommon.ACART_HOURLY_CAMPAIGN)
 
   }
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
