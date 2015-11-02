@@ -9,7 +9,7 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.campaignFeeds.CampaignFeedsModel
+import com.jabong.dap.model.campaignFeeds.DataFeedsModel
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
@@ -20,7 +20,7 @@ import scala.collection.mutable.{ ArrayBuffer, HashMap }
 /**
  * Created by raghu on 13/10/15.
  */
-object CustomerPreferredTimeslotPart2 extends CampaignFeedsModel with Logging {
+object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
     val pathCustomerPreferredTimeslotPart2Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, incrDate)

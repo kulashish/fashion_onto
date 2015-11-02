@@ -10,7 +10,7 @@ import scala.collection.mutable.HashMap
 /**
  * Created by pooja on 30/10/15.
  */
-abstract class CampaignFeedsModel {
+abstract class DataFeedsModel {
 
   def start(params: ParamInfo): Unit = {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
