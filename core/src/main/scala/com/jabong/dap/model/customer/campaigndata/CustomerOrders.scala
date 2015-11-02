@@ -3,13 +3,13 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils, Utils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Utils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.order.variables.{SalesOrderAddress, SalesOrderItem}
+import com.jabong.dap.model.order.variables.{ SalesOrderAddress, SalesOrderItem }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -105,21 +105,21 @@ object CustomerOrders {
     DataWriter.writeParquet(custOrderFull, savePath, saveMode)
 
     val custOrdersCsv = custOrdersIncr
-                        .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
-                        .withColumn(SalesOrderVariables.AVG_ORDER_ITEM_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.ORDER_ITEM_COUNT))
-                        .withColumn(SalesRuleSetVariables.AVG_COUPON_VALUE_USED, col(SalesRuleSetVariables.COUPON_SUM) / col(SalesRuleSetVariables.COUPON_COUNT))
-                        .withColumn(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED, col(SalesRuleSetVariables.DISCOUNT_SUM) / col(SalesRuleSetVariables.DISCOUNT_COUNT))
-                        .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
-                        .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
-                        .drop(SalesOrderVariables.SUM_BASKET_VALUE)
-                        .drop(SalesOrderVariables.ORDER_ITEM_COUNT)
-                        .drop(SalesRuleSetVariables.COUPON_SUM)
-                        .drop(SalesRuleSetVariables.COUPON_COUNT)
-                        .drop(SalesRuleSetVariables.DISCOUNT_SUM)
-                        .drop(SalesRuleSetVariables.DISCOUNT_COUNT)
-                        .drop(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
-                        .drop(SalesOrderItemVariables.FAV_BRAND)
-                        .drop(SalesOrderVariables.LAST_ORDER_DATE)
+      .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
+      .withColumn(SalesOrderVariables.AVG_ORDER_ITEM_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.ORDER_ITEM_COUNT))
+      .withColumn(SalesRuleSetVariables.AVG_COUPON_VALUE_USED, col(SalesRuleSetVariables.COUPON_SUM) / col(SalesRuleSetVariables.COUPON_COUNT))
+      .withColumn(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED, col(SalesRuleSetVariables.DISCOUNT_SUM) / col(SalesRuleSetVariables.DISCOUNT_COUNT))
+      .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
+      .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
+      .drop(SalesOrderVariables.SUM_BASKET_VALUE)
+      .drop(SalesOrderVariables.ORDER_ITEM_COUNT)
+      .drop(SalesRuleSetVariables.COUPON_SUM)
+      .drop(SalesRuleSetVariables.COUPON_COUNT)
+      .drop(SalesRuleSetVariables.DISCOUNT_SUM)
+      .drop(SalesRuleSetVariables.DISCOUNT_COUNT)
+      .drop(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
+      .drop(SalesOrderItemVariables.FAV_BRAND)
+      .drop(SalesOrderVariables.LAST_ORDER_DATE)
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(custOrdersCsv, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_ORDERS", DataSets.IGNORE_SAVEMODE, "true", ";")
   }
