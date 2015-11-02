@@ -9,7 +9,7 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.campaignFeeds.DataFeedsModel
+import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import com.jabong.dap.model.customer.schema.CustVarSchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._

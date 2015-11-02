@@ -1,4 +1,4 @@
-package com.jabong.dap.model.campaignFeeds
+package com.jabong.dap.model.dataFeeds
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
