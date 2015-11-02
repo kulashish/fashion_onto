@@ -5,7 +5,6 @@ import com.jabong.dap.common.{ AppConfig, Config, Spark }
 import com.jabong.dap.data.acq.Delegator
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.MergeDelegator
-import com.jabong.dap.model.custorder.ComponentExecutor
 import com.jabong.dap.model.product.itr.Itr
 import com.jabong.dap.quality.campaign.CampaignQuality
 import net.liftweb.json.JsonParser.ParseException
@@ -23,6 +22,7 @@ object Init {
    * @param component String Name of the component
    * @param tableJson String Path of data acquisition config json file
    * @param mergeJson String Path of merge job config json file
+   * @param paramJson String Path of component executor job config json file
    * @param config String Path of application config json file
    */
   case class Params(
@@ -138,4 +138,5 @@ object Init {
       case _ => new ComponentExecutor().start(params.paramJson)
     }
   }
+
 }
