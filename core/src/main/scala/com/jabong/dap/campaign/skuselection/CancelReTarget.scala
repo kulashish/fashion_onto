@@ -29,7 +29,6 @@ object CancelReTarget {
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.DECLINED
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.EXPORTABLE_CANCEL_CUST
       + " or " + SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + "=" + OrderStatus.EXPORTED_CANCEL_CUST)
-      .orderBy(SalesOrderItemVariables.UNIT_PRICE)
       .select(inDataFrame(CustomerVariables.FK_CUSTOMER),
         inDataFrame(ProductVariables.SKU) as ProductVariables.SKU_SIMPLE,
         inDataFrame(SalesOrderItemVariables.UNIT_PRICE))

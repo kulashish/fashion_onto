@@ -73,7 +73,7 @@ object GroupedUtils {
       case IntegerType =>
         var ordering: Ordering[Int] = null
         if (order.equals(ASC)) ordering = Ordering.Int else ordering = Ordering.Int.reverse
-        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[Int])(ordering)
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[Int]))(ordering)
 
       case DoubleType =>
         var ordering: Ordering[Double] = null
@@ -88,7 +88,12 @@ object GroupedUtils {
       case StringType =>
         var ordering: Ordering[String] = null
         if (order.equals(ASC)) ordering = Ordering.String else ordering = Ordering.String.reverse
-        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[String])(ordering)
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[String]))(ordering)
+
+      case TimestampType =>
+        var ordering: Ordering[Long] = null
+        if (order.equals(ASC)) ordering = Ordering.Long else ordering = Ordering.Long.reverse
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[java.sql.Timestamp].getTime))(ordering)
     }
   }
 }
