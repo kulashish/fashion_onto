@@ -464,38 +464,34 @@ object SalesOrderItem {
       ordersDf(SalesOrderVariables.FK_CUSTOMER),
       when(ordersDf("type") === 10, 1).otherwise(0) as "invalid",
       when(ordersDf("type") === 20, 1).otherwise(0) as "cancel",
-      when(ordersDf("type") === 30, 1).otherwise(0) as "return"
+      when(ordersDf("type") === 30, 1).otherwise(0) as "return",
+      when(ordersDf("type") === 40, 1).otherwise(0) as "success"
     )
     val res = canOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(count("invalid") as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
         count("cancel") as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-        count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS
-      )
-    res
+        count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
+        count("success") as SalesOrderItemVariables.SUCCESSFUL_ORDERS
+        )
+      return res
   }
 
   def findOrderType(list: List[Int]): Int = {
-    var f = 0
-    var g = 0
-    var h = 0
-    list.foreach(
-      e =>
-        if (OrderStatus.INVALID != e) {
-          f = 1
-        } else if (!OrderStatus.CANCELLED_ARRAY.contains(e)) {
-          g = 1
-        } else if (!OrderStatus.RETURN_ARRAY.contains(e)) {
-          h = 1
-        }
-    )
-    if (f == 0) {
-      10
-    } else if (g == 0) {
-      20
-    } else if (h == 0) {
-      30
+    var custStatus = list.toSet
+    val inval = scala.collection.immutable.Set[Int](OrderStatus.INVALID)
+    val succ = OrderStatus.SUCCESSFUL_ARRAY.toSet
+    val ret = OrderStatus.RETURN_ARRAY.toSet
+    val cancl = OrderStatus.CANCELLED_ARRAY.toSet
+    if (custStatus subsetOf(inval)) {
+     return 10
+    } else if (custStatus subsetOf(cancl)) {
+     return 20
+    } else if (custStatus subsetOf(ret)) {
+     return 30
+    } else if (custStatus subsetOf(succ)) {
+      return 40
     } else {
-      0
+     return 0
     }
 
   }
