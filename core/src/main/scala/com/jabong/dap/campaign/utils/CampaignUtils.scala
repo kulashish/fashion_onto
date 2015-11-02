@@ -136,15 +136,14 @@ object CampaignUtils extends Logging {
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
 
     val groupedFields = Array(PageVisitVariables.BROWSER_ID)
-    val aggFields = Array(PageVisitVariables.BROWSER_ID,ProductVariables.SKU,CustomerVariables.FK_CUSTOMER,PageVisitVariables.DOMAIN)
-     val deviceOnlyRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku,groupedFields,aggFields,GroupedUtils.FIRST,Schema.pushSurfReferenceSku,ProductVariables.SPECIAL_PRICE,GroupedUtils.DESC,DecimalType.apply())
+    val aggFields = Array(PageVisitVariables.BROWSER_ID, ProductVariables.SKU, CustomerVariables.FK_CUSTOMER, PageVisitVariables.DOMAIN)
+    val deviceOnlyRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     // non zero FK_CUSTOMER
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
 
-    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku,groupedFields,aggFields,GroupedUtils.FIRST,Schema.pushSurfReferenceSku,ProductVariables.SPECIAL_PRICE,GroupedUtils.DESC,DecimalType.apply())
-
+    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     val customerRefSku = deviceOnlyRefSkus.unionAll(registeredRefSkus)
 
