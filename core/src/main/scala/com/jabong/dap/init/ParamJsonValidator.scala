@@ -1,12 +1,13 @@
-package com.jabong.dap.model.custorder
+package com.jabong.dap.init
 
-import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo }
+import com.jabong.dap.data.acq.common.{ ParamJobInfo, ParamInfo }
 import com.jabong.dap.data.storage.DataSets
 
 /**
  * Created by pooja on 9/7/15.
  */
 object ParamJsonValidator {
+
   def validateRequiredValues(paramInfo: ParamInfo) = {
     require(paramInfo.source != null && paramInfo.source.length() != 0, "Source cannot be null or empty.")
     require(paramInfo.saveMode != null && paramInfo.saveMode.length() != 0, "Save mode cannot be null or empty.")
