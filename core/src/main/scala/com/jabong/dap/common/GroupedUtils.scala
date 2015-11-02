@@ -12,6 +12,11 @@ import org.apache.spark.sql.types._
  */
 object GroupedUtils {
 
+  val FIRST = "first"
+  val LAST = "last"
+  val ASC = "ASC"
+  val DESC = "DESC"
+
   /**
    * Common order group By function takes dataFrame and needed fields and return final dataFrame
    * @param inputData
@@ -46,8 +51,8 @@ object GroupedUtils {
   def aggregateSupporter(list: List[Row], aggFields: Array[String], aggFunction: String): Row = {
     var outRow: Row = null
     aggFunction match {
-      case "first" => outRow = list(0)
-      case "last" => outRow = list(list.size - 1)
+      case FIRST => outRow = list(0)
+      case LAST => outRow = list(list.size - 1)
     }
     return Utils.createKey(outRow, aggFields)
   }
@@ -67,18 +72,23 @@ object GroupedUtils {
     orderFieldDataType match {
       case IntegerType =>
         var ordering: Ordering[Int] = null
-        if (order.equals("ASC")) ordering = Ordering.Int else ordering = Ordering.Int.reverse
+        if (order.equals(ASC)) ordering = Ordering.Int else ordering = Ordering.Int.reverse
         return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[Int])(ordering)
 
       case DoubleType =>
         var ordering: Ordering[Double] = null
-        if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
+        if (order.equals(ASC)) ordering = Ordering.Double else ordering = Ordering.Double.reverse
         return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[Double]))(ordering)
 
       case DecimalType() =>
         var ordering: Ordering[Double] = null
-        if (order.equals("ASC")) ordering = Ordering.Double else ordering = Ordering.Double.reverse
+        if (order.equals(ASC)) ordering = Ordering.Double else ordering = Ordering.Double.reverse
         return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField)).asInstanceOf[BigDecimal].doubleValue()))(ordering)
+
+      case StringType =>
+        var ordering: Ordering[String] = null
+        if (order.equals(ASC)) ordering = Ordering.String else ordering = Ordering.String.reverse
+        return iterable.toList.sortBy(row => (row(row.fieldIndex(orderField))).asInstanceOf[String])(ordering)
     }
   }
 }
