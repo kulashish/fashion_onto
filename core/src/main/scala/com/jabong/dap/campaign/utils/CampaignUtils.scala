@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
@@ -17,6 +17,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.DecimalType
 import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.annotation.elidable
@@ -48,11 +49,13 @@ object CampaignUtils extends Logging {
     //      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
     //        as (CampaignMergedFields.REF_SKU1))
 
-    val refSkus = customerFilteredData.map(row => ((row.getLong(0)), (row.getString(1), row(2).asInstanceOf[BigDecimal].doubleValue())))
-      .groupByKey().map{ case (key, value) => (key, value.toList.sortBy(-_._2).take(NumberSku)) }.map(x => (x._1, x._2(0)._1))
+    //    val refSkus = customerFilteredData.map(row => ((row.getLong(0)), (row.getString(1), row(2).asInstanceOf[BigDecimal].doubleValue())))
+    //      .groupByKey().map{ case (key, value) => (key, value.toList.sortBy(-_._2).take(NumberSku)) }.map(x => (x._1, x._2(0)._1))
 
-    import sqlContext.implicits._
-    val customerRefSku = refSkus.toDF(CustomerVariables.FK_CUSTOMER, CampaignMergedFields.REF_SKU1)
+    val aggFields = Array(CustomerVariables.FK_CUSTOMER, ProductVariables.SKU)
+    val groupedFields = Array(CustomerVariables.FK_CUSTOMER)
+
+    val customerRefSku = GroupedUtils.orderGroupBy(customerFilteredData, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     CampaignUtils.debug(customerRefSku, "AcartDaily:-after ref sku generation")
 
@@ -131,36 +134,18 @@ object CampaignUtils extends Logging {
 
     // null or 0 FK_CUSTOMER
     val deviceOnlyCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " = 0  or " + CustomerVariables.FK_CUSTOMER + " is null")
-      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
-      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
-      .groupBy(PageVisitVariables.BROWSER_ID).agg(
-        first(ProductVariables.SKU) as (CampaignMergedFields.REF_SKU1),
-        first(CustomerVariables.FK_CUSTOMER) as CustomerVariables.FK_CUSTOMER,
-        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
-      ).select(
-          col(CampaignMergedFields.REF_SKU1),
-          col(CustomerVariables.FK_CUSTOMER),
-          col(PageVisitVariables.BROWSER_ID) as "device_id",
-          col(PageVisitVariables.DOMAIN)
-        )
+
+    val groupedFields = Array(PageVisitVariables.BROWSER_ID)
+    val aggFields = Array(PageVisitVariables.BROWSER_ID, ProductVariables.SKU, CustomerVariables.FK_CUSTOMER, PageVisitVariables.DOMAIN)
+    val deviceOnlyRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     // non zero FK_CUSTOMER
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
-      // .orderBy($"${ProductVariables.SPECIAL_PRICE}".desc)
-      .orderBy(desc(ProductVariables.SPECIAL_PRICE))
-      .groupBy(CustomerVariables.FK_CUSTOMER).agg(first(ProductVariables.SKU)
-        as (CampaignMergedFields.REF_SKU1),
-        first(PageVisitVariables.BROWSER_ID) as "device_id",
-        first(PageVisitVariables.DOMAIN) as PageVisitVariables.DOMAIN
-      ).select(
-          col(CampaignMergedFields.REF_SKU1),
-          col(CustomerVariables.FK_CUSTOMER),
-          col("device_id"),
-          col(PageVisitVariables.DOMAIN)
-        )
 
-    val customerRefSku = deviceOnlyCustomerRefSku.unionAll(registeredCustomerRefSku)
+    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
+
+    val customerRefSku = deviceOnlyRefSkus.unionAll(registeredRefSkus)
 
     customerRefSku
 
