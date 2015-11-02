@@ -72,22 +72,23 @@ object CustTop5 {
       )
     val customerMapFull = getTop5(top5PrevFull, saleOrderJoined, itr)
 
-    customerMapFull.printSchema()
-    customerMapFull.show(5)
-    println("COUNT:-"+customerMapFull.count())
+    //println("Full COUNT:-"+customerMapFull.count())
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(customerMapFull, fullPath, saveMode)
 
-    val (fav, categoryCount, categoryAVG) = calcTop5(customerMapFull, path, incrDate)
+    val (top5incr, categoryCount, categoryAVG) = calcTop5(customerMapFull, path, incrDate)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(fav, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(top5incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
+    //val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
+    //DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
+    DataWriter.writeCsv(top5incr, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
+    //val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
+    //DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
+    DataWriter.writeCsv(top5incr, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
+
 
 
   }
@@ -127,12 +128,6 @@ object CustTop5 {
 
     val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
 
-    fav.printSchema()
-    fav.show(100)
-    categoryCount.printSchema()
-    categoryCount.show(10)
-    categoryAVG.printSchema()
-    categoryAVG.show(10)
     return (fav, categoryCount, categoryAVG)
   }
 
