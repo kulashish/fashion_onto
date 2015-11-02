@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.common.{GroupedUtils, Spark}
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
@@ -13,7 +13,7 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{IntegerType, StringType}
+import org.apache.spark.sql.types.{ IntegerType, StringType }
 
 /**
  * Created by Mubarak on 28/7/15.
@@ -139,11 +139,11 @@ object CampaignProcessor {
     }
 
     val groupedFields = Array(groupKey)
-    val aggFields = Array(CampaignMergedFields.CUSTOMER_ID,CampaignMergedFields.CAMPAIGN_MAIL_TYPE,CampaignMergedFields.REF_SKU1,CampaignMergedFields.EMAIL,CampaignMergedFields.DOMAIN)
+    val aggFields = Array(CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.REF_SKU1, CampaignMergedFields.EMAIL, CampaignMergedFields.DOMAIN)
 
-   val campaignMerged = GroupedUtils.orderGroupBy(inputCampaignsData,groupedFields,aggFields,GroupedUtils.FIRST,OrderBySchema.pushCampaignSchema,CampaignCommon.PRIORITY,GroupedUtils.DESC,IntegerType)
+    val campaignMerged = GroupedUtils.orderGroupBy(inputCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.pushCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
 
-   campaignMerged
+    campaignMerged
   }
 
   /**
@@ -216,9 +216,9 @@ object CampaignProcessor {
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
 
     val groupedFields = Array(CampaignMergedFields.EMAIL)
-    val aggFields = Array(ContactListMobileVars.UID,CampaignMergedFields.CUSTOMER_ID,CampaignMergedFields.REF_SKUS,CampaignMergedFields.REC_SKUS,CampaignMergedFields.CAMPAIGN_MAIL_TYPE,CampaignMergedFields.LIVE_CART_URL)
+    val aggFields = Array(ContactListMobileVars.UID, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKUS, CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
-    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData,groupedFields,aggFields,GroupedUtils.FIRST,OrderBySchema.emailCampaignSchema,CampaignCommon.PRIORITY,GroupedUtils.DESC,StringType)
+    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, StringType)
 
     campaignMerged
   }
