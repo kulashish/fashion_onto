@@ -16,6 +16,23 @@ import scopt.OptionParser
 
 object Init {
 
+  /**
+   * Define command line option parameters
+   *
+   * @param component String Name of the component
+   * @param tableJson String Path of data acquisition config json file
+   * @param mergeJson String Path of merge job config json file
+   * @param paramJson String Path of component executor job config json file
+   * @param config String Path of application config json file
+   */
+  case class Params(
+                     component: String = null,
+                     tableJson: String = null,
+                     mergeJson: String = null,
+                     paramJson: String = null,
+                     campaignsJson: String = null,
+                     config: String = null)
+
   def main(args: Array[String]) {
     options(args)
   }
@@ -122,19 +139,4 @@ object Init {
     }
   }
 
-  /**
-   * Define command line option parameters
-   *
-   * @param component String Name of the component
-   * @param tableJson String Path of data acquisition config json file
-   * @param mergeJson String Path of merge job config json file
-   * @param config String Path of application config json file
-   */
-  case class Params(
-    component: String = null,
-    tableJson: String = null,
-    mergeJson: String = null,
-    paramJson: String = null,
-    campaignsJson: String = null,
-    config: String = null)
 }

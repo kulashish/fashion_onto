@@ -1,18 +1,12 @@
 package com.jabong.dap.init
 
-import com.jabong.dap.data.acq.common.{ ParamInfo, ParamJobInfo }
+import com.jabong.dap.data.acq.common.{ParamJobInfo, ParamInfo}
 import com.jabong.dap.data.storage.DataSets
 
 /**
  * Created by pooja on 9/7/15.
  */
 object ParamJsonValidator {
-  def validate(info: ParamJobInfo) = {
-    for (paramInfo <- info.params) {
-      validateRequiredValues(paramInfo)
-      validatePossibleValues(paramInfo)
-    }
-  }
 
   def validateRequiredValues(paramInfo: ParamInfo) = {
     require(paramInfo.source != null && paramInfo.source.length() != 0, "Source cannot be null or empty.")
@@ -28,6 +22,13 @@ object ParamJsonValidator {
       format(paramInfo.saveFormat, possibleSaveFormats.mkString(",")))
     require(possibleSaveModes.contains(paramInfo.saveMode), "Save mode '%s' not recognized. Possible values: %s".
       format(paramInfo.saveMode, possibleSaveModes.mkString(",")))
+  }
+
+  def validate(info: ParamJobInfo) = {
+    for (paramInfo <- info.params) {
+      validateRequiredValues(paramInfo)
+      validatePossibleValues(paramInfo)
+    }
   }
 
 }
