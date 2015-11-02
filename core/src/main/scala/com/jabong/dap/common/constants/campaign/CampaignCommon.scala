@@ -21,6 +21,7 @@ object CampaignCommon {
   val INVALID_IOD_CAMPAIGN = "invalid_iod"
   val ACART_FOLLOWUP_CAMPAIGN = "acart_followup"
   val ACART_DAILY_CAMPAIGN = "acart_daily"
+  val ACART_HOURLY_CAMPAIGN = "acart_hourly"
   val ACART_LOWSTOCK_CAMPAIGN = "acart_lowstock"
   val ACART_IOD_CAMPAIGN = "acart_iod"
   val WISHLIST_IOD_CAMPAIGN = "wishlist_iod"

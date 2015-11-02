@@ -15,6 +15,8 @@ import scala.collection.immutable.HashMap
 object TimeUtils extends Logging {
 
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  val LAST_HOUR_FOLDER = TimeUtils.getDateAfterHours(-1, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
 
   val MIN_TIMESTAMP = new Timestamp(Long.MinValue)
@@ -494,7 +496,7 @@ object TimeUtils extends Logging {
    * @param dateFormat
    * @return
    */
-  def getDateAfterHours(noOfHours: Int, dateFormat: String) ={
+  def getDateAfterHours(noOfHours: Int, dateFormat: String) = {
     getDateAfterNHours(noOfHours, dateFormat, getTodayDate(dateFormat))
   }
 

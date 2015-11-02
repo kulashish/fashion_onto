@@ -100,19 +100,19 @@ object CustomerOrders {
     DataWriter.writeParquet(custOrdersincr, savePath, saveMode)
 
     val custOrdersCsv = custOrderFull
-                        .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
-                        .withColumn(SalesOrderVariables.AVG_ORDER_ITEM_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.ORDER_ITEM_COUNT))
-                        .withColumn(SalesRuleSetVariables.AVG_COUPON_VALUE_USED, col(SalesRuleSetVariables.COUPON_SUM) / col(SalesRuleSetVariables.COUPON_COUNT))
-                        .withColumn(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED, col(SalesRuleSetVariables.DISCOUNT_SUM) / col(SalesRuleSetVariables.DISCOUNT_COUNT))
-                        .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
-                        .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
-                        .drop(SalesOrderVariables.SUM_BASKET_VALUE)
-                        .drop(SalesOrderVariables.ORDER_ITEM_COUNT)
-                        .drop(SalesRuleSetVariables.COUPON_SUM)
-                        .drop(SalesRuleSetVariables.COUPON_COUNT)
-                        .drop(SalesRuleSetVariables.DISCOUNT_SUM)
-                        .drop(SalesRuleSetVariables.DISCOUNT_COUNT)
-                        .drop(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
+      .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
+      .withColumn(SalesOrderVariables.AVG_ORDER_ITEM_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.ORDER_ITEM_COUNT))
+      .withColumn(SalesRuleSetVariables.AVG_COUPON_VALUE_USED, col(SalesRuleSetVariables.COUPON_SUM) / col(SalesRuleSetVariables.COUPON_COUNT))
+      .withColumn(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED, col(SalesRuleSetVariables.DISCOUNT_SUM) / col(SalesRuleSetVariables.DISCOUNT_COUNT))
+      .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
+      .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
+      .drop(SalesOrderVariables.SUM_BASKET_VALUE)
+      .drop(SalesOrderVariables.ORDER_ITEM_COUNT)
+      .drop(SalesRuleSetVariables.COUPON_SUM)
+      .drop(SalesRuleSetVariables.COUPON_COUNT)
+      .drop(SalesRuleSetVariables.DISCOUNT_SUM)
+      .drop(SalesRuleSetVariables.DISCOUNT_COUNT)
+      .drop(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
     val custOrdersIncr = Utils.getOneDayData(custOrdersCsv, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
@@ -124,7 +124,7 @@ object CustomerOrders {
     if (null == prevFull) {
       return incr
     }
-  val custOrdersFull =  incr.join(prevFull, incr(SalesOrderVariables.FK_CUSTOMER) === prevFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val custOrdersFull = incr.join(prevFull, incr(SalesOrderVariables.FK_CUSTOMER) === prevFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(coalesce(incr(SalesOrderVariables.FK_CUSTOMER), prevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         when(incr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE) > prevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE), incr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(prevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)) as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
         when(incr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE) > prevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE), incr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(prevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)) as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,

@@ -39,7 +39,7 @@ object CustomerDeviceMapping extends Logging {
       .filter(PageVisitVariables.DOMAIN + " IN ('" + DataSets.IOS + "', '" + DataSets.ANDROID + "', '" + DataSets.WINDOWS + "')")
 
     val groupedFields = Array(PageVisitVariables.USER_ID)
-    val aggFields = Array(PageVisitVariables.USER_ID,PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
+    val aggFields = Array(PageVisitVariables.USER_ID, PageVisitVariables.BROWSER_ID, PageVisitVariables.DOMAIN)
 
     val latestDeviceData = GroupedUtils.orderGroupBy(clickStream, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.latestDeviceSchema, PageVisitVariables.PAGE_TIMESTAMP, GroupedUtils.DESC, TimestampType)
 
@@ -176,7 +176,7 @@ object CustomerDeviceMapping extends Logging {
       .na.drop(Array(PageVisitVariables.ADD4PUSH))
 
     val groupedFields = Array(PageVisitVariables.BROWSER_ID)
-    val aggFields = Array(PageVisitVariables.BROWSER_ID,PageVisitVariables.ADD4PUSH, PageVisitVariables.PAGE_TIMESTAMP)
+    val aggFields = Array(PageVisitVariables.BROWSER_ID, PageVisitVariables.ADD4PUSH, PageVisitVariables.PAGE_TIMESTAMP)
 
     val grouped = GroupedUtils.orderGroupBy(notNullAdd4push, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.ad4PushIntermediateSchema, PageVisitVariables.PAGE_TIMESTAMP, GroupedUtils.DESC, TimestampType)
 
