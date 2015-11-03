@@ -69,7 +69,7 @@ object CustomerOrders extends DataFeedsModel {
     val salesRevenue30 = dfMap("salesRevenue30")
     val salesRevenue90 = dfMap("salesRevenue90")
     val salesRuleCalc = dfMap("salesRuleCalc")
-    val salesItemInvalidCalc= dfMap("salesItemInvalidCalc")
+    val salesItemInvalidCalc = dfMap("salesItemInvalidCalc")
     val salesCatBrickCalc = dfMap("salesCatBrickCalc")
     val salesOrderValueCalc = dfMap("salesOrderValueCalc")
     val salesAddressCalc = dfMap("salesAddressCalc")
@@ -99,15 +99,15 @@ object CustomerOrders extends DataFeedsModel {
     )
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(saleOrderJoined)
-    dfWrite.put("salesOrderValueIncr",salesOrderValueIncr)
+    dfWrite.put("salesOrderValueIncr", salesOrderValueIncr)
 
     val salesAddressFirstIncr = SalesOrderAddress.getFirstShippingCity(salesOrderIncr, salesAddressFull, salesAddressCalc, cityZone)
-    dfWrite.put("salesAddressFirstIncr",salesAddressFirstIncr)
+    dfWrite.put("salesAddressFirstIncr", salesAddressFirstIncr)
     //val salesRevIncr = Utils.getOneDayData(salesVariablesFull, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     val custOrdersCalc = merger(salesVariablesIncr, salesDiscountFull, salesInvalidFull, salesCatBrick, salesOrderValueIncr, salesAddressFirstIncr)
 
     val custOrderFull = joinCustOrder(custOrdersCalc, custOrdersPrevFull)
-    dfWrite.put("custOrderFull",custOrderFull)
+    dfWrite.put("custOrderFull", custOrderFull)
 
     dfWrite
   }
