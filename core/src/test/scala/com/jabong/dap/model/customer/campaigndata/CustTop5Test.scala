@@ -32,8 +32,7 @@ class CustTop5Test extends FlatSpec with SharedSparkContext {
 
     res.collect().foreach(println)
 
-    assert(res.collect().size >2)
-
+    assert(res.collect().size > 2)
 
   }
 

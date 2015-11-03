@@ -7,16 +7,16 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ OptionUtils, Spark, Utils }
-import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
+import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
-import scala.collection.mutable.{ ListBuffer, Map }
+import scala.collection.mutable.{ HashMap, ListBuffer, Map }
 
 /**
  * Created by mubarak on 20/10/15.
@@ -47,56 +47,59 @@ import scala.collection.mutable.{ ListBuffer, Map }
  * COLOR_5
  */
 
-object CustTop5 {
+object CustTop5 extends DataFeedsModel {
 
-  def start(vars: ParamInfo) = {
-    val saveMode = vars.saveMode
-    val path = OptionUtils.getOptValue(vars.path)
-    val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
-    val (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr) = readDF(incrDate, prevDate, path)
-    var salesOrderincr: DataFrame = salesOrderIncr
-    var salesOrderItemincr: DataFrame = salesOrderItemIncr
-    if (null != top5PrevFull) {
-      salesOrderincr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      salesOrderItemincr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-    }
-    val salesOrderNew = salesOrderincr.na.fill(scala.collection.immutable.Map(
+  def canProcess(incrDate: String, saveMode: String): Boolean = {
+    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.canWrite(saveMode, fullPath)
+  }
+
+  def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
+    val top5PrevFull = dfMap("custTop5PrevFull")
+    var salesOrderIncr: DataFrame = dfMap("salesOrderIncr")
+    var salesOrderItemIncr: DataFrame = dfMap("salesOrderItemIncr")
+
+    val salesOrderNew = salesOrderIncr.na.fill(scala.collection.immutable.Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
     ))
-    val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
+    val saleOrderJoined = salesOrderNew.join(salesOrderItemIncr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER))
       .select(
         salesOrderNew(SalesOrderVariables.FK_CUSTOMER),
-        salesOrderItemincr(SalesOrderItemVariables.SKU),
+        salesOrderItemIncr(SalesOrderItemVariables.SKU),
         salesOrderNew(SalesOrderVariables.CREATED_AT)
       )
-    val customerMapFull = getTop5(top5PrevFull, saleOrderJoined, itr)
 
-    //println("Full COUNT:-"+customerMapFull.count())
+    var writeMap = new HashMap[String, DataFrame]()
+    val custTop5Full = getTop5(top5PrevFull, saleOrderJoined, dfMap("yestItr"))
+    writeMap.put("custTop5Full", custTop5Full)
+    //println("Full COUNT:-" + custTop5Full.count())
+    writeMap.put("custTop5PrevFull", top5PrevFull)
+    writeMap
+  }
+
+  def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
+    val custTop5PrevFull = dfWrite("custTop5PrevFull")
+    val custTop5Full = dfWrite("custTop5Full")
+
+    var top5MapIncr = custTop5Full
+    if (null != custTop5PrevFull) {
+      top5MapIncr = Utils.getOneDayData(custTop5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    }
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(customerMapFull, fullPath, saveMode)
+    DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
 
-    val (top5incr, categoryCount, categoryAVG) = calcTop5(customerMapFull, path, incrDate)
+    val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(top5incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(custTop5Incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    //val catCountPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
-    //DataWriter.writeParquet(categoryCount, catCountPath, saveMode)
     DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    //val catAvgPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
-    //DataWriter.writeParquet(categoryAVG, catAvgPath, saveMode)
     DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 
-  def calcTop5(custMapFull: DataFrame, path: String, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
-    var top5Incr = custMapFull
-    if (null == path) {
-      top5Incr = Utils.getOneDayData(custMapFull, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-    }
-
+  def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
     val favTop5Map = top5Incr.map(e =>
       (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
@@ -278,17 +281,24 @@ object CustTop5 {
     map
   }
 
-  def readDF(incrDate: String, prevDate: String, path: String): (DataFrame, DataFrame, DataFrame, DataFrame) = {
-    var mode: String = DataSets.DAILY_MODE
-    var top5PrevFull: DataFrame = null
-    top5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
-    if (null != path) {
-      mode = DataSets.FULL_MERGE_MODE
+  def readDF(incrDate: String, prevDate: String, path: String): HashMap[String, DataFrame] = {
+    var dfMap = new HashMap[String, DataFrame]()
+    var mode: String = DataSets.FULL_MERGE_MODE
+    if (null == path) {
+      mode = DataSets.DAILY_MODE
+      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custTop5PrevFull", custTop5PrevFull)
     }
-    val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
-    val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
-    val itr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
-    (top5PrevFull, salesOrderIncr, salesOrderItemIncr, itr)
+    var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    var salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
+    if (null == path) {
+      salesOrderIncr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      salesOrderItemIncr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    }
+    dfMap.put("salesOrderIncr", salesOrderIncr)
+    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
+    val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
+    dfMap.put("yestItr", yestItr)
+    dfMap
   }
-
 }
