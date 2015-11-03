@@ -14,7 +14,7 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
+import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
@@ -143,10 +143,9 @@ object CampaignUtils extends Logging {
 
     val groupedFields1 = Array(CustomerVariables.FK_CUSTOMER)
 
-
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
 
-    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields1, aggFields, GroupedUtils.FIRST, OrderBySchema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
+    val registeredRefSkus = GroupedUtils.orderGroupBy(registeredCustomerRefSku, groupedFields1, aggFields, GroupedUtils.FIRST, OrderBySchema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     val customerRefSku = deviceOnlyRefSkus.unionAll(registeredRefSkus)
 

@@ -4,7 +4,6 @@ package com.jabong.dap.model.customer.campaigndata
  * Created by mubarak on 30/10/15.
  */
 
-
 /**
  * SUNGLASSES_COUNT
  * WOMEN_FOOTWEAR_COUNT
@@ -61,21 +60,20 @@ object CustCatPurchase {
     "TOYS",
     "BAGS")
 
-
   def getCatCount(map: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): List[(Int, Double)] = {
     var list = scala.collection.mutable.ListBuffer[(Int, Double)]()
     catagories.foreach{
-      e=>
-        var count =0
+      e =>
+        var count = 0
         var sum = 0.0
-        if(map.contains(e)){
+        if (map.contains(e)) {
           val m = map(e)
           m.foreach{
-            e=>
-              count= e._1
+            e =>
+              count = e._1
               sum = e._2
           }
-          val ele = Tuple2(count, (sum/count))
+          val ele = Tuple2(count, (sum / count))
           list.+=(ele)
         } else {
           val ele = Tuple2(count, sum)
@@ -84,7 +82,5 @@ object CustCatPurchase {
     }
     list.toList
   }
-
-
 
 }

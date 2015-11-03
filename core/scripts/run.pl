@@ -262,19 +262,19 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custWelcomeVoucher --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custWelcomeVoucher.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "custTop5") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerPreferredTimeslotPart2") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerPreferredTimeslotPart1") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart1 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart1.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerPreferredTimeslotPart1 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart1.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "paybackData") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
     $job_exit = run_component($component, $command);
 } else {
     print "not a valid component\n";
