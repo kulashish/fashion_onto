@@ -69,12 +69,12 @@ object CustTop5 extends DataFeedsModel {
         salesOrderNew(SalesOrderVariables.CREATED_AT)
       )
 
-    var writeMap = new HashMap[String, DataFrame]()
+    val dfWrite = new HashMap[String, DataFrame]()
     val custTop5Full = getTop5(top5PrevFull, saleOrderJoined, dfMap("yestItr"))
-    writeMap.put("custTop5Full", custTop5Full)
+    dfWrite.put("custTop5Full", custTop5Full)
     //println("Full COUNT:-" + custTop5Full.count())
-    writeMap.put("custTop5PrevFull", top5PrevFull)
-    writeMap
+    dfWrite.put("custTop5PrevFull", top5PrevFull)
+    dfWrite
   }
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
@@ -282,7 +282,7 @@ object CustTop5 extends DataFeedsModel {
   }
 
   def readDF(incrDate: String, prevDate: String, path: String): HashMap[String, DataFrame] = {
-    var dfMap = new HashMap[String, DataFrame]()
+    val dfMap = new HashMap[String, DataFrame]()
     var mode: String = DataSets.FULL_MERGE_MODE
     if (null == path) {
       mode = DataSets.DAILY_MODE

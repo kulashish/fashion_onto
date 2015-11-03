@@ -71,7 +71,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
   }
 
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
-    var dfMap = new HashMap[String, DataFrame]()
+    val dfMap = new HashMap[String, DataFrame]()
     var mode = DataSets.FULL_MERGE_MODE
     if (null == paths) {
       mode = DataSets.DAILY_MODE
@@ -137,8 +137,8 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val (dfSalesOrderAddrFavCalc, dfSalesOrderAddrFavFull) = SalesOrderAddress.processVariable(dfSalesOrderIncr, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull)
     // FK_CUSTOMER, CITY, MOBILE, FIRST_NAME, LAST_NAME
 
-    var writeMap = new HashMap[String, DataFrame]()
-    writeMap.put("salesOrderAddrFavFull", dfSalesOrderAddrFavFull)
+    val dfWrite = new HashMap[String, DataFrame]()
+    dfWrite.put("salesOrderAddrFavFull", dfSalesOrderAddrFavFull)
 
     //call SalesOrder.processVariable for LAST_ORDER_DATE variable
     val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
@@ -187,14 +187,14 @@ object ContactListMobile extends DataFeedsModel with Logging {
       dfZoneCityFull,
       dfCmrFull)
 
-    writeMap.put("contactListMobileFull", dfContactListMobileFull)
+    dfWrite.put("contactListMobileFull", dfContactListMobileFull)
 
     val dfContactListMobileIncrCached = dfContactListMobileIncr.cache()
-    writeMap.put("contactListMobileIncrCached", dfContactListMobileIncrCached)
+    dfWrite.put("contactListMobileIncrCached", dfContactListMobileIncrCached)
 
-    writeMap.put("contactListMobilePrevFull", dfContactListMobilePrevFull)
+    dfWrite.put("contactListMobilePrevFull", dfContactListMobilePrevFull)
 
-    writeMap
+    dfWrite
   }
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
