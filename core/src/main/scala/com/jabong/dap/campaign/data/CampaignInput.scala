@@ -583,7 +583,7 @@ object CampaignInput extends Logging {
 
     for (i <- lastHour to -1) {
 
-      val incrDateHour: String = TimeUtils.getDateAfterNHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
+      val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
 
       logger.info("Reading last " + lastHour + " day " + tableName + "data from hdfs")
 
