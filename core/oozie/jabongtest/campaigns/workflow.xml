@@ -481,6 +481,22 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
+        <ok to="customerOrders"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="customerOrders">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerOrders</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
         <ok to="contactListMobile"/>
         <error to="fail"/>
     </action>

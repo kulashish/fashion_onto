@@ -332,7 +332,7 @@ object CustomerOrders extends DataFeedsModel {
     if (null == paths) {
       mode = DataSets.DAILY_MODE
 
-      val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, prevDate)
+      val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custOrdersPrevFull", custOrdersPrevFull)
 
       val salesRuleCalcIncr = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_COUPON_DISC, DataSets.DAILY_MODE, prevDate)
