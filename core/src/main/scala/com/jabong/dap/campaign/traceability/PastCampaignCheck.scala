@@ -83,11 +83,11 @@ object PastCampaignCheck extends Logging {
     var pastCampaignData: DataFrame = null
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
-      if(past30DayEmailCampaignMergedData!=null) past30DayEmailCampaignMergedData.cache()
+      if (past30DayEmailCampaignMergedData != null) past30DayEmailCampaignMergedData.cache()
       pastCampaignData = past30DayEmailCampaignMergedData
       return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
-      if(past30DayMobileCampaignMergedData!=null) past30DayMobileCampaignMergedData.cache()
+      if (past30DayMobileCampaignMergedData != null) past30DayMobileCampaignMergedData.cache()
       pastCampaignData = past30DayMobileCampaignMergedData
       return pushCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     }

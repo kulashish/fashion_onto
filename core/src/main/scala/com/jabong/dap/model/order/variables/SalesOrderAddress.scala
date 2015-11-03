@@ -128,7 +128,7 @@ object SalesOrderAddress {
         cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
       )
     res
-      /*join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    /*join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(
 
         )
