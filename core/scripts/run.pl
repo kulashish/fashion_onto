@@ -276,7 +276,10 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "paybackData") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
     $job_exit = run_component($component, $command);
-} else {
+} elsif ($component eq "acartHourly") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acartHourly --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/acartHourly.json";
+      $job_exit = run_component($component, $command);
+  } else {
     print "not a valid component\n";
     $job_exit = -1;
 }

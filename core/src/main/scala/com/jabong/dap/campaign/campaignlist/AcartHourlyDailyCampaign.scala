@@ -28,7 +28,7 @@ class AcartHourlyDailyCampaign {
     CampaignUtils.debug(filteredSku, "AcartDaily:-after filteredSku")
 
     // ***** mobile push use case
-    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, campaignName, filteredSku, false)
+    if(campaignName.equals(CampaignCommon.ACART_DAILY_CAMPAIGN)) CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, campaignName, filteredSku, false)
 
     // ***** email use case
     CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, campaignName, filteredSku, false, brickMvpRecommendations)
