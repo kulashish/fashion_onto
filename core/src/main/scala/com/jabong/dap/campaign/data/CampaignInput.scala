@@ -565,8 +565,8 @@ object CampaignInput extends Logging {
    * @param lastHour
    * @return
    */
-  def loadNthHourTableData(tableName: String, lastHour: Int): DataFrame = {
-    val incrDateHour: String = TimeUtils.getDateAfterHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+  def loadNthHourTableData(tableName: String, lastHour: Int, date: String): DataFrame = {
+    val incrDateHour: String = TimeUtils.getDateAfterNHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
     val tableData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
     return tableData
   }
@@ -577,13 +577,13 @@ object CampaignInput extends Logging {
    * @param lastHour
    * @return
    */
-  def loadNHoursTableData(tableName: String, lastHour: Int): DataFrame = {
+  def loadNHoursTableData(tableName: String, lastHour: Int, date: String): DataFrame = {
 
     var tableNameUnionData: DataFrame = null
 
-    for (i <- lastHour to lastHour + SALES_HOUR_DIFF) {
+    for (i <- lastHour to -1) {
 
-      val incrDateHour: String = TimeUtils.getDateAfterHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+      val incrDateHour: String = TimeUtils.getDateAfterNHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
 
       logger.info("Reading last " + lastHour + " day " + tableName + "data from hdfs")
 

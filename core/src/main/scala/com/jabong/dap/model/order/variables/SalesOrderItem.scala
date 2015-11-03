@@ -1,12 +1,10 @@
 package com.jabong.dap.model.order.variables
 
-import com.jabong.dap.common.time.TimeConstants
-import com.jabong.dap.common.{ Utils, Spark }
+import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -448,7 +446,8 @@ object SalesOrderItem {
    Need to get final count of orders where invalid orderitem count matches total orderitem count
    */
 
-  def getInvalidCancelOrders(salesOrderJoined: DataFrame): DataFrame = {
+  def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame): DataFrame = {
+    val salesOrderJoined = salesOrderFull.join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
     val joinedMap = salesOrderJoined.select(salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
       salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS))

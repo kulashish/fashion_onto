@@ -17,9 +17,8 @@ import org.apache.spark.sql.functions._
  */
 object PastCampaignCheck extends Logging {
 
-  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS).cache()
-  val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS).cache()
-
+  val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS)
+  val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS)
   /**
    *
    * @param pastCampaignData
@@ -84,9 +83,11 @@ object PastCampaignCheck extends Logging {
     var pastCampaignData: DataFrame = null
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
+      if (past30DayEmailCampaignMergedData != null) past30DayEmailCampaignMergedData.cache()
       pastCampaignData = past30DayEmailCampaignMergedData
       return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     } else if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
+      if (past30DayMobileCampaignMergedData != null) past30DayMobileCampaignMergedData.cache()
       pastCampaignData = past30DayMobileCampaignMergedData
       return pushCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     }
