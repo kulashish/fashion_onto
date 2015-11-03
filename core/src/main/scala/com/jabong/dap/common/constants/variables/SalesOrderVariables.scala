@@ -83,6 +83,7 @@ object SalesOrderVariables {
   val SUM_BASKET_VALUE = "sum_basket_value"
   val COUNT_BASKET_VALUE = "count_basket_value"
   val ORDER_ITEM_COUNT = "order_item_count"
+  val LAST_ORDER_DATE = "last_order_date"
 
   val NEW_ = "new_"
 

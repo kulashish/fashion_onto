@@ -128,7 +128,7 @@ object CustTop5 {
 
     val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
 
-    return (fav, categoryCount, categoryAVG)
+    (fav, categoryCount, categoryAVG)
   }
 
 
@@ -156,7 +156,7 @@ object CustTop5 {
       while (list.size < 5) {
         list.+=("")
       }
-      return list.toList
+      list.toList
     }
   }
 
@@ -182,7 +182,7 @@ object CustTop5 {
 
     val top5incr = Spark.getSqlContext().createDataFrame(top5, Schema.customerFavList)
     if (null == top5PrevFull) {
-      return top5incr
+      top5incr
     } else {
       val top5Joined = top5PrevFull.join(top5incr, top5PrevFull(SalesOrderVariables.FK_CUSTOMER) === top5incr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(top5incr(SalesOrderVariables.FK_CUSTOMER), top5PrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
@@ -193,7 +193,7 @@ object CustTop5 {
           coalesce(top5incr("last_orders_created_at"), top5PrevFull("last_orders_created_at")) as "last_orders_created_at"
 
         )
-      return top5Joined
+      top5Joined
     }
   }
 
@@ -237,8 +237,7 @@ object CustTop5 {
         }
     }
     val finalMap = mapFull.map(kv => (kv._1,kv._2)).toMap
-    return finalMap
-
+    finalMap
   }
 
   def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
@@ -279,7 +278,7 @@ object CustTop5 {
         map.put(key, newMap)
       }
     }
-    return map
+    map
   }
 
   def readDF(incrDate: String, prevDate: String, path: String): (DataFrame, DataFrame, DataFrame, DataFrame) = {
