@@ -191,4 +191,5 @@ object DataSets {
   val CUSTOMER_ORDERS = "customer_orders"
   val CAT_COUNT = "cat_count"
   val CAT_AVG = "cat_avg"
+  val APP_DETAILS = "appDetails"
 }
