@@ -106,8 +106,8 @@ object CustTop5 extends DataFeedsModel {
         getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         CustCatPurchase.getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]])
-      )
-      )
+        )
+        )
     )
     val favTop5 = favTop5Map.map(e => Row(e._1, e._2._1(0), e._2._1(1), e._2._1(2), e._2._1(3), e._2._1(4), //brand
       e._2._2(0), e._2._2(1), e._2._2(2), e._2._2(3), e._2._2(4), //cat
