@@ -181,7 +181,7 @@ object CampaignManager extends Serializable with Logging {
     val lastHour = -2
     val salesCartHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_CART,lastHour,incrDateWithHour)
     val salesOrderHourly = CampaignInput.loadNHoursTableData(DataSets.SALES_ORDER,lastHour,incrDateWithHour)
-    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM, -lastHour,incrDateWithHour)
+    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM, lastHour,incrDateWithHour)
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 

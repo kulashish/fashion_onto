@@ -587,7 +587,7 @@ object CampaignInput extends Logging {
 
       logger.info("Reading last " + lastHour + " day " + tableName + "data from hdfs")
 
-      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
+      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
       if (null != tableNameData) {
         if (tableNameUnionData == null) {
           tableNameUnionData = tableNameData
