@@ -145,7 +145,7 @@ object CampaignUtils extends Logging {
 
     val registeredCustomerRefSku = customerFilteredData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
 
-    val registeredRefSkus = GroupedUtils.orderGroupBy(deviceOnlyCustomerRefSku, groupedFields1, aggFields, GroupedUtils.FIRST, OrderBySchema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
+    val registeredRefSkus = GroupedUtils.orderGroupBy(registeredCustomerRefSku, groupedFields1, aggFields, GroupedUtils.FIRST, OrderBySchema.pushSurfReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
     val customerRefSku = deviceOnlyRefSkus.unionAll(registeredRefSkus)
 
