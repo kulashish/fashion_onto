@@ -40,7 +40,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
-    val dfCmrFull = dfMap("crmFull")
+    val dfCmrFull = dfMap("cmrFull")
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfCPOTPart2PrevFull = dfMap("CPOTPart2PrevFull")
 
