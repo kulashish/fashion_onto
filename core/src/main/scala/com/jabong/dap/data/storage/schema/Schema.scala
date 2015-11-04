@@ -535,21 +535,21 @@ object Schema {
   ))
 
   val cmrSchema = StructType(Array(
-    StructField("UID",StringType,true),
-    StructField(CustomerVariables.EMAIL,StringType,true),
-    StructField(CustomerVariables.RESPONSYS_ID,StringType,true),
-    StructField(CustomerVariables.ID_CUSTOMER,LongType,true),
-    StructField(ClickstreamFields.BROWSER_ID,StringType,true),
-    StructField(CustomerVariables.DOMAIN,StringType,true)
+    StructField("UID", StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.RESPONSYS_ID, StringType, true),
+    StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
+    StructField(ClickstreamFields.BROWSER_ID, StringType, true),
+    StructField(CustomerVariables.DOMAIN, StringType, true)
   ))
 
   val customerSessionSchema = StructType(Array(
-    StructField(CustomerVariables.ID_CUSTOMER_SESSION,LongType,true),
-    StructField(CustomerAppDetails.SESSION_KEY,StringType,true),
-    StructField(CustomerVariables.FK_CUSTOMER,LongType,true),
-    StructField(CustomerAppDetails.LOGIN_TIME,TimestampType,true),
-    StructField(SalesOrderVariables.CREATED_AT,TimestampType,true),
-    StructField(SalesOrderVariables.UPDATED_AT,TimestampType,true)
+    StructField(CustomerVariables.ID_CUSTOMER_SESSION, LongType, true),
+    StructField(CustomerAppDetails.SESSION_KEY, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerAppDetails.LOGIN_TIME, TimestampType, true),
+    StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
+    StructField(SalesOrderVariables.UPDATED_AT, TimestampType, true)
   ))
 
   val cmr = StructType(Array(
