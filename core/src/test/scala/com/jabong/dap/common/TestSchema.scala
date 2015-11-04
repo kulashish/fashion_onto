@@ -1,6 +1,6 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import org.apache.spark.sql.types._
