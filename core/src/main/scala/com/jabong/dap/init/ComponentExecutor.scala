@@ -96,6 +96,7 @@ class ComponentExecutor extends Serializable with Logging {
           // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
+          case DataSets.CUST_EMAIL_RESPONSE => CustEmailResponse.start(paramJob)
 
           //// clickstream use cases
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)

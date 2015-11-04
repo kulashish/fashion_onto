@@ -26,6 +26,9 @@ object UdfUtils extends Logging {
     return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
   }
 
+  def outputDateFormat(s: String): String = {
+    return TimeUtils.changeDateFormat(s, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT)
+  }
   /**
    * min of Timestamp t1 or t2
    * @param t1
@@ -235,7 +238,7 @@ object UdfUtils extends Logging {
     iterable.foreach {
       case (slot, value) =>
         if (value > max) { maxSlot = slot; max = value }
-        timeSlotArray(slot) = value
+        timeSlotArray(slot - 1) = value
     }
 
     logger.info("Exit from  getCompleteSlotData: ")
@@ -707,4 +710,28 @@ object UdfUtils extends Logging {
     df.dropDuplicates()
   }
 
+
+  // The last click date will be calculated based on click dates alone and the open dates are passed empty.
+  // If the open dates are are null or empty, we need to check the values in click date to set the final open date  value.
+  def latestDate(openDate: String, yesOpenDate: String, clickDate: String,  yesClickDate:String): String = {
+    var maxDateString: String = "2001-01-01 00:00:00"
+    var i: Int = 0;
+    var maxDate: Date = TimeUtils.getDate(maxDateString, TimeConstants.DATE_TIME_FORMAT)
+    var date : Date = null
+    if(null != openDate && openDate.length > 0){
+      date = TimeUtils.getDate(openDate, TimeConstants.DATE_TIME_FORMAT)
+    }else if(null != yesOpenDate && yesOpenDate.length > 0) {
+      date = TimeUtils.getDate(yesOpenDate, TimeConstants.DATE_TIME_FORMAT)
+    }
+    if(date != null && date.after(maxDate)){
+      maxDate = date
+    }else{
+      if(null != clickDate && clickDate.length > 0){
+        maxDate = TimeUtils.getDate(clickDate, TimeConstants.DATE_TIME_FORMAT)
+      }else if(null != yesClickDate && yesClickDate.length > 0) {
+        maxDate = TimeUtils.getDate(yesClickDate, TimeConstants.DATE_TIME_FORMAT)
+      }
+    }
+    TimeUtils.dateStringFromDate(maxDate, TimeConstants.DATE_TIME_FORMAT)
+  }
 }
