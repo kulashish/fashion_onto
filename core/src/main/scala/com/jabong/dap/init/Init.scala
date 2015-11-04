@@ -128,7 +128,6 @@ object Init {
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
       case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
       case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
-      case "followUpCampaigns" => CampaignManager.startFollowUpCampaigns()
 
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
