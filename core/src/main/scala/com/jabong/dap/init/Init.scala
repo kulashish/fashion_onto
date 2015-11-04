@@ -129,6 +129,9 @@ object Init {
       case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
       case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
 
+      //calendar campaigns
+      case "pricepoint" => CampaignManager.startPricepointCampaign()
+
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
 
