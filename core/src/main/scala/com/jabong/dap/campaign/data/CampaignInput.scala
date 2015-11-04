@@ -611,7 +611,7 @@ object CampaignInput extends Logging {
 
     val lastHour = TimeUtils.getHour(date,TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
 
-    for (i <- lastHour to -1) {
+    for (i <- lastHour to 1 by -1) {
 
       val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
 

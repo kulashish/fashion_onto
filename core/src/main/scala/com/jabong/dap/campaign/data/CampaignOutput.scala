@@ -36,7 +36,7 @@ object CampaignOutput {
         val dateYesterday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateYesterday)
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
-          DataWriter.writeParquet(campaignOutput.cache(), path, DataSets.IGNORE_SAVEMODE)
+          DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
         }
         val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
         DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.LAST_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
