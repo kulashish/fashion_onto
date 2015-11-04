@@ -148,6 +148,7 @@ object DataSets {
   val CUSTOMER_PREFERRED_TIMESLOT_PART1 = "customerPreferredTimeslotPart1"
   val CUST_TOP5 = "custTop5"
   val CUSTOMER_ORDERS = "customerOrders"
+  val CUSTOMER_APP_DETAILS = "customerAppDetails"
   val NL_DATA_LIST = "NL_data_list"
   val CONTACT_LIST_PLUS = "Contact_list_Plus"
   val APP_EMAIL_FEED = "app_email_feed"
@@ -191,5 +192,4 @@ object DataSets {
   val SALES_ADDRESS_FIRST = "sales_address_first"
   val CAT_COUNT = "cat_count"
   val CAT_AVG = "cat_avg"
-  val APP_DETAILS = "appDetails"
 }
