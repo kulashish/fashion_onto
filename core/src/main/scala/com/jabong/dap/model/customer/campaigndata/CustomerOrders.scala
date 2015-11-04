@@ -82,7 +82,7 @@ object CustomerOrders extends DataFeedsModel {
 
     val (salesVariablesIncr, salesVariablesFull) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90)
 
-    var dfWrite = new HashMap[String, DataFrame]()
+    val dfWrite = new HashMap[String, DataFrame]()
     dfWrite.put("salesVariablesFull", salesVariablesFull)
     dfWrite.put("salesVariablesIncr", salesVariablesIncr)
 
@@ -326,13 +326,13 @@ object CustomerOrders extends DataFeedsModel {
 
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
 
-    var dfMap = new HashMap[String, DataFrame]()
+    val dfMap = new HashMap[String, DataFrame]()
 
     var mode: String = DataSets.FULL_MERGE_MODE
     if (null == paths) {
       mode = DataSets.DAILY_MODE
 
-      val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, prevDate)
+      val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custOrdersPrevFull", custOrdersPrevFull)
 
       val salesRuleCalcIncr = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_COUPON_DISC, DataSets.DAILY_MODE, prevDate)

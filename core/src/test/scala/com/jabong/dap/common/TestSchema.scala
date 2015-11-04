@@ -1,8 +1,8 @@
 package com.jabong.dap.common
 
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignCommon, CampaignMergedFields }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.model.product.itr.variables.ITR
+import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import org.apache.spark.sql.types._
 
 /**
@@ -236,4 +236,23 @@ object TestSchema {
     StructField(ProductVariables.BRICK, StringType, true),
     StructField(ProductVariables.BRAND, StringType, true)))
 
+  // CUSTOMER_APP_DETAILS related Schemas
+  val customerAppDetails = StructType(Array(
+    StructField(CustomerAppDetails.UID, StringType, true),
+    StructField(CustomerVariables.DOMAIN, StringType, true),
+    StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
+    StructField(CustomerAppDetails.FIRST_LOGIN_TIME, TimestampType, true),
+    StructField(CustomerAppDetails.LAST_LOGIN_TIME, TimestampType, true),
+    StructField(CustomerAppDetails.SESSION_KEY, StringType, true),
+    StructField(CustomerAppDetails.ORDER_COUNT, IntegerType, true)
+  ))
+
+  val customerSession = StructType(Array(
+    StructField(CustomerVariables.ID_CUSTOMER_SESSION, LongType, true),
+    StructField(CustomerAppDetails.SESSION_KEY, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerAppDetails.LOGIN_TIME, TimestampType, true),
+    StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
+    StructField(SalesOrderVariables.UPDATED_AT, TimestampType, true)
+  ))
 }

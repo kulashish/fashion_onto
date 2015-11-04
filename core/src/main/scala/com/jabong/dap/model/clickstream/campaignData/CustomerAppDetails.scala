@@ -6,24 +6,22 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.catalyst.util.DateUtils
-import org.apache.spark.sql.types.IntegerType
-import org.apache.spark.sql.{ DataFrame }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.IntegerType
 
 import scala.collection.mutable.HashMap
 
 /**
  * Created by kapil on 13/10/15.
  */
-object AppDetails extends DataFeedsModel with Logging {
+object CustomerAppDetails extends DataFeedsModel with Logging {
   val UID = "uid"
   val SESSION_KEY = "session_key"
   val LOGIN_TIME = "login_time"
@@ -31,12 +29,12 @@ object AppDetails extends DataFeedsModel with Logging {
   val FIRST_LOGIN_TIME = "first_login_time"
   val ORDER_COUNT = "order_count"
   val CUSTOMER_SESSION = "customer_session"
-  val CUSTOMER_APP_DETAILS = "Customer_App_details"
-  def canProcess(incrDate: String, saveMode: String): Boolean = {
-    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
-    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
 
-    DataWriter.canWrite(saveMode, incrSavePath) || DataWriter.canWrite(saveMode,fullSavePath)
+  def canProcess(incrDate: String, saveMode: String): Boolean = {
+    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
+    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
+
+    DataWriter.canWrite(saveMode, incrSavePath) || DataWriter.canWrite(saveMode, fullSavePath)
   }
   def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
@@ -44,7 +42,7 @@ object AppDetails extends DataFeedsModel with Logging {
     val masterRecord =
       if (null != paths) getFullOnFirstDay(yesterday)
       else
-        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, yesterday)
+        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, yesterday)
 
     val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, yesterday)
     val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, yesterday)
@@ -57,9 +55,9 @@ object AppDetails extends DataFeedsModel with Logging {
     dfMap.put("customerSession", customerSession)
     dfMap
   }
-  def getFullOnFirstDay(date: String):DataFrame = {
-    val inputCSVPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
-    val outputPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + date
+  def getFullOnFirstDay(date: String): DataFrame = {
+    val inputCSVPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + DataSets.CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
+    val outputPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + DataSets.CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + date
     val df = DataReader.getDataFrame4mCsv(inputCSVPath, "true", "|")
     df.withColumnRenamed("ID_CUSTOMER", "uid")
       .withColumnRenamed("DOMAIN", "domain")
@@ -112,7 +110,7 @@ object AppDetails extends DataFeedsModel with Logging {
         coalesce(soWithUIDLoginTime(CustomerVariables.CREATED_AT), masterRecordRenamed(MASTER_ + CustomerVariables.CREATED_AT)) as CustomerVariables.CREATED_AT,
         coalesce(masterRecordRenamed(MASTER_ + FIRST_LOGIN_TIME), soWithUIDLoginTime(FIRST_LOGIN_TIME)) as FIRST_LOGIN_TIME,
         coalesce(soWithUIDLoginTime(LAST_LOGIN_TIME), masterRecordRenamed(MASTER_ + LAST_LOGIN_TIME)) as LAST_LOGIN_TIME,
-        coalesce(soWithUIDLoginTime(SESSION_KEY), masterRecordRenamed(MASTER_ +SESSION_KEY)) as SESSION_KEY,
+        coalesce(soWithUIDLoginTime(SESSION_KEY), masterRecordRenamed(MASTER_ + SESSION_KEY)) as SESSION_KEY,
         when(masterRecordRenamed(MASTER_ + ORDER_COUNT).isNull, soWithUIDLoginTime(ORDER_COUNT).cast(IntegerType))
           .otherwise((masterRecordRenamed(MASTER_ + ORDER_COUNT) + soWithUIDLoginTime(ORDER_COUNT)).cast(IntegerType))
           as ORDER_COUNT)
@@ -127,7 +125,7 @@ object AppDetails extends DataFeedsModel with Logging {
         coalesce(masterRecord(FIRST_LOGIN_TIME), incrRenamed(INCR_ + FIRST_LOGIN_TIME)) as FIRST_LOGIN_TIME,
         coalesce(incrRenamed(INCR_ + LAST_LOGIN_TIME), masterRecord(LAST_LOGIN_TIME)) as LAST_LOGIN_TIME,
         coalesce(incrRenamed(INCR_ + SESSION_KEY), masterRecord(SESSION_KEY)) as SESSION_KEY,
-        when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull && masterRecord(ORDER_COUNT).isNotNull, (masterRecord(ORDER_COUNT)+incrRenamed(INCR_ + ORDER_COUNT)).cast(IntegerType))
+        when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull && masterRecord(ORDER_COUNT).isNotNull, (masterRecord(ORDER_COUNT) + incrRenamed(INCR_ + ORDER_COUNT)).cast(IntegerType))
           .otherwise(when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull, incrRenamed(INCR_ + ORDER_COUNT).cast(IntegerType)).otherwise(masterRecord(ORDER_COUNT).cast(IntegerType))) as ORDER_COUNT)
     val dfWriteMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
     dfWriteMap.put("updatedMaster", updatedMaster)
@@ -137,15 +135,15 @@ object AppDetails extends DataFeedsModel with Logging {
   def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     val full = dfWriteMap("updatedMaster")
     val incr = dfWriteMap("incrDF")
-    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
-    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
-    val csvFileName = TimeUtils.changeDateFormat(incrDate,TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)+"_"+CUSTOMER_APP_DETAILS
+    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
+    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
+    val csvFileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_Customer_App_details"
     if (DataWriter.canWrite(incrSavePath, saveMode)) {
       DataWriter.writeParquet(incr, incrSavePath, saveMode)
     }
     if (DataWriter.canWrite(fullSavePath, saveMode)) {
       DataWriter.writeParquet(full, fullSavePath, saveMode)
     }
-    DataWriter.writeCsv(incr, DataSets.VARIABLES, CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, csvFileName, saveMode, "true", ";")
+    DataWriter.writeCsv(incr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, csvFileName, saveMode, "true", ";")
   }
 }
