@@ -36,7 +36,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
    */
   def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
 
-    var dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
+    val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
 
     val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
     var dfSalesOrderIncr: DataFrame = null
@@ -85,7 +85,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
         col(CustomerVariables.PREFERRED_ORDER_TIMESLOT)
       )
 
-    var dfWriteMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
+    val dfWrite: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
 
     if (dfCPOTPart2PrevFull != null) {
       val dfIncrVarBC = Spark.getContext().broadcast(dfInc).value
@@ -141,13 +141,13 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
       // Apply the schema to the RDD.
       val dfFullFinal = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart2)
 
-      dfWriteMap.put("CPOTPart2Full", dfFullFinal)
-      dfWriteMap.put("CPOTPart2Incr", dfFullFinal.except(dfCPOTPart2PrevFull))
+      dfWrite.put("CPOTPart2Full", dfFullFinal)
+      dfWrite.put("CPOTPart2Incr", dfFullFinal.except(dfCPOTPart2PrevFull))
     } else {
-      dfWriteMap.put("CPOTPart2Full", dfInc)
-      dfWriteMap.put("CPOTPart2Incr", dfInc)
+      dfWrite.put("CPOTPart2Full", dfInc)
+      dfWrite.put("CPOTPart2Incr", dfInc)
     }
-    dfWriteMap
+    dfWrite
   }
 
   def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {

@@ -2,8 +2,6 @@ package com.jabong.dap.data.storage.schema
 
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.model.clickstream.campaignData.AppDetails
-import com.jabong.dap.model.clickstream.variables.ClickstreamFields
 import org.apache.spark.sql.types._
 
 /**
@@ -514,42 +512,13 @@ object Schema {
     StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
 
-  val csvMasterSchema = StructType(Array(
-    StructField("ID_CUSTOMER", LongType, true),
-    StructField("DOMAIN", StringType, true),
-    StructField("CREATED_AT", TimestampType, true),
-    StructField("PROCESSED_DATE", TimestampType, true),
-    StructField("LOGIN_TIME", TimestampType, true),
-    StructField("SESSION_KEY", StringType, true),
-    StructField("ORDER_COUNT", IntegerType, true),
-    StructField("LAST_LOGIN_TIME", TimestampType, true)
-  ))
-  val masterSchema = StructType(Array(
-    StructField(AppDetails.UID, StringType, true),
-    StructField(CustomerVariables.DOMAIN, StringType, true),
-    StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
-    StructField(AppDetails.FIRST_LOGIN_TIME, TimestampType, true),
-    StructField(AppDetails.LAST_LOGIN_TIME, TimestampType, true),
-    StructField(AppDetails.SESSION_KEY, StringType, true),
-    StructField(AppDetails.ORDER_COUNT, IntegerType, true)
-  ))
-
-  val cmrSchema = StructType(Array(
-    StructField("UID",StringType,true),
-    StructField(CustomerVariables.EMAIL,StringType,true),
-    StructField(CustomerVariables.RESPONSYS_ID,StringType,true),
-    StructField(CustomerVariables.ID_CUSTOMER,LongType,true),
-    StructField(ClickstreamFields.BROWSER_ID,StringType,true),
-    StructField(CustomerVariables.DOMAIN,StringType,true)
-  ))
-
-  val customerSessionSchema = StructType(Array(
-    StructField(CustomerVariables.ID_CUSTOMER_SESSION,LongType,true),
-    StructField(AppDetails.SESSION_KEY,StringType,true),
-    StructField(CustomerVariables.FK_CUSTOMER,LongType,true),
-    StructField(AppDetails.LOGIN_TIME,TimestampType,true),
-    StructField(SalesOrderVariables.CREATED_AT,TimestampType,true),
-    StructField(SalesOrderVariables.UPDATED_AT,TimestampType,true)
+  val cmr = StructType(Array(
+    StructField(ContactListMobileVars.UID, StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.RESPONSYS_ID, StringType, true),
+    StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
+    StructField(PageVisitVariables.BROWSER_ID, StringType, true),
+    StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
 
 }
