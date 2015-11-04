@@ -386,7 +386,7 @@
         <path start="customerPreferredTimeslotPart1" />
         <path start="customerPreferredTimeslotPart2" />
         <path start="paybackData" />
-        <path start="appDetails" />
+        <path start="customerAppDetails" />
         <path start="custTop5" />
     </fork>
 
@@ -454,7 +454,7 @@
         <error to="fail"/>
     </action>
 
-    <action name="appDetails">
+    <action name="customerAppDetails">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
