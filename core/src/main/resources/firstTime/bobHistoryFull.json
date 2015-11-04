@@ -16,7 +16,7 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "Overwrite",
-      "filterCondition": "updated_at <= '2015-10-11 23:59:59'"
+      "filterCondition": "updated_at <= '2015-10-28 23:59:59'"
     },
     {
       "source": "bob",
@@ -25,7 +25,7 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "Overwrite",
-      "filterCondition": "updated_at <= '2015-10-12 23:59:59'"
+      "filterCondition": "updated_at <= '2015-10-17 23:59:59'"
     },
     {
       "source": "bob",
@@ -34,7 +34,34 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "Overwrite",
-      "filterCondition": "updated_at <= '2015-10-12 23:59:59'"
+      "filterCondition": "updated_at <= '2015-10-25 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "payment_prepaid_transaction_data",
+      "primaryKey": "id_payment_prepaid_transaction_data",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Overwrite",
+      "filterCondition": "order_created_at <= '2015-10-30 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_payback_earn",
+      "primaryKey": "id_sales_order_payback_earn",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Overwrite",
+      "filterCondition": "updated_at <= '2015-10-30 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_payback_redeem",
+      "primaryKey": "id_sales_order_payback_redeem",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Overwrite",
+      "filterCondition": "updated_at <= '2015-10-30 23:59:59'"
     }
   ]
 }

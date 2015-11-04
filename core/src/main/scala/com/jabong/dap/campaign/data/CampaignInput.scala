@@ -2,8 +2,8 @@ package com.jabong.dap.campaign.data
 
 import java.io.File
 import java.sql.Timestamp
-import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.Spark
+
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -88,7 +88,7 @@ object CampaignInput extends Logging {
     val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
-    val lastNdaysOrderItemData = CampaignUtils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
+    val lastNdaysOrderItemData = Utils.getTimeBasedDataFrame(fullOrderItemData, SalesOrderVariables.UPDATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
 
     lastNdaysOrderItemData
   }
@@ -108,7 +108,7 @@ object CampaignInput extends Logging {
     val dateTime = Timestamp.valueOf(dateTimeMs)
     val dateEndTime = TimeUtils.getEndTimestampMS(dateTime)
 
-    val lastNdaysOrderData = CampaignUtils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
+    val lastNdaysOrderData = Utils.getTimeBasedDataFrame(fullOrderData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, dateEndTime.toString)
     lastNdaysOrderData
   }
 
@@ -125,7 +125,7 @@ object CampaignInput extends Logging {
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
     val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
 
-    val nthDayOrderData = CampaignUtils.getTimeBasedDataFrame(last30daysAcartData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
+    val nthDayOrderData = Utils.getTimeBasedDataFrame(last30daysAcartData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
     nthDayOrderData
   }
 
@@ -144,7 +144,8 @@ object CampaignInput extends Logging {
       itrData(ITR.COLOR),
       itrData(ITR.PRICE_BAND),
       itrData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT)
+      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+      itrData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
     filteredItr
   }
@@ -271,7 +272,7 @@ object CampaignInput extends Logging {
         val campaignSchema = if (DataSets.PUSH_CAMPAIGNS == campaignType) Schema.campaignSchema else Schema.emailCampaignSchema
 
         if (!SchemaUtils.isSchemaEqual(campaignData.schema, campaignSchema)) {
-          val res = SchemaUtils.changeSchema(campaignData, campaignSchema)
+          val res = SchemaUtils.addColumns(campaignData, campaignSchema)
           if (DataSets.PUSH_CAMPAIGNS == campaignType) {
             result = res
               .select(
@@ -285,11 +286,10 @@ object CampaignInput extends Logging {
               )
           } else {
             result = res.select(
-              res(CustomerVariables.FK_CUSTOMER),
+              res(CustomerVariables.EMAIL),
               res(CampaignMergedFields.REF_SKUS),
               res(CampaignMergedFields.REC_SKUS),
               res(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-              res(CustomerVariables.EMAIL),
               res(CampaignCommon.PRIORITY),
               res(CampaignMergedFields.LIVE_CART_URL)
             )
@@ -456,7 +456,7 @@ object CampaignInput extends Logging {
           var newMergedCamapignData = mergedCampaignData
           if (!SchemaUtils.isSchemaEqual(mergedCampaignData.schema, campaignMerged30Day.schema)) {
             // added to add new column add4pushId for the old camaigns data
-            newMergedCamapignData = SchemaUtils.changeSchema(mergedCampaignData, campaignMerged30Day.schema)
+            newMergedCamapignData = SchemaUtils.addColumns(mergedCampaignData, campaignMerged30Day.schema)
           }
           campaignMerged30Day = campaignMerged30Day.unionAll(newMergedCamapignData)
         }
@@ -525,7 +525,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
     val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
 
-    val nthDayShortlistData = CampaignUtils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nthDayShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nthDayShortlistData
   }
@@ -560,7 +560,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
     val endTimestamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
 
-    val nDaysShortlistData = CampaignUtils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nDaysShortlistData
   }

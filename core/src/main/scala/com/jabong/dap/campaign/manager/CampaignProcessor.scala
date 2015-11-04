@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
@@ -8,11 +8,12 @@ import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.CampaignInfo
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.schema.OrderBySchema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types.{ IntegerType, StringType }
 
 /**
  * Created by Mubarak on 28/7/15.
@@ -85,19 +86,13 @@ object CampaignProcessor {
   }
 
   /**
-   *
+   * Gets customer id  from customer master data for merged email campaigns
    * @param cmr
    * @param campaign
    * @return
    */
   def mapEmailCampaignWithCMR(cmr: DataFrame, campaign: DataFrame): DataFrame = {
     println("Starting the device mapping after dropping duplicates: ") // + campaign.count())
-
-    val notNullCampaign = campaign.filter(!(col(CustomerVariables.FK_CUSTOMER) === 0))
-
-    println("After dropping empty customer and device ids: ") // + notNullCampaign.count())
-
-    println("Starting the CMR: ") // + cmr.count())
 
     val cmrn = cmr
       .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
@@ -112,57 +107,43 @@ object CampaignProcessor {
 
     println("After removing customer id = 0 or null ") // + cmrn.count())
 
-    val bcCampaign = Spark.getContext().broadcast(notNullCampaign).value
-    val campaignDevice = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.FK_CUSTOMER) === cmrn(CustomerVariables.ID_CUSTOMER), SQL.RIGHT_OUTER)
+    val bcCampaign = Spark.getContext().broadcast(campaign).value
+    val emailData = cmrn.join(bcCampaign, bcCampaign(CustomerVariables.EMAIL) === cmrn(CustomerVariables.EMAIL), SQL.INNER)
       .select(
-        cmr(ContactListMobileVars.UID),
-        bcCampaign(CustomerVariables.FK_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
+        cmrn(ContactListMobileVars.UID),
+        cmrn(CustomerVariables.ID_CUSTOMER) as CampaignMergedFields.CUSTOMER_ID,
         bcCampaign(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         bcCampaign(CampaignMergedFields.REF_SKUS),
         bcCampaign(CampaignMergedFields.REC_SKUS),
         bcCampaign(CampaignCommon.PRIORITY),
         bcCampaign(CampaignMergedFields.LIVE_CART_URL),
-        Udf.email(bcCampaign(CampaignMergedFields.EMAIL), cmrn(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL
+        bcCampaign(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL
       )
-    campaignDevice
+    emailData
   }
   /**
    * takes union input of all campaigns and return merged campaign list
    * @param inputCampaignsData
-   * @param key
-   * @param key1
+   * @param groupKey
    * @return
    */
-  def campaignMerger(inputCampaignsData: DataFrame, key: String, key1: String): DataFrame = {
+  def campaignMerger(inputCampaignsData: DataFrame, groupKey: String): DataFrame = {
     if (inputCampaignsData == null) {
       // logger.error("inputCampaignData is null")
       return null
     }
 
-    if (!(inputCampaignsData.columns.contains(key) || inputCampaignsData.columns.contains(key1))) {
+    if (!(inputCampaignsData.columns.contains(groupKey))) {
       // logger.error("Keys doesn't Exists")
       return null
     }
 
-    val campaignMerged = inputCampaignsData
-      .orderBy(CampaignCommon.PRIORITY)
-      .groupBy(key)
-      .agg(first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as (CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        first(CampaignCommon.PRIORITY) as (CampaignCommon.PRIORITY),
-        first(CampaignMergedFields.REF_SKU1) as (CampaignMergedFields.REF_SKU1),
-        first(key1) as key1,
-        first(CampaignMergedFields.DOMAIN) as CampaignMergedFields.DOMAIN,
-        first(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL)
+    val groupedFields = Array(groupKey)
+    val aggFields = Array(groupKey, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.REF_SKU1, CampaignMergedFields.EMAIL, CampaignMergedFields.DOMAIN)
 
-    return campaignMerged
-      .select(
-        campaignMerged(CampaignMergedFields.CUSTOMER_ID),
-        campaignMerged(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        campaignMerged(CampaignMergedFields.REF_SKU1),
-        campaignMerged(CampaignMergedFields.EMAIL),
-        campaignMerged(CampaignMergedFields.DOMAIN),
-        campaignMerged(CampaignMergedFields.DEVICE_ID)
-      )
+    val campaignMerged = GroupedUtils.orderGroupBy(inputCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.pushCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
+
+    campaignMerged
   }
 
   /**
@@ -204,7 +185,7 @@ object CampaignProcessor {
     // //camp.printSchema()
     // //camp.show(10)
 
-    val camp = campaignMerger(campaign, CampaignMergedFields.DEVICE_ID, CampaignMergedFields.CUSTOMER_ID)
+    val camp = campaignMerger(campaign, CampaignMergedFields.DEVICE_ID)
     println("After campaign merger on DeviceId")
     //DeviceId.printSchema()
     //DeviceId.show(10)
@@ -233,13 +214,13 @@ object CampaignProcessor {
   }
 
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
-    allCampaignsData.sort(col(CampaignCommon.PRIORITY).desc).groupBy(CampaignMergedFields.EMAIL)
-      .agg(first(ContactListMobileVars.UID) as ContactListMobileVars.UID,
-        first(CampaignMergedFields.CUSTOMER_ID) as CampaignMergedFields.CUSTOMER_ID,
-        first(CampaignMergedFields.REF_SKUS) as CampaignMergedFields.REF_SKUS,
-        first(CampaignMergedFields.REC_SKUS) as CampaignMergedFields.REC_SKUS,
-        first(CampaignMergedFields.CAMPAIGN_MAIL_TYPE) as CampaignMergedFields.CAMPAIGN_MAIL_TYPE,
-        first(CampaignMergedFields.LIVE_CART_URL) as CampaignMergedFields.LIVE_CART_URL)
+
+    val groupedFields = Array(CampaignMergedFields.EMAIL)
+    val aggFields = Array(CampaignMergedFields.EMAIL, ContactListMobileVars.UID, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKUS, CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
+
+    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
+
+    campaignMerged
   }
   /**
    *

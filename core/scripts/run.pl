@@ -136,8 +136,8 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 # bob acq run for only customer_product_shortlist full dump separately as this takes a lot of time.
 } elsif ($component eq "bobAcqFull2") {
-    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
-    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH --num-executors 3 --executor-memory 27G $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
+    $AMMUNITION = "--num-executors 3 --executor-memory 27G";
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqFull2.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "bobAcqIncr") {
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
@@ -163,24 +163,15 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 # crm acquisition
 } elsif ($component eq "crmAcqIncr") {
-    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
-    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
-    $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 3 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqIncr.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "crmAcqFull") {
-    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
-    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
-    $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqFull.json";
     $job_exit = run_component($component, $command);
 #crm Merge
 } elsif ($component eq "crmMerge") {
-    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
-    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
-    $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/crmMerge.json";
     $job_exit = run_component($component, $command);
@@ -198,6 +189,10 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "basicITR") {
     $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "appDetails") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component appDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/appDetails.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
@@ -270,14 +265,23 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "custWelcomeVoucher") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custWelcomeVoucher --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custWelcomeVoucher.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "custTop5") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "customerOrders") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerOrders --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerOrders.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerPreferredTimeslotPart2") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerPreferredTimeslotPart2 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart2.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerPreferredTimeslotPart1") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerPreferredTimeslotPart1 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart1.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerPreferredTimeslotPart1 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerPreferredTimeslotPart1.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "paybackData") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
     $job_exit = run_component($component, $command);
 } else {
     print "not a valid component\n";

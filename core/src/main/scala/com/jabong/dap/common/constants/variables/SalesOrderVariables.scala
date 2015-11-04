@@ -73,6 +73,18 @@ object SalesOrderVariables {
   val DAYS_SINCE_LAST_ORDER = "days_since_last_order"
   val FIRST_ORDER_DATE = "first_order_date"
   val ORDERS_COUNT = "orders_count"
+  val CATEGORY_PENETRATION = "CATEGORY_PENETRATION"
+  val BRICK_PENETRATION = "BRICK_PENETRATION"
+
+  val MAX_ORDER_BASKET_VALUE = "MAX_ORDER_BASKET_VALUE"
+  val MAX_ORDER_ITEM_VALUE = "MAX_ORDER_ITEM_VALUE"
+  val AVG_ORDER_VALUE = "AVG_ORDER_VALUE"
+  val AVG_ORDER_ITEM_VALUE = "AVG_ORDER_ITEM_VALUE"
+  val SUM_BASKET_VALUE = "sum_basket_value"
+  val COUNT_BASKET_VALUE = "count_basket_value"
+  val ORDER_ITEM_COUNT = "order_item_count"
+  val LAST_ORDER_DATE = "last_order_date"
 
   val NEW_ = "new_"
+
 }

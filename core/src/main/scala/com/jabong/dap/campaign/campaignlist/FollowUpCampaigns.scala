@@ -17,8 +17,8 @@ class FollowUpCampaigns {
 
     val refSku1Out = CampaignUtils.campaignSkuStockFilter(selectedData, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU1, 3)
     val refSku2Out = CampaignUtils.campaignSkuStockFilter(refSku1Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "2", 3)
-    val refSku3Out = CampaignUtils.campaignSkuStockFilter(refSku2Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "3", 3)
-
-    CampaignOutput.saveCampaignDataForYesterday(refSku3Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS)
+//    val refSku3Out = CampaignUtils.campaignSkuStockFilter(refSku2Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "3", 3)
+/
+    CampaignOutput.saveCampaignDataForYesterday(refSku2Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS)
   }
 }

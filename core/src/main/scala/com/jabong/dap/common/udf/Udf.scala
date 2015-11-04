@@ -23,26 +23,6 @@ object Udf {
   val maxTimestamp = udf((t1: Timestamp, t2: Timestamp) => UdfUtils.getMax(t1: Timestamp, t2: Timestamp))
 
   /**
-   * latestTimestamp will return latest Timestamp value
-   */
-  val latestTimestamp = udf((a1: Timestamp, a2: Timestamp) => UdfUtils.getLatest(a1: Timestamp, a2: Timestamp))
-
-  /**
-   * latestDecimal will return latest Decimal value
-   */
-  val latestDecimal = udf((a1: java.math.BigDecimal, a2: java.math.BigDecimal) => UdfUtils.getLatest(a1: java.math.BigDecimal, a2: java.math.BigDecimal))
-
-  /**
-   * latestDate will return latest Date value
-   */
-  val latestDate = udf((a1: Date, a2: Date) => UdfUtils.getLatest(a1: Date, a2: Date))
-
-  /**
-   * latestString will return latest String value
-   */
-  val latestString = udf((a1: String, a2: String) => UdfUtils.getLatest(a1: String, a2: String))
-
-  /**
    * mergeSlots will return merge two slots data
    */
   val mergeSlots = udf((oldSlot: Any, newSlot: Any) => UdfUtils.getMergeSlots(oldSlot: Any, newSlot: Any))
@@ -143,6 +123,8 @@ object Udf {
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
   val addString = udf((s: String, constant: String) => UdfUtils.addString(s: String, constant: String))
+
+  val addInt = udf((i1: Int, i2: Int) => UdfUtils.addInt(i1: Int, i2: Int))
 
   val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
 

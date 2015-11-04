@@ -16,5 +16,6 @@ object SalesRuleVariables {
   val CODE2 = "CODE2"
   val CODE2_CREATION_DATE = "CODE2_CREATION_DATE"
   val CODE2_VALID_DATE = "CODE2_VALID_DATE"
+  val FK_SALES_RULE_SET = "fk_sales_rule_set"
 
 }

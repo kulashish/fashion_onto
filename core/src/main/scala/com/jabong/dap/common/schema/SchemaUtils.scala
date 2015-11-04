@@ -20,15 +20,14 @@ object SchemaUtils {
 
       return false
     }
-    return true
+    true
   }
 
   private def addColumn(df: DataFrame, key: String, dataType: DataType): DataFrame = {
-    //TODO Add check for datatype as well.
     if (df.columns.contains(key)) {
-      return df
+      df
     } else {
-      return df.withColumn(key, lit(null).cast(dataType))
+      df.withColumn(key, lit(null).cast(dataType))
     }
   }
 
@@ -36,14 +35,14 @@ object SchemaUtils {
     var res: DataFrame = df
     var sec = df.schema
     sec.foreach(e => (res = dropColumn(res, e.name, schema)))
-    return res
+    res
   }
 
-  def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
+  private def dropColumn(df: DataFrame, key: String, schema: StructType): DataFrame = {
     if (schema.fieldNames.contains(key)) {
-      return df
+      df
     } else {
-      return df.drop(key)
+      df.drop(key)
     }
   }
 
@@ -53,10 +52,40 @@ object SchemaUtils {
    * @param schema
    * @return
    */
-  def changeSchema(df: DataFrame, schema: StructType): DataFrame = {
+  def addColumns(df: DataFrame, schema: StructType): DataFrame = {
     var res: DataFrame = df
     schema.foreach(e => (res = addColumn(res, e.name, e.dataType)))
-    return res
+    res
 
+  }
+
+  /**
+   *
+   * @param df
+   * @param schema
+   * @return
+   */
+  def changeSchema(df: DataFrame, schema: StructType): DataFrame = {
+    //TODO Check for datatypes changes.
+    var res: DataFrame = df
+    // Adding any new columns to DF with null value.
+    schema.foreach(e => (res = addColumn(res, e.name, e.dataType)))
+    // Deleting any extra columns in DF.
+    var sec = df.schema
+    sec.foreach(e => (res = dropColumn(res, e.name, schema)))
+    res
+  }
+
+  /**
+   * rename every column with prefix given
+   * @param df
+   * @param prefix
+   * @return
+   */
+  def renameCols(df: DataFrame, prefix: String): DataFrame = {
+    var dfVar = df
+    val schema = df.schema
+    schema.foreach(x => dfVar = dfVar.withColumnRenamed(x.name, prefix + x.name))
+    dfVar
   }
 }

@@ -2,9 +2,16 @@
   "params": [
     {
       "source": "custWelcomeVoucher",
-      "path": "/data/input/bob/sales_rule/full/2015/09/26/24",
-      "incrDate": "2015/09/26",
+      "path": "/data/input/bob/sales_rule/full/2015/10/31/24",
+      "incrDate": "2015/10/31",
       "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "custWelcomeVoucher",
+      "fullDate": "2015/10/31",
+      "incrDate": "2015/11/01",
+      "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
   ]

@@ -434,7 +434,7 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.LIVE_CART_URL + temp)
 
-        val emailCampaignFileName = "53699_33838_" + TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
         val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.REC_SKUS)

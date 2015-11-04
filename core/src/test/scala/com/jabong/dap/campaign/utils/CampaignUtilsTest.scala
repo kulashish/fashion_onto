@@ -11,6 +11,7 @@ import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
 import org.scalatest.FlatSpec
+import com.jabong.dap.common.Utils
 
 /**
  * Utilities test class
@@ -18,6 +19,7 @@ import org.scalatest.FlatSpec
 class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var sqlContext: SQLContext = _
   @transient var refSkuInput: DataFrame = _
+  @transient var refSkuInputPush: DataFrame = _
   @transient var customerSelected: DataFrame = _
   @transient var salesOrder: DataFrame = _
   @transient var salesOrderItem: DataFrame = _
@@ -37,6 +39,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     refSkuInput = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input", TestSchema.refSkuInput)
+    refSkuInputPush = JsonUtils.readFromJson(DataSets.CAMPAIGNS, "ref_sku_input_push", TestSchema.refSkuInput)
     customerSelected = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected")
     customerSelectedShortlist = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "customer_selected_shortlist")
     salesOrder = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/campaign_utils", "sales_order_placed")
@@ -88,6 +91,14 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     assert(refSkuFirst.size == 1)
   }
 
+  "Generate reference sku with refernce sku input " should "return only one reference sku per customer sorted with price" in {
+    val refSkus = CampaignUtils.generateReferenceSku(refSkuInputPush, 1)
+    val refSkuFirst = refSkus.filter(SalesOrderVariables.FK_CUSTOMER + "=8552648")
+    // val expectedData = Row(2095.0, "GE160BG56HMHINDFAS-2211538")
+    // assert(refSkuFirst.head === expectedData)
+    assert(refSkuFirst.count == 1)
+  }
+
   "No input Data for sku simple Not Bought" should "return null" in {
     val skuNotBought = CampaignUtils.skuSimpleNOTBoughtWithoutPrice(null, salesOrder, salesOrderItem)
     assert(skuNotBought == null)
@@ -112,7 +123,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:58.0"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(null, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(null, field, after, before)
     assert(filteredData == null)
   }
 
@@ -120,21 +131,21 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:58"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
     assert(filteredData == null)
   }
 
   "null Field " should "return no filtered frame" in {
     val after = "2015-07-02 22:36:58"
     val before = "2015-07-12 22:36:58.0"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
     assert(filteredData == null)
   }
 
   "Field doesn't exist in data frame schema" should "return no filtered frame" in {
     val after = "2015-07-02 22:36:58"
     val before = "2015-07-12 22:36:58.0"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, null, after, before)
     assert(filteredData == null)
   }
 
@@ -142,7 +153,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:58.0"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
     assert(filteredData.count == 2)
   }
 
@@ -150,7 +161,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val after = "2015-07-02 22:36:59.0"
     val before = "2015-07-12 22:36:58.0"
     val field = "updated_at"
-    val filteredData = CampaignUtils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
+    val filteredData = Utils.getTimeBasedDataFrame(customerSelectedTime, field, after, before)
     assert(filteredData.count == 1)
   }
   //

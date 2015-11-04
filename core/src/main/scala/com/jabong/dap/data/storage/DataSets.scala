@@ -11,6 +11,10 @@ object DataSets {
   val SALES_ORDER_ADDRESS = "sales_order_address"
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
+  val SALES_RULE_SET = "sales_rule_set"
+
+  val PAYMENT_PREPAID_TRANSACTION_DATA = "payment_prepaid_transaction_data"
+  val PAYMENT_BANK_PRIORITY = "payment_bank_priority"
 
   //customer
   val CUSTOMER = "customer"
@@ -142,8 +146,14 @@ object DataSets {
   val CONTACT_LIST_MOBILE = "contactListMobile"
   val CUSTOMER_PREFERRED_TIMESLOT_PART2 = "customerPreferredTimeslotPart2"
   val CUSTOMER_PREFERRED_TIMESLOT_PART1 = "customerPreferredTimeslotPart1"
+  val CUST_TOP5 = "custTop5"
+  val CUSTOMER_ORDERS = "customerOrders"
+  val CUSTOMER_APP_DETAILS = "customerAppDetails"
   val NL_DATA_LIST = "NL_data_list"
+  val CONTACT_LIST_PLUS = "Contact_list_Plus"
   val APP_EMAIL_FEED = "app_email_feed"
+  val CUSTOMER_JC_DETAILS = "customerJCDetails"
+  val PAYBACK_DATA = "paybackData"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
@@ -173,4 +183,13 @@ object DataSets {
   val OPEN = "open"
   val CLICK = "click"
 
+  //SalesOrderItemVariables-->Customerorders.csv
+  val SALES_ITEM_REVENUE = "sales_item_revenue"
+  val SALES_ITEM_COUPON_DISC = "sales_item_coupon_disc"
+  val SALES_ITEM_INVALID_CANCEL = "sales_order_invalid_cancel"
+  val SALES_ITEM_CAT_BRICK_PEN = "sales_item_cat_brick_pen"
+  val SALES_ITEM_ORDERS_VALUE = "sales_item_orders_value"
+  val SALES_ADDRESS_FIRST = "sales_address_first"
+  val CAT_COUNT = "cat_count"
+  val CAT_AVG = "cat_avg"
 }

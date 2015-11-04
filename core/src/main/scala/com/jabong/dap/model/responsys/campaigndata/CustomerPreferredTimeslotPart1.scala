@@ -1,91 +1,95 @@
 package com.jabong.dap.model.responsys.campaigndata
 
+import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
-import com.jabong.dap.common.{ OptionUtils, Spark }
-import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustVarSchema
+import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{ DataFrame, Row }
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ ArrayBuffer, HashMap }
 
 /**
  * Created by raghu on 13/10/15.
  */
-object CustomerPreferredTimeslotPart1 {
+object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
 
-  def start(params: ParamInfo) = {
-
-    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val saveMode = params.saveMode
-    val paths = OptionUtils.getOptValue(params.path)
-    val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
-
-    val (dfOpen, dfClick, dfPrevFullCPOTPart1) = readDF(paths, incrDate, prevDate)
-
-    val (dfInc, dfFull) = getCPOTPart1(dfOpen, dfClick, dfPrevFullCPOTPart1)
-
+  def canProcess(incrDate: String, saveMode: String): Boolean = {
     val pathCustomerPreferredTimeslotPart1Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, incrDate)
-    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart1Full)) {
-      DataWriter.writeParquet(dfFull, pathCustomerPreferredTimeslotPart1Full, saveMode)
-    }
-
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfInc.na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.DAILY_MODE, incrDate, "53699_70792_" + fileDate + "_Customer_PREFERRED_TIMESLOT_part1", DataSets.IGNORE_SAVEMODE, "true", ";")
-
+    DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart1Full)
   }
 
   /**
    *
-   * @param dfOpen
-   * @param dfClick
+   * @param paths
+   * @param incrDate
+   * @param prevDate
    * @return
    */
-  def getCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame, dfPrevFullCPOTPart1: DataFrame): (DataFrame, DataFrame) = {
+  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
+    val dfMap = new HashMap[String, DataFrame]()
 
-    val dfIncCPOTPart1 = getIncCPOTPart1(dfOpen, dfClick)
+    val fileDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-    if (dfPrevFullCPOTPart1 != null) {
+    val dfOpenIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE, incrDate, "53699_" + "OPEN_" + fileDate + ".txt", "true", ";")
+    dfMap.put("openIncr", dfOpenIncr)
+    val dfClickIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate, "53699_" + "CLICK_" + fileDate + ".txt", "true", ";")
+    dfMap.put("clickIncr", dfClickIncr)
 
+    if (paths == null) {
+      val dfCPOTPart1PrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("cpotPart1PrevFull", dfCPOTPart1PrevFull)
+    }
+    dfMap
+  }
+
+  def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
+
+    var dfCPOTPart1Incr = getIncCPOTPart1(dfMap("openIncr"), dfMap("clickIncr"))
+    var dfCPOTPart1Full = dfCPOTPart1Incr
+
+    val dfCPOTPart1PrevFull = dfMap("cpotPart1PrevFull")
+
+    if (dfCPOTPart1PrevFull != null) {
+
+      val dfIncrVarBC = Spark.getContext().broadcast(dfCPOTPart1Incr).value
       //join old and new data frame
-      val joinDF = MergeUtils.joinOldAndNewDF(dfIncCPOTPart1, dfPrevFullCPOTPart1, CustomerVariables.CUSTOMER_ID)
+      val joinDF = dfCPOTPart1PrevFull.join(dfIncrVarBC, dfCPOTPart1PrevFull(CustomerVariables.CUSTOMER_ID) === dfIncrVarBC(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
+      //MergeUtils.joinOldAndNewDF(dfIncrVarBC, dfPrevFullCPOTPart1, CustomerVariables.CUSTOMER_ID)
 
       val dfFull = joinDF.select(
-        coalesce(joinDF(CustomerVariables.NEW_ + CustomerVariables.CUSTOMER_ID), joinDF(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_0).+(joinDF(CustomerVariables.OPEN_0)) as CustomerVariables.OPEN_0,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_1).+(joinDF(CustomerVariables.OPEN_1)) as CustomerVariables.OPEN_1,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_2).+(joinDF(CustomerVariables.OPEN_2)) as CustomerVariables.OPEN_2,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_3).+(joinDF(CustomerVariables.OPEN_3)) as CustomerVariables.OPEN_3,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_4).+(joinDF(CustomerVariables.OPEN_4)) as CustomerVariables.OPEN_4,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_5).+(joinDF(CustomerVariables.OPEN_5)) as CustomerVariables.OPEN_5,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_6).+(joinDF(CustomerVariables.OPEN_6)) as CustomerVariables.OPEN_6,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_7).+(joinDF(CustomerVariables.OPEN_7)) as CustomerVariables.OPEN_7,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_8).+(joinDF(CustomerVariables.OPEN_8)) as CustomerVariables.OPEN_8,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_9).+(joinDF(CustomerVariables.OPEN_9)) as CustomerVariables.OPEN_9,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_10).+(joinDF(CustomerVariables.OPEN_10)) as CustomerVariables.OPEN_10,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.OPEN_11).+(joinDF(CustomerVariables.OPEN_11)) as CustomerVariables.OPEN_11,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_0).+(joinDF(CustomerVariables.CLICK_0)) as CustomerVariables.CLICK_0,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_1).+(joinDF(CustomerVariables.CLICK_1)) as CustomerVariables.CLICK_1,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_2).+(joinDF(CustomerVariables.CLICK_2)) as CustomerVariables.CLICK_2,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_3).+(joinDF(CustomerVariables.CLICK_3)) as CustomerVariables.CLICK_3,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_4).+(joinDF(CustomerVariables.CLICK_4)) as CustomerVariables.CLICK_4,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_5).+(joinDF(CustomerVariables.CLICK_5)) as CustomerVariables.CLICK_5,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_6).+(joinDF(CustomerVariables.CLICK_6)) as CustomerVariables.CLICK_6,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_7).+(joinDF(CustomerVariables.CLICK_7)) as CustomerVariables.CLICK_7,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_8).+(joinDF(CustomerVariables.CLICK_8)) as CustomerVariables.CLICK_8,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_9).+(joinDF(CustomerVariables.CLICK_9)) as CustomerVariables.CLICK_9,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_10).+(joinDF(CustomerVariables.CLICK_10)) as CustomerVariables.CLICK_10,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.CLICK_11).+(joinDF(CustomerVariables.CLICK_11)) as CustomerVariables.CLICK_11,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.PREFERRED_OPEN_TIMESLOT).+(joinDF(CustomerVariables.PREFERRED_OPEN_TIMESLOT)) as CustomerVariables.PREFERRED_OPEN_TIMESLOT,
-        joinDF(CustomerVariables.NEW_ + CustomerVariables.PREFERRED_CLICK_TIMESLOT).+(joinDF(CustomerVariables.PREFERRED_CLICK_TIMESLOT)) as CustomerVariables.PREFERRED_CLICK_TIMESLOT)
+        coalesce(dfIncrVarBC(CustomerVariables.CUSTOMER_ID), dfCPOTPart1PrevFull(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_0), dfCPOTPart1PrevFull(CustomerVariables.OPEN_0)) as CustomerVariables.OPEN_0,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_1), dfCPOTPart1PrevFull(CustomerVariables.OPEN_1)) as CustomerVariables.OPEN_1,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_2), dfCPOTPart1PrevFull(CustomerVariables.OPEN_2)) as CustomerVariables.OPEN_2,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_3), dfCPOTPart1PrevFull(CustomerVariables.OPEN_3)) as CustomerVariables.OPEN_3,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_4), dfCPOTPart1PrevFull(CustomerVariables.OPEN_4)) as CustomerVariables.OPEN_4,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_5), dfCPOTPart1PrevFull(CustomerVariables.OPEN_5)) as CustomerVariables.OPEN_5,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_6), dfCPOTPart1PrevFull(CustomerVariables.OPEN_6)) as CustomerVariables.OPEN_6,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_7), dfCPOTPart1PrevFull(CustomerVariables.OPEN_7)) as CustomerVariables.OPEN_7,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_8), dfCPOTPart1PrevFull(CustomerVariables.OPEN_8)) as CustomerVariables.OPEN_8,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_9), dfCPOTPart1PrevFull(CustomerVariables.OPEN_9)) as CustomerVariables.OPEN_9,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_10), dfCPOTPart1PrevFull(CustomerVariables.OPEN_10)) as CustomerVariables.OPEN_10,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.OPEN_11), dfCPOTPart1PrevFull(CustomerVariables.OPEN_11)) as CustomerVariables.OPEN_11,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_0), dfCPOTPart1PrevFull(CustomerVariables.CLICK_0)) as CustomerVariables.CLICK_0,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_1), dfCPOTPart1PrevFull(CustomerVariables.CLICK_1)) as CustomerVariables.CLICK_1,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_2), dfCPOTPart1PrevFull(CustomerVariables.CLICK_2)) as CustomerVariables.CLICK_2,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_3), dfCPOTPart1PrevFull(CustomerVariables.CLICK_3)) as CustomerVariables.CLICK_3,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_4), dfCPOTPart1PrevFull(CustomerVariables.CLICK_4)) as CustomerVariables.CLICK_4,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_5), dfCPOTPart1PrevFull(CustomerVariables.CLICK_5)) as CustomerVariables.CLICK_5,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_6), dfCPOTPart1PrevFull(CustomerVariables.CLICK_6)) as CustomerVariables.CLICK_6,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_7), dfCPOTPart1PrevFull(CustomerVariables.CLICK_7)) as CustomerVariables.CLICK_7,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_8), dfCPOTPart1PrevFull(CustomerVariables.CLICK_8)) as CustomerVariables.CLICK_8,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_9), dfCPOTPart1PrevFull(CustomerVariables.CLICK_9)) as CustomerVariables.CLICK_9,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_10), dfCPOTPart1PrevFull(CustomerVariables.CLICK_10)) as CustomerVariables.CLICK_10,
+        Udf.addInt(dfIncrVarBC(CustomerVariables.CLICK_11), dfCPOTPart1PrevFull(CustomerVariables.CLICK_11)) as CustomerVariables.CLICK_11)
 
       val rowRDD = dfFull.map(r => (Row(
         r(0),
@@ -144,12 +148,24 @@ object CustomerPreferredTimeslotPart1 {
       )
 
       // Apply the schema to the RDD.
-      val dfFullFinal = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart1)
+      dfCPOTPart1Full = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart1)
 
-      (dfFullFinal.except(dfPrevFullCPOTPart1), dfFullFinal)
-    } else {
-      (dfIncCPOTPart1, dfIncCPOTPart1)
+      dfCPOTPart1Incr = dfCPOTPart1Full.except(dfCPOTPart1PrevFull)
     }
+    val dfWrite = new HashMap[String, DataFrame]()
+    dfWrite.put("dfCPOTPart1Full", dfCPOTPart1Full)
+    dfWrite.put("dfCPOTPart1Incr", dfCPOTPart1Incr)
+    dfWrite
+  }
+
+  def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
+    val pathCustomerPreferredTimeslotPart1Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart1Full)) {
+      DataWriter.writeParquet(dfWrite("dfCPOTPart1Full"), pathCustomerPreferredTimeslotPart1Full, saveMode)
+    }
+
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(dfWrite("dfCPOTPart1Incr").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part1", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 
@@ -161,10 +177,10 @@ object CustomerPreferredTimeslotPart1 {
    */
   def getIncCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): DataFrame = {
 
-    val dfOpenCPOT = getCPOT(dfOpen, CustVarSchema.emailOpen)
-    val dfClickCPOT = getCPOT(dfClick, CustVarSchema.emailClick)
+    val dfOpenCPOT = UdfUtils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfClickCPOT = UdfUtils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
 
-    val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT(CustomerVariables.CUSTOMER_ID))
+    val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
       .select(
         coalesce(dfOpenCPOT(CustomerVariables.CUSTOMER_ID), dfClickCPOT(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
         dfOpenCPOT(CustomerVariables.OPEN_0),
@@ -197,72 +213,4 @@ object CustomerPreferredTimeslotPart1 {
 
     dfIncCPOTPart1
   }
-
-  /**
-   *
-   * @param dfIn
-   * @param schema
-   * @return
-   */
-  def getCPOT(dfIn: DataFrame, schema: StructType): DataFrame = {
-
-    val dfSelect = dfIn.select(col("CUSTOMER_ID"), col(CustomerVariables.EVENT_CAPTURED_DT))
-      .sort("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT)
-
-    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, TimeConstants.DD_MMM_YYYY_HH_MM_SS)), 1)).reduceByKey(_ + _)
-
-    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
-
-    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
-
-    val rowRDD = grouped.map({
-      case (key, value) =>
-        Row(
-          key,
-          value._1,
-          value._2,
-          value._3,
-          value._4,
-          value._5,
-          value._6,
-          value._7,
-          value._8,
-          value._9,
-          value._10,
-          value._11,
-          value._12,
-          value._13)
-    })
-
-    // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
-
-    df
-  }
-
-  /**
-   *
-   * @param paths
-   * @param incrDate
-   * @param prevDate
-   * @return
-   */
-  def readDF(paths: String, incrDate: String, prevDate: String): (DataFrame, DataFrame, DataFrame) = {
-
-    val fileDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-
-    val dfOpen = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE, incrDate, "53699_" + "OPEN_" + fileDate + ".txt", "true", ";")
-    val dfClick = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate, "53699_" + "CLICK_" + fileDate + ".txt", "true", ";")
-
-    if (paths != null) {
-
-      (dfOpen, dfClick, null)
-    } else {
-
-      val dfFullCPOTPart1 = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
-
-      (dfOpen, dfClick, dfFullCPOTPart1)
-    }
-  }
-
 }
