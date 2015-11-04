@@ -598,4 +598,34 @@ object CampaignInput extends Logging {
     }
     tableNameUnionData
   }
+
+  /**
+   *
+   * @param campaignName
+   * @param lastHour
+   * @return
+   */
+  def loadNHoursCampaignData(campaignName: String, campaignType: String,date: String = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
+
+    var tableNameUnionData: DataFrame = null
+
+    val lastHour = TimeUtils.getHour(date,TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+
+    for (i <- lastHour to -1) {
+
+      val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
+
+      logger.info("Reading last " + lastHour + " day " + campaignName + "data from hdfs")
+
+      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH,campaignType,campaignName, DataSets.HOURLY_MODE, incrDateHour)
+      if (null != tableNameData) {
+        if (tableNameUnionData == null) {
+          tableNameUnionData = tableNameData
+        } else {
+          tableNameUnionData = tableNameUnionData.unionAll(tableNameData)
+        }
+      }
+    }
+    tableNameUnionData
+  }
 }

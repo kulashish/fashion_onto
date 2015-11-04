@@ -35,6 +35,8 @@ object CampaignCommon {
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
+  val ACART_HOURLY_STOCK_VALUE = 2
+
 
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
@@ -74,6 +76,7 @@ object CampaignCommon {
     "mipr" -> 67,
     "new_arrivals_brand" -> 68,
     "shortlist_reminder" -> 53,
-    "invalid_iod" -> 100
+    "invalid_iod" -> 100,
+    "acart_hourly" -> 41
   )
 }

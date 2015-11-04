@@ -135,7 +135,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayAcartData = CampaignInput.loadNthdayAcartData(1, last30DayAcartData)
     val yesterdaySalesOrderItemData = CampaignInput.loadYesterdayOrderItemData() // created_at
     val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
-    val acartDaily = new AcartHourlyDailyCampaign()
+    val acartDaily = new AcartDailyCampaign()
     acartDaily.runCampaign(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
 
     // acart followup - only = 3rd days acart, still not bought ref skus, qty >= 10, yesterdayItrData
@@ -185,7 +185,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
-    val acartHourly = new AcartHourlyDailyCampaign()
+    val acartHourly = new AcartHourlyCampaign()
 
     acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations, CampaignCommon.ACART_HOURLY_CAMPAIGN)
 
