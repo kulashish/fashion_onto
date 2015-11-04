@@ -135,7 +135,10 @@ object CustomerDeviceMapping extends Logging {
           cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
             .filter(col(CustomerVariables.ID_CUSTOMER).geq(1))
           if (!SchemaUtils.isSchemaEqual(cmrFull.schema, Schema.cmr)) {
-            SchemaUtils.changeSchema(cmrFull, Schema.cmr)
+            println("correctingSchema")
+            cmrFull.printSchema()
+            cmrFull = SchemaUtils.changeSchema(cmrFull, Schema.cmr)
+            cmrFull.printSchema()
           }
           nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
