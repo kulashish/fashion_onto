@@ -34,7 +34,7 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
    * @return
    */
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
-    var dfMap = new HashMap[String, DataFrame]()
+    val dfMap = new HashMap[String, DataFrame]()
 
     val fileDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
@@ -152,7 +152,7 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
 
       dfCPOTPart1Incr = dfCPOTPart1Full.except(dfCPOTPart1PrevFull)
     }
-    var dfWrite = new HashMap[String, DataFrame]()
+    val dfWrite = new HashMap[String, DataFrame]()
     dfWrite.put("dfCPOTPart1Full", dfCPOTPart1Full)
     dfWrite.put("dfCPOTPart1Incr", dfCPOTPart1Incr)
     dfWrite

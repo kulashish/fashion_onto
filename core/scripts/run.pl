@@ -190,6 +190,10 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "appDetails") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component appDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/appDetails.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushInvalidCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
@@ -263,6 +267,9 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "custTop5") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "customerOrders") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerOrders --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerOrders.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";

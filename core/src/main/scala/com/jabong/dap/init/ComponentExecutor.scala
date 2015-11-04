@@ -9,6 +9,7 @@ import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
+import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
 import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, DNDMerger, SmsOptOut }
@@ -88,6 +89,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
           case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
           case DataSets.CUST_TOP5 => CustTop5.start(paramJob)
+          case DataSets.CUSTOMER_ORDERS => CustomerOrders.start(paramJob)
           case DataSets.CONTACT_LIST_MOBILE => ContactListMobile.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
@@ -106,6 +108,7 @@ class ComponentExecutor extends Serializable with Logging {
             // campaigns
           case DataSets.ACART_HOURLY => CampaignManager.startAcartHourlyCampaign(paramJob)
 
+          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
           case _ => logger.error("Unknown source.")
 
         }
