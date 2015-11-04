@@ -187,7 +187,7 @@ object CampaignManager extends Serializable with Logging {
 
     val acartHourly = new AcartHourlyCampaign()
 
-    acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations, CampaignCommon.ACART_HOURLY_CAMPAIGN)
+    acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations)
 
   }
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
