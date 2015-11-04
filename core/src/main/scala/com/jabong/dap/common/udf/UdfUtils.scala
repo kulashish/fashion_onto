@@ -676,9 +676,6 @@ object UdfUtils extends Logging {
 
     val dfSelect = dfIn.sort(dfIn.columns(0), dfIn.columns(1))
 
-    dfSelect.collect().foreach(println)
-    println("dfSelect:" + dfSelect.printSchema())
-
     val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
 
     val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
