@@ -708,7 +708,7 @@ object UdfUtils extends Logging {
   }
 
   def nextPriceBand(priceBand: String): String = {
-    if (priceBand.equals("E")) {
+    if (priceBand == null || priceBand.equals("E")) {
       return priceBand
     } else {
       return (priceBand.charAt(0) + 1).toChar.toString

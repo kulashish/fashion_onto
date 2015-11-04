@@ -392,7 +392,8 @@ object Schema {
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
         StructField(ProductVariables.GENDER, StringType, true),
-        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false)
+        StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+        StructField(ProductVariables.PRICE_BAND, StringType, true)))), false)
   ))
 
   val expectedFinalReferenceSku = StructType(Array(
@@ -406,7 +407,8 @@ object Schema {
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
         StructField(ProductVariables.GENDER, StringType, true),
-        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false),
+        StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+        StructField(ProductVariables.PRICE_BAND, StringType, true)))), false),
 
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
@@ -510,6 +512,12 @@ object Schema {
     StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
     StructField(CampaignMergedFields.DEVICE_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true)
+  ))
+
+  //FIXME: move it into OrderBySchema
+  val lastOrder = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
   ))
 
 }

@@ -6,6 +6,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
@@ -168,7 +169,9 @@ object CampaignUtils extends Logging {
 
     //    refSkuData.printSchema()
 
-    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
+    val dfSchemaChange = SchemaUtils.changeSchema(refSkuData, Schema.finalReferenceSku)
+
+    val customerData = dfSchemaChange.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
       .select(col(CustomerVariables.EMAIL),
         col(ProductVariables.SKU_SIMPLE),
@@ -177,7 +180,8 @@ object CampaignUtils extends Logging {
         col(ProductVariables.BRAND),
         col(ProductVariables.MVP),
         col(ProductVariables.GENDER),
-        col(ProductVariables.PRODUCT_NAME))
+        col(ProductVariables.PRODUCT_NAME),
+        col(ProductVariables.PRICE_BAND))
 
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
@@ -190,7 +194,8 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.BRICK))),
         checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
         checkNullString(t(t.fieldIndex(ProductVariables.GENDER))),
-        checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))))))
+        checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
+        checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -204,7 +209,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -714,12 +719,7 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    var campaignOutput: DataFrame = null
-
-    if (campaignName == CampaignCommon.PRICEPOINT_CAMPAIGN) {
-      campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, Recommendation.BRICK_PRICE_BAND_SUB_TYPE)
-
-    } else campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations)
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE))
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
     //save campaign Output for mobile

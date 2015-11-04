@@ -14,6 +14,7 @@ object CampaignCommon {
 
   val BASE_PATH = "/data/output/campaigns/"
 
+  //Live campaigns
   val CANCEL_RETARGET_CAMPAIGN = "cancel_retarget"
   val RETURN_RETARGET_CAMPAIGN = "return_retarget"
   val INVALID_FOLLOWUP_CAMPAIGN = "invalid_followup"
@@ -31,6 +32,8 @@ object CampaignCommon {
   val MERGED_CAMPAIGN = "merged"
   val WISHLIST_FOLLOWUP_CAMPAIGN = "wishlist_followup"
   val WISHLIST_LOWSTOCK_CAMPAIGN = "wishlist_lowstock"
+
+  //calendar campaigns
   val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
   val PRICEPOINT_CAMPAIGN = "pricepoint"
   val BRICK_AFFINITY = "brick_affinity"
@@ -80,5 +83,9 @@ object CampaignCommon {
     "new_arrivals_brand" -> 68,
     "shortlist_reminder" -> 53,
     "invalid_iod" -> 100
+  )
+
+  val campaignRecommendationMap = collection.immutable.HashMap(
+    CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE
   )
 }

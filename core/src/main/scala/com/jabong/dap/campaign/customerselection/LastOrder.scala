@@ -1,10 +1,14 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.common.GroupedUtils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{ TimestampType, DecimalType }
+
 /**
  * Created by raghu on 29/9/15.
  */
@@ -19,9 +23,14 @@ class LastOrder extends LiveCustomerSelector with Logging {
       return null
 
     }
-    val groupedSalesOrder = salesOrder.sort(SalesOrderVariables.CREATED_AT)
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(last(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER)
+
+    val groupedFields = Array(SalesOrderVariables.FK_CUSTOMER)
+    val aggFields = Array(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
+    val groupedSalesOrder = GroupedUtils.orderGroupBy(salesOrder, groupedFields, aggFields, GroupedUtils.LAST, Schema.lastOrder, SalesOrderVariables.CREATED_AT, GroupedUtils.ASC, TimestampType)
+
+    //    val groupedSalesOrder = salesOrder.sort(SalesOrderVariables.CREATED_AT)
+    //      .groupBy(SalesOrderVariables.FK_CUSTOMER)
+    //      .agg(last(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER)
 
     val joinedDf = groupedSalesOrder.join(
       salesOrderItem,

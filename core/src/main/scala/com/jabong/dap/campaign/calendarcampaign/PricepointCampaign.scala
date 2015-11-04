@@ -25,20 +25,8 @@ class PricepointCampaign {
     //filter sku based on daily filter
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
-    val dfNextPriceBand = filteredSku.select(
-      col(SalesOrderVariables.FK_CUSTOMER),
-      col(CustomerVariables.EMAIL),
-      col(ProductVariables.SKU_SIMPLE),
-      col(ProductVariables.SPECIAL_PRICE),
-      col(ProductVariables.BRICK),
-      col(ProductVariables.BRAND),
-      col(ProductVariables.MVP),
-      col(ProductVariables.GENDER),
-      col(ProductVariables.PRODUCT_NAME),
-      Udf.nextPriceBand(col(ProductVariables.PRICE_BAND)) as ProductVariables.PRICE_BAND
-    )
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.PRICEPOINT_CAMPAIGN, dfNextPriceBand, false, brickPriceBandRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.PRICEPOINT_CAMPAIGN, filteredSku, false, brickPriceBandRecommendations)
 
   }
 

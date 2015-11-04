@@ -1,9 +1,10 @@
 package com.jabong.dap.campaign.recommendation
 
+import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
@@ -51,6 +52,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.gender") as ProductVariables.GENDER,
       refSkuExploded("ref_sku_fields.brand") as ProductVariables.BRAND,
       refSkuExploded("ref_sku_fields.productName") as ProductVariables.PRODUCT_NAME,
+      refSkuExploded("ref_sku_fields.priceBand") as ProductVariables.PRICE_BAND,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     val recommendationJoined = joinToRecommendation(completeRefSku, recommendations, recType)
@@ -79,19 +81,39 @@ class LiveCommonRecommender extends Recommender with Logging {
 
   def joinToRecommendation(completeRefSku: DataFrame, recommendations: DataFrame, recType: String): DataFrame = {
 
+    require(completeRefSku != null, "completeRefSku data frame should not null")
+    require(recommendations != null, "recommendations data frame should not null")
+    require(RecommendationUtils.recommendationType.contains(recType), "recommendations data frame should not null")
+
     val recommendationJoined = recType match {
-      case Recommendation.BRICK_MVP_SUB_TYPE => {
-        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
+      case Recommendation.BRAND_MVP_SUB_TYPE => {
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+
       }
       case Recommendation.BRICK_PRICE_BAND_SUB_TYPE => {
+        //
+        //        val dfNextPriceBand = completeRefSku.select(
+        //          col(CustomerVariables.EMAIL),
+        //          col(CampaignMergedFields.REF_SKU1),
+        //          col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        //          col(CampaignMergedFields.LIVE_CART_URL),
+        //          col(ProductVariables.BRICK),
+        //          col(ProductVariables.MVP),
+        //          col(ProductVariables.GENDER),
+        //          col(ProductVariables.BRAND),
+        //          col(ProductVariables.PRODUCT_NAME),
+        //          Udf.nextPriceBand(col(ProductVariables.PRICE_BAND)) as ProductVariables.PRICE_BAND,
+        //          col(CampaignMergedFields.REF_SKU)
+        //        )
+
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
-          && completeRefSku(ProductVariables.PRICE_BAND) === recommendations(ProductVariables.PRICE_BAND)
+          && Udf.nextPriceBand(completeRefSku(ProductVariables.PRICE_BAND)) === recommendations(ProductVariables.PRICE_BAND)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       }
       case _ => {
-        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       }
