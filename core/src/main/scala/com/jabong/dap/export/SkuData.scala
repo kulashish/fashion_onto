@@ -35,11 +35,12 @@ object SkuData {
     val rawDF = getRawData(date)
     val result = skuBasedProcess(rawDF, date)
 
-    val filename = DataSets.SKU_DATA + "_" + DataSets.PRICING + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     val writePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.SKU_DATA, DataSets.PRICING, DataSets.DAILY_MODE, date)
     if (DataWriter.canWrite(writePath, saveMode)) {
       DataWriter.writeParquet(result, writePath, saveMode)
     }
+
+    val filename = DataSets.SKU_DATA + "_" + DataSets.PRICING + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(result, DataSets.SKU_DATA, DataSets.PRICING, DataSets.DAILY_MODE, date, filename, saveMode, "true", ";")
   }
 
