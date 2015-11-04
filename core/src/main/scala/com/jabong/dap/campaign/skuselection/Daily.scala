@@ -30,7 +30,9 @@ object Daily extends Logging {
         yesterdayItrData(ProductVariables.BRAND),
         yesterdayItrData(ProductVariables.MVP),
         yesterdayItrData(ProductVariables.GENDER),
-        yesterdayItrData(ProductVariables.PRODUCT_NAME))
+        yesterdayItrData(ProductVariables.PRODUCT_NAME),
+        yesterdayItrData(ProductVariables.STOCK)
+      )
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
