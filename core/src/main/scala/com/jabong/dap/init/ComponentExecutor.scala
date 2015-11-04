@@ -1,7 +1,9 @@
 package com.jabong.dap.init
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.recommendation.generator.RecommendationGenerator
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.export.SkuData
@@ -105,6 +107,9 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
 
           case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
+
+          case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
+
           case _ => logger.error("Unknown source.")
 
         }

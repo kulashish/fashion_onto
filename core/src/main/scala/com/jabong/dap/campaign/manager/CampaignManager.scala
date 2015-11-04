@@ -3,12 +3,13 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.acq.common.{ParamInfo, CampaignConfig, CampaignInfo}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -278,13 +279,12 @@ object CampaignManager extends Serializable with Logging {
     newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
   }
 
-  def startFollowUpCampaigns() = {
-    // CampaignManager.initCampaignsConfig(campaignsConfig)
-    //loading brickmvp recommendations
-
+  def startFollowUpCampaigns(params: ParamInfo) = {
     val fullOrderData = CampaignInput.loadFullOrderData()
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+
     //  val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
+    val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData, incrDate)
     //    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
     val itrSkYesterdayData = CampaignInput.loadYesterdayItrSkuData()
 
