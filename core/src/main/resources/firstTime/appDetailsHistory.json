@@ -1,0 +1,13 @@
+{
+  "isHistory": true,
+  "params": [
+    {
+      "source": "appDetails",
+      "path": "first time",
+      "incrMode": "daily",
+      "incrDate": "2015/07/10",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

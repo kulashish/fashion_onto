@@ -89,10 +89,7 @@ object MergeUtils extends MergeData {
 
     dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
 
-    val dfSchema = dfIncr.schema
-
-    // rename dfIncr column names with new_ as prefix
-    dfSchema.foreach(x => dfIncrVar = dfIncrVar.withColumnRenamed(x.name, NEW_ + x.name))
+    dfIncrVar = SchemaUtils.renameCols(dfIncrVar, NEW_)
 
     // join old and new data frame on primary key
     val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
@@ -120,5 +117,4 @@ object MergeUtils extends MergeData {
 
     joinedDF
   }
-
 }

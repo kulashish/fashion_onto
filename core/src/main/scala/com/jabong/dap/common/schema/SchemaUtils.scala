@@ -75,4 +75,17 @@ object SchemaUtils {
     sec.foreach(e => (res = dropColumn(res, e.name, schema)))
     res
   }
+
+  /**
+   * rename every column with prefix given
+   * @param df
+   * @param prefix
+   * @return
+   */
+  def renameCols(df: DataFrame, prefix: String): DataFrame = {
+    var dfVar = df
+    val schema = df.schema
+    schema.foreach(x => dfVar = dfVar.withColumnRenamed(x.name, prefix + x.name))
+    dfVar
+  }
 }
