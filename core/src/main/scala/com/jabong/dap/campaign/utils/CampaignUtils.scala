@@ -169,19 +169,21 @@ object CampaignUtils extends Logging {
 
     //    refSkuData.printSchema()
 
-    val dfSchemaChange = SchemaUtils.changeSchema(refSkuData, Schema.finalReferenceSku)
-
-    val customerData = dfSchemaChange.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
+    val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
-      .select(col(CustomerVariables.EMAIL),
-        col(ProductVariables.SKU_SIMPLE),
-        col(ProductVariables.SPECIAL_PRICE),
-        col(ProductVariables.BRICK),
-        col(ProductVariables.BRAND),
-        col(ProductVariables.MVP),
-        col(ProductVariables.GENDER),
-        col(ProductVariables.PRODUCT_NAME),
-        col(ProductVariables.PRICE_BAND))
+
+    val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.finalReferenceSku)
+
+    val customerData = dfSchemaChange.select(
+      col(CustomerVariables.EMAIL),
+      col(ProductVariables.SKU_SIMPLE),
+      col(ProductVariables.SPECIAL_PRICE),
+      col(ProductVariables.BRICK),
+      col(ProductVariables.BRAND),
+      col(ProductVariables.MVP),
+      col(ProductVariables.GENDER),
+      col(ProductVariables.PRODUCT_NAME),
+      col(ProductVariables.PRICE_BAND))
 
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
