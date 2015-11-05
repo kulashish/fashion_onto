@@ -175,9 +175,20 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 9 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/crmMerge.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "pushRetargetCampaign") {
-    # for retarget campaign module
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+#responsys files merger
+} elsif ($component eq "dndMerger") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component dndMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dndMerger.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "smsOptOutMerger") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component smsOptOutMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/smsOptOutMerger.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "basicITR") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "recommendations") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 500M";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component recommendations --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/recommendation.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamYesterdaySession") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamYesterdaySession --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamYesterdaySession.json";
@@ -186,9 +197,16 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 5 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamSurf3Variable.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "basicITR") {
-    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component basicITR --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/basicITR.json";
+} elsif ($component eq "customerDeviceMapping") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "pushSurfCampaign") {
+    $AMMUNITION = "--num-executors 7 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "pushRetargetCampaign") {
+    # for retarget campaign module
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pushInvalidCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
@@ -202,32 +220,15 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 10 --executor-memory 6G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushWishlistCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "miscellaneousCampaigns") {
+    $AMMUNITION = "--num-executors 7 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component miscellaneousCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "pushCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "emailCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "customerDeviceMapping") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "ad4pushCustomerResponse") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component ad4pushCustomerResponse --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/ad4pushCustomerResponse.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "ad4pushDeviceMerger") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component ad4pushDeviceMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/ad4pushDeviceMerger.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "pushSurfCampaign") {
-    $AMMUNITION = "--num-executors 7 --executor-memory 9G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "miscellaneousCampaigns") {
-    $AMMUNITION = "--num-executors 7 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component miscellaneousCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "pricingSKUData") {
-    $AMMUNITION = "--num-executors 9 --executor-memory 3G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "mobilePushCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
@@ -235,26 +236,28 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "emailCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component emailCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
     $job_exit =run_component($component, $command);
-}elsif ($component eq "dcfFeedGenerate") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
-    $job_exit = run_component($component, $command);
 } elsif ($component eq "campaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
     $job_exit = run_component($component, $command);
- } elsif ($component eq "recommendations") {
-    $AMMUNITION = "--num-executors 10 --executor-memory 500M";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component recommendations --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/recommendation.json";
+# ad4push
+} elsif ($component eq "ad4pushCustomerResponse") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component ad4pushCustomerResponse --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/ad4pushCustomerResponse.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "ad4pushDeviceMerger") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component ad4pushDeviceMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/ad4pushDeviceMerger.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "pricingSKUData") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 3G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
+    $job_exit = run_component($component, $command);
+}elsif ($component eq "dcfFeedGenerate") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamDataQualityCheck --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamDataQualityCheck.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "dndMerger") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component dndMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dndMerger.json";
-    $job_exit = run_component($component, $command);
-} elsif ($component eq "smsOptOutMerger") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component smsOptOutMerger --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/smsOptOutMerger.json";
-    $job_exit = run_component($component, $command);
+# Data Feeds
 } elsif ($component eq "custPreference") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component custPreference --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custPreference.json";
     $job_exit = run_component($component, $command);
@@ -263,6 +266,9 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "custTop5") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component custTop5 --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custTop5.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "customerOrders") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerOrders --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerOrders.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
@@ -275,6 +281,10 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "paybackData") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "customerAppDetails") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerAppDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/appDetails.json";
     $job_exit = run_component($component, $command);
 } else {
     print "not a valid component\n";

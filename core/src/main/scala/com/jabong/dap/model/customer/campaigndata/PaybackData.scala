@@ -39,7 +39,7 @@ object PaybackData extends DataFeedsModel {
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
     val dateDiffFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
 
-    var dfMap = new HashMap[String, DataFrame]()
+    val dfMap = new HashMap[String, DataFrame]()
 
     val paymentBankPriorityFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.PAYMENT_BANK_PRIORITY, DataSets.FULL_FETCH_MODE, dateDiffFormat)
     dfMap.put("paymentBankPriorityFull", paymentBankPriorityFull)
@@ -71,8 +71,8 @@ object PaybackData extends DataFeedsModel {
     val paymentBankPriorityFull = dfMap("paymentBankPriorityFull")
     val paybackEarnIncr = dfMap("paybackEarnIncr")
     val paybackRedeemIncr = dfMap("paybackRedeemIncr")
-    val cmrFull = dfMap("salesOrderIncr")
-    val paybackDataPrevFull = dfMap("cmrFull")
+    val cmrFull = dfMap("cmrFull")
+    val paybackDataPrevFull = dfMap("paybackDataPrevFull")
 
     val dfIcici = salesOrderIncr.join(paymentPrepaidTransactionDataIncr, salesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) === paymentPrepaidTransactionDataIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.INNER)
       .join(paymentBankPriorityFull, paymentPrepaidTransactionDataIncr(BANK_CODE) === paymentBankPriorityFull(BANK_CODE), SQL.INNER)
@@ -136,7 +136,7 @@ object PaybackData extends DataFeedsModel {
       paybackDataFull = paybackDataPrevFull.unionAll(paybackIncr)
     }
 
-    var dfWrite = new HashMap[String, DataFrame]()
+    val dfWrite = new HashMap[String, DataFrame]()
     dfWrite.put("paybackIncr", paybackIncr)
     dfWrite.put("paybackDataFull", paybackDataFull)
     dfWrite
