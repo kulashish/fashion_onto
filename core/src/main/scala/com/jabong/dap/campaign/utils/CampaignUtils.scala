@@ -175,22 +175,10 @@ object CampaignUtils extends Logging {
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
 
     val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.referenceSku)
-
-    val customerData = dfSchemaChange.select(
-      col(CustomerVariables.EMAIL),
-      col(ProductVariables.SKU_SIMPLE),
-      col(ProductVariables.SPECIAL_PRICE),
-      col(ProductVariables.BRICK),
-      col(ProductVariables.BRAND),
-      col(ProductVariables.MVP),
-      col(ProductVariables.GENDER),
-      col(ProductVariables.PRODUCT_NAME),
-      col(ProductVariables.PRICE_BAND))
-
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
-    val customerSkuMap = customerData.map(t => (
+    val customerSkuMap = dfSchemaChange.map(t => (
       (t(t.fieldIndex(CustomerVariables.EMAIL))),
       (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
         t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString,

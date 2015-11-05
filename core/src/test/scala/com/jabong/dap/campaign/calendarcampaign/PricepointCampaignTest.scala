@@ -41,7 +41,7 @@ class PricepointCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
 
       val pricepointCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)
-      assert(pricepointCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && pricepointCampaignOut._2 == CampaignCommon.PRICEPOINT_CAMPAIGN)
+      assert(pricepointCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && pricepointCampaignOut._2 == CampaignCommon.PRICEPOINT_CAMPAIGN)
 
     }
   }
