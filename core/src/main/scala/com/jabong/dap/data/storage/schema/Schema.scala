@@ -517,6 +517,7 @@ object Schema {
   //FIXME: move it into OrderBySchema
   val lastOrder = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
+    StructField(SalesOrderVariables.CUSTOMER_EMAIL, LongType, false),
     StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
   ))
 
