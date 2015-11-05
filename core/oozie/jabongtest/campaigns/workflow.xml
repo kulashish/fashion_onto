@@ -134,17 +134,17 @@
     <join name="ItrCmrJoin" to="dcfFeedSurfCampaignStart"/>
 
     <fork name="dcfFeedSurfCampaignStart">
-        <path start="surfCampaign" />
+        <path start="surfCampaigns" />
         <path start="dcfFeedGenerate" />
     </fork>
 
-    <action name="surfCampaign">
+    <action name="surfCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>pushSurfCampaign</argument>
+            <argument>surfCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -189,20 +189,20 @@
     <join name="dcfFeedSurfCampaignJoin" to="campaignsStart"/>
 
     <fork name="campaignsStart">
-        <path start="retargetCampaign" />
-        <path start="invalidCampaign" />
-        <path start="abandonedCartCampaign" />
-        <path start="wishlistCampaign" />
+        <path start="retargetCampaigns" />
+        <path start="invalidCampaigns" />
+        <path start="abandonedCartCampaigns" />
+        <path start="wishlistCampaigns" />
         <path start="miscellaneousCampaigns" />
     </fork>
 
-    <action name="retargetCampaign">
+    <action name="retargetCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>pushRetargetCampaign</argument>
+            <argument>retargetCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -212,13 +212,13 @@
         <error to="fail"/>
     </action>
 
-    <action name="invalidCampaign">
+    <action name="invalidCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>pushInvalidCampaign</argument>
+            <argument>invalidCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -227,13 +227,13 @@
         <ok to="campaignsJoin"/>
         <error to="fail"/>
     </action>
-    <action name="abandonedCartCampaign">
+    <action name="abandonedCartCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>pushAbandonedCartCampaign</argument>
+            <argument>abandonedCartCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -242,13 +242,13 @@
         <ok to="campaignsJoin"/>
         <error to="fail"/>
     </action>
-    <action name="wishlistCampaign">
+    <action name="wishlistCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>pushWishlistCampaign</argument>
+            <argument>wishlistCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>

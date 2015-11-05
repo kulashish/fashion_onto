@@ -202,23 +202,23 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "surfCampaign") {
     $AMMUNITION = "--num-executors 7 --executor-memory 9G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component surfCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "retargetCampaign") {
     # for retarget campaign module
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component retargetCampaigns --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "invalidCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushInvalidCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component invalidCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "abandonedCartCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushAbandonedCartCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component abandonedCartCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "wishlistCampaign") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushWishlistCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component wishlistCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "miscellaneousCampaigns") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
