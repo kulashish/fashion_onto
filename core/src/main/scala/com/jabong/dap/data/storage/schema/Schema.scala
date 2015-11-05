@@ -396,6 +396,17 @@ object Schema {
         StructField(ProductVariables.PRICE_BAND, StringType, true)))), false)
   ))
 
+  val referenceSku = StructType(Array(
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.PRICE_BAND, StringType, true)))
+
   val expectedFinalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
