@@ -25,7 +25,6 @@ class CustomerPreferredTimeslotPart1Test extends FlatSpec with SharedSparkContex
     dfEmailClick = JsonUtils.readFromJson(DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, "email_click")
     dfFullCPOTPart1 = JsonUtils.readFromJson(DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, "cpotPart1", CustVarSchema.customersPreferredOrderTimeslotPart1)
 
-
   }
 
   "getCPOTPart1: Data Frame count" should "10" in {
