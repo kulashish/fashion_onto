@@ -17,6 +17,7 @@
         <path start="basicITR" />
         <path start="clickstreamYesterdaySession" />
         <path start="pricingSKUData" />
+        <path start="clickstreamSurf3Variable" />
     </fork>
 
     <action name="basicITR">
@@ -63,28 +64,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="CmrClickstreamFork"/>
-        <error to="fail"/>
-    </action>
-
-    <fork name="CmrClickstreamFork">
-        <path start="clickstreamSurf3Variable" />
-        <path start="customerDeviceMapping" />
-    </fork>
-
-    <action name="clickstreamSurf3Variable">
-        <shell xmlns="uri:oozie:shell-action:0.3">
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>clickstreamSurf3Variable</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="CmrClickstreamJoin"/>
+        <ok to="customerDeviceMapping"/>
         <error to="fail"/>
     </action>
 
@@ -100,11 +80,57 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="CmrClickstreamJoin"/>
+        <ok to="dcfFeedGenerate"/>
         <error to="fail"/>
     </action>
 
-    <join name="CmrClickstreamJoin" to="ItrCmrJoin"/>
+    <action name="dcfFeedGenerate">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>dcfFeedGenerate</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="dcfFeedFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="dcfFeedFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>dcf_feed</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="ItrCmrJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="clickstreamSurf3Variable">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>clickstreamSurf3Variable</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="ItrCmrJoin"/>
+        <error to="fail"/>
+    </action>
 
     <action name="pricingSKUData">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -138,11 +164,15 @@
         <error to="fail"/>
     </action>
 
-    <join name="ItrCmrJoin" to="dcfFeedSurfCampaignStart"/>
+    <join name="ItrCmrJoin" to="campaignsStart"/>
 
-    <fork name="dcfFeedSurfCampaignStart">
+    <fork name="campaignsStart">
         <path start="surfCampaigns" />
-        <path start="dcfFeedGenerate" />
+        <path start="retargetCampaigns" />
+        <path start="invalidCampaigns" />
+        <path start="abandonedCartCampaigns" />
+        <path start="wishlistCampaigns" />
+        <path start="miscellaneousCampaigns" />
     </fork>
 
     <action name="surfCampaigns">
@@ -157,51 +187,9 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="dcfFeedSurfCampaignJoin"/>
+        <ok to="campaignsJoin"/>
         <error to="fail"/>
     </action>
-
-    <action name="dcfFeedGenerate">
-        <shell xmlns="uri:oozie:shell-action:0.3">
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>dcfFeedGenerate</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="dcfFeedFtpUpload"/>
-        <error to="fail"/>
-    </action>
-
-    <action name="dcfFeedFtpUpload">
-        <shell xmlns="uri:oozie:shell-action:0.3">
-            <exec>ftp_upload.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>dcf_feed</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="dcfFeedSurfCampaignJoin"/>
-        <error to="fail"/>
-    </action>
-
-    <join name="dcfFeedSurfCampaignJoin" to="campaignsStart"/>
-
-    <fork name="campaignsStart">
-        <path start="retargetCampaigns" />
-        <path start="invalidCampaigns" />
-        <path start="abandonedCartCampaigns" />
-        <path start="wishlistCampaigns" />
-        <path start="miscellaneousCampaigns" />
-    </fork>
 
     <action name="retargetCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
