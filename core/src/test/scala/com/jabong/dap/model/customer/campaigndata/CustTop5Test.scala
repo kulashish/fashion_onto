@@ -3,8 +3,6 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
-import com.jabong.dap.model.customer.schema.CustVarSchema
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
@@ -28,12 +26,11 @@ class CustTop5Test extends FlatSpec with SharedSparkContext {
 
     val df = CustTop5.getTop5(null, salesOrderItemJoined, itr)
 
-    val res = CustTop5.calcTop5(df, null, "")
+    val (fav, categoryCount, categoryAVG) = CustTop5.calcTop5(df, "")
 
-    res.collect().foreach(println)
+    fav.collect().foreach(println)
 
-    assert(res.collect().size >2)
-
+    assert(fav.collect().size > 2)
 
   }
 

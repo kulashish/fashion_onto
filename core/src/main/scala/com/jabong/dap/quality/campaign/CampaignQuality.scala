@@ -35,6 +35,9 @@ object CampaignQuality extends Logging {
   val CUSTID_ZERO = "CustIdZero"
   val CUSTID_NONZERO = "CustIdNonZero"
 
+  val EMAIL_NULL = "EmailNull"
+  val EMAIL_NON_NULL = "EmailNonNull"
+
   val schema = StructType(Array(
     StructField(CAMPAIGNNAME, StringType, TRUE),
     StructField(TOTALCOUNT, LongType, TRUE),
@@ -75,8 +78,14 @@ object CampaignQuality extends Logging {
 
       } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
 
-        writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.EMAIL_CAMPAIGN_QUALITY, dateYesterday)
-        writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
+        val df = cachedfCampaignQuality.select(
+          col(CAMPAIGNNAME),
+          col(TOTALCOUNT),
+          col(CUSTID_ZERO) as EMAIL_NULL,
+          col(CUSTID_NONZERO) as EMAIL_NON_NULL,
+          col(PRIORITYMERGE)).cache()
+        writeDataAndSendMail(df, CampaignCommon.EMAIL_CAMPAIGN_QUALITY, dateYesterday)
+        writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
       }
 
     }
@@ -144,10 +153,17 @@ object CampaignQuality extends Logging {
 
       } else {
 
-        val countNonZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
-        val countZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
+        if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
+          val countZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
+          val countNonZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
+          row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
+        } else {
 
-        row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
+          val countNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
+          val countNonNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
+          row = Row(campaignName, dataFrame.count(), countNullEmail, countNonNullEmail, zero, zero, zero, zero)
+        }
+
         list += row
       }
     } else { //if data frame is null

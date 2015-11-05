@@ -120,14 +120,15 @@ object Init {
 
       case "merge" => new MergeDelegator().start(params.mergeJson)
 
-      case "pushRetargetCampaign" => CampaignManager.startPushRetargetCampaign()
-      case "pushInvalidCampaign" => CampaignManager.startPushInvalidCampaign(params.campaignsJson)
-      case "pushAbandonedCartCampaign" => CampaignManager.startPushAbandonedCartCampaign(params.campaignsJson)
-      case "pushWishlistCampaign" => CampaignManager.startWishlistCampaigns(params.campaignsJson)
+      case "retargetCampaigns" => CampaignManager.startRetargetCampaigns()
+      case "invalidCampaigns" => CampaignManager.startInvalidCampaigns(params.campaignsJson)
+      case "abandonedCartCampaigns" => CampaignManager.startAbandonedCartCampaigns(params.campaignsJson)
+      case "wishlistCampaigns" => CampaignManager.startWishlistCampaigns(params.campaignsJson)
+      case "surfCampaigns" => CampaignManager.startSurfCampaigns(params.campaignsJson)
+      case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
+
       case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
-      case "pushSurfCampaign" => CampaignManager.startSurfCampaigns(params.campaignsJson)
-      case "miscellaneousCampaigns" => CampaignManager.startMiscellaneousCampaigns(params.campaignsJson)
 
       //calendar campaigns
       case "pricepoint" => CampaignManager.startPricepointCampaign()

@@ -61,7 +61,7 @@ object CampaignManager extends Serializable with Logging {
     return true
   }
 
-  def startPushRetargetCampaign() = {
+  def startRetargetCampaigns() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
 
     val orderItemData = CampaignInput.loadYesterdayOrderItemData().cache()
@@ -92,7 +92,7 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-  def startPushInvalidCampaign(campaignsConfig: String) = {
+  def startInvalidCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
     // invalid followup
@@ -129,7 +129,7 @@ object CampaignManager extends Serializable with Logging {
     invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations)
   }
 
-  def startPushAbandonedCartCampaign(campaignsConfig: String) = {
+  def startAbandonedCartCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
     // acart daily, acart followup, acart low stock, acart iod

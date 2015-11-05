@@ -3,7 +3,7 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, ContactListMobileVars, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.read.DataReader
@@ -27,24 +27,40 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
     DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Full)
   }
 
-  def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
+  /**
+   *
+   * @param paths
+   * @param incrDate
+   * @param prevDate
+   * @return
+   */
+  def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
 
-    val pathCustomerPreferredTimeslotPart2Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, incrDate)
-    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Full)) {
-      DataWriter.writeParquet(dfWriteMap("CPOTPart2Full"), pathCustomerPreferredTimeslotPart2Full, saveMode)
+    val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
+
+    val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    var dfSalesOrderIncr: DataFrame = null
+    var dfCPOTPart2PrevFull: DataFrame = null
+
+    dfMap.put("cmrFull", dfCmr)
+
+    if (paths != null) {
+      dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
+    } else {
+      dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
+      dfCPOTPart2PrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
     }
-
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfWriteMap("dfCsv").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";")
-
+    dfMap.put("salesOrderIncr", dfSalesOrderIncr)
+    dfMap.put("CPOTPart2PrevFull", dfCPOTPart2PrevFull)
+    dfMap
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
-    val dfCmrFull = dfMap("crmFull")
+    val dfCmrFull = dfMap("cmrFull")
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfCPOTPart2PrevFull = dfMap("CPOTPart2PrevFull")
 
-    val dfCPOT = UdfUtils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+    val dfCPOT = UdfUtils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT).filter(col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(SalesOrderVariables.FK_CUSTOMER) != "" && col(SalesOrderVariables.CREATED_AT).isNotNull), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
 
     val dfCmr = dfCmrFull.select(
       dfCmrFull(ContactListMobileVars.UID),
@@ -69,7 +85,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
         col(CustomerVariables.PREFERRED_ORDER_TIMESLOT)
       )
 
-    var dfWriteMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
+    val dfWrite: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
 
     if (dfCPOTPart2PrevFull != null) {
       val dfIncrVarBC = Spark.getContext().broadcast(dfInc).value
@@ -125,41 +141,24 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
       // Apply the schema to the RDD.
       val dfFullFinal = Spark.getSqlContext().createDataFrame(rowRDD, CustVarSchema.customersPreferredOrderTimeslotPart2)
 
-      dfWriteMap.put("CPOTPart2Full", dfFullFinal)
-      dfWriteMap.put("CPOTPart2Incr", dfFullFinal.except(dfCPOTPart2PrevFull))
+      dfWrite.put("CPOTPart2Full", dfFullFinal)
+      dfWrite.put("CPOTPart2Incr", dfFullFinal.except(dfCPOTPart2PrevFull))
     } else {
-      dfWriteMap.put("CPOTPart2Full", dfInc)
-      dfWriteMap.put("CPOTPart2Incr", dfInc)
+      dfWrite.put("CPOTPart2Full", dfInc)
+      dfWrite.put("CPOTPart2Incr", dfInc)
     }
-    dfWriteMap
+    dfWrite
   }
 
-  /**
-   *
-   * @param paths
-   * @param incrDate
-   * @param prevDate
-   * @return
-   */
-  def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
+  def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
 
-    var dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
-
-    val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
-    var dfSalesOrderIncr: DataFrame = null
-    var dfCPOTPart2PrevFull: DataFrame = null
-
-    dfMap.put("cmrFull", dfCmr)
-
-    if (paths != null) {
-      dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
-    } else {
-      dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
-      dfCPOTPart2PrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, prevDate)
+    val pathCustomerPreferredTimeslotPart2Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Full)) {
+      DataWriter.writeParquet(dfWriteMap("CPOTPart2Full"), pathCustomerPreferredTimeslotPart2Full, saveMode)
     }
-    dfMap.put("salesOrderIncr", dfSalesOrderIncr)
-    dfMap.put("CPOTPart2PrevFull", dfCPOTPart2PrevFull)
-    dfMap
-  }
 
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(dfWriteMap("dfCsv").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";")
+
+  }
 }

@@ -113,5 +113,5 @@ object CustomerVariables {
   val PREFERRED_CLICK_TIMESLOT = "preferred_click_timeslot"
 
   val EVENT_CAPTURED_DT = "EVENT_CAPTURED_DT"
-
+  val ID_CUSTOMER_SESSION = "id_customer_session"
 }
