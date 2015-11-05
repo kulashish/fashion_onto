@@ -20,7 +20,7 @@ object SalesOrderHistoric {
 
   def processHistoricData() = {
     var i = 0
-    for (i <- 0 to 10) {
+    for (i <- 0 to 90) {
       val date = TimeUtils.getDateAfterNDays(-(91 - i), TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-(90 - i), TimeConstants.DATE_FORMAT_FOLDER)
       val prevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
@@ -56,7 +56,7 @@ object SalesOrderHistoric {
       var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
       var savePathDaily = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
       DataWriter.writeParquet(salesRevenueVariables, savePath, DataSets.IGNORE_SAVEMODE)
-      DataWriter.writeParquet(joinedData, savePath, DataSets.IGNORE_SAVEMODE)
+      DataWriter.writeParquet(joinedData, savePathDaily, DataSets.IGNORE_SAVEMODE)
 
     }
   }
