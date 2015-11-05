@@ -18,7 +18,6 @@ import org.apache.spark.sql.functions._
 object SalesOrderHistoric {
 
   def processHistoricData() = {
-    var i = 0
     for (i <- 91 to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
