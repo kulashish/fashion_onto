@@ -17,22 +17,21 @@ import org.apache.spark.sql.functions._
 object SalesOrderHistoric {
 
   def processHistoricData() = {
-    val READ_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/output"
     val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
     val INPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/input"
 
     for (i <- 91 to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
-      val prevFull = DataReader.getDataFrameOrNull(READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
+      val prevFull = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
       val before7 = TimeUtils.getDateAfterNDays(-7, incrDate)
-      val salesRevenue7 = DataReader.getDataFrameOrNull(READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before7)
+      val salesRevenue7 = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before7)
 
       val before30 = TimeUtils.getDateAfterNDays(-30, incrDate)
-      val salesRevenue30 = DataReader.getDataFrameOrNull(READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before30)
+      val salesRevenue30 = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before30)
 
       val before90 = TimeUtils.getDateAfterNDays(-90, incrDate)
-      val salesRevenue90 = DataReader.getDataFrameOrNull(READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before90)
+      val salesRevenue90 = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before90)
       var salesOrderincr: DataFrame = null
       var salesOrderItemincr: DataFrame = null
       if (null == prevFull) {
