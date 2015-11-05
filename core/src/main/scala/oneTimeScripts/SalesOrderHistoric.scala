@@ -19,9 +19,9 @@ object SalesOrderHistoric {
 
   def processHistoricData() = {
     var i = 0
-    for (i <- 0 to 90) {
-      val date = TimeUtils.getDateAfterNDays(-(91 - i), TimeConstants.DATE_FORMAT_FOLDER)
-      val incrDate = TimeUtils.getDateAfterNDays(-(90 - i), TimeConstants.DATE_FORMAT_FOLDER)
+    for (i <- 91 to 1 by -1) {
+      val date = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
+      val incrDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       val prevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
       val before7 = TimeUtils.getDateAfterNDays(-7, incrDate)
       val salesRevenue7 = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, before7)
