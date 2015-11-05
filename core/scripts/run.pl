@@ -80,7 +80,7 @@ sub run_component {
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
 my $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
-my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
+my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # target needs to be either stage or prod
@@ -200,25 +200,25 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "customerDeviceMapping") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "pushSurfCampaign") {
-    $AMMUNITION = "--num-executors 7 --executor-memory 9G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushSurfCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+} elsif ($component eq "surfCampaigns") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component surfCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "pushRetargetCampaign") {
+} elsif ($component eq "retargetCampaigns") {
     # for retarget campaign module
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushRetargetCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component retargetCampaigns --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "pushInvalidCampaign") {
+} elsif ($component eq "invalidCampaigns") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushInvalidCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component invalidCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "pushAbandonedCartCampaign") {
-    $AMMUNITION = "--num-executors 10 --executor-memory 6G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushAbandonedCartCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+} elsif ($component eq "abandonedCartCampaigns") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component abandonedCartCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "pushWishlistCampaign") {
-    $AMMUNITION = "--num-executors 10 --executor-memory 6G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushWishlistCampaign --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
+} elsif ($component eq "wishlistCampaigns") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component wishlistCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "miscellaneousCampaigns") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
