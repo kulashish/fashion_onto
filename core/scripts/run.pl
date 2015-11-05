@@ -201,7 +201,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "surfCampaigns") {
-    $AMMUNITION = "--num-executors 7 --executor-memory 9G";
+    $AMMUNITION = "--num-executors 15 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component surfCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "retargetCampaigns") {
