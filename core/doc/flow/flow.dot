@@ -1,0 +1,49 @@
+graph {
+      // db acquisition 
+      bobIncr -- bobMerge;
+      bobFull -- bobMerge 
+      bobMerge -- bobMergeMonthly;
+      erpIncr -- erpMerge;
+      bobMergeMonthly -- acqDone;
+      erpMerge -- acqDone;
+      
+
+      // clickstream core
+      clickstreamApps -- clickstreamMerge;
+      clickstreamDesktop -- clickstreamMerge;
+      clickstreamArtemis -- clickstreamMerge;
+      clickstreamMerge -- yesterdaySession; 
+      clickstreamMerge -- surf3Variable;	
+      		         
+      // basic flows
+      acqDone -- basicITR;	
+      yesterdaySession -- customerDeviceMap;
+      
+      // dcf feed
+      customerDeviceMap -- dcfFeed;
+      clickstreamMerge -- dcfFeed;
+
+      // campaigns
+      basicITR -- recommendation;
+      acqDone -- recommendation;
+
+      customerDeviceMap -- campaignStart;
+      recommendation -- campaignStart;
+      
+      campaignStart -- retargetCampaign;
+      campaignStart -- wishlistCampaign;
+      campaignStart -- abcartCampaign;
+      campaignStart -- invalidCampaign;
+      campaignStart -- miscCampaign;
+
+      campaignStart -- surf126Campaign;
+      campaignStart -- surf3Campaign;
+
+      yesterdaySession -- surf126Campaign;
+      surf3Variable -- surf3Campaign;
+
+      // pricing
+      clickstreamMerge -- pricingSKU;
+      
+} 
+
