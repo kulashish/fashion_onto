@@ -1,11 +1,13 @@
 package com.jabong.dap.model.order.variables
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.time.TimeConstants
+import com.jabong.dap.common.{Utils, Spark}
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
-import org.apache.spark.sql.DataFrame
+import com.jabong.dap.data.storage.schema.Schema
+import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
@@ -446,53 +448,117 @@ object SalesOrderItem {
    Need to get final count of orders where invalid orderitem count matches total orderitem count
    */
 
-  def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame): DataFrame = {
+  def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame, prevMap: DataFrame, incrDate: String): (DataFrame, DataFrame) = {
     val salesOrderJoined = salesOrderFull.join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
-    val joinedMap = salesOrderJoined.select(salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
+    val incrMap = salesOrderJoined.select(
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
-      salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS))
-      .map(e => (e(0).asInstanceOf[LongType], e(1).asInstanceOf[LongType]) -> (e(2).asInstanceOf[Int]))
-      .groupByKey()
-    val orderType = joinedMap.map(e => (e._1, findOrderType(e._2.toList))).map(e => (e._1._1, e._1._2, e._2))
+      salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
+      salesOrderJoined(SalesOrderItemVariables.ID_SALES_ORDER_ITEM),
+      salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS),
+      salesOrderJoined(SalesOrderItemVariables.UPDATED_AT))
+      .map(e =>
+      (e(0).asInstanceOf[Long]-> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int]))).groupByKey()
+      val ordersMapIncr = incrMap.map(e => Row(e._1, makeMap4mGroupedData(e._2.toList)))
 
-    val ordersDf = Spark.getSqlContext().createDataFrame(orderType).withColumnRenamed("_1", SalesOrderVariables.ID_SALES_ORDER)
-      .withColumnRenamed("_2", SalesOrderVariables.FK_CUSTOMER)
-      .withColumnRenamed("_3", "type")
+    val orderIncr = Spark.getSqlContext().createDataFrame(ordersMapIncr, Schema.salesItemStatus)
 
-    val canOrders = ordersDf.select(ordersDf(SalesOrderVariables.ID_SALES_ORDER),
-      ordersDf(SalesOrderVariables.FK_CUSTOMER),
-      when(ordersDf("type") === 10, 1).otherwise(0) as "invalid",
-      when(ordersDf("type") === 20, 1).otherwise(0) as "cancel",
-      when(ordersDf("type") === 30, 1).otherwise(0) as "return",
-      when(ordersDf("type") === 40, 1).otherwise(0) as "success"
-    )
-    val res = canOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(count("invalid") as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
-        count("cancel") as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-        count("return") as SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
-        count("success") as SalesOrderItemVariables.SUCCESSFUL_ORDERS
-      )
-    return res
-  }
+    var joinedMap: DataFrame = null
 
-  def findOrderType(list: List[Int]): Int = {
-    var custStatus = list.toSet
-    val inval = scala.collection.immutable.Set[Int](OrderStatus.INVALID)
-    val succ = OrderStatus.SUCCESSFUL_ARRAY.toSet
-    val ret = OrderStatus.RETURN_ARRAY.toSet
-    val cancl = OrderStatus.CANCELLED_ARRAY.toSet
-    if (custStatus subsetOf (inval)) {
-      return 10
-    } else if (custStatus subsetOf (cancl)) {
-      return 20
-    } else if (custStatus subsetOf (ret)) {
-      return 30
-    } else if (custStatus subsetOf (succ)) {
-      return 40
-    } else {
-      return 0
+
+    if(null == prevMap){
+      joinedMap = orderIncr
+    } else{
+      joinedMap = prevMap.join(orderIncr, prevMap(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+                        .select( coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+                        mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
+                        coalesce(orderIncr("last_orders_updated_at"), prevMap("last_orders_updated_at")) as "last_orders_updated_at"
+        )
     }
 
+    val incrData = Utils.getOneDayData(joinedMap, "last_orders_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+
+    val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
+      countOrders(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
+      e(2).asInstanceOf[TimestampType]))
+
+    val finalOrdersCount = orderStatusMap.map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._3))
+
+    val res = Spark.getSqlContext().createDataFrame(finalOrdersCount, Schema.ordersCount)
+
+    return (res, joinedMap)
+  }
+
+  val mergeMaps = udf((map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]) => joinMaps(map1, map2))
+
+
+  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] ={
+    val full= scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
+    map2.keySet.foreach{
+      orderId =>
+        val itemMap = map2(orderId)
+        val item = scala.collection.mutable.Map[Long, Int]()
+        itemMap.keySet.foreach{
+          ItemId =>
+            item.put(ItemId, itemMap(ItemId))
+        }
+        full.put(orderId, item)
+    }
+    map1.keySet.foreach{
+      orderId =>
+        if(full.contains(orderId)){
+          val itemMapPrev = full(orderId)
+          val itemMapNew = map1(orderId)
+          itemMapNew.keySet.foreach{
+            itemId =>
+              if(itemMapPrev.contains(itemId)){
+                itemMapPrev.update(itemId, itemMapNew(itemId))
+              } else{
+                itemMapPrev.put(itemId, itemMapNew(itemId))
+              }
+          }
+        }else{
+            val itemMap = map1(orderId)
+            val item = scala.collection.mutable.Map[Long, Int]()
+            itemMap.keySet.foreach{
+              ItemId =>
+                item.put(ItemId, itemMap(ItemId))
+            }
+            full.put(orderId, item)
+          }
+
+        }
+    full
+  }
+
+  def makeMap4mGroupedData(list: List[(Long, Long, Int)]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]={
+    val map = scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
+
+    list.foreach{
+      val innerMap = scala.collection.mutable.Map[Long, Int]()
+      e =>
+        innerMap.put(e._2, e._3)
+        map.put(e._1, innerMap)
+    }
+    map
+  }
+
+  def countOrders(map: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): (Int, Int, Int, Int, Int) = {
+    var (cancel, ret, succ, inv, oth) = (0, 0, 0, 0, 0)
+    map.keys.foreach{
+      ordersId =>
+       val itemMap = map(ordersId)
+        if(itemMap.values.toSet.intersect(OrderStatus.SUCCESSFUL_ARRAY.toSet).size > 0)
+          succ += 1
+        else if(itemMap.values.toSet subsetOf(OrderStatus.CANCELLED_ARRAY.toSet))
+          cancel += 1
+        else if(itemMap.values.toSet subsetOf(OrderStatus.RETURN_ARRAY.toSet))
+          ret += 1
+        else if (itemMap.values.toSet subsetOf(scala.collection.immutable.Set(OrderStatus.INVALID)))
+          inv += 1
+        else
+          oth += 1
+    }
+    (succ, cancel, ret, inv, oth)
   }
 
   /*
@@ -515,13 +581,14 @@ object SalesOrderItem {
         salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
         salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
         salesOrderJoined(SalesOrderItemVariables.UNIT_PRICE),
-        salesOrderJoined(SalesOrderVariables.CREATED_AT)
-      )
+        salesOrderJoined(SalesOrderVariables.CREATED_AT))
+
     val orderGrp = salesJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
       .agg(sum(SalesOrderItemVariables.UNIT_PRICE) as "basket_value",
         max(SalesOrderItemVariables.UNIT_PRICE) as "max_item",
         count(SalesOrderItemVariables.UNIT_PRICE) as "item_count",
         max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.CREATED_AT)
+
     val orderValue = orderGrp.groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(max("basket_value") as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
         sum("basket_value") as SalesOrderVariables.SUM_BASKET_VALUE,
@@ -531,9 +598,6 @@ object SalesOrderItem {
         max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.CREATED_AT)
 
     return orderValue
-    /*     val orderValueFull =
-        )
-      */
   }
 
   /**
