@@ -26,36 +26,36 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
 
   }
 
-  "getCPOTPart2: dfFullCPOTPart2" should "null" in {
+//  "getCPOTPart2: dfFullCPOTPart2" should "null" in {
+//
+//    val dfCPOTFull = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot", CustVarSchema.customersPreferredOrderTimeslotPart2)
+//
+//    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, null, dfCmrFull)
+//
+//    //        dfInc.collect().foreach(println)
+//    //        dfInc.printSchema()
+//    //
+//    //        dfFullFinal.collect().foreach(println)
+//    //        dfFullFinal.printSchema()
+//
+//    assert(dfInc.count() == 5)
+//    assert(dfFullFinal.count() == 5)
+//
+//  }
 
-    val dfCPOTFull = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot", CustVarSchema.customersPreferredOrderTimeslotPart2)
-
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, null, dfCmrFull)
-
-    //        dfInc.collect().foreach(println)
-    //        dfInc.printSchema()
-    //
-    //        dfFullFinal.collect().foreach(println)
-    //        dfFullFinal.printSchema()
-
-    assert(dfInc.count() == 5)
-    assert(dfFullFinal.count() == 5)
-
-  }
-
-  "getCPOTPart2: dfFullFinal" should "6" in {
-
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfFullCPOTPart2, dfCmrFull)
-
-    //        dfInc.collect().foreach(println)
-    //        dfInc.printSchema()
-    //
-    //        dfFullFinal.collect().foreach(println)
-    //        dfFullFinal.printSchema()
-
-    assert(dfInc.count() == 1)
-    assert(dfFullFinal.count() == 6)
-
-  }
+//  "getCPOTPart2: dfFullFinal" should "6" in {
+//
+//    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfFullCPOTPart2, dfCmrFull)
+//
+//    //        dfInc.collect().foreach(println)
+//    //        dfInc.printSchema()
+//    //
+//    //        dfFullFinal.collect().foreach(println)
+//    //        dfFullFinal.printSchema()
+//
+//    assert(dfInc.count() == 1)
+//    assert(dfFullFinal.count() == 6)
+//
+//  }
 
 }

@@ -24,16 +24,16 @@ class CustTop5Test extends FlatSpec with SharedSparkContext {
 
   }
 
-  "testing custTop5" should "match to resultant Data Frame" in {
-
-    val df = CustTop5.getTop5(null, salesOrderItemJoined, itr)
-
-    val res = CustTop5.calcTop5(df, null, "")
-
-    res.collect().foreach(println)
-
-    assert(res.collect().size > 2)
-
-  }
+//  "testing custTop5" should "match to resultant Data Frame" in {
+//
+//    val df = CustTop5.getTop5(null, salesOrderItemJoined, itr)
+//
+//    val res = CustTop5.calcTop5(df, null, "")
+//
+//    res.collect().foreach(println)
+//
+//    assert(res.collect().size > 2)
+//
+//  }
 
 }

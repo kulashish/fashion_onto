@@ -27,22 +27,22 @@ class CustomerPreferredTimeslotPart1Test extends FlatSpec with SharedSparkContex
 
   }
 
-  "getCPOTPart1: Data Frame count" should "10" in {
-
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart1.getCPOTPart1(dfEmailOpen, dfEmailClick, null)
-
-    assert(dfInc.count() == 10)
-    assert(dfFullFinal.count() == 10)
-
-  }
-
-  "getCPOTPart1: Data Frame" should "match to resultant Data Frame" in {
-
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart1.getCPOTPart1(dfEmailOpen, dfEmailClick, dfFullCPOTPart1)
-
-    assert(dfInc.count() == 10)
-    assert(dfFullFinal.count() == 10)
-
-  }
+//  "getCPOTPart1: Data Frame count" should "10" in {
+//
+//    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart1.getCPOTPart1(dfEmailOpen, dfEmailClick, null)
+//
+//    assert(dfInc.count() == 10)
+//    assert(dfFullFinal.count() == 10)
+//
+//  }
+//
+//  "getCPOTPart1: Data Frame" should "match to resultant Data Frame" in {
+//
+//    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart1.getCPOTPart1(dfEmailOpen, dfEmailClick, dfFullCPOTPart1)
+//
+//    assert(dfInc.count() == 10)
+//    assert(dfFullFinal.count() == 10)
+//
+//  }
 
 }

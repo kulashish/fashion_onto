@@ -19,6 +19,8 @@ object Recommendation {
 
   val BRICK_PRICE_BAND_SUB_TYPE = "brick_price_band"
 
+  val GENDER_MVP_BRICK = "gender_mvp_brick"
+
   val INVENTORY_FILTER = "inventory_filter"
 
   val WEEKLY_AVERAGE_SALE = "weekly_average_sale"
@@ -30,10 +32,16 @@ object Recommendation {
   val BRICK_PRICE_BAND_PIVOT = Array(ProductVariables.BRAND, ProductVariables.PRICE_BAND)
   val MVP_COLOR_PIVOT = Array(ProductVariables.MVP, ProductVariables.COLOR)
   val MVP_DISCOUNT_PIVOT = Array(ProductVariables.MVP, Recommendation.DISCOUNT_STATUS)
+  val GENDER_MVP_BRICK_PIVOT = Array(ProductVariables.GENDER, ProductVariables.MVP, ProductVariables.BRICK)
 
   val ORDER_ITEM_DAYS = 30
 
   val NUM_REC_SKU_REF_SKU = 8
 
   val DISCOUNT_THRESHOLD = 35
+
+  val NTHDAY_45 = "nthday_45"
+  val NTHDAY_60 = "nthday_60"
+
+
 }

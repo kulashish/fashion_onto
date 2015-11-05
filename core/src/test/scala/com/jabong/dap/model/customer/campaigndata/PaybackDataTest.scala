@@ -31,18 +31,18 @@ class PaybackDataTest extends FlatSpec with SharedSparkContext {
 
   }
 
-  "getPaybackData: Data Frame size" should "1" in {
-
-    val (dfInc, dfFull) = PaybackData.getPaybackData(salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, null)
-
-    //    dfInc.collect().foreach(println)
-    //    dfInc.printSchema()
-    //
-    //    dfFull.collect().foreach(println)
-    //    dfFull.printSchema()
-
-    assert(dfInc.count() == 1)
-    assert(dfFull.count() == 1)
-  }
+//  "getPaybackData: Data Frame size" should "1" in {
+//
+//    val (dfInc, dfFull) = PaybackData.getPaybackData(salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, null)
+//
+//    //    dfInc.collect().foreach(println)
+//    //    dfInc.printSchema()
+//    //
+//    //    dfFull.collect().foreach(println)
+//    //    dfFull.printSchema()
+//
+//    assert(dfInc.count() == 1)
+//    assert(dfFull.count() == 1)
+//  }
 
 }
