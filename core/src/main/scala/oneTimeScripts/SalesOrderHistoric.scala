@@ -1,9 +1,9 @@
 package oneTimeScripts
 
-import com.jabong.dap.common.{ time, Spark, Utils }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -11,7 +11,6 @@ import com.jabong.dap.model.order.variables.SalesOrderItem
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.LongType
 
 /**
  * Created by mubarak on 21/10/15.
