@@ -15,11 +15,11 @@ import org.scalatest.{ FeatureSpec, GivenWhenThen }
 class ReplenishmentCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
-  @transient var fullSalesOrderData = _
-  @transient var fullSalesOrderItemData = _
-  @transient var brickMvpRecommendations = _
-  @transient var yesterdayItrData = _
-  @transient var yestCustomerData = _
+  @transient var fullSalesOrderData: DataFrame = _
+  @transient var fullSalesOrderItemData: DataFrame = _
+  @transient var brickMvpRecommendations: DataFrame = _
+  @transient var yesterdayItrData: DataFrame = _
+  @transient var yestCustomerData: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
