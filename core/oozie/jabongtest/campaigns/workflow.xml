@@ -63,9 +63,14 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="clickstreamSurf3Variable"/>
+        <ok to="CmrClickstreamFork"/>
         <error to="fail"/>
     </action>
+
+    <fork name="CmrClickstreamFork">
+        <path start="clickstreamSurf3Variable" />
+        <path start="customerDeviceMapping" />
+    </fork>
 
     <action name="clickstreamSurf3Variable">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -79,7 +84,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="customerDeviceMapping"/>
+        <ok to="CmrClickstreamJoin"/>
         <error to="fail"/>
     </action>
 
@@ -95,9 +100,11 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="ItrCmrJoin"/>
+        <ok to="CmrClickstreamJoin"/>
         <error to="fail"/>
     </action>
+
+    <join name="CmrClickstreamJoin" to="ItrCmrJoin"/>
 
     <action name="pricingSKUData">
         <shell xmlns="uri:oozie:shell-action:0.3">
