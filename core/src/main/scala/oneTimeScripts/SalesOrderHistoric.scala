@@ -1,9 +1,9 @@
 package oneTimeScripts
 
-import com.jabong.dap.common.{ time, Spark, Utils }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -11,7 +11,6 @@ import com.jabong.dap.model.order.variables.SalesOrderItem
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.LongType
 
 /**
  * Created by mubarak on 21/10/15.
@@ -20,7 +19,7 @@ object SalesOrderHistoric {
 
   def processHistoricData() = {
     var i = 0
-    for (i <- 0 to 10) {
+    for (i <- 0 to 90) {
       val date = TimeUtils.getDateAfterNDays(-(91 - i), TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-(90 - i), TimeConstants.DATE_FORMAT_FOLDER)
       val prevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
@@ -55,7 +54,7 @@ object SalesOrderHistoric {
       val (joinedData, salesRevenueVariables) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
       var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
       var savePathDaily = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
-      DataWriter.writeParquet(salesRevenueVariables, savePath, DataSets.IGNORE_SAVEMODE)
+      DataWriter.writeParquet(salesRevenueVariables, savePathDaily, DataSets.IGNORE_SAVEMODE)
       DataWriter.writeParquet(joinedData, savePath, DataSets.IGNORE_SAVEMODE)
 
     }
