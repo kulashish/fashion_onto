@@ -266,6 +266,11 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "paybackData";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20150927_Customer_App_details.csv
+    $filename = "$date_with_zero_today"."_Customer_App_details.csv";
+    $folderName = "customerAppDetails";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     # 20150928_CONTACTS_LIST_MOBILE.csv
     # $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
     # $folderName = "contactListMobile";

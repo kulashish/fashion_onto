@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "customerOrders",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

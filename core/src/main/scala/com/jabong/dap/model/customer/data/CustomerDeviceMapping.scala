@@ -1,9 +1,9 @@
 package com.jabong.dap.model.customer.data
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ GroupedUtils, OptionUtils, Spark }
@@ -11,12 +11,12 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.{ DataNotFound, DataReader, ValidFormatNotFound }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
-import com.jabong.dap.data.storage.schema.OrderBySchema
+import com.jabong.dap.data.storage.schema.{ Schema, OrderBySchema }
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ TimestampType, IntegerType, LongType }
+import org.apache.spark.sql.types.{ LongType, TimestampType }
 
 /**
  * Created by mubarak on 15/7/15.
@@ -101,7 +101,7 @@ object CustomerDeviceMapping extends Logging {
     println("Total count with id_customer > 0: " + resWithout0.count())
     println("Distinct id_customer count for device Mapping: " + resWithout0.select(CustomerVariables.ID_CUSTOMER).distinct.count())
 
-    return result
+    result
   }
 
   /**
@@ -134,6 +134,12 @@ object CustomerDeviceMapping extends Logging {
         if ("firstTime4Nls".equals(path)) {
           cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
             .filter(col(CustomerVariables.ID_CUSTOMER).geq(1))
+          if (!SchemaUtils.isSchemaEqual(cmrFull.schema, Schema.cmr)) {
+            println("correctingSchema")
+            cmrFull.printSchema()
+            cmrFull = SchemaUtils.changeSchema(cmrFull, Schema.cmr)
+            cmrFull.printSchema()
+          }
           nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
         } else {
@@ -255,7 +261,7 @@ object CustomerDeviceMapping extends Logging {
       // res.printSchema()
       // res.show(9)
 
-      return res
+      res
 
     } catch {
       case e: DataNotFound =>

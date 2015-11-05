@@ -2,7 +2,7 @@
   "isHistory": true,
   "params": [
     {
-      "source": "appDetails",
+      "source": "customerAppDetails",
       "path": "first time",
       "incrMode": "daily",
       "incrDate": "2015/07/10",
