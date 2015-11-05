@@ -200,23 +200,23 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "customerDeviceMapping") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "surfCampaign") {
+} elsif ($component eq "surfCampaigns") {
     $AMMUNITION = "--num-executors 7 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component surfCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "retargetCampaign") {
+} elsif ($component eq "retargetCampaigns") {
     # for retarget campaign module
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component retargetCampaigns --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "invalidCampaign") {
+} elsif ($component eq "invalidCampaigns") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component invalidCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "abandonedCartCampaign") {
+} elsif ($component eq "abandonedCartCampaigns") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component abandonedCartCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "wishlistCampaign") {
+} elsif ($component eq "wishlistCampaigns") {
     $AMMUNITION = "--num-executors 15 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component wishlistCampaigns --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
