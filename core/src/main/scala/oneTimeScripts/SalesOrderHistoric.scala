@@ -1,8 +1,8 @@
 package oneTimeScripts
 
-import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{Spark, Utils}
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -51,7 +51,7 @@ object SalesOrderHistoric {
       salesOrderNew.printSchema()
       salesOrderItemincr.printSchema()
       val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
-      .drop(salesOrderItemincr(SalesOrderItemVariables.CREATED_AT))
+        .drop(salesOrderItemincr(SalesOrderItemVariables.CREATED_AT))
       println("count joined: " + saleOrderJoined.count())
       val (joinedData, salesRevenueVariables) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
       var savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
