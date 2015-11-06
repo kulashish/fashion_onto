@@ -39,18 +39,18 @@ class CustomerPreferredTimeslotPart1Test extends FlatSpec with SharedSparkContex
     assert(dfWrite("dfCPOTPart1Full").count() == 10)
 
   }
-  //
-  //  "getCPOTPart1: Data Frame" should "match to resultant Data Frame" in {
-  //    val dfMap = new HashMap[String, DataFrame]()
-  //    dfMap.put("openIncr", dfEmailOpen)
-  //    dfMap.put("clickIncr", dfEmailClick)
-  //    dfMap.put("cpotPart1PrevFull", dfFullCPOTPart1)
-  //
-  //    val dfWrite = CustomerPreferredTimeslotPart1.process(dfMap)
-  //
-  //    assert(dfWrite("dfCPOTPart1Incr").count() == 10)
-  //    assert(dfWrite("dfCPOTPart1Full").count() == 10)
-  //
-  //  }
+
+  "getCPOTPart1: Data Frame" should "match to resultant Data Frame" in {
+    val dfMap = new HashMap[String, DataFrame]()
+    dfMap.put("openIncr", dfEmailOpen)
+    dfMap.put("clickIncr", dfEmailClick)
+    dfMap.put("cpotPart1PrevFull", dfFullCPOTPart1)
+
+    val dfWrite = CustomerPreferredTimeslotPart1.process(dfMap)
+
+    assert(dfWrite("dfCPOTPart1Incr").count() == 10)
+    assert(dfWrite("dfCPOTPart1Full").count() == 10)
+
+  }
 
 }
