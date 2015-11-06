@@ -1,12 +1,10 @@
 package com.jabong.dap.model.clickstream.campaignData
 
-import java.io.File
-
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, SalesOrderVariables}
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -37,16 +35,14 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     DataWriter.canWrite(saveMode, incrSavePath) || DataWriter.canWrite(saveMode, fullSavePath)
   }
   def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
-    val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
-
     val masterRecord =
-      if (null != paths) getFullOnFirstDay(yesterday)
+      if (null != paths) getFullOnFirstDay(prevDate)
       else
-        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, yesterday)
+        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, prevDate)
 
-    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, yesterday)
-    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, yesterday)
-    val customerSession = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, yesterday)
+    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
+    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val customerSession = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, incrDate)
 
     val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
     dfMap.put("masterRecord", masterRecord)
@@ -55,10 +51,10 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     dfMap.put("customerSession", customerSession)
     dfMap
   }
+
   def getFullOnFirstDay(date: String): DataFrame = {
-    val inputCSVPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + DataSets.CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL + File.separator + "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
-    val outputPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + DataSets.CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + date
-    val df = DataReader.getDataFrame4mCsv(inputCSVPath, "true", "|")
+    val inputCSVFile = "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
+    val df = DataReader.getDataFrame4mCsv(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, date, inputCSVFile, "true", "|")
     df.withColumnRenamed("ID_CUSTOMER", "uid")
       .withColumnRenamed("DOMAIN", "domain")
       .withColumnRenamed("CREATED_AT", "created_at")
@@ -68,6 +64,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
       .withColumnRenamed("ORDER_COUNT", "order_count")
       .withColumnRenamed("LAST_LOGIN_TIME", "last_login_time")
   }
+
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val masterRecord = dfMap("masterRecord")
     val salesOrder = dfMap("salesOrder")
