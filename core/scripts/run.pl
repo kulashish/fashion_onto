@@ -80,7 +80,7 @@ sub run_component {
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
 my $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
-my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
+my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # target needs to be either stage or prod
@@ -107,11 +107,11 @@ if ($target eq "STAGE") {
     my $USER_NAME = `whoami`;
     chomp($USER_NAME);
 
-    if($hostname =~ /^bigdata/){
+    if ($hostname =~ /^bigdata/) {
         $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
-    }elsif($hostname =~ /^dataplatform/){
+    } elsif ($hostname =~ /^dataplatform/) {
         $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-    }else{
+    } else {
         print("Error: not supported platform");
         exit(-1);
     }
@@ -250,7 +250,8 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
     $job_exit = run_component($component, $command);
-}elsif ($component eq "dcfFeedGenerate") {
+} elsif ($component eq "dcfFeedGenerate") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 2G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {

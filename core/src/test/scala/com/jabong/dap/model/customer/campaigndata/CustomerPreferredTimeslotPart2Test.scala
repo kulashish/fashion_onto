@@ -54,7 +54,6 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     dfMap.put("cmrFull", dfCmrFull)
     dfMap.put("CPOTPart2PrevFull", dfFullCPOTPart2)
 
-
     val dfWrite = CustomerPreferredTimeslotPart2.process(dfMap)
 
     //        dfInc.collect().foreach(println)
