@@ -218,46 +218,6 @@ object UdfUtils extends Logging {
   }
 
   /**
-   * this method will create a slot data
-   * @param iterable
-   * @return Tuple2[String, Int]
-   */
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
-
-    logger.info("Enter in getCompleteSlotData:")
-
-    val timeSlotArray = new Array[Int](12)
-
-    var maxSlot: Int = 0
-
-    var max: Int = 0
-
-    iterable.foreach {
-      case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value }
-        timeSlotArray(slot) = value
-    }
-
-    logger.info("Exit from  getCompleteSlotData: ")
-
-    new Tuple13(
-      timeSlotArray(0),
-      timeSlotArray(1),
-      timeSlotArray(2),
-      timeSlotArray(3),
-      timeSlotArray(4),
-      timeSlotArray(5),
-      timeSlotArray(6),
-      timeSlotArray(7),
-      timeSlotArray(8),
-      timeSlotArray(9),
-      timeSlotArray(10),
-      timeSlotArray(11),
-      maxSlot)
-
-  }
-
-  /**
    * This will return age of person
    * @param birthday
    * @return
@@ -670,41 +630,6 @@ object UdfUtils extends Logging {
 
     return maxSlot
 
-  }
-
-  def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
-
-    val dfSelect = dfIn.sort(dfIn.columns(0), dfIn.columns(1))
-
-    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
-
-    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
-
-    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
-
-    val rowRDD = grouped.map({
-      case (key, value) =>
-        Row(
-          key,
-          value._1,
-          value._2,
-          value._3,
-          value._4,
-          value._5,
-          value._6,
-          value._7,
-          value._8,
-          value._9,
-          value._10,
-          value._11,
-          value._12,
-          value._13)
-    })
-
-    // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
-
-    df.dropDuplicates()
   }
 
 }
