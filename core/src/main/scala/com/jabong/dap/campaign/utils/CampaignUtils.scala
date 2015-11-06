@@ -181,6 +181,7 @@ object CampaignUtils extends Logging {
         col(ProductVariables.GENDER),
         col(ProductVariables.PRODUCT_NAME))
 
+
     debug(customerData,"In ref skus after filter customerData is not null")
 
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
@@ -201,6 +202,7 @@ object CampaignUtils extends Logging {
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
+    debug(grouped,"In ref sku generation final , after final grouping ")
     grouped
   }
 
@@ -803,6 +805,8 @@ object CampaignUtils extends Logging {
       custFilteredPastCampaign = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, custFilteredWithEmail,
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
+    debug(custFilteredPastCampaign, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
+
 
     var refSkus: DataFrame = null
     if (campaignName.startsWith("acart")) {
