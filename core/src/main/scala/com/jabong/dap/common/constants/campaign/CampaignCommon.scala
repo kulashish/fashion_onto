@@ -70,8 +70,6 @@ object CampaignCommon {
   val SURF3_MAIL_TYPE = 58
   val SURF3_FOLLOW_UP_MAIL_TYPE = 74
 
-
-
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
     "return_retarget" -> 47,
@@ -93,6 +91,5 @@ object CampaignCommon {
     "shortlist_reminder" -> 53,
     "invalid_iod" -> 100
   )
-
 
 }

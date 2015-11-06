@@ -713,7 +713,7 @@ object UdfUtils extends Logging {
    * @param mailType
    * @return
    */
-  def followUpCampaignMailTypes(mailType:Int): Int = {
+  def followUpCampaignMailTypes(mailType: Int): Int = {
     val followUpCampaignMap = collection.immutable.HashMap(
       CampaignCommon.SURF1_MAIL_TYPE -> CampaignCommon.SURF1_FOLLOW_UP_MAIL_TYPE,
       CampaignCommon.SURF2_MAIL_TYPE -> CampaignCommon.SURF2_FOLLOW_UP_MAIL_TYPE,

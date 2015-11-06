@@ -471,8 +471,8 @@ object CampaignInput extends Logging {
    * @param nDays
    * @return
    */
-  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, nDays: Int = -1, incrDate: String = TimeUtils.YESTERDAY_FOLDER ): DataFrame = {
-    val date = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT_FOLDER,incrDate)
+  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, nDays: Int = -1, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    val date = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
     val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
 
     mergedCampaignData

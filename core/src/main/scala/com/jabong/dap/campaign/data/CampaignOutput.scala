@@ -40,13 +40,12 @@ object CampaignOutput {
     }
   }
 
-
-  def saveCampaignCSVForYesterday(campaignOutput: DataFrame, campaignName: String,fileName:String ,campaignType: String = DataSets.PUSH_CAMPAIGNS) = {
+  def saveCampaignCSVForYesterday(campaignOutput: DataFrame, campaignName: String, fileName: String, campaignType: String = DataSets.PUSH_CAMPAIGNS) = {
     if (testMode) {
       saveTestData(campaignOutput, campaignName, campaignType)
     } else {
       val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-        DataWriter.writeCsv(campaignOutput,campaignType,campaignName,DataSets.DAILY_MODE,dateYesterday,fileName,DataSets.IGNORE_SAVEMODE,"true",",")
+      DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday, fileName, DataSets.IGNORE_SAVEMODE, "true", ",")
     }
   }
 

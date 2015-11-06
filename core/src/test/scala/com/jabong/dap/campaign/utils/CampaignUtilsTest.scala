@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.utils
 
 import java.io.File
 
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, SkuSelection}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, SkuSelection }
 import com.jabong.dap.common.constants.variables.{ ItrVariables, ProductVariables, SalesOrderVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark, TestConstants }
@@ -54,7 +54,6 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     dfYesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + File.separator + TestConstants.SKU_SELECTION, TestConstants.YESTERDAY_ITR_DATA, Schema.itr)
     emailCampaignMergedData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "email_campaign_merged")
     salesOrderFollowUp = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/follow_up_campaigns", "sales_order_data")
-
 
   }
 
@@ -250,7 +249,7 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
 
   "Get follow up campaigns from merged campaign output " should "return surf campaign" in {
     val emailMergedChanged = emailCampaignMergedData.drop(CampaignMergedFields.LIVE_MAIL_TYPE)
-    val emailChanged1 = emailMergedChanged.withColumn(CampaignMergedFields.LIVE_MAIL_TYPE,lit(46))
+    val emailChanged1 = emailMergedChanged.withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, lit(46))
     val followUpCampaigns = CampaignUtils.campaignFollowUpSelection(emailChanged1, salesOrder)
     followUpCampaigns.select(CampaignMergedFields.LIVE_MAIL_TYPE).show(100)
     assert(followUpCampaigns.count === 20)

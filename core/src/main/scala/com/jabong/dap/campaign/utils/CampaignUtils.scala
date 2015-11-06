@@ -701,7 +701,7 @@ object CampaignUtils extends Logging {
     val campaignMergedOutData = campaignMergedData.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, Udf.followUpCampaignMailType(col(CampaignMergedFields.LIVE_MAIL_TYPE)))
       .filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + "!= 0").drop(CampaignMergedFields.LIVE_MAIL_TYPE)
 
-      val campaignMailTypeFilteredData = campaignMergedOutData.withColumnRenamed(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_MAIL_TYPE)
+    val campaignMailTypeFilteredData = campaignMergedOutData.withColumnRenamed(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_MAIL_TYPE)
 
     val filteredCampaignCustomerNotBought = campaignMailTypeFilteredData.join(salesOrderData, campaignMailTypeFilteredData(CampaignMergedFields.CUSTOMER_ID) === salesOrderData(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
       .filter(SalesOrderVariables.FK_CUSTOMER + " is null")
