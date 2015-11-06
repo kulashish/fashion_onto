@@ -17,6 +17,7 @@ import org.apache.spark.sql.functions._
 object SalesOrderHistoric {
 
   def processHistoricData() = {
+    var i = 0
     val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
     val INPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/input"
 
@@ -53,6 +54,7 @@ object SalesOrderHistoric {
       val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
         .drop(salesOrderItemincr(SalesOrderItemVariables.CREATED_AT))
       println("count joined: " + saleOrderJoined.count())
+
       val (salesRevenueVarIncr, salesRevenueVarFull) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
       var savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
       var savePathDaily = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
