@@ -7,7 +7,7 @@ object OrderStatus {
 
   val CLOSED_ORDER = 6
   val RETURN = 8
-  val CANCELLED = 9
+  val CANCELLED   = 9
   val INVALID = 10
   val REFUNDED = 12
   val CLARIFY_REFUND_FAILED = 14
