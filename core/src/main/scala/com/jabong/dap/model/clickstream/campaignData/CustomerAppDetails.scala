@@ -34,7 +34,8 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
     DataWriter.canWrite(saveMode, incrSavePath) || DataWriter.canWrite(saveMode, fullSavePath)
   }
-  def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
+
+  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
     val masterRecord =
       if (null != paths) getFullOnFirstDay(prevDate)
       else
