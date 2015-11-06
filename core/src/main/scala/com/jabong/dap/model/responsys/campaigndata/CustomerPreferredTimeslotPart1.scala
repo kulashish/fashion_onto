@@ -177,9 +177,6 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
    */
   def getIncCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): DataFrame = {
 
-    //    val dfOpenFiltered = dfOpen.select(Udf.allZero2NullUdf(col("CUSTOMER_ID")), Udf.allZero2NullUdf(col(CustomerVariables.EVENT_CAPTURED_DT)))
-    //      .na.drop("any", Array("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT))
-
     val dfOpenCPOT = Utils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
     val dfClickCPOT = Utils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
 
