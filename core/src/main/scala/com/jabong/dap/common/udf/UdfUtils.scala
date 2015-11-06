@@ -1,6 +1,7 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -579,6 +580,21 @@ object UdfUtils extends Logging {
       }
     }
     str
+  }
+
+  def validateDateData(dateString: String, dateFormat: String): String = {
+
+    val nullStr: String = null
+
+    try {
+      val formatter = new SimpleDateFormat(dateFormat)
+      var date: java.util.Date = null
+      date = formatter.parse(dateString)
+    } catch {
+      case _: Throwable => return nullStr
+    }
+    return dateString
+
   }
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
