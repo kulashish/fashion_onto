@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.Date
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -714,12 +715,12 @@ object UdfUtils extends Logging {
    */
   def followUpCampaignMailTypes(mailType:Int): Int = {
     val followUpCampaignMap = collection.immutable.HashMap(
-      56 -> 72,
-      57 -> 73,
-      58 -> 74,
-      71 -> 75,
-      46 -> 76,
-      47 -> 77)
+      CampaignCommon.SURF1_MAIL_TYPE -> CampaignCommon.SURF1_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF2_MAIL_TYPE -> CampaignCommon.SURF2_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF3_MAIL_TYPE -> CampaignCommon.SURF3_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF6_MAIL_TYPE -> CampaignCommon.SURF6_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.CANCEL_RETARGET_MAIL_TYPE -> CampaignCommon.CANCEL_RETARGET_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.RETURN_RETARGET_MAIL_TYPE -> CampaignCommon.RETURN_RETARGET_FOLLOW_UP_MAIL_TYPE)
 
     return followUpCampaignMap.getOrElse(mailType, 0)
   }

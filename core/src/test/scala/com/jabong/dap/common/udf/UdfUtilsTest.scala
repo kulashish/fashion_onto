@@ -17,7 +17,8 @@ import org.scalatest.FlatSpec
 /**
  * Created by raghu on 3/7/15.
  */
-class UdfUtilsTest extends FlatSpec with SharedSparkContext {
+class
+UdfUtilsTest extends FlatSpec with SharedSparkContext {
 
   @transient var dfSalesOrder: DataFrame = _
 
@@ -572,5 +573,12 @@ class UdfUtilsTest extends FlatSpec with SharedSparkContext {
     assert(result.equals(dfCustomersPreferredOrderTimeslot) == true)
 
   }
+
+  "followUp campaign Types 46" should "76 as mail Type" in {
+    val expectedType = UdfUtils.followUpCampaignMailTypes(46)
+    assert(expectedType==76)
+  }
+
+
 
 }
