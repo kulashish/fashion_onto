@@ -55,7 +55,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
   def getFullOnFirstDay(date: String): DataFrame = {
     val inputCSVFile = "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
-    val df = DataReader.getDataFrame4mCsv(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, date, inputCSVFile, "true", "|")
+    val df = DataReader.getDataFrame4mCsv(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, date, inputCSVFile, "true", "|")
     df.withColumnRenamed("ID_CUSTOMER", "uid")
       .withColumnRenamed("DOMAIN", "domain")
       .withColumnRenamed("CREATED_AT", "created_at")
