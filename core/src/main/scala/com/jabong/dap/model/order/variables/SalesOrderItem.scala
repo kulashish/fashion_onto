@@ -139,9 +139,6 @@ object SalesOrderItem {
         SalesOrderItemVariables.ORDERS_COUNT,
         joinedData(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB)
       )
-
-    res.printSchema()
-    res.show(5)
     res
   }
 
@@ -193,8 +190,6 @@ object SalesOrderItem {
         full(SalesOrderItemVariables.REVENUE_MWEB_90) + bcInc(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_90,
         coalesce(bcInc(SalesOrderVariables.LAST_ORDER_DATE), full(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
       )
-    res.printSchema()
-    res.show(5)
     res
   }
 
@@ -305,15 +300,11 @@ object SalesOrderItem {
     val newRdd = resultDF.rdd
     val schema = StructType(Array(StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true), StructField(SalesOrderItemVariables.REVENUE + domain, DecimalType.apply(16, 2), true), StructField(SalesOrderVariables.ORDERS_COUNT + domain, LongType, true), StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)))
     val res = Spark.getSqlContext().createDataFrame(newRdd, schema)
-    res.printSchema()
-    res.show(5)
     res
   }
 
   def getRevenueDays(curr: DataFrame, prev: DataFrame, days: Int, day1: Int, day2: Int): DataFrame = {
     if (null == curr) {
-      prev.printSchema()
-      prev.show(5)
       return prev
     }
     val bcCurr = Spark.getContext().broadcast(prev).value
@@ -356,8 +347,6 @@ object SalesOrderItem {
       joinedData(SalesOrderItemVariables.REVENUE_WEB_LIFE),
       joinedData(SalesOrderItemVariables.REVENUE_MWEB_LIFE)
     )
-    res.printSchema()
-    res.show(5)
     res
   }
 
