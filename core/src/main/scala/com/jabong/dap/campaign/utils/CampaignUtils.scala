@@ -181,6 +181,8 @@ object CampaignUtils extends Logging {
         col(ProductVariables.GENDER),
         col(ProductVariables.PRODUCT_NAME))
 
+    debug(customerData,"In ref skus after filter customerData is not null")
+
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
