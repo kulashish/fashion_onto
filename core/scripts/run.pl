@@ -251,6 +251,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
     $job_exit = run_component($component, $command);
 }elsif ($component eq "dcfFeedGenerate") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 2G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {

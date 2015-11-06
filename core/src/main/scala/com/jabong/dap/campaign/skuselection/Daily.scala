@@ -16,9 +16,6 @@ object Daily extends Logging {
       logger.error("either customer selected skus are null or itrData is null")
       return null
     }
-    customerSkuData.printSchema()
-    yesterdayItrData.printSchema()
-
     val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(
         customerSkuData(CustomerVariables.FK_CUSTOMER),
