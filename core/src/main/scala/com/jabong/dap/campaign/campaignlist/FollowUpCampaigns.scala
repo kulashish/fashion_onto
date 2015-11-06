@@ -12,12 +12,18 @@ import org.apache.spark.sql.DataFrame
  */
 class FollowUpCampaigns {
 
+  /**
+   * follow up campaign for surf1,surf2,surf3,surf6 and cancel,return retarget
+   * @param campaignMergedData
+   * @param salesOrderLast3Days
+   * @param itrSkuSimpleYesterdayData
+   */
   def runCampaign(campaignMergedData: DataFrame, salesOrderLast3Days: DataFrame, itrSkuSimpleYesterdayData: DataFrame): Unit = {
 
     val selectedData = CampaignUtils.campaignFollowUpSelection(campaignMergedData, salesOrderLast3Days)
 
     val refSku1Out = CampaignUtils.campaignSkuStockFilter(selectedData, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU1, 3)
-    val refSku2Out = CampaignUtils.campaignSkuStockFilter(refSku1Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "2", 3)
+    val refSku2Out = CampaignUtils.campaignSkuStockFilter(refSku1Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "2", 3).cache()
     //    val refSku3Out = CampaignUtils.campaignSkuStockFilter(refSku2Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "3", 3)
 
     val fileName = TimeUtils.getDateAfterNDays(-1, TimeConstants.YYYYMMDD) + "_live_campaign_followup.csv"

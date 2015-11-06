@@ -251,7 +251,6 @@ class CampaignUtilsTest extends FlatSpec with SharedSparkContext {
     val emailMergedChanged = emailCampaignMergedData.drop(CampaignMergedFields.LIVE_MAIL_TYPE)
     val emailChanged1 = emailMergedChanged.withColumn(CampaignMergedFields.LIVE_MAIL_TYPE, lit(46))
     val followUpCampaigns = CampaignUtils.campaignFollowUpSelection(emailChanged1, salesOrder)
-    followUpCampaigns.select(CampaignMergedFields.LIVE_MAIL_TYPE).show(100)
     assert(followUpCampaigns.count === 20)
   }
 }
