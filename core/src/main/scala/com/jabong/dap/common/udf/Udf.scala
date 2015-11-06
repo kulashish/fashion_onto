@@ -138,7 +138,5 @@ object Udf {
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
-  val outputCsvFormat = udf((s: String) => UdfUtils.outputDateFormat(s: String))
-
-  val getLatestDate = udf((s: String, s1 : String, s2:  String, s3: String) => UdfUtils.latestDate(s: String, s1 : String, s2:  String, s3: String))
+  val getLatestEmailOpenDate = udf((s: String, s1 : String, s2:  String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1 : String, s2:  String, s3: String))
 }

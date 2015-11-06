@@ -59,13 +59,13 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     assert(joinedDf.count() == 15)
 
   }
-  //
-  //  "testReadDataFrame" should "match with expected data" in {
-  //    //val joinedDf = readDataFrame("2015-10-09", DataSets.DAILY_MODE)
-  //    CustEmailResponse.emailResponse("2015-10-09", DataSets.OVERWRITE_SAVEMODE, null)
-  //
-  //  }
-  //
+
+//    "testReadDataFrame" should "match with expected data" in {
+//      //val joinedDf = readDataFrame("2015-10-09", DataSets.DAILY_MODE)
+//      CustEmailResponse.emailResponse("2015-10-09", DataSets.OVERWRITE_SAVEMODE, null)
+//
+//    }
+
   "testMergeAllDataFrame" should "match expected values" in {
     val incremental = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "today_incr_csv", CustEmailSchema.todayDf)
     val yesterdayDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "yes_full_email", CustEmailSchema.resCustomerEmail)
@@ -86,6 +86,15 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
     val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo7", CustEmailSchema.effective_Smry_Schema)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
+  }
+
+  "testMergeEffectiveDfWithCmrAndNl" should "match expected values" in {
+    val effectiveDf =  JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective7_email", CustEmailSchema.effective_Smry_Schema)
+    val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr")
+    val nl = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "newsletter_subscription")
+    val result = merge(effectiveDf, cmr, nl)
+    assert(result.count() === 4)
+
   }
 
   "testMergeTodayWithEmpty7_15Df" should "match expected values" in {

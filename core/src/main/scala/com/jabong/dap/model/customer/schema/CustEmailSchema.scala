@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.EmailResponseVariables
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, EmailResponseVariables}
 import org.apache.spark.sql.types._
 
 /**
@@ -9,7 +9,7 @@ import org.apache.spark.sql.types._
 object CustEmailSchema {
   val resCustomerEmail = StructType(Array(
     StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
-    StructField(EmailResponseVariables.UID, StringType, true),
+    StructField(ContactListMobileVars.UID, StringType, true),
     StructField(EmailResponseVariables.OPEN_SEGMENT, IntegerType, true),
     StructField(EmailResponseVariables.OPEN_7DAYS, IntegerType, true),
     StructField(EmailResponseVariables.OPEN_15DAYS, IntegerType, true),

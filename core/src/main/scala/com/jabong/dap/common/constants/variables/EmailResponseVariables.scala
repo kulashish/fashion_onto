@@ -5,7 +5,6 @@ package com.jabong.dap.common.constants.variables
  */
 object EmailResponseVariables {
   // Email Response
-  val UID = "UID"
   val OPEN_SEGMENT = "OPEN_SEGMENT"
   val OPEN_7DAYS = "OPEN_7DAYS"
   val OPEN_15DAYS = "OPEN_15DAYS"
@@ -21,7 +20,7 @@ object EmailResponseVariables {
   val EVENT_CAPTURED_DT = "EVENT_CAPTURED_DT"
   val EVENT_STORED_DT = "EVENT_STORED_DT"
   val CLICKS_TODAY = "CLICKS_TODAY"
-
   val OPENS_TODAY = "OPENS_TODAY"
+  val UPDATED_DT = "UPDATED_DT"
 
 }
