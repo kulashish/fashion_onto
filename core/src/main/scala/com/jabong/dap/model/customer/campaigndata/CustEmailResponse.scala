@@ -32,7 +32,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     val dfMap:mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
-    val formattedDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.YYYYMMDD)
+    val formattedDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
     val filename = "53699_CLICK_" + formattedDate + ".txt"
     val dfClickData = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE,
@@ -44,9 +44,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       incrDate, openFilename, "true", ";")
     dfMap.put("openData", dfOpenData)
 
-    val before7daysString = TimeUtils.getDateAfterNDays(-7, TimeConstants.DATE_FORMAT, incrDate)
-    val before15daysString = TimeUtils.getDateAfterNDays(-15, TimeConstants.DATE_FORMAT, incrDate)
-    val before30daysString = TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_FORMAT, incrDate)
+    val before7daysString = TimeUtils.getDateAfterNDays(-7, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val before15daysString = TimeUtils.getDateAfterNDays(-15, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val before30daysString = TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
 
     val days7Df = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
       DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, before7daysString)
@@ -73,7 +73,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       DataSets.FULL_MERGE_MODE, incrDate)
     dfMap.put("nlSub", nlSubscribers)
 
-    (dfMap)
+    dfMap
 
   }
 
@@ -102,7 +102,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       DataWriter.writeParquet(fullDf, savePathFull, saveMode)
     }
 
-    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
+    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
 
     DataWriter.writeCsv(diffDf, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
 
@@ -164,7 +164,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       "NO"
     else if (value == null) {
       val lastUpdtDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
-      val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT)
+      val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
       val time4mToday = TimeUtils.daysBetweenTwoDates(lastUpdtDate, incrDate)
 
       val segment = {
@@ -186,7 +186,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     } else {
 
       val lastOpenDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
-      val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT)
+      val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
       val time4mToday = TimeUtils.daysBetweenTwoDates(lastOpenDate, incrDate)
 
       val segment = {
@@ -217,24 +217,24 @@ object CustEmailResponse extends DataFeedsModel with Logging {
           "NO"
         }
       }
-      (segment.toString)
+      segment.toString
     }
   }
 
   val opens = (opens: Integer, clicks: Integer) => {
     if (opens == null) {
-      (clicks)
+      clicks
     } else {
-      (opens)
+      opens
     }
 
   }
 
   val openDate = (opens: String, clickDate: String) => {
     if (opens == null) {
-      (clickDate)
+      clickDate
     } else {
-      (opens)
+      opens
     }
   }
 
@@ -255,7 +255,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     if (incremental == null) {
       logger.error("Incremental DataFrame is null, returning full")
-      return (full)
+      full
     }
 
     val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, CustEmailSchema.reqCsvDf,
@@ -353,7 +353,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) + col(EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) as EmailResponseVariables.CLICKS_LIFETIME,
       col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) + col(EmailResponseVariables.OPENS_LIFETIME) as EmailResponseVariables.OPENS_LIFETIME)
 
-    (incrDatefullSummary)
+    incrDatefullSummary
   }
 
   def reduce(df: DataFrame, evenDateType: String, eventNumType: String): DataFrame = {
