@@ -56,6 +56,22 @@ object CampaignCommon {
   val SHORTLIST_REMINDER = "shortlist_reminder"
   val COUNT_NEW_ARRIVALS = 4
 
+  //follow up campaigns
+  val CANCEL_RETARGET_MAIL_TYPE = 46
+  val CANCEL_RETARGET_FOLLOW_UP_MAIL_TYPE = 76
+  val SURF6_MAIL_TYPE = 71
+  val SURF6_FOLLOW_UP_MAIL_TYPE = 75
+  val RETURN_RETARGET_MAIL_TYPE = 47
+  val RETURN_RETARGET_FOLLOW_UP_MAIL_TYPE = 77
+  val SURF1_MAIL_TYPE = 56
+  val SURF1_FOLLOW_UP_MAIL_TYPE = 72
+  val SURF2_MAIL_TYPE = 57
+  val SURF2_FOLLOW_UP_MAIL_TYPE = 73
+  val SURF3_MAIL_TYPE = 58
+  val SURF3_FOLLOW_UP_MAIL_TYPE = 74
+
+
+
   val campaignMailTypeMap = collection.immutable.HashMap(
     "cancel_retarget" -> 46,
     "return_retarget" -> 47,
