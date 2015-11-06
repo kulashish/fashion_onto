@@ -121,7 +121,6 @@ object CustomerOrders extends DataFeedsModel {
     var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(dfWrite("salesVariablesIncr"), savePathIncr, saveMode)
 
-
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(dfWrite("orderStatusmap"), savePath, saveMode)
 
@@ -323,7 +322,7 @@ object CustomerOrders extends DataFeedsModel {
     val dfMap = new HashMap[String, DataFrame]()
 
     var mode: String = DataSets.FULL_MERGE_MODE
-    if(null == paths){
+    if (null == paths) {
       mode = DataSets.DAILY_MODE
     }
     val custOrdersPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
