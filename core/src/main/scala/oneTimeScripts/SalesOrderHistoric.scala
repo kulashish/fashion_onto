@@ -53,11 +53,11 @@ object SalesOrderHistoric {
       val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
         .drop(salesOrderItemincr(SalesOrderItemVariables.CREATED_AT))
       println("count joined: " + saleOrderJoined.count())
-      val (joinedData, salesRevenueVariables) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
+      val (salesRevenueVarIncr, salesRevenueVarFull) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
       var savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
       var savePathDaily = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
-      DataWriter.writeParquet(salesRevenueVariables, savePathDaily, DataSets.IGNORE_SAVEMODE)
-      DataWriter.writeParquet(joinedData, savePath, DataSets.IGNORE_SAVEMODE)
+      DataWriter.writeParquet(salesRevenueVarIncr, savePathDaily, DataSets.IGNORE_SAVEMODE)
+      DataWriter.writeParquet(salesRevenueVarFull, savePath, DataSets.IGNORE_SAVEMODE)
 
     }
   }
