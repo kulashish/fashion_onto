@@ -1,13 +1,13 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.time.TimeConstants
-import com.jabong.dap.common.{Utils, Spark}
+import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
@@ -457,21 +457,20 @@ object SalesOrderItem {
       salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS),
       salesOrderJoined(SalesOrderItemVariables.UPDATED_AT))
       .map(e =>
-      (e(0).asInstanceOf[Long]-> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int]))).groupByKey()
-      val ordersMapIncr = incrMap.map(e => Row(e._1, makeMap4mGroupedData(e._2.toList)))
+        (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int]))).groupByKey()
+    val ordersMapIncr = incrMap.map(e => Row(e._1, makeMap4mGroupedData(e._2.toList)))
 
     val orderIncr = Spark.getSqlContext().createDataFrame(ordersMapIncr, Schema.salesItemStatus)
 
     var joinedMap: DataFrame = null
 
-
-    if(null == prevMap){
+    if (null == prevMap) {
       joinedMap = orderIncr
-    } else{
+    } else {
       joinedMap = prevMap.join(orderIncr, prevMap(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-                        .select( coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-                        mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
-                        coalesce(orderIncr("last_orders_updated_at"), prevMap("last_orders_updated_at")) as "last_orders_updated_at"
+        .select(coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
+          coalesce(orderIncr("last_orders_updated_at"), prevMap("last_orders_updated_at")) as "last_orders_updated_at"
         )
     }
 
@@ -490,9 +489,8 @@ object SalesOrderItem {
 
   val mergeMaps = udf((map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]) => joinMaps(map1, map2))
 
-
-  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] ={
-    val full= scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
+  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] = {
+    val full = scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
     map2.keySet.foreach{
       orderId =>
         val itemMap = map2(orderId)
@@ -505,32 +503,32 @@ object SalesOrderItem {
     }
     map1.keySet.foreach{
       orderId =>
-        if(full.contains(orderId)){
+        if (full.contains(orderId)) {
           val itemMapPrev = full(orderId)
           val itemMapNew = map1(orderId)
           itemMapNew.keySet.foreach{
             itemId =>
-              if(itemMapPrev.contains(itemId)){
+              if (itemMapPrev.contains(itemId)) {
                 itemMapPrev.update(itemId, itemMapNew(itemId))
-              } else{
+              } else {
                 itemMapPrev.put(itemId, itemMapNew(itemId))
               }
           }
-        }else{
-            val itemMap = map1(orderId)
-            val item = scala.collection.mutable.Map[Long, Int]()
-            itemMap.keySet.foreach{
-              ItemId =>
-                item.put(ItemId, itemMap(ItemId))
-            }
-            full.put(orderId, item)
+        } else {
+          val itemMap = map1(orderId)
+          val item = scala.collection.mutable.Map[Long, Int]()
+          itemMap.keySet.foreach{
+            ItemId =>
+              item.put(ItemId, itemMap(ItemId))
           }
-
+          full.put(orderId, item)
         }
+
+    }
     full
   }
 
-  def makeMap4mGroupedData(list: List[(Long, Long, Int)]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]={
+  def makeMap4mGroupedData(list: List[(Long, Long, Int)]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] = {
     val map = scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
 
     list.foreach{
@@ -546,14 +544,14 @@ object SalesOrderItem {
     var (cancel, ret, succ, inv, oth) = (0, 0, 0, 0, 0)
     map.keys.foreach{
       ordersId =>
-       val itemMap = map(ordersId)
-        if(itemMap.values.toSet.intersect(OrderStatus.SUCCESSFUL_ARRAY.toSet).size > 0)
+        val itemMap = map(ordersId)
+        if (itemMap.values.toSet.intersect(OrderStatus.SUCCESSFUL_ARRAY.toSet).size > 0)
           succ += 1
-        else if(itemMap.values.toSet subsetOf(OrderStatus.CANCELLED_ARRAY.toSet))
+        else if (itemMap.values.toSet subsetOf (OrderStatus.CANCELLED_ARRAY.toSet))
           cancel += 1
-        else if(itemMap.values.toSet subsetOf(OrderStatus.RETURN_ARRAY.toSet))
+        else if (itemMap.values.toSet subsetOf (OrderStatus.RETURN_ARRAY.toSet))
           ret += 1
-        else if (itemMap.values.toSet subsetOf(scala.collection.immutable.Set(OrderStatus.INVALID)))
+        else if (itemMap.values.toSet subsetOf (scala.collection.immutable.Set(OrderStatus.INVALID)))
           inv += 1
         else
           oth += 1
