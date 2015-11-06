@@ -107,11 +107,11 @@ if ($target eq "STAGE") {
     my $USER_NAME = `whoami`;
     chomp($USER_NAME);
 
-    if($hostname =~ /^bigdata/){
+    if ($hostname =~ /^bigdata/) {
         $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
-    }elsif($hostname =~ /^dataplatform/){
+    } elsif ($hostname =~ /^dataplatform/) {
         $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-    }else{
+    } else {
         print("Error: not supported platform");
         exit(-1);
     }
@@ -250,7 +250,8 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
     $job_exit = run_component($component, $command);
-}elsif ($component eq "dcfFeedGenerate") {
+} elsif ($component eq "dcfFeedGenerate") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 2G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {
