@@ -1,4 +1,5 @@
-<coordinator-app name="dap-hourly-acq" frequency="${frequency}" start="${startTime}" end="${endTime}" timezone="${timezone}" xmlns="uri:oozie:coordinator:0.4">
+<coordinator-app name="dap-hourly-acq-coord" frequency="${coord:hours(1)}" start="${jobStart}" end="${jobEnd}"
+                 timezone="UTC" xmlns="uri:oozie:coordinator:0.4">
     <action>
         <workflow>
             <app-path>${workflowPath}</app-path>
