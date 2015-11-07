@@ -94,12 +94,12 @@ input:- row  and fields: field array
 
   def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
 
-    val dfOpenFiltered = dfIn.select(Udf.allZero2NullUdf(dfIn(dfIn.columns(0)).cast(StringType)) as dfIn.columns(0), Udf.validateDateData(dfIn(dfIn.columns(1)).cast(StringType), lit(dateFormat)) as dfIn.columns(1))
+    val dfOpenFiltered = dfIn.select(Udf.allZero2NullUdf(dfIn(dfIn.columns(0)).cast(StringType)) as dfIn.columns(0), Udf.timeToSlot(dfIn(dfIn.columns(1)).cast(StringType), lit(dateFormat)) as dfIn.columns(1))
       .na.drop("any", Array(dfIn.columns(0), dfIn.columns(1)))
 
     val dfSelect = dfOpenFiltered.sort(dfOpenFiltered.columns(0), dfOpenFiltered.columns(1))
 
-    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
+    val mapReduce = dfSelect.map(r => ((r(0), r(1)), 1)).reduceByKey(_ + _)
 
     val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
 

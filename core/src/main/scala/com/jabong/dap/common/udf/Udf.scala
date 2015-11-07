@@ -91,7 +91,7 @@ object Udf {
 
   val allZero2NullUdf = udf((str: String) => UdfUtils.allZero2Null(str: String))
 
-  val validateDateData = udf((str: String, dateFormat: String) => UdfUtils.validateDateData(str: String, dateFormat: String))
+  val timeToSlot = udf((str: String, dateFormat: String) => UdfUtils.timeToSlot(str: String, dateFormat: String))
 
   /**
    * For populating empty email id from dcf data as _app_deviceid
