@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.schema
 
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, EmailResponseVariables}
+import com.jabong.dap.common.constants.variables.{NewsletterVariables, ContactListMobileVars, CustomerVariables, EmailResponseVariables}
 import org.apache.spark.sql.types._
 
 /**
@@ -69,7 +69,39 @@ object CustEmailSchema {
     StructField(EmailResponseVariables.OPEN_30DAYS, IntegerType, true),
     StructField(EmailResponseVariables.CLICKS_LIFETIME, IntegerType, true),
     StructField(EmailResponseVariables.OPENS_LIFETIME, IntegerType, true),
-  StructField(EmailResponseVariables.UPDATED_DT, StringType, true)
+  StructField(NewsletterVariables.UPDATED_AT, StringType
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    , true)
   ))
 
 }

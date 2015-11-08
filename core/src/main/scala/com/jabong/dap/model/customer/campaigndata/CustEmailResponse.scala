@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables }
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
@@ -66,6 +66,10 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
       incrDate).filter(col(CustomerVariables.EMAIL) isNotNull)
+    val dfCmrReduced = dfCmrFull.select(
+      ContactListMobileVars.UID,
+      ContactListMobileVars.EMAIL,
+      CustomerVariables.RESPONSYS_ID)
     dfMap.put("cmr", dfCmrFull)
 
     val nlSubscribers = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION,
@@ -255,24 +259,23 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(CustomerVariables.RESPONSYS_ID) === resultSet(EmailResponseVariables.CUSTOMER_ID),
       SQL.LEFT_OUTER)
 
-    def result = cmrResDf.join(nlSubscribers, cmrResDf(CustomerVariables.EMAIL) === nlSubscribers(CustomerVariables.EMAIL),
-      SQL.LEFT_OUTER)
+    val result = cmrResDf.join(nlSubscribers, cmrResDf(CustomerVariables.EMAIL) === nlSubscribers(CustomerVariables.EMAIL),
+      SQL.LEFT_OUTER).select(
+        cmrResDf(ContactListMobileVars.UID),
+        cmrResDf(EmailResponseVariables.OPEN_7DAYS),
+        cmrResDf(EmailResponseVariables.OPEN_15DAYS),
+        cmrResDf(EmailResponseVariables.OPEN_30DAYS),
+        cmrResDf(EmailResponseVariables.CLICK_7DAYS),
+        cmrResDf(EmailResponseVariables.CLICK_15DAYS),
+        cmrResDf(EmailResponseVariables.CLICK_30DAYS),
+        cmrResDf(EmailResponseVariables.LAST_OPEN_DATE),
+        cmrResDf(EmailResponseVariables.LAST_CLICK_DATE),
+        cmrResDf(EmailResponseVariables.OPENS_LIFETIME),
+        cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
+        when(nlSubscribers(NewsletterVariables.UPDATED_AT) isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
+          .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)
 
-    val retVal = result.select(
-      ContactListMobileVars.UID,
-      EmailResponseVariables.OPEN_7DAYS,
-      EmailResponseVariables.OPEN_15DAYS,
-      EmailResponseVariables.OPEN_30DAYS,
-      EmailResponseVariables.CLICK_7DAYS,
-      EmailResponseVariables.CLICK_15DAYS,
-      EmailResponseVariables.CLICK_30DAYS,
-      EmailResponseVariables.LAST_OPEN_DATE,
-      EmailResponseVariables.LAST_CLICK_DATE,
-      EmailResponseVariables.OPENS_LIFETIME,
-      EmailResponseVariables.CLICKS_LIFETIME,
-      EmailResponseVariables.UPDATED_DT)
-
-    retVal
+    result
   }
 
   def effectiveDFFull(incremental: DataFrame, full: DataFrame, effective7: DataFrame, effective15: DataFrame, effective30: DataFrame): DataFrame = {
