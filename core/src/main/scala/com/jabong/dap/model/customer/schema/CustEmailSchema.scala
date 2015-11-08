@@ -69,39 +69,7 @@ object CustEmailSchema {
     StructField(EmailResponseVariables.OPEN_30DAYS, IntegerType, true),
     StructField(EmailResponseVariables.CLICKS_LIFETIME, IntegerType, true),
     StructField(EmailResponseVariables.OPENS_LIFETIME, IntegerType, true),
-  StructField(NewsletterVariables.UPDATED_AT, StringType
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    , true)
+    StructField(NewsletterVariables.UPDATED_AT, TimestampType, true)
   ))
 
 }

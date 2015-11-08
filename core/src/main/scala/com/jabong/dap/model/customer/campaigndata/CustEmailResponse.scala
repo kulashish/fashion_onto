@@ -1,8 +1,10 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.Spark
+import com.jabong.dap.common.constants.{variables, SQL}
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
@@ -12,7 +14,7 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustEmailSchema
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 
@@ -68,7 +70,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       incrDate).filter(col(CustomerVariables.EMAIL) isNotNull)
     val dfCmrReduced = dfCmrFull.select(
       ContactListMobileVars.UID,
-      ContactListMobileVars.EMAIL,
+      CustomerVariables.EMAIL,
       CustomerVariables.RESPONSYS_ID)
     dfMap.put("cmr", dfCmrFull)
 
@@ -150,6 +152,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       EmailResponseVariables.CLICK_15DAYS -> 0,
       EmailResponseVariables.CLICK_30DAYS -> 0,
       EmailResponseVariables.CLICKS_LIFETIME -> 0))
+
     val diffDf = result.except(prevFullDf).select(
       ContactListMobileVars.UID,
       EmailResponseVariables.OPEN_7DAYS,
@@ -343,7 +346,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE) as EmailResponseVariables.LAST_CLICK_DATE,
       col(MergeUtils.NEW_ + EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE)
 
-    val incrDateFullDf = MergeUtils.joinOldAndNewDF(joinedIncrSummary, CustEmailSchema.effective_Smry_Schema, full, CustEmailSchema.resCustomerEmail,
+    val prevEffDf = SchemaUtils.addColumns(full, CustEmailSchema.effective_Smry_Schema)
+
+    val incrDateFullDf = MergeUtils.joinOldAndNewDF(joinedIncrSummary, CustEmailSchema.effective_Smry_Schema, prevEffDf, CustEmailSchema.effective_Smry_Schema,
       EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
       .na.fill(
         Map(
@@ -378,8 +383,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       col(EmailResponseVariables.OPEN_15DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_15DAYS) as EmailResponseVariables.OPEN_15DAYS,
       col(EmailResponseVariables.OPEN_30DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_30DAYS) as EmailResponseVariables.OPEN_30DAYS,
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) + col(EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) as EmailResponseVariables.CLICKS_LIFETIME,
-      col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) + col(EmailResponseVariables.OPENS_LIFETIME) as EmailResponseVariables.OPENS_LIFETIME)
-
+      col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) + col(EmailResponseVariables.OPENS_LIFETIME) as EmailResponseVariables.OPENS_LIFETIME,
+      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.UPDATED_AT)
     incrDatefullSummary
   }
 
