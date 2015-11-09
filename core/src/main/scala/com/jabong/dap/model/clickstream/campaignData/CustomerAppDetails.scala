@@ -30,7 +30,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
-    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
+    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, incrDate)
 
     DataWriter.canWrite(saveMode, incrSavePath) || DataWriter.canWrite(saveMode, fullSavePath)
   }
@@ -140,7 +140,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     val full = dfWriteMap("updatedMaster")
     val incr = dfWriteMap("incrDF")
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
-    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
+    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, incrDate)
     val csvFileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_Customer_App_details"
     if (DataWriter.canWrite(incrSavePath, saveMode)) {
       DataWriter.writeParquet(incr, incrSavePath, saveMode)
