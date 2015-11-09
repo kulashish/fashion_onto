@@ -6,6 +6,8 @@ import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
+import scala.collection.mutable.HashMap
+
 /**
  * Created by raghu on 27/10/15.
  */
@@ -31,18 +33,27 @@ class PaybackDataTest extends FlatSpec with SharedSparkContext {
 
   }
 
-//  "getPaybackData: Data Frame size" should "1" in {
-//
-//    val (dfInc, dfFull) = PaybackData.getPaybackData(salesOrder, paymentPrepaidTransactionData, paymentBankPriority, soPaybackEarn, soPaybackRedeem, dfCmrFull, null)
-//
-//    //    dfInc.collect().foreach(println)
-//    //    dfInc.printSchema()
-//    //
-//    //    dfFull.collect().foreach(println)
-//    //    dfFull.printSchema()
-//
-//    assert(dfInc.count() == 1)
-//    assert(dfFull.count() == 1)
-//  }
+  "getPaybackData: Data Frame size" should "1" in {
+    val dfMap = new HashMap[String, DataFrame]()
+
+    dfMap.put("paymentBankPriorityFull", paymentBankPriority)
+    dfMap.put("cmrFull", dfCmrFull)
+    dfMap.put("paybackDataPrevFull", null)
+    dfMap.put("salesOrderIncr", salesOrder)
+    dfMap.put("paymentPrepaidTransactionDataIncr", paymentPrepaidTransactionData)
+    dfMap.put("paybackEarnIncr", soPaybackEarn)
+    dfMap.put("paybackRedeemIncr", soPaybackRedeem)
+
+    val dfWrite = PaybackData.process(dfMap)
+
+    //    dfInc.collect().foreach(println)
+    //    dfInc.printSchema()
+    //
+    //    dfFull.collect().foreach(println)
+    //    dfFull.printSchema()
+
+    assert(dfWrite("paybackIncr").count() == 1)
+    assert(dfWrite("paybackDataFull").count() == 1)
+  }
 
 }

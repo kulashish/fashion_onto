@@ -41,11 +41,11 @@ class CampaignProcessorTest extends FlatSpec with Serializable with SharedSparkC
     assert(res.count() == 6)
   }
 
-//  "Test campaignMerger" should "return 6" in {
-//    val res = CampaignProcessor.campaignMerger(res1, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.DEVICE_ID)
-//    res2 = res
-//    assert(res.count() == 3)
-//  }
+  "Test campaignMerger" should "return 6" in {
+    val res = CampaignProcessor.campaignMerger(res1, CampaignMergedFields.CUSTOMER_ID)
+    res2 = res
+    assert(res.count() == 3)
+  }
 
   "Test mergeCampaigns" should "return 2" in {
     val res = CampaignProcessor.mergepushCampaigns(res1, itr)
