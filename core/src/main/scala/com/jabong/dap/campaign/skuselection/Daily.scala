@@ -1,12 +1,9 @@
 package com.jabong.dap.campaign.skuselection
 
-import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
 
 object Daily extends Logging {
 
@@ -15,11 +12,10 @@ object Daily extends Logging {
   // inDataFrame =  [(id_customer, sku simple)]
   // itrData = [(skusimple, date, stock, special price)]
   def skuFilter(customerSkuData: DataFrame, yesterdayItrData: DataFrame): DataFrame = {
-    if (customerSkuData == null || yesterdayItrData == null) {
+    if (null == customerSkuData || null == yesterdayItrData) {
       logger.error("either customer selected skus are null or itrData is null")
       return null
     }
-
     val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(
         customerSkuData(CustomerVariables.FK_CUSTOMER),
@@ -38,6 +34,6 @@ object Daily extends Logging {
     //generate reference skus
     // val refSkus = CampaignUtils.generateReferenceSku(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
-    return filteredSku
+    filteredSku
   }
 }

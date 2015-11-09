@@ -8,6 +8,8 @@ import com.jabong.dap.model.customer.schema.CustVarSchema
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
+import scala.collection.mutable.HashMap
+
 /**
  * Created by raghu on 13/10/15.
  */
@@ -29,8 +31,12 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
   "getCPOTPart2: dfFullCPOTPart2" should "null" in {
 
     val dfCPOTFull = JsonUtils.readFromJson(DataSets.CUSTOMER, "customers_preferred_order_timeslot", CustVarSchema.customersPreferredOrderTimeslotPart2)
+    val dfMap = new HashMap[String, DataFrame]()
+    dfMap.put("salesOrderIncr", dfSalesOrder)
+    dfMap.put("cmrFull", dfCmrFull)
+    dfMap.put("CPOTPart2PrevFull", null)
 
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, null, dfCmrFull)
+    val dfWrite = CustomerPreferredTimeslotPart2.process(dfMap)
 
     //        dfInc.collect().foreach(println)
     //        dfInc.printSchema()
@@ -38,14 +44,18 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     //        dfFullFinal.collect().foreach(println)
     //        dfFullFinal.printSchema()
 
-    assert(dfInc.count() == 5)
-    assert(dfFullFinal.count() == 5)
+    assert(dfWrite("CPOTPart2Incr").count() == 5)
+    assert(dfWrite("CPOTPart2Full").count() == 5)
 
   }
 
   "getCPOTPart2: dfFullFinal" should "6" in {
+    val dfMap = new HashMap[String, DataFrame]()
+    dfMap.put("salesOrderIncr", dfSalesOrder)
+    dfMap.put("cmrFull", dfCmrFull)
+    dfMap.put("CPOTPart2PrevFull", dfFullCPOTPart2)
 
-    val (dfInc, dfFullFinal) = CustomerPreferredTimeslotPart2.getCPOTPart2(dfSalesOrder, dfFullCPOTPart2, dfCmrFull)
+    val dfWrite = CustomerPreferredTimeslotPart2.process(dfMap)
 
     //        dfInc.collect().foreach(println)
     //        dfInc.printSchema()
@@ -53,8 +63,8 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     //        dfFullFinal.collect().foreach(println)
     //        dfFullFinal.printSchema()
 
-    assert(dfInc.count() == 1)
-    assert(dfFullFinal.count() == 6)
+    assert(dfWrite("CPOTPart2Incr").count() == 1)
+    assert(dfWrite("CPOTPart2Full").count() == 6)
 
   }
 
