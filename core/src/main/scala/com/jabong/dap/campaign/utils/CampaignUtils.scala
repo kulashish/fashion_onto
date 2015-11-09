@@ -6,6 +6,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
@@ -170,24 +171,14 @@ object CampaignUtils extends Logging {
 
     //    refSkuData.printSchema()
 
-    val customerData = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
+    val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
-      .select(col(CustomerVariables.EMAIL),
-        col(ProductVariables.SKU_SIMPLE),
-        col(ProductVariables.SPECIAL_PRICE),
-        col(ProductVariables.BRICK),
-        col(ProductVariables.BRAND),
-        col(ProductVariables.MVP),
-        col(ProductVariables.GENDER),
-        col(ProductVariables.PRODUCT_NAME))
-
-
-    debug(customerData,"In ref skus after filter customerData is not null")
-
+    debug(dfFilterd, "In ref skus after filter customerData is not null")
+    val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.referenceSku)
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
-    val customerSkuMap = customerData.map(t => (
+    val customerSkuMap = dfSchemaChange.map(t => (
       (t(t.fieldIndex(CustomerVariables.EMAIL))),
       (t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
         t(t.fieldIndex(ProductVariables.SKU_SIMPLE)).toString,
@@ -195,14 +186,15 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.BRICK))),
         checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
         checkNullString(t(t.fieldIndex(ProductVariables.GENDER))),
-        checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))))))
+        checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
+        checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map{ case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
-    debug(grouped,"In ref sku generation final , after final grouping ")
+    debug(grouped, "In ref sku generation final , after final grouping ")
     grouped
   }
 
@@ -210,7 +202,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -746,8 +738,28 @@ object CampaignUtils extends Logging {
       pushCampaignPostProcess(campaignType, campaignName, filteredSku, pastCampaignCheck)
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
       emailCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, pastCampaignCheck)
+    } else if (campaignType.equalsIgnoreCase(DataSets.CALENDAR_CAMPAIGNS)) {
+      calendarCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations)
     }
 
+  }
+
+  def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
+
+    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
+
+    val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
+
+    // create recommendations
+    val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
+
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE))
+
+    debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
+    //save campaign Output for mobile
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
   }
 
   /**
@@ -805,8 +817,6 @@ object CampaignUtils extends Logging {
       custFilteredPastCampaign = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, custFilteredWithEmail,
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
-    debug(custFilteredPastCampaign, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
-
 
     var refSkus: DataFrame = null
     if (campaignName.startsWith("acart")) {

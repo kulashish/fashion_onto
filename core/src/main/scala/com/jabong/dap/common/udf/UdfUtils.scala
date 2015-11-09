@@ -584,21 +584,6 @@ object UdfUtils extends Logging {
     str
   }
 
-  //  def validateDateData(dateString: String, dateFormat: String): Int = {
-  //
-  //    val nullStr: Int = null
-  //
-  //    try {
-  //      val formatter = new SimpleDateFormat(dateFormat)
-  //      var date: java.util.Date = null
-  //      date = formatter.parse(dateString)
-  //    } catch {
-  //      case _: Throwable => return nullStr
-  //    }
-  //    return dateString
-  //
-  //  }
-
   /**
    *
    * @param dateString
@@ -695,4 +680,13 @@ object UdfUtils extends Logging {
 
     return followUpCampaignMap.getOrElse(mailType, 0)
   }
+
+  def nextPriceBand(priceBand: String): String = {
+    if (priceBand == null || priceBand.equals("E")) {
+      return priceBand
+    } else {
+      return (priceBand.charAt(0) + 1).toChar.toString
+    }
+  }
+
 }

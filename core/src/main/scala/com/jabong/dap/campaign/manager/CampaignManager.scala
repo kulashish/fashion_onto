@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.campaign.calendarcampaign.PricepointCampaign
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -73,6 +74,23 @@ object CampaignManager extends Serializable with Logging {
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
     liveRetargetCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
+  }
+
+  def startPricepointCampaign() = {
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val last20thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(20, fullOrderData)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last20thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(20, fullOrderItemData)
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickPriceBandRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_PRICE_BAND_SUB_TYPE).cache()
+
+    val pricepointCampaign = new PricepointCampaign()
+    pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData)
+
   }
 
   def startInvalidCampaigns(campaignsConfig: String) = {
