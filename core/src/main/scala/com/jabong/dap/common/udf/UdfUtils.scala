@@ -1,9 +1,11 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -14,6 +16,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{ DataFrame, Row }
 import org.apache.spark.sql.functions._
 
+import scala.collection.immutable.HashMap
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
@@ -215,46 +218,6 @@ object UdfUtils extends Logging {
     }
 
     return maxSlot
-  }
-
-  /**
-   * this method will create a slot data
-   * @param iterable
-   * @return Tuple2[String, Int]
-   */
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
-
-    logger.info("Enter in getCompleteSlotData:")
-
-    val timeSlotArray = new Array[Int](12)
-
-    var maxSlot: Int = 0
-
-    var max: Int = 0
-
-    iterable.foreach {
-      case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value }
-        timeSlotArray(slot) = value
-    }
-
-    logger.info("Exit from  getCompleteSlotData: ")
-
-    new Tuple13(
-      timeSlotArray(0),
-      timeSlotArray(1),
-      timeSlotArray(2),
-      timeSlotArray(3),
-      timeSlotArray(4),
-      timeSlotArray(5),
-      timeSlotArray(6),
-      timeSlotArray(7),
-      timeSlotArray(8),
-      timeSlotArray(9),
-      timeSlotArray(10),
-      timeSlotArray(11),
-      maxSlot)
-
   }
 
   /**
@@ -621,6 +584,35 @@ object UdfUtils extends Logging {
     str
   }
 
+  /**
+   *
+   * @param dateString
+   * @param dateFormat
+   * @return Int
+   */
+  def timeToSlot(dateString: String, dateFormat: String): Int = {
+
+    logger.info("Enter in  timeToSlot:")
+    val nullStr: Int = null.asInstanceOf[Int]
+    var timeToSlotMap = new HashMap[Int, Int]
+    timeToSlotMap += (7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
+
+    try {
+      val formatter = new SimpleDateFormat(dateFormat)
+      var date: java.util.Date = null
+      date = formatter.parse(dateString)
+
+      val calendar = Calendar.getInstance()
+      calendar.setTime(date)
+      val hours = calendar.get(Calendar.HOUR_OF_DAY)
+      val timeSlot = timeToSlotMap.getOrElse(hours, 0)
+      logger.info("Exit from  timeToSlot: ")
+      return timeSlot
+    } catch {
+      case _: Throwable => return nullStr
+    }
+  }
+
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
@@ -670,6 +662,31 @@ object UdfUtils extends Logging {
 
     return maxSlot
 
+  }
+
+  /**
+   * follow up campaign map
+   * @param mailType
+   * @return
+   */
+  def followUpCampaignMailTypes(mailType: Int): Int = {
+    val followUpCampaignMap = collection.immutable.HashMap(
+      CampaignCommon.SURF1_MAIL_TYPE -> CampaignCommon.SURF1_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF2_MAIL_TYPE -> CampaignCommon.SURF2_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF3_MAIL_TYPE -> CampaignCommon.SURF3_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF6_MAIL_TYPE -> CampaignCommon.SURF6_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.CANCEL_RETARGET_MAIL_TYPE -> CampaignCommon.CANCEL_RETARGET_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.RETURN_RETARGET_MAIL_TYPE -> CampaignCommon.RETURN_RETARGET_FOLLOW_UP_MAIL_TYPE)
+
+    return followUpCampaignMap.getOrElse(mailType, 0)
+  }
+
+  def nextPriceBand(priceBand: String): String = {
+    if (priceBand == null || priceBand.equals("E")) {
+      return priceBand
+    } else {
+      return (priceBand.charAt(0) + 1).toChar.toString
+    }
   }
 
 

@@ -15,4 +15,6 @@ object CustomerSelection {
   val CLOSED_ORDER = "ClosedOrder"
   val CUSTOMER_PREFERRED_DATA = "CustomerPreferredData"
   val HOTTEST_X  = "HottestX"
+  val LAST_ORDER = "LastOrder"
+  val LAST5_SUCCESSFUL_ORDER = "Last5SuccessfulOrder"
 }

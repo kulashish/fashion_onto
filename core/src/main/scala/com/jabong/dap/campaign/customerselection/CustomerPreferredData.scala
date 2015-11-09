@@ -28,7 +28,7 @@ class CustomerPreferredData extends CustomerSelector with Logging {
     val dfCustomerData = yestCustomerData.select(CustomerVariables.ID_CUSTOMER, CustomerVariables.CITY, ProductVariables.BRAND)
 
     val dfResult = dfCustomerData.join(dfJoinOrderAndItem, dfCustomerData(CustomerVariables.ID_CUSTOMER) === dfJoinOrderAndItem(SalesOrderVariables.FK_CUSTOMER), SQL.INNER)
-      .select(CustomerVariables.ID_CUSTOMER, CustomerVariables.CITY, ProductVariables.BRAND, SalesOrderItemVariables.SKU)
+      .select(col(CustomerVariables.ID_CUSTOMER), col(CustomerVariables.CITY), col(ProductVariables.BRAND) as CustomerVariables.PREFERRED_BRAND, col(SalesOrderItemVariables.SKU))
 
     return dfResult
   }

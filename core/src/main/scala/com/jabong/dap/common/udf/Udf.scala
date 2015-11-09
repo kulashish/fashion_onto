@@ -91,6 +91,8 @@ object Udf {
 
   val allZero2NullUdf = udf((str: String) => UdfUtils.allZero2Null(str: String))
 
+  val timeToSlot = udf((str: String, dateFormat: String) => UdfUtils.timeToSlot(str: String, dateFormat: String))
+
   /**
    * For populating empty email id from dcf data as _app_deviceid
    */
@@ -134,9 +136,13 @@ object Udf {
 
   val mps = udf((s: String) => UdfUtils.markMps(s: String))
 
+  val followUpCampaignMailType = udf((mailType: Int) => UdfUtils.followUpCampaignMailTypes(mailType: Int))
+
   val BigDecimalToDouble = udf((value: java.math.BigDecimal) => UdfUtils.BigDecimalToDouble(value: java.math.BigDecimal))
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
+
+  val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
 
   val getLatestEmailOpenDate = udf((s: String, s1 : String, s2:  String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1 : String, s2:  String, s3: String))
 }
