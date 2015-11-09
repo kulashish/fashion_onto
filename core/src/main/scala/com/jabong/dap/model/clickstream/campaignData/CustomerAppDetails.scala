@@ -137,17 +137,16 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     dfWriteMap
   }
   def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
-    val full = dfWriteMap("updatedMaster")
     val incr = dfWriteMap("incrDF")
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
     val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, incrDate)
-    val csvFileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_Customer_App_details"
     if (DataWriter.canWrite(incrSavePath, saveMode)) {
       DataWriter.writeParquet(incr, incrSavePath, saveMode)
     }
     if (DataWriter.canWrite(fullSavePath, saveMode)) {
-      DataWriter.writeParquet(full, fullSavePath, saveMode)
+      DataWriter.writeParquet(dfWriteMap("updatedMaster"), fullSavePath, saveMode)
     }
+    val csvFileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_Customer_App_details"
     DataWriter.writeCsv(incr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, csvFileName, saveMode, "true", ";")
   }
 }
