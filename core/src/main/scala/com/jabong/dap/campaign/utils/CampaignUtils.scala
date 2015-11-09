@@ -3,23 +3,23 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
+import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{ GroupedUtils, Spark }
+import com.jabong.dap.common.{GroupedUtils, Spark}
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.{Udf, UdfUtils}
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
+import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
@@ -34,6 +34,7 @@ object CampaignUtils extends Logging {
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
+
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
     CampaignUtils.debug(skuData, "AcartDaily:-after ref sku generation")
 
@@ -160,7 +161,7 @@ object CampaignUtils extends Logging {
    * @param NumberSku
    * @return
    */
-  def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
+  def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int, MinSku: Int = -1): DataFrame = {
 
     //    import sqlContext.implicits._
     // FIXME: customer null check won't work for surf, check if sku simple need to be converted to sku
@@ -190,7 +191,7 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
 
     val customerGroup = customerSkuMap.groupByKey().
-      map{ case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
+      map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku, MinSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
@@ -202,14 +203,17 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int, minSkus: Int): List[(Double, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
     val listSize = refList.size
     var numberSkus = numSKus
-    if (numberSkus > refList.size) numberSkus = listSize
-    return refList.take(numberSkus)
+    if (refList.size > minSkus) {
+      if (numberSkus > refList.size) numberSkus = listSize
+      return refList.take(numberSkus)
+    }
+    null
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
@@ -399,7 +403,7 @@ object CampaignUtils extends Logging {
 
   /**
    * R2 - returns the skus which are not bought during last x days
-   *    - We need to give salesOrder and salesOrderItem data pre-filtered for last x days
+   * - We need to give salesOrder and salesOrderItem data pre-filtered for last x days
    * @param inputData - FK_CUSTOMER, EMAIL, SKU
    * @param salesOrder
    * @param salesOrderItem
@@ -431,7 +435,7 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.SKU),
         inputData(PageVisitVariables.BROWSER_ID),
         inputData(PageVisitVariables.DOMAIN)
-      //inputData(ProductVariables.SPECIAL_PRICE)
+        //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -541,7 +545,7 @@ object CampaignUtils extends Logging {
 
   //FIXME: make it generalized for all campaigns
   /**
-   *  * shortListSkuSimpleFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of simple_sku
+   * * shortListSkuSimpleFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of simple_sku
    * @param dfCustomerProductShortlist
    * @param dfYesterdayItrData
    * @return DataFrame
@@ -578,6 +582,7 @@ object CampaignUtils extends Logging {
     dfResult
 
   }
+
   /**
    * get customer email to customer id mapping for all clickStream users
    * @param dfCustomerPageVisit
@@ -746,7 +751,13 @@ object CampaignUtils extends Logging {
 
   def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
 
-    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkus =
+      campaignName match {
+        case CampaignCommon.HOTTEST_X => CampaignUtils.generateReferenceSkus(filteredSku, 16, CampaignCommon.MIN_REF_SKUS)
+        case _ => CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+      }
+
+    CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 

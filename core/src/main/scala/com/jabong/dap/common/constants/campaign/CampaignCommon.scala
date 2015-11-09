@@ -11,6 +11,7 @@ object CampaignCommon {
   val REF_SKUS = "refSkus"
   val PUSH_REF_SKUS = 1
   val NUMBER_REF_SKUS = 2
+  val MIN_REF_SKUS = 4
 
   val BASE_PATH = "/data/output/campaigns/"
 
@@ -42,6 +43,7 @@ object CampaignCommon {
   val BRICK_AFFINITY = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
   val BEAUTY_CAMPAIGN = "beauty_campaign"
+  val HOTTEST_X = "hottest_x"
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
@@ -109,4 +111,6 @@ object CampaignCommon {
   val campaignRecommendationMap = collection.immutable.HashMap(
     CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE
   )
+
+
 }

@@ -334,7 +334,7 @@ object CampaignManager extends Serializable with Logging {
 
     val hottestXCampaign = new HottestXCampaign
 
-    //hottestXCampaign.runHottestXCampaign(day_45OrderData, day_60OrderData, genderMvpBrickRecos)
+//    hottestXCampaign.runCampaign(day_45OrderData, day_60OrderData, genderMvpBrickRecos)
 
 
   }

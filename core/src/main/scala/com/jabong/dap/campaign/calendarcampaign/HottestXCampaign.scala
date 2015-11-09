@@ -12,16 +12,16 @@ import org.apache.spark.sql.DataFrame
  */
 class HottestXCampaign {
 
-  def runHottestXCampaign(nthDay_45Df : DataFrame, nthDay_60Df : DataFrame, yesterdayItr: DataFrame, recommendations: DataFrame) {
+  def runHottestXCampaign(nthDay_45Df : DataFrame, nthDay_60Df : DataFrame, recommendations: DataFrame) {
 
     val customerSelection =  CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.HOTTEST_X)
 
     val hottestX = customerSelection.customerSelection(nthDay_45Df, nthDay_60Df)
 
-    val filteredSku  = HottestXFilter.skuFilter(hottestX, yesterdayItr)
+    val filteredSku  = hottestX//HottestXFilter.skuFilter(hottestX, yesterdayItr)
 
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_DAILY_CAMPAIGN, filteredSku, false,
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.HOTTEST_X, filteredSku, false,
       recommendations)
   }
 
