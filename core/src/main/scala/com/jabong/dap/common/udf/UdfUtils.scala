@@ -1,9 +1,11 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.time.TimeUtils._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -14,6 +16,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{ DataFrame, Row }
 import org.apache.spark.sql.functions._
 
+import scala.collection.immutable.HashMap
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
@@ -579,6 +582,50 @@ object UdfUtils extends Logging {
       }
     }
     str
+  }
+
+  //  def validateDateData(dateString: String, dateFormat: String): Int = {
+  //
+  //    val nullStr: Int = null
+  //
+  //    try {
+  //      val formatter = new SimpleDateFormat(dateFormat)
+  //      var date: java.util.Date = null
+  //      date = formatter.parse(dateString)
+  //    } catch {
+  //      case _: Throwable => return nullStr
+  //    }
+  //    return dateString
+  //
+  //  }
+
+  /**
+   *
+   * @param dateString
+   * @param dateFormat
+   * @return Int
+   */
+  def timeToSlot(dateString: String, dateFormat: String): Int = {
+
+    logger.info("Enter in  timeToSlot:")
+    val nullStr: Int = null.asInstanceOf[Int]
+    var timeToSlotMap = new HashMap[Int, Int]
+    timeToSlotMap += (7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
+
+    try {
+      val formatter = new SimpleDateFormat(dateFormat)
+      var date: java.util.Date = null
+      date = formatter.parse(dateString)
+
+      val calendar = Calendar.getInstance()
+      calendar.setTime(date)
+      val hours = calendar.get(Calendar.HOUR_OF_DAY)
+      val timeSlot = timeToSlotMap.getOrElse(hours, 0)
+      logger.info("Exit from  timeToSlot: ")
+      return timeSlot
+    } catch {
+      case _: Throwable => return nullStr
+    }
   }
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
