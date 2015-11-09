@@ -146,7 +146,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     if (DataWriter.canWrite(fullSavePath, saveMode)) {
       DataWriter.writeParquet(dfWriteMap("updatedMaster"), fullSavePath, saveMode)
     }
-    val csvFileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_Customer_App_details"
-    DataWriter.writeCsv(incr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, csvFileName, saveMode, "true", ";")
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(incr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_App_details", saveMode, "true", ";")
   }
 }
