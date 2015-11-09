@@ -83,8 +83,7 @@ object CampaignCommon {
     "new_arrivals_brand" -> 68,
     "shortlist_reminder" -> 53,
     "invalid_iod" -> 100,
-    //FIXME: correct mail type for calendar campaign
-    CampaignCommon.PRICEPOINT_CAMPAIGN -> 200
+    CampaignCommon.PRICEPOINT_CAMPAIGN -> 24
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(
