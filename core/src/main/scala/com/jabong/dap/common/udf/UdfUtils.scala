@@ -221,46 +221,6 @@ object UdfUtils extends Logging {
   }
 
   /**
-   * this method will create a slot data
-   * @param iterable
-   * @return Tuple2[String, Int]
-   */
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
-
-    logger.info("Enter in getCompleteSlotData:")
-
-    val timeSlotArray = new Array[Int](12)
-
-    var maxSlot: Int = 0
-
-    var max: Int = 0
-
-    iterable.foreach {
-      case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value }
-        timeSlotArray(slot) = value
-    }
-
-    logger.info("Exit from  getCompleteSlotData: ")
-
-    new Tuple13(
-      timeSlotArray(0),
-      timeSlotArray(1),
-      timeSlotArray(2),
-      timeSlotArray(3),
-      timeSlotArray(4),
-      timeSlotArray(5),
-      timeSlotArray(6),
-      timeSlotArray(7),
-      timeSlotArray(8),
-      timeSlotArray(9),
-      timeSlotArray(10),
-      timeSlotArray(11),
-      maxSlot)
-
-  }
-
-  /**
    * This will return age of person
    * @param birthday
    * @return
@@ -623,7 +583,6 @@ object UdfUtils extends Logging {
     }
     str
   }
-
 
   /**
    *

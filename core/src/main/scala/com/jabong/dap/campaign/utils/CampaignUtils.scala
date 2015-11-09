@@ -173,7 +173,7 @@ object CampaignUtils extends Logging {
 
     val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
-
+    debug(dfFilterd, "In ref skus after filter customerData is not null")
     val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.referenceSku)
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
@@ -194,6 +194,7 @@ object CampaignUtils extends Logging {
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
+    debug(grouped, "In ref sku generation final , after final grouping ")
     grouped
   }
 

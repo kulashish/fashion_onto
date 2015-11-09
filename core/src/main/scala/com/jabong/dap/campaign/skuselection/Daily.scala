@@ -28,6 +28,7 @@ object Daily extends Logging {
         yesterdayItrData(ProductVariables.MVP),
         yesterdayItrData(ProductVariables.GENDER),
         yesterdayItrData(ProductVariables.PRODUCT_NAME),
+        yesterdayItrData(ProductVariables.STOCK),
         yesterdayItrData(ProductVariables.PRICE_BAND))
 
     logger.info("Join selected customer sku with sku data and get special price")
