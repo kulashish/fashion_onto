@@ -703,14 +703,15 @@ object UdfUtils extends Logging {
       date = TimeUtils.getDate(yesOpenDate, TimeConstants.DATE_TIME_FORMAT)
     }
     if(date != null && date.after(maxDate)){
-      maxDate = date
+      maxDateString = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT).format(date)
     }else{
       if(null != clickDate && clickDate.length > 0){
         maxDate = TimeUtils.getDate(clickDate, TimeConstants.DATE_TIME_FORMAT)
       }else if(null != yesClickDate && yesClickDate.length > 0) {
         maxDate = TimeUtils.getDate(yesClickDate, TimeConstants.DATE_TIME_FORMAT)
       }
+      maxDateString = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT).format(maxDate)
     }
-    TimeUtils.dateStringFromDate(maxDate, TimeConstants.DATE_TIME_FORMAT)
+    maxDateString
   }
 }
