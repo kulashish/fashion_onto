@@ -33,12 +33,16 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkusUpdatedSchema = SchemaUtils.addColumns(refSkus, Schema.expectedFinalReferenceSku)
     }
 
+    CampaignUtils.debug(recommendations, "after recommendations")
+
     val refSkuExploded = refSkusUpdatedSchema.select(
       refSkusUpdatedSchema(CustomerVariables.EMAIL),
       refSkusUpdatedSchema(CampaignMergedFields.REF_SKU1),
       refSkusUpdatedSchema(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       refSkusUpdatedSchema(CampaignMergedFields.LIVE_CART_URL),
       explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
+
+    CampaignUtils.debug(refSkuExploded, "after refSkuExploded")
 
     //FIXME: To check if there is any ref sku in recommended sku
     //FIXME: add column as rec skus instead of passing entire data to genRecSkus function
@@ -55,7 +59,12 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.priceBand") as ProductVariables.PRICE_BAND,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
+
+    CampaignUtils.debug(completeRefSku, "after completeRefSku")
+
     val recommendationJoined = joinToRecommendation(completeRefSku, recommendations, recType)
+
+    CampaignUtils.debug(recommendationJoined, "after recommendationJoined")
 
     val recommendationSelected = recommendationJoined.select(
       completeRefSku(CustomerVariables.EMAIL),
