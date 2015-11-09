@@ -3,12 +3,13 @@ package com.jabong.dap.campaign.manager
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.acq.common.{ ParamInfo, CampaignConfig, CampaignInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -111,6 +112,10 @@ object CampaignManager extends Serializable with Logging {
     invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations)
   }
 
+  /**
+   *
+   * @param campaignsConfig
+   */
   def startAbandonedCartCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
 
@@ -167,6 +172,24 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
+  /**
+   *
+   * @param params
+   */
+  def startAcartHourlyCampaign(params: ParamInfo) = {
+    val incrDateWithHour = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER))
+    val lastHour = -2
+    val salesCartHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_CART,lastHour,incrDateWithHour)
+    val salesOrderHourly = CampaignInput.loadNHoursTableData(DataSets.SALES_ORDER,lastHour,incrDateWithHour)
+    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM, lastHour,incrDateWithHour)
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    val acartHourly = new AcartHourlyCampaign()
+
+    acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations)
+
+  }
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
 
   def startWishlistCampaigns(campaignsConfig: String) = {
