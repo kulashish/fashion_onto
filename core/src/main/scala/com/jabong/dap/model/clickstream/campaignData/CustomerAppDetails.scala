@@ -2,9 +2,9 @@ package com.jabong.dap.model.clickstream.campaignData
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{CustomerVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables }
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -12,7 +12,7 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{TimestampType, LongType, IntegerType}
+import org.apache.spark.sql.types.{ TimestampType, LongType, IntegerType }
 
 import scala.collection.mutable.HashMap
 
@@ -57,18 +57,18 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     val inputCSVFile = "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
     val df = DataReader.getDataFrame4mCsv(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, date, inputCSVFile, "true", "|")
     val correctSchemaDF = df.select(col("ID_CUSTOMER").cast(LongType) as CustomerVariables.ID_CUSTOMER,
-              col("DOMAIN") as CustomerVariables.DOMAIN,
-              col("CREATED_AT").cast(TimestampType) as SalesOrderVariables.CREATED_AT,
-              col("LOGIN_TIME").cast(TimestampType) as FIRST_LOGIN_TIME,
-              col("LAST_LOGIN_TIME").cast(TimestampType) as LAST_LOGIN_TIME,
-              col("SESSION_KEY") as SESSION_KEY,
-              col("ORDER_COUNT").cast(IntegerType) as ORDER_COUNT)
+      col("DOMAIN") as CustomerVariables.DOMAIN,
+      col("CREATED_AT").cast(TimestampType) as SalesOrderVariables.CREATED_AT,
+      col("LOGIN_TIME").cast(TimestampType) as FIRST_LOGIN_TIME,
+      col("LAST_LOGIN_TIME").cast(TimestampType) as LAST_LOGIN_TIME,
+      col("SESSION_KEY") as SESSION_KEY,
+      col("ORDER_COUNT").cast(IntegerType) as ORDER_COUNT)
     val trimmedCMR = cmr.filter("domain in ('ios', 'android', 'windows')")
-      .select("UID", CustomerVariables.ID_CUSTOMER).withColumnRenamed("UID", UID).withColumnRenamed(CustomerVariables.ID_CUSTOMER, "temp_"+CustomerVariables.ID_CUSTOMER)
+      .select("UID", CustomerVariables.ID_CUSTOMER).withColumnRenamed("UID", UID).withColumnRenamed(CustomerVariables.ID_CUSTOMER, "temp_" + CustomerVariables.ID_CUSTOMER)
 
-    val withUID = correctSchemaDF.join(trimmedCMR, correctSchemaDF(CustomerVariables.ID_CUSTOMER) === trimmedCMR("temp_"+CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
-                  .drop(trimmedCMR("temp_"+CustomerVariables.ID_CUSTOMER))
-                  .drop(correctSchemaDF(CustomerVariables.ID_CUSTOMER))
+    val withUID = correctSchemaDF.join(trimmedCMR, correctSchemaDF(CustomerVariables.ID_CUSTOMER) === trimmedCMR("temp_" + CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
+      .drop(trimmedCMR("temp_" + CustomerVariables.ID_CUSTOMER))
+      .drop(correctSchemaDF(CustomerVariables.ID_CUSTOMER))
     withUID
   }
 
