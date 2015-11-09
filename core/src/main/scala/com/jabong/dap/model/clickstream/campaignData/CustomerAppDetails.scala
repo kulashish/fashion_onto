@@ -1,12 +1,10 @@
 package com.jabong.dap.model.clickstream.campaignData
 
-import java.io.File
-
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, SalesOrderVariables}
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -14,7 +12,7 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.types.{TimestampType, LongType, IntegerType}
 
 import scala.collection.mutable.HashMap
 
@@ -36,17 +34,17 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
     DataWriter.canWrite(saveMode, incrSavePath) || DataWriter.canWrite(saveMode, fullSavePath)
   }
-  def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
-    val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+
+  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
+
+    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
+    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val customerSession = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, incrDate)
 
     val masterRecord =
-      if (null != paths) getFullOnFirstDay(yesterday)
+      if (null != paths) getFullOnFirstDay(prevDate, cmr)
       else
-        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, yesterday)
-
-    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, yesterday)
-    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, yesterday)
-    val customerSession = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, yesterday)
+        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, prevDate)
 
     val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
     dfMap.put("masterRecord", masterRecord)
@@ -55,19 +53,25 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     dfMap.put("customerSession", customerSession)
     dfMap
   }
-  def getFullOnFirstDay(date: String): DataFrame = {
-    val inputCSVPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + DataSets.CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
-    val outputPath = ConfigConstants.READ_OUTPUT_PATH + File.separator + DataSets.VARIABLES + File.separator + DataSets.CUSTOMER_APP_DETAILS + File.separator + DataSets.FULL_MERGE_MODE + File.separator + date
-    val df = DataReader.getDataFrame4mCsv(inputCSVPath, "true", "|")
-    df.withColumnRenamed("ID_CUSTOMER", "uid")
-      .withColumnRenamed("DOMAIN", "domain")
-      .withColumnRenamed("CREATED_AT", "created_at")
-      .drop("PROCESSED_DATE")
-      .withColumnRenamed("LOGIN_TIME", "first_login_time")
-      .withColumnRenamed("SESSION_KEY", "session_key")
-      .withColumnRenamed("ORDER_COUNT", "order_count")
-      .withColumnRenamed("LAST_LOGIN_TIME", "last_login_time")
+  def getFullOnFirstDay(date: String, cmr: DataFrame): DataFrame = {
+    val inputCSVFile = "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
+    val df = DataReader.getDataFrame4mCsv(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, date, inputCSVFile, "true", "|")
+    val correctSchemaDF = df.select(col("ID_CUSTOMER").cast(LongType) as CustomerVariables.ID_CUSTOMER,
+              col("DOMAIN") as CustomerVariables.DOMAIN,
+              col("CREATED_AT").cast(TimestampType) as SalesOrderVariables.CREATED_AT,
+              col("LOGIN_TIME").cast(TimestampType) as FIRST_LOGIN_TIME,
+              col("LAST_LOGIN_TIME").cast(TimestampType) as LAST_LOGIN_TIME,
+              col("SESSION_KEY") as SESSION_KEY,
+              col("ORDER_COUNT").cast(IntegerType) as ORDER_COUNT)
+    val trimmedCMR = cmr.filter("domain in ('ios', 'android', 'windows')")
+      .select("UID", CustomerVariables.ID_CUSTOMER).withColumnRenamed("UID", UID).withColumnRenamed(CustomerVariables.ID_CUSTOMER, "temp_"+CustomerVariables.ID_CUSTOMER)
+
+    val withUID = correctSchemaDF.join(trimmedCMR, correctSchemaDF(CustomerVariables.ID_CUSTOMER) === trimmedCMR("temp_"+CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
+                  .drop(trimmedCMR("temp_"+CustomerVariables.ID_CUSTOMER))
+                  .drop(correctSchemaDF(CustomerVariables.ID_CUSTOMER))
+    withUID
   }
+
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val masterRecord = dfMap("masterRecord")
     val salesOrder = dfMap("salesOrder")

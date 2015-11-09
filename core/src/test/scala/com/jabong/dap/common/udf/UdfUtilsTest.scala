@@ -2,7 +2,7 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.SharedSparkContext
+import com.jabong.dap.common.{ Utils, SharedSparkContext }
 import com.jabong.dap.common.constants.variables.SalesOrderVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.TimeConstants
@@ -554,7 +554,7 @@ class UdfUtilsTest extends FlatSpec with SharedSparkContext {
 
   "getCPOT: Data Frame" should "match to resultant Data Frame" in {
 
-    val result = UdfUtils.getCPOT(dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT).filter(col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(SalesOrderVariables.FK_CUSTOMER) != "" && col(SalesOrderVariables.CREATED_AT).isNotNull), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+    val result = Utils.getCPOT(dfSalesOrder.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT).filter(col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(SalesOrderVariables.FK_CUSTOMER) != "" && col(SalesOrderVariables.CREATED_AT).isNotNull), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
       .limit(30).collect().toSet
 
     //result.limit(30).write.json(DataSets.TEST_RESOURCES + "customers_preferred_order_timeslot" + ".json")

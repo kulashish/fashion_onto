@@ -143,6 +143,10 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "bobAcqHourly") {
+    $AMMUNITION = "--num-executors 1 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqHourly.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "bobMerge") {
     $AMMUNITION = "--num-executors 12 --executor-memory 18G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/bobMerge.json";
