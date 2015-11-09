@@ -1,5 +1,7 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import java.sql.Timestamp
+
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.{variables, SQL}
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -87,17 +89,10 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     val fullDf = dfWrite("fullDf")
     val diffDf = dfWrite("diffDf")
 
-    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
-    val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, incrDate)
-
-    if (DataWriter.canWrite(incrSavePath, saveMode)) {
-      DataWriter.writeParquet(incrDf, incrSavePath, saveMode)
-    }
-
     val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
       DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
     val savePathFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
-      DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
+      DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, incrDate)
 
     if (DataWriter.canWrite(savePathIncr, saveMode)) {
       DataWriter.writeParquet(incrDf, savePathIncr, saveMode)
@@ -174,7 +169,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfResultMap
   }
 
-  def open_segment(value: String, updateValue: String, incrDateStr: String): String = {
+  def open_segment(value: String, updateValue: Timestamp, incrDateStr: String): String = {
 
     if (null == value && updateValue == null)
       "NO"
@@ -201,9 +196,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     } else {
 
-      val lastOpenDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
       val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
-      val time4mToday = TimeUtils.daysBetweenTwoDates(lastOpenDate, incrDate)
+      val time4mToday = TimeUtils.daysBetweenTwoDates(updateValue, incrDate)
 
       val segment = {
 

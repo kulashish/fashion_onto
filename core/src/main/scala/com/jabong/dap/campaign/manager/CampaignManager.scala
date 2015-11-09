@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.campaign.calendarcampaign.DCFBrandInCityCampaign
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -276,6 +277,26 @@ object CampaignManager extends Serializable with Logging {
     //Start: New Arrival email Campaign
     val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
     newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
+  }
+
+
+  def startHottestXCampaign(campaignsConfig: String) = {
+
+    CampaignManager.initCampaignsConfig(campaignsConfig)
+
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE)
+
+    val day_45past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
+    val day_45OrderData = CampaignInput.loadOrderItemData(day_45past)
+
+    val day_60past = TimeUtils.getDateAfterNDays(-60, TimeConstants.DATE_FORMAT_FOLDER)
+    val day_60OrderData = CampaignInput.loadOrderItemData(day_60past)
+
+    val hottestXCampaign = new DCFBrandInCityCampaign
+
+    //hottestXCampaign.runHottestXCampaign(day_45OrderData, day_60OrderData, genderMvpBrickRecos)
+
+
   }
 
   def loadCustomerMasterData(): DataFrame = {
