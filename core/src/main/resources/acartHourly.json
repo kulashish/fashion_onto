@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "acartHourly",
+      "incrDate": "2015/10/13/16",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
