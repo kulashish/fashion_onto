@@ -34,6 +34,7 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     val dfMap = new HashMap[String, DataFrame]()
     dfMap.put("salesOrderIncr", dfSalesOrder)
     dfMap.put("cmrFull", dfCmrFull)
+    dfMap.put("CPOTPart2PrevFull", null)
 
     val dfWrite = CustomerPreferredTimeslotPart2.process(dfMap)
 
@@ -44,7 +45,7 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     //        dfFullFinal.printSchema()
 
     assert(dfWrite("CPOTPart2Incr").count() == 5)
-    assert(dfWrite("CPOTPart2Full") == 5)
+    assert(dfWrite("CPOTPart2Full").count() == 5)
 
   }
 
@@ -53,7 +54,6 @@ class CustomerPreferredTimeslotPart2Test extends FlatSpec with SharedSparkContex
     dfMap.put("salesOrderIncr", dfSalesOrder)
     dfMap.put("cmrFull", dfCmrFull)
     dfMap.put("CPOTPart2PrevFull", dfFullCPOTPart2)
-
 
     val dfWrite = CustomerPreferredTimeslotPart2.process(dfMap)
 

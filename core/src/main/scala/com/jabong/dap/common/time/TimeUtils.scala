@@ -15,6 +15,8 @@ import scala.collection.immutable.HashMap
 object TimeUtils extends Logging {
 
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+  val LAST_HOUR_FOLDER = TimeUtils.getDateAfterHours(-1, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
 
   val MIN_TIMESTAMP = new Timestamp(Long.MinValue)
@@ -326,33 +328,6 @@ object TimeUtils extends Logging {
   }
 
   /**
-   *
-   * @param dateString
-   * @param dateFormat
-   * @return Int
-   */
-  def timeToSlot(dateString: String, dateFormat: String): Int = {
-
-    logger.info("Enter in  timeToSlot:")
-
-    var timeToSlotMap = new HashMap[Int, Int]
-    timeToSlotMap += (7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
-
-    val formatter = new SimpleDateFormat(dateFormat)
-    var date: java.util.Date = null
-    date = formatter.parse(dateString)
-
-    val calendar = Calendar.getInstance()
-    calendar.setTime(date)
-    val hours = calendar.get(Calendar.HOUR_OF_DAY)
-    val timeSlot = timeToSlotMap.getOrElse(hours, 0)
-
-    logger.info("Exit from  timeToSlot: ")
-
-    timeSlot
-  }
-
-  /**
    * calculate total number of years from given date till today.
    * @param date
    * @return Int
@@ -486,6 +461,34 @@ object TimeUtils extends Logging {
     } else {
       "%s".format(input)
     }
+  }
+
+  /**
+   *
+   * @param noOfHours
+   * @param dateFormat
+   * @return
+   */
+  def getDateAfterHours(noOfHours: Int, dateFormat: String) = {
+    getDateAfterNHours(noOfHours, dateFormat, getTodayDate(dateFormat))
+  }
+
+  /**
+   * Returns the Date as a string in the given Date Format which is given no. of hours after given input date.
+   * If input date is null then use today's date.
+   * If n is negative then returns the date as a string which is given no. of hours before today's date.
+   * @param noOfHours
+   * @param dateFormat
+   * @param date
+   * @return
+   */
+  def getDateAfterNHours(noOfHours: Int, dateFormat: String, date: String): String = {
+    val sdf = new SimpleDateFormat(dateFormat)
+    val cal = Calendar.getInstance()
+    if (date != null)
+      cal.setTime(sdf.parse(date))
+    cal.add(Calendar.HOUR_OF_DAY, noOfHours)
+    sdf.format(cal.getTime())
   }
 
   case class MonthYear(val month: Int, val year: Int, val day: Int)

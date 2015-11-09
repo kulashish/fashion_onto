@@ -80,7 +80,7 @@ sub run_component {
 my $SPARK_HOME = "/ext/spark";
 my $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
 my $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
-my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar ";
+my $DRIVER_CLASS_PATH = "--driver-class-path /usr/share/java/mysql-connector-java-5.1.17.jar";
 my $AMMUNITION = "--num-executors 27 --executor-memory 1G";
 
 # target needs to be either stage or prod
@@ -107,11 +107,11 @@ if ($target eq "STAGE") {
     my $USER_NAME = `whoami`;
     chomp($USER_NAME);
 
-    if($hostname =~ /^bigdata/){
+    if ($hostname =~ /^bigdata/) {
         $HDFS_BASE = "hdfs://bigdata-master.jabong.com:8020";
-    }elsif($hostname =~ /^dataplatform/){
+    } elsif ($hostname =~ /^dataplatform/) {
         $HDFS_BASE = "hdfs://dataplatform-master.jabong.com:8020";
-    }else{
+    } else {
         print("Error: not supported platform");
         exit(-1);
     }
@@ -142,6 +142,10 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "bobAcqIncr") {
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqIncr.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "bobAcqHourly") {
+    $AMMUNITION = "--num-executors 1 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/bobAcqHourly.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "bobMerge") {
     $AMMUNITION = "--num-executors 12 --executor-memory 18G";
@@ -255,6 +259,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "dcfFeedGenerate") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 2G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "clickstreamDataQualityCheck") {
@@ -286,11 +291,18 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "paybackData") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "acartHourly") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acartHourly --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/acartHourly.json";
+      $job_exit = run_component($component, $command);
 } elsif ($component eq "customerAppDetails") {
     $AMMUNITION = "--num-executors 10 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerAppDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/appDetails.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerAppDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerAppDetails.json";
     $job_exit = run_component($component, $command);
-} else {
+}elsif ($component eq "followUpCampaigns") {
+     $AMMUNITION = "--num-executors 8 --executor-memory 1G";
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component followUpCampaigns --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/followUpCampaigns.json";
+     $job_exit = run_component($component, $command);
+ } else {
     print "not a valid component\n";
     $job_exit = -1;
 }

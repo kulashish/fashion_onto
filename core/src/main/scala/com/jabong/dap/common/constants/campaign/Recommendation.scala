@@ -33,7 +33,7 @@ object Recommendation {
 
   val BRICK_MVP_PIVOT = Array(ProductVariables.BRICK, ProductVariables.MVP)
   val BRAND_MVP_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP)
-  val BRICK_PRICE_BAND_PIVOT = Array(ProductVariables.BRAND, ProductVariables.PRICE_BAND)
+  val BRICK_PRICE_BAND_PIVOT = Array(ProductVariables.BRICK, ProductVariables.PRICE_BAND)
   val MVP_COLOR_PIVOT = Array(ProductVariables.MVP, ProductVariables.COLOR)
   val MVP_DISCOUNT_PIVOT = Array(ProductVariables.MVP, Recommendation.DISCOUNT_STATUS)
 

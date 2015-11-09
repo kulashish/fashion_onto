@@ -20,6 +20,10 @@ import org.apache.spark.sql.functions._
  */
 object DcfFeedGenerator extends Logging {
 
+  /**
+   * Starting point of dcf feed generation
+   * @param params
+   */
   def start(params: ParamInfo) {
     logger.info("dcf feed generation process started")
     val hiveContext = Spark.getHiveContext()

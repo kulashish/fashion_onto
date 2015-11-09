@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, ContactListMobileVars, CustomerVariables }
@@ -60,7 +60,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfCPOTPart2PrevFull = dfMap("CPOTPart2PrevFull")
 
-    val dfCPOT = UdfUtils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT).filter(col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(SalesOrderVariables.FK_CUSTOMER) != "" && col(SalesOrderVariables.CREATED_AT).isNotNull), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
+    val dfCPOT = Utils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
 
     val dfCmr = dfCmrFull.select(
       dfCmrFull(ContactListMobileVars.UID),
@@ -158,7 +158,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
     }
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfWriteMap("dfCsv").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(dfWriteMap("CPOTPart2Incr").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
 }

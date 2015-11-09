@@ -1,6 +1,6 @@
 package com.jabong.dap.model.responsys.campaigndata
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
@@ -177,8 +177,8 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
    */
   def getIncCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): DataFrame = {
 
-    val dfOpenCPOT = UdfUtils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT).filter(col("CUSTOMER_ID").isNotNull && col("CUSTOMER_ID") != "" && col(CustomerVariables.EVENT_CAPTURED_DT).isNotNull), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
-    val dfClickCPOT = UdfUtils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT).filter(col("CUSTOMER_ID").isNotNull && col("CUSTOMER_ID") != "" && col(CustomerVariables.EVENT_CAPTURED_DT).isNotNull), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfOpenCPOT = Utils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfClickCPOT = Utils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
 
     val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
       .select(
