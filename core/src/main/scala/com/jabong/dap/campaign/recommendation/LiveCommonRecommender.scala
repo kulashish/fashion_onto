@@ -59,7 +59,6 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.priceBand") as ProductVariables.PRICE_BAND,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
-
     CampaignUtils.debug(completeRefSku, "after completeRefSku")
 
     val recommendationJoined = joinToRecommendation(completeRefSku, recommendations, recType)
@@ -109,23 +108,20 @@ class LiveCommonRecommender extends Recommender with Logging {
       }
       case Recommendation.BRICK_PRICE_BAND_SUB_TYPE => {
 
-                val dfNextPriceBand = completeRefSku.select(
-                  col(CustomerVariables.EMAIL),
-                  col(CampaignMergedFields.REF_SKU1),
-                  col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-                  col(CampaignMergedFields.LIVE_CART_URL),
-                  col(ProductVariables.BRICK),
-                  col(ProductVariables.MVP),
-                  col(ProductVariables.GENDER),
-                  col(ProductVariables.BRAND),
-                  col(ProductVariables.PRODUCT_NAME),
-                  Udf.nextPriceBand(col(ProductVariables.PRICE_BAND)) as ProductVariables.PRICE_BAND,
-                  col(CampaignMergedFields.REF_SKU)
-                )
+        val dfNextPriceBand = completeRefSku.select(
+          col(CustomerVariables.EMAIL),
+          col(CampaignMergedFields.REF_SKU1),
+          col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+          col(CampaignMergedFields.LIVE_CART_URL),
+          col(ProductVariables.BRICK),
+          col(ProductVariables.MVP),
+          col(ProductVariables.GENDER),
+          col(ProductVariables.BRAND),
+          col(ProductVariables.PRODUCT_NAME),
+          Udf.nextPriceBand(col(ProductVariables.PRICE_BAND)) as ProductVariables.PRICE_BAND,
+          col(CampaignMergedFields.REF_SKU)
+        )
 
-        dfNextPriceBand.show(100)
-        completeRefSku.show(100)
-        recommendations.show(100)
         CampaignUtils.debug(dfNextPriceBand, "inside join dfNextPriceBand")
         CampaignUtils.debug(completeRefSku, "inside join completeRefSku")
         CampaignUtils.debug(recommendations, "inside join recommendations")
