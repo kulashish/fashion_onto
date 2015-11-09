@@ -472,6 +472,19 @@ object CampaignInput extends Logging {
     campaignMerged30Day
   }
 
+  /**
+   * to get campaign data for a particular date
+   * @param campaignType
+   * @param nDays
+   * @return
+   */
+  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, nDays: Int = -1, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    val date = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
+
+    mergedCampaignData
+  }
+
   def loadYesterdayMobilePushCampaignQualityData(): DataFrame = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     logger.info("Reading last day Mobile Push Campaign Quality data from hdfs")

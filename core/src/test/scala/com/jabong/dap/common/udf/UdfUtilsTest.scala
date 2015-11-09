@@ -573,4 +573,9 @@ class UdfUtilsTest extends FlatSpec with SharedSparkContext {
 
   }
 
+  "followUp campaign Types 46" should "76 as mail Type" in {
+    val expectedType = UdfUtils.followUpCampaignMailTypes(46)
+    assert(expectedType == 76)
+  }
+
 }

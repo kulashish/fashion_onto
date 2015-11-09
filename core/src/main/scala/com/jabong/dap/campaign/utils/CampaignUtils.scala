@@ -181,6 +181,9 @@ object CampaignUtils extends Logging {
         col(ProductVariables.GENDER),
         col(ProductVariables.PRODUCT_NAME))
 
+
+    debug(customerData,"In ref skus after filter customerData is not null")
+
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
     // Group by fk_customer, and sort by special prices -> create list of tuples containing (fk_customer, sku, special_price, brick, brand, mvp, gender)
@@ -199,6 +202,7 @@ object CampaignUtils extends Logging {
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
+    debug(grouped,"In ref sku generation final , after final grouping ")
     grouped
   }
 
@@ -689,6 +693,49 @@ object CampaignUtils extends Logging {
   }
 
   /**
+   * select follow up  from campaign merged data
+   * @param campaignMergedData
+   * @param salesOrderData
+   * @return
+   */
+  def campaignFollowUpSelection(campaignMergedData: DataFrame, salesOrderData: DataFrame): DataFrame = {
+    require(campaignMergedData != null, "campaign merged data cannot be null")
+    require(salesOrderData != null, "sales order data cannot be null")
+
+    val campaignMergedOutData = campaignMergedData.withColumn(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, Udf.followUpCampaignMailType(col(CampaignMergedFields.LIVE_MAIL_TYPE)))
+      .filter(CampaignMergedFields.CAMPAIGN_MAIL_TYPE + "!= 0").drop(CampaignMergedFields.LIVE_MAIL_TYPE)
+
+    val campaignMailTypeFilteredData = campaignMergedOutData.withColumnRenamed(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_MAIL_TYPE)
+
+    val filteredCampaignCustomerNotBought = campaignMailTypeFilteredData.join(salesOrderData, campaignMailTypeFilteredData(CampaignMergedFields.CUSTOMER_ID) === salesOrderData(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
+      .filter(SalesOrderVariables.FK_CUSTOMER + " is null")
+      .select(campaignMailTypeFilteredData("*"))
+
+    return filteredCampaignCustomerNotBought
+  }
+
+  /**
+   *
+   * @param selectedData
+   * @param itrData
+   * @param simpleField
+   * @param stockValue
+   * @return
+   */
+  def campaignSkuStockFilter(selectedData: DataFrame, itrData: DataFrame, simpleField: String, stockValue: Int): DataFrame = {
+    require(selectedData != null, "selectedData cannot be null")
+    require(itrData != null, "itrData cannot be null")
+
+    val filteredSku = selectedData.join(itrData, selectedData(simpleField) === itrData(ProductVariables.SKU), SQL.INNER)
+      .filter(ProductVariables.STOCK + " >= " + stockValue)
+      .select(
+        selectedData("*")
+      )
+
+    return filteredSku
+  }
+
+  /**
    * Function to be called after customer selection and sku filter
    * * @param campaignType
    * @param filteredSku
@@ -758,6 +805,8 @@ object CampaignUtils extends Logging {
       custFilteredPastCampaign = PastCampaignCheck.campaignCommonRefSkuCheck(campaignType, custFilteredWithEmail,
         CampaignCommon.campaignMailTypeMap.getOrElse(campaignName, 1000), 30)
     }
+    debug(custFilteredPastCampaign, campaignType + "::" + campaignName + " after pastcampaign check status:-" + pastCampaignCheck)
+
 
     var refSkus: DataFrame = null
     if (campaignName.startsWith("acart")) {
@@ -844,5 +893,6 @@ object CampaignUtils extends Logging {
     println("Count of " + name + ":-" + data.count() + "\n")
     data.printSchema()
   }
+
 }
 
