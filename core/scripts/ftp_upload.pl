@@ -271,6 +271,21 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20151109_CUST_TOP5.csv
+    $filename = "$date_with_zero_today"."_CUST_TOP5.csv";
+    $folderName = "custTop5";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20151109_CUST_CAT_PURCH_PRICE.csv
+    $filename = "$date_with_zero_today"."_CUST_CAT_PURCH_PRICE.csv";
+    $folderName = "cat_avg";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20151109_CUST_CAT_PURCH_COUNT.csv
+    $filename = "$date_with_zero_today"."_CUST_CAT_PURCH_COUNT.csv";
+    $folderName = "cat_count";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     # 20150928_CONTACTS_LIST_MOBILE.csv
     # $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
     # $folderName = "contactListMobile";
