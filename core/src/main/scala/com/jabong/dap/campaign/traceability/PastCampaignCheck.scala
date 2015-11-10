@@ -191,7 +191,7 @@ object PastCampaignCheck extends Logging {
             ||
             (customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
       .filter(
-        CampaignMergedFields.EMAIL + " is null "
+        pastCampaignSendCustomers(ContactListMobileVars.EMAIL).isNull
       )
       .select(
         customerSkuSimpleSelected("*")

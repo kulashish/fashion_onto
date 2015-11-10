@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.time.TimeUtils._
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -584,21 +584,6 @@ object UdfUtils extends Logging {
     str
   }
 
-  //  def validateDateData(dateString: String, dateFormat: String): Int = {
-  //
-  //    val nullStr: Int = null
-  //
-  //    try {
-  //      val formatter = new SimpleDateFormat(dateFormat)
-  //      var date: java.util.Date = null
-  //      date = formatter.parse(dateString)
-  //    } catch {
-  //      case _: Throwable => return nullStr
-  //    }
-  //    return dateString
-  //
-  //  }
-
   /**
    *
    * @param dateString
@@ -677,6 +662,31 @@ object UdfUtils extends Logging {
 
     return maxSlot
 
+  }
+
+  /**
+   * follow up campaign map
+   * @param mailType
+   * @return
+   */
+  def followUpCampaignMailTypes(mailType: Int): Int = {
+    val followUpCampaignMap = collection.immutable.HashMap(
+      CampaignCommon.SURF1_MAIL_TYPE -> CampaignCommon.SURF1_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF2_MAIL_TYPE -> CampaignCommon.SURF2_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF3_MAIL_TYPE -> CampaignCommon.SURF3_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF6_MAIL_TYPE -> CampaignCommon.SURF6_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.CANCEL_RETARGET_MAIL_TYPE -> CampaignCommon.CANCEL_RETARGET_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.RETURN_RETARGET_MAIL_TYPE -> CampaignCommon.RETURN_RETARGET_FOLLOW_UP_MAIL_TYPE)
+
+    return followUpCampaignMap.getOrElse(mailType, 0)
+  }
+
+  def nextPriceBand(priceBand: String): String = {
+    if (priceBand == null || priceBand.equals("E")) {
+      return priceBand
+    } else {
+      return (priceBand.charAt(0) + 1).toChar.toString
+    }
   }
 
 }
