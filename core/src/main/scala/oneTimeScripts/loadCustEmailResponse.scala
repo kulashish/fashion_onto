@@ -12,8 +12,8 @@ import org.apache.spark.SparkConf
 /**
  * Created by samathashetty on 9/11/15.
  */
-class loadCustEmailResponse {
-  def main(args: Array[String]) {
+object loadCustEmailResponse {
+  def main(args: Array[String]) = {
     Spark.init(new SparkConf().setAppName("loadCustEmailResponse"))
 
     val date = args(0).trim
