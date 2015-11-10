@@ -168,6 +168,7 @@ object DataSets {
   // type of campaigns
   val PUSH_CAMPAIGNS = "push_campaigns"
   val EMAIL_CAMPAIGNS = "email_campaigns"
+  val CALENDAR_CAMPAIGNS = "calendar_campaigns"
 
   val AD4PUSH_ID = "ad4pushId"
   //Clickstream Data Quality
@@ -192,4 +193,9 @@ object DataSets {
   val SALES_ADDRESS_FIRST = "sales_address_first"
   val CAT_COUNT = "cat_count"
   val CAT_AVG = "cat_avg"
+
+
+
+  // campaigns
+  val ACART_HOURLY = "acartHourly"
 }

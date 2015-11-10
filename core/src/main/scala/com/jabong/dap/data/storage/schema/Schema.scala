@@ -392,8 +392,20 @@ object Schema {
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
         StructField(ProductVariables.GENDER, StringType, true),
-        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false)
+        StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+        StructField(ProductVariables.PRICE_BAND, StringType, true)))), false)
   ))
+
+  val referenceSku = StructType(Array(
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(ProductVariables.SPECIAL_PRICE, DoubleType, true),
+    StructField(ProductVariables.SKU_SIMPLE, StringType, true),
+    StructField(ProductVariables.BRAND, StringType, true),
+    StructField(ProductVariables.BRICK, StringType, true),
+    StructField(ProductVariables.MVP, StringType, true),
+    StructField(ProductVariables.GENDER, StringType, true),
+    StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.PRICE_BAND, StringType, true)))
 
   val expectedFinalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
@@ -406,7 +418,8 @@ object Schema {
         StructField(ProductVariables.BRICK, StringType, true),
         StructField(ProductVariables.MVP, StringType, true),
         StructField(ProductVariables.GENDER, StringType, true),
-        StructField(ProductVariables.PRODUCT_NAME, StringType, true)))), false),
+        StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+        StructField(ProductVariables.PRICE_BAND, StringType, true)))), false),
 
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
@@ -571,6 +584,12 @@ object Schema {
     StructField(SalesOrderItemVariables.REVENUE_WEB_90, DecimalType.apply(16, 2), true),
     StructField(SalesOrderItemVariables.REVENUE_MWEB_90, DecimalType.apply(16, 2), true),
     StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)
+
+  //FIXME: move it into OrderBySchema
+  val lastOrder = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
+    StructField(SalesOrderVariables.CUSTOMER_EMAIL, StringType, false),
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
   ))
 
 }
