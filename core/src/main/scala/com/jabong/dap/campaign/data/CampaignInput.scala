@@ -615,14 +615,13 @@ object CampaignInput extends Logging {
   /**
    *
    * @param campaignName
-   * @param lastHour
    * @return
    */
-  def loadNHoursCampaignData(campaignName: String, campaignType: String,date: String = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
+  def loadNHoursCampaignData(campaignName: String, campaignType: String, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
 
     var tableNameUnionData: DataFrame = null
 
-    val lastHour = TimeUtils.getHour(date,TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+    val lastHour = TimeUtils.getHour(date, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
 
     for (i <- lastHour to 1 by -1) {
 
@@ -630,7 +629,7 @@ object CampaignInput extends Logging {
 
       logger.info("Reading last " + lastHour + " day " + campaignName + "data from hdfs")
 
-      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH,campaignType,campaignName, DataSets.HOURLY_MODE, incrDateHour)
+      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, incrDateHour)
       if (null != tableNameData) {
         if (tableNameUnionData == null) {
           tableNameUnionData = tableNameData
@@ -640,5 +639,12 @@ object CampaignInput extends Logging {
       }
     }
     tableNameUnionData
+  }
+
+  def loadFullContactListMobileData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading Full Contact List Mobile Data data from hdfs")
+    val orderData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, date)
+    orderData
   }
 }

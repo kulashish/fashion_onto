@@ -144,4 +144,8 @@ object Udf {
 
   val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
 
+  val nonBeauty = udf((category: String, created_at: String) => UdfUtils.nonBeauty(category: String, created_at: String))
+
+  val beauty = udf((category: String, created_at: String) => UdfUtils.beauty(category: String, created_at: String))
+
 }

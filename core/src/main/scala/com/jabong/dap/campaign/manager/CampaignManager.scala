@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.PricepointCampaign
+import com.jabong.dap.campaign.calendarcampaign.{ ReplenishmentCampaign, PricepointCampaign }
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -90,6 +90,22 @@ object CampaignManager extends Serializable with Logging {
 
     val pricepointCampaign = new PricepointCampaign()
     pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData)
+
+  }
+
+  def startReplenishmentCampaign() = {
+
+    val contactListMobileFull = CampaignInput.loadFullContactListMobileData()
+    val fullSalesOrderData = CampaignInput.loadFullOrderData()
+
+    val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    val replenishmentCampaign = new ReplenishmentCampaign()
+    replenishmentCampaign.runCampaign(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
 
   }
 
@@ -197,9 +213,9 @@ object CampaignManager extends Serializable with Logging {
   def startAcartHourlyCampaign(params: ParamInfo) = {
     val incrDateWithHour = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER))
     val lastHour = -2
-    val salesCartHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_CART,lastHour,incrDateWithHour)
-    val salesOrderHourly = CampaignInput.loadNHoursTableData(DataSets.SALES_ORDER,lastHour,incrDateWithHour)
-    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM, lastHour,incrDateWithHour)
+    val salesCartHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_CART, lastHour, incrDateWithHour)
+    val salesOrderHourly = CampaignInput.loadNHoursTableData(DataSets.SALES_ORDER, lastHour, incrDateWithHour)
+    val salesOrderItemHourly = CampaignInput.loadNthHourTableData(DataSets.SALES_ORDER_ITEM, lastHour, incrDateWithHour)
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 

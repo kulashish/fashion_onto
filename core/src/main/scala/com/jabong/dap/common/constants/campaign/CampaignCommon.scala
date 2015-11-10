@@ -48,7 +48,6 @@ object CampaignCommon {
   val ACART_HOURLY_STOCK_VALUE = 2
   val LAST_FIVE_PURCHASES = 5
 
-
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
 
@@ -103,7 +102,11 @@ object CampaignCommon {
     "shortlist_reminder" -> 53,
     "invalid_iod" -> 100,
     "acart_hourly" -> 41,
-    CampaignCommon.PRICEPOINT_CAMPAIGN -> 24
+    CampaignCommon.PRICEPOINT_CAMPAIGN -> 24,
+    //FIXME: put correct mail type
+    CampaignCommon.BEAUTY_CAMPAIGN -> 400,
+    //FIXME: put correct mail type
+    CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(

@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
 
+import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -687,6 +688,44 @@ object UdfUtils extends Logging {
     } else {
       return (priceBand.charAt(0) + 1).toChar.toString
     }
+  }
+
+  def nonBeauty(category: String, created_at: String): String = {
+    if (category == null || created_at == null) {
+      return null
+    }
+
+    val lastPurchaseDay = RecommendationUtils.NonBeautyCategory.getOrElse(category, null)
+
+    if (lastPurchaseDay == null) {
+      return null
+    }
+
+    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+      return null
+    }
+
+    return category
+
+  }
+
+  def beauty(category: String, created_at: String): String = {
+    if (category == null || created_at == null) {
+      return null
+    }
+
+    val lastPurchaseDay = RecommendationUtils.BeautyCategory.getOrElse(category, null)
+
+    if (lastPurchaseDay == null) {
+      return null
+    }
+
+    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+      return null
+    }
+
+    return category
+
   }
 
 }

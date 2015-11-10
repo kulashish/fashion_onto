@@ -39,7 +39,8 @@ class LastOrder extends LiveCustomerSelector with Logging {
     ).select(
         col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
-        col(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE
+        col(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE,
+        col(SalesOrderVariables.CREATED_AT)
       )
 
     joinedDf

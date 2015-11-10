@@ -31,12 +31,13 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
 
     val joinedDf = filterCustomerData.join(
       dfCustomerSelection,
-      filterCustomerData(CustomerVariables.ID_CUSTOMER) === dfCustomerSelection(SalesOrderVariables.FK_SALES_ORDER),
+      filterCustomerData(CustomerVariables.ID_CUSTOMER) === dfCustomerSelection(SalesOrderVariables.FK_CUSTOMER),
       SQL.INNER
     ).select(
         SalesOrderVariables.FK_CUSTOMER,
         CustomerVariables.EMAIL,
-        ProductVariables.SKU_SIMPLE
+        ProductVariables.SKU_SIMPLE,
+        SalesOrderVariables.CREATED_AT
       )
 
     joinedDf
