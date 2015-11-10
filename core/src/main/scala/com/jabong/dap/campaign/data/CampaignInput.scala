@@ -598,7 +598,7 @@ object CampaignInput extends Logging {
 
       val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
 
-      logger.info("Reading last " + lastHour + " day " + tableName + "data from hdfs")
+      logger.info("Reading last " + i + " hours " + tableName + " data from hdfs")
 
       val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
       if (null != tableNameData) {
@@ -615,6 +615,8 @@ object CampaignInput extends Logging {
   /**
    *
    * @param campaignName
+   * @param campaignType
+   * @param date
    * @return
    */
   def loadNHoursCampaignData(campaignName: String, campaignType: String, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
@@ -627,7 +629,7 @@ object CampaignInput extends Logging {
 
       val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
 
-      logger.info("Reading last " + lastHour + " day " + campaignName + "data from hdfs")
+      logger.info("Reading last " + i + " hours " + campaignName + "data from hdfs")
 
       val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, incrDateHour)
       if (null != tableNameData) {
