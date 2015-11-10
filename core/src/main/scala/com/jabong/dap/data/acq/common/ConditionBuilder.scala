@@ -27,7 +27,7 @@ object ConditionBuilder {
         dateColumn, prevDayDate, TimeConstants.END_TIME, tempFilterCondition)
     } else if (null == rangeStart && null == rangeEnd && DataSets.HOURLY_MODE == mode) {
       val dateNow = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT)
-      val hr = TimeUtils.getHour(null, TimeConstants.DATE_FORMAT) - 1
+      val hr = TimeUtils.withLeadingZeros(TimeUtils.getHour(null, TimeConstants.DATE_FORMAT) - 1)
       "WHERE t1.%s >= '%s %s:%s' AND t1.%s <= '%s %s:%s' %s".format(dateColumn, dateNow, hr, TimeConstants.START_MIN,
         dateColumn, dateNow, hr, TimeConstants.END_MIN, tempFilterCondition)
     } else if (mode == DataSets.FULL && filterCondition == null) {
