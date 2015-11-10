@@ -22,10 +22,12 @@ object loadCustEmailResponse {
 
     val saveDate = args(2).trim
 
+    val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
+
     val inputCsv = DataReader.getDataFrame4mCsv(fullPath, "true", "|")
     val custOutputDf = SchemaUtils.addColumns(inputCsv, CustEmailSchema.effective_Smry_Schema)
 
-    val savePathFull = DataWriter.getWritePath(ConfigConstants.TMP_PATH, DataSets.VARIABLES,
+    val savePathFull = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES,
       DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, saveDate)
 
     DataWriter.writeParquet(custOutputDf, savePathFull, DataSets.IGNORE_SAVEMODE)
