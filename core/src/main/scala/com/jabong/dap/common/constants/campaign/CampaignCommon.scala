@@ -48,7 +48,6 @@ object CampaignCommon {
   val ACART_HOURLY_STOCK_VALUE = 2
   val LAST_FIVE_PURCHASES = 5
 
-
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
 
