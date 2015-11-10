@@ -29,7 +29,6 @@ object HottestXFilter extends Logging{
         col(SalesCartVariables.EMAIL),
         col(SalesCartVariables.SKU) as ProductVariables.SKU_SIMPLE,
         col(ProductVariables.SPECIAL_PRICE),
-        col(ProductVariables.BRAND),
         col(ProductVariables.BRICK),
         col(ProductVariables.GENDER),
         col(ProductVariables.MVP),

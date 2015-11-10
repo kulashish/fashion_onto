@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.recommendation
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
@@ -24,7 +24,10 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param recommendations
    * @return
    */
-  override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE): DataFrame = {
+  //TODO: check if recType can be removed
+  override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType:String = Recommendation.BRICK_MVP_SUB_TYPE, campaignName: String): DataFrame = {
+    val recType = CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE)
+
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
     require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE) contains recType, "recommendation type is invalid")
@@ -61,7 +64,7 @@ class LiveCommonRecommender extends Recommender with Logging {
 
     CampaignUtils.debug(completeRefSku, "after completeRefSku")
 
-    val recommendationJoined = joinToRecommendation(completeRefSku, recommendations, recType)
+    val recommendationJoined = joinToRecommendation(completeRefSku, recommendations, recType, campaignName)
 
     CampaignUtils.debug(recommendationJoined, "after recommendationJoined")
 
@@ -87,13 +90,13 @@ class LiveCommonRecommender extends Recommender with Logging {
     import sqlContext.implicits._
     val campaignDataWithRecommendations = recommendationGrouped.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
       CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
-    
+
     CampaignUtils.debug(campaignDataWithRecommendations, "after campaignDataWithRecommendations")
 
     return campaignDataWithRecommendations
   }
 
-  def joinToRecommendation(completeRefSku: DataFrame, recommendations: DataFrame, recType: String): DataFrame = {
+  def joinToRecommendation(completeRefSku: DataFrame, recommendations: DataFrame, recType: String, campaignName :String): DataFrame = {
 
     require(completeRefSku != null, "completeRefSku data frame should not null")
     require(recommendations != null, "recommendations data frame should not null")
@@ -134,10 +137,26 @@ class LiveCommonRecommender extends Recommender with Logging {
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+
       }
     }
 
-    return recommendationJoined
+    val ret =
+    campaignName match {
+      case CampaignCommon.HOTTEST_X => {
+        var num_recs = 16
+        val min_recs = 4
+        if (recommendationJoined.count() < min_recs) {
+          null
+        }
+        if (num_recs > num_recs) num_recs = recommendationJoined.count().toInt
+
+        recommendationJoined.limit(num_recs)
+      }
+      case _ =>  recommendationJoined
+    }
+    ret
+
   }
 
   //  val recommendedSkus = udf((refSkus: String, recommendations: List[((Row))]) => getRecommendedSkus(refSkus: String, recommendations: List[(Row)]))

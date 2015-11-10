@@ -320,21 +320,25 @@ object CampaignManager extends Serializable with Logging {
   }
 
 
-  def startHottestXCampaign(campaignsConfig: String) = {
+  def startHottestXCampaign(params: ParamInfo) = {
 
-    CampaignManager.initCampaignsConfig(campaignsConfig)
 
-    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE)
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
 
-    val day_45past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
-    val day_45OrderData = CampaignInput.loadOrderItemData(day_45past)
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val fullOrderItemData =  CampaignInput.loadFullOrderItemData()
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
-    val day_60past = TimeUtils.getDateAfterNDays(-60, TimeConstants.DATE_FORMAT_FOLDER)
-    val day_60OrderData = CampaignInput.loadOrderItemData(day_60past)
+    val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData, incrDate)
+    val last60DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(60, fullOrderItemData, incrDate)
+
+    val customerMasterData = loadCustomerMasterData()
+
+    val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
 
     val hottestXCampaign = new HottestXCampaign
 
-//    hottestXCampaign.runCampaign(day_45OrderData, day_60OrderData, genderMvpBrickRecos)
+    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, customerMasterData,itrSkuYesterdayData, genderMvpBrickRecos)
 
 
   }

@@ -161,7 +161,7 @@ object CampaignUtils extends Logging {
    * @param NumberSku
    * @return
    */
-  def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int, MinSku: Int = -1): DataFrame = {
+  def generateReferenceSkus(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
 
     //    import sqlContext.implicits._
     // FIXME: customer null check won't work for surf, check if sku simple need to be converted to sku
@@ -191,7 +191,7 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
 
     val customerGroup = customerSkuMap.groupByKey().
-      map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku, MinSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
+      map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
@@ -203,17 +203,14 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int, minSkus: Int): List[(Double, String, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
     val listSize = refList.size
     var numberSkus = numSKus
-    if (refList.size > minSkus) {
-      if (numberSkus > refList.size) numberSkus = listSize
-      return refList.take(numberSkus)
-    }
-    null
+    if (numberSkus > refList.size) numberSkus = listSize
+    return refList.take(numberSkus)
   }
 
   val currentDaysDifference = udf((date: Timestamp) => TimeUtils.currentTimeDiff(date: Timestamp, "days"))
@@ -753,7 +750,7 @@ object CampaignUtils extends Logging {
 
     val refSkus =
       campaignName match {
-        case CampaignCommon.HOTTEST_X => CampaignUtils.generateReferenceSkus(filteredSku, 16, CampaignCommon.MIN_REF_SKUS)
+        case CampaignCommon.HOTTEST_X => CampaignUtils.generateReferenceSkus(filteredSku, 1)
         case _ => CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
       }
 
@@ -766,7 +763,7 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE))
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, campaignName)
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
     //save campaign Output for mobile
