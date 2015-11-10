@@ -1,0 +1,17 @@
+<coordinator-app name="dap-acart-hourly-coord" frequency="${coord:hours(1)}" start="${jobStart}" end="${jobEnd}"
+                 timezone="UTC" xmlns="uri:oozie:coordinator:0.4">
+    <action>
+        <workflow>
+            <app-path>${workflowPath}</app-path>
+            <configuration>
+                <property>
+                    <name>acartInputDirectory</name>
+                    <value>${acartDirectory}/${coord:formatTime(coord:dateOffset(coord:nominalTime(), -2, 'HOUR'),'yyyy/MM/dd/HH')}/_SUCCESS</value>
+                </property>
+                <property><name>currentHour</name>
+                    <value>${coord:formatTime(coord:nominalTime(),'HH')}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>
