@@ -107,7 +107,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CLICKSTREAM_SURF3_MERGED_DATA30 => GetSurfVariables.getSurf3mergedForLast30Days(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
 
-            // campaigns
+          // campaigns
           case DataSets.ACART_HOURLY => CampaignManager.startAcartHourlyCampaign(paramJob)
 
           case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)

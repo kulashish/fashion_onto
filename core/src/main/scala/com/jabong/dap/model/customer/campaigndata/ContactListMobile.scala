@@ -98,8 +98,8 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
 
-    val dfCustTop5Incr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate)
-    dfMap.put("custTop5Incr", dfCustTop5Incr)
+    val dfCustomerOrdersIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, mode, incrDate)
+    dfMap.put("customerOrdersIncr", dfCustomerOrdersIncr)
 
     val dfDndFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
     dfMap.put("dndFull", dfDndFull)
@@ -140,9 +140,9 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val writeMap = new HashMap[String, DataFrame]()
     writeMap.put("salesOrderAddrFavFull", dfSalesOrderAddrFavFull)
 
-    //call SalesOrder.processVariable for LAST_ORDER_DATE variable
-    val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
-    //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT
+    //    //call SalesOrder.processVariable for LAST_ORDER_DATE variable
+    //    val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
+    //    //FK_CUSTOMER, LAST_ORDER_DATE, UPDATED_AT
 
     //    //SalesOrderItem.getSucessfulOrders for NET_ORDERS variable
     //    val salesOrderFull = dfSalesOrderFull.select(SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_CUSTOMER)
@@ -168,8 +168,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val dfBlockedNumbersFull = dfMap("blockedNumbersFull")
     val dfZoneCityFull = dfMap("zoneCityFull")
     val dfCmrFull = dfMap("cmrFull")
-    val dfSuccessfulOrders = dfMap("successfulOrders")
-    val dfFavBrandIncr = dfMap("favBrandIncr")
+    val dfCustomerOrdersIncr = dfMap("customerOrdersIncr")
 
     //Save Data Frame Contact List Mobile
     val (dfContactListMobileIncr, dfContactListMobileFull) = getContactListMobileDF (
@@ -178,9 +177,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
       dfCustSegCalcIncr,
       dfNLSIncr,
       dfSalesOrderAddrFavCalc,
-      dfSalesOrderCalcIncr,
-      dfSuccessfulOrders,
-      dfFavBrandIncr,
+      dfCustomerOrdersIncr,
       dfDndFull,
       dfSmsOptOutFull,
       dfBlockedNumbersFull,
@@ -279,9 +276,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     dfCustSegCalcIncr: DataFrame,
     dfNLSIncr: DataFrame,
     dfSalesOrderAddrFavCalc: DataFrame,
-    dfSalesOrderCalcIncr: DataFrame,
-    dfSuccessfulOrders: DataFrame,
-    dfFavBrandIncr: DataFrame,
+    dfCustomerOrdersIncr: DataFrame,
     dfDND: DataFrame,
     dfSmsOptOut: DataFrame,
     dfBlockedNumbers: DataFrame,
@@ -295,7 +290,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
     val dfSmsOptOutMerged = dfSmsOptOut.select(DNDVariables.MOBILE_NUMBER).unionAll(dfBlockedNumbers.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfSalesOrderAddrFavCalc, dfSalesOrderCalcIncr, dfSuccessfulOrders, dfFavBrandIncr, dfZoneCity, dfDND, dfSmsOptOutMerged, dfCmrFull)
+    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfSalesOrderAddrFavCalc, dfCustomerOrdersIncr, dfZoneCity, dfDND, dfSmsOptOutMerged, dfCmrFull)
 
     if (null != dfContactListMobilePrevFull) {
 
@@ -376,7 +371,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
   }
 
-  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesOrderAddrFavCalc: DataFrame, salesOrderCalcIncr: DataFrame, successfulOrdersIncr: DataFrame, favBrandIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, dfCmrFull: DataFrame): DataFrame = {
+  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, salesOrderAddrFavCalc: DataFrame, customerOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, dfCmrFull: DataFrame): DataFrame = {
     val customerNls = customerIncr.join(nls, customerIncr(CustomerVariables.EMAIL) === nls(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
       .select(
         coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -420,54 +415,31 @@ object ContactListMobile extends DataFeedsModel with Logging {
         customerNls(NewsletterVariables.STATUS)
       )
 
-    val salesOrderAddress = salesOrderAddrFavCalc.join(salesOrderCalcIncr, salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER) === salesOrderCalcIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val salesMerged = salesOrderAddrFavCalc.join(customerOrdersIncr, salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER) === customerOrdersIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
-        coalesce(salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER), salesOrderCalcIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+        coalesce(salesOrderAddrFavCalc(SalesOrderVariables.FK_CUSTOMER), customerOrdersIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
         salesOrderAddrFavCalc(SalesAddressVariables.PHONE),
         salesOrderAddrFavCalc(SalesAddressVariables.CITY),
         salesOrderAddrFavCalc(SalesAddressVariables.FIRST_NAME),
         salesOrderAddrFavCalc(SalesAddressVariables.LAST_NAME),
-        salesOrderCalcIncr(ContactListMobileVars.LAST_ORDER_DATE),
-        salesOrderCalcIncr(SalesOrderVariables.UPDATED_AT)
+        customerOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL),
+        customerOrdersIncr(ContactListMobileVars.LAST_ORDER_DATE),
+        customerOrdersIncr(SalesOrderVariables.UPDATED_AT),
+        customerOrdersIncr(SalesOrderItemVariables.FAV_BRAND)
       )
 
-    val salesMerged = salesOrderAddress.join(successfulOrdersIncr, salesOrderAddress(SalesOrderVariables.FK_CUSTOMER) === successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-      .select(
-        coalesce(salesOrderAddress(SalesOrderVariables.FK_CUSTOMER), successfulOrdersIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        salesOrderAddress(SalesAddressVariables.PHONE),
-        salesOrderAddress(SalesAddressVariables.CITY),
-        salesOrderAddress(SalesAddressVariables.FIRST_NAME),
-        salesOrderAddress(SalesAddressVariables.LAST_NAME),
-        successfulOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL),
-        salesOrderAddress(ContactListMobileVars.LAST_ORDER_DATE),
-        salesOrderAddress(SalesOrderVariables.UPDATED_AT)
-      )
-
-    val brandMerged = salesMerged.join(favBrandIncr, salesMerged(SalesOrderVariables.FK_CUSTOMER) === favBrandIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-      .select(
-        coalesce(salesMerged(SalesOrderVariables.FK_CUSTOMER), favBrandIncr(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-        salesMerged(SalesAddressVariables.PHONE),
-        salesMerged(SalesAddressVariables.CITY),
-        salesMerged(SalesAddressVariables.FIRST_NAME),
-        salesMerged(SalesAddressVariables.LAST_NAME),
-        salesMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL),
-        salesMerged(ContactListMobileVars.LAST_ORDER_DATE),
-        salesMerged(SalesOrderVariables.UPDATED_AT),
-        favBrandIncr(SalesOrderItemVariables.FAV_BRAND)
-      )
-
-    val mergedIncr = customerMerged.join(brandMerged, customerMerged(CustomerVariables.ID_CUSTOMER) === brandMerged(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val mergedIncr = customerMerged.join(salesMerged, customerMerged(CustomerVariables.ID_CUSTOMER) === salesMerged(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .select(
         customerMerged(CustomerVariables.EMAIL),
         customerMerged(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
-        coalesce(customerMerged(CustomerVariables.PHONE), brandMerged(SalesAddressVariables.PHONE)) as SalesAddressVariables.PHONE,
-        brandMerged(SalesAddressVariables.CITY),
-        coalesce(customerMerged(CustomerVariables.FIRST_NAME), brandMerged(SalesAddressVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
-        coalesce(customerMerged(CustomerVariables.LAST_NAME), brandMerged(SalesAddressVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+        coalesce(customerMerged(CustomerVariables.PHONE), salesMerged(SalesAddressVariables.PHONE)) as SalesAddressVariables.PHONE,
+        salesMerged(SalesAddressVariables.CITY),
+        coalesce(customerMerged(CustomerVariables.FIRST_NAME), salesMerged(SalesAddressVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+        coalesce(customerMerged(CustomerVariables.LAST_NAME), salesMerged(SalesAddressVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
         customerMerged(ContactListMobileVars.DOB),
         customerMerged(ContactListMobileVars.MVP_TYPE),
-        brandMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
-        brandMerged(ContactListMobileVars.LAST_ORDER_DATE),
+        salesMerged(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
+        salesMerged(ContactListMobileVars.LAST_ORDER_DATE),
         customerMerged(CustomerVariables.GENDER),
         customerMerged(ContactListMobileVars.REG_DATE),
         customerMerged(CustomerSegmentsVariables.SEGMENT),
@@ -475,12 +447,12 @@ object ContactListMobile extends DataFeedsModel with Logging {
         customerMerged(ContactListMobileVars.PLATINUM_STATUS),
         customerMerged(ContactListMobileVars.NL_SUB_DATE),
         customerMerged(ContactListMobileVars.VERIFICATION_STATUS),
-        Udf.maxTimestamp(brandMerged(SalesOrderVariables.UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
+        Udf.maxTimestamp(salesMerged(SalesOrderVariables.UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
         customerMerged(ContactListMobileVars.UNSUB_KEY),
         customerMerged(CustomerSegmentsVariables.DISCOUNT_SCORE),
-        coalesce(customerMerged(CustomerVariables.ID_CUSTOMER), brandMerged(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(customerMerged(CustomerVariables.ID_CUSTOMER), salesMerged(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         customerMerged(NewsletterVariables.STATUS),
-        brandMerged(SalesOrderItemVariables.FAV_BRAND)
+        salesMerged(SalesOrderItemVariables.FAV_BRAND)
       )
 
     val cityBc = Spark.getContext().broadcast(cityZone).value

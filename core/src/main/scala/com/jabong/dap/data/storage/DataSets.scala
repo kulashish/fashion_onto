@@ -195,8 +195,6 @@ object DataSets {
   val CAT_COUNT = "cat_count"
   val CAT_AVG = "cat_avg"
 
-
-
   // campaigns
   val ACART_HOURLY = "acartHourly"
 }
