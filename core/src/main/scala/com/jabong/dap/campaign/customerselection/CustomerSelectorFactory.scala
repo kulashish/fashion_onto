@@ -50,9 +50,6 @@ class CustomerSelectorFactory extends CampaignFactory {
     if (customerSelectionType.equalsIgnoreCase(CustomerSelection.CUSTOMER_PREFERRED_DATA)) {
       return new CustomerPreferredData()
     }
-    if (customerSelectionType.equalsIgnoreCase(CustomerSelection.HOTTEST_X)) {
-      return new HottestXData()
-    }
     if (customerSelectionType.equalsIgnoreCase(CustomerSelection.LAST_ORDER)) {
       return new LastOrder()
     }

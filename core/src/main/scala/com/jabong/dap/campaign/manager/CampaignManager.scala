@@ -332,13 +332,11 @@ object CampaignManager extends Serializable with Logging {
     val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData, incrDate)
     val last60DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(60, fullOrderItemData, incrDate)
 
-    val customerMasterData = loadCustomerMasterData()
-
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
 
     val hottestXCampaign = new HottestXCampaign
 
-    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, customerMasterData,itrSkuYesterdayData, genderMvpBrickRecos)
+    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData,itrSkuYesterdayData, genderMvpBrickRecos)
 
 
   }

@@ -11,7 +11,10 @@ object CampaignCommon {
   val REF_SKUS = "refSkus"
   val PUSH_REF_SKUS = 1
   val NUMBER_REF_SKUS = 2
+  val CALENDAR_REF_SKUS = 1
+  val CALENDAR_REC_SKUS = 16
 
+  val CALENDAR_MIN_RECS = 4
   val BASE_PATH = "/data/output/campaigns/"
 
   //Live campaigns

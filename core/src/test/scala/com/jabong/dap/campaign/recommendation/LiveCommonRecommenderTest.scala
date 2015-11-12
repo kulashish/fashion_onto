@@ -92,7 +92,7 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
 
   "iterable row is null " should "return IllegalArgumentException" in {
     a[IllegalArgumentException] should be thrownBy {
-      liveRecommender.getRecSkus(null)
+      liveRecommender.getRecSkus(null, 0)
     }
   }
 

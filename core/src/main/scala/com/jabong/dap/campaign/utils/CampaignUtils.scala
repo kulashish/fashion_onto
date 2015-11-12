@@ -748,13 +748,7 @@ object CampaignUtils extends Logging {
 
   def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
 
-    val refSkus =
-      campaignName match {
-        case CampaignCommon.HOTTEST_X => CampaignUtils.generateReferenceSkus(filteredSku, 1)
-        case _ => CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
-      }
-
-    CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
@@ -763,11 +757,18 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, campaignName)
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), CampaignCommon.CALENDAR_REC_SKUS)
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
+
+    val recs = campaignName match {
+      case CampaignCommon.HOTTEST_X  => {campaignOutput.filter (count (campaignOutput ("REC_SKUS") ).>= (CampaignCommon.CALENDAR_MIN_RECS))}
+      case _ => campaignOutput
+
+    }
+
     //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
+    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
   /**
