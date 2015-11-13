@@ -255,7 +255,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricepoint --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "replenishment") {
-    $AMMUNITION = "--num-executors 7 --executor-memory 4G";
+    $AMMUNITION = "--num-executors 15 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component replenishment --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
  } elsif ($component eq "pricingSKUData") {
