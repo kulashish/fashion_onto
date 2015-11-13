@@ -42,6 +42,7 @@ object CampaignCommon {
   val BRICK_AFFINITY = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
   val BEAUTY_CAMPAIGN = "beauty_campaign"
+  val CLEARANCE_CAMPAIGN = "clearance_campaign"
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
@@ -102,10 +103,12 @@ object CampaignCommon {
     "shortlist_reminder" -> 53,
     "invalid_iod" -> 100,
     "acart_hourly" -> 41,
-    CampaignCommon.PRICEPOINT_CAMPAIGN -> 24
+    CampaignCommon.PRICEPOINT_CAMPAIGN -> 24,
+    CampaignCommon.CLEARANCE_CAMPAIGN -> 20
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(
-    CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE
+    CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE,
+    CampaignCommon.CLEARANCE_CAMPAIGN -> Recommendation.MVP_DISCOUNT_SUB_TYPE
   )
 }
