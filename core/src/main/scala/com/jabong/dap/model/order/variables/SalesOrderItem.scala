@@ -438,7 +438,7 @@ object SalesOrderItem {
    This is used as a proxy to discount score at times
 
    */
-  def getCouponDisc(salesOrder: DataFrame, salesRuleFull: DataFrame, salesRuleSet: DataFrame, prevFull: DataFrame): DataFrame = {
+  def getCouponDisc(salesOrder: DataFrame, salesRuleFull: DataFrame, salesRuleSet: DataFrame): DataFrame = {
     val salesRuleJoined = salesOrder.join(salesRuleFull, salesOrder(SalesOrderVariables.COUPON_CODE) === salesRuleFull(SalesRuleVariables.CODE)).select(
       salesOrder(SalesOrderVariables.FK_CUSTOMER),
       salesOrder(SalesOrderVariables.ID_SALES_ORDER),
@@ -450,7 +450,9 @@ object SalesOrderItem {
         salesRuleJoined(SalesOrderVariables.ID_SALES_ORDER),
         salesRuleJoined(SalesRuleVariables.CODE),
         salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET),
-        salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE))
+        salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE),
+        salesRuleSet(SalesRuleSetVariables.DISCOUNT_PERCENTAGE),
+        salesRuleSet(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT))
 
     val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
     val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
@@ -499,7 +501,7 @@ object SalesOrderItem {
    */
 
   def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame, prevMap: DataFrame, incrDate: String): (DataFrame, DataFrame) = {
-    val salesOrderJoined = salesOrderFull.join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
+    val salesOrderJoined = salesOrderFull.drop(SalesOrderItemVariables.UPDATED_AT).join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
     val incrMap = salesOrderJoined.select(
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
       salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),

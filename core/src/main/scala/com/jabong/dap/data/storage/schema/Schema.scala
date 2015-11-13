@@ -583,7 +583,7 @@ object Schema {
     StructField(SalesOrderItemVariables.REVENUE_APP_90, DecimalType.apply(16, 2), true),
     StructField(SalesOrderItemVariables.REVENUE_WEB_90, DecimalType.apply(16, 2), true),
     StructField(SalesOrderItemVariables.REVENUE_MWEB_90, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)))
 
   //FIXME: move it into OrderBySchema
   val lastOrder = StructType(Array(
