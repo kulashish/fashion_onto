@@ -31,7 +31,7 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
       fullSalesOrderData,
       filterCustomerData(CustomerVariables.ID_CUSTOMER) === fullSalesOrderData(SalesOrderVariables.FK_CUSTOMER),
       SQL.INNER
-    )
+    ).coalesce(100)
 
     CampaignUtils.debug(joinedDf, "last 5 orders joinedDf")
 

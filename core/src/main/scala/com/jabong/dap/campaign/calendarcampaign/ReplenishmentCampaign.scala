@@ -17,11 +17,11 @@ class ReplenishmentCampaign {
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST5_SUCCESSFUL_ORDER)
 
-    CampaignUtils.debug(contactListMobileFull, "contactListMobileFull")
-    CampaignUtils.debug(fullSalesOrderData, "fullSalesOrderData")
-    CampaignUtils.debug(fullSalesOrderItemData, "fullSalesOrderItemData")
-    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
-    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
+    //    CampaignUtils.debug(contactListMobileFull, "contactListMobileFull")
+    //    CampaignUtils.debug(fullSalesOrderData, "fullSalesOrderData")
+    //    CampaignUtils.debug(fullSalesOrderItemData, "fullSalesOrderItemData")
+    //    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
+    //    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
 
     val dfCustomerSelection = customerSelector.customerSelection(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData)
 

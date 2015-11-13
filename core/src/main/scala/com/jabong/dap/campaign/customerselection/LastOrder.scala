@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.GroupedUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables._
@@ -31,6 +32,8 @@ class LastOrder extends LiveCustomerSelector with Logging {
     //    val groupedSalesOrder = salesOrder.sort(SalesOrderVariables.CREATED_AT)
     //      .groupBy(SalesOrderVariables.FK_CUSTOMER)
     //      .agg(last(SalesOrderVariables.ID_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER)
+
+    CampaignUtils.debug(groupedSalesOrder, "last order groupedSalesOrder")
 
     val joinedDf = groupedSalesOrder.join(
       salesOrderItem,
