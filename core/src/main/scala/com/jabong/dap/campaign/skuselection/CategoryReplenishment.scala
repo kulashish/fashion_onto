@@ -30,7 +30,7 @@ object CategoryReplenishment extends Logging {
         yesterdayItrData(ProductVariables.STOCK),
         yesterdayItrData(ProductVariables.PRICE_BAND),
         yesterdayItrData(ProductVariables.CATEGORY)
-      )
+      ).cache()
 
     val filterNonBeauty = getNonBeauty(filteredSkuJoinedItr)
 

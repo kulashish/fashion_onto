@@ -26,21 +26,16 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
     val filterCustomerData = customerData.filter(ContactListMobileVars.NET_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
       .select(CustomerVariables.ID_CUSTOMER)
 
-    val lastOrder = new LastOrder()
-    val dfCustomerSelection = lastOrder.customerSelection(fullSalesOrderData, fullSalesOrderItemData)
-
     val joinedDf = filterCustomerData.join(
-      dfCustomerSelection,
-      filterCustomerData(CustomerVariables.ID_CUSTOMER) === dfCustomerSelection(SalesOrderVariables.FK_CUSTOMER),
+      fullSalesOrderData,
+      filterCustomerData(CustomerVariables.ID_CUSTOMER) === fullSalesOrderData(SalesOrderVariables.FK_CUSTOMER),
       SQL.INNER
-    ).select(
-        SalesOrderVariables.FK_CUSTOMER,
-        CustomerVariables.EMAIL,
-        ProductVariables.SKU_SIMPLE,
-        SalesOrderVariables.CREATED_AT
-      )
+    )
 
-    joinedDf
+    val lastOrder = new LastOrder()
+    val dfCustomerSelection = lastOrder.customerSelection(joinedDf, fullSalesOrderItemData)
+
+    dfCustomerSelection
   }
 
   override def customerSelection(inData: DataFrame): DataFrame = ???
