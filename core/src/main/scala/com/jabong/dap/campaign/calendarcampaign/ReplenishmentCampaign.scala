@@ -17,10 +17,19 @@ class ReplenishmentCampaign {
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST5_SUCCESSFUL_ORDER)
 
+    CampaignUtils.debug(contactListMobileFull, "contactListMobileFull")
+    CampaignUtils.debug(fullSalesOrderData, "fullSalesOrderData")
+    CampaignUtils.debug(fullSalesOrderItemData, "fullSalesOrderItemData")
+    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
+    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
+
     val dfCustomerSelection = customerSelector.customerSelection(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData)
 
     //filter sku based on daily filter
     val (dfNonBeautyFrag, dfBeauty) = CategoryReplenishment.skuFilter(dfCustomerSelection, yesterdayItrData)
+
+    CampaignUtils.debug(dfNonBeautyFrag, "dfNonBeautyFrag")
+    CampaignUtils.debug(dfBeauty, "dfBeauty")
 
     // ***** NON_BEAUTY_FRAG_CAMPAIGN email use case
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN, dfNonBeautyFrag, false, brickMvpRecommendations)

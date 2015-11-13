@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.Daily._
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
 import com.jabong.dap.common.constants.variables._
@@ -32,8 +33,12 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
       SQL.INNER
     )
 
+    CampaignUtils.debug(joinedDf, "last 5 orders joinedDf")
+
     val lastOrder = new LastOrder()
     val dfCustomerSelection = lastOrder.customerSelection(joinedDf, fullSalesOrderItemData)
+
+    CampaignUtils.debug(dfCustomerSelection, "last 5 orders dfCustomerSelection")
 
     dfCustomerSelection
   }
