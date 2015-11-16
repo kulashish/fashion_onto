@@ -43,7 +43,7 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
     val dfClickIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate, "53699_" + "CLICK_" + fileDate + ".txt", "true", ";")
     dfMap.put("clickIncr", dfClickIncr)
 
-    if (paths == null) {
+    if (null == paths) {
       val dfCPOTPart1PrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cpotPart1PrevFull", dfCPOTPart1PrevFull)
     }
@@ -55,9 +55,9 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
     var dfCPOTPart1Incr = getIncCPOTPart1(dfMap("openIncr"), dfMap("clickIncr"))
     var dfCPOTPart1Full = dfCPOTPart1Incr
 
-    val dfCPOTPart1PrevFull = dfMap("cpotPart1PrevFull")
+    val dfCPOTPart1PrevFull = dfMap.getOrElse("cpotPart1PrevFull", null)
 
-    if (dfCPOTPart1PrevFull != null) {
+    if (null != dfCPOTPart1PrevFull) {
 
       val dfIncrVarBC = Spark.getContext().broadcast(dfCPOTPart1Incr).value
       //join old and new data frame
