@@ -84,7 +84,7 @@ object CustTop5 extends DataFeedsModel {
 
     var top5MapIncr = custTop5Full
     if (null != custTop5PrevFull) {
-      top5MapIncr = Utils.getOneDayData(custTop5Full, "last_orders_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      top5MapIncr = Utils.getOneDayData(custTop5Full, "last_order_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
@@ -194,7 +194,7 @@ object CustTop5 extends DataFeedsModel {
           mergeMapCols(top5incr("catagory_list"), top5PrevFull("catagory_list")) as "catagory_list",
           mergeMapCols(top5incr("brick_list"), top5PrevFull("brick_list")) as "brick_list",
           mergeMapCols(top5incr("color_list"), top5PrevFull("color_list")) as "color_list",
-          coalesce(top5incr("last_orders_created_at"), top5PrevFull("last_orders_created_at")) as "last_orders_created_at"
+          coalesce(top5incr("last_order_created_at"), top5PrevFull("last_order_created_at")) as "last_order_created_at"
 
         )
       top5Joined
