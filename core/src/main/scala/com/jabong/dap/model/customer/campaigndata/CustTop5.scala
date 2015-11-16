@@ -96,19 +96,21 @@ object CustTop5 extends DataFeedsModel {
 
     val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
 
+    val custTop5IncrCached = custTop5Incr.cache().toDF()
+
     val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(custTop5Incr, incrPath, saveMode)
+    DataWriter.writeParquet(custTop5IncrCached, incrPath, saveMode)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(custTop5Incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(custTop5IncrCached, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
     DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
 
     DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    var custTop5Full = custTop5Incr
+    var custTop5Full = custTop5IncrCached
     if (null != custTop5PrevFull) {
-      custTop5Full = MergeUtils.InsertUpdateMerge(custTop5PrevFull, custTop5Incr, SalesOrderVariables.FK_CUSTOMER)
+      custTop5Full = MergeUtils.InsertUpdateMerge(custTop5PrevFull, custTop5IncrCached, SalesOrderVariables.FK_CUSTOMER)
     }
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
