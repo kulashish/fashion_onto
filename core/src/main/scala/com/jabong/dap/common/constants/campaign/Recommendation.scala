@@ -45,5 +45,4 @@ object Recommendation {
   val NTHDAY_45 = "nthday_45"
   val NTHDAY_60 = "nthday_60"
 
-
 }

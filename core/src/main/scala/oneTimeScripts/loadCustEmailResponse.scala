@@ -32,6 +32,5 @@ object loadCustEmailResponse {
 
     DataWriter.writeParquet(custOutputDf, savePathFull, DataSets.IGNORE_SAVEMODE)
 
-
   }
 }

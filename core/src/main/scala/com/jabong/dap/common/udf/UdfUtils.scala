@@ -689,25 +689,24 @@ object UdfUtils extends Logging {
     }
   }
 
-
   // The last click date will be calculated based on click dates alone and the open dates are passed empty.
   // If the open dates are are null or empty, we need to check the values in click date to set the final open date  value.
-  def latestEmailOpenDate(openDate: String, yesOpenDate: String, clickDate: String,  yesClickDate:String): String = {
+  def latestEmailOpenDate(openDate: String, yesOpenDate: String, clickDate: String, yesClickDate: String): String = {
     var maxDateString: String = "2001-01-01 00:00:00"
     var i: Int = 0;
     var maxDate: Date = TimeUtils.getDate(maxDateString, TimeConstants.DATE_TIME_FORMAT)
-    var date : Date = null
-    if(null != openDate && openDate.length > 0){
+    var date: Date = null
+    if (null != openDate && openDate.length > 0) {
       date = TimeUtils.getDate(openDate, TimeConstants.DATE_TIME_FORMAT)
-    }else if(null != yesOpenDate && yesOpenDate.length > 0) {
+    } else if (null != yesOpenDate && yesOpenDate.length > 0) {
       date = TimeUtils.getDate(yesOpenDate, TimeConstants.DATE_TIME_FORMAT)
     }
-    if(date != null && date.after(maxDate)){
+    if (date != null && date.after(maxDate)) {
       maxDateString = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT).format(date)
-    }else{
-      if(null != clickDate && clickDate.length > 0){
+    } else {
+      if (null != clickDate && clickDate.length > 0) {
         maxDate = TimeUtils.getDate(clickDate, TimeConstants.DATE_TIME_FORMAT)
-      }else if(null != yesClickDate && yesClickDate.length > 0) {
+      } else if (null != yesClickDate && yesClickDate.length > 0) {
         maxDate = TimeUtils.getDate(yesClickDate, TimeConstants.DATE_TIME_FORMAT)
       }
       maxDateString = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT).format(maxDate)

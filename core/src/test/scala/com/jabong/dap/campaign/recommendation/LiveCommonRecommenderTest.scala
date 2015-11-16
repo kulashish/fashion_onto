@@ -45,7 +45,7 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
 
   "refskus and brick mvp geneder recommendation  data as input" should "return set of eight recommendedSkus for refSkus" in {
     val expectedRecommendations = liveRecommender.generateRecommendation(newReferenceSkuData, recommendationOutput)
-      println(expectedRecommendations.first())
+    println(expectedRecommendations.first())
 
     //println("RECOMMENDED"+expectedRecommendations.count())
     //expectedRecommendations.collect().foreach(println)

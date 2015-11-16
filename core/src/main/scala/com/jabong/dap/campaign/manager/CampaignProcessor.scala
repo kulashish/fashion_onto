@@ -300,6 +300,4 @@ object CampaignProcessor {
     return joined
   }
 
-
-
 }

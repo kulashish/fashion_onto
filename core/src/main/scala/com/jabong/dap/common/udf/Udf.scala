@@ -144,5 +144,5 @@ object Udf {
 
   val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
 
-  val getLatestEmailOpenDate = udf((s: String, s1 : String, s2:  String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1 : String, s2:  String, s3: String))
+  val getLatestEmailOpenDate = udf((s: String, s1: String, s2: String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1: String, s2: String, s3: String))
 }

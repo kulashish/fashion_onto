@@ -113,5 +113,4 @@ object CampaignCommon {
     CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE
   )
 
-
 }

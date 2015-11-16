@@ -3,7 +3,7 @@ package com.jabong.dap.model.customer.campaigndata
 import java.sql.Timestamp
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.{variables, SQL}
+import com.jabong.dap.common.constants.{ variables, SQL }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
 import com.jabong.dap.common.schema.SchemaUtils
@@ -16,7 +16,7 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustEmailSchema
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 

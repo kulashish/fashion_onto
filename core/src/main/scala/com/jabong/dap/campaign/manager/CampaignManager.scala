@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{HottestXCampaign, PricepointCampaign}
+import com.jabong.dap.campaign.calendarcampaign.{ HottestXCampaign, PricepointCampaign }
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -319,14 +319,12 @@ object CampaignManager extends Serializable with Logging {
     newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
   }
 
-
   def startHottestXCampaign(params: ParamInfo) = {
-
 
     val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val fullOrderItemData =  CampaignInput.loadFullOrderItemData()
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
     val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData, incrDate)
@@ -336,8 +334,7 @@ object CampaignManager extends Serializable with Logging {
 
     val hottestXCampaign = new HottestXCampaign
 
-    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData,itrSkuYesterdayData, genderMvpBrickRecos)
-
+    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, itrSkuYesterdayData, genderMvpBrickRecos)
 
   }
 

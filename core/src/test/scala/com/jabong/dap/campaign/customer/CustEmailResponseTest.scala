@@ -61,11 +61,11 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
 
   }
 
-//    "testReadDataFrame" should "match with expected data" in {
-//      //val joinedDf = readDataFrame("2015-10-09", DataSets.DAILY_MODE)
-//      CustEmailResponse.emailResponse("2015-10-09", DataSets.OVERWRITE_SAVEMODE, null)
-//
-//    }
+  //    "testReadDataFrame" should "match with expected data" in {
+  //      //val joinedDf = readDataFrame("2015-10-09", DataSets.DAILY_MODE)
+  //      CustEmailResponse.emailResponse("2015-10-09", DataSets.OVERWRITE_SAVEMODE, null)
+  //
+  //    }
 
   "testMergeAllDataFrame" should "match expected values" in {
     val incremental = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "today_incr_csv", CustEmailSchema.todayDf)
@@ -90,7 +90,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
   }
 
   "testMergeEffectiveDfWithCmrAndNl" should "match expected values" in {
-    val effectiveDf =  JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective7_email", CustEmailSchema.effective_Smry_Schema)
+    val effectiveDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective7_email", CustEmailSchema.effective_Smry_Schema)
     val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr")
     val nl = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "newsletter_subscription")
     val result = merge(effectiveDf, cmr, nl)
@@ -107,8 +107,8 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val effective15 = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], CustEmailSchema.reqCsvDf)
     val effective30 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective30_email", CustEmailSchema.reqCsvDf)
     val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, prevEffDf, effective7, effective15, effective30)
-//    val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo7_15", CustEmailSchema.effective_Smry_Schema)
-//    assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
+    //    val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo7_15", CustEmailSchema.effective_Smry_Schema)
+    //    assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
 
     val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr")
     val nl = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "newsletter_subscription")
