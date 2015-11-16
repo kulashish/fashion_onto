@@ -10,6 +10,7 @@ import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
+import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
@@ -50,12 +51,14 @@ import scala.collection.mutable.{ HashMap, ListBuffer, Map }
 object CustTop5 extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
-    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
     val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    (DataWriter.canWrite(saveMode, fullPath) || DataWriter.canWrite(saveMode, incrPath))
+    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+    (DataWriter.canWrite(saveMode, fullMapPath) || DataWriter.canWrite(saveMode, incrPath) || DataWriter.canWrite(saveMode, fullPath))
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
+    val top5MapPrevFull = dfMap("custTop5MapPrevFull")
     val top5PrevFull = dfMap("custTop5PrevFull")
     var salesOrderIncr: DataFrame = dfMap("salesOrderIncr")
     var salesOrderItemIncr: DataFrame = dfMap("salesOrderItemIncr")
@@ -71,23 +74,25 @@ object CustTop5 extends DataFeedsModel {
       )
 
     val dfWrite = new HashMap[String, DataFrame]()
-    val custTop5Full = getTop5(top5PrevFull, saleOrderJoined, dfMap("yestItr"))
+    val custTop5Full = getTop5(top5MapPrevFull, saleOrderJoined, dfMap("yestItr"))
     dfWrite.put("custTop5Full", custTop5Full)
     //println("Full COUNT:-" + custTop5Full.count())
+    dfWrite.put("custTop5MapPrevFull", top5MapPrevFull)
     dfWrite.put("custTop5PrevFull", top5PrevFull)
     dfWrite
   }
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
+    val custTop5MapPrevFull = dfWrite("custTop5MapPrevFull")
+    val custTop5MapFull = dfWrite("custTop5MapFull")
     val custTop5PrevFull = dfWrite("custTop5PrevFull")
-    val custTop5Full = dfWrite("custTop5Full")
 
-    var top5MapIncr = custTop5Full
-    if (null != custTop5PrevFull) {
-      top5MapIncr = Utils.getOneDayData(custTop5Full, "last_order_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    var top5MapIncr = custTop5MapFull
+    if (null != custTop5MapPrevFull) {
+      top5MapIncr = Utils.getOneDayData(custTop5MapFull, "last_order_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
-    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
+    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
 
     val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
 
@@ -101,6 +106,9 @@ object CustTop5 extends DataFeedsModel {
 
     DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
+    val custTop5Full = MergeUtils.InsertUpdateMerge(custTop5PrevFull, custTop5Incr, SalesOrderVariables.FK_CUSTOMER)
+    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
   }
 
   def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
@@ -290,7 +298,9 @@ object CustTop5 extends DataFeedsModel {
     var mode: String = DataSets.FULL_MERGE_MODE
     if (null == path) {
       mode = DataSets.DAILY_MODE
-      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      val custTop5MapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custTop5MapPrevFull", custTop5MapPrevFull)
+      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custTop5PrevFull", custTop5PrevFull)
     }
     var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
