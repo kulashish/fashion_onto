@@ -60,8 +60,8 @@ object CustTop5 extends DataFeedsModel {
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val top5MapPrevFull = dfMap("custTop5MapPrevFull")
     val top5PrevFull = dfMap("custTop5PrevFull")
-    var salesOrderIncr: DataFrame = dfMap("salesOrderIncr")
-    var salesOrderItemIncr: DataFrame = dfMap("salesOrderItemIncr")
+    var salesOrderIncr = dfMap("salesOrderIncr")
+    var salesOrderItemIncr = dfMap("salesOrderItemIncr")
 
     val salesOrderNew = salesOrderIncr.na.fill(scala.collection.immutable.Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
