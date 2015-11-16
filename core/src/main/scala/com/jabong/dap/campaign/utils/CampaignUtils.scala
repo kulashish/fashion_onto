@@ -751,7 +751,6 @@ object CampaignUtils extends Logging {
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
-
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 

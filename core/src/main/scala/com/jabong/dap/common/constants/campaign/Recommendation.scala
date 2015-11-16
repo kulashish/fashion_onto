@@ -17,9 +17,9 @@ object Recommendation {
 
   val BRAND_MVP_SUB_TYPE = "brand_mvp"
 
-  val MVP_DISCOUNT = "mvp_discount"
+  val MVP_DISCOUNT_SUB_TYPE = "mvp_discount"
 
-  val MVP_COLOR = "mvp_color"
+  val MVP_COLOR_SUB_TYPE = "mvp_color"
 
   val BRICK_PRICE_BAND_SUB_TYPE = "brick_price_band"
 
