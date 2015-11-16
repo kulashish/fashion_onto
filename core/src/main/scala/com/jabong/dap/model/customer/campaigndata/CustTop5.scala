@@ -58,8 +58,8 @@ object CustTop5 extends DataFeedsModel {
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
-    val top5MapPrevFull = dfMap("custTop5MapPrevFull")
-    val top5PrevFull = dfMap("custTop5PrevFull")
+    val top5MapPrevFull = dfMap.getOrElse("custTop5MapPrevFull", null)
+    val top5PrevFull = dfMap.getOrElse("custTop5PrevFull", null)
     var salesOrderIncr = dfMap("salesOrderIncr")
     var salesOrderItemIncr = dfMap("salesOrderItemIncr")
 
@@ -83,9 +83,9 @@ object CustTop5 extends DataFeedsModel {
   }
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
-    val custTop5MapPrevFull = dfWrite("custTop5MapPrevFull")
+    val custTop5MapPrevFull = dfWrite.getOrElse("custTop5MapPrevFull", null)
     val custTop5MapFull = dfWrite("custTop5MapFull")
-    val custTop5PrevFull = dfWrite("custTop5PrevFull")
+    val custTop5PrevFull = dfWrite.getOrElse("custTop5PrevFull", null)
 
     var top5MapIncr = custTop5MapFull
     if (null != custTop5MapPrevFull) {
