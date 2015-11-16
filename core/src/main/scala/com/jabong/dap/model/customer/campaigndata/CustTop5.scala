@@ -74,8 +74,8 @@ object CustTop5 extends DataFeedsModel {
       )
 
     val dfWrite = new HashMap[String, DataFrame]()
-    val custTop5Full = getTop5(top5MapPrevFull, saleOrderJoined, dfMap("yestItr"))
-    dfWrite.put("custTop5Full", custTop5Full)
+    val custTop5MapFull = getTop5(top5MapPrevFull, saleOrderJoined, dfMap("yestItr"))
+    dfWrite.put("custTop5MapFull", custTop5MapFull)
     //println("Full COUNT:-" + custTop5Full.count())
     dfWrite.put("custTop5MapPrevFull", top5MapPrevFull)
     dfWrite.put("custTop5PrevFull", top5PrevFull)
