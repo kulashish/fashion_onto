@@ -459,11 +459,11 @@ object SalesOrderItem {
       joinedMap = prevMap.join(orderIncr, prevMap(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
           mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
-          coalesce(orderIncr("last_orders_updated_at"), prevMap("last_orders_updated_at")) as "last_orders_updated_at"
+          coalesce(orderIncr("last_order_updated_at"), prevMap("last_order_updated_at")) as "last_order_updated_at"
         )
     }
 
-    val incrData = Utils.getOneDayData(joinedMap, "last_orders_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
       countOrders(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
