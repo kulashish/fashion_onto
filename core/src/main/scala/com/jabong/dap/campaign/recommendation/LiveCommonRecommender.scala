@@ -27,7 +27,7 @@ class LiveCommonRecommender extends Recommender with Logging {
   override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE): DataFrame = {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
-    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE) contains recType, "recommendation type is invalid")
+    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE, Recommendation.MVP_DISCOUNT_SUB_TYPE) contains recType, "recommendation type is invalid")
     var refSkusUpdatedSchema: DataFrame = refSkus
     if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)) {
       refSkusUpdatedSchema = SchemaUtils.addColumns(refSkus, Schema.expectedFinalReferenceSku)
@@ -98,12 +98,14 @@ class LiveCommonRecommender extends Recommender with Logging {
     require(RecommendationUtils.recommendationType.contains(recType), "recommendations data frame should not null")
 
     val recommendationJoined = recType match {
+
       case Recommendation.BRAND_MVP_SUB_TYPE => {
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
 
       }
+
       case Recommendation.BRICK_PRICE_BAND_SUB_TYPE => {
 
         val dfNextPriceBand = completeRefSku.select(
@@ -127,6 +129,13 @@ class LiveCommonRecommender extends Recommender with Logging {
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
           && Udf.nextPriceBand(completeRefSku(ProductVariables.PRICE_BAND)) === recommendations(ProductVariables.PRICE_BAND)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+      }
+      case Recommendation.MVP_DISCOUNT_SUB_TYPE => {
+        val completeRefSkuWithDiscountStatus = completeRefSku.withColumn(Recommendation.DISCOUNT_STATUS, lit("true"))
+
+        completeRefSkuWithDiscountStatus.join(recommendations, completeRefSkuWithDiscountStatus(Recommendation.DISCOUNT_STATUS) === recommendations(Recommendation.DISCOUNT_STATUS)
+          && completeRefSkuWithDiscountStatus(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+          && completeRefSkuWithDiscountStatus(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       }
       case _ => {
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)

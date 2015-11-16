@@ -448,13 +448,13 @@ object Schema {
     StructField("catagory_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
     StructField("brick_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
     StructField("color_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
-    StructField("last_orders_created_at", TimestampType, true)
+    StructField("last_order_created_at", TimestampType, true)
   ))
 
   val salesItemStatus = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField("order_status_map", MapType(LongType, MapType(LongType, IntegerType)), true),
-    StructField("last_orders_updated_at", TimestampType, true)
+    StructField("last_order_updated_at", TimestampType, true)
   ))
   val ordersCount = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
@@ -463,7 +463,7 @@ object Schema {
     StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, true),
     StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS, IntegerType, true),
     StructField("others", IntegerType, true),
-    StructField("last_orders_updated_at", TimestampType, true)
+    StructField("last_order_updated_at", TimestampType, true)
   ))
 
   val cusTop5 = StructType(Array(

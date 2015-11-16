@@ -37,22 +37,23 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
 
-    val salesOrder = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
-    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
-    val customerSession = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, incrDate)
+    val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
+    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val customerSessionIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, incrDate)
 
-    val masterRecord =
-      if (null != paths) getFullOnFirstDay(prevDate, cmr)
+    val CustAppDetailsPrevFull =
+      if (null != paths) getFullOnFirstDay(prevDate, cmrFull)
       else
         DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, prevDate)
 
     val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
-    dfMap.put("masterRecord", masterRecord)
-    dfMap.put("salesOrder", salesOrder)
-    dfMap.put("cmr", cmr)
-    dfMap.put("customerSession", customerSession)
+    dfMap.put("CustAppDetailsPrevFull", CustAppDetailsPrevFull)
+    dfMap.put("salesOrderIncr", salesOrderIncr)
+    dfMap.put("cmrFull", cmrFull)
+    dfMap.put("customerSessionIncr", customerSessionIncr)
     dfMap
   }
+
   def getFullOnFirstDay(date: String, cmr: DataFrame): DataFrame = {
     val inputCSVFile = "CUSTOMER_APP_DETAILS_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + ".csv"
     val df = DataReader.getDataFrame4mCsv(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL, date, inputCSVFile, "true", "|")
@@ -73,13 +74,13 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
-    val masterRecord = dfMap("masterRecord")
-    val salesOrder = dfMap("salesOrder")
-    val cmr = dfMap("cmr")
-    val customerSession = dfMap("customerSession")
+    val CustAppDetailsPrevFull = dfMap.getOrElse("CustAppDetailsPrevFull", null)
+    val salesOrderIncr = dfMap("salesOrderIncr")
+    val cmrFull = dfMap("cmrFull")
+    val customerSessionIncr = dfMap("customerSessionIncr")
 
     //trimming
-    val trimmedSalesOrder = salesOrder.filter("domain in ('ios', 'android', 'windows')")
+    val trimmedSalesOrder = salesOrderIncr.filter("domain in ('ios', 'android', 'windows')")
       .select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CUSTOMER_SESSION_ID, SalesOrderVariables.CREATED_AT, CustomerVariables.DOMAIN)
       .groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(
@@ -88,10 +89,10 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
         last(CustomerVariables.DOMAIN) as CustomerVariables.DOMAIN,
         last(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.CREATED_AT)
 
-    val trimmedCMR = cmr.filter("domain in ('ios', 'android', 'windows')")
+    val trimmedCMR = cmrFull.filter("domain in ('ios', 'android', 'windows')")
       .select("UID", CustomerVariables.ID_CUSTOMER).withColumnRenamed("UID", UID)
 
-    val trimmedCustomerSession = customerSession.select(SESSION_KEY, LOGIN_TIME)
+    val trimmedCustomerSession = customerSessionIncr.select(SESSION_KEY, LOGIN_TIME)
       .groupBy(SESSION_KEY)
       .agg(min(LOGIN_TIME) as FIRST_LOGIN_TIME, max(LOGIN_TIME) as LAST_LOGIN_TIME)
 
@@ -104,9 +105,9 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     val INCR_ = "incr_"
     val MASTER_ = "master_"
 
-    val masterRecordRenamed = SchemaUtils.renameCols(masterRecord, MASTER_)
+    val masterRecordRenamed = SchemaUtils.renameCols(CustAppDetailsPrevFull, MASTER_)
 
-    val incrDF = soWithUIDLoginTime.join(masterRecordRenamed, soWithUIDLoginTime(UID) === masterRecordRenamed(MASTER_ + UID), SQL.LEFT_OUTER)
+    val custAppDetailsIncr = soWithUIDLoginTime.join(masterRecordRenamed, soWithUIDLoginTime(UID) === masterRecordRenamed(MASTER_ + UID), SQL.LEFT_OUTER)
       .select(
         coalesce(masterRecordRenamed(MASTER_ + UID), soWithUIDLoginTime(UID)) as UID,
 
@@ -119,34 +120,36 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
           .otherwise((masterRecordRenamed(MASTER_ + ORDER_COUNT) + soWithUIDLoginTime(ORDER_COUNT)).cast(IntegerType))
           as ORDER_COUNT)
 
-    val incrRenamed = SchemaUtils.renameCols(incrDF, INCR_)
+    val incrRenamed = SchemaUtils.renameCols(custAppDetailsIncr, INCR_)
 
-    val updatedMaster = masterRecord.join(incrRenamed, incrRenamed(INCR_ + UID) === masterRecord(UID), SQL.FULL_OUTER)
+    val custAppDetailsFull = CustAppDetailsPrevFull.join(incrRenamed, incrRenamed(INCR_ + UID) === CustAppDetailsPrevFull(UID), SQL.FULL_OUTER)
       .select(
-        coalesce(incrRenamed(INCR_ + UID), masterRecord(UID)) as UID,
-        coalesce(incrRenamed(INCR_ + CustomerVariables.DOMAIN), masterRecord(CustomerVariables.DOMAIN)) as CustomerVariables.DOMAIN,
-        coalesce(incrRenamed(INCR_ + CustomerVariables.CREATED_AT), masterRecord(CustomerVariables.CREATED_AT)) as CustomerVariables.CREATED_AT,
-        coalesce(masterRecord(FIRST_LOGIN_TIME), incrRenamed(INCR_ + FIRST_LOGIN_TIME)) as FIRST_LOGIN_TIME,
-        coalesce(incrRenamed(INCR_ + LAST_LOGIN_TIME), masterRecord(LAST_LOGIN_TIME)) as LAST_LOGIN_TIME,
-        coalesce(incrRenamed(INCR_ + SESSION_KEY), masterRecord(SESSION_KEY)) as SESSION_KEY,
-        when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull && masterRecord(ORDER_COUNT).isNotNull, (masterRecord(ORDER_COUNT) + incrRenamed(INCR_ + ORDER_COUNT)).cast(IntegerType))
-          .otherwise(when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull, incrRenamed(INCR_ + ORDER_COUNT).cast(IntegerType)).otherwise(masterRecord(ORDER_COUNT).cast(IntegerType))) as ORDER_COUNT)
+        coalesce(incrRenamed(INCR_ + UID), CustAppDetailsPrevFull(UID)) as UID,
+        coalesce(incrRenamed(INCR_ + CustomerVariables.DOMAIN), CustAppDetailsPrevFull(CustomerVariables.DOMAIN)) as CustomerVariables.DOMAIN,
+        coalesce(incrRenamed(INCR_ + CustomerVariables.CREATED_AT), CustAppDetailsPrevFull(CustomerVariables.CREATED_AT)) as CustomerVariables.CREATED_AT,
+        coalesce(CustAppDetailsPrevFull(FIRST_LOGIN_TIME), incrRenamed(INCR_ + FIRST_LOGIN_TIME)) as FIRST_LOGIN_TIME,
+        coalesce(incrRenamed(INCR_ + LAST_LOGIN_TIME), CustAppDetailsPrevFull(LAST_LOGIN_TIME)) as LAST_LOGIN_TIME,
+        coalesce(incrRenamed(INCR_ + SESSION_KEY), CustAppDetailsPrevFull(SESSION_KEY)) as SESSION_KEY,
+        when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull && CustAppDetailsPrevFull(ORDER_COUNT).isNotNull, (CustAppDetailsPrevFull(ORDER_COUNT) + incrRenamed(INCR_ + ORDER_COUNT)).cast(IntegerType))
+          .otherwise(when(incrRenamed(INCR_ + ORDER_COUNT).isNotNull, incrRenamed(INCR_ + ORDER_COUNT).cast(IntegerType)).otherwise(CustAppDetailsPrevFull(ORDER_COUNT).cast(IntegerType))) as ORDER_COUNT)
     val dfWriteMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
-    dfWriteMap.put("updatedMaster", updatedMaster)
-    dfWriteMap.put("incrDF", incrDF)
+    dfWriteMap.put("custAppDetailsFull", custAppDetailsFull)
+    dfWriteMap.put("custAppDetailsIncr", custAppDetailsIncr)
     dfWriteMap
   }
+
   def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
-    val incr = dfWriteMap("incrDF")
-    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
     val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, incrDate)
-    if (DataWriter.canWrite(incrSavePath, saveMode)) {
-      DataWriter.writeParquet(incr, incrSavePath, saveMode)
-    }
     if (DataWriter.canWrite(fullSavePath, saveMode)) {
-      DataWriter.writeParquet(dfWriteMap("updatedMaster"), fullSavePath, saveMode)
+      DataWriter.writeParquet(dfWriteMap("custAppDetailsFull"), fullSavePath, saveMode)
+    }
+
+    val custAppDetailsIncr = dfWriteMap("custAppDetailsIncr")
+    val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate)
+    if (DataWriter.canWrite(incrSavePath, saveMode)) {
+      DataWriter.writeParquet(custAppDetailsIncr, incrSavePath, saveMode)
     }
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(incr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_App_details", saveMode, "true", ";")
+    DataWriter.writeCsv(custAppDetailsIncr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_App_details", saveMode, "true", ";")
   }
 }

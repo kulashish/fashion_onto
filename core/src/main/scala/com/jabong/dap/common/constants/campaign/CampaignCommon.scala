@@ -42,6 +42,8 @@ object CampaignCommon {
   val BRICK_AFFINITY = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
   val BEAUTY_CAMPAIGN = "beauty_campaign"
+  val CLEARANCE_CAMPAIGN = "clearance"
+  val LOVE_BRAND_CAMPAIGN = "love_brand"
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
@@ -108,10 +110,14 @@ object CampaignCommon {
     //FIXME: put correct mail type
     CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500,
     //FIXME: put correct mail type
-    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 600
+    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 600,
+    CampaignCommon.CLEARANCE_CAMPAIGN -> 20,
+    CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(
-    CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE
+    CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE,
+    CampaignCommon.CLEARANCE_CAMPAIGN -> Recommendation.MVP_DISCOUNT_SUB_TYPE,
+    CampaignCommon.LOVE_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE
   )
 }

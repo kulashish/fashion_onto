@@ -58,7 +58,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val dfCmrFull = dfMap("cmrFull")
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
-    val dfCPOTPart2PrevFull = dfMap("CPOTPart2PrevFull")
+    val dfCPOTPart2PrevFull = dfMap.getOrElse("CPOTPart2PrevFull", null)
 
     val dfCPOT = Utils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
 
@@ -151,7 +151,6 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
   }
 
   def write(dfWriteMap: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
-
     val pathCustomerPreferredTimeslotPart2Full = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Full)) {
       DataWriter.writeParquet(dfWriteMap("CPOTPart2Full"), pathCustomerPreferredTimeslotPart2Full, saveMode)
@@ -159,6 +158,5 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(dfWriteMap("CPOTPart2Incr").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";")
-
   }
 }
