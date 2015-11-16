@@ -51,7 +51,8 @@ object CustTop5 extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.canWrite(saveMode, fullPath)
+    val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
+    (DataWriter.canWrite(saveMode, fullPath) || DataWriter.canWrite(saveMode, incrPath))
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
@@ -89,6 +90,9 @@ object CustTop5 extends DataFeedsModel {
     DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
 
     val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
+
+    val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeParquet(custTop5Incr, incrPath, saveMode)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(custTop5Incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
