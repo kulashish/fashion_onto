@@ -106,7 +106,10 @@ object CustTop5 extends DataFeedsModel {
 
     DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    val custTop5Full = MergeUtils.InsertUpdateMerge(custTop5PrevFull, custTop5Incr, SalesOrderVariables.FK_CUSTOMER)
+    var custTop5Full = custTop5Incr
+    if (null != custTop5PrevFull) {
+      custTop5Full = MergeUtils.InsertUpdateMerge(custTop5PrevFull, custTop5Incr, SalesOrderVariables.FK_CUSTOMER)
+    }
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
   }
