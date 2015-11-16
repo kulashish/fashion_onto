@@ -132,7 +132,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfSalesOrderAddrFull = dfMap("salesOrderAddrFull")
-    val dfSalesOrderAddrFavPrevFull = dfMap("salesOrderAddrFavPrevFull")
+    val dfSalesOrderAddrFavPrevFull = dfMap.getOrElse("salesOrderAddrFavPrevFull", null)
     //call SalesOrderAddress.processVariable
     val (dfSalesOrderAddrFavCalc, dfSalesOrderAddrFavFull) = SalesOrderAddress.processVariable(dfSalesOrderIncr, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull)
     // FK_CUSTOMER, CITY, MOBILE, FIRST_NAME, LAST_NAME
@@ -161,7 +161,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     //    }
 
     val dfCustomerIncr = dfMap("customerIncr")
-    val dfContactListMobilePrevFull = dfMap("contactListMobilePrevFull")
+    val dfContactListMobilePrevFull = dfMap.getOrElse("contactListMobilePrevFull", null)
     val dfNLSIncr = dfMap("nlsIncr")
     val dfDndFull = dfMap("dndFull")
     val dfSmsOptOutFull = dfMap("smsOptOutFull")
@@ -211,7 +211,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
       DataWriter.writeParquet(dfContactListMobileIncrCached, pathContactListMobile, saveMode)
     }
 
-    val dfContactListMobilePrevFull = dfWrite("contactListMobilePrevFull")
+    val dfContactListMobilePrevFull = dfWrite.getOrElse("contactListMobilePrevFull", null)
 
     if (null != dfContactListMobilePrevFull) {
       val dfCsv = dfContactListMobileIncrCached.select(
