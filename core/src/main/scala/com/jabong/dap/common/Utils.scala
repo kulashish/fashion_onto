@@ -172,7 +172,6 @@ input:- row  and fields: field array
 
   }
 
-
   /**
    * To generate top map based on dimension.e.g Top brick,brand in the city
    * @param inputDataFrame
@@ -182,15 +181,15 @@ input:- row  and fields: field array
    * @param outputSchema
    * @return
    */
-  def generateTopMap(inputDataFrame : DataFrame,pivotFields: Array[String],attributeField: Array[String],valueFields: Array[String],outputSchema: StructType): DataFrame ={
-    require(inputDataFrame!=null,"input dataframe cannot be null")
-    require(Array("count","sum_price") contains valueFields(0), "value field not supported")
+  def generateTopMap(inputDataFrame: DataFrame, pivotFields: Array[String], attributeField: Array[String], valueFields: Array[String], outputSchema: StructType): DataFrame = {
+    require(inputDataFrame != null, "input dataframe cannot be null")
+    require(Array("count", "sum_price") contains valueFields(0), "value field not supported")
 
     val keyRdd = inputDataFrame.rdd.keyBy(row => Utils.createKey(row, pivotFields))
-    val outRDD = keyRdd.groupByKey().map({ case (key, value) => (key,genMap(value,attributeField,valueFields))})
-      .map{case (key,value) =>(Row.fromSeq(key.toSeq ++ value.map(_._2).toSeq))}
+    val outRDD = keyRdd.groupByKey().map({ case (key, value) => (key, genMap(value, attributeField, valueFields)) })
+      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.map(_._2).toSeq)) }
 
-    val outDataFrame = sqlContext.createDataFrame(outRDD,outputSchema)
+    val outDataFrame = sqlContext.createDataFrame(outRDD, outputSchema)
 
     outDataFrame
 
@@ -203,44 +202,42 @@ input:- row  and fields: field array
    * @param values
    * @return
    */
-  def genMap(iterable: Iterable[Row], dimensions:  Array[String],values :Array[String]): scala.collection.mutable.Map[String,scala.collection.mutable.Map[String,Row]] ={
-    val dimensionSMap = scala.collection.mutable.Map[String,scala.collection.mutable.Map[String,Row]]()
+  def genMap(iterable: Iterable[Row], dimensions: Array[String], values: Array[String]): scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Row]] = {
+    val dimensionSMap = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Row]]()
     for (row <- iterable) {
-      for (dimension <- dimensions){
+      for (dimension <- dimensions) {
 
         val rowKey = row(row.fieldIndex(dimension)).toString
-        val dimensionMap = dimensionSMap.getOrElse(dimension,scala.collection.mutable.Map[String,Row]())
-        var rowValue:Row = null
-        if(dimensionMap!=null) rowValue = dimensionMap.getOrElse(rowKey,null)
-        if(dimensionMap != null && rowValue!=null) {
+        val dimensionMap = dimensionSMap.getOrElse(dimension, scala.collection.mutable.Map[String, Row]())
+        var rowValue: Row = null
+        if (dimensionMap != null) rowValue = dimensionMap.getOrElse(rowKey, null)
+        if (dimensionMap != null && rowValue != null) {
           var valueSeq = rowValue.toSeq
-          for(value <- values ) {
+          for (value <- values) {
             //          val valueSeq: Seq[Any] = Seq()
             value match {
-              case "count" => valueSeq = valueSeq.updated(0,valueSeq.apply(0).asInstanceOf[Int]+1)
-              case "sum_price" => valueSeq = valueSeq.updated(1,valueSeq.apply(1).asInstanceOf[Double]+row(row.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue())
+              case "count" => valueSeq = valueSeq.updated(0, valueSeq.apply(0).asInstanceOf[Int] + 1)
+              case "sum_price" => valueSeq = valueSeq.updated(1, valueSeq.apply(1).asInstanceOf[Double] + row(row.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue())
               //            case "avg_price" => valueSeq :+ row(row.fieldIndex(ProductVariables.SPECIAL_PRICE))
             }
           }
-          dimensionMap.put(rowKey,Row.fromSeq(valueSeq))
+          dimensionMap.put(rowKey, Row.fromSeq(valueSeq))
 
-
-        }
-        else {
-          var valueSeq :Seq[Any] = Seq()
-          for(value <- values ){
+        } else {
+          var valueSeq: Seq[Any] = Seq()
+          for (value <- values) {
 
             value match {
-              case "count" => valueSeq =  valueSeq :+ (1)
+              case "count" => valueSeq = valueSeq :+ (1)
               case "sum_price" => valueSeq = valueSeq :+ row(row.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue()
               //            case "avg_price" => valueSeq :+ row(row.fieldIndex(ProductVariables.SPECIAL_PRICE))
             }
 
           }
-          dimensionMap.put(rowKey,Row.fromSeq(valueSeq))
+          dimensionMap.put(rowKey, Row.fromSeq(valueSeq))
 
-      }
-        dimensionSMap.put(dimension,dimensionMap)
+        }
+        dimensionSMap.put(dimension, dimensionMap)
       }
 
     }
@@ -248,8 +245,5 @@ input:- row  and fields: field array
     return dimensionSMap
 
   }
-
-
-
 
 }

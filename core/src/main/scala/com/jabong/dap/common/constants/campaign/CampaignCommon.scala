@@ -106,12 +106,12 @@ object CampaignCommon {
     "acart_hourly" -> 41,
     CampaignCommon.PRICEPOINT_CAMPAIGN -> 24,
     CampaignCommon.CLEARANCE_CAMPAIGN -> 20,
-  CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13
+    CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(
     CampaignCommon.PRICEPOINT_CAMPAIGN -> Recommendation.BRICK_PRICE_BAND_SUB_TYPE,
     CampaignCommon.CLEARANCE_CAMPAIGN -> Recommendation.MVP_DISCOUNT_SUB_TYPE,
-      CampaignCommon.LOVE_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE
+    CampaignCommon.LOVE_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE
   )
 }
