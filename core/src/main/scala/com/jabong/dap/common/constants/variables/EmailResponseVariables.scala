@@ -21,5 +21,6 @@ object EmailResponseVariables {
   val EVENT_STORED_DT = "EVENT_STORED_DT"
   val CLICKS_TODAY = "CLICKS_TODAY"
   val OPENS_TODAY = "OPENS_TODAY"
+  val END_DATE  = "END_DATE"
 
 }

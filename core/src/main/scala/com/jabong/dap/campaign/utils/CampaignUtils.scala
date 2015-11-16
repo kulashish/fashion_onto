@@ -3,23 +3,24 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
+import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{ GroupedUtils, Spark }
+import com.jabong.dap.common.{GroupedUtils, Spark}
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.{Udf, UdfUtils}
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
+import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql._
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
@@ -432,7 +433,7 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.SKU),
         inputData(PageVisitVariables.BROWSER_ID),
         inputData(PageVisitVariables.DOMAIN)
-      //inputData(ProductVariables.SPECIAL_PRICE)
+        //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -762,7 +763,14 @@ object CampaignUtils extends Logging {
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
     val recs = campaignName match {
-      case CampaignCommon.HOTTEST_X => { campaignOutput.filter (count (campaignOutput ("REC_SKUS")).>= (CampaignCommon.CALENDAR_MIN_RECS)) }
+      case CampaignCommon.HOTTEST_X  =>
+        val sqlContext = Spark.getSqlContext()
+        import sqlContext.implicits._
+
+        val intCnt =  campaignOutput.map(t => (t.getString(0), t.getAs[List[Int]](CampaignMergedFields.REC_SKUS).size)).toDF()
+        val filteredDf = intCnt.filter(intCnt("_1").>=(CampaignCommon.CALENDAR_MIN_RECS))
+
+      campaignOutput.filter(campaignOutput("EMAIL").in(filteredDf("_1")))
       case _ => campaignOutput
 
     }

@@ -159,7 +159,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       EmailResponseVariables.LAST_OPEN_DATE,
       EmailResponseVariables.LAST_CLICK_DATE,
       EmailResponseVariables.OPENS_LIFETIME,
-      EmailResponseVariables.CLICKS_LIFETIME)
+      EmailResponseVariables.CLICKS_LIFETIME,
+      EmailResponseVariables.END_DATE)
 
     val dfResultMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
     dfResultMap.put("incrDf", incrDf)
@@ -269,7 +270,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         cmrResDf(EmailResponseVariables.LAST_CLICK_DATE),
         cmrResDf(EmailResponseVariables.OPENS_LIFETIME),
         cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
-        when(nlSubscribers(NewsletterVariables.UPDATED_AT) isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
+//         when(nlSubscribers(NewsletterVariables.STATUS) ===  "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT))
+//        .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
+    when(nlSubscribers(NewsletterVariables.UPDATED_AT) isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
           .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)
 
     result
