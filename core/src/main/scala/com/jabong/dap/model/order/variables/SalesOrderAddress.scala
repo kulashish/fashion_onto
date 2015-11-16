@@ -1,38 +1,15 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesAddressVariables, ContactListMobileVars, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, SalesAddressVariables, SalesOrderVariables }
 import com.jabong.dap.model.order.schema.OrderVarSchema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
-
-import scala.collection.mutable.HashMap
 
 /**
  * Created by mubarak on 24/6/15.
  */
 object SalesOrderAddress {
-
-  def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
-    val favSalesOrderAddrPrevFull = dfMap("favSalesOrderAddrPrevFull")
-    var salesOrderIncr: DataFrame = dfMap("salesOrderIncr")
-    var salesOrderAddrFull: DataFrame = dfMap("salesOrderAddrFull")
-
-    val saleOrderAddrJoined = salesOrderIncr.join(salesOrderAddrFull, salesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) === salesOrderAddrFull(SalesOrderVariables.FK_SALES_ORDER))
-      .select(
-        salesOrderNew(SalesOrderVariables.FK_CUSTOMER),
-        salesOrderItemIncr(SalesOrderItemVariables.SKU),
-        salesOrderNew(SalesOrderVariables.CREATED_AT)
-      )
-
-    val dfWrite = new HashMap[String, DataFrame]()
-    val custTop5Full = getTop5(top5PrevFull, saleOrderJoined, dfMap("yestItr"))
-    dfWrite.put("custTop5Full", custTop5Full)
-    //println("Full COUNT:-" + custTop5Full.count())
-    dfWrite.put("custTop5PrevFull", top5PrevFull)
-    dfWrite
-  }
 
   /**
    *
