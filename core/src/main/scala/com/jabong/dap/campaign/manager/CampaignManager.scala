@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{ ReplenishmentCampaign, PricepointCampaign }
+import com.jabong.dap.campaign.calendarcampaign.{ BrandInCityCampaign, ReplenishmentCampaign, PricepointCampaign }
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -90,6 +90,28 @@ object CampaignManager extends Serializable with Logging {
 
     val pricepointCampaign = new PricepointCampaign()
     pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData)
+
+  }
+
+  def startBrandInCityCampaign() = {
+
+    val fullCusTop5 = CampaignInput.loadFullCusTop5()
+
+    val fullSalesOrderAddress = CampaignInput.loadFullSalesOrderAddress()
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val last6thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(6, fullOrderData)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last6thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(6, fullOrderItemData)
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    //FIXME: Add correct reccmmendation for brand mvp and city
+    val brandMvpSubType = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE).cache()
+
+    val brandInCityCampaign = new BrandInCityCampaign()
+    brandInCityCampaign.runCampaign(fullCusTop5, fullSalesOrderAddress, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpSubType, yesterdayItrData)
 
   }
 

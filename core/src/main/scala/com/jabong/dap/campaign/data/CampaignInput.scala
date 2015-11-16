@@ -102,6 +102,18 @@ object CampaignInput extends Logging {
     orderData
   }
 
+  def loadFullCusTop5(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading Full CusTop5 data from hdfs")
+    val cusTop5Data = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, date)
+    cusTop5Data
+  }
+
+  def loadFullSalesOrderAddress(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading Full SalesOrderAddress data from hdfs")
+    val cusTop5Data = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
+    cusTop5Data
+  }
+
   def loadLastNdaysOrderData(n: Int, fullOrderData: DataFrame, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     val dateTimeMs = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))

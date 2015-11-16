@@ -106,7 +106,9 @@ object CampaignCommon {
     //FIXME: put correct mail type
     CampaignCommon.BEAUTY_CAMPAIGN -> 400,
     //FIXME: put correct mail type
-    CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500
+    CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500,
+    //FIXME: put correct mail type
+    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 600
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(
