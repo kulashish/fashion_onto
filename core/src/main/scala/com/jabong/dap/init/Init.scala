@@ -132,6 +132,7 @@ object Init {
 
       //calendar campaigns
       case "pricepoint" => CampaignManager.startPricepointCampaign()
+      case "hottest_x" => CampaignManager.startHottestXCampaign()
       case "replenishment" => CampaignManager.startReplenishmentCampaign()
       case "brandInCity" => CampaignManager.startBrandInCityCampaign()
 

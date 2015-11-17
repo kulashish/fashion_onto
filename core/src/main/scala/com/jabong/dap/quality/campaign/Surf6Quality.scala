@@ -51,7 +51,7 @@ object Surf6Quality extends BaseCampaignQuality with Logging {
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.SKU_LIST),
-      Udf.countSku(dfDistinctSku(PageVisitVariables.SKU_LIST)) as "count_sku"
+      Udf.columnCount(dfDistinctSku(PageVisitVariables.SKU_LIST)) as "count_sku"
     )
     val joined = dfCountSku.join(surf6Campaign, dfCountSku(PageVisitVariables.BROWSER_ID) === surf6Campaign(CampaignMergedFields.DEVICE_ID))
       .select(CampaignMergedFields.DEVICE_ID,

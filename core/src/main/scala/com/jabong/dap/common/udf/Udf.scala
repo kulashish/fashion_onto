@@ -5,13 +5,13 @@ import java.sql.{ Date, Timestamp }
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by raghu on 3/7/15.
  */
 object Udf {
-
   /**
    * minTimestamp will return min of Timestamp t1 or t2
    */
@@ -82,7 +82,7 @@ object Udf {
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
+  val columnCount = udf((colList: List[String]) => UdfUtils.getCountColumn(colList: List[String]))
 
   /**
    * Removes all zeroes string and null string to emptyString.
@@ -143,6 +143,10 @@ object Udf {
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
   val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
+
+  val getLatestEmailOpenDate = udf((s: String, s1: String, s2: String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1: String, s2: String, s3: String))
+
+  val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
 
   val nonBeauty = udf((category: String, created_at: String) => UdfUtils.nonBeauty(category: String, created_at: String))
 

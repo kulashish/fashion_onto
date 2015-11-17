@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "salesOrderAddrFav",
+      "incrMode": "daily",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}

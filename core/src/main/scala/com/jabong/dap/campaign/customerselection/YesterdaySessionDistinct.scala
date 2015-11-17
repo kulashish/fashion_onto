@@ -42,7 +42,7 @@ class YesterdaySessionDistinct extends CustomerSelector with Logging {
       col(PageVisitVariables.BROWSER_ID),
       col(PageVisitVariables.DOMAIN),
       col(PageVisitVariables.SKU_LIST),
-      Udf.countSku(dfDistinctSku(PageVisitVariables.SKU_LIST)) as "count_sku"
+      Udf.columnCount(dfDistinctSku(PageVisitVariables.SKU_LIST)) as "count_sku"
     )
 
     val dfResult = dfCountSku.filter("count_sku >= " + 5)

@@ -12,7 +12,6 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.variables.CustomerSegments
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
-import com.jabong.dap.model.order.variables.{ SalesOrder, SalesOrderAddress }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -130,15 +129,15 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(dfCustomerSegmentsIncr)
     //FK_CUSTOMER, MVP_TYPE, SEGMENT, DISCOUNT_SCORE
 
-    val dfSalesOrderIncr = dfMap("salesOrderIncr")
-    val dfSalesOrderAddrFull = dfMap("salesOrderAddrFull")
-    val dfSalesOrderAddrFavPrevFull = dfMap.getOrElse("salesOrderAddrFavPrevFull", null)
+    //val dfSalesOrderIncr = dfMap("salesOrderIncr")
+    //val dfSalesOrderAddrFull = dfMap("salesOrderAddrFull")
+    //val dfSalesOrderAddrFavPrevFull = dfMap.getOrElse("salesOrderAddrFavPrevFull", null)
     //call SalesOrderAddress.processVariable
-    val (dfSalesOrderAddrFavCalc, dfSalesOrderAddrFavFull) = SalesOrderAddress.processVariable(dfSalesOrderIncr, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull)
+    //val (dfSalesOrderAddrFavCalc, dfSalesOrderAddrFavFull) = SalesOrderAddress.processVariable(dfSalesOrderIncr, dfSalesOrderAddrFull, dfSalesOrderAddrFavPrevFull)
     // FK_CUSTOMER, CITY, MOBILE, FIRST_NAME, LAST_NAME
 
     val writeMap = new HashMap[String, DataFrame]()
-    writeMap.put("salesOrderAddrFavFull", dfSalesOrderAddrFavFull)
+    //writeMap.put("salesOrderAddrFavFull", dfSalesOrderAddrFavFull)
 
     //    //call SalesOrder.processVariable for LAST_ORDER_DATE variable
     //    val dfSalesOrderCalcIncr = (SalesOrder.getlastOrderDate(dfSalesOrderIncr))
@@ -163,6 +162,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val dfCustomerIncr = dfMap("customerIncr")
     val dfContactListMobilePrevFull = dfMap.getOrElse("contactListMobilePrevFull", null)
     val dfNLSIncr = dfMap("nlsIncr")
+    val dfSalesOrderAddrFavCalc = dfMap("salesOrderAddrFavIncr")
     val dfDndFull = dfMap("dndFull")
     val dfSmsOptOutFull = dfMap("smsOptOutFull")
     val dfBlockedNumbersFull = dfMap("blockedNumbersFull")
@@ -265,8 +265,6 @@ object ContactListMobile extends DataFeedsModel with Logging {
    * @param dfCustSegCalcIncr
    * @param dfNLSIncr
    * @param dfSalesOrderAddrFavCalc
-   * @param dfSalesOrderCalcIncr
-   * @param dfSuccessfulOrders
    * @param dfZoneCity
    * @return
    */

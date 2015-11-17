@@ -451,11 +451,25 @@ object Schema {
     StructField("last_order_created_at", TimestampType, true)
   ))
 
+  val salesOrderAddrFavList = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField("city_list", MapType(StringType, IntegerType), true),
+    StructField("phone_list", MapType(StringType, IntegerType), true),
+    StructField("first_name_list", MapType(StringType, IntegerType), true),
+    StructField("last_name_list", MapType(StringType, IntegerType), true),
+    StructField("last_order_created_at", TimestampType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, true)
+  ))
+
   val salesItemStatus = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField("order_status_map", MapType(LongType, MapType(LongType, IntegerType)), true),
     StructField("last_order_updated_at", TimestampType, true)
   ))
+
   val ordersCount = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, true),
@@ -488,6 +502,18 @@ object Schema {
     StructField("COLOR_3", StringType, true),
     StructField("COLOR_4", StringType, true),
     StructField("COLOR_5", StringType, true)
+  ))
+
+  val favSalesOrderAddr = StructType(Array(
+    StructField("fk_customer", LongType, true),
+    StructField("CITY", StringType, true),
+    StructField("PHONE", StringType, true),
+    StructField("FIRST_NAME", StringType, true),
+    StructField("LAST_NAME", StringType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, true)
   ))
 
   val catCount = StructType(Array(
@@ -550,11 +576,80 @@ object Schema {
     StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
 
+  val salesRev = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_7, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_7, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_7, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_30, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_30, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_30, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_30, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_90, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_90, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_90, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_90, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)))
+
   //FIXME: move it into OrderBySchema
   val lastOrder = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
     StructField(SalesOrderVariables.CUSTOMER_EMAIL, StringType, false),
     StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
+  ))
+
+  val customerOrdersSchema = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(SalesOrderVariables.MAX_ORDER_BASKET_VALUE, DecimalType.apply(10, 2), false),
+    StructField(SalesOrderVariables.MAX_ORDER_ITEM_VALUE, DecimalType.apply(10, 2), false),
+    StructField(SalesOrderVariables.SUM_BASKET_VALUE, DecimalType.apply(10, 2), false),
+    StructField(SalesOrderVariables.COUNT_BASKET_VALUE, LongType, false),
+    StructField(SalesOrderVariables.ORDER_ITEM_COUNT, LongType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, false),
+    StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.COUPON_SUM, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.COUPON_COUNT, IntegerType, false),
+    StructField(SalesRuleSetVariables.MIN_DISCOUNT_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.MAX_DISCOUNT_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_SUM, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_COUNT, IntegerType, false),
+    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE, LongType, false),
+    StructField(SalesOrderVariables.CATEGORY_PENETRATION, StringType, false),
+    StructField(SalesOrderVariables.BRICK_PENETRATION, StringType, false),
+    StructField(SalesOrderItemVariables.FAV_BRAND, StringType, false)
   ))
 
   val surfAffinitySchema = StructType(Array(
@@ -563,5 +658,4 @@ object Schema {
     StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
     StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
     StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
-
 }

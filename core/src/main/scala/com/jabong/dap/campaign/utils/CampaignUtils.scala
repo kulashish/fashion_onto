@@ -3,23 +3,24 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
+import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{ GroupedUtils, Spark }
+import com.jabong.dap.common.{GroupedUtils, Spark}
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.{Udf, UdfUtils}
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
+import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql._
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
@@ -34,6 +35,7 @@ object CampaignUtils extends Logging {
   val SUCCESS_ = "success_"
 
   val sqlContext = Spark.getSqlContext()
+
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
     CampaignUtils.debug(skuData, "AcartDaily:-after ref sku generation")
 
@@ -190,7 +192,7 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
 
     val customerGroup = customerSkuMap.groupByKey().
-      map{ case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
+      map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
 
     val grouped = sqlContext.createDataFrame(customerGroup, Schema.finalReferenceSku)
 
@@ -399,7 +401,7 @@ object CampaignUtils extends Logging {
 
   /**
    * R2 - returns the skus which are not bought during last x days
-   *    - We need to give salesOrder and salesOrderItem data pre-filtered for last x days
+   * - We need to give salesOrder and salesOrderItem data pre-filtered for last x days
    * @param inputData - FK_CUSTOMER, EMAIL, SKU
    * @param salesOrder
    * @param salesOrderItem
@@ -431,7 +433,7 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.SKU),
         inputData(PageVisitVariables.BROWSER_ID),
         inputData(PageVisitVariables.DOMAIN)
-      //inputData(ProductVariables.SPECIAL_PRICE)
+        //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -541,7 +543,7 @@ object CampaignUtils extends Logging {
 
   //FIXME: make it generalized for all campaigns
   /**
-   *  * shortListSkuSimpleFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of simple_sku
+   * * shortListSkuSimpleFilter will calculate data from YesterdayItrData and dfCustomerProductShortlist on the basis of simple_sku
    * @param dfCustomerProductShortlist
    * @param dfYesterdayItrData
    * @return DataFrame
@@ -578,6 +580,7 @@ object CampaignUtils extends Logging {
     dfResult
 
   }
+
   /**
    * get customer email to customer id mapping for all clickStream users
    * @param dfCustomerPageVisit
@@ -747,7 +750,7 @@ object CampaignUtils extends Logging {
 
   def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
 
-    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.NUMBER_REF_SKUS)
+    val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
@@ -755,11 +758,19 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE))
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), CampaignCommon.CALENDAR_REC_SKUS)
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
+
+    val recs = campaignName match {
+      case CampaignCommon.HOTTEST_X  =>
+        campaignOutput.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+      case _ => campaignOutput
+
+    }
+
     //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
+    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
   /**

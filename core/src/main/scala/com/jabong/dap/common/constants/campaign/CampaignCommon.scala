@@ -11,7 +11,10 @@ object CampaignCommon {
   val REF_SKUS = "refSkus"
   val PUSH_REF_SKUS = 1
   val NUMBER_REF_SKUS = 2
+  val CALENDAR_REF_SKUS = 1
+  val CALENDAR_REC_SKUS = 16
 
+  val CALENDAR_MIN_RECS = 4
   val BASE_PATH = "/data/output/campaigns/"
 
   //Live campaigns
@@ -42,6 +45,7 @@ object CampaignCommon {
   val BRICK_AFFINITY = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
   val BEAUTY_CAMPAIGN = "beauty_campaign"
+  val HOTTEST_X = "hottest_x"
   val CLEARANCE_CAMPAIGN = "clearance"
   val LOVE_BRAND_CAMPAIGN = "love_brand"
 
@@ -112,7 +116,8 @@ object CampaignCommon {
     //FIXME: put correct mail type
     CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 600,
     CampaignCommon.CLEARANCE_CAMPAIGN -> 20,
-    CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13
+    CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13,
+    CampaignCommon.HOTTEST_X -> 11
   )
 
   val campaignRecommendationMap = collection.immutable.HashMap(

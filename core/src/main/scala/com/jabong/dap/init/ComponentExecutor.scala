@@ -14,6 +14,7 @@ import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
 import com.jabong.dap.model.customer.data.{ CustomerSurfAffinity, CustomerDeviceMapping, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.order.variables.SalesOrderAddress
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
@@ -95,13 +96,14 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
-
+          case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
           //CUSTOMER_SURF_AFFINITY from surf data
           case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
           // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
+          case DataSets.CUST_EMAIL_RESPONSE => CustEmailResponse.start(paramJob)
 
           //// clickstream use cases
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)
@@ -115,6 +117,8 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
 
           case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
+
+          case CampaignCommon.HOTTEST_X => CampaignManager.startHottestXCampaign()
 
           case _ => logger.error("Unknown source.")
 
