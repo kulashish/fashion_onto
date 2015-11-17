@@ -34,7 +34,7 @@ object CityData extends DataFeedsModel with Logging {
     if (null == paths) {
       mode = DataSets.DAILY_MODE
       logger.info("Running in Daily Mode")
-      val dfCityWisePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, prevDate)
+      val dfCityWisePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cityWisePrevFullData", dfCityWisePrevFull)
     }
     val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
