@@ -3,16 +3,17 @@ package com.jabong.dap.campaign.recommendation
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
-import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /**
  * Created by rahul aneja on 21/8/15.
@@ -24,7 +25,7 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param recommendations
    * @return
    */
-  override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE): DataFrame = {
+  override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE, numRecSkus: Int = 8): DataFrame = {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
     require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE, Recommendation.MVP_DISCOUNT_SUB_TYPE) contains recType, "recommendation type is invalid")
@@ -78,7 +79,7 @@ class LiveCommonRecommender extends Recommender with Logging {
 
     CampaignUtils.debug(recommendationSelected, "after recommendationSelected")
 
-    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value)) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value,  numRecSkus)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
@@ -166,7 +167,7 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row]): (mutable.MutableList[(String, String, String, String)], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -183,7 +184,7 @@ class LiveCommonRecommender extends Recommender with Logging {
     val liveBrickIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRICK)
     val liveProdNameIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_PROD_NAME)
     val numberRefSku = iterable.size
-    val skuPerIteration = if (numberRefSku == 1) 8 else 4
+    val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
     for (row <- iterable) {
       var i = 1;
       val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].

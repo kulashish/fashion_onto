@@ -132,6 +132,7 @@ object Init {
 
       //calendar campaigns
       case "pricepoint" => CampaignManager.startPricepointCampaign()
+      case "hottest_x" => CampaignManager.startHottestXCampaign()
 
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
