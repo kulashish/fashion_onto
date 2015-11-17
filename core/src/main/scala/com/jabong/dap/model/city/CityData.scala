@@ -3,10 +3,10 @@ package com.jabong.dap.model.city
 import com.jabong.dap.common.Utils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ProductVariables, SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
+import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import com.jabong.dap.model.order.variables.SalesOrder
@@ -19,12 +19,12 @@ import scala.collection.mutable.HashMap
 /**
  * Created by rahul on 16/11/15.
  */
-object CityData extends DataFeedsModel with Logging{
+object CityData extends DataFeedsModel with Logging {
 
   override def canProcess(incrDate: String, saveMode: String): Boolean = {
     val cityWiseDataPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
     val res = DataWriter.canWrite(saveMode, cityWiseDataPath)
-    logger.error(cityWiseDataPath+"already Exists")
+    logger.error(cityWiseDataPath + "already Exists")
     res
   }
 
@@ -50,7 +50,7 @@ object CityData extends DataFeedsModel with Logging{
     val dfCityWiseMapData = dfWrite("cityWiseMapOut")
     logger.info("writing city Wise Map Data")
     val writeOutPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfCityWiseMapData,writeOutPath,saveMode)
+    DataWriter.writeParquet(dfCityWiseMapData, writeOutPath, saveMode)
   }
 
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {
@@ -59,20 +59,20 @@ object CityData extends DataFeedsModel with Logging{
     val dfSalesOrderItemIncr = dfMap("salesOrderItemIncr")
     val dfSalesOrderAddressIncr = dfMap("salesOrderAddressIncr")
 
-    val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr,dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER)===
-      dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER),SQL.INNER).join(dfSalesOrderAddressIncr,dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER)
-      === dfSalesOrderAddressIncr(SalesAddressVariables.FK_SALES_ORDER),SQL.INNER)
+    val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) ===
+      dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER)
+      === dfSalesOrderAddressIncr(SalesAddressVariables.FK_SALES_ORDER), SQL.INNER)
     val pivotFields = Array(SalesAddressVariables.CITY)
-    val attributeFields = Array(ProductVariables.BRAND,ProductVariables.BRICK)
-    val valueFields = Array("count","sum_price")
-    val cityWiseMapData = Utils.generateTopMap(salesJoinedData,pivotFields,attributeFields,valueFields,OrderBySchema.cityMapSchema)
-    val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData",null)
-//    if(dfCityWisePrevFull != null){
-//      cityWiseMapData.
-//    }
-val writeMap = new HashMap[String, DataFrame]()
+    val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK)
+    val valueFields = Array("count", "sum_price")
+    val cityWiseMapData = Utils.generateTopMap(salesJoinedData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
+    val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData", null)
+    //    if(dfCityWisePrevFull != null){
+    //      cityWiseMapData.
+    //    }
+    val writeMap = new HashMap[String, DataFrame]()
 
-    writeMap.put("cityWiseMapOut",cityWiseMapData)
+    writeMap.put("cityWiseMapOut", cityWiseMapData)
     return writeMap
   }
 }

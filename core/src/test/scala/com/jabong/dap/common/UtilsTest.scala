@@ -3,7 +3,7 @@ package com.jabong.dap.common
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
 import org.scalatest.FlatSpec
 
@@ -46,8 +46,8 @@ class UtilsTest extends FlatSpec with SharedSparkContext {
   }
 
   "Given prev Brand Map and new Brand Map" should "create updated brand map" in {
-    val prevBrandMap = Map("adidas" -> Row(2,3190.0))
-    val newBrandMap = Map("adidas" -> Row(2,3190.0))
+    val prevBrandMap = Map("adidas" -> Row(2, 3190.0))
+    val newBrandMap = Map("adidas" -> Row(2, 3190.0))
 
   }
 
