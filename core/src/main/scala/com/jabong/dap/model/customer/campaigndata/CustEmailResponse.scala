@@ -39,17 +39,17 @@ object CustEmailResponse extends DataFeedsModel with Logging {
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     date = incrDate
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
-    val formattedDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    val fileDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-    val filename = "53699_CLICK_" + formattedDate + ".txt"
-    val dfClickData = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE,
+    val filename = "53699_CLICK_" + fileDate + ".txt"
+    val clickIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE,
       incrDate, filename, "true", ";")
-    dfMap.put("clickData", dfClickData)
+    dfMap.put("clickIncr", clickIncr)
 
-    val openFilename = "53699_OPEN_" + formattedDate + ".txt"
-    val dfOpenData = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE,
+    val openFilename = "53699_OPEN_" + fileDate + ".txt"
+    val openIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE,
       incrDate, openFilename, "true", ";")
-    dfMap.put("openData", dfOpenData)
+    dfMap.put("openIncr", openIncr)
 
     val before7daysString = TimeUtils.getDateAfterNDays(-7, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
     val before15daysString = TimeUtils.getDateAfterNDays(-15, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
@@ -57,31 +57,33 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val days7Df = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
       DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, before7daysString)
-    dfMap.put("days_7daily", days7Df)
+    dfMap.put("custEmailResDay7", days7Df)
 
     val days15Df = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
       DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, before15daysString)
-    dfMap.put("days_15daily", days15Df)
+    dfMap.put("custEmailResDay15", days15Df)
 
     val days30Df = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
       DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, before30daysString)
-    dfMap.put("days_30daily", days30Df)
+    dfMap.put("custEmailResDay30", days30Df)
 
-    val prevFullDf = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
-      DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, prevDate)
-    dfMap.put("prev_full", prevFullDf)
+    var prevFullDf: DataFrame = null
+    if (null != paths) {
+      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|")
+      prevFullDf = SchemaUtils.addColumns(inputCsv, CustEmailSchema.effective_Smry_Schema)
+    } else {
+      prevFullDf = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
+        DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, prevDate)
+    }
+    dfMap.put("custEmailResPrevFull", prevFullDf)
 
     val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
       incrDate).filter(col(CustomerVariables.EMAIL) isNotNull)
-    val dfCmrReduced = dfCmrFull.select(
-      ContactListMobileVars.UID,
-      CustomerVariables.EMAIL,
-      CustomerVariables.RESPONSYS_ID)
-    dfMap.put("cmr", dfCmrFull)
+    dfMap.put("cmrFull", dfCmrFull)
 
     val nlSubscribers = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION,
       DataSets.DAILY_MODE, incrDate)
-    dfMap.put("nlSub", nlSubscribers)
+    dfMap.put("nlsIncr", nlSubscribers)
 
     dfMap
 
@@ -113,10 +115,10 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {
 
-    val dfClickData = dfMap("clickData")
+    val dfClickData = dfMap("clickIncr")
     val aggClickData = reduce(dfClickData, EmailResponseVariables.LAST_CLICK_DATE, EmailResponseVariables.CLICKS_TODAY)
 
-    val dfOpenData = dfMap("clickData")
+    val dfOpenData = dfMap("openIncr")
     val aggOpenData = reduce(dfOpenData, EmailResponseVariables.LAST_OPEN_DATE, EmailResponseVariables.OPENS_TODAY)
 
     val outputCsvFormat = udf((s: String) => TimeUtils.changeDateFormat(s: String, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT))
@@ -130,16 +132,16 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         outputCsvFormat(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE)
       .withColumn(EmailResponseVariables.OPENS_TODAY, findOpen(col(EmailResponseVariables.OPENS_TODAY), col(EmailResponseVariables.CLICKS_TODAY)))
 
-    val prevFullDf = dfMap("prev_full")
-    val days7Df = dfMap("days_7daily")
-    val days15Df = dfMap("days_15daily")
-    val days30Df = dfMap("days_30daily")
+    val prevFullDf = dfMap("custEmailResPrevFull")
+    val days7Df = dfMap("custEmailResDay7")
+    val days15Df = dfMap("custEmailResDay15")
+    val days30Df = dfMap("custEmailResDay30")
 
     val effectiveDf = effectiveDFFull(incrDf, prevFullDf, days7Df, days15Df, days30Df)
 
-    val cmr = dfMap("cmr")
+    val cmr = dfMap("cmrFull")
 
-    val nlSub = dfMap("nlSub")
+    val nlSub = dfMap("nlsIncr")
 
 
     val result = merge(effectiveDf, cmr, nlSub).na.fill(Map(
@@ -171,9 +173,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       col(EmailResponseVariables.END_DATE))
 
     val dfResultMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
-    dfResultMap.put("incrDf", incrDf)
-    dfResultMap.put("fullDf", result)
-    dfResultMap.put("diffDf", result.except(prevFullDf))
+    dfResultMap.put("custEmailResIncr", incrDf)
+    dfResultMap.put("custEmailResFull", result)
+    dfResultMap.put("custEmailResCsv", result.except(prevFullDf))
 
     dfResultMap
   }
@@ -264,6 +266,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
   val findOpenDate = udf(openDate)
 
   def merge(resultSet: DataFrame, dfCmrFull: DataFrame, nlSubscribers: DataFrame) = {
+
     val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(CustomerVariables.RESPONSYS_ID) === resultSet(EmailResponseVariables.CUSTOMER_ID),
       SQL.LEFT_OUTER)
 
@@ -282,7 +285,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
       when(nlSubscribers(NewsletterVariables.STATUS) === "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT))
         .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
-      when(nlSubscribers(NewsletterVariables.UPDATED_AT) isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
+      when(nlSubscribers(NewsletterVariables.UPDATED_AT).isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
         .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)
 
     result

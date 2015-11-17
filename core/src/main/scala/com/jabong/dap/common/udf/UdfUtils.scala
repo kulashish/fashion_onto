@@ -700,7 +700,6 @@ object UdfUtils extends Logging {
   // If the open dates are are null or empty, we need to check the values in click date to set the final open date  value.
   def latestEmailOpenDate(openDate: String, yesOpenDate: String, clickDate: String, yesClickDate: String): String = {
     var maxDateString: String = "2001-01-01 00:00:00"
-    var i: Int = 0;
     var maxDate: Date = TimeUtils.getDate(maxDateString, TimeConstants.DATE_TIME_FORMAT)
     var date: Date = null
     if (null != openDate && openDate.length > 0) {
@@ -720,10 +719,4 @@ object UdfUtils extends Logging {
     }
     maxDateString
   }
-
-  def size(a: List[String]):Int= {
-    if(a ==null) return 0
-    a.size
-  }
-
 }

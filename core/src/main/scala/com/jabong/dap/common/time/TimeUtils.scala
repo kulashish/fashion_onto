@@ -327,7 +327,6 @@ object TimeUtils extends Logging {
     cal.getActualMaximum(Calendar.DAY_OF_MONTH)
   }
 
-
   /**
    * calculate total number of years from given date till today.
    * @param date
