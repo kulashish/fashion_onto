@@ -57,6 +57,29 @@ object CustTop5 extends DataFeedsModel {
     (DataWriter.canWrite(saveMode, fullMapPath) || DataWriter.canWrite(saveMode, incrPath) || DataWriter.canWrite(saveMode, fullPath))
   }
 
+  def readDF(incrDate: String, prevDate: String, path: String): HashMap[String, DataFrame] = {
+    val dfMap = new HashMap[String, DataFrame]()
+    var mode: String = DataSets.FULL_MERGE_MODE
+    if (null == path) {
+      mode = DataSets.DAILY_MODE
+      val custTop5MapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custTop5MapPrevFull", custTop5MapPrevFull)
+      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custTop5PrevFull", custTop5PrevFull)
+    }
+    var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    var salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
+    if (null == path) {
+      salesOrderIncr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      salesOrderItemIncr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    }
+    dfMap.put("salesOrderIncr", salesOrderIncr)
+    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
+    val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
+    dfMap.put("yestItr", yestItr)
+    dfMap
+  }
+
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val top5MapPrevFull = dfMap.getOrElse("custTop5MapPrevFull", null)
     val top5PrevFull = dfMap.getOrElse("custTop5PrevFull", null)
@@ -208,7 +231,6 @@ object CustTop5 extends DataFeedsModel {
           mergeMapCols(top5incr("brick_list"), top5PrevFull("brick_list")) as "brick_list",
           mergeMapCols(top5incr("color_list"), top5PrevFull("color_list")) as "color_list",
           coalesce(top5incr("last_order_created_at"), top5PrevFull("last_order_created_at")) as "last_order_created_at"
-
         )
       top5Joined
     }
@@ -296,28 +318,5 @@ object CustTop5 extends DataFeedsModel {
       }
     }
     map
-  }
-
-  def readDF(incrDate: String, prevDate: String, path: String): HashMap[String, DataFrame] = {
-    val dfMap = new HashMap[String, DataFrame]()
-    var mode: String = DataSets.FULL_MERGE_MODE
-    if (null == path) {
-      mode = DataSets.DAILY_MODE
-      val custTop5MapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
-      dfMap.put("custTop5MapPrevFull", custTop5MapPrevFull)
-      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
-      dfMap.put("custTop5PrevFull", custTop5PrevFull)
-    }
-    var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
-    var salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
-    if (null == path) {
-      salesOrderIncr = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      salesOrderItemIncr = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-    }
-    dfMap.put("salesOrderIncr", salesOrderIncr)
-    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
-    val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
-    dfMap.put("yestItr", yestItr)
-    dfMap
   }
 }

@@ -451,11 +451,21 @@ object Schema {
     StructField("last_order_created_at", TimestampType, true)
   ))
 
+  val salesOrderAddrFavList = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField("city_list", MapType(StringType, IntegerType), true),
+    StructField("phone_list", MapType(StringType, IntegerType), true),
+    StructField("first_name_list", MapType(StringType, IntegerType), true),
+    StructField("last_name_list", MapType(StringType, IntegerType), true),
+    StructField("last_order_created_at", TimestampType, true)
+  ))
+
   val salesItemStatus = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField("order_status_map", MapType(LongType, MapType(LongType, IntegerType)), true),
     StructField("last_order_updated_at", TimestampType, true)
   ))
+
   val ordersCount = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, true),
@@ -488,6 +498,14 @@ object Schema {
     StructField("COLOR_3", StringType, true),
     StructField("COLOR_4", StringType, true),
     StructField("COLOR_5", StringType, true)
+  ))
+
+  val favSalesOrderAddr = StructType(Array(
+    StructField("fk_customer", LongType, true),
+    StructField("CITY", StringType, true),
+    StructField("PHONE", StringType, true),
+    StructField("FIRST_NAME", StringType, true),
+    StructField("LAST_NAME", StringType, true)
   ))
 
   val catCount = StructType(Array(
