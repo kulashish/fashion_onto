@@ -142,7 +142,7 @@ object Udf {
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
-  val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String)
+  val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
 
   val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 
