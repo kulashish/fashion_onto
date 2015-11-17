@@ -1,0 +1,57 @@
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="dap-acart-hourly-wf">
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to='acartTimeCheck' />
+
+    <decision name="acartTimeCheck">
+        <switch>
+            <case to ="acartLocationCheck">
+                ${currentHour ne '2[0-3]' }
+            </case>
+            <default to="end"/>
+        </switch>
+    </decision>
+
+    <decision name="acartLocationCheck">
+        <switch>
+            <case to ="acartHourly">
+                ${fs:exists(acartInputDirectory)}
+            </case>
+            <default to="end"/>
+        </switch>
+    </decision>
+
+
+    <action name="acartHourly">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>acartHourly</argument>
+
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="end"/>
+        <error to="fail"/>
+    </action>
+
+    <kill name="fail">
+        <message>Workflow failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end" />
+
+</workflow-app>

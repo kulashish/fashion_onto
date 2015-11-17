@@ -531,7 +531,7 @@ object SalesOrderItem {
       joinedMap = prevMap.join(orderIncr, prevMap(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
           mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
-          coalesce(orderIncr("last_orders_updated_at"), prevMap("last_orders_updated_at")) as "last_orders_updated_at"
+          coalesce(orderIncr("last_order_updated_at"), prevMap("last_order_updated_at")) as "last_order_updated_at"
         )
     }
 

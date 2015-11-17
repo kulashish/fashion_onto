@@ -21,14 +21,14 @@ class AcartHourlyCampaign {
     //FIXME:Filter the order items data for last 1 day
     val selectedCustomers = acartCustomerSelector.customerSelection(acartData, salesOrderData, salesOrderItemData)
 
-    CampaignUtils.debug(selectedCustomers,"Acart Hourly:-after customer selection")
+    CampaignUtils.debug(selectedCustomers, "Acart Hourly:-after customer selection")
     //sku selection
     //filter sku based on daily filter
     val filteredSku = Daily.skuFilter(selectedCustomers, yesterdayItrData).cache()
 
-    CampaignUtils.debug(filteredSku,"Acart Hourly:-after filteredSku")
+    CampaignUtils.debug(filteredSku, "Acart Hourly:-after filteredSku")
 
-    val filterSkus = filteredSku.filter(ProductVariables.STOCK+">"+CampaignCommon.ACART_HOURLY_STOCK_VALUE)
+    val filterSkus = filteredSku.filter(ProductVariables.STOCK + ">" + CampaignCommon.ACART_HOURLY_STOCK_VALUE)
     // ***** mobile push use case
 
     // ***** email use case
