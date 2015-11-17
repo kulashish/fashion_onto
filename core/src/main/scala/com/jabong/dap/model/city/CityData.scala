@@ -37,11 +37,11 @@ object CityData extends DataFeedsModel with Logging {
       val dfCityWisePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cityWisePrevFullData", dfCityWisePrevFull)
     }
-    val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     dfMap.put("salesOrderIncr", dfSalesOrderIncr)
-    val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
+    val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
-    val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
+    val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
     dfMap.put("salesOrderAddressIncr", dfSalesOrderAddressIncr)
     dfMap
   }
