@@ -53,12 +53,12 @@ object SalesOrderAddress extends DataFeedsModel {
 
     val saleOrderAddrJoined = salesOrderIncr.join(salesOrderAddressFull, salesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddressFull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS))
       .select(
-        SalesOrderVariables.FK_CUSTOMER,
-        SalesAddressVariables.CITY,
-        SalesAddressVariables.PHONE,
-        SalesAddressVariables.FIRST_NAME,
-        SalesAddressVariables.LAST_NAME,
-        SalesOrderVariables.CREATED_AT
+        salesOrderIncr(SalesOrderVariables.FK_CUSTOMER),
+        salesOrderAddressFull(SalesAddressVariables.CITY),
+        salesOrderAddressFull(SalesAddressVariables.PHONE),
+        salesOrderAddressFull(SalesAddressVariables.FIRST_NAME),
+        salesOrderAddressFull(SalesAddressVariables.LAST_NAME),
+        salesOrderIncr(SalesOrderVariables.CREATED_AT)
       )
 
     val dfWrite = new HashMap[String, DataFrame]()
