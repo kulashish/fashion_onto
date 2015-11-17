@@ -1,7 +1,9 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, SalesAddressVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, ContactListMobileVars, SalesOrderVariables }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.model.order.schema.OrderVarSchema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -103,35 +105,33 @@ object SalesOrderAddress {
   LAST_SHIPPING_CITY_TIER
   */
 
-  def getFirstShippingCity(salesOrder: DataFrame, salesOrderAddress: DataFrame, prevCalc: DataFrame, cityZone: DataFrame): DataFrame = {
-    val joinedDf = salesOrder.join(salesOrderAddress, salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS))
-      .select(salesOrder(SalesOrderVariables.FK_CUSTOMER),
-        salesOrder(SalesOrderVariables.CREATED_AT),
-        salesOrderAddress(SalesAddressVariables.CITY))
-      .orderBy(desc(SalesOrderVariables.CREATED_AT)).groupBy(SalesOrderVariables.FK_CUSTOMER)
+  def getFirstShippingCity(salesOrder: DataFrame, salesOrderAddress: DataFrame, cityZone: DataFrame): DataFrame = {
+
+    println("salesOrder Count",  salesOrder.count())
+    println("salesOrderAddress", salesOrderAddress.count())
+    val joinedDf = salesOrder.join(salesOrderAddress, salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.LEFT_OUTER)
+      .groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(first(SalesAddressVariables.CITY) as SalesAddressVariables.LAST_SHIPPING_CITY,
         last(SalesAddressVariables.CITY) as SalesAddressVariables.FIRST_SHIPPING_CITY
       )
-    val cityBc = Spark.getContext().broadcast(cityZone).value
-    val joinedZoneLast = joinedDf.join(cityBc, joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY) === cityBc(ContactListMobileVars.CITY))
+    println("joinedDf", joinedDf.count())
+    val joinedZoneLast = joinedDf.join(cityZone, Udf.toLowercase(cityZone(ContactListMobileVars.CITY)) === Udf.toLowercase(joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY)) , SQL.LEFT_OUTER)
       .select(joinedDf(SalesOrderVariables.FK_CUSTOMER),
         joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY),
         joinedDf(SalesAddressVariables.FIRST_SHIPPING_CITY),
-        cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
+        cityZone(ContactListMobileVars.TIER1) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
       )
-    val res = joinedZoneLast.join(cityBc, cityBc(ContactListMobileVars.CITY) === joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY))
+    val res = joinedZoneLast.join(cityZone, Udf.toLowercase(cityZone(ContactListMobileVars.CITY)) === Udf.toLowercase(joinedZoneLast(SalesAddressVariables.FIRST_SHIPPING_CITY)), SQL.LEFT_OUTER)
       .select(joinedZoneLast(SalesOrderVariables.FK_CUSTOMER),
         joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY),
         joinedZoneLast(SalesAddressVariables.FIRST_SHIPPING_CITY),
         joinedZoneLast(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),
-        cityBc(ContactListMobileVars.CITY_TIER) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
+        cityZone(ContactListMobileVars.TIER1) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER
       )
-    res
-    /*join(prevCalc, res(SalesOrderVariables.FK_CUSTOMER) === prevCalc(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-        .select(
 
-        )
-    */
+    res.printSchema()
+    println("res Count", res.count())
+    res
 
   }
 
@@ -149,3 +149,4 @@ object SalesOrderAddress {
    */
 
 }
+
