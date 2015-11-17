@@ -457,7 +457,11 @@ object Schema {
     StructField("phone_list", MapType(StringType, IntegerType), true),
     StructField("first_name_list", MapType(StringType, IntegerType), true),
     StructField("last_name_list", MapType(StringType, IntegerType), true),
-    StructField("last_order_created_at", TimestampType, true)
+    StructField("last_order_created_at", TimestampType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, true)
   ))
 
   val salesItemStatus = StructType(Array(
@@ -505,7 +509,11 @@ object Schema {
     StructField("CITY", StringType, true),
     StructField("PHONE", StringType, true),
     StructField("FIRST_NAME", StringType, true),
-    StructField("LAST_NAME", StringType, true)
+    StructField("LAST_NAME", StringType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, true),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, true)
   ))
 
   val catCount = StructType(Array(
