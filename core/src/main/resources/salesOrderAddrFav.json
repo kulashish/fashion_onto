@@ -1,9 +1,9 @@
 {
   "params": [
     {
-      "source": "paybackData",
+      "source": "salesOrderAddrFav",
       "incrMode": "daily",
-      "saveMode": "Ignore",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
   ]
