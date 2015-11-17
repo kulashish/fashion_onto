@@ -1,7 +1,7 @@
 package com.jabong.dap.data.storage.schema
 
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ ProductVariables, PageVisitVariables, ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.constants.variables._
 import org.apache.spark.sql.types._
 
 /**
@@ -47,4 +47,10 @@ object OrderBySchema {
     StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
     StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
+
+  val cityMapSchema = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
+
 }

@@ -3,7 +3,7 @@ package com.jabong.dap.common
 import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.sql.types._
 import org.scalatest.FlatSpec
 
@@ -41,11 +41,14 @@ class UtilsTest extends FlatSpec with SharedSparkContext {
       StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
 
     val testData = Utils.generateTopMap(refSkuInputPush, groupFields, attributeFields, valueFields, testSchema)
-
-    println("outData" + testData.count)
-    testData.collect().foreach(println)
     val outputCount = testData.filter(CustomerVariables.FK_CUSTOMER + " = 8552648").select("brand_list")
     assert(outputCount.count == 1)
+  }
+
+  "Given prev Brand Map and new Brand Map" should "create updated brand map" in {
+    val prevBrandMap = Map("adidas" -> Row(2,3190.0))
+    val newBrandMap = Map("adidas" -> Row(2,3190.0))
+
   }
 
 }
