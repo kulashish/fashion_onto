@@ -11,7 +11,8 @@ import org.apache.spark.sql.DataFrame
  * Created by raghu on 29/10/15.
  */
 class BrickAffinityCampaign {
-  def runCampaign(last7thDaySalesOrderData: DataFrame, last7thDaySalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
+
+  def runCampaign(customerSurfAffinity: DataFrame, last7thDaySalesOrderData: DataFrame, last7thDaySalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST_ORDER)
