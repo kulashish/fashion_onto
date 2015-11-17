@@ -43,6 +43,9 @@ object CityData extends DataFeedsModel with Logging {
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
     val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
     dfMap.put("salesOrderAddressIncr", dfSalesOrderAddressIncr)
+    val dfItrSkuSimple = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE,incrDate)
+    dfMap.put("itrSkuSimple", dfItrSkuSimple)
+
     dfMap
   }
 
@@ -58,14 +61,27 @@ object CityData extends DataFeedsModel with Logging {
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfSalesOrderItemIncr = dfMap("salesOrderItemIncr")
     val dfSalesOrderAddressIncr = dfMap("salesOrderAddressIncr")
+    val dfItrSkuSimple = dfMap("itrSkuSimple")
+
 
     val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) ===
       dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
       === dfSalesOrderAddressIncr(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.INNER)
+      .select(dfSalesOrderAddressIncr(SalesAddressVariables.CITY),
+               dfSalesOrderItemIncr(SalesOrderItemVariables.SKU))
+
+    val salesWithItrData = salesJoinedData.join(dfItrSkuSimple,salesJoinedData(SalesOrderItemVariables.SKU)===dfItrSkuSimple(ProductVariables.SKU_SIMPLE),SQL.INNER)
+      .select(salesJoinedData(SalesAddressVariables.CITY),
+        dfItrSkuSimple(ProductVariables.BRAND),
+        dfItrSkuSimple(ProductVariables.BRICK),
+        dfItrSkuSimple(ProductVariables.GENDER),
+        dfItrSkuSimple(ProductVariables.MVP))
+
+
     val pivotFields = Array(SalesAddressVariables.CITY)
-    val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK)
+    val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK,ProductVariables.GENDER,ProductVariables.MVP)
     val valueFields = Array("count", "sum_price")
-    val cityWiseMapData = Utils.generateTopMap(salesJoinedData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
+    val cityWiseMapData = Utils.generateTopMap(salesWithItrData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
     val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData", null)
     //    if(dfCityWisePrevFull != null){
     //      cityWiseMapData.
