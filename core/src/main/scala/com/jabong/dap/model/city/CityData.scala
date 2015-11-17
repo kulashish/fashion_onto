@@ -95,7 +95,7 @@ object CityData extends DataFeedsModel with Logging {
         if(dfCityWisePrevFull != null){
           import org.apache.spark.sql
           val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData,dfCityWisePrevFull(SalesAddressVariables.CITY)===cityWiseMapData(SalesAddressVariables.CITY)
-            ,SQL.FULL_OUTER).rdd.map(row => (Utils.getNonNull(row(0),row(4)),
+            ,SQL.FULL_OUTER).rdd.map(row => (Utils.getNonNull(row(0),row(4)).asInstanceOf[String],
               Utils.mergeMaps(row(1).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(6).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
               Utils.mergeMaps(row(2).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(7).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
               Utils.mergeMaps(row(3).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(8).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
