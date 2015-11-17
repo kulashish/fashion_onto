@@ -254,7 +254,7 @@ input:- row  and fields: field array
    * @return
    */
   def mergeMaps(prevMap: scala.collection.mutable.Map[String, Row], newMap: scala.collection.mutable.Map[String, Row]): scala.collection.mutable.Map[String, Row] = {
-    require(prevMap != null && newMap != null, "prevMap and cannot be null")
+    require(prevMap != null && newMap != null, "prevMap and newMap cannot be null")
     if (prevMap == null) return newMap
     if (newMap == null) return prevMap
 
