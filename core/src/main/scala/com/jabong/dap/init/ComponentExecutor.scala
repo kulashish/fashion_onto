@@ -10,6 +10,7 @@ import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
+import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
@@ -112,6 +113,9 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
 
           case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
+
+          // miscellaneous data
+          case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
 
           case _ => logger.error("Unknown source.")
 
