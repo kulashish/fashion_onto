@@ -28,8 +28,11 @@ object ContactListMobileVars {
   val VERIFICATION_STATUS = "VERIFICATION_STATUS"
   val LAST_UPDATE_DATE = "LAST_UPDATE_DATE"
   val UNSUB_KEY = "UNSUB_KEY"
-  val CITY_TIER = "TIER1"
+  val CITY_TIER = "CITY_TIER"
+  val TIER1 = "TIER1"
+  val ZONE = "ZONE"
   val STATE_ZONE = "ZONE"
   val DISCOUNT_SCORE = "DISCOUNT_SCORE"
   val DND = "DND"
 }
+

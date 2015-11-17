@@ -1,10 +1,11 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.Utils
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -12,6 +13,7 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import com.jabong.dap.model.order.variables.{ SalesOrderAddress, SalesOrderItem }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
 
 import scala.collection.mutable.HashMap
 
@@ -72,6 +74,7 @@ object CustomerOrders extends DataFeedsModel {
     val salesRevenue30 = dfMap("salesRevenue30")
     val salesRevenue90 = dfMap("salesRevenue90")
     val custOrdersStatusMap = dfMap("orderStatusMap")
+    val custOrdersPrevFull = dfMap("custOrdersPrevFull")
 
     val salesOrderNew = salesOrderIncrFil.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
@@ -84,26 +87,44 @@ object CustomerOrders extends DataFeedsModel {
     dfWrite.put("salesRevenueFull", salesRevenueFull)
     dfWrite.put("salesRevenueOrdersIncr", salesRevenueOrdersIncr)
 
-    val salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.CREATED_AT, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
+    println("salesRevenueFull Count", salesRevenueFull.count())
+    salesRevenueFull.printSchema()
+
+    val salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
+    println("salesRevenueIncr Count", salesRevenueIncr.count())
+
+    salesRevenueIncr.printSchema()
+    salesRevenueIncr.show(5)
 
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncr, salesRuleFull, salesRuleSetFull)
 
     val (salesInvalidIncr, orderStatusmap) = SalesOrderItem.getInvalidCancelOrders(salesOrderItemIncr, salesOrderFull, custOrdersStatusMap, incrDateLocal)
     dfWrite.put("orderStatusmap", orderStatusmap)
+    println("orderStatusmap Count", orderStatusmap.count())
+    orderStatusmap.show(5)
 
     val salesCatBrick = custTop5Incr.select(
+      custTop5Incr(SalesOrderVariables.FK_CUSTOMER).cast(LongType) as SalesOrderVariables.FK_CUSTOMER,
       custTop5Incr("CAT_1") as SalesOrderVariables.CATEGORY_PENETRATION,
       custTop5Incr("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION,
       custTop5Incr("BRAND_1") as SalesOrderItemVariables.FAV_BRAND
     )
+    salesCatBrick.printSchema()
+    salesCatBrick.show(5)
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(saleOrderJoined)
 
     val salesAddressFirstIncr = SalesOrderAddress.getFirstShippingCity(salesOrderIncr, salesAddressFull, cityZone)
     //val salesRevIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    salesAddressFirstIncr.printSchema()
+    println("salesAddressFirstIncr Count", salesAddressFirstIncr.count())
+    salesAddressFirstIncr.show(5)
+
     val custOrdersCalc = merger(salesRevenueIncr, salesDiscountIncr, salesInvalidIncr, salesCatBrick, salesOrderValueIncr, salesAddressFirstIncr)
 
-    val custOrderFull = joinCustOrder(custOrdersCalc, custOrdersStatusMap)
+
+
+    val custOrderFull = joinCustOrder(custOrdersCalc, custOrdersPrevFull)
     dfWrite.put("custOrderFull", custOrderFull)
 
     dfWrite
@@ -185,8 +206,72 @@ object CustomerOrders extends DataFeedsModel {
           coalesce(incr(SalesOrderItemVariables.FAV_BRAND), prevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND
         )
     }
-    custOrdersFull
+    val rdd =  custOrdersFull.select(CustomerVariables.FK_CUSTOMER,
+    SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
+    SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
+    SalesOrderVariables.SUM_BASKET_VALUE,
+    SalesOrderVariables.COUNT_BASKET_VALUE,
+    SalesOrderVariables.ORDER_ITEM_COUNT,
+    SalesOrderVariables.LAST_ORDER_DATE,
+    SalesAddressVariables.LAST_SHIPPING_CITY,
+    SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
+    SalesAddressVariables.FIRST_SHIPPING_CITY,
+    SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
+    SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
+    SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
+    SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
+    SalesOrderItemVariables.SUCCESSFUL_ORDERS,
+    SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+    SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
+    SalesRuleSetVariables.COUPON_SUM,
+    SalesRuleSetVariables.COUPON_COUNT,
+    SalesRuleSetVariables.MIN_DISCOUNT_USED,
+    SalesRuleSetVariables.MAX_DISCOUNT_USED,
+    SalesRuleSetVariables.DISCOUNT_SUM,
+    SalesRuleSetVariables.DISCOUNT_COUNT,
+    SalesOrderItemVariables.REVENUE_7,
+    SalesOrderItemVariables.REVENUE_30,
+    SalesOrderItemVariables.REVENUE_LIFE,
+    SalesOrderItemVariables.ORDERS_COUNT_LIFE,
+    SalesOrderVariables.CATEGORY_PENETRATION,
+    SalesOrderVariables.BRICK_PENETRATION,
+    SalesOrderItemVariables.FAV_BRAND).rdd
+    val res = Spark.getSqlContext().createDataFrame(rdd, customerOrdersSchema)
+    return res
   }
+
+  val customerOrdersSchema = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(SalesOrderVariables.MAX_ORDER_BASKET_VALUE, DecimalType.apply(10,2), false),
+    StructField(SalesOrderVariables.MAX_ORDER_ITEM_VALUE, DecimalType.apply(10,2), false),
+    StructField(SalesOrderVariables.SUM_BASKET_VALUE, DecimalType.apply(10,2), false),
+    StructField(SalesOrderVariables.COUNT_BASKET_VALUE, LongType, false),
+    StructField(SalesOrderVariables.ORDER_ITEM_COUNT, LongType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, false),
+    StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED, DecimalType.apply(10,2), false),
+    StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED, DecimalType.apply(10,2), false),
+    StructField(SalesRuleSetVariables.COUPON_SUM, DecimalType.apply(10,2), false),
+    StructField(SalesRuleSetVariables.COUPON_COUNT, IntegerType, false),
+    StructField(SalesRuleSetVariables.MIN_DISCOUNT_USED, DecimalType.apply(10,2), false),
+    StructField(SalesRuleSetVariables.MAX_DISCOUNT_USED, DecimalType.apply(10,2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_SUM, DecimalType.apply(10,2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_COUNT, IntegerType, false),
+    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16,2), false),
+    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16,2), false),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16,2), false),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE, LongType, false),
+    StructField(SalesOrderVariables.CATEGORY_PENETRATION, StringType, false),
+    StructField(SalesOrderVariables.BRICK_PENETRATION, StringType, false),
+    StructField(SalesOrderItemVariables.FAV_BRAND, StringType, false)
+  ))
 
   def merger(salesRevenueVariables: DataFrame, salesDiscount: DataFrame, salesInvalid: DataFrame, salesCatBrick: DataFrame, salesOrderValue: DataFrame, salesAddressFirst: DataFrame): DataFrame = {
     if(null == salesRevenueVariables || null == salesDiscount || null == salesInvalid || null == salesCatBrick || null == salesOrderValue || null == salesAddressFirst ){
@@ -292,10 +377,12 @@ object CustomerOrders extends DataFeedsModel {
         salesValueJoined(SalesOrderVariables.LAST_ORDER_DATE),
         salesValueJoined(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
         salesValueJoined(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
-        salesValueJoined(SalesRuleSetVariables.AVG_COUPON_VALUE_USED),
         salesValueJoined(SalesRuleSetVariables.MIN_DISCOUNT_USED),
         salesValueJoined(SalesRuleSetVariables.MAX_DISCOUNT_USED),
-        salesValueJoined(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED),
+        catBrickJoined(SalesRuleSetVariables.COUPON_SUM),
+        catBrickJoined(SalesRuleSetVariables.COUPON_COUNT),
+        catBrickJoined(SalesRuleSetVariables.DISCOUNT_SUM),
+        catBrickJoined(SalesRuleSetVariables.DISCOUNT_COUNT),
         salesValueJoined(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
         salesValueJoined(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
         salesValueJoined(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
@@ -365,3 +452,4 @@ object CustomerOrders extends DataFeedsModel {
   }
 
 }
+

@@ -1,5 +1,7 @@
 package com.jabong.dap.model.order.variables
 
+import java.sql.Timestamp
+
 import com.jabong.dap.common.time.{TimeUtils, TimeConstants}
 import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
@@ -43,7 +45,6 @@ object SalesOrderItem {
     val app = getRevenueOrders(appOrders, "_app")
     val web = getRevenueOrders(webOrders, "_web")
     val mWeb = getRevenueOrders(mWebOrders, "_mweb")
-    println("mobile web count", mWeb.count())
     val salesVariablesIncr = joinDataFrames(app, web, mWeb)
 
     val mergedData = merge(salesVariablesIncr, prevFull)
@@ -506,13 +507,21 @@ object SalesOrderItem {
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
       salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
       salesOrderJoined(SalesOrderItemVariables.ID_SALES_ORDER_ITEM),
-      salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS),
+      salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS).cast(IntegerType) as SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS,
       salesOrderJoined(SalesOrderItemVariables.UPDATED_AT))
       .map(e =>
-        (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int]))).groupByKey()
-    val ordersMapIncr = incrMap.map(e => Row(e._1, makeMap4mGroupedData(e._2.toList)))
+        (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
+    val ordersMapIncr = incrMap.map(e => (e._1, makeMap4mGroupedData(e._2.toList)))
 
-    val orderIncr = Spark.getSqlContext().createDataFrame(ordersMapIncr, Schema.salesItemStatus)
+    println("ordersMapIncr Count", ordersMapIncr.count())
+
+    val ordersIncrFlat = ordersMapIncr.map(e => Row(e._1, e._2._1, e._2._2))
+
+
+    val orderIncr = Spark.getSqlContext().createDataFrame(ordersIncrFlat, Schema.salesItemStatus)
+
+    println("orderIncr Count", orderIncr.count())
+    orderIncr.printSchema()
 
     var joinedMap: DataFrame = null
 
@@ -526,15 +535,18 @@ object SalesOrderItem {
         )
     }
 
+    println("joinedMap Count",joinedMap.count())
+
     val incrData = Utils.getOneDayData(joinedMap, "last_orders_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
       countOrders(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
-      e(2).asInstanceOf[TimestampType]))
+      e(2).asInstanceOf[Timestamp]))
 
     val finalOrdersCount = orderStatusMap.map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._3))
 
     val res = Spark.getSqlContext().createDataFrame(finalOrdersCount, Schema.ordersCount)
+    println("res Count", res.count())
 
     return (res, joinedMap)
   }
@@ -552,19 +564,19 @@ object SalesOrderItem {
             item.put(ItemId, itemMap(ItemId))
         }
         full.put(orderId, item)
-    }
-    map1.keySet.foreach{
+      }
+      map1.keySet.foreach{
       orderId =>
         if (full.contains(orderId)) {
           val itemMapPrev = full(orderId)
           val itemMapNew = map1(orderId)
           itemMapNew.keySet.foreach{
             itemId =>
-if (itemMapPrev.contains(itemId)) {
-  itemMapPrev.update(itemId, itemMapNew(itemId))
-} else {
-  itemMapPrev.put(itemId, itemMapNew(itemId))
-}
+        if (itemMapPrev.contains(itemId)) {
+          itemMapPrev.update(itemId, itemMapNew(itemId))
+        } else {
+          itemMapPrev.put(itemId, itemMapNew(itemId))
+        }
           }
         } else {
           val itemMap = map1(orderId)
@@ -580,16 +592,22 @@ item.put(ItemId, itemMap(ItemId))
     full
   }
 
-  def makeMap4mGroupedData(list: List[(Long, Long, Int)]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] = {
+  def makeMap4mGroupedData(list: List[(Long, Long, Int, Timestamp)]): (scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]], Timestamp) = {
     val map = scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
 
+    var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
+    if(list.length >0){
+      maxDate = list(0)._4
+    }
     list.foreach{
       val innerMap = scala.collection.mutable.Map[Long, Int]()
       e =>
+        if(maxDate.after(list(0)._4))
+          maxDate = list(0)._4
         innerMap.put(e._2, e._3)
         map.put(e._1, innerMap)
     }
-    map
+    (map, maxDate)
   }
 
   def countOrders(map: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): (Int, Int, Int, Int, Int) = {
@@ -664,3 +682,4 @@ item.put(ItemId, itemMap(ItemId))
    */
 
 }
+
