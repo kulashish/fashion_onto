@@ -104,6 +104,9 @@ object SalesOrderAddress extends DataFeedsModel {
   }
 
   def getFav(map: scala.collection.immutable.Map[String, Int]): String = {
+    if (map.size == 0) {
+      return ""
+    }
     val a = ListBuffer[(String, Int)]()
     val keys = map.keySet
     keys.foreach{
