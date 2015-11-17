@@ -302,7 +302,7 @@ object SalesOrderAddress extends DataFeedsModel {
 
   def getFirstShippingCity(salesOrder: DataFrame, salesOrderAddress: DataFrame, cityZone: DataFrame): DataFrame = {
 
-    println("salesOrder Count",  salesOrder.count())
+    println("salesOrder Count", salesOrder.count())
     println("salesOrderAddress", salesOrderAddress.count())
     val joinedDf = salesOrder.join(salesOrderAddress, salesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.LEFT_OUTER)
       .groupBy(SalesOrderVariables.FK_CUSTOMER)
@@ -310,7 +310,7 @@ object SalesOrderAddress extends DataFeedsModel {
         last(SalesAddressVariables.CITY) as SalesAddressVariables.FIRST_SHIPPING_CITY
       )
     println("joinedDf", joinedDf.count())
-    val joinedZoneLast = joinedDf.join(cityZone, Udf.toLowercase(cityZone(ContactListMobileVars.CITY)) === Udf.toLowercase(joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY)) , SQL.LEFT_OUTER)
+    val joinedZoneLast = joinedDf.join(cityZone, Udf.toLowercase(cityZone(ContactListMobileVars.CITY)) === Udf.toLowercase(joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY)), SQL.LEFT_OUTER)
       .select(joinedDf(SalesOrderVariables.FK_CUSTOMER),
         joinedDf(SalesAddressVariables.LAST_SHIPPING_CITY),
         joinedDf(SalesAddressVariables.FIRST_SHIPPING_CITY),
