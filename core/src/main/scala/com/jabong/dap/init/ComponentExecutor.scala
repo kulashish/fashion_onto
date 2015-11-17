@@ -13,7 +13,7 @@ import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.customer.data.{ CustomerSurfAffinity, CustomerDeviceMapping, DNDMerger, SmsOptOut }
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
@@ -95,6 +95,9 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
+
+          //CUSTOMER_SURF_AFFINITY from surf data
+          case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
           // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)

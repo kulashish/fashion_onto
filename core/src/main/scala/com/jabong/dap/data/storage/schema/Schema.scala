@@ -557,4 +557,11 @@ object Schema {
     StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
   ))
 
+  val surfAffinitySchema = StructType(Array(
+    StructField(CustomerVariables.EMAIL, LongType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
+
 }
