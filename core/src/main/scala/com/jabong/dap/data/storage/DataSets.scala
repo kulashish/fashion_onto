@@ -154,6 +154,7 @@ object DataSets {
   val APP_EMAIL_FEED = "app_email_feed"
   val CUSTOMER_JC_DETAILS = "customerJCDetails"
   val PAYBACK_DATA = "paybackData"
+  val SALES_ORDER_ADDR_FAV = "salesOrderAddrFav"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
