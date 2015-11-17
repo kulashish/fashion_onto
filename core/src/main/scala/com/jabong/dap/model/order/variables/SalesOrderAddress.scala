@@ -43,6 +43,8 @@ object SalesOrderAddress extends DataFeedsModel {
 
     var salesOrderAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
     dfMap.put("salesOrderAddressFull", salesOrderAddressFull)
+    val cityZoneFull = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
+    dfMap.put("cityZoneFull", cityZoneFull)
     dfMap
   }
 
@@ -50,6 +52,7 @@ object SalesOrderAddress extends DataFeedsModel {
     val salesOrderAddrMapPrevFull = dfMap.getOrElse("salesOrderAddrMapPrevFull", null)
     var salesOrderIncr = dfMap("salesOrderIncr")
     var salesOrderAddressFull = dfMap("salesOrderAddressFull")
+    var cityZoneFull = dfMap("cityZoneFull")
 
     val saleOrderAddrJoined = salesOrderIncr.join(salesOrderAddressFull, salesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesOrderAddressFull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS))
       .select(
@@ -61,8 +64,19 @@ object SalesOrderAddress extends DataFeedsModel {
         salesOrderIncr(SalesOrderVariables.CREATED_AT)
       )
 
+    val saleOrderAddr = saleOrderAddrJoined.join(cityZoneFull, Udf.toLowercase(cityZoneFull(ContactListMobileVars.CITY)) === Udf.toLowercase(saleOrderAddrJoined(SalesAddressVariables.CITY)), SQL.LEFT_OUTER)
+      .select(
+        saleOrderAddrJoined(SalesOrderVariables.FK_CUSTOMER),
+        saleOrderAddrJoined(SalesAddressVariables.CITY),
+        saleOrderAddrJoined(SalesAddressVariables.PHONE),
+        saleOrderAddrJoined(SalesAddressVariables.FIRST_NAME),
+        saleOrderAddrJoined(SalesAddressVariables.LAST_NAME),
+        saleOrderAddrJoined(SalesOrderVariables.CREATED_AT),
+        cityZoneFull(ContactListMobileVars.TIER1)
+      )
+
     val dfWrite = new HashMap[String, DataFrame]()
-    val salesOrderAddrMapFull = getFavMap(salesOrderAddrMapPrevFull, saleOrderAddrJoined)
+    val salesOrderAddrMapFull = getFavMap(salesOrderAddrMapPrevFull, saleOrderAddr)
     dfWrite.put("salesOrderAddrMapFull", salesOrderAddrMapFull)
     dfWrite.put("salesOrderAddrMapPrevFull", salesOrderAddrMapPrevFull)
     dfWrite
@@ -91,14 +105,22 @@ object SalesOrderAddress extends DataFeedsModel {
       (e(0).asInstanceOf[Long] -> (getFav(e(1).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
         getFav(e(2).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
         getFav(e(3).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(4).asInstanceOf[scala.collection.immutable.Map[String, Int]])
+        getFav(e(4).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+        e(5).toString,
+        e(6).toString,
+        e(7).toString,
+        e(8).toString
       )
       )
     )
     val favAddr = favMap.map(e => Row(e._1, e._2._1, //city
       e._2._2, //phone
       e._2._3, //first_name
-      e._2._4 //last_name
+      e._2._4, //last_name
+      e._2._5, //first_order_city
+      e._2._6, //last_order_city
+      e._2._7, // first_shipping_tier
+      e._2._8 //last_shipping_tier
     ))
     Spark.getSqlContext().createDataFrame(favAddr, Schema.favSalesOrderAddr)
   }
@@ -124,11 +146,12 @@ object SalesOrderAddress extends DataFeedsModel {
       .na.fill(scala.collection.immutable.Map(SalesAddressVariables.CITY -> "",
         SalesAddressVariables.PHONE -> "",
         SalesAddressVariables.FIRST_NAME -> "",
-        SalesAddressVariables.LAST_NAME -> ""
-      )).filter(saleOrderAddrJoined(SalesOrderVariables.CREATED_AT).isNotNull)
+        SalesAddressVariables.LAST_NAME -> "",
+        ContactListMobileVars.TIER1 -> ""
+    )).filter(saleOrderAddrJoined(SalesOrderVariables.CREATED_AT).isNotNull)
 
-    val favMap = salesOrderAddrJoinedMap.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, Timestamp.valueOf(e(5).toString)))).groupByKey()
-    val fav = favMap.map(e => (e._1, getFavCount(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
+    val favMap = salesOrderAddrJoinedMap.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, Timestamp.valueOf(e(5).toString), e(6).toString, e(7).toString))).groupByKey()
+    val fav = favMap.map(e => (e._1, getFavCount(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._2._6, e._2._7, e._2._8 , e._2._9))
 
     val favIncr = Spark.getSqlContext().createDataFrame(fav, Schema.salesOrderAddrFavList)
     if (null == salesOrderAddrMapPrevFull) {
@@ -140,7 +163,9 @@ object SalesOrderAddress extends DataFeedsModel {
           mergeMapCols(favIncr("phone_list"), salesOrderAddrMapPrevFull("phone_list")) as "phone_list",
           mergeMapCols(favIncr("first_name_list"), salesOrderAddrMapPrevFull("first_name_list")) as "first_name_list",
           mergeMapCols(favIncr("last_name_list"), salesOrderAddrMapPrevFull("last_name_list")) as "last_name_list",
-          coalesce(favIncr("last_order_created_at"), salesOrderAddrMapPrevFull("last_order_created_at")) as "last_order_created_at"
+          coalesce(favIncr("last_order_created_at"), salesOrderAddrMapPrevFull("last_order_created_at")) as "last_order_created_at",
+          coalesce(favIncr("last_order_city"), salesOrderAddrMapPrevFull("last_order_city")) as "last_order_city",
+          coalesce(salesOrderAddrMapPrevFull("first_order_city"),  favIncr("first_order_city")) as "first_order_city"
         )
       favJoined
     }
@@ -176,23 +201,40 @@ object SalesOrderAddress extends DataFeedsModel {
     finalMap
   }
 
-  def getFavCount(list: List[(String, String, String, String, Timestamp)]): (Map[String, Int], Map[String, Int], Map[String, Int], Map[String, Int], Timestamp) = {
+  def getFavCount(list: List[(String, String, String, String, Timestamp, String, String)]): (Map[String, Int], Map[String, Int], Map[String, Int], Map[String, Int], Timestamp, String, String, String, String) = {
     val cityMap = Map[String, Int]()
     val phoneMap = Map[String, Int]()
     val firstNameMap = Map[String, Int]()
     val lastNameMap = Map[String, Int]()
+    var lastCity = ""
+    var firstCity = ""
+    var firstTier = ""
+    var lastTier = ""
     var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
+    var minDate: Timestamp = TimeUtils.MIN_TIMESTAMP
+    if(list.length >0){
+      minDate = list(0)._5
+      firstCity = list(0)._1
+      firstTier = list(0)._6
+    }
     list.foreach{ e =>
-      val (city, phone, firstName, lastName, date) = e
+      val (city, phone, firstName, lastName, date, tier) = e
       if (maxDate.before(date)) {
         maxDate = date
+        lastCity = city
+        lastTier = tier
+      }
+      if(minDate.after(date)){
+        minDate = date
+        firstCity = city
+        firstTier = tier
       }
       updateMap(cityMap, city)
       updateMap(phoneMap, phone)
       updateMap(firstNameMap, firstName)
       updateMap(lastNameMap, lastName)
     }
-    (cityMap, phoneMap, firstNameMap, lastNameMap, maxDate)
+    (cityMap, phoneMap, firstNameMap, lastNameMap, maxDate, firstCity, lastCity, firstTier, lastTier)
   }
 
   def updateMap(map: Map[String, Int], key: String): Map[String, Int] = {
