@@ -11,6 +11,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
+import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -70,7 +71,7 @@ object CustomerSurfAffinity extends DataFeedsModel {
 
   def getSurfAffinity(dfSurfData: DataFrame, yestItr: DataFrame): DataFrame = {
 
-    val filteredSurfData = dfSurfData.filter(!(col(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))).select(PageVisitVariables.USER_ID, PageVisitVariables.SKU_LIST)
+    val filteredSurfData = dfSurfData.filter(!(col(PageVisitVariables.USER_ID).isNull || (col(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER)))).select(PageVisitVariables.USER_ID, PageVisitVariables.SKU_LIST)
 
     val dfRepeatedSku = filteredSurfData.select(
       col(PageVisitVariables.USER_ID),
@@ -85,8 +86,16 @@ object CustomerSurfAffinity extends DataFeedsModel {
         yestItr(ProductVariables.BRICK),
         yestItr(ProductVariables.GENDER),
         yestItr(ProductVariables.MVP),
-        yestItr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE
-      ).na.fill("")
+        yestItr(ProductVariables.SPECIAL_PRICE)
+      ).
+        na.fill(Map(
+          ProductVariables.SKU_SIMPLE -> "",
+          ProductVariables.BRAND -> "",
+          ProductVariables.BRICK -> "",
+          ProductVariables.GENDER -> "",
+          ProductVariables.MVP -> "",
+          ITR.SPECIAL_PRICE -> 0.00
+        ))
 
     val groupFields = Array(CustomerVariables.EMAIL)
     val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.MVP)
