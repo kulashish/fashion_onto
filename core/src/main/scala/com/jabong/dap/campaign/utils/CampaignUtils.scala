@@ -763,7 +763,7 @@ object CampaignUtils extends Logging {
 
     val recs = campaignName match {
       case CampaignCommon.HOTTEST_X  =>
-        campaignOutput.filter(Udf.columnCount(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+        campaignOutput.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ => campaignOutput
 
     }
