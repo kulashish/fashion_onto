@@ -187,7 +187,7 @@ input:- row  and fields: field array
 
     val keyRdd = inputDataFrame.rdd.keyBy(row => Utils.createKey(row, pivotFields))
     val outRDD = keyRdd.groupByKey().map({ case (key, value) => (key, genMap(value, attributeField, valueFields)) })
-      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.map(_._2).toSeq.sortBy(_.keys))) }
+      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.toSeq.sortBy(_._1).map(_._2))) }
 
     val outDataFrame = sqlContext.createDataFrame(outRDD, outputSchema)
 
@@ -239,6 +239,7 @@ input:- row  and fields: field array
         }
         dimensionSMap.put(dimension, dimensionMap)
       }
+
 
     }
 
