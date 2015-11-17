@@ -164,8 +164,10 @@ object SalesOrderAddress extends DataFeedsModel {
           mergeMapCols(favIncr("first_name_list"), salesOrderAddrMapPrevFull("first_name_list")) as "first_name_list",
           mergeMapCols(favIncr("last_name_list"), salesOrderAddrMapPrevFull("last_name_list")) as "last_name_list",
           coalesce(favIncr("last_order_created_at"), salesOrderAddrMapPrevFull("last_order_created_at")) as "last_order_created_at",
-          coalesce(favIncr("last_order_city"), salesOrderAddrMapPrevFull("last_order_city")) as "last_order_city",
-          coalesce(salesOrderAddrMapPrevFull("first_order_city"),  favIncr("first_order_city")) as "first_order_city"
+          coalesce(favIncr(SalesAddressVariables.FIRST_SHIPPING_CITY), salesOrderAddrMapPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
+          coalesce(salesOrderAddrMapPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY),  favIncr(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
+          coalesce(favIncr(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), salesOrderAddrMapPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
+          coalesce(salesOrderAddrMapPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),  favIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
         )
       favJoined
     }
