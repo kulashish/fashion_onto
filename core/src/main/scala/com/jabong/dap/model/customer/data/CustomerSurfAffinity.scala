@@ -79,9 +79,8 @@ object CustomerSurfAffinity extends DataFeedsModel {
     )
 
     //FIXME: remove .na.fill("") once it will fix on Utils
-    val joinedItr = dfRepeatedSku.join(yestItr, dfRepeatedSku(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE), SQL.INNER)
+    val joinedItr = dfRepeatedSku.join(yestItr, dfRepeatedSku(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU), SQL.INNER)
       .select(dfRepeatedSku(PageVisitVariables.USER_ID) as CustomerVariables.EMAIL,
-        yestItr(ProductVariables.SKU_SIMPLE),
         yestItr(ProductVariables.BRAND),
         yestItr(ProductVariables.BRICK),
         yestItr(ProductVariables.GENDER),
@@ -89,7 +88,6 @@ object CustomerSurfAffinity extends DataFeedsModel {
         yestItr(ProductVariables.SPECIAL_PRICE)
       ).
         na.fill(Map(
-          ProductVariables.SKU_SIMPLE -> "",
           ProductVariables.BRAND -> "",
           ProductVariables.BRICK -> "",
           ProductVariables.GENDER -> "",
