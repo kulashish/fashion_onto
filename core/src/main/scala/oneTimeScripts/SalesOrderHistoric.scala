@@ -17,7 +17,7 @@ import org.apache.spark.sql.functions._
 object SalesOrderHistoric {
 
   def processHistoricData() = {
-    val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/user/mubarak/output"
+    val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
     val INPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/input"
 
     for (i <- 11 to 1 by -1) {
