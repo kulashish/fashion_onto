@@ -148,10 +148,10 @@ object SalesOrderAddress extends DataFeedsModel {
         SalesAddressVariables.FIRST_NAME -> "",
         SalesAddressVariables.LAST_NAME -> "",
         ContactListMobileVars.TIER1 -> ""
-    )).filter(saleOrderAddrJoined(SalesOrderVariables.CREATED_AT).isNotNull)
+      )).filter(saleOrderAddrJoined(SalesOrderVariables.CREATED_AT).isNotNull)
 
     val favMap = salesOrderAddrJoinedMap.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, Timestamp.valueOf(e(5).toString), e(6).toString))).groupByKey()
-    val fav = favMap.map(e => (e._1, getFavCount(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._2._6, e._2._7, e._2._8 , e._2._9))
+    val fav = favMap.map(e => (e._1, getFavCount(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._2._6, e._2._7, e._2._8, e._2._9))
 
     val favIncr = Spark.getSqlContext().createDataFrame(fav, Schema.salesOrderAddrFavList)
     if (null == salesOrderAddrMapPrevFull) {
@@ -165,9 +165,9 @@ object SalesOrderAddress extends DataFeedsModel {
           mergeMapCols(favIncr("last_name_list"), salesOrderAddrMapPrevFull("last_name_list")) as "last_name_list",
           coalesce(favIncr("last_order_created_at"), salesOrderAddrMapPrevFull("last_order_created_at")) as "last_order_created_at",
           coalesce(favIncr(SalesAddressVariables.FIRST_SHIPPING_CITY), salesOrderAddrMapPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
-          coalesce(salesOrderAddrMapPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY),  favIncr(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
+          coalesce(salesOrderAddrMapPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY), favIncr(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
           coalesce(favIncr(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), salesOrderAddrMapPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
-          coalesce(salesOrderAddrMapPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),  favIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
+          coalesce(salesOrderAddrMapPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), favIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER
         )
       favJoined
     }
@@ -214,7 +214,7 @@ object SalesOrderAddress extends DataFeedsModel {
     var lastTier = ""
     var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
     var minDate: Timestamp = TimeUtils.MIN_TIMESTAMP
-    if(list.length >0){
+    if (list.length > 0) {
       minDate = list(0)._5
       firstCity = list(0)._1
       firstTier = list(0)._6
@@ -226,7 +226,7 @@ object SalesOrderAddress extends DataFeedsModel {
         lastCity = city
         lastTier = tier
       }
-      if(minDate.after(date)){
+      if (minDate.after(date)) {
         minDate = date
         firstCity = city
         firstTier = tier
