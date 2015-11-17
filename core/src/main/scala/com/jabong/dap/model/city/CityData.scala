@@ -1,5 +1,6 @@
 package com.jabong.dap.model.city
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.Utils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -43,7 +44,7 @@ object CityData extends DataFeedsModel with Logging {
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
     val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
     dfMap.put("salesOrderAddressIncr", dfSalesOrderAddressIncr)
-    val dfItrSkuSimple = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE,incrDate)
+    val dfItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
     dfMap.put("itrSkuSimple", dfItrSkuSimple)
 
     dfMap
