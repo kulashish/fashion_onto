@@ -38,7 +38,7 @@ object CityData extends DataFeedsModel with Logging {
       val dfCityWisePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cityWisePrevFullData", dfCityWisePrevFull)
     }
-    val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH , DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     dfMap.put("salesOrderIncr", dfSalesOrderIncr)
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
@@ -64,14 +64,13 @@ object CityData extends DataFeedsModel with Logging {
     val dfSalesOrderAddressIncr = dfMap("salesOrderAddressIncr")
     val dfItrSkuSimple = dfMap("itrSkuSimple")
 
-
     val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) ===
       dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
       === dfSalesOrderAddressIncr(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.INNER)
       .select(dfSalesOrderAddressIncr(SalesAddressVariables.CITY),
-               dfSalesOrderItemIncr(SalesOrderItemVariables.SKU))
+        dfSalesOrderItemIncr(SalesOrderItemVariables.SKU))
 
-    val salesWithItrData = salesJoinedData.join(dfItrSkuSimple,salesJoinedData(SalesOrderItemVariables.SKU)===dfItrSkuSimple(ProductVariables.SKU_SIMPLE),SQL.INNER)
+    val salesWithItrData = salesJoinedData.join(dfItrSkuSimple, salesJoinedData(SalesOrderItemVariables.SKU) === dfItrSkuSimple(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(salesJoinedData(SalesAddressVariables.CITY),
         dfItrSkuSimple(ProductVariables.BRAND),
         dfItrSkuSimple(ProductVariables.BRICK),
@@ -79,9 +78,8 @@ object CityData extends DataFeedsModel with Logging {
         dfItrSkuSimple(ProductVariables.MVP),
         dfItrSkuSimple(ProductVariables.SPECIAL_PRICE))
 
-
     val pivotFields = Array(SalesAddressVariables.CITY)
-    val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK,ProductVariables.GENDER,ProductVariables.MVP)
+    val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.MVP)
     val valueFields = Array("count", "sum_price")
     val cityWiseMapData = Utils.generateTopMap(salesWithItrData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
     val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData", null)
