@@ -764,13 +764,7 @@ object CampaignUtils extends Logging {
 
     val recs = campaignName match {
       case CampaignCommon.HOTTEST_X  =>
-        val sqlContext = Spark.getSqlContext()
-        import sqlContext.implicits._
-
-        val intCnt =  campaignOutput.map(t => (t.getString(0), t.getAs[List[Int]](CampaignMergedFields.REC_SKUS).size)).toDF()
-        val filteredDf = intCnt.filter(intCnt("_1").>=(CampaignCommon.CALENDAR_MIN_RECS))
-
-      campaignOutput.filter(campaignOutput("EMAIL").in(filteredDf("_1")))
+        campaignOutput.filter(Udf.columnCount(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ => campaignOutput
 
     }

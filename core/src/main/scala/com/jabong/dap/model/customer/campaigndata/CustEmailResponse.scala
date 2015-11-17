@@ -27,6 +27,8 @@ import scala.collection.mutable
  */
 object CustEmailResponse extends DataFeedsModel with Logging {
 
+  var date = ""
+
   override def canProcess(incrDate: String, saveMode: String): Boolean = {
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
     val fullSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL, incrDate)
@@ -35,6 +37,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
   }
 
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
+    date = incrDate
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
     val formattedDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
@@ -138,6 +141,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val nlSub = dfMap("nlSub")
 
+
     val result = merge(effectiveDf, cmr, nlSub).na.fill(Map(
       EmailResponseVariables.OPEN_7DAYS -> 0,
       EmailResponseVariables.OPEN_15DAYS -> 0,
@@ -148,19 +152,23 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       EmailResponseVariables.CLICK_30DAYS -> 0,
       EmailResponseVariables.CLICKS_LIFETIME -> 0))
 
+    val udfOpenSegFn = udf((s: String, s1: String, s2:String) => open_segment(s: String, s1: String, s2:String, date))
+
     val diffDf = result.except(prevFullDf).select(
-      ContactListMobileVars.UID,
-      EmailResponseVariables.OPEN_7DAYS,
-      EmailResponseVariables.OPEN_15DAYS,
-      EmailResponseVariables.OPEN_30DAYS,
-      EmailResponseVariables.CLICK_7DAYS,
-      EmailResponseVariables.CLICK_15DAYS,
-      EmailResponseVariables.CLICK_30DAYS,
-      EmailResponseVariables.LAST_OPEN_DATE,
-      EmailResponseVariables.LAST_CLICK_DATE,
-      EmailResponseVariables.OPENS_LIFETIME,
-      EmailResponseVariables.CLICKS_LIFETIME,
-      EmailResponseVariables.END_DATE)
+      col(ContactListMobileVars.UID),
+      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT),
+        col(EmailResponseVariables.END_DATE)),
+      col(EmailResponseVariables.OPEN_7DAYS),
+      col(EmailResponseVariables.OPEN_15DAYS),
+      col(EmailResponseVariables.OPEN_30DAYS),
+      col(EmailResponseVariables.CLICK_7DAYS),
+      col(EmailResponseVariables.CLICK_15DAYS),
+      col(EmailResponseVariables.CLICK_30DAYS),
+      col(EmailResponseVariables.LAST_OPEN_DATE),
+      col(EmailResponseVariables.LAST_CLICK_DATE),
+      col(EmailResponseVariables.OPENS_LIFETIME),
+      col(EmailResponseVariables.CLICKS_LIFETIME),
+      col(EmailResponseVariables.END_DATE))
 
     val dfResultMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
     dfResultMap.put("incrDf", incrDf)
@@ -170,9 +178,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfResultMap
   }
 
-  def open_segment(value: String, updateValue: Timestamp, incrDateStr: String): String = {
+  def open_segment(value: String, updateValue: String, endDate: String, incrDateStr: String): String = {
 
-    if (null == value && updateValue == null)
+    if (null != endDate || (null == value && updateValue == null))
       "NO"
     else if (value == null) {
       val lastUpdtDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
@@ -198,7 +206,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     } else {
 
       val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
-      val time4mToday = TimeUtils.daysBetweenTwoDates(updateValue, incrDate)
+      val updDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
+
+      val time4mToday = TimeUtils.daysBetweenTwoDates(updDate, incrDate)
 
       val segment = {
 
@@ -270,8 +280,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         cmrResDf(EmailResponseVariables.LAST_CLICK_DATE),
         cmrResDf(EmailResponseVariables.OPENS_LIFETIME),
         cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
-//         when(nlSubscribers(NewsletterVariables.STATUS) ===  "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT))
-//        .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
+         when(nlSubscribers(NewsletterVariables.STATUS) ===  "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT))
+        .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
     when(nlSubscribers(NewsletterVariables.UPDATED_AT) isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
           .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)
 
@@ -381,7 +391,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       col(EmailResponseVariables.OPEN_30DAYS) + col(MergeUtils.NEW_ + EmailResponseVariables.OPEN_30DAYS) as EmailResponseVariables.OPEN_30DAYS,
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) + col(EmailResponseVariables.CLICKS_LIFETIME).cast(IntegerType) as EmailResponseVariables.CLICKS_LIFETIME,
       col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_LIFETIME) + col(EmailResponseVariables.OPENS_LIFETIME) as EmailResponseVariables.OPENS_LIFETIME,
-      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.UPDATED_AT)
+      col(NewsletterVariables.UPDATED_AT) as NewsletterVariables.UPDATED_AT,
+      col(EmailResponseVariables.END_DATE) as EmailResponseVariables.END_DATE)
     incrDatefullSummary
   }
 
