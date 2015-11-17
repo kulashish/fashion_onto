@@ -20,7 +20,7 @@ object SalesOrderHistoric {
     val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
     val INPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/input"
 
-    for (i <- 11 to 1 by -1) {
+    for (i <- 91 to 1 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       val prevFull = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
