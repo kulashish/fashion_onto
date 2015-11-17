@@ -73,8 +73,6 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val effective15 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective15_email", CustEmailSchema.reqCsvDf)
     val effective30 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective30_email", CustEmailSchema.reqCsvDf)
     val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
-    effectiveDFFull.drop(EmailResponseVariables.END_DATE)
-    effectiveDFFull.drop(NewsletterVariables.UPDATED_AT)
     val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_result_all", CustEmailSchema.effective_Smry_Schema)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
