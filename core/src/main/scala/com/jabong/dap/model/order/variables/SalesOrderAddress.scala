@@ -125,7 +125,7 @@ object SalesOrderAddress extends DataFeedsModel {
       )).filter(saleOrderAddrJoined(SalesOrderVariables.CREATED_AT).isNotNull)
 
     val favMap = salesOrderAddrJoinedMap.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, Timestamp.valueOf(e(5).toString)))).groupByKey()
-    val fav = favMap.map(e => (e._1, getFavCount(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4))
+    val fav = favMap.map(e => (e._1, getFavCount(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
 
     val favIncr = Spark.getSqlContext().createDataFrame(fav, Schema.salesOrderAddrFavList)
     if (null == salesOrderAddrMapPrevFull) {
