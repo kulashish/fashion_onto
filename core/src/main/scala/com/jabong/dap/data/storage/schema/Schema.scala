@@ -619,4 +619,37 @@ object Schema {
     StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
   ))
 
+  val customerOrdersSchema = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, false),
+    StructField(SalesOrderVariables.MAX_ORDER_BASKET_VALUE, DecimalType.apply(10, 2), false),
+    StructField(SalesOrderVariables.MAX_ORDER_ITEM_VALUE, DecimalType.apply(10, 2), false),
+    StructField(SalesOrderVariables.SUM_BASKET_VALUE, DecimalType.apply(10, 2), false),
+    StructField(SalesOrderVariables.COUNT_BASKET_VALUE, LongType, false),
+    StructField(SalesOrderVariables.ORDER_ITEM_COUNT, LongType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, false),
+    StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, false),
+    StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.COUPON_SUM, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.COUPON_COUNT, IntegerType, false),
+    StructField(SalesRuleSetVariables.MIN_DISCOUNT_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.MAX_DISCOUNT_USED, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_SUM, DecimalType.apply(10, 2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_COUNT, IntegerType, false),
+    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE, LongType, false),
+    StructField(SalesOrderVariables.CATEGORY_PENETRATION, StringType, false),
+    StructField(SalesOrderVariables.BRICK_PENETRATION, StringType, false),
+    StructField(SalesOrderItemVariables.FAV_BRAND, StringType, false)
+  ))
+
 }
