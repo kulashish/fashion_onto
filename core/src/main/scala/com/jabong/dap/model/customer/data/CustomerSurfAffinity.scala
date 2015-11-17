@@ -39,7 +39,7 @@ object CustomerSurfAffinity extends DataFeedsModel {
 
     val dfSurfData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.SURF1_PROCESSED_VARIABLE, DataSets.DAILY_MODE, incrDate)
     dfMap.put("dfSurfData", dfSurfData)
-    val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
+    val yestItr = CampaignInput.loadYesterdayItrSkuData(incrDate)
     dfMap.put("yestItr", yestItr)
 
     if (null == paths) {
