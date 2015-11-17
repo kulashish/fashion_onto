@@ -57,6 +57,7 @@ object CustomerSurfAffinity extends DataFeedsModel {
 
     val dfSurfAffinityPrevFull = dfMap.getOrElse("dfSurfAffinityPrevFull", null)
 
+    //FIXME: Add merge logic here
     if (null != dfSurfAffinityPrevFull) {
 
     }
@@ -76,6 +77,7 @@ object CustomerSurfAffinity extends DataFeedsModel {
       explode(Udf.repeatedSku(col(PageVisitVariables.SKU_LIST))) as PageVisitVariables.SKU
     )
 
+    //FIXME: remove .na.fill("") once it will fix on Utils
     val joinedItr = dfRepeatedSku.join(yestItr, dfRepeatedSku(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE), SQL.LEFT_OUTER)
       .select(dfRepeatedSku(PageVisitVariables.USER_ID) as CustomerVariables.EMAIL,
         yestItr(ProductVariables.SKU_SIMPLE),
@@ -84,7 +86,7 @@ object CustomerSurfAffinity extends DataFeedsModel {
         yestItr(ProductVariables.GENDER),
         yestItr(ProductVariables.MVP),
         yestItr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE
-      )
+      ).na.fill("")
 
     val groupFields = Array(CustomerVariables.EMAIL)
     val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.MVP)
