@@ -5,6 +5,7 @@ import com.jabong.dap.common.Utils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
@@ -13,6 +14,8 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import com.jabong.dap.model.order.variables.SalesOrder
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
+
 
 import scala.collection.mutable
 import scala.collection.mutable.HashMap
@@ -64,6 +67,9 @@ object CityData extends DataFeedsModel with Logging {
     val dfSalesOrderAddressIncr = dfMap("salesOrderAddressIncr")
     val dfItrSkuSimple = dfMap("itrSkuSimple")
 
+    val writeMap = new HashMap[String, DataFrame]()
+
+
     val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) ===
       dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
       === dfSalesOrderAddressIncr(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.INNER)
@@ -83,10 +89,18 @@ object CityData extends DataFeedsModel with Logging {
     val valueFields = Array("count", "sum_price")
     val cityWiseMapData = Utils.generateTopMap(salesWithItrData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
     val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData", null)
-    //    if(dfCityWisePrevFull != null){
-    //      cityWiseMapData.
-    //    }
-    val writeMap = new HashMap[String, DataFrame]()
+        if(dfCityWisePrevFull != null){
+          val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData,dfCityWisePrevFull(SalesAddressVariables.CITY)===cityWiseMapData(SalesAddressVariables.CITY)
+            ,SQL.FULL_OUTER)
+            .select(coalesce(dfCityWisePrevFull(SalesAddressVariables.CITY),cityWiseMapData(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY)
+                    Udf.mergeMap(dfCityWisePrevFull("brand_list"),cityWiseMapData("brand_list")) as "brand_list",
+                    Udf.mergeMap(dfCityWisePrevFull("brick_list"),cityWiseMapData("brick_list")) as "brick_list",
+                    Udf.mergeMap(dfCityWisePrevFull("gender_list"),cityWiseMapData("gender_list")) as "gender_list",
+                    Udf.mergeMap(dfCityWisePrevFull("mvp_list"),cityWiseMapData("brand_list")) as "mvp_list")
+
+          writeMap.put("cityWiseMapOut", cityJoinedData)
+
+        }
 
     writeMap.put("cityWiseMapOut", cityWiseMapData)
     return writeMap
