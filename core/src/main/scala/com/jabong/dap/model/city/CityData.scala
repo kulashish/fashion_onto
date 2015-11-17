@@ -37,7 +37,7 @@ object CityData extends DataFeedsModel with Logging {
       val dfCityWisePrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cityWisePrevFullData", dfCityWisePrevFull)
     }
-    val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH , DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     dfMap.put("salesOrderIncr", dfSalesOrderIncr)
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
@@ -60,8 +60,8 @@ object CityData extends DataFeedsModel with Logging {
     val dfSalesOrderAddressIncr = dfMap("salesOrderAddressIncr")
 
     val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) ===
-      dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER)
-      === dfSalesOrderAddressIncr(SalesAddressVariables.FK_SALES_ORDER), SQL.INNER)
+      dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
+      === dfSalesOrderAddressIncr(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.INNER)
     val pivotFields = Array(SalesAddressVariables.CITY)
     val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK)
     val valueFields = Array("count", "sum_price")
