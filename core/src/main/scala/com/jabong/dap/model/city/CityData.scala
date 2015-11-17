@@ -93,7 +93,6 @@ object CityData extends DataFeedsModel with Logging {
     val cityWiseMapData = Utils.generateTopMap(salesWithItrData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
     val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData", null)
         if(dfCityWisePrevFull != null){
-          import org.apache.spark.sql
           val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData,dfCityWisePrevFull(SalesAddressVariables.CITY)===cityWiseMapData(SalesAddressVariables.CITY)
             ,SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0),row(4)).asInstanceOf[String],
               Utils.mergeMaps(row(1).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(6).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
@@ -108,9 +107,10 @@ object CityData extends DataFeedsModel with Logging {
           val dfCityData = sqlContext.createDataFrame(cityJoinedData,OrderBySchema.cityMapSchema)
           writeMap.put("cityWiseMapOut", dfCityData)
 
+        }else{
+          writeMap.put("cityWiseMapOut", cityWiseMapData)
         }
 
-    writeMap.put("cityWiseMapOut", cityWiseMapData)
     return writeMap
   }
 }
