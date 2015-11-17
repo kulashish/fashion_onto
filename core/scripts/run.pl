@@ -232,6 +232,9 @@ if ($component eq "bobAcqFull1") {
      $AMMUNITION = "--num-executors 8 --executor-memory 1G";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component followUpCampaigns --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/followUpCampaigns.json";
      $job_exit = run_component($component, $command);
+} elsif ($component eq "acartHourly") {
+      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acartHourly --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/acartHourly.json";
+      $job_exit = run_component($component, $command);
 } elsif ($component eq "pushCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pushCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
@@ -258,6 +261,10 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricepoint --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
+ } elsif ($component eq "hottest_x") {
+       $AMMUNITION = "--num-executors 7 --executor-memory 4G";
+       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component hottest_x --config $HDFS_CONF/config.json";
+       $job_exit = run_component($component, $command);
  } elsif ($component eq "pricingSKUData") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
@@ -298,12 +305,12 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "paybackData") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component paybackData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/paybackData.json";
     $job_exit = run_component($component, $command);
-} elsif ($component eq "acartHourly") {
-      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acartHourly --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/acartHourly.json";
-      $job_exit = run_component($component, $command);
 } elsif ($component eq "customerAppDetails") {
     $AMMUNITION = "--num-executors 10 --executor-memory 4G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component customerAppDetails --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerAppDetails.json";
+    $job_exit = run_component($component, $command);
+} elsif($component eq "custEmailResponse") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component custEmailResponse --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custEmailResponse.json";
     $job_exit = run_component($component, $command);
 } else {
     print "not a valid component\n";

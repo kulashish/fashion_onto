@@ -45,6 +45,8 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
 
   "refskus and brick mvp geneder recommendation  data as input" should "return set of eight recommendedSkus for refSkus" in {
     val expectedRecommendations = liveRecommender.generateRecommendation(newReferenceSkuData, recommendationOutput)
+    println(expectedRecommendations.first())
+
     //println("RECOMMENDED"+expectedRecommendations.count())
     //expectedRecommendations.collect().foreach(println)
     assert(expectedRecommendations != null)
@@ -79,7 +81,7 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
   //    val row1 = Row(7L, "SO596WA65JLIINDFAS")
   //    val row2 = Row(4L, "ES418WA79UAUINDFAS")
   //    val inputRecommendations: List[Row] = List(row1, row2)
-  //    val expectedValue = liveRecommender.getRecommendedSkus(refSku, inputRecommendations)
+  //    val expectedValue = liveRecommender.getRecommendedSkus(refSku, inputRereccommendations)
   //    assert(expectedValue.size == 1)
   //  }
 
@@ -90,7 +92,7 @@ class LiveCommonRecommenderTest extends FlatSpec with SharedSparkContext with Ma
 
   "iterable row is null " should "return IllegalArgumentException" in {
     a[IllegalArgumentException] should be thrownBy {
-      liveRecommender.getRecSkus(null)
+      liveRecommender.getRecSkus(null, 0)
     }
   }
 
