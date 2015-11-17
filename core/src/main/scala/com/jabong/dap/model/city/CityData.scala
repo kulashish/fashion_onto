@@ -92,7 +92,7 @@ object CityData extends DataFeedsModel with Logging {
         if(dfCityWisePrevFull != null){
           val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData,dfCityWisePrevFull(SalesAddressVariables.CITY)===cityWiseMapData(SalesAddressVariables.CITY)
             ,SQL.FULL_OUTER)
-            .select(coalesce(dfCityWisePrevFull(SalesAddressVariables.CITY),cityWiseMapData(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY)
+            .select(coalesce(dfCityWisePrevFull(SalesAddressVariables.CITY),cityWiseMapData(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY),
                     Udf.mergeMap(dfCityWisePrevFull("brand_list"),cityWiseMapData("brand_list")) as "brand_list",
                     Udf.mergeMap(dfCityWisePrevFull("brick_list"),cityWiseMapData("brick_list")) as "brick_list",
                     Udf.mergeMap(dfCityWisePrevFull("gender_list"),cityWiseMapData("gender_list")) as "gender_list",
