@@ -42,7 +42,7 @@ object CampaignCommon {
   //calendar campaigns
   val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
   val PRICEPOINT_CAMPAIGN = "pricepoint"
-  val BRICK_AFFINITY = "brick_affinity"
+  val BRICK_AFFINITY_CAMPAIGN = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
   val BEAUTY_CAMPAIGN = "beauty_campaign"
   val HOTTEST_X = "hottest_x"
@@ -113,8 +113,8 @@ object CampaignCommon {
     CampaignCommon.BEAUTY_CAMPAIGN -> 400,
     //FIXME: put correct mail type
     CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500,
-    //FIXME: put correct mail type
-    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 600,
+    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 24,
+    CampaignCommon.BRICK_AFFINITY_CAMPAIGN -> 14,
     CampaignCommon.CLEARANCE_CAMPAIGN -> 20,
     CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13,
     CampaignCommon.HOTTEST_X -> 11

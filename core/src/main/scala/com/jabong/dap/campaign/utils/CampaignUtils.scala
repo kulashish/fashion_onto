@@ -3,23 +3,23 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
+import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{GroupedUtils, Spark}
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
+import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql._
 
 import scala.annotation.elidable
@@ -175,7 +175,9 @@ object CampaignUtils extends Logging {
 
     val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+
     debug(dfFilterd, "In ref skus after filter customerData is not null")
+
     val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.referenceSku)
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
@@ -433,7 +435,7 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.SKU),
         inputData(PageVisitVariables.BROWSER_ID),
         inputData(PageVisitVariables.DOMAIN)
-        //inputData(ProductVariables.SPECIAL_PRICE)
+      //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -750,6 +752,72 @@ object CampaignUtils extends Logging {
 
   def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
 
+    val recs = campaignName match {
+      case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => {
+        val (dfBrick1, dfBrick2) = getBrick1Brick2(filteredSku: DataFrame)
+
+        val dfBrik1RecommendationData = getRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        val dfBrick2RecommendationData = getRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+
+        val dfJoined = dfBrik1RecommendationData.join(
+          dfBrick2RecommendationData,
+          dfBrik1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
+          SQL.INNER
+        )
+        //FIXME: select REC_SKUS of brick1 and birck2
+        //          .select(
+        //            dfBrik1RecommendationData(CampaignMergedFields.EMAIL),
+        //            dfBrik1RecommendationData(CampaignMergedFields.REF_SKUS),
+        //            dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS),
+        //            dfBrik1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        //            dfBrik1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+        //          )
+
+        dfJoined
+      }
+      case CampaignCommon.HOTTEST_X =>
+        val dfRecommendationData = getRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+      case _ =>
+        val dfRecommendationData = getRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+        dfRecommendationData
+    }
+
+    //save campaign Output for mobile
+    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+  }
+
+  def getBrick1Brick2(filteredSku: DataFrame): (DataFrame, DataFrame) = {
+    val dfBrik1 = filteredSku.select(
+      filteredSku(CustomerVariables.EMAIL),
+      filteredSku(CustomerVariables.FK_CUSTOMER),
+      filteredSku(ProductVariables.SKU_SIMPLE),
+      filteredSku(ProductVariables.SPECIAL_PRICE),
+      filteredSku("BRICK1") as ProductVariables.BRICK,
+      filteredSku(ProductVariables.BRAND),
+      filteredSku(ProductVariables.MVP),
+      filteredSku(ProductVariables.GENDER),
+      filteredSku(ProductVariables.PRODUCT_NAME),
+      filteredSku(ProductVariables.STOCK),
+      filteredSku(ProductVariables.PRICE_BAND))
+
+    val dfBrik2 = filteredSku.select(
+      filteredSku(CustomerVariables.EMAIL),
+      filteredSku(CustomerVariables.FK_CUSTOMER),
+      filteredSku(ProductVariables.SKU_SIMPLE),
+      filteredSku(ProductVariables.SPECIAL_PRICE),
+      filteredSku("BRICK2") as ProductVariables.BRICK,
+      filteredSku(ProductVariables.BRAND),
+      filteredSku(ProductVariables.MVP),
+      filteredSku(ProductVariables.GENDER),
+      filteredSku(ProductVariables.PRODUCT_NAME),
+      filteredSku(ProductVariables.STOCK),
+      filteredSku(ProductVariables.PRICE_BAND))
+
+    (dfBrik1, dfBrik2)
+  }
+
+  def getRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
@@ -762,15 +830,7 @@ object CampaignUtils extends Logging {
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
-    val recs = campaignName match {
-      case CampaignCommon.HOTTEST_X  =>
-        campaignOutput.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
-      case _ => campaignOutput
-
-    }
-
-    //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+    campaignOutput
   }
 
   /**

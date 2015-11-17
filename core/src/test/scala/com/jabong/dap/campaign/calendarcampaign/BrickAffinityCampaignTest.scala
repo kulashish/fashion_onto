@@ -41,7 +41,7 @@ class BrickAffinityCampaignTest extends FeatureSpec with GivenWhenThen with Shar
 
       val brickAffinityCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)
-      assert(brickAffinityCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && brickAffinityCampaignOut._2 == CampaignCommon.BRICK_AFFINITY)
+      assert(brickAffinityCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && brickAffinityCampaignOut._2 == CampaignCommon.BRICK_AFFINITY_CAMPAIGN)
 
     }
   }
