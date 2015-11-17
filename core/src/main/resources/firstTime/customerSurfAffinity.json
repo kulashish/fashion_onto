@@ -4,7 +4,7 @@
 "source": "customerSurfAffinity",
 "path": "first time",
 "mode": "full",
-"incrDate": "2015/10/17",
+"incrDate": "2015/10/18",
 "saveMode": "Ignore",
 "saveFormat": "parquet"
 }
