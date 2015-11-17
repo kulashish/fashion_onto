@@ -19,8 +19,9 @@ object Recommendation {
 
   val MVP_DISCOUNT = "mvp_discount"
   val ALL = "all"
+  val MVP_DISCOUNT_SUB_TYPE = "mvp_discount"
 
-  val MVP_COLOR = "mvp_color"
+  val MVP_COLOR_SUB_TYPE = "mvp_color"
 
   val BRICK_PRICE_BAND_SUB_TYPE = "brick_price_band"
 
@@ -41,8 +42,4 @@ object Recommendation {
   val NUM_REC_SKU_REF_SKU = 8
 
   val DISCOUNT_THRESHOLD = 35
-
-  val NTHDAY_45 = "nthday_45"
-  val NTHDAY_60 = "nthday_60"
-
 }

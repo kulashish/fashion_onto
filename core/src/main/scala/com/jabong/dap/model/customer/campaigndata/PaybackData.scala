@@ -72,7 +72,7 @@ object PaybackData extends DataFeedsModel {
     val paybackEarnIncr = dfMap("paybackEarnIncr")
     val paybackRedeemIncr = dfMap("paybackRedeemIncr")
     val cmrFull = dfMap("cmrFull")
-    val paybackDataPrevFull = dfMap("paybackDataPrevFull")
+    val paybackDataPrevFull = dfMap.getOrElse("paybackDataPrevFull", null)
 
     val dfIcici = salesOrderIncr.join(paymentPrepaidTransactionDataIncr, salesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) === paymentPrepaidTransactionDataIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.INNER)
       .join(paymentBankPriorityFull, paymentPrepaidTransactionDataIncr(BANK_CODE) === paymentBankPriorityFull(BANK_CODE), SQL.INNER)

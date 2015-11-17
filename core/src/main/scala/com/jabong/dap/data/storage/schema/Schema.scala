@@ -448,13 +448,13 @@ object Schema {
     StructField("catagory_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
     StructField("brick_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
     StructField("color_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
-    StructField("last_orders_created_at", TimestampType, true)
+    StructField("last_order_created_at", TimestampType, true)
   ))
 
   val salesItemStatus = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField("order_status_map", MapType(LongType, MapType(LongType, IntegerType)), true),
-    StructField("last_orders_updated_at", TimestampType, true)
+    StructField("last_order_updated_at", TimestampType, true)
   ))
   val ordersCount = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
@@ -463,7 +463,7 @@ object Schema {
     StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, true),
     StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS, IntegerType, true),
     StructField("others", IntegerType, true),
-    StructField("last_orders_updated_at", TimestampType, true)
+    StructField("last_order_updated_at", TimestampType, true)
   ))
 
   val cusTop5 = StructType(Array(
@@ -549,6 +549,42 @@ object Schema {
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true)
   ))
+
+  val salesRev = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_7, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_7, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_7, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_30, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_30, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_30, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_30, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_90, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_90, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_90, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_90, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)))
 
   //FIXME: move it into OrderBySchema
   val lastOrder = StructType(Array(
