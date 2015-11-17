@@ -95,10 +95,10 @@ object CityData extends DataFeedsModel with Logging {
         if(dfCityWisePrevFull != null){
           val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData,dfCityWisePrevFull(SalesAddressVariables.CITY)===cityWiseMapData(SalesAddressVariables.CITY)
             ,SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0),row(4)).asInstanceOf[String],
-              Utils.mergeMaps(row(1).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(6).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
-              Utils.mergeMaps(row(2).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(7).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
-              Utils.mergeMaps(row(3).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(8).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
-              Utils.mergeMaps(row(4).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(9).asInstanceOf[scala.collection.mutable.Map[String,Row]])))
+              UdfUtils.mergeMaps(row(1).asInstanceOf[Map[String,Row]],row(6).asInstanceOf[Map[String,Row]]),
+              UdfUtils.mergeMaps(row(2).asInstanceOf[Map[String,Row]],row(7).asInstanceOf[Map[String,Row]]),
+              UdfUtils.mergeMaps(row(3).asInstanceOf[Map[String,Row]],row(8).asInstanceOf[Map[String,Row]]),
+              UdfUtils.mergeMaps(row(4).asInstanceOf[Map[String,Row]],row(9).asInstanceOf[Map[String,Row]])))
 //            .select(coalesce(dfCityWisePrevFull(SalesAddressVariables.CITY),cityWiseMapData(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY,
 //                    Udf.mergeMap(dfCityWisePrevFull("brand_list"),cityWiseMapData("brand_list")) as "brand_list",
 //                    Udf.mergeMap(dfCityWisePrevFull("brick_list"),cityWiseMapData("brick_list")) as "brick_list",
@@ -106,7 +106,6 @@ object CityData extends DataFeedsModel with Logging {
 //                    Udf.mergeMap(dfCityWisePrevFull("mvp_list"),cityWiseMapData("brand_list")) as "mvp_list")
           val dfCityData = sqlContext.createDataFrame(cityJoinedData,OrderBySchema.cityMapSchema)
           writeMap.put("cityWiseMapOut", dfCityData)
-
         }else{
           writeMap.put("cityWiseMapOut", cityWiseMapData)
         }
