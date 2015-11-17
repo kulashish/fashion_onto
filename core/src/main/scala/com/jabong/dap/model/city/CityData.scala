@@ -76,7 +76,8 @@ object CityData extends DataFeedsModel with Logging {
         dfItrSkuSimple(ProductVariables.BRAND),
         dfItrSkuSimple(ProductVariables.BRICK),
         dfItrSkuSimple(ProductVariables.GENDER),
-        dfItrSkuSimple(ProductVariables.MVP))
+        dfItrSkuSimple(ProductVariables.MVP),
+        dfItrSkuSimple(ProductVariables.SPECIAL_PRICE))
 
 
     val pivotFields = Array(SalesAddressVariables.CITY)
