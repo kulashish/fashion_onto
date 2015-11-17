@@ -95,7 +95,7 @@ object CityData extends DataFeedsModel with Logging {
         if(dfCityWisePrevFull != null){
           import org.apache.spark.sql
           val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData,dfCityWisePrevFull(SalesAddressVariables.CITY)===cityWiseMapData(SalesAddressVariables.CITY)
-            ,SQL.FULL_OUTER).rdd.map(row => (Utils.getNonNull(row(0),row(4)).asInstanceOf[String],
+            ,SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0),row(4)).asInstanceOf[String],
               Utils.mergeMaps(row(1).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(6).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
               Utils.mergeMaps(row(2).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(7).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
               Utils.mergeMaps(row(3).asInstanceOf[scala.collection.mutable.Map[String,Row]],row(8).asInstanceOf[scala.collection.mutable.Map[String,Row]]),
@@ -105,8 +105,7 @@ object CityData extends DataFeedsModel with Logging {
 //                    Udf.mergeMap(dfCityWisePrevFull("brick_list"),cityWiseMapData("brick_list")) as "brick_list",
 //                    Udf.mergeMap(dfCityWisePrevFull("gender_list"),cityWiseMapData("gender_list")) as "gender_list",
 //                    Udf.mergeMap(dfCityWisePrevFull("mvp_list"),cityWiseMapData("brand_list")) as "mvp_list")
-          import sqlContext.implicits._
-          val dfCityData = cityJoinedData.toDF(SalesAddressVariables.CITY,"brand_list","brick_list","gender_list","mvp_list")
+          val dfCityData = sqlContext.createDataFrame(cityJoinedData,OrderBySchema.cityMapSchema)
           writeMap.put("cityWiseMapOut", dfCityData)
 
         }
