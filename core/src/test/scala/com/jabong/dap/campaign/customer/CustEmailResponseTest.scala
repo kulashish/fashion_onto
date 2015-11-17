@@ -1,15 +1,14 @@
 
 package com.jabong.dap.campaign.customer
 
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.EmailResponseVariables
+import com.jabong.dap.common.constants.variables.{NewsletterVariables, EmailResponseVariables}
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.schema.SchemaUtils
+import com.jabong.dap.common.{SharedSparkContext, Spark}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
-import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
 import com.jabong.dap.model.customer.schema.CustEmailSchema
@@ -51,11 +50,11 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
 
     val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
       aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
-      .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
-        col(EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE,
-        col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPENS_TODAY,
-        col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICKS_TODAY,
-        col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE) as EmailResponseVariables.LAST_CLICK_DATE)
+      .select(coalesce(aggClickData(EmailResponseVariables.CUSTOMER_ID), aggOpenData(EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
+        aggOpenData(EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE,
+        aggOpenData(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPENS_TODAY,
+        aggClickData(EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICKS_TODAY,
+        aggClickData(EmailResponseVariables.LAST_CLICK_DATE) as EmailResponseVariables.LAST_CLICK_DATE)
 
     assert(joinedDf.count() == 15)
 
@@ -74,6 +73,8 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val effective15 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective15_email", CustEmailSchema.reqCsvDf)
     val effective30 = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective30_email", CustEmailSchema.reqCsvDf)
     val effectiveDFFull = CustEmailResponse.effectiveDFFull(incremental, yesterdayDf, effective7, effective15, effective30)
+    effectiveDFFull.drop(EmailResponseVariables.END_DATE)
+    effectiveDFFull.drop(NewsletterVariables.UPDATED_AT)
     val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_result_all", CustEmailSchema.effective_Smry_Schema)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
@@ -127,5 +128,6 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo_any", CustEmailSchema.effective_Smry_Schema)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
+
 
 }
