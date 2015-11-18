@@ -119,6 +119,10 @@ object CustTop5 extends DataFeedsModel {
     val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
 
+    Spark.getContext().parallelize(custTop5MapFull.head(10)).saveAsTextFile("/user/mubarak/sample.json")
+
+
+
     val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
 
     custTop5Incr.show(10)
@@ -148,7 +152,7 @@ object CustTop5 extends DataFeedsModel {
       (e(0).asInstanceOf[Long] -> (getTop5FavListRow(e(1).asInstanceOf[scala.collection.immutable.Map[String, Row]]),
         getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
-        getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+        getTop5FavListRow(e(4).asInstanceOf[scala.collection.immutable.Map[String, Row]]),
         CustCatPurchase.getCatCount(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]])
       )
       )
@@ -254,18 +258,34 @@ object CustTop5 extends DataFeedsModel {
     } else {
       val top5Joined = top5PrevFull.join(top5incr, top5PrevFull(SalesOrderVariables.FK_CUSTOMER) === top5incr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(top5incr(SalesOrderVariables.FK_CUSTOMER), top5PrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-          mergeRowCols(top5incr("brand_list"), top5PrevFull("brand_list")) as "brand_list",
-          mergeMapCols(top5incr("catagory_list"), top5PrevFull("catagory_list")) as "catagory_list",
-          mergeMapCols(top5incr("brick_list"), top5PrevFull("brick_list")) as "brick_list",
-          mergeMapCols(top5incr("color_list"), top5PrevFull("color_list")) as "color_list",
+          top5incr("brand_list"),
+          top5PrevFull("brand_list"),
+          top5incr("catagory_list"),
+          top5PrevFull("catagory_list"),
+          top5incr("brick_list"),
+          top5PrevFull("brick_list"),
+          top5incr("color_list"),
+          top5PrevFull("color_list"),
           coalesce(top5incr("last_order_created_at"), top5PrevFull("last_order_created_at")) as "last_order_created_at"
         )
-      top5Joined
+
+    val top5JoinedMap =   top5Joined.map(
+          e=> (e(0).asInstanceOf[Long] -> (joinRows(e(1).asInstanceOf[scala.collection.immutable.Map[String, Row]], e(2).asInstanceOf[scala.collection.immutable.Map[String, Row]]),
+            joinMaps(e(3).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]], e(4).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+            joinMaps(e(5).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]], e(6).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+            joinRows(e(7).asInstanceOf[scala.collection.immutable.Map[String, Row]], e(8).asInstanceOf[scala.collection.immutable.Map[String, Row]]),
+            e(9).asInstanceOf[Timestamp]
+            )
+            )
+            )
+    val top5Rdd =   top5JoinedMap.map(e=>Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
+
+    val top5MapFull =  Spark.getSqlContext().createDataFrame(top5Rdd, Schema.customerFavList)
     }
   }
 
-  val mergeRowCols = udf((map1: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]], map2: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]]) => joinRows(map1, map2))
-  val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]) => joinMaps(map1, map2))
+  //val mergeRowCols = udf((map1: scala.collection.immutable.Map[String, Row], map2: scala.collection.immutable.Map[String, Row]) => joinRows(map1, map2))
+  //val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]) => joinMaps(map1, map2))
 
   def joinMaps(map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]] = {
     val mapFull = collection.mutable.Map[String, scala.collection.immutable.Map[Int, Double]]()
@@ -309,8 +329,8 @@ object CustTop5 extends DataFeedsModel {
   }
 
 
-  def joinRows(map1: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]], map2: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]]): scala.collection.immutable.Map[String, Tuple3[Int, Double, String]]={
-    val mapFull = collection.mutable.Map[String, Tuple3[Int, Double, String]]()
+  def joinRows(map1: scala.collection.immutable.Map[String, Row], map2: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row]={
+    val mapFull = collection.mutable.Map[String, Row]()
     if (null == map1 && null == map2) {
       return null
     } else if (null == map2) {
@@ -325,15 +345,15 @@ object CustTop5 extends DataFeedsModel {
     keys.foreach{
       key =>
         val row = map1(key)
-            val count = row._1
-            val sum = row._2
+            val count = row(0).asInstanceOf[Int]
+            val sum = row(1).asInstanceOf[Double]
 
             if (mapFull.contains(key)) {
               val m = mapFull(key)
-              val count1 = m._1
-              val sum1 = m._2
-              val sku = m._3
-              val t = Tuple3((count1 + count), (sum + sum1), sku)
+              val count1 = m(0).asInstanceOf[Int]
+              val sum1 = m(1).asInstanceOf[Double]
+              val sku = m(2).asInstanceOf[String]
+              val t = Row((count1 + count), (sum + sum1), sku)
               mapFull.put(key, t)
               }
              else {
@@ -344,11 +364,11 @@ object CustTop5 extends DataFeedsModel {
     finalMap
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp, String)]): (Map[String, Row], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
+  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp, String)]): (Map[String, Row], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Row], Timestamp) = {
     val brand = Map[String, Row]()
     val cat = Map[String, Map[Int, Double]]()
     val brick = Map[String, Map[Int, Double]]()
-    val color = Map[String, Map[Int, Double]]()
+    val color = Map[String, Row]()
     var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
     val sortedList = list.sortBy(r => (r._6.getTime, r._5))(Ordering.Tuple2(Ordering.Long.reverse, Ordering.Double.reverse))
       .map(e=> (
@@ -362,7 +382,7 @@ object CustTop5 extends DataFeedsModel {
       updateMapRow(brand, brandName, price, sku)
       updateMap(cat, catName, price)
       updateMap(brick, brickName, price)
-      updateMap(color, coloName, price)
+      updateMapRow(color, coloName, price, sku)
     }
     (brand, cat, brick, color, maxDate)
 
