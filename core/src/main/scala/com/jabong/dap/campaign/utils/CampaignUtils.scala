@@ -817,7 +817,7 @@ object CampaignUtils extends Logging {
       val cmr = CampaignInput.loadCustomerMasterData()
       custFilteredWithEmail = mapEmailCampaignWithCMR(cmr, custFiltered)
     } else if (campaignName.startsWith("surf")) {
-      custFilteredWithEmail = custFiltered.filter(!col(CustomerVariables.EMAIL) like ("_app%"))
+      custFilteredWithEmail = custFiltered.filter(!col(CustomerVariables.EMAIL).startsWith(CustomerVariables.APP_FILTER))
     }
 
     var custFilteredPastCampaign: DataFrame = custFilteredWithEmail
