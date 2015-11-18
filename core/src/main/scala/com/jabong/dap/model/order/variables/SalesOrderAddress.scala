@@ -21,7 +21,7 @@ import scala.collection.mutable.{ HashMap, ListBuffer, Map }
 object SalesOrderAddress extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
-    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
     val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.DAILY_MODE, incrDate)
     (DataWriter.canWrite(saveMode, fullMapPath) || DataWriter.canWrite(saveMode, incrPath))
   }
@@ -31,7 +31,7 @@ object SalesOrderAddress extends DataFeedsModel {
     var mode: String = DataSets.FULL_MERGE_MODE
     if (null == path) {
       mode = DataSets.DAILY_MODE
-      val salesOrderAddrMapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
+      val salesOrderAddrMapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("salesOrderAddrMapPrevFull", salesOrderAddrMapPrevFull)
     }
     var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
@@ -87,7 +87,7 @@ object SalesOrderAddress extends DataFeedsModel {
     val salesOrderAddrMapFull = dfWrite("salesOrderAddrMapFull")
     val cityZoneFull = dfWrite("cityZoneFull")
 
-    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(salesOrderAddrMapFull, fullMapPath, saveMode)
 
     var favMapIncr = salesOrderAddrMapFull
@@ -95,8 +95,13 @@ object SalesOrderAddress extends DataFeedsModel {
       favMapIncr = Utils.getOneDayData(salesOrderAddrMapFull, "last_order_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
     val custFavIncr = calcFav(favMapIncr, cityZoneFull)
-    val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(custFavIncr, incrPath, saveMode)
+    if (null != salesOrderAddrMapPrevFull) {
+      val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.DAILY_MODE, incrDate)
+      DataWriter.writeParquet(custFavIncr, incrPath, saveMode)
+    } else {
+      val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+      DataWriter.writeParquet(custFavIncr, fullPath, saveMode)
+    }
   }
 
   def getValueFromMap(map: scala.collection.mutable.Map[String, Tuple2[String, String]], key: String, field: Int): String = {
