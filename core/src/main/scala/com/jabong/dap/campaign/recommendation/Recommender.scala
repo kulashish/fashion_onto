@@ -11,7 +11,6 @@ import scala.collection.immutable.HashMap
 trait Recommender extends java.io.Serializable {
 
   // given [(customerId, refSkuList)] ---> [(customerId, refSkuList, recommendationsList)]
-  // 8 recommendations
-  def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = null): DataFrame
+  def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = null, numRecSkus:Int = 8): DataFrame
 
 }

@@ -381,11 +381,8 @@ object CustomerOrders extends DataFeedsModel {
     val dateDiffFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
     val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL_FETCH_MODE, dateDiffFormat)
     dfMap.put("salesRuleSetFull", salesRuleSetFull)
-
-    val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
-    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
-    val salesOrderAddrFavIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
-    dfMap.put("salesOrderAddrFavIncr", salesOrderAddrFavIncr)
+    val salesAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("salesAddressFull", salesAddressFull)
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     val custTop5Incr = DataReader.getDataFrame4mCsv("/data/test/tmp", DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate, fileDate + "_CUST_TOP5.csv", "true", ";")
     dfMap.put("custTop5Incr", custTop5Incr)
