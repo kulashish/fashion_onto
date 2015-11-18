@@ -6,7 +6,7 @@ import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars, SalesAddressVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, SalesAddressVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
