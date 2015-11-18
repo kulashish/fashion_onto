@@ -661,4 +661,10 @@ object CampaignInput extends Logging {
     val orderData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, date)
     orderData
   }
+
+  def loadFullCustomerSurfAffinity(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading Full Customer Surf Affinity data from hdfs")
+    val customerSurfAffinity = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_SURF_AFFINITY, DataSets.FULL_MERGE_MODE, date)
+    customerSurfAffinity
+  }
 }

@@ -135,6 +135,7 @@ object Init {
       case "hottest_x" => CampaignManager.startHottestXCampaign()
       case "replenishment" => CampaignManager.startReplenishmentCampaign()
       case "brandInCity" => CampaignManager.startBrandInCityCampaign()
+      case "brickAffinity" => CampaignManager.startBrickAffinityCampaign()
 
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)

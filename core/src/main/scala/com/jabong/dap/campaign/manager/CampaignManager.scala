@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{ BrandInCityCampaign, ReplenishmentCampaign, PricepointCampaign, HottestXCampaign }
+import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -90,6 +90,25 @@ object CampaignManager extends Serializable with Logging {
 
     val pricepointCampaign = new PricepointCampaign()
     pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData)
+
+  }
+
+  def startBrickAffinityCampaign() = {
+
+    val fullCustomerSurfAffinity = CampaignInput.loadFullCustomerSurfAffinity()
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val last7thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(7, fullOrderData)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last7thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(7, fullOrderItemData)
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    val brickAffinityCampaign = new BrickAffinityCampaign()
+    brickAffinityCampaign.runCampaign(fullCustomerSurfAffinity, last7thDaySalesOrderData, last7thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
 
   }
 
