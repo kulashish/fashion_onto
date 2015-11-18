@@ -286,7 +286,7 @@ input:- row  and fields: field array
       Utils.mergeMaps(row(2).asInstanceOf[Map[String, Row]], row(7).asInstanceOf[Map[String, Row]]),
       Utils.mergeMaps(row(3).asInstanceOf[Map[String, Row]], row(8).asInstanceOf[Map[String, Row]]),
       Utils.mergeMaps(row(4).asInstanceOf[Map[String, Row]], row(9).asInstanceOf[Map[String, Row]])))
-    val dfMergeTopMapDataFrame = sqlContext.createDataFrame(cityJoinedData, OrderBySchema.cityMapSchema)
+    val dfMergeTopMapDataFrame = sqlContext.createDataFrame(cityJoinedData, outputSchema)
 
     return dfMergeTopMapDataFrame
   }

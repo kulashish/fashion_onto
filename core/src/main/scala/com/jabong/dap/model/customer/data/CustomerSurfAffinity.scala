@@ -10,7 +10,6 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
-import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
