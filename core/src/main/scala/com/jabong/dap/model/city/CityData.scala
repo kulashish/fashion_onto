@@ -46,8 +46,8 @@ object CityData extends DataFeedsModel with Logging {
     dfMap.put("salesOrderIncr", dfSalesOrderIncr)
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
-    val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("salesOrderAddressIncr", dfSalesOrderAddressIncr)
+    val dfSalesOrderAddressFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("salesOrderAddressFull", dfSalesOrderAddressFull)
     val dfItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
     dfMap.put("itrSkuSimple", dfItrSkuSimple)
 
@@ -65,15 +65,15 @@ object CityData extends DataFeedsModel with Logging {
 
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfSalesOrderItemIncr = dfMap("salesOrderItemIncr")
-    val dfSalesOrderAddressIncr = dfMap("salesOrderAddressIncr")
+    val dfSalesOrderAddressFull = dfMap("salesOrderAddressFull")
     val dfItrSkuSimple = dfMap("itrSkuSimple")
 
     val writeMap = new HashMap[String, DataFrame]()
 
     val salesJoinedData = dfSalesOrderIncr.join(dfSalesOrderItemIncr, dfSalesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) ===
-      dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressIncr, dfSalesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
-      === dfSalesOrderAddressIncr(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.INNER)
-      .select(dfSalesOrderAddressIncr(SalesAddressVariables.CITY),
+      dfSalesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER).join(dfSalesOrderAddressFull, dfSalesOrderIncr(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
+      === dfSalesOrderAddressFull(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.INNER)
+      .select(dfSalesOrderAddressFull(SalesAddressVariables.CITY),
         dfSalesOrderItemIncr(SalesOrderItemVariables.SKU))
 
     val salesWithItrData = salesJoinedData.join(dfItrSkuSimple, salesJoinedData(SalesOrderItemVariables.SKU) === dfItrSkuSimple(ProductVariables.SKU_SIMPLE), SQL.INNER)
