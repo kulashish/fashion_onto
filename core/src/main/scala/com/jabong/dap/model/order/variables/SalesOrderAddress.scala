@@ -6,7 +6,7 @@ import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, SalesAddressVariables, SalesOrderVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars, SalesAddressVariables, SalesOrderVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -115,7 +115,7 @@ object SalesOrderAddress extends DataFeedsModel {
   def calcFav(favIncr: DataFrame, cityZone: DataFrame): DataFrame = {
     val cityMap = scala.collection.mutable.Map[String, Tuple2[String, String]]()
     val cities = cityZone
-      .select(SalesAddressVariables.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
+      .select(CustomerVariables.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
       .map(e => (e(0).toString, e(1).toString, e(2).toString))
     cities.foreach{
       e =>
