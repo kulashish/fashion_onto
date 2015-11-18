@@ -72,8 +72,8 @@ object CustomerSurfAffinity extends DataFeedsModel {
 
     val filteredSurfData = dfPageViewSurfData.filter(!(col(PageVisitVariables.USER_ID).isNull || (col(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))))
       .select(
-        PageVisitVariables.USER_ID,
-        PageVisitVariables.SKU
+        col(PageVisitVariables.USER_ID),
+        col(PageVisitVariables.PRODUCT_SKU) as SalesOrderItemVariables.SKU
       )
 
     val joinedItr = filteredSurfData.join(yestItr, filteredSurfData(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU), SQL.INNER)
