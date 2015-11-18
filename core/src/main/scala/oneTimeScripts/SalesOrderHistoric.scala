@@ -20,7 +20,7 @@ object SalesOrderHistoric {
     val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
     val INPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/input"
 
-    for (i <- 10 to 4 by -1) {
+    for (i <- 91 to 4 by -1) {
       val date = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       val prevFull = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
@@ -58,22 +58,20 @@ object SalesOrderHistoric {
         .drop(salesOrderItemincr(SalesOrderItemVariables.CREATED_AT))
       println("count joined: " + saleOrderJoined.count())
       val (salesRevenueVarIncr, salesRevenueVarFull) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
-      val salesRevenueVarIncrCached = salesRevenueVarIncr.cache()
-      val salesRevenueVarFullCached = salesRevenueVarFull.cache()
       if (null == prevFull) {
         var fullPath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
-        println("Full Count", salesRevenueVarFullCached.count())
-        salesRevenueVarFullCached.show(10)
-        DataWriter.writeParquet(salesRevenueVarFullCached, fullPath, DataSets.IGNORE_SAVEMODE)
+        println("Full Count", salesRevenueVarFull.count())
+        salesRevenueVarFull.show(10)
+        DataWriter.writeParquet(salesRevenueVarFull, fullPath, DataSets.IGNORE_SAVEMODE)
       } else {
         var savePath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
         var savePathDaily = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
-        println("Incr Count", salesRevenueVarIncrCached.count())
-        salesRevenueVarIncrCached.show(10)
-        DataWriter.writeParquet(salesRevenueVarIncrCached, savePathDaily, DataSets.IGNORE_SAVEMODE)
-        println("Full Count", salesRevenueVarFullCached.count())
-        salesRevenueVarFullCached.show(10)
-        DataWriter.writeParquet(salesRevenueVarFullCached, savePath, DataSets.IGNORE_SAVEMODE)
+        println("Incr Count", salesRevenueVarIncr.count())
+        salesRevenueVarIncr.show(10)
+        DataWriter.writeParquet(salesRevenueVarIncr, savePathDaily, DataSets.IGNORE_SAVEMODE)
+        println("Full Count", salesRevenueVarFull.count())
+        salesRevenueVarFull.show(10)
+        DataWriter.writeParquet(salesRevenueVarFull, savePath, DataSets.IGNORE_SAVEMODE)
         Spark.getSqlContext().clearCache()
       }
     }
