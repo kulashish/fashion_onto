@@ -42,7 +42,7 @@ class RecommendationUtilsTest extends FlatSpec {
 
   "testFiloterCount" should "check if the filter on count works" in {
     val df = JsonUtils.readFromJson("campaigns/recommendation", "filter_data")
-    val filtered =  df.filter(count(df("")).>(3))
+    val filtered = df.filter(count(df("")).>(3))
     println(filtered)
 
   }

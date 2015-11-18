@@ -187,7 +187,7 @@ input:- row  and fields: field array
 
     val keyRdd = inputDataFrame.rdd.keyBy(row => Utils.createKey(row, pivotFields))
     val outRDD = keyRdd.groupByKey().map({ case (key, value) => (key, genMap(value, attributeField, valueFields)) })
-      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.map(_._2).toSeq)) }
+      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.toSeq.sortBy(_._1).map(_._2))) }
 
     val outDataFrame = sqlContext.createDataFrame(outRDD, outputSchema)
 
@@ -244,6 +244,79 @@ input:- row  and fields: field array
 
     return dimensionSMap
 
+  }
+
+  /**
+   * merge two maps with count and sum price in row e.g Banglalore -> Row(84(count),99989.98(sum_price)
+   * @param prevMap
+   * @param newMap
+   * @return
+   */
+  def mergeMaps(prevMap: scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row] = {
+    require(prevMap != null || newMap != null, "prevMap and newMap cannot be null")
+    if (prevMap == null) return newMap
+    if (newMap == null) return prevMap
+
+    newMap.keys.foreach {
+      key =>
+        if (prevMap.contains(key)) {
+          var updatedRow: Row = null
+          val prevRowValue = prevMap(key)
+          val newRowValue = newMap(key)
+          if (newRowValue.size == 1) {
+            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
+          } else {
+            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
+              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
+          }
+          prevMap + (key -> updatedRow)
+        } else {
+          prevMap + (key -> newMap(key))
+        }
+    }
+    return prevMap
+  }
+
+  //  /**
+  //   * merge two maps
+  //   * @param prevMap
+  //   * @param newMap
+  //   * @return
+  //   */
+  //  def mergeMaps(prevMap: scala.collection.mutable.Map[String, Row], newMap: scala.collection.mutable.Map[String, Row]): scala.collection.mutable.Map[String, Row] = {
+  //    require(prevMap != null && newMap != null, "prevMap and newMap cannot be null")
+  //    if (prevMap == null) return newMap
+  //    if (newMap == null) return prevMap
+  //
+  //    newMap.keys.foreach {
+  //      key =>
+  //        if (prevMap.contains(key)) {
+  //          var updatedRow: Row = null
+  //          val prevRowValue = prevMap(key)
+  //          val newRowValue = newMap(key)
+  //          if (newRowValue.size == 1) {
+  //            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
+  //          } else {
+  //            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
+  //              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
+  //          }
+  //          prevMap.put(key, updatedRow)
+  //        } else {
+  //          prevMap.put(key, newMap(key))
+  //        }
+  //    }
+  //    return prevMap
+  //  }
+
+  /**
+   *
+   * @param a1
+   * @param a2
+   * @return
+   */
+  def getNonNull(a1: Any, a2: Any): Any = {
+    if (a1 == null) return a2
+    else a1
   }
 
 }

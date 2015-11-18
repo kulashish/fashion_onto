@@ -79,7 +79,7 @@ class LiveCommonRecommender extends Recommender with Logging {
 
     CampaignUtils.debug(recommendationSelected, "after recommendationSelected")
 
-    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value,  numRecSkus)) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value, numRecSkus)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
