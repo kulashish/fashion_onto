@@ -1,8 +1,9 @@
 package com.jabong.dap.campaign.recommendation.generator
 
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesAddressVariables, SalesOrderVariables}
 import com.jabong.dap.common.{ NullInputException, WrongInputException }
 import com.jabong.dap.common.constants.campaign.Recommendation
-import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -38,7 +39,6 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
 
     // FIXME: optimize logic for next 3 steps
 
-    // create list of (sku, count sold in last 30 days)
     val varProductsWithCountSold = productsWithCountSold(last30DaysOrderItemData)
 
     // create list of (sku, avg count sold in last 7 days) : only for skus sold in last 7 days

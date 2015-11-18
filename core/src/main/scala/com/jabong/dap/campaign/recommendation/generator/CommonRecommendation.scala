@@ -4,13 +4,13 @@ import com.jabong.dap.common.{ NullInputException, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.constants.status.OrderStatus
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.merge.common.MergeUtils
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{GroupedData, DataFrame, Row}
 
 /**
  * Created by rahul (first version of basic recommender) on 23/6/15.
@@ -34,26 +34,34 @@ abstract class CommonRecommendation extends Logging {
    * @param last30DaysOrderItemData
    * @return
    */
-  def productsWithCountSold(last30DaysOrderItemData: DataFrame): DataFrame = {
+  def productsWithCountSold(last30DaysOrderItemData: DataFrame,cityStateBased:Boolean = false): DataFrame = {
     if (last30DaysOrderItemData == null) {
       logger.error("last30DaysOrderItemData is null")
       throw new NullInputException("last30DaysOrderItemData is null")
     }
-
-    val groupedSku = last30DaysOrderItemData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(last30DaysOrderItemData(SalesOrderItemVariables.SKU)))
-      .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)
+    var groupedSku: GroupedData = null
+    if(cityStateBased){
+      groupedSku = last30DaysOrderItemData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(last30DaysOrderItemData(SalesOrderItemVariables.SKU)))
+        .groupBy(Recommendation.SALES_ORDER_ITEM_SKU,SalesAddressVariables.CITY,Recommendation.RECOMMENDATION_STATE)
+    }else{
+      groupedSku = last30DaysOrderItemData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(last30DaysOrderItemData(SalesOrderItemVariables.SKU)))
+        .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)
+    }
+    val skuWithNumberOrdered = groupedSku
       .agg(count(SalesOrderItemVariables.CREATED_AT) as Recommendation.NUMBER_LAST_30_DAYS_ORDERED,
         max(SalesOrderItemVariables.CREATED_AT) as Recommendation.LAST_SOLD_DATE)
 
-    return groupedSku
+    return skuWithNumberOrdered
   }
+
+
 
   /**
    * Add weekly average sales for last seven days data
    * @param lastSevenDaysOrderItemsData
    * @return
    */
-  def createWeeklyAverageSales(lastSevenDaysOrderItemsData: DataFrame): DataFrame = {
+  def createWeeklyAverageSales(lastSevenDaysOrderItemsData: DataFrame,cityStateBased:Boolean = false): DataFrame = {
     if (lastSevenDaysOrderItemsData == null) {
       logger.info("order item  dataframe is null")
       return null
@@ -62,9 +70,16 @@ abstract class CommonRecommendation extends Logging {
     val orderPlacedData = lastSevenDaysOrderItemsData.filter(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS + " not in ( " + OrderStatus.CANCEL_PAYMENT_ERROR + " , " +
       OrderStatus.CANCELLED + " , " + OrderStatus.INVALID + " , " + OrderStatus.EXPORTABLE_CANCEL_CUST + " , " + OrderStatus.CANCELLED_CC + " ) ")
 
-    val orderItemswithWeeklyAverage = orderPlacedData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(orderPlacedData(SalesOrderItemVariables.SKU)))
-      .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)
-      .agg(count(Recommendation.SALES_ORDER_ITEM_SKU) / 7 as Recommendation.WEEKLY_AVERAGE_SALE)
+    var orderGroupedData:GroupedData = null
+    if(cityStateBased){
+      orderGroupedData =  orderPlacedData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(orderPlacedData(SalesOrderItemVariables.SKU)))
+        .groupBy(Recommendation.SALES_ORDER_ITEM_SKU,SalesAddressVariables.CITY,Recommendation.RECOMMENDATION_STATE)
+    }else{
+      orderGroupedData =  orderPlacedData.withColumn(Recommendation.SALES_ORDER_ITEM_SKU, Udf.skuFromSimpleSku(orderPlacedData(SalesOrderItemVariables.SKU)))
+        .groupBy(Recommendation.SALES_ORDER_ITEM_SKU)
+    }
+
+    val orderItemswithWeeklyAverage = orderGroupedData.agg(count(Recommendation.SALES_ORDER_ITEM_SKU) / 7 as Recommendation.WEEKLY_AVERAGE_SALE)
 
     return orderItemswithWeeklyAverage
   }
@@ -75,12 +90,18 @@ abstract class CommonRecommendation extends Logging {
    * @param last30OrderItemData
    * @return
    */
-  def addWeeklyAverageSales(weeklyAverageData: DataFrame, last30OrderItemData: DataFrame): DataFrame = {
+  def addWeeklyAverageSales(weeklyAverageData: DataFrame, last30OrderItemData: DataFrame,cityStateBased:Boolean = false): DataFrame = {
     if (weeklyAverageData == null || last30OrderItemData == null) {
       logger.info("Either weeklyAverageData or last30OrderItemData is null")
       throw new NullInputException("Either weeklyAverageData or last30OrderItemData is null ")
     }
-
+    if(cityStateBased){
+      val joinedWeeklyAverageData = last30OrderItemData.join(weeklyAverageData,
+        last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === weeklyAverageData(Recommendation.SALES_ORDER_ITEM_SKU) &&
+        last30OrderItemData(SalesAddressVariables.CITY) === weeklyAverageData(SalesAddressVariables.CITY) &&
+        last30OrderItemData(Recommendation.RECOMMENDATION_STATE) === weeklyAverageData(Recommendation.RECOMMENDATION_STATE), SQL.LEFT_OUTER)
+      return joinedWeeklyAverageData
+    }
     val updatedWeeklyAverageData = weeklyAverageData.withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU, "NEW_" + Recommendation.SALES_ORDER_ITEM_SKU)
     val joinedWeeklyAverageData = last30OrderItemData.join(updatedWeeklyAverageData,
       last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_" + Recommendation.SALES_ORDER_ITEM_SKU), SQL.LEFT_OUTER)
@@ -100,21 +121,18 @@ abstract class CommonRecommendation extends Logging {
     // import sqlContext.implicits._
     val RecommendationInput = orderItemWithWeeklySale.join(yesterdayItrData, orderItemWithWeeklySale(Recommendation.SALES_ORDER_ITEM_SKU).equalTo(yesterdayItrData(ProductVariables.SKU)), SQL.INNER)
       .select(
-        Recommendation.SALES_ORDER_ITEM_SKU,
-        ProductVariables.BRICK,
-        ProductVariables.MVP,
-        ProductVariables.BRAND,
-        ProductVariables.CATEGORY,
-        ProductVariables.NUMBER_SIMPLE_PER_SKU,
-        ProductVariables.GENDER,
-        ProductVariables.SPECIAL_PRICE,
-        ProductVariables.STOCK,
-        ProductVariables.PRICE_BAND,
-        ProductVariables.COLOR,
-        ProductVariables.DISCOUNT,
-        Recommendation.NUMBER_LAST_30_DAYS_ORDERED,
-        Recommendation.WEEKLY_AVERAGE_SALE,
-        Recommendation.LAST_SOLD_DATE).
+        orderItemWithWeeklySale("*"),
+        yesterdayItrData(ProductVariables.BRICK),
+        yesterdayItrData(ProductVariables.MVP),
+        yesterdayItrData(ProductVariables.BRAND),
+        yesterdayItrData(ProductVariables.CATEGORY),
+        yesterdayItrData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
+        yesterdayItrData(ProductVariables.GENDER),
+        yesterdayItrData(ProductVariables.SPECIAL_PRICE),
+        yesterdayItrData(ProductVariables.STOCK),
+        yesterdayItrData(ProductVariables.PRICE_BAND),
+        yesterdayItrData(ProductVariables.COLOR),
+        yesterdayItrData(ProductVariables.DISCOUNT)).
         withColumn(Recommendation.DISCOUNT_STATUS, when(col(ProductVariables.DISCOUNT) >= Recommendation.DISCOUNT_THRESHOLD, lit(true)).otherwise(lit(false)))
 
     return RecommendationInput
@@ -267,24 +285,24 @@ abstract class CommonRecommendation extends Logging {
       throw new NullInputException("inventoryCheck:- inputData is null")
     }
     val inventoryFiltered = inputData.
-      select(
+      withColumn(Recommendation.INVENTORY_FILTER,
         inventoryChecked(inputData(ProductVariables.CATEGORY), inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU), inputData(ProductVariables.STOCK),
-          inputData(Recommendation.WEEKLY_AVERAGE_SALE)) as Recommendation.INVENTORY_FILTER,
-        inputData(Recommendation.SALES_ORDER_ITEM_SKU),
-        inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
-        inputData(Recommendation.LAST_SOLD_DATE),
-        inputData(Recommendation.DISCOUNT_STATUS),
-        inputData(ProductVariables.CATEGORY),
-        inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
-        inputData(ProductVariables.STOCK),
-        inputData(ProductVariables.BRAND),
-        inputData(ProductVariables.BRICK),
-        inputData(ProductVariables.MVP),
-        inputData(ProductVariables.GENDER),
-        inputData(ProductVariables.PRICE_BAND),
-        inputData(ProductVariables.COLOR),
-        inputData(ProductVariables.SPECIAL_PRICE)
-      )
+          inputData(Recommendation.WEEKLY_AVERAGE_SALE)))
+//        inputData(Recommendation.SALES_ORDER_ITEM_SKU),
+//        inputData(Recommendation.NUMBER_LAST_30_DAYS_ORDERED),
+//        inputData(Recommendation.LAST_SOLD_DATE),
+//        inputData(Recommendation.DISCOUNT_STATUS),
+//        inputData(ProductVariables.CATEGORY),
+//        inputData(ProductVariables.NUMBER_SIMPLE_PER_SKU),
+//        inputData(ProductVariables.STOCK),
+//        inputData(ProductVariables.BRAND),
+//        inputData(ProductVariables.BRICK),
+//        inputData(ProductVariables.MVP),
+//        inputData(ProductVariables.GENDER),
+//        inputData(ProductVariables.PRICE_BAND),
+//        inputData(ProductVariables.COLOR),
+//        inputData(ProductVariables.SPECIAL_PRICE)
+//      )
       .filter(Recommendation.INVENTORY_FILTER + " = true")
 
     logger.info("inventory check ended")
@@ -305,5 +323,21 @@ abstract class CommonRecommendation extends Logging {
     return false
   }
 
+  /**
+   *
+   * @param cityZoneData
+   * @param salesAddress
+   * @return
+   */
+  def addStateFromMapping(cityZoneData:DataFrame,salesAddress:DataFrame): DataFrame ={
+
+    val saleOrderAddrWithState = salesAddress.join(cityZoneData, cityZoneData("ZIPCODE") === salesAddress(SalesAddressVariables.POSTCODE), SQL.LEFT_OUTER)
+      .select(
+        salesAddress(Recommendation.RECOMMENDATION_STATE),
+        salesAddress(SalesAddressVariables.CITY),
+        salesAddress(SalesAddressVariables.POSTCODE))
+
+    saleOrderAddrWithState
+  }
 }
 
