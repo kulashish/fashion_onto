@@ -99,7 +99,7 @@ abstract class CommonRecommendation extends Logging {
       .withColumnRenamed(SalesAddressVariables.CITY,"NEW_"+SalesAddressVariables.CITY)
       .withColumnRenamed(Recommendation.RECOMMENDATION_STATE,"NEW_"+Recommendation.RECOMMENDATION_STATE)
 
-      val joinedWeeklyAverageData = last30OrderItemData.join(weeklyAverageData,
+      val joinedWeeklyAverageData = last30OrderItemData.join(updatedWeeklyAverageData,
         last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_"+Recommendation.SALES_ORDER_ITEM_SKU) &&
           last30OrderItemData(SalesAddressVariables.CITY) === updatedWeeklyAverageData("NEW_"+SalesAddressVariables.CITY) &&
           last30OrderItemData(Recommendation.RECOMMENDATION_STATE) === updatedWeeklyAverageData("NEW_"+Recommendation.RECOMMENDATION_STATE), SQL.LEFT_OUTER)
