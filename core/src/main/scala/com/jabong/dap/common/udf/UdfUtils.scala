@@ -718,5 +718,4 @@ object UdfUtils extends Logging {
     a.size
   }
 
-
 }

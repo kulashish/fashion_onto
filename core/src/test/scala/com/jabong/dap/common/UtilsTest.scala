@@ -62,10 +62,10 @@ class UtilsTest extends FlatSpec with SharedSparkContext {
   }
 
   //FIXME:add unit test cases to merge maps
-//  "Given prev Brand Map and new Brand Map" should "create updated brand map" in {
-//    val prevBrandMap = Map("adidas" -> Row(2, 3190.0))
-//    val newBrandMap = Map("adidas" -> Row(2, 3190.0))
-//
-//  }
+  //  "Given prev Brand Map and new Brand Map" should "create updated brand map" in {
+  //    val prevBrandMap = Map("adidas" -> Row(2, 3190.0))
+  //    val newBrandMap = Map("adidas" -> Row(2, 3190.0))
+  //
+  //  }
 
 }
