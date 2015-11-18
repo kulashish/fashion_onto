@@ -327,7 +327,7 @@ abstract class CommonRecommendation extends Logging {
    * @param salesAddress
    * @return
    */
-  def addStateFromMapping(cityZoneData: DataFrame, salesAddress: DataFrame): DataFrame = {
+  def addStateFromMapping(salesAddress: DataFrame,cityZoneData: DataFrame): DataFrame = {
 
     val saleOrderAddrWithState = salesAddress.join(cityZoneData, cityZoneData("ZIPCODE") === salesAddress(SalesAddressVariables.POSTCODE), SQL.LEFT_OUTER)
       .select(
