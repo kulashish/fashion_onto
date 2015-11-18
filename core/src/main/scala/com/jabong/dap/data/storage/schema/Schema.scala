@@ -506,10 +506,12 @@ object Schema {
 
   val favSalesOrderAddr = StructType(Array(
     StructField("fk_customer", LongType, true),
-    StructField("CITY", StringType, true),
-    StructField("PHONE", StringType, true),
-    StructField("FIRST_NAME", StringType, true),
-    StructField("LAST_NAME", StringType, true),
+    StructField(ContactListMobileVars.CITY, StringType, true),
+    StructField(CustomerVariables.PHONE, StringType, true),
+    StructField(CustomerVariables.FIRST_NAME, StringType, true),
+    StructField(CustomerVariables.LAST_NAME, StringType, true),
+    StructField(ContactListMobileVars.CITY_TIER, StringType, true),
+    StructField(ContactListMobileVars.STATE_ZONE, StringType, true),
     StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, true),
     StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true),
     StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, true),

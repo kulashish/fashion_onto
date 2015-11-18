@@ -5,7 +5,6 @@ import com.jabong.dap.common.Utils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -14,7 +13,7 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import com.jabong.dap.model.product.itr.variables.ITR
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -37,8 +36,9 @@ object CustomerSurfAffinity extends DataFeedsModel {
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
     val dfMap = new HashMap[String, DataFrame]()
 
-    val dfSurfData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.SURF1_PROCESSED_VARIABLE, DataSets.DAILY_MODE, incrDate)
-    dfMap.put("dfSurfData", dfSurfData)
+    val dfPageViewSurfData = CampaignInput.loadPageViewSurfData(incrDate)
+    dfMap.put("dfPageViewSurfData", dfPageViewSurfData)
+
     val yestItr = CampaignInput.loadYesterdayItrSkuData(incrDate)
     dfMap.put("yestItr", yestItr)
 
@@ -51,49 +51,39 @@ object CustomerSurfAffinity extends DataFeedsModel {
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
 
-    val dfSurfData = dfMap("dfSurfData")
+    val dfPageViewSurfData = dfMap("dfPageViewSurfData")
     val yestItr = dfMap("yestItr")
-    val dfSurfAffinityInc = getSurfAffinity(dfSurfData, yestItr)
-    val dfSurfAffinityFull = dfSurfAffinityInc
-
     val dfSurfAffinityPrevFull = dfMap.getOrElse("dfSurfAffinityPrevFull", null)
 
-    //FIXME: Add merge logic here
-    if (null != dfSurfAffinityPrevFull) {
+    val dfSurfAffinityInc = getSurfAffinity(dfPageViewSurfData, yestItr)
 
+    val dfWriteMap = new HashMap[String, DataFrame]()
+    if (dfSurfAffinityPrevFull != null) {
+      val dfMergedTopMapDataFrame = Utils.mergeTopMapDataFrame(dfSurfAffinityPrevFull, dfSurfAffinityInc, CustomerVariables.EMAIL, Schema.surfAffinitySchema)
+      dfWriteMap.put("dfSurfAffinityFull", dfMergedTopMapDataFrame)
+    } else {
+      dfWriteMap.put("dfSurfAffinityFull", dfSurfAffinityInc)
     }
-    val dfWrite = new HashMap[String, DataFrame]()
-    dfWrite.put("dfSurfAffinityInc", dfSurfAffinityInc)
-    dfWrite.put("dfSurfAffinityFull", dfSurfAffinityFull)
 
-    dfWrite
+    dfWriteMap
   }
 
-  def getSurfAffinity(dfSurfData: DataFrame, yestItr: DataFrame): DataFrame = {
+  def getSurfAffinity(dfPageViewSurfData: DataFrame, yestItr: DataFrame): DataFrame = {
 
-    val filteredSurfData = dfSurfData.filter(!(col(PageVisitVariables.USER_ID).isNull || (col(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER)))).select(PageVisitVariables.USER_ID, PageVisitVariables.SKU_LIST)
+    val filteredSurfData = dfPageViewSurfData.filter(!(col(PageVisitVariables.USER_ID).isNull || (col(PageVisitVariables.USER_ID).startsWith(CustomerVariables.APP_FILTER))))
+      .select(
+        PageVisitVariables.USER_ID,
+        PageVisitVariables.SKU
+      )
 
-    val dfRepeatedSku = filteredSurfData.select(
-      col(PageVisitVariables.USER_ID),
-      explode(Udf.repeatedSku(col(PageVisitVariables.SKU_LIST))) as PageVisitVariables.SKU
-    )
-
-    //FIXME: remove .na.fill("") once it will fix on Utils
-    val joinedItr = dfRepeatedSku.join(yestItr, dfRepeatedSku(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU), SQL.INNER)
-      .select(dfRepeatedSku(PageVisitVariables.USER_ID) as CustomerVariables.EMAIL,
+    val joinedItr = filteredSurfData.join(yestItr, filteredSurfData(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU), SQL.INNER)
+      .select(filteredSurfData(PageVisitVariables.USER_ID) as CustomerVariables.EMAIL,
         yestItr(ProductVariables.BRAND),
         yestItr(ProductVariables.BRICK),
         yestItr(ProductVariables.GENDER),
         yestItr(ProductVariables.MVP),
         yestItr(ProductVariables.SPECIAL_PRICE)
-      ).
-        na.fill(Map(
-          ProductVariables.BRAND -> "",
-          ProductVariables.BRICK -> "",
-          ProductVariables.GENDER -> "",
-          ProductVariables.MVP -> "",
-          ITR.SPECIAL_PRICE -> 0.00
-        ))
+      )
 
     val groupFields = Array(CustomerVariables.EMAIL)
     val attributeFields = Array(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.MVP)

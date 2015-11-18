@@ -12,6 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  * Created by raghu on 3/7/15.
  */
 object Udf {
+
   /**
    * minTimestamp will return min of Timestamp t1 or t2
    */
@@ -85,7 +86,7 @@ object Udf {
   val columnCount = udf((colList: List[String]) => UdfUtils.getCountColumn(colList: List[String]))
 
   /**
-   * countSku will return total no of sku
+   * concatenate two List
    */
   val concatenateListOfString = udf((l1: List[String], l2: List[String]) => UdfUtils.concatenateList(l1: List[String], l2: List[String]))
 
@@ -157,4 +158,5 @@ object Udf {
 
   val beauty = udf((category: String, created_at: String) => UdfUtils.beauty(category: String, created_at: String))
 
+  // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

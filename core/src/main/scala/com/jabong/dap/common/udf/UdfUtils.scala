@@ -443,11 +443,10 @@ object UdfUtils extends Logging {
    */
   def concatenateList[T](l1: List[T], l2: List[T]): List[T] = {
 
-    if (l1 == null && l2 == null) {
-      return null
-    } else if (l1 == null) {
+    if (l1 == null) {
       return l2
-    } else if (l2 == null) {
+    }
+    if (l2 == null) {
       return l1
     }
 

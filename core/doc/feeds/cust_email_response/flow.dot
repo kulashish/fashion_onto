@@ -1,0 +1,38 @@
+digraph  {
+
+      subgraph cluster_0 {
+          label="FirstTime"
+          // 1st time
+          DCF_Customer_Response_Table_Dump -> InitialMergedFeed;
+      
+      }
+      
+      subgraph cluster_1 {
+          label="Daily"
+
+          YesterdayMergedFeed [shape=box,color=red];
+
+          InitialMergedFeed -> YesterdayMergedFeed;
+          // daily incremental run
+          Responsys_CLICK_FEED -> incrFeed;
+          Responsys_OPEN_FEED -> incrFeed;
+
+          //
+          incrFeed -> todayMergedFeed
+          YesterdayMergedFeed -> todayMergedFeed
+          incr7dayOldFeed -> todayMergedFeed
+          incr5dayOldFeed -> todayMergedFeed
+          incr30dayOldFeed -> todayMergedFeed
+
+          //
+          bobNLS -> todayMergedFeed
+          cmr -> todayMergedFeed
+
+          // today incremental feed
+          todayMergedFeed -> todayOutputFeed
+          YesterdayMergedFeed -> todayOutputFeed
+
+          { rank = same; YesterdayMergedFeed; "Responsys_CLICK_FEED";}
+
+      }
+}

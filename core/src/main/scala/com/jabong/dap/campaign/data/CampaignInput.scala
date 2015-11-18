@@ -14,6 +14,7 @@ import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
@@ -666,5 +667,21 @@ object CampaignInput extends Logging {
     logger.info("Reading Full Customer Surf Affinity data from hdfs")
     val customerSurfAffinity = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_SURF_AFFINITY, DataSets.FULL_MERGE_MODE, date)
     customerSurfAffinity
+  }
+
+  def loadPageViewSurfData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+
+    val hiveContext = Spark.getHiveContext()
+    val monthYear = TimeUtils.getMonthAndYear(date, TimeConstants.DATE_FORMAT_FOLDER)
+    val month = monthYear.month + 1
+    val day = monthYear.day
+    val year = monthYear.year
+
+    val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + ClickStreamConstant.MERGE_PAGEVISIT +
+      " where userid is not null and pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and sessionid != '(null)' and " +
+      "date1 = " + day + " and month1 = " + month + " and year1=" + year
+
+    val pageViewSurfData = hiveContext.sql(hiveQuery)
+    return pageViewSurfData
   }
 }

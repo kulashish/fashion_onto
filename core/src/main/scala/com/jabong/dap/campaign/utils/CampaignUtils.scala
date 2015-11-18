@@ -848,7 +848,7 @@ object CampaignUtils extends Logging {
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
-    campaignOutput
+    return campaignOutput
   }
 
   /**

@@ -3,11 +3,13 @@ package com.jabong.dap.common
 import java.math.BigDecimal
 
 import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.Recommendation
-import com.jabong.dap.common.constants.variables.ProductVariables
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, ProductVariables }
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.UdfUtils._
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.data.storage.schema.OrderBySchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
@@ -187,7 +189,7 @@ input:- row  and fields: field array
 
     val keyRdd = inputDataFrame.rdd.keyBy(row => Utils.createKey(row, pivotFields))
     val outRDD = keyRdd.groupByKey().map({ case (key, value) => (key, genMap(value, attributeField, valueFields)) })
-      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.map(_._2).toSeq)) }
+      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.toSeq.sortBy(_._1).map(_._2))) }
 
     val outDataFrame = sqlContext.createDataFrame(outRDD, outputSchema)
 
@@ -244,6 +246,91 @@ input:- row  and fields: field array
 
     return dimensionSMap
 
+  }
+
+  /**
+   * merge two maps with count and sum price in row e.g Banglalore -> Row(84(count),99989.98(sum_price)
+   * @param prevMap
+   * @param newMap
+   * @return
+   */
+  def mergeMaps(prevMap: scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row] = {
+    require(prevMap != null || newMap != null, "prevMap and newMap cannot be null")
+    if (prevMap == null) return newMap
+    if (newMap == null) return prevMap
+
+    newMap.keys.foreach {
+      key =>
+        if (prevMap.contains(key)) {
+          var updatedRow: Row = null
+          val prevRowValue = prevMap(key)
+          val newRowValue = newMap(key)
+          if (newRowValue.size == 1) {
+            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
+          } else {
+            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
+              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
+          }
+          prevMap + (key -> updatedRow)
+        } else {
+          prevMap + (key -> newMap(key))
+        }
+    }
+    return prevMap
+  }
+
+  def mergeTopMapDataFrame(priv: DataFrame, inc: DataFrame, joinedKey: String, outputSchema: StructType): DataFrame = {
+
+    val cityJoinedData = priv.join(inc, priv(joinedKey) === inc(joinedKey), SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0), row(5)).asInstanceOf[String],
+      Utils.mergeMaps(row(1).asInstanceOf[Map[String, Row]], row(6).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(2).asInstanceOf[Map[String, Row]], row(7).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(3).asInstanceOf[Map[String, Row]], row(8).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(4).asInstanceOf[Map[String, Row]], row(9).asInstanceOf[Map[String, Row]])))
+    val dfMergeTopMapDataFrame = sqlContext.createDataFrame(cityJoinedData, OrderBySchema.cityMapSchema)
+
+    return dfMergeTopMapDataFrame
+  }
+
+  //  /**
+  //   * merge two maps
+  //   * @param prevMap
+  //   * @param newMap
+  //   * @return
+  //   */
+  //  def mergeMaps(prevMap: scala.collection.mutable.Map[String, Row], newMap: scala.collection.mutable.Map[String, Row]): scala.collection.mutable.Map[String, Row] = {
+  //    require(prevMap != null && newMap != null, "prevMap and newMap cannot be null")
+  //    if (prevMap == null) return newMap
+  //    if (newMap == null) return prevMap
+  //
+  //    newMap.keys.foreach {
+  //      key =>
+  //        if (prevMap.contains(key)) {
+  //          var updatedRow: Row = null
+  //          val prevRowValue = prevMap(key)
+  //          val newRowValue = newMap(key)
+  //          if (newRowValue.size == 1) {
+  //            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
+  //          } else {
+  //            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
+  //              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
+  //          }
+  //          prevMap.put(key, updatedRow)
+  //        } else {
+  //          prevMap.put(key, newMap(key))
+  //        }
+  //    }
+  //    return prevMap
+  //  }
+
+  /**
+   *
+   * @param a1
+   * @param a2
+   * @return
+   */
+  def getNonNull(a1: Any, a2: Any): Any = {
+    if (a1 == null) return a2
+    else a1
   }
 
 }
