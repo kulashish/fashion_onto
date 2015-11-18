@@ -783,14 +783,14 @@ object CampaignUtils extends Logging {
             //Udf.concatenateListOfString(dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
             dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
             dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
-          ).rdd.map(row => (row(0), row(1), row(2).asInstanceOf[List] ::: row(3).asInstanceOf[List], row(4), row(5)))
+          ).rdd.map(row => (row(0).asInstanceOf[String], row(1).asInstanceOf[List[String]], row(2).asInstanceOf[List[String]] ::: row(3).asInstanceOf[List[String]], row(4).asInstanceOf[String], row(5).asInstanceOf[String]))
 
         val sqlContext = Spark.getSqlContext()
         import sqlContext.implicits._
         val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
           CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
         CampaignUtils.debug(dfJoined, "dfJoined")
-
+        dfJoined.show(10)
         dfJoined
       }
       case CampaignCommon.HOTTEST_X =>
