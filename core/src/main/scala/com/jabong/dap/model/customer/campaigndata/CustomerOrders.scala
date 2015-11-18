@@ -85,21 +85,21 @@ object CustomerOrders extends DataFeedsModel {
     dfWrite.put("salesRevenueFull", salesRevenueFull)
     dfWrite.put("salesRevenueOrdersIncr", salesRevenueOrdersIncr)
 
-    println("salesRevenueFull Count", salesRevenueFull.count())
-    salesRevenueFull.printSchema()
+    // println("salesRevenueFull Count", salesRevenueFull.count())
+    // salesRevenueFull.printSchema()
 
     val salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
-    println("salesRevenueIncr Count", salesRevenueIncr.count())
+    // println("salesRevenueIncr Count", salesRevenueIncr.count())
 
-    salesRevenueIncr.printSchema()
-    salesRevenueIncr.show(5)
+    // salesRevenueIncr.printSchema()
+    // salesRevenueIncr.show(5)
 
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncrFil, salesRuleFull, salesRuleSetFull)
 
     val (salesInvalidIncr, custOrdersStatusMap) = SalesOrderItem.getInvalidCancelOrders(salesOrderItemIncr, salesOrderFull, custOrdersStatusPrevMap, incrDateLocal)
     dfWrite.put("custOrdersStatusMap", custOrdersStatusMap)
-    println("custOrdersStatusMap Count", custOrdersStatusMap.count())
-    custOrdersStatusMap.show(5)
+    // println("custOrdersStatusMap Count", custOrdersStatusMap.count())
+    // custOrdersStatusMap.show(5)
 
     val salesCatBrick = custTop5Incr.select(
       custTop5Incr(SalesOrderVariables.FK_CUSTOMER).cast(LongType) as SalesOrderVariables.FK_CUSTOMER,
@@ -107,8 +107,8 @@ object CustomerOrders extends DataFeedsModel {
       custTop5Incr("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION,
       custTop5Incr("BRAND_1") as SalesOrderItemVariables.FAV_BRAND
     )
-    salesCatBrick.printSchema()
-    salesCatBrick.show(5)
+    // salesCatBrick.printSchema()
+    // salesCatBrick.show(5)
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(saleOrderJoined)
 
