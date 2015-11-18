@@ -778,7 +778,7 @@ object CampaignUtils extends Logging {
         ).select(
             dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
             dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
-            dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS),
+            Udf.concatenateListOfString(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
             dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
             dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
           )
@@ -1015,6 +1015,5 @@ object CampaignUtils extends Logging {
 
     data.printSchema()
   }
-
 }
 
