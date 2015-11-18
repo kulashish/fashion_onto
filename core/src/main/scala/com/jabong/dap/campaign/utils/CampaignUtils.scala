@@ -176,6 +176,8 @@ object CampaignUtils extends Logging {
     val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
 
+    debug(dfFilterd, "In ref skus after filter customerData is not null")
+
     val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.referenceSku)
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
@@ -760,6 +762,8 @@ object CampaignUtils extends Logging {
     val recs = campaignName match {
       case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => {
         val (dfBrick1, dfBrick2) = getBrick1Brick2(filteredSku: DataFrame)
+        CampaignUtils.debug(dfBrick1, "dfBrick1")
+        CampaignUtils.debug(dfBrick2, "dfBrick2")
 
         val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
@@ -767,17 +771,17 @@ object CampaignUtils extends Logging {
         val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
-        val dfJoined = dfBrick1RecommendationData.join(
-          dfBrick2RecommendationData,
-          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
-          SQL.INNER
-        ).select(
-            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
-            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
-            Udf.concatenateListOfString(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
-            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
-          )
+        //        val dfJoined = dfBrick1RecommendationData.join(
+        //          dfBrick2RecommendationData,
+        //          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
+        //          SQL.INNER
+        //        ).select(
+        //            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
+        //            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
+        //            Udf.concatenateListOfString(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+        //            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        //            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+        //          )
 
         //          .select(
         //            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
@@ -793,8 +797,8 @@ object CampaignUtils extends Logging {
         //        import sqlContext.implicits._
         //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
         //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
-        CampaignUtils.debug(dfJoined, "dfJoined")
-        dfJoined
+        //        CampaignUtils.debug(dfJoined, "dfJoined")
+        dfBrick1RecommendationData
       }
       case CampaignCommon.HOTTEST_X =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
@@ -854,14 +858,15 @@ object CampaignUtils extends Logging {
   def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
-    debug(refSkus, "refSkus")
+    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), CampaignCommon.CALENDAR_REC_SKUS)
-    debug(refSkus, "campaignOutput")
+
+    debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
     return campaignOutput
   }
@@ -1006,9 +1011,9 @@ object CampaignUtils extends Logging {
   @elidable(FINE) def debug(data: DataFrame, name: String) {
     println("Count of " + name + ":-" + data.count() + "\n")
     println("show dataframe " + name + ":-" + data.show(10) + "\n")
-    CampaignOutput.saveCampaignDataForYesterday(data, name, "CALENDAR_CAMPAIGNS")
 
     data.printSchema()
   }
+
 }
 
