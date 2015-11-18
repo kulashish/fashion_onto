@@ -54,7 +54,21 @@ object CustomerOrders extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
     incrDateLocal = incrDate
-    val res = true
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
+    var res = DataWriter.canWrite(saveMode, savePath)
+
+    var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePathIncr)
+
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePath)
+
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePath)
+
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePath)
+
     res
   }
 
