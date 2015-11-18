@@ -96,13 +96,13 @@ abstract class CommonRecommendation extends Logging {
     if (cityStateBased) {
       val updatedWeeklyAverageData = weeklyAverageData.
         withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU, "NEW_" + Recommendation.SALES_ORDER_ITEM_SKU)
-      .withColumnRenamed(SalesAddressVariables.CITY,"NEW_"+SalesAddressVariables.CITY)
-      .withColumnRenamed(Recommendation.RECOMMENDATION_STATE,"NEW_"+Recommendation.RECOMMENDATION_STATE)
+        .withColumnRenamed(SalesAddressVariables.CITY, "NEW_" + SalesAddressVariables.CITY)
+        .withColumnRenamed(Recommendation.RECOMMENDATION_STATE, "NEW_" + Recommendation.RECOMMENDATION_STATE)
 
       val joinedWeeklyAverageData = last30OrderItemData.join(updatedWeeklyAverageData,
-        last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_"+Recommendation.SALES_ORDER_ITEM_SKU) &&
-          last30OrderItemData(SalesAddressVariables.CITY) === updatedWeeklyAverageData("NEW_"+SalesAddressVariables.CITY) &&
-          last30OrderItemData(Recommendation.RECOMMENDATION_STATE) === updatedWeeklyAverageData("NEW_"+Recommendation.RECOMMENDATION_STATE), SQL.LEFT_OUTER)
+        last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_" + Recommendation.SALES_ORDER_ITEM_SKU) &&
+          last30OrderItemData(SalesAddressVariables.CITY) === updatedWeeklyAverageData("NEW_" + SalesAddressVariables.CITY) &&
+          last30OrderItemData(Recommendation.RECOMMENDATION_STATE) === updatedWeeklyAverageData("NEW_" + Recommendation.RECOMMENDATION_STATE), SQL.LEFT_OUTER)
       return joinedWeeklyAverageData
     }
     val updatedWeeklyAverageData = weeklyAverageData.withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU, "NEW_" + Recommendation.SALES_ORDER_ITEM_SKU)
@@ -332,7 +332,7 @@ abstract class CommonRecommendation extends Logging {
    * @param salesAddress
    * @return
    */
-  def addStateFromMapping(salesAddress: DataFrame,cityZoneData: DataFrame): DataFrame = {
+  def addStateFromMapping(salesAddress: DataFrame, cityZoneData: DataFrame): DataFrame = {
 
     val saleOrderAddrWithState = salesAddress.join(cityZoneData, cityZoneData("ZIPCODE") === salesAddress(SalesAddressVariables.POSTCODE), SQL.LEFT_OUTER)
       .select(
