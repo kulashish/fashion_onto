@@ -854,15 +854,14 @@ object CampaignUtils extends Logging {
   def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
-    debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
+    debug(refSkus, "refSkus")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), CampaignCommon.CALENDAR_REC_SKUS)
-
-    debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
+    debug(refSkus, "campaignOutput")
 
     return campaignOutput
   }
