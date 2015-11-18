@@ -361,7 +361,6 @@ object ContactListMobile extends DataFeedsModel with Logging {
         customerOrdersIncr(SalesOrderItemVariables.FAV_BRAND)
       )
 
-
     val dndBc = Spark.getContext().broadcast(dnd).value
 
     val dndMerged = mergedIncr.join(dndBc, mergedIncr(CustomerVariables.PHONE) === dndBc(DNDVariables.MOBILE_NUMBER), SQL.LEFT_OUTER)
