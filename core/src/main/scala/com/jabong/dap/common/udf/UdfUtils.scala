@@ -441,7 +441,7 @@ object UdfUtils extends Logging {
    * @param l2
    * @return
    */
-  def concatenateList[T](l1: List[T], l2: List[T]): List[T] = {
+  def concatenateList[T](l1: scala.collection.mutable.ArrayBuffer[T], l2: scala.collection.mutable.ArrayBuffer[T]): scala.collection.mutable.ArrayBuffer[T] = {
 
     if (l1 == null) {
       return l2
