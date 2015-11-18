@@ -102,6 +102,7 @@ class ComponentExecutor extends Serializable with Logging {
           // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
+          case DataSets.CUST_EMAIL_RESPONSE => CustEmailResponse.start(paramJob)
 
           //// clickstream use cases
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)
@@ -116,7 +117,10 @@ class ComponentExecutor extends Serializable with Logging {
 
           case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
 
-          // miscellaneous data
+          case CampaignCommon.HOTTEST_X => CampaignManager.startHottestXCampaign()
+
+
+		  // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
 
           case _ => logger.error("Unknown source.")

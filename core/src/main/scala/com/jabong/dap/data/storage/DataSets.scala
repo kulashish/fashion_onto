@@ -184,6 +184,7 @@ object DataSets {
 
   val OPEN = "open"
   val CLICK = "click"
+  val CUST_EMAIL_RESPONSE = "custEmailResponse"
 
   //SalesOrderItemVariables-->Customerorders.csv
   val SALES_ITEM_REVENUE = "sales_item_revenue"
