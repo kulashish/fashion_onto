@@ -114,11 +114,15 @@ object CustTop5 extends DataFeedsModel {
     if (null != custTop5MapPrevFull) {
       top5MapIncr = Utils.getOneDayData(custTop5MapFull, "last_order_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
+    custTop5MapFull.show(10)
+    custTop5MapFull.printSchema()
     val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
 
     val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
 
+    custTop5Incr.show(10)
+    custTop5Incr.printSchema()
     val custTop5IncrCached = custTop5Incr.cache().toDF()
 
     val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
@@ -134,9 +138,9 @@ object CustTop5 extends DataFeedsModel {
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(custTop5IncrCached, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
+ //   DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
+   // DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
   }
 
   def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
@@ -260,7 +264,7 @@ object CustTop5 extends DataFeedsModel {
     }
   }
 
-  val mergeRowCols = udf((map1: scala.collection.immutable.Map[String, Row], map2: scala.collection.immutable.Map[String, Row]) => joinRows(map1, map2))
+  val mergeRowCols = udf((map1: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]], map2: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]]) => joinRows(map1, map2))
   val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]) => joinMaps(map1, map2))
 
   def joinMaps(map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]] = {
@@ -305,8 +309,8 @@ object CustTop5 extends DataFeedsModel {
   }
 
 
-  def joinRows(map1: scala.collection.immutable.Map[String, Row], map2: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row]={
-    val mapFull = collection.mutable.Map[String, Row]()
+  def joinRows(map1: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]], map2: scala.collection.immutable.Map[String, Tuple3[Int, Double, String]]): scala.collection.immutable.Map[String, Tuple3[Int, Double, String]]={
+    val mapFull = collection.mutable.Map[String, Tuple3[Int, Double, String]]()
     if (null == map1 && null == map2) {
       return null
     } else if (null == map2) {
@@ -321,15 +325,16 @@ object CustTop5 extends DataFeedsModel {
     keys.foreach{
       key =>
         val row = map1(key)
-            val count = row(0).asInstanceOf[Int]
-            val sum = row(0).asInstanceOf[Double]
+            val count = row._1
+            val sum = row._2
 
             if (mapFull.contains(key)) {
               val m = mapFull(key)
-              val count1 = m(0).asInstanceOf[Int]
-              val sum1 = m(1).asInstanceOf[Double]
-              val sku = m(2).asInstanceOf[String]
-              mapFull.put(key, Row((count1 + count), (sum + sum1), sku))
+              val count1 = m._1
+              val sum1 = m._2
+              val sku = m._3
+              val t = Tuple3((count1 + count), (sum + sum1), sku)
+              mapFull.put(key, t)
               }
              else {
               mapFull.put(key, row)
@@ -345,11 +350,11 @@ object CustTop5 extends DataFeedsModel {
     val brick = Map[String, Map[Int, Double]]()
     val color = Map[String, Map[Int, Double]]()
     var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
-    val sortedlist = list.sortBy(r => (r._6.getTime, r._5))(Ordering.Tuple2(Ordering.Long.reverse, Ordering.Double.reverse))
+    val sortedList = list.sortBy(r => (r._6.getTime, r._5))(Ordering.Tuple2(Ordering.Long.reverse, Ordering.Double.reverse))
       .map(e=> (
           e._1, e._2, e._3, e._4, e._5, e._6, e._7
       ))
-    list.foreach{ e =>
+    sortedList.foreach{ e =>
       val (brandName, catName, brickName, coloName, price, date, sku) = e
       if (maxDate.before(date)) {
         maxDate = date
