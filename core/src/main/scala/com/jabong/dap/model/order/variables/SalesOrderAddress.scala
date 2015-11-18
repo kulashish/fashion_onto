@@ -2,21 +2,21 @@ package com.jabong.dap.model.order.variables
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, SalesAddressVariables, SalesOrderVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, SalesAddressVariables, SalesOrderVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
-import scala.collection.mutable.{ HashMap, ListBuffer, Map }
+import scala.collection.mutable.{HashMap, ListBuffer, Map}
 
 object SalesOrderAddress extends DataFeedsModel {
 
@@ -115,7 +115,7 @@ object SalesOrderAddress extends DataFeedsModel {
   def calcFav(favIncr: DataFrame, cityZone: DataFrame): DataFrame = {
     val cityMap = scala.collection.mutable.Map[String, Tuple2[String, String]]()
     val cities = cityZone
-      .select(CustomerVariables.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
+      .select(ContactListMobileVars.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
       .map(e => (e(0).toString, e(1).toString, e(2).toString))
     cities.foreach{
       e =>
