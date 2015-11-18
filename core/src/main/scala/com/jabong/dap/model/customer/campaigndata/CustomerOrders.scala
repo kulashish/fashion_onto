@@ -122,22 +122,32 @@ object CustomerOrders extends DataFeedsModel {
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfWrite("salesRevenueFull"), savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(dfWrite("salesRevenueFull"), savePath, saveMode)
+    }
 
     var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(dfWrite("salesRevenueOrdersIncr"), savePathIncr, saveMode)
+    if (DataWriter.canWrite(saveMode, savePathIncr)) {
+      DataWriter.writeParquet(dfWrite("salesRevenueOrdersIncr"), savePathIncr, saveMode)
+    }
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfWrite("custOrdersStatusMap"), savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(dfWrite("custOrdersStatusMap"), savePath, saveMode)
+    }
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
     val custOrderFull = dfWrite("custOrderFull")
-    DataWriter.writeParquet(custOrderFull, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(custOrderFull, savePath, saveMode)
+    }
 
     val custOrdersIncr = Utils.getOneDayData(custOrderFull, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(custOrdersIncr, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(custOrdersIncr, savePath, saveMode)
+    }
 
     val custOrdersCsv = custOrdersIncr
       .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
