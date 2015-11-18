@@ -20,7 +20,6 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
 import org.apache.spark.sql.{ Row, DataFrame }
-import org.apache.spark.sql._
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
