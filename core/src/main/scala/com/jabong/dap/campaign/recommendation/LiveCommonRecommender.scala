@@ -139,6 +139,9 @@ class LiveCommonRecommender extends Recommender with Logging {
           && completeRefSkuWithDiscountStatus(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       }
       case _ => {
+        CampaignUtils.debug(recommendations, "recommendations")
+        CampaignUtils.debug(completeRefSku, "completeRefSku")
+
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRICK) === recommendations(ProductVariables.BRICK)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
