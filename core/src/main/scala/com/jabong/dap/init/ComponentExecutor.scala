@@ -119,8 +119,7 @@ class ComponentExecutor extends Serializable with Logging {
 
           case CampaignCommon.HOTTEST_X => CampaignManager.startHottestXCampaign()
 
-
-		  // miscellaneous data
+          // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
 
           case _ => logger.error("Unknown source.")

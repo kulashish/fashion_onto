@@ -149,5 +149,5 @@ object Udf {
 
   val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
 
- // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
+  // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

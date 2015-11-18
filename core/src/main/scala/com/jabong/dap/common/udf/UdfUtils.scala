@@ -713,11 +713,10 @@ object UdfUtils extends Logging {
     maxDateString
   }
 
-  def size(a: mutable.MutableList[String]):Int= {
-    if(a ==null) return 0
+  def size(a: mutable.MutableList[String]): Int = {
+    if (a == null) return 0
     a.size
   }
-
 
   /**
    * merge two maps
@@ -749,6 +748,5 @@ object UdfUtils extends Logging {
     }
     return prevMap
   }
-
 
 }

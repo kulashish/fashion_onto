@@ -240,7 +240,6 @@ input:- row  and fields: field array
         dimensionSMap.put(dimension, dimensionMap)
       }
 
-
     }
 
     return dimensionSMap
@@ -284,8 +283,8 @@ input:- row  and fields: field array
    * @param a2
    * @return
    */
-  def getNonNull(a1: Any ,a2:Any): Any ={
-    if(a1 == null) return a2
+  def getNonNull(a1: Any, a2: Any): Any = {
+    if (a1 == null) return a2
     else a1
   }
 
