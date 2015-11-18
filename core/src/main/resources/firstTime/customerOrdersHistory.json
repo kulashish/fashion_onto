@@ -3,14 +3,14 @@
     {
       "source": "customerOrders",
       "path": "first time",
-      "incrDate": "2015/11/01",
+      "incrDate": "2015/11/14",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
       "source": "customerOrders",
-      "fullDate": "2015/11/01",
-      "incrDate": "2015/11/02",
+      "fullDate": "2015/11/14",
+      "incrDate": "2015/11/15",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
