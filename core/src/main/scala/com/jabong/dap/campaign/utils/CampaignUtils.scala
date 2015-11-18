@@ -799,7 +799,7 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.GENDER),
       filteredSku(ProductVariables.PRODUCT_NAME),
       filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND))
+      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
     val dfBrik2 = filteredSku.select(
       filteredSku(CustomerVariables.EMAIL),
@@ -812,7 +812,7 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.GENDER),
       filteredSku(ProductVariables.PRODUCT_NAME),
       filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND))
+      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
     (dfBrik1, dfBrik2)
   }
