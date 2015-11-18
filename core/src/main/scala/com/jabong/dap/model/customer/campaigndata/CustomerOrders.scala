@@ -405,8 +405,7 @@ object CustomerOrders extends DataFeedsModel {
 
     val salesOrderAddrFavIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
     dfMap.put("salesOrderAddrFavIncr", salesOrderAddrFavIncr)
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    val custTop5Incr = DataReader.getDataFrame4mCsv("/data/test/tmp", DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate, fileDate + "_CUST_TOP5.csv", "true", ";")
+    val custTop5Incr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate)
     dfMap.put("custTop5Incr", custTop5Incr)
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     val salesOrderIncrFil = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
