@@ -765,23 +765,30 @@ object CampaignUtils extends Logging {
         CampaignUtils.debug(dfBrick1, "dfBrick1")
         CampaignUtils.debug(dfBrick2, "dfBrick2")
 
-        val dfBrik1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
-        CampaignUtils.debug(dfBrik1RecommendationData, "dfBrik1RecommendationData")
+        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
         val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
-        val dfJoined = dfBrik1RecommendationData.join(
+        val joinedRdd = dfBrick1RecommendationData.join(
           dfBrick2RecommendationData,
-          dfBrik1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
+          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
           SQL.INNER
         ).select(
-            dfBrik1RecommendationData(CampaignMergedFields.EMAIL),
-            dfBrik1RecommendationData(CampaignMergedFields.REF_SKUS),
-            Udf.concatenateListOfString(dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
-            dfBrik1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-            dfBrik1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
-          )
+            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
+            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
+            dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS),
+            dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS),
+            //Udf.concatenateListOfString(dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+          ).rdd.map(row => (row(0), row(1), row(2).asInstanceOf[List] ::: row(3).asInstanceOf[List], row(4), row(5)))
+
+        val sqlContext = Spark.getSqlContext()
+        import sqlContext.implicits._
+        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
+          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
         CampaignUtils.debug(dfJoined, "dfJoined")
 
         dfJoined
