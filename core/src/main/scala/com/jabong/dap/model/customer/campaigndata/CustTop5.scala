@@ -141,7 +141,7 @@ object CustTop5 extends DataFeedsModel {
 
   def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
     val favTop5Map = top5Incr.map(e =>
-      (e(0).asInstanceOf[Long] -> (getTop5FavList(e(1).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
+      (e(0).asInstanceOf[Long] -> (getTop5FavListRow(e(1).asInstanceOf[scala.collection.immutable.Map[String, Row]]),
         getTop5FavList(e(2).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         getTop5FavList(e(3).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
         getTop5FavList(e(4).asInstanceOf[scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]]),
@@ -170,6 +170,28 @@ object CustTop5 extends DataFeedsModel {
     val categoryAVG = Spark.getSqlContext().createDataFrame(catAvg, Schema.catAvg)
 
     (fav, categoryCount, categoryAVG)
+  }
+
+  def getTop5FavListRow(map: scala.collection.immutable.Map[String, Row]): List[String] = {
+    val a = ListBuffer[(String, Int, Double)]()
+    val keys = map.keySet
+    keys.foreach{
+      t =>
+        val row = map(t)
+        val  count = row(0).asInstanceOf[Int]
+        val  sum = row(1).asInstanceOf[Double]
+        val x = Tuple3(t, count, sum)
+        a.+=:(x)
+    }
+    val list = a.sortBy(r => (r._2.toInt, r._3.toDouble))(Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)
+    if (list.size >= 5) {
+      list.toList.take(5)
+    } else {
+      while (list.size < 5) {
+        list.+=("")
+      }
+      list.toList
+    }
   }
 
   def getTop5FavList(map: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): List[String] = {
@@ -228,7 +250,7 @@ object CustTop5 extends DataFeedsModel {
     } else {
       val top5Joined = top5PrevFull.join(top5incr, top5PrevFull(SalesOrderVariables.FK_CUSTOMER) === top5incr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(top5incr(SalesOrderVariables.FK_CUSTOMER), top5PrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-          mergeMapCols(top5incr("brand_list"), top5PrevFull("brand_list")) as "brand_list",
+          mergeRowCols(top5incr("brand_list"), top5PrevFull("brand_list")) as "brand_list",
           mergeMapCols(top5incr("catagory_list"), top5PrevFull("catagory_list")) as "catagory_list",
           mergeMapCols(top5incr("brick_list"), top5PrevFull("brick_list")) as "brick_list",
           mergeMapCols(top5incr("color_list"), top5PrevFull("color_list")) as "color_list",
@@ -238,6 +260,7 @@ object CustTop5 extends DataFeedsModel {
     }
   }
 
+  val mergeRowCols = udf((map1: scala.collection.immutable.Map[String, Row], map2: scala.collection.immutable.Map[String, Row]) => joinRows(map1, map2))
   val mergeMapCols = udf((map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]) => joinMaps(map1, map2))
 
   def joinMaps(map1: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]], map2: scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]]): scala.collection.immutable.Map[String, scala.collection.immutable.Map[Int, Double]] = {
@@ -281,24 +304,78 @@ object CustTop5 extends DataFeedsModel {
     finalMap
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp, String)]): (Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
-    val brand = Map[String, Map[Int, Double]]()
+
+  def joinRows(map1: scala.collection.immutable.Map[String, Row], map2: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row]={
+    val mapFull = collection.mutable.Map[String, Row]()
+    if (null == map1 && null == map2) {
+      return null
+    } else if (null == map2) {
+      return map1
+    } else if (null == map1) {
+      return map2
+    }
+    map2.keySet.foreach{
+      key => mapFull.put(key, map2(key))
+    }
+    val keys = map1.keySet
+    keys.foreach{
+      key =>
+        val row = map1(key)
+            val count = row(0).asInstanceOf[Int]
+            val sum = row(0).asInstanceOf[Double]
+
+            if (mapFull.contains(key)) {
+              val m = mapFull(key)
+              val count1 = m(0).asInstanceOf[Int]
+              val sum1 = m(1).asInstanceOf[Double]
+              val sku = m(2).asInstanceOf[String]
+              mapFull.put(key, Row((count1 + count), (sum + sum1), sku))
+              }
+             else {
+              mapFull.put(key, row)
+            }
+        }
+    val finalMap = mapFull.map(kv => (kv._1, kv._2)).toMap
+    finalMap
+  }
+
+  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp, String)]): (Map[String, Row], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
+    val brand = Map[String, Row]()
     val cat = Map[String, Map[Int, Double]]()
     val brick = Map[String, Map[Int, Double]]()
     val color = Map[String, Map[Int, Double]]()
     var maxDate: Timestamp = TimeUtils.MIN_TIMESTAMP
+    val sortedlist = list.sortBy(r => (r._6.getTime, r._5))(Ordering.Tuple2(Ordering.Long.reverse, Ordering.Double.reverse))
+      .map(e=> (
+          e._1, e._2, e._3, e._4, e._5, e._6, e._7
+      ))
     list.foreach{ e =>
-      val (brandName, catName, brickName, coloName, price, date) = e
+      val (brandName, catName, brickName, coloName, price, date, sku) = e
       if (maxDate.before(date)) {
         maxDate = date
       }
-      updateMap(brand, brandName, price)
+      updateMapRow(brand, brandName, price, sku)
       updateMap(cat, catName, price)
       updateMap(brick, brickName, price)
       updateMap(color, coloName, price)
     }
     (brand, cat, brick, color, maxDate)
 
+  }
+
+  def updateMapRow(map: Map[String, Row], key: String, price: Double, sku: String): Map[String, Row] ={
+    if (map.contains(key)) {
+      val row = map(key)
+      val currentSum = row(1).asInstanceOf[Double]
+      val currCount = row(0).asInstanceOf[Int]
+      map.update(key, Row(currCount+1, currentSum+price, row(2).asInstanceOf[String]))
+    } else {
+      if (key.length > 0) {
+        val newRow = Row(1, price, sku)
+        map.put(key, newRow)
+      }
+    }
+    map
   }
 
   def updateMap(map: Map[String, Map[Int, Double]], key: String, price: Double): Map[String, Map[Int, Double]] = {
