@@ -67,7 +67,7 @@ object SalesOrderAddress extends DataFeedsModel {
     val saleOrderAddr = saleOrderAddrJoined.join(cityZoneFull, cityZoneFull("ZIPCODE") === saleOrderAddrJoined(SalesAddressVariables.POSTCODE), SQL.LEFT_OUTER)
       .select(
         saleOrderAddrJoined(SalesOrderVariables.FK_CUSTOMER),
-        coalesce(Udf.toLowercase(cityZoneFull(SalesAddressVariables.CITY)), saleOrderAddrJoined(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY,
+        coalesce(Udf.toLowercase(cityZoneFull(ContactListMobileVars.CITY)), saleOrderAddrJoined(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY,
         saleOrderAddrJoined(SalesAddressVariables.PHONE),
         saleOrderAddrJoined(SalesAddressVariables.FIRST_NAME),
         saleOrderAddrJoined(SalesAddressVariables.LAST_NAME),
