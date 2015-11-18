@@ -252,7 +252,6 @@ object UdfUtils extends Logging {
     }
     return app_user_id
   }
-
   /**
    * This will return Timestamp into YYYYMMDD format
    * @param t1
@@ -288,7 +287,7 @@ object UdfUtils extends Logging {
   }
 
   /**
-   * getSimpleSkuFromExtraData will extract data from extraData
+   *  getSimpleSkuFromExtraData will extract data from extraData
    * @param extraData
    * @return
    */
@@ -569,7 +568,6 @@ object UdfUtils extends Logging {
       0
     }
   }
-
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
     if (i >= strings.size) "" else strings(i)
   }
@@ -625,11 +623,7 @@ object UdfUtils extends Logging {
   }
 
   def addInt(i1: Int, i2: Int): Int = {
-    {
-      if (null.asInstanceOf[Int] == i1) 0 else i1
-    } + {
-      if (null.asInstanceOf[Int] == i2) 0 else i2
-    }
+    { if (null.asInstanceOf[Int] == i1) 0 else i1 } + { if (null.asInstanceOf[Int] == i2) 0 else i2 }
   }
 
   /**

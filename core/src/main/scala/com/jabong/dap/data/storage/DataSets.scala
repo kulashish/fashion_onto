@@ -198,4 +198,8 @@ object DataSets {
 
   // campaigns
   val ACART_HOURLY = "acartHourly"
+
+  // miscellaneous data sets
+  val CITY_WISE_DATA = "city_wise_data"
 }
+
