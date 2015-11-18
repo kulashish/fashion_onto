@@ -122,6 +122,7 @@ object DataSets {
   val EXTRAS = "extras"
 
   val VARIABLES = "variables"
+  val MAPS = "maps"
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
