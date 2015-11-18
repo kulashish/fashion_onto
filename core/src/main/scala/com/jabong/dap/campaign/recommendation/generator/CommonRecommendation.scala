@@ -94,10 +94,15 @@ abstract class CommonRecommendation extends Logging {
       throw new NullInputException("Either weeklyAverageData or last30OrderItemData is null ")
     }
     if (cityStateBased) {
+      val updatedWeeklyAverageData = weeklyAverageData.
+        withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU, "NEW_" + Recommendation.SALES_ORDER_ITEM_SKU)
+      .withColumnRenamed(SalesAddressVariables.CITY,"NEW_"+SalesAddressVariables.CITY)
+      .withColumnRenamed(Recommendation.RECOMMENDATION_STATE,"NEW_"+Recommendation.RECOMMENDATION_STATE)
+
       val joinedWeeklyAverageData = last30OrderItemData.join(weeklyAverageData,
-        last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === weeklyAverageData(Recommendation.SALES_ORDER_ITEM_SKU) &&
-          last30OrderItemData(SalesAddressVariables.CITY) === weeklyAverageData(SalesAddressVariables.CITY) &&
-          last30OrderItemData(Recommendation.RECOMMENDATION_STATE) === weeklyAverageData(Recommendation.RECOMMENDATION_STATE), SQL.LEFT_OUTER)
+        last30OrderItemData(Recommendation.SALES_ORDER_ITEM_SKU) === updatedWeeklyAverageData("NEW_"+Recommendation.SALES_ORDER_ITEM_SKU) &&
+          last30OrderItemData(SalesAddressVariables.CITY) === weeklyAverageData("NEW_"+SalesAddressVariables.CITY) &&
+          last30OrderItemData(Recommendation.RECOMMENDATION_STATE) === weeklyAverageData("NEW_"+Recommendation.RECOMMENDATION_STATE), SQL.LEFT_OUTER)
       return joinedWeeklyAverageData
     }
     val updatedWeeklyAverageData = weeklyAverageData.withColumnRenamed(Recommendation.SALES_ORDER_ITEM_SKU, "NEW_" + Recommendation.SALES_ORDER_ITEM_SKU)
