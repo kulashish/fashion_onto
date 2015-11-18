@@ -26,7 +26,6 @@ class BrickAffinityCampaign {
     CampaignUtils.debug(dfCustomerSelection, "dfCustomerSelection")
     //filter sku based on daily filter
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
-    CampaignUtils.debug(filteredSku, "filteredSku")
 
     //join Customer Favorite data [email, Brick1, Brick2]
     val customerFavBrick = getCustomerFavBrick(customerSurfAffinity)
@@ -39,7 +38,6 @@ class BrickAffinityCampaign {
         customerFavBrick(BRICK1),
         customerFavBrick(BRICK2)
       )
-    CampaignUtils.debug(joinedToFavBrick, "joinedToFavBrick")
 
     //Generate 8 sku from Brick1 from seller recommendation [email, ref-sku, Brick1 -> [sku1 to sku8]]
     //Generate 8 sku from Brick2 from seller recommendation [email, ref-sku, Brick2 -> [sku1 to sku8]]
