@@ -801,7 +801,7 @@ object CampaignUtils extends Logging {
         dfJoined
       }
       case CampaignCommon.HOTTEST_X =>
-        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
         dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
@@ -855,7 +855,7 @@ object CampaignUtils extends Logging {
    * @param recommendations
    * @return
    */
-  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame): DataFrame = {
+  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = 8): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
@@ -864,7 +864,7 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), CampaignCommon.CALENDAR_REC_SKUS)
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), numRecSkus)
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
