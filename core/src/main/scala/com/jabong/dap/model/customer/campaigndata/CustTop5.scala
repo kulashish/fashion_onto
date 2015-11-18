@@ -208,16 +208,18 @@ object CustTop5 extends DataFeedsModel {
         itr(ProductVariables.BRICK),
         itr(ProductVariables.COLOR),
         itr(ProductVariables.SPECIAL_PRICE).cast(DoubleType) as ProductVariables.SPECIAL_PRICE,
-        saleOrderJoined(SalesOrderVariables.CREATED_AT)
+        saleOrderJoined(SalesOrderVariables.CREATED_AT),
+        saleOrderJoined(SalesOrderItemVariables.SKU)
       )
       .na.fill(scala.collection.immutable.Map(ProductVariables.BRAND -> "",
         ProductVariables.CATEGORY -> "",
         ProductVariables.BRICK -> "",
         ProductVariables.COLOR -> "",
-        ProductVariables.SPECIAL_PRICE -> 0.0
+        ProductVariables.SPECIAL_PRICE -> 0.0,
+        SalesOrderItemVariables.SKU -> ""
       )).filter(saleOrderJoined(SalesOrderVariables.CREATED_AT).isNotNull)
 
-    val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], Timestamp.valueOf(e(6).toString)))).groupByKey()
+    val top5Map = joinedItr.map(e => (e(0) -> (e(1).toString, e(2).toString, e(3).toString, e(4).toString, e(5).asInstanceOf[Double], Timestamp.valueOf(e(6).toString), e(7).toString))).groupByKey()
     val top5 = top5Map.map(e => (e._1, getTop5Count(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
 
     val top5incr = Spark.getSqlContext().createDataFrame(top5, Schema.customerFavList)
@@ -279,7 +281,7 @@ object CustTop5 extends DataFeedsModel {
     finalMap
   }
 
-  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp)]): (Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
+  def getTop5Count(list: List[(String, String, String, String, Double, Timestamp, String)]): (Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Map[String, Map[Int, Double]], Timestamp) = {
     val brand = Map[String, Map[Int, Double]]()
     val cat = Map[String, Map[Int, Double]]()
     val brick = Map[String, Map[Int, Double]]()
