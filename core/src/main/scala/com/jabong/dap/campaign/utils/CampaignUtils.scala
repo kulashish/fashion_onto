@@ -762,9 +762,14 @@ object CampaignUtils extends Logging {
     val recs = campaignName match {
       case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => {
         val (dfBrick1, dfBrick2) = getBrick1Brick2(filteredSku: DataFrame)
+        CampaignUtils.debug(dfBrick1, "dfBrick1")
+        CampaignUtils.debug(dfBrick2, "dfBrick2")
 
         val dfBrik1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        CampaignUtils.debug(dfBrik1RecommendationData, "dfBrik1RecommendationData")
+
         val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+        CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
         val dfJoined = dfBrik1RecommendationData.join(
           dfBrick2RecommendationData,
@@ -777,6 +782,7 @@ object CampaignUtils extends Logging {
             dfBrik1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
             dfBrik1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
           )
+        CampaignUtils.debug(dfJoined, "dfJoined")
 
         dfJoined
       }
