@@ -17,14 +17,14 @@ import com.jabong.dap.common.Utils
  * Created by rahul  on 27/8/15.
  */
 object RecommendationInput {
-  var orderItemFullData, lastdayItrData,salesAddressFullData,salesOrder30DaysData,cityZoneMapping: DataFrame = null
+  var orderItemFullData, lastdayItrData, salesAddressFullData, salesOrder30DaysData, cityZoneMapping: DataFrame = null
   /**
    *
    */
   def loadCommonDataSets(date: String) {
     orderItemFullData = CampaignInput.loadFullOrderItemData(date)
     val salesOrderFullData = CampaignInput.loadFullOrderData(date)
-    salesOrder30DaysData = CampaignInput.loadLastNdaysOrderData(30,salesOrderFullData,date)
+    salesOrder30DaysData = CampaignInput.loadLastNdaysOrderData(30, salesOrderFullData, date)
     cityZoneMapping = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
     salesAddressFullData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
     lastdayItrData = CampaignInput.loadYesterdayItrSkuData(date).cache()
