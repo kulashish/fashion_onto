@@ -3,23 +3,23 @@ package com.jabong.dap.common.udf
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{ArrayUtils, Spark, StringUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 import org.apache.spark.sql.functions._
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
@@ -598,7 +598,7 @@ object UdfUtils extends Logging {
     logger.info("Enter in  timeToSlot:")
     val nullStr: Int = null.asInstanceOf[Int]
     var timeToSlotMap = new HashMap[Int, Int]
-    timeToSlotMap +=(7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
+    timeToSlotMap += (7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
 
     try {
       val formatter = new SimpleDateFormat(dateFormat)
@@ -720,8 +720,8 @@ object UdfUtils extends Logging {
     maxDateString
   }
 
-  def size(a: mutable.MutableList[String]):Int= {
-    if(a ==null) return 0
+  def size(a: mutable.MutableList[String]): Int = {
+    if (a == null) return 0
     a.size
   }
 }
