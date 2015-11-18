@@ -95,10 +95,8 @@ object CustomerSurfAffinity extends DataFeedsModel {
   }
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
-    val pathSurfAffinityInc = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_SURF_AFFINITY, DataSets.DAILY_MODE, incrDate)
     val pathSurfAffinityFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_SURF_AFFINITY, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathSurfAffinityFull)) {
-      DataWriter.writeParquet(dfWrite("dfSurfAffinityInc"), pathSurfAffinityInc, saveMode)
       DataWriter.writeParquet(dfWrite("dfSurfAffinityFull"), pathSurfAffinityFull, saveMode)
     }
   }
