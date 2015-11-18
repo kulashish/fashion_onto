@@ -455,7 +455,6 @@ object SalesOrderItem {
 
     val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
     val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
-    var discCalc: DataFrame = null
     val disc = percent.groupBy(SalesOrderVariables.ID_SALES_ORDER)
       .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
         min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
@@ -662,7 +661,7 @@ object SalesOrderItem {
         sum("item_count") as SalesOrderVariables.ORDER_ITEM_COUNT,
         max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.CREATED_AT)
 
-    return orderValue
+    orderValue
   }
 
   /**
