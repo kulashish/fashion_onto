@@ -27,10 +27,7 @@ class BrickAffinityCampaign {
     //filter sku based on daily filter
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
-    //call generate ref sku for maximum sku price [email, ref-sku]
-    //    val refSkus = CampaignUtils.generateReferenceSkus(dfCustomerSelection, CampaignCommon.CALENDAR_REF_SKUS)
-
-    //join Customer Favorite data [email, Brick1, Brick2, Brand1, Brand2]
+    //join Customer Favorite data [email, Brick1, Brick2]
     val customerFavBrick = getCustomerFavBrick(customerSurfAffinity)
 
     //join Customer Favorite data [email, ref-sku, Brick1, Brick2]
@@ -41,9 +38,9 @@ class BrickAffinityCampaign {
         customerFavBrick(BRICK2)
       )
 
-    //FIXME: Generate 8 sku from Brick1 from seller recommendation [email, ref-sku, Brick1 -> [sku1 to sku8]]
-    //FIXME: Generate 8 sku from Brick2 from seller recommendation [email, ref-sku, Brick2 -> [sku1 to sku8]]
-    //FIXME: join Brick1 to Brick2 [email, ref-sku, Brick1 -> [sku1 to sku8], Brick2 -> [sku1 to sku8]]
+    //Generate 8 sku from Brick1 from seller recommendation [email, ref-sku, Brick1 -> [sku1 to sku8]]
+    //Generate 8 sku from Brick2 from seller recommendation [email, ref-sku, Brick2 -> [sku1 to sku8]]
+    //join Brick1 to Brick2 [email, ref-sku, Brick1 -> [sku1 to sku8], Brick2 -> [sku1 to sku8]]
 
     // ***** email use case
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRICK_AFFINITY_CAMPAIGN, joinedToFavBrick, false, brickMvpRecommendations)

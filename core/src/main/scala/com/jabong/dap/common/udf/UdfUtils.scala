@@ -436,6 +436,24 @@ object UdfUtils extends Logging {
   }
 
   /**
+   *
+   * @param l1
+   * @param l2
+   * @return
+   */
+  def concatenateList[T](l1: List[T], l2: List[T]): List[T] = {
+
+    if (l1 == null && l2 == null) {
+      return null
+    } else if (l1 == null) {
+      return l2
+    } else if (l2 == null) {
+      return l1
+    }
+
+    return l1 ++ l2
+  }
+  /**
    * returns dayName with max click given counts for 7 days
    * @param count1
    * @param count2

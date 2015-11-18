@@ -85,6 +85,11 @@ object Udf {
   val columnCount = udf((colList: List[String]) => UdfUtils.getCountColumn(colList: List[String]))
 
   /**
+   * countSku will return total no of sku
+   */
+  val concatenateListOfString = udf((l1: List[String], l2: List[String]) => UdfUtils.concatenateList(l1: List[String], l2: List[String]))
+
+  /**
    * Removes all zeroes string and null string to emptyString.
    */
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))

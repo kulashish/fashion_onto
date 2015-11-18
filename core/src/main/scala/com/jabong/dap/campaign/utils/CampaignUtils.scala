@@ -750,36 +750,41 @@ object CampaignUtils extends Logging {
 
   }
 
+  /**
+   *
+   * @param campaignType
+   * @param campaignName
+   * @param filteredSku
+   * @param recommendations
+   */
   def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
 
     val recs = campaignName match {
       case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => {
         val (dfBrick1, dfBrick2) = getBrick1Brick2(filteredSku: DataFrame)
 
-        val dfBrik1RecommendationData = getRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
-        val dfBrick2RecommendationData = getRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+        val dfBrik1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
 
         val dfJoined = dfBrik1RecommendationData.join(
           dfBrick2RecommendationData,
           dfBrik1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
           SQL.INNER
-        )
-        //FIXME: select REC_SKUS of brick1 and birck2
-        //          .select(
-        //            dfBrik1RecommendationData(CampaignMergedFields.EMAIL),
-        //            dfBrik1RecommendationData(CampaignMergedFields.REF_SKUS),
-        //            dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS),
-        //            dfBrik1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-        //            dfBrik1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
-        //          )
+        ).select(
+            dfBrik1RecommendationData(CampaignMergedFields.EMAIL),
+            dfBrik1RecommendationData(CampaignMergedFields.REF_SKUS),
+            Udf.concatenateListOfString(dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+            dfBrik1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+            dfBrik1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+          )
 
         dfJoined
       }
       case CampaignCommon.HOTTEST_X =>
-        val dfRecommendationData = getRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ =>
-        val dfRecommendationData = getRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         dfRecommendationData
     }
 
@@ -787,8 +792,13 @@ object CampaignUtils extends Logging {
     CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
+  /**
+   * This method for BrickAffinityCampaign
+   * @param filteredSku
+   * @return
+   */
   def getBrick1Brick2(filteredSku: DataFrame): (DataFrame, DataFrame) = {
-    val dfBrik1 = filteredSku.select(
+    val dfBrick1 = filteredSku.select(
       filteredSku(CustomerVariables.EMAIL),
       filteredSku(CustomerVariables.FK_CUSTOMER),
       filteredSku(ProductVariables.SKU_SIMPLE),
@@ -801,7 +811,7 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.STOCK),
       filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    val dfBrik2 = filteredSku.select(
+    val dfBrick2 = filteredSku.select(
       filteredSku(CustomerVariables.EMAIL),
       filteredSku(CustomerVariables.FK_CUSTOMER),
       filteredSku(ProductVariables.SKU_SIMPLE),
@@ -814,10 +824,18 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.STOCK),
       filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    (dfBrik1, dfBrik2)
+    (dfBrick1, dfBrick2)
   }
 
-  def getRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame): DataFrame = {
+  /**
+   *
+   * @param campaignType
+   * @param campaignName
+   * @param filteredSku
+   * @param recommendations
+   * @return
+   */
+  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
