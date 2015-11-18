@@ -718,35 +718,5 @@ object UdfUtils extends Logging {
     a.size
   }
 
-  /**
-   * merge two maps
-   * @param prevMap
-   * @param newMap
-   * @return
-   */
-  def mergeMaps(prevMap: scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row] = {
-    require(prevMap != null || newMap != null, "prevMap and newMap cannot be null")
-    if (prevMap == null) return newMap
-    if (newMap == null) return prevMap
-
-    newMap.keys.foreach {
-      key =>
-        if (prevMap.contains(key)) {
-          var updatedRow: Row = null
-          val prevRowValue = prevMap(key)
-          val newRowValue = newMap(key)
-          if (newRowValue.size == 1) {
-            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
-          } else {
-            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
-              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
-          }
-          prevMap + (key -> updatedRow)
-        } else {
-          prevMap + (key -> newMap(key))
-        }
-    }
-    return prevMap
-  }
 
 }

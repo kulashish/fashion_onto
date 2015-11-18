@@ -46,7 +46,7 @@ object CityData extends DataFeedsModel with Logging {
     dfMap.put("salesOrderIncr", dfSalesOrderIncr)
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
     dfMap.put("salesOrderItemIncr", dfSalesOrderItemIncr)
-    val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
+    val dfSalesOrderAddressIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
     dfMap.put("salesOrderAddressIncr", dfSalesOrderAddressIncr)
     val dfItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
     dfMap.put("itrSkuSimple", dfItrSkuSimple)
@@ -90,11 +90,11 @@ object CityData extends DataFeedsModel with Logging {
     val cityWiseMapData = Utils.generateTopMap(salesWithItrData, pivotFields, attributeFields, valueFields, OrderBySchema.cityMapSchema)
     val dfCityWisePrevFull = dfMap.getOrElse("cityWisePrevFullData", null)
     if (dfCityWisePrevFull != null) {
-      val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData, dfCityWisePrevFull(SalesAddressVariables.CITY) === cityWiseMapData(SalesAddressVariables.CITY), SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0), row(4)).asInstanceOf[String],
-        UdfUtils.mergeMaps(row(1).asInstanceOf[Map[String, Row]], row(6).asInstanceOf[Map[String, Row]]),
-        UdfUtils.mergeMaps(row(2).asInstanceOf[Map[String, Row]], row(7).asInstanceOf[Map[String, Row]]),
-        UdfUtils.mergeMaps(row(3).asInstanceOf[Map[String, Row]], row(8).asInstanceOf[Map[String, Row]]),
-        UdfUtils.mergeMaps(row(4).asInstanceOf[Map[String, Row]], row(9).asInstanceOf[Map[String, Row]])))
+      val cityJoinedData = dfCityWisePrevFull.join(cityWiseMapData, dfCityWisePrevFull(SalesAddressVariables.CITY) === cityWiseMapData(SalesAddressVariables.CITY), SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0), row(5)).asInstanceOf[String],
+        Utils.mergeMaps(row(1).asInstanceOf[Map[String, Row]], row(6).asInstanceOf[Map[String, Row]]),
+        Utils.mergeMaps(row(2).asInstanceOf[Map[String, Row]], row(7).asInstanceOf[Map[String, Row]]),
+        Utils.mergeMaps(row(3).asInstanceOf[Map[String, Row]], row(8).asInstanceOf[Map[String, Row]]),
+        Utils.mergeMaps(row(4).asInstanceOf[Map[String, Row]], row(9).asInstanceOf[Map[String, Row]])))
       //            .select(coalesce(dfCityWisePrevFull(SalesAddressVariables.CITY),cityWiseMapData(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY,
       //                    Udf.mergeMap(dfCityWisePrevFull("brand_list"),cityWiseMapData("brand_list")) as "brand_list",
       //                    Udf.mergeMap(dfCityWisePrevFull("brick_list"),cityWiseMapData("brick_list")) as "brick_list",
