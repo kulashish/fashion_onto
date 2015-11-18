@@ -331,6 +331,7 @@ abstract class CommonRecommendation extends Logging {
 
     val saleOrderAddrWithState = salesAddress.join(cityZoneData, cityZoneData("ZIPCODE") === salesAddress(SalesAddressVariables.POSTCODE), SQL.LEFT_OUTER)
       .select(
+        salesAddress(SalesAddressVariables.ID_SALES_ORDER_ADDRESS),
         cityZoneData(Recommendation.RECOMMENDATION_STATE),
         salesAddress(SalesAddressVariables.CITY),
         salesAddress(SalesAddressVariables.POSTCODE))
