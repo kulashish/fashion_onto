@@ -511,14 +511,14 @@ object SalesOrderItem {
         (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
     val ordersMapIncr = incrMap.map(e => (e._1, makeMap4mGroupedData(e._2.toList)))
 
-    println("ordersMapIncr Count", ordersMapIncr.count())
+    // println("ordersMapIncr Count", ordersMapIncr.count())
 
     val ordersIncrFlat = ordersMapIncr.map(e => Row(e._1, e._2._1, e._2._2))
 
     val orderIncr = Spark.getSqlContext().createDataFrame(ordersIncrFlat, Schema.salesItemStatus)
 
-    println("orderIncr Count", orderIncr.count())
-    orderIncr.printSchema()
+    // println("orderIncr Count", orderIncr.count())
+    // orderIncr.printSchema()
 
     var joinedMap: DataFrame = null
 
@@ -532,7 +532,7 @@ object SalesOrderItem {
         )
     }
 
-    println("joinedMap Count", joinedMap.count())
+    // println("joinedMap Count", joinedMap.count())
 
     val incrData = Utils.getOneDayData(joinedMap, "last_orders_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
@@ -543,9 +543,9 @@ object SalesOrderItem {
     val finalOrdersCount = orderStatusMap.map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._3))
 
     val res = Spark.getSqlContext().createDataFrame(finalOrdersCount, Schema.ordersCount)
-    println("res Count", res.count())
+    // println("res Count", res.count())
 
-    return (res, joinedMap)
+    (res, joinedMap)
   }
 
   val mergeMaps = udf((map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]) => joinMaps(map1, map2))
