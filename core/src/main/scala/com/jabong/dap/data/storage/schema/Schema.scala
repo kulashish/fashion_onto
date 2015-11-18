@@ -459,9 +459,7 @@ object Schema {
     StructField("last_name_list", MapType(StringType, IntegerType), true),
     StructField("last_order_created_at", TimestampType, true),
     StructField(SalesAddressVariables.FIRST_SHIPPING_CITY, StringType, true),
-    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true),
-    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER, StringType, true),
-    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER, StringType, true)
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY, StringType, true)
   ))
 
   val salesItemStatus = StructType(Array(
@@ -651,7 +649,13 @@ object Schema {
     StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE, LongType, false),
     StructField(SalesOrderVariables.CATEGORY_PENETRATION, StringType, false),
     StructField(SalesOrderVariables.BRICK_PENETRATION, StringType, false),
-    StructField(SalesOrderItemVariables.FAV_BRAND, StringType, false)
+    StructField(SalesOrderItemVariables.FAV_BRAND, StringType, false),
+    StructField(ContactListMobileVars.CITY, StringType, true),
+    StructField(CustomerVariables.PHONE, StringType, true),
+    StructField(CustomerVariables.FIRST_NAME, StringType, true),
+    StructField(CustomerVariables.LAST_NAME, StringType, true),
+    StructField(ContactListMobileVars.CITY_TIER, StringType, true),
+    StructField(ContactListMobileVars.STATE_ZONE, StringType, true)
   ))
 
 }

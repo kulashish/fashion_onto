@@ -12,7 +12,6 @@ import scala.collection.mutable.ArrayBuffer
  * Created by raghu on 3/7/15.
  */
 object Udf {
-
   /**
    * minTimestamp will return min of Timestamp t1 or t2
    */

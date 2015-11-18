@@ -2,6 +2,7 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
+import java.util
 import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -717,5 +718,4 @@ object UdfUtils extends Logging {
     if (a == null) return 0
     a.size
   }
-
 }
