@@ -117,9 +117,10 @@ object SalesOrderAddress extends DataFeedsModel {
 
   def calcFav(favIncr: DataFrame, incrDate: String, cityZone: DataFrame): DataFrame = {
     val cityMap = scala.collection.mutable.Map[String, Tuple2[String, String]]()
-    cityZone
+    val cities = cityZone
       .select(SalesAddressVariables.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
-      .rdd.foreach{
+      .map(e=>(e(0).toString, e(1).toString, e(2).toString))
+    cities.foreach{
       e => val (city, tier, zone) = e
         if(!cityMap.contains(city)){
           cityMap.put(city, Tuple2(tier, zone))
