@@ -193,9 +193,18 @@ object CustomerOrders extends DataFeedsModel {
           coalesce(incr(SalesOrderItemVariables.ORDERS_COUNT_LIFE), prevFull(SalesOrderItemVariables.ORDERS_COUNT_LIFE)) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
           coalesce(incr(SalesOrderVariables.CATEGORY_PENETRATION), prevFull(SalesOrderVariables.CATEGORY_PENETRATION)) as SalesOrderVariables.CATEGORY_PENETRATION,
           coalesce(incr(SalesOrderVariables.BRICK_PENETRATION), prevFull(SalesOrderVariables.BRICK_PENETRATION)) as SalesOrderVariables.BRICK_PENETRATION,
-          coalesce(incr(SalesOrderItemVariables.FAV_BRAND), prevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND
+          coalesce(incr(SalesOrderItemVariables.FAV_BRAND), prevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
+          coalesce(incr(ContactListMobileVars.CITY), prevFull(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
+          coalesce(incr(CustomerVariables.PHONE), prevFull(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+          coalesce(incr(CustomerVariables.FIRST_NAME), prevFull(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+          coalesce(incr(CustomerVariables.LAST_NAME), prevFull(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+          coalesce(incr(ContactListMobileVars.CITY_TIER), prevFull(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
+          coalesce(incr(ContactListMobileVars.STATE_ZONE), prevFull(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE
         )
     }
+
+    // This is being done as for decimal type columns the precision is becoming 20 and
+    // while writing to parquet it is giving error
     val rdd = custOrdersFull.select(CustomerVariables.FK_CUSTOMER,
       SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
       SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
@@ -225,7 +234,13 @@ object CustomerOrders extends DataFeedsModel {
       SalesOrderItemVariables.ORDERS_COUNT_LIFE,
       SalesOrderVariables.CATEGORY_PENETRATION,
       SalesOrderVariables.BRICK_PENETRATION,
-      SalesOrderItemVariables.FAV_BRAND).rdd
+      SalesOrderItemVariables.FAV_BRAND,
+      ContactListMobileVars.CITY,
+      CustomerVariables.PHONE,
+      CustomerVariables.FIRST_NAME,
+      CustomerVariables.LAST_NAME,
+      ContactListMobileVars.CITY_TIER,
+      ContactListMobileVars.STATE_ZONE).rdd
     val res = Spark.getSqlContext().createDataFrame(rdd, Schema.customerOrdersSchema)
     res
   }
@@ -355,7 +370,13 @@ object CustomerOrders extends DataFeedsModel {
         salesOrderAddrFavIncr(SalesAddressVariables.FIRST_SHIPPING_CITY),
         salesOrderAddrFavIncr(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER),
         salesOrderAddrFavIncr(SalesAddressVariables.LAST_SHIPPING_CITY),
-        salesOrderAddrFavIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)
+        salesOrderAddrFavIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),
+        salesOrderAddrFavIncr(ContactListMobileVars.CITY),
+        salesOrderAddrFavIncr(CustomerVariables.PHONE),
+        salesOrderAddrFavIncr(CustomerVariables.FIRST_NAME),
+        salesOrderAddrFavIncr(CustomerVariables.LAST_NAME),
+        salesOrderAddrFavIncr(ContactListMobileVars.CITY_TIER),
+        salesOrderAddrFavIncr(ContactListMobileVars.STATE_ZONE)
       )
     res
   }
