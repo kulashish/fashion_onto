@@ -384,7 +384,7 @@ object Schema {
   val brandMvpCityRecommendationOutput = StructType(Array(
     StructField(ProductVariables.BRAND, StringType, false),
     StructField(ProductVariables.MVP, StringType, false),
-    StructField(SalesAddressVariables.CITY, BooleanType, false),
+    StructField(SalesAddressVariables.CITY, StringType, false),
     StructField(ProductVariables.GENDER, StringType, false),
     StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
@@ -392,7 +392,7 @@ object Schema {
   val brandMvpStateRecommendationOutput = StructType(Array(
     StructField(ProductVariables.BRAND, StringType, false),
     StructField(ProductVariables.MVP, StringType, false),
-    StructField(Recommendation.DISCOUNT_STATUS, BooleanType, false),
+    StructField(Recommendation.RECOMMENDATION_STATE, StringType, false),
     StructField(ProductVariables.GENDER, StringType, false),
     StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
