@@ -26,7 +26,6 @@ object PivotAddressRecommendation extends CommonRecommendation with Serializable
 
     val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, Recommendation.ORDER_ITEM_DAYS, incrDate)
 
-    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(last30DaysOrderItemData, 7, incrDate)
 
     val salesAddressFullDataWithState = addStateFromMapping(salesAddressFullData, RecommendationInput.cityZoneMapping)
 
@@ -36,12 +35,15 @@ object PivotAddressRecommendation extends CommonRecommendation with Serializable
       .select(salesAddressFullDataWithState(SalesAddressVariables.CITY),
         salesAddressFullDataWithState(Recommendation.RECOMMENDATION_STATE),
         last30DaysOrderItemData(SalesOrderItemVariables.SKU),
-        last30DaysOrderItemData(SalesOrderItemVariables.CREATED_AT))
+        last30DaysOrderItemData(SalesOrderItemVariables.CREATED_AT),
+        last30DaysOrderItemData(SalesOrderItemVariables.SALES_ORDER_ITEM_STATUS))
+
+    val last7DaysOrderItemDataWithCityState = RecommendationInput.lastNdaysData(salesJoinedData, 7, incrDate)
 
     val varProductsWithCountSold = productsWithCountSold(salesJoinedData, true)
 
     // create list of (sku, avg count sold in last 7 days) : only for skus sold in last 7 days
-    val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemData, true)
+    val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemDataWithCityState, true)
 
     // merge to product (sku, count sold in last 30 days, avg count sold in last 7 days or NULL)
     val weeklySaleData = addWeeklyAverageSales(orderItem7DaysWithWeeklySale, varProductsWithCountSold, true)
