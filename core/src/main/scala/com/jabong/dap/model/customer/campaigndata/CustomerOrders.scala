@@ -67,12 +67,12 @@ object CustomerOrders extends DataFeedsModel {
     val salesRuleSetFull = dfMap("salesRuleSetFull")
     val salesOrderAddrFavIncr = dfMap("salesOrderAddrFavIncr")
     val custTop5Incr = dfMap("custTop5Incr")
-    val salesRevenuePrevFull = dfMap("salesRevenuePrevFull")
+    val salesRevenuePrevFull = dfMap.getOrElse("salesRevenuePrevFull", null)
     val salesRevenue7 = dfMap("salesRevenue7")
     val salesRevenue30 = dfMap("salesRevenue30")
     val salesRevenue90 = dfMap("salesRevenue90")
-    val custOrdersStatusPrevMap = dfMap("custOrdersStatusPrevMap")
-    val custOrdersPrevFull = dfMap("custOrdersPrevFull")
+    val custOrdersStatusPrevMap = dfMap.getOrElse("custOrdersStatusPrevMap", null)
+    val custOrdersPrevFull = dfMap.getOrElse("custOrdersPrevFull", null)
 
     val salesOrderNew = salesOrderIncrFil.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
