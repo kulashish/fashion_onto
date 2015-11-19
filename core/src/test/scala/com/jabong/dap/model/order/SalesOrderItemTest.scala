@@ -29,7 +29,7 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
 //
 //    df3 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_mweb")
 
-    df4 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_joined1", TestSchema.salesOrderItemJoined)
+    df4 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_joined", TestSchema.salesOrderItemJoined)
 
   }
 
