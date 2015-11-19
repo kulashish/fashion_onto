@@ -376,7 +376,42 @@ object CustomerOrders extends DataFeedsModel {
         salesOrderAddrFavIncr(ContactListMobileVars.CITY_TIER),
         salesOrderAddrFavIncr(ContactListMobileVars.STATE_ZONE)
       )
-    res
+    res.na.fill(scala.collection.immutable.Map(
+      SalesOrderItemVariables.REVENUE_7 -> 0.0,
+      SalesOrderItemVariables.REVENUE_30 -> 0.0,
+      SalesOrderItemVariables.REVENUE_LIFE -> 0.0,
+      SalesOrderItemVariables.ORDERS_COUNT_LIFE -> 0,
+      SalesRuleSetVariables.MIN_COUPON_VALUE_USED -> 0.0,
+      SalesRuleSetVariables.MAX_COUPON_VALUE_USED -> 0.0,
+      SalesRuleSetVariables.MIN_DISCOUNT_USED -> 0.0,
+      SalesRuleSetVariables.MAX_DISCOUNT_USED -> 0.0,
+      SalesRuleSetVariables.COUPON_SUM -> 0.0,
+      SalesRuleSetVariables.COUPON_COUNT -> 0,
+      SalesRuleSetVariables.DISCOUNT_SUM -> 0.0,
+      SalesRuleSetVariables.DISCOUNT_COUNT -> 0,
+      SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS -> 0,
+      SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS -> 0,
+      SalesOrderItemVariables.COUNT_OF_RET_ORDERS -> 0,
+      SalesOrderItemVariables.SUCCESSFUL_ORDERS -> 0,
+      SalesOrderVariables.CATEGORY_PENETRATION -> "",
+      SalesOrderVariables.BRICK_PENETRATION -> "",
+      SalesOrderItemVariables.FAV_BRAND -> "",
+      SalesOrderVariables.MAX_ORDER_BASKET_VALUE -> 0.0,
+      SalesOrderVariables.MAX_ORDER_ITEM_VALUE -> 0.0,
+      SalesOrderVariables.SUM_BASKET_VALUE -> 0.0,
+      SalesOrderVariables.COUNT_BASKET_VALUE -> 0,
+      SalesOrderVariables.ORDER_ITEM_COUNT -> 0,
+      SalesAddressVariables.FIRST_SHIPPING_CITY -> "",
+      SalesAddressVariables.FIRST_SHIPPING_CITY_TIER -> "",
+      SalesAddressVariables.LAST_SHIPPING_CITY -> "",
+      SalesAddressVariables.LAST_SHIPPING_CITY_TIER -> "",
+      ContactListMobileVars.CITY -> "",
+      CustomerVariables.PHONE -> "",
+      CustomerVariables.FIRST_NAME -> "",
+      CustomerVariables.LAST_NAME -> "",
+      ContactListMobileVars.CITY_TIER -> "",
+      ContactListMobileVars.STATE_ZONE -> ""
+    ))
   }
 
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
