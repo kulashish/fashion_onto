@@ -13,12 +13,12 @@ import org.apache.spark.sql.DataFrame
  */
 class GeoBrandCampaign {
 
-  def runCampaign(day50_SalesOrder: DataFrame, fullOrderItemData: DataFrame, salesAddressData: DataFrame, yesterdayItrData: DataFrame, cityWiseData: DataFrame,
+  def runCampaign(day50_SalesOrder: DataFrame, day50_SalesOrderItem: DataFrame, salesAddressData: DataFrame, yesterdayItrData: DataFrame, cityWiseData: DataFrame,
                        recommendationsData: DataFrame) = {
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
 
-    val selectCustomers = customerSelection.customerSelection(day50_SalesOrder, fullOrderItemData, salesAddressData)
+    val selectCustomers = customerSelection.customerSelection(day50_SalesOrder, day50_SalesOrderItem, salesAddressData)
 
     val cityWiseMap = CampaignUtils.getFavouriteAttribute(cityWiseData, CustomerVariables.CITY, ProductVariables.BRAND, 1)
 
