@@ -81,11 +81,11 @@ object CampaignManager extends Serializable with Logging {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val last20thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(20, fullOrderData, incrDate)
+    val last20thDaySalesOrderData = CampaignInput.loadNthdayTableData(20, fullOrderData)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    //FIXME
-    val last20thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(20, fullOrderItemData, incrDate)
+
+    val last20thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(20, fullOrderItemData)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
@@ -103,12 +103,12 @@ object CampaignManager extends Serializable with Logging {
     val fullCustomerSurfAffinity = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_SURF_AFFINITY)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    //FIXME
-    val last7thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(7, fullOrderData, incrDate)
+
+    val last7thDaySalesOrderData = CampaignInput.loadNthdayTableData(7, fullOrderData)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    //FIXME
-    val last7thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(7, fullOrderItemData, incrDate)
+
+    val last7thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(7, fullOrderItemData)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
@@ -126,12 +126,12 @@ object CampaignManager extends Serializable with Logging {
     val fullCustomerOrders = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    //FIXME: loadLastNdaysOrderData
-    val last6thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(6, fullOrderData, incrDate)
+
+    val last6thDaySalesOrderData = CampaignInput.loadNthdayTableData(6, fullOrderData)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    //FIXME: loadLastNdaysOrderData
-    val last6thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(6, fullOrderItemData, incrDate)
+
+    val last6thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(6, fullOrderItemData)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
@@ -428,10 +428,10 @@ object CampaignManager extends Serializable with Logging {
 
     val fullOrderData = CampaignInput.loadFullOrderData()
     val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
-    //FIXME:
-    val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData, incrDate)
-    //FIXME:
-    val last60DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(60, fullOrderItemData, incrDate)
+
+    val last60DaySalesOrderData = CampaignInput.loadNthdayTableData(60, fullOrderData)
+
+    val last60DaySalesOrderItemData = CampaignInput.loadNthdayTableData(60, fullOrderItemData)
 
     val itrYesterdayData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
