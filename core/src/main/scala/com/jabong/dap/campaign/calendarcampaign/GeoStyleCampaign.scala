@@ -3,8 +3,8 @@ package com.jabong.dap.campaign.calendarcampaign
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CustomerSelection}
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables, SalesAddressVariables}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesAddressVariables }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
@@ -40,7 +40,5 @@ class GeoStyleCampaign {
 
   }
 
-
 }
-
 

@@ -121,27 +121,26 @@ object SalesOrderAddress extends DataFeedsModel {
     val cityMap = scala.collection.mutable.Map[String, Tuple2[String, String]]()
     val cities = cityZone
       .select(ContactListMobileVars.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
-      .map(e => (e(0).toString.toLowerCase ->(e(1).toString.toLowerCase, e(2).toString.toLowerCase)))
-      .groupByKey().map(e=> (e._1-> e._2.toList(0)))
-
+      .map(e => (e(0).toString.toLowerCase -> (e(1).toString.toLowerCase, e(2).toString.toLowerCase)))
+      .groupByKey().map(e => (e._1 -> e._2.toList(0)))
 
     cities.collect().foreach{
       e =>
         val (city, (tier, zone)) = e
         cityMap.put(city, Tuple2(tier, zone))
     }
-    println("CityMap:", cityMap.toString())
+    // println("CityMap:", cityMap.toString())
 
     val favMap = favIncr.map(e =>
       (e(0).asInstanceOf[Long] ->
         (getFav(e(1).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(2).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(3).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(4).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        e(5).asInstanceOf[Timestamp],
-        e(6).toString,
-        e(7).toString
-      )
+          getFav(e(2).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          getFav(e(3).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          getFav(e(4).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          e(5).asInstanceOf[Timestamp],
+          e(6).toString,
+          e(7).toString
+        )
       )
     )
 

@@ -5,12 +5,12 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, PageVisitVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo, ParamInfo}
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -18,7 +18,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -478,10 +478,10 @@ object CampaignManager extends Serializable with Logging {
     val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
 
     val geoStyleCampaign = new GeoStyleCampaign
-    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
 
-    val geoBrandCampaign =  new GeoBrandCampaign
-    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrandRecos)
+    val geoBrandCampaign = new GeoBrandCampaign
+    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrandRecos)
 
   }
 
@@ -574,7 +574,7 @@ object CampaignManager extends Serializable with Logging {
    * @param campaignJsonPath
    */
   def startCampaignMerge(campaignJsonPath: String, campaignType: String) = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
       //      createCampaignMaps(json)
@@ -610,7 +610,7 @@ object CampaignManager extends Serializable with Logging {
 
         //writing csv file
         CampaignProcessor.splitFileToCSV(iosDF, androidDF, dateFolder)
-      } else {
+      } else if (campaignType == DataSets.EMAIL_CAMPAIGNS) {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp = "temp"
         val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL, CampaignMergedFields.LIVE_CART_URL + temp)
@@ -649,6 +649,56 @@ object CampaignManager extends Serializable with Logging {
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
+      } else if (campaignType == DataSets.CALENDAR_CAMPAIGNS) {
+        val GARBAGE = "NA" //:TODO replace with correct value
+        val temp = "temp"
+        val expectedDF = mergedData
+          .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+
+          .withColumn(CampaignMergedFields.CALENDAR_CITY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(5)))
+          .withColumn(CampaignMergedFields.CALENDAR_COLOR, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
+          .withColumn(CampaignMergedFields.CALENDAR_PRICE_POINT, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit("")))
+          .withColumn(CampaignMergedFields.CALENDAR_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
+
+          //          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
+
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "2", lit(""))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "3", lit(""))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "4", lit(""))
+
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(0)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "4", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(3)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "5", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(4)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "6", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(5)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(6)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "9", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(8)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "10", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(9)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "11", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(10)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "12", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(11)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "13", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(12)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "14", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(13)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "15", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(14)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "16", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(15)))
+          .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
+          .drop(CustomerVariables.EMAIL)
+          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+          .drop(CampaignMergedFields.LIVE_CART_URL)
+
+        val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+          .drop(CampaignMergedFields.REF_SKUS)
+          .drop(CampaignMergedFields.REC_SKUS)
+        CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
+        DataWriter.writeParquet(expectedDF, writePath, saveMode)
+        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, calendarCampaignFileName, saveMode, "true", ";")
       }
     }
   }

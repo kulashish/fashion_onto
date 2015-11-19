@@ -3,8 +3,8 @@ package com.jabong.dap.campaign.calendarcampaign
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CustomerSelection, CampaignCommon}
-import com.jabong.dap.common.constants.variables.{SalesAddressVariables, ProductVariables, CustomerVariables}
+import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, ProductVariables, CustomerVariables }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
@@ -14,7 +14,7 @@ import org.apache.spark.sql.DataFrame
 class GeoBrandCampaign {
 
   def runCampaign(day50_SalesOrder: DataFrame, day50_SalesOrderItem: DataFrame, salesAddressData: DataFrame, yesterdayItrData: DataFrame, cityWiseData: DataFrame,
-                       recommendationsData: DataFrame) = {
+                  recommendationsData: DataFrame) = {
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
 
@@ -38,7 +38,6 @@ class GeoBrandCampaign {
         yesterdayItrData(ProductVariables.PRICE_BAND))
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_BRAND_CAMPAIGN, custFilter, false, recommendationsData)
-
 
   }
 
