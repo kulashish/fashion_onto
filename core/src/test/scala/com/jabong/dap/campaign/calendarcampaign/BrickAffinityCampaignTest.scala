@@ -37,7 +37,7 @@ class BrickAffinityCampaignTest extends FeatureSpec with GivenWhenThen with Shar
     scenario("select brick Affinity Campaign"){
       Given("customerSurfAffinity, last7thDaySalesOrderData, last7thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val brickAffinityCampaign = new BrickAffinityCampaign()
-      brickAffinityCampaign.runCampaign(customerSurfAffinity, last7thDaySalesOrderData, last7thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
+      brickAffinityCampaign.runCampaign(customerSurfAffinity, last7thDaySalesOrderData, last7thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
       val brickAffinityCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)
