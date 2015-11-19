@@ -485,6 +485,23 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
+  def startClearanceCampaign(params: ParamInfo) = {
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, incrDate)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(60, fullOrderItemData, incrDate)
+
+    val mvpDiscountRecos = CampaignInput.loadRecommendationData(Recommendation.MVP_DISCOUNT_SUB_TYPE).cache()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val clearanceCampaign = new ClearanceCampaign
+    clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData,  yesterdayItrData, mvpDiscountRecos)
+  }
+
   def loadCustomerMasterData(): DataFrame = {
 
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
