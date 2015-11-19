@@ -54,7 +54,21 @@ object CustomerOrders extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
     incrDateLocal = incrDate
-    val res = true
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
+    var res = DataWriter.canWrite(saveMode, savePath)
+
+    var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePathIncr)
+
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePath)
+
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePath)
+
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate)
+    res = res || DataWriter.canWrite(saveMode, savePath)
+
     res
   }
 
@@ -67,12 +81,12 @@ object CustomerOrders extends DataFeedsModel {
     val salesRuleSetFull = dfMap("salesRuleSetFull")
     val salesOrderAddrFavIncr = dfMap("salesOrderAddrFavIncr")
     val custTop5Incr = dfMap("custTop5Incr")
-    val salesRevenuePrevFull = dfMap("salesRevenuePrevFull")
+    val salesRevenuePrevFull = dfMap.getOrElse("salesRevenuePrevFull", null)
     val salesRevenue7 = dfMap("salesRevenue7")
     val salesRevenue30 = dfMap("salesRevenue30")
     val salesRevenue90 = dfMap("salesRevenue90")
-    val custOrdersStatusPrevMap = dfMap("custOrdersStatusPrevMap")
-    val custOrdersPrevFull = dfMap("custOrdersPrevFull")
+    val custOrdersStatusPrevMap = dfMap.getOrElse("custOrdersStatusPrevMap", null)
+    val custOrdersPrevFull = dfMap.getOrElse("custOrdersPrevFull", null)
 
     val salesOrderNew = salesOrderIncrFil.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
@@ -85,21 +99,21 @@ object CustomerOrders extends DataFeedsModel {
     dfWrite.put("salesRevenueFull", salesRevenueFull)
     dfWrite.put("salesRevenueOrdersIncr", salesRevenueOrdersIncr)
 
-    println("salesRevenueFull Count", salesRevenueFull.count())
-    salesRevenueFull.printSchema()
+    // println("salesRevenueFull Count", salesRevenueFull.count())
+    // salesRevenueFull.printSchema()
 
     val salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
-    println("salesRevenueIncr Count", salesRevenueIncr.count())
+    // println("salesRevenueIncr Count", salesRevenueIncr.count())
 
-    salesRevenueIncr.printSchema()
-    salesRevenueIncr.show(5)
+    // salesRevenueIncr.printSchema()
+    // salesRevenueIncr.show(5)
 
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncrFil, salesRuleFull, salesRuleSetFull)
 
     val (salesInvalidIncr, custOrdersStatusMap) = SalesOrderItem.getInvalidCancelOrders(salesOrderItemIncr, salesOrderFull, custOrdersStatusPrevMap, incrDateLocal)
     dfWrite.put("custOrdersStatusMap", custOrdersStatusMap)
-    println("custOrdersStatusMap Count", custOrdersStatusMap.count())
-    custOrdersStatusMap.show(5)
+    // println("custOrdersStatusMap Count", custOrdersStatusMap.count())
+    // custOrdersStatusMap.show(5)
 
     val salesCatBrick = custTop5Incr.select(
       custTop5Incr(SalesOrderVariables.FK_CUSTOMER).cast(LongType) as SalesOrderVariables.FK_CUSTOMER,
@@ -107,8 +121,8 @@ object CustomerOrders extends DataFeedsModel {
       custTop5Incr("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION,
       custTop5Incr("BRAND_1") as SalesOrderItemVariables.FAV_BRAND
     )
-    salesCatBrick.printSchema()
-    salesCatBrick.show(5)
+    // salesCatBrick.printSchema()
+    // salesCatBrick.show(5)
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(saleOrderJoined)
 
@@ -122,22 +136,32 @@ object CustomerOrders extends DataFeedsModel {
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfWrite("salesRevenueFull"), savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(dfWrite("salesRevenueFull"), savePath, saveMode)
+    }
 
     var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(dfWrite("salesRevenueOrdersIncr"), savePathIncr, saveMode)
+    if (DataWriter.canWrite(saveMode, savePathIncr)) {
+      DataWriter.writeParquet(dfWrite("salesRevenueOrdersIncr"), savePathIncr, saveMode)
+    }
 
-    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(dfWrite("custOrdersStatusMap"), savePath, saveMode)
+    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(dfWrite("custOrdersStatusMap"), savePath, saveMode)
+    }
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
     val custOrderFull = dfWrite("custOrderFull")
-    DataWriter.writeParquet(custOrderFull, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(custOrderFull, savePath, saveMode)
+    }
 
     val custOrdersIncr = Utils.getOneDayData(custOrderFull, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(custOrdersIncr, savePath, saveMode)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(custOrdersIncr, savePath, saveMode)
+    }
 
     val custOrdersCsv = custOrdersIncr
       .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
@@ -390,7 +414,7 @@ object CustomerOrders extends DataFeedsModel {
       mode = DataSets.DAILY_MODE
       val custOrdersPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custOrdersPrevFull", custOrdersPrevFull)
-      val custOrdersStatusPrevMap = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, prevDate)
+      val custOrdersStatusPrevMap = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custOrdersStatusPrevMap", custOrdersStatusPrevMap)
       val salesRevenuePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("salesRevenuePrevFull", salesRevenuePrevFull)
@@ -405,8 +429,7 @@ object CustomerOrders extends DataFeedsModel {
 
     val salesOrderAddrFavIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
     dfMap.put("salesOrderAddrFavIncr", salesOrderAddrFavIncr)
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    val custTop5Incr = DataReader.getDataFrame4mCsv("/data/test/tmp", DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate, fileDate + "_CUST_TOP5.csv", "true", ";")
+    val custTop5Incr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate)
     dfMap.put("custTop5Incr", custTop5Incr)
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     val salesOrderIncrFil = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
