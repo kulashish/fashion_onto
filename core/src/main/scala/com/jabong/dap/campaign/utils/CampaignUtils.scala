@@ -798,7 +798,7 @@ object CampaignUtils extends Logging {
         //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
         //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
         CampaignUtils.debug(dfJoined, "dfJoined")
-        dfBrick2RecommendationData
+        dfJoined
       }
       case CampaignCommon.HOTTEST_X =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
