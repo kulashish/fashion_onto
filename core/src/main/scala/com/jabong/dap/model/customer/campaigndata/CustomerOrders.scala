@@ -107,8 +107,9 @@ object CustomerOrders extends DataFeedsModel {
     }
     // println("salesRevenueIncr Count", salesRevenueIncr.count())
 
-    // salesRevenueIncr.printSchema()
-    // salesRevenueIncr.show(5)
+    salesRevenueIncr.printSchema()
+    salesRevenueIncr.show(5)
+    println(salesRevenueIncr.count())
 
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncrFil, salesRuleFull, salesRuleSetFull)
 
