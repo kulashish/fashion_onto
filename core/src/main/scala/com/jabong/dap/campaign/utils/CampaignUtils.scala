@@ -1022,7 +1022,7 @@ object CampaignUtils extends Logging {
       sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int],
         r._2(r._2.fieldIndex("price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(e => (e._1, e._2(e._2.fieldIndex("sku")).toString))))
 
-    val topSkusBasedOnField = topSkus.map(x => (x._1, x._2(0)._1, x._2(0)._2))
+    val topSkusBasedOnField = topSkus.filter(_._2.length>0).map(x => (x._1, x._2(0)._1, x._2(0)._2))
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
