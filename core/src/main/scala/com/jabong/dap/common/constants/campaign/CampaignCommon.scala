@@ -58,6 +58,7 @@ object CampaignCommon {
 
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
+  val LOVE_CALENDAR_CAMPAIGNS = "loveCalendarCampaigns"
 
   val VERY_LOW_PRIORITY = 10000
 

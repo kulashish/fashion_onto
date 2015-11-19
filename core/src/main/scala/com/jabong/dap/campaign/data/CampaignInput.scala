@@ -133,6 +133,21 @@ object CampaignInput extends Logging {
   }
 
   /**
+   *
+   * @param n
+   * @param inputData
+   * @return
+   */
+  def loadNthdayTableData(n: Int, inputData: DataFrame): DataFrame = {
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS))
+    val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
+    val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
+
+    val nthDayOrderData = Utils.getTimeBasedDataFrame(inputData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
+    nthDayOrderData
+  }
+
+  /**
    * load yesterdays itr sku simle data
    * @param dateYesterday
    * @return

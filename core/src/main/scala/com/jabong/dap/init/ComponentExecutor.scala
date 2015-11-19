@@ -126,6 +126,9 @@ class ComponentExecutor extends Serializable with Logging {
           case CampaignCommon.BRAND_IN_CITY_CAMPAIGN => CampaignManager.startBrandInCityCampaign(paramJob)
           case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => CampaignManager.startBrickAffinityCampaign(paramJob)
 
+          case CampaignCommon.LOVE_CALENDAR_CAMPAIGNS => CampaignManager.startLoveCampaigns(paramJob)
+
+
           // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
 
