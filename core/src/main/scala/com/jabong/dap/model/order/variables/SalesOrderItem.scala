@@ -58,7 +58,7 @@ object SalesOrderItem {
         salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET),
         salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE),
         salesRuleSet(SalesRuleSetVariables.DISCOUNT_PERCENTAGE),
-        salesRuleSet(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT))
+        salesRuleSet(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT)).na.fill(0)
 
     val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
     val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
@@ -85,7 +85,7 @@ object SalesOrderItem {
         disc(SalesRuleSetVariables.MAX_DISCOUNT_USED),
         disc(SalesRuleSetVariables.DISCOUNT_SUM),
         disc(SalesRuleSetVariables.DISCOUNT_COUNT)
-      )
+      ).na.fill(0)
 
     incr
   }
