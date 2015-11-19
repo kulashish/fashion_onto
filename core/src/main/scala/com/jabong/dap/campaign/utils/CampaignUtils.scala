@@ -3,23 +3,23 @@ package com.jabong.dap.campaign.utils
 import java.math.BigDecimal
 import java.sql.Timestamp
 
-import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
+import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{GroupedUtils, Spark}
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.udf.{Udf, UdfUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{OrderBySchema, Schema}
+import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql._
 
 import scala.annotation.elidable
@@ -433,7 +433,7 @@ object CampaignUtils extends Logging {
         inputData(ProductVariables.SKU),
         inputData(PageVisitVariables.BROWSER_ID),
         inputData(PageVisitVariables.DOMAIN)
-        //inputData(ProductVariables.SPECIAL_PRICE)
+      //inputData(ProductVariables.SPECIAL_PRICE)
       )
 
     logger.info("Filtered all the sku which has been bought")
@@ -762,7 +762,7 @@ object CampaignUtils extends Logging {
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
     val recs = campaignName match {
-      case CampaignCommon.HOTTEST_X  =>
+      case CampaignCommon.HOTTEST_X =>
         campaignOutput.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ => campaignOutput
 
@@ -817,7 +817,7 @@ object CampaignUtils extends Logging {
       val cmr = CampaignInput.loadCustomerMasterData()
       custFilteredWithEmail = mapEmailCampaignWithCMR(cmr, custFiltered)
     } else if (campaignName.startsWith("surf")) {
-      custFilteredWithEmail = custFiltered.filter(!col(CustomerVariables.EMAIL) like ("_app%"))
+      custFilteredWithEmail = custFiltered.filter(!col(CustomerVariables.EMAIL).startsWith(CustomerVariables.APP_FILTER))
     }
 
     var custFilteredPastCampaign: DataFrame = custFilteredWithEmail

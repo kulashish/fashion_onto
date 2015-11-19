@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  * Created by raghu on 3/7/15.
  */
 object Udf {
-    /**
+  /**
    * minTimestamp will return min of Timestamp t1 or t2
    */
   val minTimestamp = udf((t1: Timestamp, t2: Timestamp) => UdfUtils.getMin(t1: Timestamp, t2: Timestamp))
@@ -148,4 +148,5 @@ object Udf {
 
   val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
 
+  // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

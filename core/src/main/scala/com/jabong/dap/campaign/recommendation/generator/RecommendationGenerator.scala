@@ -22,6 +22,7 @@ object RecommendationGenerator extends Logging {
     logger.info("Recommendation Process has started for pivotkey:-" + pivotKey + " date::-" + incrDate)
     RecommendationInput.loadCommonDataSets(incrDate)
     PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, pivotKey, Recommendation.NUM_RECOMMENDATIONS, incrDate)
+    PivotAddressRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRAND_MVP_CITY_STATE, Recommendation.NUM_RECOMMENDATIONS, incrDate)
     logger.info("Recommendation successfully generated for pivotkey:-" + pivotKey + " date::-" + incrDate)
   }
 

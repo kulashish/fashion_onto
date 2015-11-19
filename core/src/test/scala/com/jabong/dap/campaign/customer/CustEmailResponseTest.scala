@@ -2,10 +2,10 @@
 package com.jabong.dap.campaign.customer
 
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{NewsletterVariables, EmailResponseVariables}
+import com.jabong.dap.common.constants.variables.{ NewsletterVariables, EmailResponseVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark}
+import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
@@ -126,6 +126,5 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo_any", CustEmailSchema.effective_Smry_Schema)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
-
 
 }

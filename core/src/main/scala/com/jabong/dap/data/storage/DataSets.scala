@@ -122,6 +122,7 @@ object DataSets {
   val EXTRAS = "extras"
 
   val VARIABLES = "variables"
+  val MAPS = "maps"
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
@@ -141,6 +142,8 @@ object DataSets {
   val BRICK_PRICE_BAND_RECOMMENDATIONS = "brick_price_band"
   val MVP_COLOR_RECOMMENDATIONS = "mvp_color"
   val MVP_DISCOUNT_RECOMMENDATIONS = "mvp_discount"
+  val BRAND_MVP_CITY_RECOMMENDATIONS = "brand_mvp_city"
+  val BRAND_MVP_STATE_RECOMMENDATIONS = "brand_mvp_state"
 
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
@@ -198,4 +201,8 @@ object DataSets {
 
   // campaigns
   val ACART_HOURLY = "acartHourly"
+
+  // miscellaneous data sets
+  val CITY_WISE_DATA = "city_wise_data"
 }
+

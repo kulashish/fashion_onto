@@ -3,14 +3,14 @@
     {
       "source": "salesOrderAddrFav",
       "path": "first time",
-      "incrDate": "2015/11/14",
+      "incrDate": "2015/11/15",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
       "source": "salesOrderAddrFav",
-      "fullDate": "2015/11/14",
-      "incrDate": "2015/11/15",
+      "fullDate": "2015/11/15",
+      "incrDate": "2015/11/16",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
