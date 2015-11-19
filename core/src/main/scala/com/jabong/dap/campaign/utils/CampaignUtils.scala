@@ -766,10 +766,10 @@ object CampaignUtils extends Logging {
         CampaignUtils.debug(dfBrick1, "dfBrick1")
         CampaignUtils.debug(dfBrick2, "dfBrick2")
 
-        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, 8)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, 8)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
         val dfJoined = dfBrick1RecommendationData.join(
@@ -802,7 +802,7 @@ object CampaignUtils extends Logging {
         dfJoined
       }
       case CampaignCommon.HOTTEST_X_CAMPAIGN =>
-        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
@@ -856,7 +856,7 @@ object CampaignUtils extends Logging {
    * @param recommendations
    * @return
    */
-  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = 8): DataFrame = {
+  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = CampaignCommon.CALENDAR_REC_SKUS): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
@@ -1022,7 +1022,7 @@ object CampaignUtils extends Logging {
       sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int],
         r._2(r._2.fieldIndex("price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(e => (e._1, e._2(e._2.fieldIndex("sku")).toString))))
 
-    val topSkusBasedOnField = topSkus.filter(_._2.length>0).map(x => (x._1, x._2(0)._1, x._2(0)._2))
+    val topSkusBasedOnField = topSkus.filter(_._2.length > 0).map(x => (x._1, x._2(0)._1, x._2(0)._2))
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
