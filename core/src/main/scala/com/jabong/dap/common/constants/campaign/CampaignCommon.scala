@@ -51,6 +51,7 @@ object CampaignCommon {
   val LOVE_COLOR_CAMPAIGN = "love_color"
 
 
+
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
   val ACART_HOURLY_STOCK_VALUE = 2
@@ -58,6 +59,7 @@ object CampaignCommon {
 
   val INVALID_CAMPAIGN = "invalidCampaign"
   val WISHLIST_CAMPAIGN = "wishlistCampaign"
+  val LOVE_CALENDAR_CAMPAIGNS = "loveCalendarCampaigns"
 
   val VERY_LOW_PRIORITY = 10000
 

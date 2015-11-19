@@ -15,14 +15,23 @@ import org.apache.spark.sql.functions._
  */
 class LoveBrandCampaign {
 
-  def runCampaign(customerTopData: DataFrame, last35thDaysSalesOrderData: DataFrame, last35thDaySalesOrderItemData: DataFrame, brandMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT)) = {
+  /**
+   * love brand campaign:- last sku of most bought brand
+   * @param customerTopData
+   * @param last35thDaysSalesOrderData
+   * @param last35thDaySalesOrderItemData
+   * @param brandMvpRecommendations
+   * @param yesterdayItrSkuSimpleData
+   * @param incrDate
+   */
+  def runCampaign(customerTopData: DataFrame, last35thDaysSalesOrderData: DataFrame, last35thDaySalesOrderItemData: DataFrame, brandMvpRecommendations: DataFrame, yesterdayItrSkuSimpleData: DataFrame, incrDate: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT)) = {
 
     val lastOrderCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST_ORDER)
 
     val dfCustomerSelected = lastOrderCustomerSelector.customerSelection(last35thDaysSalesOrderData, last35thDaySalesOrderItemData)
 
-    val filteredSku = MostBought.skuFilter(customerTopData, dfCustomerSelected, yesterdayItrData, "brand_list")
+    val filteredSku = MostBought.skuFilter(customerTopData, dfCustomerSelected, yesterdayItrSkuSimpleData, "brand_list")
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.LOVE_BRAND_CAMPAIGN, filteredSku, false, brandMvpRecommendations)
 
