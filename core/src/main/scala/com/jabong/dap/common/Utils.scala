@@ -279,6 +279,14 @@ input:- row  and fields: field array
     return prevMap
   }
 
+  /**
+   * merge Two data frames of map columns e.g city , brand_list(MapType)
+   * @param prev
+   * @param inc
+   * @param joinedKey
+   * @param outputSchema
+   * @return
+   */
   def mergeTopMapDataFrame(prev: DataFrame, inc: DataFrame, joinedKey: String, outputSchema: StructType): DataFrame = {
 
     val rddJoined = prev.join(inc, prev(joinedKey) === inc(joinedKey), SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0), row(5)).asInstanceOf[String],
