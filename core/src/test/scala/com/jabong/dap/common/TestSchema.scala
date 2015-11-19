@@ -265,7 +265,6 @@ object TestSchema {
     StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true),
     StructField(SalesOrderItemVariables.UPDATED_AT, TimestampType, true)
   ))
-}
 
   val customerFavList = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
