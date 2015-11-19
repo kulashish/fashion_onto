@@ -36,7 +36,7 @@ class ReplenishmentCampaignTest extends FeatureSpec with GivenWhenThen with Shar
     scenario("generate Replenish data on the basis of product category "){
       Given("yestCustomerData, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val replenishmentCampaign = new ReplenishmentCampaign()
-      replenishmentCampaign.runCampaign(contactlistMobile, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
+      replenishmentCampaign.runCampaign(contactlistMobile, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
       val nonBeautyReplenishmentCampaignOut = CampaignOutput.testData(0)
       //      assert(nonBeautyReplenishmentCampaignOut._1.count() == 1)

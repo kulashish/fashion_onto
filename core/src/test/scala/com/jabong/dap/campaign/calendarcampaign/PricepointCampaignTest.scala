@@ -37,7 +37,7 @@ class PricepointCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
     scenario("select sku from 20th day last order data"){
       Given("last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val pricePointCampaign = new PricepointCampaign()
-      pricePointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
+      pricePointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
       val pricepointCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)
