@@ -256,4 +256,12 @@ object TestSchema {
     StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
     StructField(SalesOrderVariables.UPDATED_AT, TimestampType, true)
   ))
+
+  val salesOrderItemJoined = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, true),
+    StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, LongType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true),
+    StructField(SalesOrderItemVariables.UPDATED_AT, TimestampType, true)
+  ))
 }

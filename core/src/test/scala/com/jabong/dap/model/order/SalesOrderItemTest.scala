@@ -4,6 +4,7 @@ import java.sql.Timestamp
 
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.TestSchema
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.model.order.variables.SalesOrderItem
 import org.apache.spark.sql.DataFrame
@@ -18,18 +19,17 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
   @transient var df2: DataFrame = _
   @transient var df3: DataFrame = _
   @transient var df4: DataFrame = _
-  @transient var df5: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
 
-    df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_app")
+//    df1 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_app")
+//
+//    df2 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_web")
+//
+//    df3 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_mweb")
 
-    df2 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_web")
-
-    df3 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_mweb")
-
-    df4 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_joined1")
+    df4 = JsonUtils.readFromJson(DataSets.SALES_ORDER_ITEM, "sales_order_item_joined1", TestSchema.salesOrderItemJoined)
 
   }
 
@@ -45,6 +45,7 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
     val ordersMapIncr = incrMap.map(e => (e._1, SalesOrderItem.makeMap4mGroupedData(e._2.toList)))
 
     println("ordersMapIncr Count", ordersMapIncr.count())
+    println(ordersMapIncr.toString())
   }
 
 }
