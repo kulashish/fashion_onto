@@ -57,11 +57,8 @@ import scala.collection.mutable.HashMap
 object ContactListMobile extends DataFeedsModel with Logging {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
-    val pathSalesOrderFavFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
-    var res = DataWriter.canWrite(saveMode, pathSalesOrderFavFull)
-
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
-    res = res || DataWriter.canWrite(saveMode, pathContactListMobileFull)
+    var res = DataWriter.canWrite(saveMode, pathContactListMobileFull)
 
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     res = res || DataWriter.canWrite(saveMode, pathContactListMobile)
