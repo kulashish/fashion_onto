@@ -258,6 +258,14 @@ object TestSchema {
     StructField(SalesOrderVariables.UPDATED_AT, TimestampType, true)
   ))
 
+  val salesOrderItemJoined = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, true),
+    StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, LongType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true),
+    StructField(SalesOrderItemVariables.UPDATED_AT, TimestampType, true)
+  ))
+
   val customerFavList = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false), StructField("sku", StringType, false)))), true),
@@ -267,4 +275,10 @@ object TestSchema {
     StructField("last_order_created_at", TimestampType, true)
   ))
 
+  val cityMapSchema = StructType(Array(
+    StructField(SalesAddressVariables.CITY, StringType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
 }

@@ -680,4 +680,11 @@ object CampaignInput extends Logging {
     val pageViewSurfData = hiveContext.sql(hiveQuery)
     return pageViewSurfData
   }
+
+  def loadSalesAddressData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading order item data from hdfs for " + date)
+    val salesAddrData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
+    salesAddrData
+  }
+
 }

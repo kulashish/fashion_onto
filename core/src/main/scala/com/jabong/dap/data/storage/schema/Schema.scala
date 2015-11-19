@@ -399,7 +399,6 @@ object Schema {
     StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
 
-
   val finalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, false),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
@@ -643,7 +642,8 @@ object Schema {
   val lastOrder = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
     StructField(SalesOrderVariables.CUSTOMER_EMAIL, StringType, false),
-    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false),
+    StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING, LongType, false)
   ))
 
   val customerOrdersSchema = StructType(Array(
@@ -665,11 +665,11 @@ object Schema {
     StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.COUPON_SUM, DecimalType.apply(10, 2), false),
-    StructField(SalesRuleSetVariables.COUPON_COUNT, IntegerType, false),
+    StructField(SalesRuleSetVariables.COUPON_COUNT, LongType, false),
     StructField(SalesRuleSetVariables.MIN_DISCOUNT_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.MAX_DISCOUNT_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.DISCOUNT_SUM, DecimalType.apply(10, 2), false),
-    StructField(SalesRuleSetVariables.DISCOUNT_COUNT, IntegerType, false),
+    StructField(SalesRuleSetVariables.DISCOUNT_COUNT, LongType, false),
     StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16, 2), false),
     StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16, 2), false),
     StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16, 2), false),

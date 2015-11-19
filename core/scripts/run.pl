@@ -281,6 +281,14 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brickAffinityCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/brickAffinityCampaign.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "geoCampaign") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 3G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geo_campaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geoCampaign.json";
+    $job_exit = run_component($component, $command);  
+} elsif ($component eq "clearanceCampaign") {
+     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clearance --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clearanceCampaign.json";
+     $job_exit = run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
@@ -305,6 +313,9 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "salesOrderAddrFav") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component salesOrderAddrFav --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/salesOrderAddrFav.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "salesItemRevenue") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component salesItemRevenue --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/salesItemRevenue.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerOrders") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerOrders --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerOrders.json";
@@ -340,7 +351,7 @@ if ($component eq "bobAcqFull1") {
  } elsif ($component eq "loveCalendarCampaigns") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component loveCalendarCampaigns --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/loveCampaigns.json";
       $job_exit = run_component($component, $command);
-  }else {
+ }else {
     print "not a valid component\n";
     $job_exit = -1;
 }

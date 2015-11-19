@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "salesItemRevenue",
+      "incrMode": "daily",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}
