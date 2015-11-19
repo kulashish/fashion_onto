@@ -436,7 +436,10 @@ object SalesOrderItem {
 
     Debugging.debug(joinedMap, "joinedMap")
 
-    val incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    var incrData = joinedMap
+    if (null != prevMap) {
+      incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    }
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
       countOrders(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
