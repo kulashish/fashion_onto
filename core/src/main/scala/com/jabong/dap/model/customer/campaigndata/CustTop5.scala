@@ -281,6 +281,7 @@ object CustTop5 extends DataFeedsModel {
     val top5Rdd =   top5JoinedMap.map(e=>Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
 
     val top5MapFull =  Spark.getSqlContext().createDataFrame(top5Rdd, Schema.customerFavList)
+      top5MapFull
     }
   }
 
