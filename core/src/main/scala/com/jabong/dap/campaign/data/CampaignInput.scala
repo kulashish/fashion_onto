@@ -269,10 +269,11 @@ object CampaignInput extends Logging {
       val campaignName = campaignDetails.campaignName
 
       df = getCampaignData(campaignName, date, campaignType, campaignPriority)
-      CampaignUtils.debug(df,"loading campaign data "+campaignName + campaignType)
       if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
+    CampaignUtils.debug(allCampaignData,"loading campaign data " + campaignType)
+
     return allCampaignData
   }
 
