@@ -498,9 +498,9 @@ object SalesOrderItem {
     if (list.length > 0) {
       maxDate = list(0)._4
     }
-    list.foreach{
-      val innerMap = scala.collection.mutable.Map[Long, Int]()
+    list.foreach {
       e =>
+        val innerMap = scala.collection.mutable.Map[Long, Int]()
         if (maxDate.after(list(0)._4))
           maxDate = list(0)._4
         if (map.contains((e._1))) {
