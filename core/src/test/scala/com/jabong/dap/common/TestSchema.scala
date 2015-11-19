@@ -217,6 +217,7 @@ object TestSchema {
     StructField(ProductVariables.PRICE_BAND, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.COLOR, LongType, true),
     StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),
     StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
@@ -264,4 +265,15 @@ object TestSchema {
     StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true),
     StructField(SalesOrderItemVariables.UPDATED_AT, TimestampType, true)
   ))
+}
+
+  val customerFavList = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false), StructField("sku", StringType, false)))), true),
+    StructField("catagory_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("brick_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false)))), true),
+    StructField("last_order_created_at", TimestampType, true)
+  ))
+
 }

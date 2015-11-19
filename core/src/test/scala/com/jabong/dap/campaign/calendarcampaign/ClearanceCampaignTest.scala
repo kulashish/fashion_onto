@@ -36,9 +36,9 @@ class ClearanceCampaignTest extends FeatureSpec with GivenWhenThen with SharedSp
       val clearanceCampaign = new ClearanceCampaign()
       clearanceCampaign.runCampaign(last30DaysSalesOrderData, last30DaysSalesOrderItemData, mvpDiscountRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
-      val pricepointCampaignOut = CampaignOutput.testData.head
+      val clearanceCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)
-      assert(pricepointCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && pricepointCampaignOut._2 == CampaignCommon.CLEARANCE_CAMPAIGN)
+      assert(clearanceCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && clearanceCampaignOut._2 == CampaignCommon.CLEARANCE_CAMPAIGN)
 
     }
   }
