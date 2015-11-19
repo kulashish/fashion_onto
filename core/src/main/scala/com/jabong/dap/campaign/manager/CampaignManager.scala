@@ -171,12 +171,12 @@ object CampaignManager extends Serializable with Logging {
     val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
     val salesOrderItemFullData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val last35thSalesOrderData = CampaignInput.loadNthdayTableData(-35, salesOrderFullData)
-    val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(-35, salesOrderItemFullData)
+    val last35thSalesOrderData = CampaignInput.loadNthdayTableData(35, salesOrderFullData)
+    val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(35, salesOrderItemFullData)
 
     val customerTopData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
-    val last15thSalesOrderData = CampaignInput.loadNthdayTableData(-15, salesOrderFullData)
-    val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(-15, salesOrderItemFullData)
+    val last15thSalesOrderData = CampaignInput.loadNthdayTableData(15, salesOrderFullData)
+    val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(15, salesOrderItemFullData)
 
     val yesterdayItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
 
