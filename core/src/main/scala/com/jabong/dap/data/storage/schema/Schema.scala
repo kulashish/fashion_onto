@@ -397,7 +397,6 @@ object Schema {
     StructField(CampaignMergedFields.RECOMMENDATIONS, ArrayType(StructType(Array(StructField(Recommendation.NUMBER_LAST_30_DAYS_ORDERED, LongType), StructField(ProductVariables.SKU, StringType))), false))
   ))
 
-
   val finalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, false),
     StructField(CampaignMergedFields.REF_SKU1, StringType, false),
