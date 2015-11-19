@@ -680,4 +680,10 @@ object Schema {
     StructField(ContactListMobileVars.STATE_ZONE, StringType, true)
   ))
 
+  val surfAffinitySchema = StructType(Array(
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
 }

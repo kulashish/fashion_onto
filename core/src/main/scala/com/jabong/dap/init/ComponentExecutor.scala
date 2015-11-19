@@ -14,7 +14,7 @@ import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.customer.data.{ CustomerSurfAffinity, CustomerDeviceMapping, DNDMerger, SmsOptOut }
 import com.jabong.dap.model.order.variables.SalesOrderAddress
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
@@ -98,6 +98,8 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
           case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
+          //CUSTOMER_SURF_AFFINITY from surf data
+          case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
           // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
@@ -117,7 +119,12 @@ class ComponentExecutor extends Serializable with Logging {
 
           case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
 
-          case CampaignCommon.HOTTEST_X => CampaignManager.startHottestXCampaign()
+          //calendar campaigns
+          case CampaignCommon.PRICEPOINT_CAMPAIGN => CampaignManager.startPricepointCampaign(paramJob)
+          case CampaignCommon.HOTTEST_X_CAMPAIGN => CampaignManager.startHottestXCampaign(paramJob)
+          case CampaignCommon.REPLENISHMENT_CAMPAIGN => CampaignManager.startReplenishmentCampaign(paramJob)
+          case CampaignCommon.BRAND_IN_CITY_CAMPAIGN => CampaignManager.startBrandInCityCampaign(paramJob)
+          case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => CampaignManager.startBrickAffinityCampaign(paramJob)
 
           case CampaignCommon.GEO_CAMPAIGN => CampaignManager.startGeoCampaigns(paramJob)
 

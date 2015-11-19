@@ -65,6 +65,30 @@ object RecommendationUtils extends Serializable {
     "TOYS" -> 2
   )
 
+  val NonBeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+  NonBeautyCategory += (
+    "SUNGLASSES" -> 365,
+    "WOMEN FOOTWEAR" -> 180,
+    "KIDS APPAREL" -> 180,
+    "WATCHES" -> 365,
+    "FURNITURE" -> 365,
+    "SPORTS EQUIPMENT" -> 180,
+    "WOMEN APPAREL" -> 90,
+    "HOME" -> 365,
+    "MEN FOOTWEAR" -> 180,
+    "MEN APPAREL" -> 180,
+    "JEWELLERY" -> 180,
+    "KIDS FOOTWEAR" -> 180,
+    "BAGS" -> 90,
+    "TOYS" -> 90
+  )
+
+  val BeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+  BeautyCategory += (
+    "BEAUTY" -> 90,
+    "FRAGRANCE" -> 180
+  )
+
   def getPivotArray(pivotKey: String): Array[(Array[String], StructType, String)] = {
     if (pivotKey == null) {
       return null
