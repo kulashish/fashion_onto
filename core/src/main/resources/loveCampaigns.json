@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "love_campaigns",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}
