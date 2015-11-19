@@ -49,6 +49,4 @@ object CampaignMergedFields {
   val CALENDAR_COLOR = "CLDR_COLOR"
   val CALENDAR_PRICE_POINT = "CLDR_PRICE_POINT"
 
-
-
 }

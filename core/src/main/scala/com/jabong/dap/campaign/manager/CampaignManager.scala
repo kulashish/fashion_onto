@@ -574,7 +574,7 @@ object CampaignManager extends Serializable with Logging {
    * @param campaignJsonPath
    */
   def startCampaignMerge(campaignJsonPath: String, campaignType: String) = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS,DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
       //      createCampaignMaps(json)
@@ -666,7 +666,7 @@ object CampaignManager extends Serializable with Logging {
 
           //          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
 
-          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1",Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "2", lit(""))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "3", lit(""))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "4", lit(""))
