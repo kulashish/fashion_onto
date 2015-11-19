@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.utils
 
 import java.math.BigDecimal
-import java.sql.Timestamp
+import java.sql.{ Struct, Timestamp }
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
@@ -74,7 +74,7 @@ object CampaignUtils extends Logging {
    */
   def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
     val referenceSkus = generateReferenceSkus(refSkuData, 100)
-    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String, String, String)]].take(NumberSku),
+    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String, String, String, String)]].take(NumberSku),
       (t(2).asInstanceOf[List[Row]]))).map(t => Row(t._1, t._2, t._3, createRefSkuAcartUrl(t._4)))
     val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSkuWithACartUrl)
     return refSkuForAcart
@@ -189,7 +189,8 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
         checkNullString(t(t.fieldIndex(ProductVariables.GENDER))),
         checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
-        checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
+        checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))),
+        checkNullString(t(t.fieldIndex(ProductVariables.COLOR))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -204,7 +205,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -907,6 +908,27 @@ object CampaignUtils extends Logging {
 
     return campaignDataEmail
 
+  }
+
+  /**
+   * get top sku for a particular field e.g fk_customer and topField as brand_list
+   * @param topData
+   * @param field
+   * @param topField
+   * @return
+   */
+  def getFavSku(topData: DataFrame, field: String, topField: String): DataFrame = {
+    val topSkus = topData.select(field, topField
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.
+      sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int],
+        r._2(r._2.fieldIndex("price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(e => (e._1, e._2(e._2.fieldIndex("sku")).toString))))
+
+    val topSkusBasedOnField = topSkus.map(x => (x._1, x._2(0)._1, x._2(0)._2))
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topSkusBasedOnField.toDF(field, topField, ProductVariables.SKU_SIMPLE)
   }
 
   @elidable(FINE) def debug(data: DataFrame, name: String) {
