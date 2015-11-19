@@ -183,6 +183,10 @@ object DataSets {
 
   val CLICKSTREAM_SURF3_VARIABLE = "clickstreamSurf3Variable"
 
+  val SURF1_PROCESSED_VARIABLE = "Surf1ProcessedVariable"
+
+  val CUSTOMER_SURF_AFFINITY = "customerSurfAffinity"
+
   val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
 
   val OPEN = "open"

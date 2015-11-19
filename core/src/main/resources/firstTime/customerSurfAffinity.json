@@ -1,0 +1,12 @@
+{
+"params": [
+{
+"source": "customerSurfAffinity",
+"path": "first time",
+"mode": "full",
+"incrDate": "2015/11/14",
+"saveMode": "Ignore",
+"saveFormat": "parquet"
+}
+]
+}

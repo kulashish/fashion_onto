@@ -40,16 +40,16 @@ object CampaignCommon {
   val FOLLOW_UP_CAMPAIGNS = "follow_up_campaigns"
 
   //calendar campaigns
-  val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
-  val PRICEPOINT_CAMPAIGN = "pricepoint"
-  val BRICK_AFFINITY = "brick_affinity"
-  val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_frag"
-  val BEAUTY_CAMPAIGN = "beauty_campaign"
-  val HOTTEST_X = "hottest_x"
+  val BRAND_IN_CITY_CAMPAIGN = "brandInCityCampaign"
+  val PRICEPOINT_CAMPAIGN = "pricepointCampaign"
+  val REPLENISHMENT_CAMPAIGN = "replenishmentCampaign"
+  val BRICK_AFFINITY_CAMPAIGN = "brickAffinityCampaign"
+  val NON_BEAUTY_FRAG_CAMPAIGN = "nonBeautyFragCampaign"
+  val BEAUTY_CAMPAIGN = "beautyCampaign"
+  val HOTTEST_X_CAMPAIGN = "hottestXCampaign"
   val CLEARANCE_CAMPAIGN = "clearance"
   val LOVE_BRAND_CAMPAIGN = "love_brand"
   val LOVE_COLOR_CAMPAIGN = "love_color"
-
 
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
@@ -111,9 +111,15 @@ object CampaignCommon {
     "invalid_iod" -> 100,
     "acart_hourly" -> 41,
     CampaignCommon.PRICEPOINT_CAMPAIGN -> 24,
+    //FIXME: put correct mail type
+    CampaignCommon.BEAUTY_CAMPAIGN -> 400,
+    //FIXME: put correct mail type
+    CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500,
+    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 24,
+    CampaignCommon.BRICK_AFFINITY_CAMPAIGN -> 14,
     CampaignCommon.CLEARANCE_CAMPAIGN -> 20,
     CampaignCommon.LOVE_BRAND_CAMPAIGN -> 13,
-    CampaignCommon.HOTTEST_X -> 11,
+    CampaignCommon.HOTTEST_X_CAMPAIGN -> 11,
     CampaignCommon.LOVE_COLOR_CAMPAIGN -> 15
   )
 

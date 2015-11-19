@@ -15,7 +15,7 @@ import org.apache.spark.sql.DataFrame
  */
 class HottestXCampaign {
 
-  def runCampaign(nDaysSalesOrder: DataFrame, nDaysSalesOrderItem_60: DataFrame, yesterdayItr: DataFrame, recommendations: DataFrame) {
+  def runCampaign(nDaysSalesOrder: DataFrame, nDaysSalesOrderItem_60: DataFrame, yesterdayItr: DataFrame, recommendations: DataFrame, incrDate: String) {
 
     val day_45past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
 
@@ -35,7 +35,7 @@ class HottestXCampaign {
 
     val filteredSku = Daily.skuFilter(hottestX, yesterdayItr)
 
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.HOTTEST_X, filteredSku, false,
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.HOTTEST_X_CAMPAIGN, filteredSku, false,
       recommendations)
 
   }

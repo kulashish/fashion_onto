@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.customerselection
 
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.Daily._
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
 import com.jabong.dap.common.constants.variables._
@@ -26,20 +27,21 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
     val filterCustomerData = customerData.filter(ContactListMobileVars.NET_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
       .select(CustomerVariables.ID_CUSTOMER)
 
-    val lastOrder = new LastOrder()
-    val dfCustomerSelection = lastOrder.customerSelection(fullSalesOrderData, fullSalesOrderItemData)
-
+    val coalesceFullSalesOrderData = fullSalesOrderData
     val joinedDf = filterCustomerData.join(
-      dfCustomerSelection,
-      filterCustomerData(CustomerVariables.ID_CUSTOMER) === dfCustomerSelection(SalesOrderVariables.FK_SALES_ORDER),
+      coalesceFullSalesOrderData,
+      filterCustomerData(CustomerVariables.ID_CUSTOMER) === coalesceFullSalesOrderData(SalesOrderVariables.FK_CUSTOMER),
       SQL.INNER
-    ).select(
-        SalesOrderVariables.FK_CUSTOMER,
-        CustomerVariables.EMAIL,
-        ProductVariables.SKU_SIMPLE
-      )
+    )
 
-    joinedDf
+    CampaignUtils.debug(joinedDf, "last 5 orders joinedDf")
+
+    val lastOrder = new LastOrder()
+    val dfCustomerSelection = lastOrder.customerSelection(joinedDf, fullSalesOrderItemData)
+
+    CampaignUtils.debug(dfCustomerSelection, "last 5 orders dfCustomerSelection")
+
+    dfCustomerSelection
   }
 
   override def customerSelection(inData: DataFrame): DataFrame = ???

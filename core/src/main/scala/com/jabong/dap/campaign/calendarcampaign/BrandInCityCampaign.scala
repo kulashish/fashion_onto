@@ -12,17 +12,17 @@ import org.apache.spark.sql.DataFrame
  */
 class BrandInCityCampaign {
 
-  def runCampaign(yestCustomerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(fullCustomerOrders: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame, brandMvpSubType: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.CUSTOMER_PREFERRED_DATA)
 
-    val dfCustomerSelection = customerSelector.customerSelection(yestCustomerData, last6thDaySalesOrderData, last6thDaySalesOrderItemData)
+    val dfCustomerSelection = customerSelector.customerSelection(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData)
 
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRAND_IN_CITY_CAMPAIGN, filteredSku, false, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRAND_IN_CITY_CAMPAIGN, filteredSku, false, brandMvpSubType)
 
   }
 
