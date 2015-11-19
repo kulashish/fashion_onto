@@ -36,7 +36,7 @@ class GeoStyleCampaign {
         yesterdayItrData(ProductVariables.STOCK),
         yesterdayItrData(ProductVariables.PRICE_BAND))
 
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_STYLE, custFilter, false, recommendationsData)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_STYLE_CAMPAIGN, custFilter, false, recommendationsData)
 
   }
 

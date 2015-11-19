@@ -37,7 +37,7 @@ class GeoBrandCampaign {
         yesterdayItrData(ProductVariables.STOCK),
         yesterdayItrData(ProductVariables.PRICE_BAND))
 
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_BRAND, custFilter, false, recommendationsData)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_BRAND_CAMPAIGN, custFilter, false, recommendationsData)
 
 
   }
