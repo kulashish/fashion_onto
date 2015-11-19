@@ -28,7 +28,7 @@ class LiveCommonRecommender extends Recommender with Logging {
   override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE, numRecSkus: Int = 8): DataFrame = {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
-    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE, Recommendation.MVP_DISCOUNT_SUB_TYPE, Recommendation.MVP_COLOR_SUB_TYPE) contains recType, "recommendation type is invalid")
+    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE, Recommendation.MVP_DISCOUNT_SUB_TYPE, Recommendation.MVP_COLOR_SUB_TYPE, Recommendation.BRAND_MVP_CITY_SUB_TYPE) contains recType, "recommendation type is invalid")
     var refSkusUpdatedSchema: DataFrame = refSkus
     if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)) {
       refSkusUpdatedSchema = SchemaUtils.addColumns(refSkus, Schema.expectedFinalReferenceSku)

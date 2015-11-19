@@ -42,7 +42,7 @@ class BrandInCityCampaignTest extends FeatureSpec with GivenWhenThen with Shared
 
       val BrandInCityCampaignOut = CampaignOutput.testData.head
       //      assert(BrandInCityCampaignOut._1.count() == 1)
-      assert(BrandInCityCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && BrandInCityCampaignOut._2 == CampaignCommon.BRAND_IN_CITY_CAMPAIGN)
+      assert(BrandInCityCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && BrandInCityCampaignOut._2 == CampaignCommon.BRAND_IN_CITY_CAMPAIGN)
 
     }
   }
