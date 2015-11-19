@@ -20,14 +20,13 @@ class BrandInCityCampaignTest extends FeatureSpec with GivenWhenThen with Shared
   @transient var brandMvpCityRecommendations: DataFrame = _
   @transient var yesterdayItrData: DataFrame = _
   @transient var fullCusTop5: DataFrame = _
-  @transient var fullSalesOrderAddress: DataFrame = _
+  @transient var fullCustomerOrders: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     CampaignOutput.setTestMode(true)
-    fullCusTop5 = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "custTop5")
-    fullSalesOrderAddress = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "sales_order_address")
+    fullCustomerOrders = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "full_customer_orders")
     last6thDaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "sales_order", Schema.salesOrder)
     last6thDaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "sales_order_item", Schema.salesOrderItem)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/brand_in_city", "itr", TestSchema.basicSimpleItr)
@@ -39,7 +38,7 @@ class BrandInCityCampaignTest extends FeatureSpec with GivenWhenThen with Shared
       Given("last6thDaySalesOrderData, last6thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val brandInCityCampaign = new BrandInCityCampaign()
 
-      brandInCityCampaign.runCampaign(fullSalesOrderAddress, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
+      brandInCityCampaign.runCampaign(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
       val BrandInCityCampaignOut = CampaignOutput.testData.head
       //      assert(BrandInCityCampaignOut._1.count() == 1)
