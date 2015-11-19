@@ -272,7 +272,7 @@ object CampaignInput extends Logging {
       if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
-    CampaignUtils.debug(allCampaignData,"loading campaign data " + campaignType)
+    CampaignUtils.debug(allCampaignData, "loading campaign data " + campaignType)
 
     return allCampaignData
   }
