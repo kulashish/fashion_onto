@@ -1,6 +1,6 @@
 package com.jabong.dap.common.constants.campaign
 
-import com.jabong.dap.common.constants.variables.ProductVariables
+import com.jabong.dap.common.constants.variables.{SalesAddressVariables, ProductVariables}
 
 /**
  * Created by rahul for recommendation constants  on 9/7/15.
@@ -17,6 +17,13 @@ object Recommendation {
 
   val BRAND_MVP_SUB_TYPE = "brand_mvp"
 
+  val BRAND_MVP_CITY_STATE = "brand_mvp_city_state"
+
+  val BRAND_MVP_CITY_SUB_TYPE = "brand_mvp_city"
+  val BRAND_MVP_STATE_SUB_TYPE = "brand_mvp_state"
+
+
+
   val MVP_DISCOUNT = "mvp_discount"
   val ALL = "all"
   val MVP_DISCOUNT_SUB_TYPE = "mvp_discount"
@@ -31,15 +38,23 @@ object Recommendation {
 
   val DISCOUNT_STATUS = "discount_status"
 
+  val RECOMMENDATION_STATE = "STATE"
+
+
   val BRICK_MVP_PIVOT = Array(ProductVariables.BRICK, ProductVariables.MVP)
   val BRAND_MVP_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP)
   val BRICK_PRICE_BAND_PIVOT = Array(ProductVariables.BRICK, ProductVariables.PRICE_BAND)
   val MVP_COLOR_PIVOT = Array(ProductVariables.MVP, ProductVariables.COLOR)
   val MVP_DISCOUNT_PIVOT = Array(ProductVariables.MVP, Recommendation.DISCOUNT_STATUS)
+  val BRAND_MVP_CITY_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP,SalesAddressVariables.CITY)
+  val BRAND_MVP_STATE_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP,Recommendation.RECOMMENDATION_STATE)
+
+
 
   val ORDER_ITEM_DAYS = 30
 
   val NUM_REC_SKU_REF_SKU = 8
 
   val DISCOUNT_THRESHOLD = 35
+
 }

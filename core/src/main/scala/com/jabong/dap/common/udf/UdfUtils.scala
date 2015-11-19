@@ -2,7 +2,6 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util
 import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
@@ -253,7 +252,6 @@ object UdfUtils extends Logging {
     }
     return app_user_id
   }
-
   /**
    * This will return Timestamp into YYYYMMDD format
    * @param t1
@@ -289,7 +287,7 @@ object UdfUtils extends Logging {
   }
 
   /**
-   * getSimpleSkuFromExtraData will extract data from extraData
+   *  getSimpleSkuFromExtraData will extract data from extraData
    * @param extraData
    * @return
    */
@@ -587,7 +585,6 @@ object UdfUtils extends Logging {
       0
     }
   }
-
   def getElementArray(strings: ArrayBuffer[String], i: Int): String = {
     if (i >= strings.size) "" else strings(i)
   }
