@@ -615,12 +615,12 @@ object CampaignManager extends Serializable with Logging {
 
           .withColumn(CampaignMergedFields.CALENDAR_CITY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(5)))
           .withColumn(CampaignMergedFields.CALENDAR_COLOR, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
-          .withColumn(CampaignMergedFields.CALENDAR_PRICE_POINT, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
+          .withColumn(CampaignMergedFields.CALENDAR_PRICE_POINT, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit("")))
           .withColumn(CampaignMergedFields.CALENDAR_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
 
           //          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
 
-          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1", lit(""))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1",Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "2", lit(""))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "3", lit(""))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "4", lit(""))
@@ -646,13 +646,13 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.LIVE_CART_URL)
 
-        val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
         val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
-        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
+        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, calendarCampaignFileName, saveMode, "true", ";")
       }
     }
   }
