@@ -98,6 +98,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
           case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
+          case DataSets.SALES_ITEM_REVENUE => SalesItemRevenue.start(paramJob)
           //CUSTOMER_SURF_AFFINITY from surf data
           case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
