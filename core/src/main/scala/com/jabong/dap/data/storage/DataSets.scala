@@ -194,7 +194,7 @@ object DataSets {
   val CUST_EMAIL_RESPONSE = "custEmailResponse"
 
   //SalesOrderItemVariables-->Customerorders.csv
-  val SALES_ITEM_REVENUE = "sales_item_revenue"
+  val SALES_ITEM_REVENUE = "salesItemRevenue"
   val SALES_ITEM_COUPON_DISC = "sales_item_coupon_disc"
   val SALES_ITEM_INVALID_CANCEL = "sales_order_invalid_cancel"
   val SALES_ITEM_CAT_BRICK_PEN = "sales_item_cat_brick_pen"
