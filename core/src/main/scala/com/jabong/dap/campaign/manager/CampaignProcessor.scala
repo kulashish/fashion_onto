@@ -121,7 +121,7 @@ object CampaignProcessor {
         bcCampaign(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL
       )
 
-    CampaignUtils.debug(emailData,"data after join with cmr in campaign Processor")
+    CampaignUtils.debug(emailData, "data after join with cmr in campaign Processor")
     emailData
   }
   /**
@@ -228,7 +228,7 @@ object CampaignProcessor {
 
     val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
 
-    CampaignUtils.debug(campaignMerged,"data after campaign merge in campaign Processor")
+    CampaignUtils.debug(campaignMerged, "data after campaign merge in campaign Processor")
 
     campaignMerged
   }
