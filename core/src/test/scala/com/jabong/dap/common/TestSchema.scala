@@ -274,5 +274,11 @@ object TestSchema {
     StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false)))), true),
     StructField("last_order_created_at", TimestampType, true)
   ))
-
+  
+  val cityMapSchema = StructType(Array(
+    StructField(SalesAddressVariables.CITY, StringType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
 }

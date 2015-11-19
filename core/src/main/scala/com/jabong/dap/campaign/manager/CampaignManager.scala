@@ -5,12 +5,12 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, PageVisitVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{ ParamInfo, CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo, ParamInfo}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -18,9 +18,10 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -427,7 +428,7 @@ object CampaignManager extends Serializable with Logging {
     val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
     //FIXME:
     val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData, incrDate)
     //FIXME:
@@ -454,6 +455,51 @@ object CampaignManager extends Serializable with Logging {
     //Start: FollowUp email Campaign
     val followUpCampaigns = new FollowUpCampaigns()
     followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, itrSkYesterdayData)
+  }
+
+  def startGeoCampaigns(params: ParamInfo) = {
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val day40_orderData = CampaignInput.loadNthdayTableData(40, fullOrderData)
+    val day50_orderData = CampaignInput.loadNthdayTableData(50, fullOrderData)
+
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    val genderMvpBrandRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE).cache()
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val day40_orderItemData = CampaignInput.loadNthdayTableData(40, fullOrderItemData)
+    val day50_orderItemData = CampaignInput.loadNthdayTableData(50, fullOrderItemData)
+
+    val salesAddressData = CampaignInput.loadSalesAddressData()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
+
+    val geoStyleCampaign = new GeoStyleCampaign
+    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+
+    val geoBrandCampaign =  new GeoBrandCampaign
+    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrandRecos)
+
+  }
+
+  def startClearanceCampaign(params: ParamInfo) = {
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, incrDate)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData, incrDate)
+
+    val mvpDiscountRecos = CampaignInput.loadRecommendationData(Recommendation.MVP_DISCOUNT_SUB_TYPE).cache()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val clearanceCampaign = new ClearanceCampaign
+    clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, mvpDiscountRecos, yesterdayItrData)
   }
 
   def loadCustomerMasterData(): DataFrame = {

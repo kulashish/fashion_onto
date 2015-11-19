@@ -12,7 +12,7 @@ import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
-import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
+import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, SurfVariablesMain}
 import com.jabong.dap.model.customer.campaigndata._
 import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut }
 import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderAddress }
@@ -24,7 +24,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 /**
  * Created by pooja on 9/7/15.
@@ -98,7 +98,6 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
           case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
-          case DataSets.SALES_ITEM_REVENUE => SalesItemRevenue.start(paramJob)
           //CUSTOMER_SURF_AFFINITY from surf data
           case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
@@ -126,8 +125,9 @@ class ComponentExecutor extends Serializable with Logging {
           case CampaignCommon.REPLENISHMENT_CAMPAIGN => CampaignManager.startReplenishmentCampaign(paramJob)
           case CampaignCommon.BRAND_IN_CITY_CAMPAIGN => CampaignManager.startBrandInCityCampaign(paramJob)
           case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => CampaignManager.startBrickAffinityCampaign(paramJob)
-
+          case CampaignCommon.GEO_CAMPAIGN => CampaignManager.startGeoCampaigns(paramJob)
           case CampaignCommon.LOVE_CALENDAR_CAMPAIGNS => CampaignManager.startLoveCampaigns(paramJob)
+          case CampaignCommon.CLEARANCE_CAMPAIGN => CampaignManager.startClearanceCampaign(paramJob)
 
           // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
