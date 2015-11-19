@@ -24,7 +24,7 @@ class CustomerPreferredData extends CustomerSelector with Logging {
     val customerData = fullCustomerOrders.select(
       fullCustomerOrders(CustomerVariables.FK_CUSTOMER),
       fullCustomerOrders(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
-      fullCustomerOrders(CustomerVariables.CITY)
+      fullCustomerOrders(ContactListMobileVars.CITY) as CustomerVariables.CITY
     )
 
     //join SalesOrder and SalesOrderItem Data
