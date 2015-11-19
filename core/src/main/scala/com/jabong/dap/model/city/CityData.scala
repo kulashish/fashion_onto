@@ -1,20 +1,17 @@
 package com.jabong.dap.model.city
 
 import com.jabong.dap.campaign.data.CampaignInput
-import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables }
-import com.jabong.dap.common.udf.{ UdfUtils, Udf }
+import com.jabong.dap.common.constants.variables.{ProductVariables, SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
+import com.jabong.dap.data.storage.schema.OrderBySchema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
-import com.jabong.dap.model.order.variables.SalesOrder
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame }
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.collection.mutable
 import scala.collection.mutable.HashMap

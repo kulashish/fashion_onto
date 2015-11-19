@@ -14,8 +14,8 @@ import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, SurfVariablesMain}
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.{CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut}
-import com.jabong.dap.model.order.variables.SalesOrderAddress
+import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderAddress }
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
