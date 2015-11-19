@@ -6,7 +6,7 @@ import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.TestSchema
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.order.variables.{SalesItemRevenue, SalesOrderItem}
+import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderItem }
 import org.apache.spark.sql.DataFrame
 import org.scalatest.FlatSpec
 
