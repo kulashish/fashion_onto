@@ -117,9 +117,16 @@ object SalesItemRevenue extends DataFeedsModel {
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
+    val otherOrders = salesJoinedDF.filter(salesJoinedDF(SalesOrderVariables.DOMAIN).isNull
+      || !salesJoinedDF(SalesOrderVariables.DOMAIN).startsWith("w")
+      || !salesJoinedDF(SalesOrderVariables.DOMAIN).startsWith("m")
+      || !salesJoinedDF(SalesOrderVariables.DOMAIN).startsWith("ios")
+      || !salesJoinedDF(SalesOrderVariables.DOMAIN).startsWith("android")
+      || !salesJoinedDF(SalesOrderVariables.DOMAIN).startsWith("windows"))
     val app = getRevenueOrders(appOrders, "_app")
     val web = getRevenueOrders(webOrders, "_web")
     val mWeb = getRevenueOrders(mWebOrders, "_mweb")
+    val others = getRevenueOrders(otherOrders, "_mweb")
     val salesRevenueOrdersIncr = joinDataFrames(app, web, mWeb)
 
     val mergedData = merge(salesRevenueOrdersIncr, salesRevenuePrevFull)
