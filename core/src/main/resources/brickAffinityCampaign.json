@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "brickAffinityCampaign",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

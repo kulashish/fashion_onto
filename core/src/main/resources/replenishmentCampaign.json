@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "replenishmentCampaign",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

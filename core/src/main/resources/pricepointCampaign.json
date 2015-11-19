@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "pricepointCampaign",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

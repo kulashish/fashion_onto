@@ -4,18 +4,15 @@ import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.Daily
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables, SalesOrderItemVariables, SalesOrderVariables }
-import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
 
 /**
  * Created by raghu on 16/9/15.
  */
 class PricepointCampaign {
 
-  def runCampaign(last20thDaySalesOrderData: DataFrame, last20thDaySalesOrderItemData: DataFrame, brickPriceBandRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(last20thDaySalesOrderData: DataFrame, last20thDaySalesOrderItemData: DataFrame, brickPriceBandRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST_ORDER)

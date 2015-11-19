@@ -3,11 +3,13 @@ package com.jabong.dap.common
 import java.math.BigDecimal
 
 import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.Recommendation
-import com.jabong.dap.common.constants.variables.ProductVariables
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesAddressVariables, ProductVariables }
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.udf.UdfUtils._
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.data.storage.schema.OrderBySchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.types._
@@ -256,9 +258,9 @@ input:- row  and fields: field array
     require(prevMap != null || newMap != null, "prevMap and newMap cannot be null")
     if (prevMap == null) return newMap
     if (newMap == null) return prevMap
-
     newMap.keys.foreach {
       key =>
+
         if (prevMap.contains(key)) {
           var updatedRow: Row = null
           val prevRowValue = prevMap(key)
@@ -275,6 +277,26 @@ input:- row  and fields: field array
         }
     }
     return prevMap
+  }
+
+  /**
+   * merge Two data frames of map columns e.g city , brand_list(MapType)
+   * @param prev
+   * @param inc
+   * @param joinedKey
+   * @param outputSchema
+   * @return
+   */
+  def mergeTopMapDataFrame(prev: DataFrame, inc: DataFrame, joinedKey: String, outputSchema: StructType): DataFrame = {
+
+    val rddJoined = prev.join(inc, prev(joinedKey) === inc(joinedKey), SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0), row(5)).asInstanceOf[String],
+      Utils.mergeMaps(row(1).asInstanceOf[Map[String, Row]], row(6).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(2).asInstanceOf[Map[String, Row]], row(7).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(3).asInstanceOf[Map[String, Row]], row(8).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(4).asInstanceOf[Map[String, Row]], row(9).asInstanceOf[Map[String, Row]])))
+    val dfMergeTopMapDataFrame = sqlContext.createDataFrame(rddJoined, outputSchema)
+
+    return dfMergeTopMapDataFrame
   }
 
   //  /**
@@ -317,6 +339,24 @@ input:- row  and fields: field array
   def getNonNull(a1: Any, a2: Any): Any = {
     if (a1 == null) return a2
     else a1
+  }
+
+  /**
+   *
+   * @param customerSurfAffinity
+   * @return
+   */
+  def getCustomerFavBrick(customerSurfAffinity: DataFrame): DataFrame = {
+    val topBricks = customerSurfAffinity.select(CustomerVariables.EMAIL, "brick_list"
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int], r._2(r._2.fieldIndex("sum_price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)))
+
+    val topTwoBricks = topBricks.map{ case (key, value) => ({ val arrayLength = value.length; if (arrayLength >= 2) (key, value(0), value(1)) else if (arrayLength == 1) (key, value(0), null) else (key, null, null) }) }
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topTwoBricks.toDF(CustomerVariables.EMAIL, "BRICK1", "BRICK2")
+
   }
 
 }

@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "loveCalendarCampaigns",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}
