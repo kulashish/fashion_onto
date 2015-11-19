@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{LoveColorCampaign, LoveBrandCampaign, HottestXCampaign, PricepointCampaign}
+import com.jabong.dap.campaign.calendarcampaign.{ LoveColorCampaign, LoveBrandCampaign, HottestXCampaign, PricepointCampaign }
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -97,36 +97,34 @@ object CampaignManager extends Serializable with Logging {
    * starting point of love campaigns
    * @param params
    */
-  def startLoveCampaigns(params: ParamInfo): Unit ={
+  def startLoveCampaigns(params: ParamInfo): Unit = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeUtils.YESTERDAY_FOLDER))
     val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
     val salesOrderItemFullData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val last35thSalesOrderData = CampaignInput.loadNthdayTableData(-35,salesOrderFullData)
-    val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(-35,salesOrderItemFullData)
+    val last35thSalesOrderData = CampaignInput.loadNthdayTableData(-35, salesOrderFullData)
+    val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(-35, salesOrderItemFullData)
 
-
-    val customerTopData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH,DataSets.MAPS,DataSets.CUST_TOP5,DataSets.FULL_MERGE_MODE,incrDate)
-    val last15thSalesOrderData = CampaignInput.loadNthdayTableData(-15,salesOrderFullData)
-    val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(-15,salesOrderItemFullData)
+    val customerTopData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+    val last15thSalesOrderData = CampaignInput.loadNthdayTableData(-15, salesOrderFullData)
+    val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(-15, salesOrderItemFullData)
 
     val yesterdayItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
 
-    val brandMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE,incrDate).cache()
+    val brandMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE, incrDate).cache()
 
-    val mvpColorRecommendations = CampaignInput.loadRecommendationData(Recommendation.MVP_COLOR_SUB_TYPE,incrDate).cache()
+    val mvpColorRecommendations = CampaignInput.loadRecommendationData(Recommendation.MVP_COLOR_SUB_TYPE, incrDate).cache()
 
-   val loveBrandCampaign = new LoveBrandCampaign()
+    val loveBrandCampaign = new LoveBrandCampaign()
 
-    loveBrandCampaign.runCampaign(customerTopData,last35thSalesOrderData,last35thSalesOrderItemData,brandMvpRecommendations,yesterdayItrSkuSimple,incrDate)
+    loveBrandCampaign.runCampaign(customerTopData, last35thSalesOrderData, last35thSalesOrderItemData, brandMvpRecommendations, yesterdayItrSkuSimple, incrDate)
 
     val loveColorCampaign = new LoveColorCampaign()
 
-    loveColorCampaign.runCampaign(customerTopData,last15thSalesOrderData,last15thSalesOrderItemData,mvpColorRecommendations,yesterdayItrSkuSimple,incrDate)
+    loveColorCampaign.runCampaign(customerTopData, last15thSalesOrderData, last15thSalesOrderItemData, mvpColorRecommendations, yesterdayItrSkuSimple, incrDate)
 
   }
-
 
   def startInvalidCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)

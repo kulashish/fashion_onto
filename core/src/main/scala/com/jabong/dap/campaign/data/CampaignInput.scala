@@ -146,7 +146,6 @@ object CampaignInput extends Logging {
     nthDayOrderData
   }
 
-
   /**
    * load yesterdays itr sku simle data
    * @param dateYesterday
