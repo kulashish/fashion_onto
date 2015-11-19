@@ -9,6 +9,7 @@ import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -501,9 +502,9 @@ object SalesOrderItem {
   def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame, prevMap: DataFrame, incrDate: String): (DataFrame, DataFrame) = {
     val salesOrderJoined = salesOrderFull.drop(SalesOrderItemVariables.UPDATED_AT).join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
     val incrMap = salesOrderJoined.select(
-      salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
-      salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
-      salesOrderJoined(SalesOrderItemVariables.ID_SALES_ORDER_ITEM),
+      salesOrderJoined(SalesOrderVariables.FK_CUSTOMER).cast(LongType),
+      salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER).cast(LongType),
+      salesOrderJoined(SalesOrderItemVariables.ID_SALES_ORDER_ITEM).cast(LongType),
       salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS).cast(IntegerType) as SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS,
       salesOrderJoined(SalesOrderItemVariables.UPDATED_AT))
       .map(e =>
@@ -596,13 +597,25 @@ object SalesOrderItem {
       maxDate = list(0)._4
     }
     list.foreach{
-      val innerMap = scala.collection.mutable.Map[Long, Int]()
+
       e =>
+        val innerMap = scala.collection.mutable.Map[Long, Int]()
         if (maxDate.after(list(0)._4))
           maxDate = list(0)._4
-        innerMap.put(e._2, e._3)
-        map.put(e._1, innerMap)
+
+        if(map.contains(e._1)){
+          val inner = map(e._1)
+          if(inner.contains(e._2)){
+            inner.update(e._2, e._3)
+          }
+          map.update(e._1, inner)
+        }
+        else{
+          innerMap.put(e._2, e._3)
+          map.put(e._1, innerMap)
+        }
     }
+    println("Map", map.toString())
     (map, maxDate)
   }
 
@@ -664,18 +677,17 @@ object SalesOrderItem {
     orderValue
   }
 
-  /**
-   * def main(args: Array[String]) {
-   * val conf = new SparkConf().setAppName("SparkExamples")
-   * Spark.init(conf)
-   * val df1 = JsonUtils.readFromJson("sales_order_item", "sales_order_item1", OrderVarSchema.salesOrderItem)
-   * df1.collect.foreach(println)
-   * val  x = getSucessfulOrders(df1)
-   *
-   * df1.collect().foreach(println)
-   *
-   * }
-   */
+
+    def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("SparkExamples")
+    Spark.init(conf)
+    val so = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order/2015/06/01")
+    val soi = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order_item/06/01")
+    val (resdf, map) =  getInvalidCancelOrders(soi, so, null, "2015/06/01")
+    map.take(5).foreach(println)
+    resdf.take(5).foreach(println)
+   }
+
 
 }
 
