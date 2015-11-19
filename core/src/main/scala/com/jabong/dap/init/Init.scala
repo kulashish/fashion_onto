@@ -131,11 +131,11 @@ object Init {
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
 
       //calendar campaigns
-      case "pricepoint" => CampaignManager.startPricepointCampaign()
-      case "hottest_x" => CampaignManager.startHottestXCampaign()
-      case "replenishment" => CampaignManager.startReplenishmentCampaign()
-      case "brandInCity" => CampaignManager.startBrandInCityCampaign()
-      case "brickAffinity" => CampaignManager.startBrickAffinityCampaign()
+      case "pricepointCampaign" => CampaignManager.startPricepointCampaign()
+      case "hottestXCampaign" => CampaignManager.startHottestXCampaign()
+      case "replenishmentCampaign" => CampaignManager.startReplenishmentCampaign()
+      case "brandInCityCampaign" => CampaignManager.startBrandInCityCampaign()
+      case "brickAffinityCampaign" => CampaignManager.startBrickAffinityCampaign()
 
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
