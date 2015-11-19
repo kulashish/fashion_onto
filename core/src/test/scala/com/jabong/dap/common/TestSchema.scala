@@ -260,10 +260,10 @@ object TestSchema {
 
   val customerFavList = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
-    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count",IntegerType, false), StructField("price",DoubleType, false), StructField("sku",StringType, false)))), true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false), StructField("sku", StringType, false)))), true),
     StructField("catagory_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
     StructField("brick_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
-    StructField("color_list", MapType(StringType, StructType(Array(StructField("count",IntegerType, false), StructField("price",DoubleType, false)))), true),
+    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false)))), true),
     StructField("last_order_created_at", TimestampType, true)
   ))
 

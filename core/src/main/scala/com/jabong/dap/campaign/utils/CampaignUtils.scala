@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.utils
 
 import java.math.BigDecimal
-import java.sql.{Struct, Timestamp}
+import java.sql.{ Struct, Timestamp }
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
@@ -205,7 +205,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String,String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String,String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -917,19 +917,18 @@ object CampaignUtils extends Logging {
    * @param topField
    * @return
    */
-  def getFavSku(topData: DataFrame,field:String,topField:String): DataFrame = {
+  def getFavSku(topData: DataFrame, field: String, topField: String): DataFrame = {
     val topSkus = topData.select(field, topField
     ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.
       sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int],
-      r._2(r._2.fieldIndex("price")).asInstanceOf[Double]))
-      (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(e=> (e._1,e._2(e._2.fieldIndex("sku")).toString))))
+        r._2(r._2.fieldIndex("price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(e => (e._1, e._2(e._2.fieldIndex("sku")).toString))))
 
-    val topSkusBasedOnField = topSkus.map(x=>(x._1,x._2(0)._1,x._2(0)._2))
+    val topSkusBasedOnField = topSkus.map(x => (x._1, x._2(0)._1, x._2(0)._2))
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
 
-    topSkusBasedOnField.toDF(field,topField,ProductVariables.SKU_SIMPLE)
+    topSkusBasedOnField.toDF(field, topField, ProductVariables.SKU_SIMPLE)
   }
 
   @elidable(FINE) def debug(data: DataFrame, name: String) {
