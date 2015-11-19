@@ -50,7 +50,6 @@ object CampaignCommon {
   val LOVE_BRAND_CAMPAIGN = "love_brand"
   val LOVE_COLOR_CAMPAIGN = "love_color"
 
-
   val LOW_STOCK_VALUE = 10
   val FOLLOW_UP_STOCK_VALUE = 10
   val ACART_HOURLY_STOCK_VALUE = 2

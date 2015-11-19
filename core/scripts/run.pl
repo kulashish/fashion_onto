@@ -287,6 +287,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "salesOrderAddrFav") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component salesOrderAddrFav --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/salesOrderAddrFav.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "salesItemRevenue") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component salesItemRevenue --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/salesItemRevenue.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "customerOrders") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerOrders --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerOrders.json";
     $job_exit = run_component($component, $command);
