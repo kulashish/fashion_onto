@@ -5,13 +5,12 @@ import java.sql.Timestamp
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ Debugging, Spark, Utils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{Debugging, Spark, Utils}
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by mubarak on 3/7/15.
@@ -592,15 +591,15 @@ object SalesOrderItem {
   }
 
 
-    def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("SparkExamples")
-    Spark.init(conf)
-    val so = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order/2015/06/01")
-    val soi = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order_item/06/01")
-    val (resdf, map) =  getInvalidCancelOrders(soi, so, null, "2015/06/01")
-    map.take(5).foreach(println)
-    resdf.take(5).foreach(println)
-   }
+//  def main(args: Array[String]) {
+//    val conf = new SparkConf().setAppName("SparkExamples")
+//    Spark.init(conf)
+//    val so = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order/2015/06/01")
+//    val soi = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order_item/06/01")
+//    val (resdf, map) =  getInvalidCancelOrders(soi, so, null, "2015/06/01")
+//    map.take(5).foreach(println)
+//    resdf.take(5).foreach(println)
+//   }
 
 
 }
