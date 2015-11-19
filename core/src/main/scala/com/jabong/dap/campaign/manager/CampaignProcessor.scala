@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.manager
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
@@ -119,6 +120,8 @@ object CampaignProcessor {
         bcCampaign(CampaignMergedFields.LIVE_CART_URL),
         bcCampaign(CampaignMergedFields.EMAIL) as CampaignMergedFields.EMAIL
       )
+
+    CampaignUtils.debug(emailData,"data after join with cmr in campaign Processor")
     emailData
   }
   /**
@@ -213,12 +216,19 @@ object CampaignProcessor {
     finalCampaign
   }
 
+  /**
+   * Merge EmailCampaigns
+   * @param allCampaignsData
+   * @return
+   */
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
 
     val groupedFields = Array(CampaignMergedFields.EMAIL)
     val aggFields = Array(CampaignMergedFields.EMAIL, ContactListMobileVars.UID, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKUS, CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
     val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
+
+    CampaignUtils.debug(campaignMerged,"data after campaign merge in campaign Processor")
 
     campaignMerged
   }
