@@ -157,7 +157,7 @@ object CustomerOrders extends DataFeedsModel {
       .drop(SalesOrderVariables.LAST_ORDER_DATE)
 
     val finalCustOrder = custOrdersCsv.join(cmrFull, cmrFull(CustomerVariables.ID_CUSTOMER) === custOrdersCsv(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
-        .select(ContactListMobileVars.UID,
+      .select(ContactListMobileVars.UID,
         SalesOrderItemVariables.REVENUE_7,
         SalesOrderItemVariables.REVENUE_30,
         SalesOrderItemVariables.REVENUE_LIFE,
@@ -181,7 +181,7 @@ object CustomerOrders extends DataFeedsModel {
         SalesRuleSetVariables.MIN_DISCOUNT_USED,
         SalesRuleSetVariables.MAX_DISCOUNT_USED,
         SalesRuleSetVariables.AVERAGE_DISCOUNT_USED
-        )
+      )
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(finalCustOrder, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_ORDERS", DataSets.IGNORE_SAVEMODE, "true", ";")
 
