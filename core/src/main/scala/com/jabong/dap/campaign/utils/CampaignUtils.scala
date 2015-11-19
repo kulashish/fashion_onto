@@ -768,7 +768,6 @@ object CampaignUtils extends Logging {
         val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        /*
         val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
@@ -783,7 +782,6 @@ object CampaignUtils extends Logging {
             dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
             dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
           )
-          */
 
         //          .select(
         //            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
@@ -799,8 +797,8 @@ object CampaignUtils extends Logging {
         //        import sqlContext.implicits._
         //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
         //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
-        CampaignUtils.debug(dfBrick1RecommendationData, "dfJoined")
-        dfBrick1RecommendationData
+        CampaignUtils.debug(dfJoined, "dfJoined")
+        dfJoined
       }
       case CampaignCommon.HOTTEST_X =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
