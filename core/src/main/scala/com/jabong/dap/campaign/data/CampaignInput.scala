@@ -282,7 +282,7 @@ object CampaignInput extends Logging {
    * @return
    */
   def getCampaignData(name: String, date: String, campaignType: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + campaignType + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading " + name + " campaign data from path:- " + path + ", Type: " + campaignType)
