@@ -1,10 +1,10 @@
 package com.jabong.dap.model.order.variables
 
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.time.{TimeUtils, TimeConstants}
-import com.jabong.dap.common.{Utils, Spark}
+import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
+import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.{SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -19,7 +19,7 @@ import scala.collection.mutable.HashMap
 /**
  * Created by pooja on 19/11/15.
  */
-object salesItemRevenue extends DataFeedsModel{
+object salesItemRevenue extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
 
@@ -29,7 +29,7 @@ object salesItemRevenue extends DataFeedsModel{
 
   }
 
-  def readDF (incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
+  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
 
     val dfMap = new HashMap[String, DataFrame]()
 
@@ -178,15 +178,15 @@ object salesItemRevenue extends DataFeedsModel{
       .withColumnRenamed(SalesOrderVariables.LAST_ORDER_DATE, SalesOrderVariables.LAST_ORDER_DATE + "NEW")
     val joined = full.join(incNew, incNew(SalesOrderVariables.FK_CUSTOMER + "NEW") === full(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
       .na.fill(Map(
-      SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
-      SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
-      SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
-      SalesOrderItemVariables.ORDERS_COUNT -> 0,
-      SalesOrderItemVariables.REVENUE_APP -> 0.0,
-      SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
-      SalesOrderItemVariables.REVENUE_WEB -> 0.0,
-      SalesOrderItemVariables.REVENUE -> 0.0
-    ))
+        SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT -> 0,
+        SalesOrderItemVariables.REVENUE_APP -> 0.0,
+        SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
+        SalesOrderItemVariables.REVENUE_WEB -> 0.0,
+        SalesOrderItemVariables.REVENUE -> 0.0
+      ))
     val res = joined.select(
       coalesce(joined(SalesOrderVariables.FK_CUSTOMER), joined(SalesOrderVariables.FK_CUSTOMER + "NEW")) as SalesOrderVariables.FK_CUSTOMER,
       joined(SalesOrderItemVariables.ORDERS_COUNT_LIFE) + joined(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
@@ -268,9 +268,9 @@ object salesItemRevenue extends DataFeedsModel{
       SalesOrderItemVariables.REVENUE,
       joinedFill(SalesOrderItemVariables.REVENUE_APP) + joinedFill(SalesOrderItemVariables.REVENUE_WEB) + joinedFill(SalesOrderItemVariables.REVENUE_MWEB)
     ).withColumn(
-      SalesOrderItemVariables.ORDERS_COUNT,
-      joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB)
-    )
+        SalesOrderItemVariables.ORDERS_COUNT,
+        joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB)
+      )
     res
   }
 
@@ -297,15 +297,15 @@ object salesItemRevenue extends DataFeedsModel{
       .withColumnRenamed(SalesOrderVariables.LAST_ORDER_DATE, SalesOrderVariables.LAST_ORDER_DATE + "_")
     val joined = currFull.join(befNew, befNew(SalesOrderVariables.FK_CUSTOMER + "_") === currFull(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
       .na.fill(Map(
-      SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
-      SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
-      SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
-      SalesOrderItemVariables.ORDERS_COUNT -> 0,
-      SalesOrderItemVariables.REVENUE_APP -> 0.0,
-      SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
-      SalesOrderItemVariables.REVENUE_WEB -> 0.0,
-      SalesOrderItemVariables.REVENUE -> 0.0
-    ))
+        SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT -> 0,
+        SalesOrderItemVariables.REVENUE_APP -> 0.0,
+        SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
+        SalesOrderItemVariables.REVENUE_WEB -> 0.0,
+        SalesOrderItemVariables.REVENUE -> 0.0
+      ))
     val res = joined.select(
       coalesce(joined(SalesOrderVariables.FK_CUSTOMER), joined(SalesOrderVariables.FK_CUSTOMER + "_")) as SalesOrderVariables.FK_CUSTOMER,
       joined(SalesOrderItemVariables.ORDERS_COUNT + "_" + days) - joined(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT + "_" + days,
