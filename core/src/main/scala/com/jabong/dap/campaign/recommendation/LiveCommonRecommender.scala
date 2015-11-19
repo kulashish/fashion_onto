@@ -9,6 +9,7 @@ import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.types.BooleanType
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 
@@ -149,7 +150,7 @@ class LiveCommonRecommender extends Recommender with Logging {
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       }
       case Recommendation.MVP_DISCOUNT_SUB_TYPE => {
-        val completeRefSkuWithDiscountStatus = completeRefSku.withColumn(Recommendation.DISCOUNT_STATUS, lit("true"))
+        val completeRefSkuWithDiscountStatus = completeRefSku.withColumn(Recommendation.DISCOUNT_STATUS, lit(true).cast(BooleanType))
 
         completeRefSkuWithDiscountStatus.join(recommendations, completeRefSkuWithDiscountStatus(Recommendation.DISCOUNT_STATUS) === recommendations(Recommendation.DISCOUNT_STATUS)
           && completeRefSkuWithDiscountStatus(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
