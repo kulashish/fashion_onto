@@ -130,10 +130,6 @@ object Init {
       case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
 
-      //calendar campaigns
-      case "pricepoint" => CampaignManager.startPricepointCampaign()
-      case "hottest_x" => CampaignManager.startHottestXCampaign()
-
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
 
