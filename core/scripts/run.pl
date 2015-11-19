@@ -282,7 +282,7 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geo_campaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geoCampaign.json";
     $job_exit = run_component($component, $command);  
-}} elsif ($component eq "clearanceCampaign") {
+} elsif ($component eq "clearanceCampaign") {
      $AMMUNITION = "--num-executors 9 --executor-memory 3G";
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clearance --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clearanceCampaign.json";
      $job_exit = run_component($component, $command);
