@@ -184,7 +184,7 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String)], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
