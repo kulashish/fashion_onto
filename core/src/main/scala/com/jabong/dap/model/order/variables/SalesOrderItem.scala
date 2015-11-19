@@ -8,6 +8,7 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ Debugging, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -455,43 +456,52 @@ object SalesOrderItem {
 
   val mergeMaps = udf((map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]) => joinMaps(map1, map2))
 
-  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] = {
-    val full = scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
+  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
+    if (null == map1 && null == map2) {
+      return null
+    } else if (null == map2) {
+      return map1
+    } else if (null == map1) {
+      return map2
+    }
+    val full = scala.collection.mutable.Map[Long, scala.collection.immutable.Map[Long, Int]]()
     map2.keySet.foreach{
       orderId =>
-        val itemMap = map2(orderId)
-        val item = scala.collection.mutable.Map[Long, Int]()
-        itemMap.keySet.foreach{
-          ItemId =>
-            item.put(ItemId, itemMap(ItemId))
-        }
-        full.put(orderId, item)
+        full.put(orderId, map2(orderId))
     }
     map1.keySet.foreach{
       orderId =>
-        if (full.contains(orderId)) {
-          val itemMapPrev = full(orderId)
-          val itemMapNew = map1(orderId)
-          itemMapNew.keySet.foreach{
-            itemId =>
-              if (itemMapPrev.contains(itemId)) {
-                itemMapPrev.update(itemId, itemMapNew(itemId))
-              } else {
-                itemMapPrev.put(itemId, itemMapNew(itemId))
-              }
-          }
-        } else {
-          val itemMap = map1(orderId)
-          val item = scala.collection.mutable.Map[Long, Int]()
-          itemMap.keySet.foreach{
-            ItemId =>
-              item.put(ItemId, itemMap(ItemId))
-          }
-          full.put(orderId, item)
-        }
-
+       if(full.contains(orderId)){
+         val combinedMap = combine2Maps(full(orderId), map1(orderId))
+         full.updated(orderId, combinedMap)
+       } else{
+         full.put(orderId, map1(orderId))
+       }
     }
-    full
+    return full.map(kv => (kv._1, kv._2)).toMap
+  }
+
+  def combine2Maps(map1: scala.collection.immutable.Map[Long, Int], map2: scala.collection.immutable.Map[Long, Int]):scala.collection.immutable.Map[Long, Int]={
+    val full = scala.collection.mutable.Map[Long, Int]()
+    if(null == map1){
+      return map2.toMap
+    }
+    if(null == map2){
+      return map1.toMap
+    }
+    map1.keySet.foreach{
+      key =>
+        full.put(key, map1(key))
+    }
+    map2.keySet.foreach{
+      key =>
+      if(full.contains(key)){
+        full.updated(key, map2(key))
+      } else{
+        full.put(key, map2(key))
+      }
+    }
+    return full.map(kv => (kv._1, kv._2)).toMap
   }
 
   def makeMap4mGroupedData(list: List[(Long, Long, Int, Timestamp)]): (scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]], Timestamp) = {
@@ -581,18 +591,17 @@ object SalesOrderItem {
     orderValue
   }
 
-  /**
-   * def main(args: Array[String]) {
-   * val conf = new SparkConf().setAppName("SparkExamples")
-   * Spark.init(conf)
-   * val df1 = JsonUtils.readFromJson("sales_order_item", "sales_order_item1", OrderVarSchema.salesOrderItem)
-   * df1.collect.foreach(println)
-   * val  x = getSucessfulOrders(df1)
-   *
-   * df1.collect().foreach(println)
-   *
-   * }
-   */
+
+    def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("SparkExamples")
+    Spark.init(conf)
+    val so = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order/2015/06/01")
+    val soi = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order_item/06/01")
+    val (resdf, map) =  getInvalidCancelOrders(soi, so, null, "2015/06/01")
+    map.take(5).foreach(println)
+    resdf.take(5).foreach(println)
+   }
+
 
 }
 
