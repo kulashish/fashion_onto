@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
  */
 class ReplenishmentCampaign {
 
-  def runCampaign(contactListMobileFull: DataFrame, fullSalesOrderData: DataFrame, fullSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(contactListMobileFull: DataFrame, fullSalesOrderData: DataFrame, fullSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST5_SUCCESSFUL_ORDER)

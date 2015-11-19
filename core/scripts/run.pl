@@ -256,11 +256,11 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pricepointCampaign") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricepointCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricepointCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricepointCampaign.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "hottestXCampaign") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component hottestXCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component hottestXCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/hottestXCampaign.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
@@ -268,15 +268,15 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 } elsif ($component eq "replenishmentCampaign") {
     $AMMUNITION = "--num-executors 27 --executor-memory 2G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component replenishmentCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component replenishmentCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/replenishmentCampaign.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "brandInCityCampaign") {
     $AMMUNITION = "--num-executors 7 --executor-memory 4G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brandInCityCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brandInCityCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/brandInCityCampaign.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "brickAffinityCampaign") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brickAffinityCampaign --config $HDFS_CONF/config.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brickAffinityCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/brickAffinityCampaign.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";

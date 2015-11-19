@@ -103,18 +103,6 @@ object CampaignInput extends Logging {
     orderData
   }
 
-  def loadFullCusTop5(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    logger.info("Reading Full CusTop5 data from hdfs")
-    val cusTop5Data = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, date)
-    cusTop5Data
-  }
-
-  def loadFullSalesOrderAddress(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    logger.info("Reading Full SalesOrderAddress data from hdfs")
-    val cusTop5Data = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
-    cusTop5Data
-  }
-
   def loadLastNdaysOrderData(n: Int, fullOrderData: DataFrame, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     val dateTimeMs = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
@@ -656,17 +644,10 @@ object CampaignInput extends Logging {
     tableNameUnionData
   }
 
-  def loadFullContactListMobileData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    //val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading Full Contact List Mobile Data data from hdfs")
-    val orderData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, date)
+  def loadFullVariablesData(tableName: String, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading Full" + tableName + "Data data from hdfs")
+    val orderData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, tableName, DataSets.FULL_MERGE_MODE, date)
     orderData
-  }
-
-  def loadFullCustomerSurfAffinity(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    logger.info("Reading Full Customer Surf Affinity data from hdfs")
-    val customerSurfAffinity = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_SURF_AFFINITY, DataSets.FULL_MERGE_MODE, date)
-    customerSurfAffinity
   }
 
   def loadPageViewSurfData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {

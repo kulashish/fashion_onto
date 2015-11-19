@@ -39,7 +39,7 @@ class BrandInCityCampaignTest extends FeatureSpec with GivenWhenThen with Shared
       Given("last6thDaySalesOrderData, last6thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val brandInCityCampaign = new BrandInCityCampaign()
 
-      brandInCityCampaign.runCampaign(fullCusTop5, fullSalesOrderAddress, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData)
+      brandInCityCampaign.runCampaign(fullSalesOrderAddress, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData)
 
       val BrandInCityCampaignOut = CampaignOutput.testData.head
       //      assert(BrandInCityCampaignOut._1.count() == 1)

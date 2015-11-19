@@ -12,14 +12,20 @@ import org.apache.spark.sql.functions._
  */
 class CustomerPreferredData extends CustomerSelector with Logging {
 
-  override def customerSelection(customerData: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
+  override def customerSelection(fullCustomerOrders: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
 
-    if (customerData == null || last6thDaySalesOrderData == null || last6thDaySalesOrderItemData == null) {
+    if (fullCustomerOrders == null || last6thDaySalesOrderData == null || last6thDaySalesOrderItemData == null) {
       log("Data frame should not be null")
       return null
     }
 
     val successFulOrderItems = CampaignUtils.getSuccessfulOrders(last6thDaySalesOrderItemData)
+
+    val customerData = fullCustomerOrders.select(
+      fullCustomerOrders(CustomerVariables.FK_CUSTOMER),
+      fullCustomerOrders(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
+      fullCustomerOrders(CustomerVariables.CITY)
+    )
 
     //join SalesOrder and SalesOrderItem Data
     val dfJoinOrderAndItem = last6thDaySalesOrderData.join(successFulOrderItems, successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) === last6thDaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER), SQL.INNER)

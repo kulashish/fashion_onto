@@ -7,20 +7,6 @@
 "incrDate": "2015/11/14",
 "saveMode": "Ignore",
 "saveFormat": "parquet"
-},
-{
-"source": "customerSurfAffinity",
-"fullDate": "2015/11/14",
-"incrDate": "2015/11/15",
-"saveMode": "Ignore",
-"saveFormat": "parquet"
-},
-{
-  "source": "customerSurfAffinity",
-  "fullDate": "2015/11/15",
-  "incrDate": "2015/11/16",
-  "saveMode": "Ignore",
-  "saveFormat": "parquet"
 }
 ]
 }
