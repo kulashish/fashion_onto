@@ -411,7 +411,8 @@ object Schema {
         StructField(ProductVariables.GENDER, StringType, true),
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
-        StructField(ProductVariables.COLOR, StringType, true)))), false)
+        StructField(ProductVariables.COLOR, StringType, true),
+        StructField(SalesAddressVariables.CITY, StringType, true)))), false)
   ))
 
   val referenceSku = StructType(Array(
@@ -424,7 +425,8 @@ object Schema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ProductVariables.PRICE_BAND, StringType, true),
-    StructField(ProductVariables.COLOR, StringType, true)))
+    StructField(ProductVariables.COLOR, StringType, true),
+    StructField(SalesAddressVariables.CITY, StringType, true)))
 
   val expectedFinalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
@@ -439,7 +441,8 @@ object Schema {
         StructField(ProductVariables.GENDER, StringType, true),
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
-        StructField(ProductVariables.COLOR, StringType, true)))), false),
+        StructField(ProductVariables.COLOR, StringType, true),
+        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
 
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
@@ -458,7 +461,8 @@ object Schema {
         StructField(ProductVariables.GENDER, StringType, true),
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
-        StructField(ProductVariables.COLOR, StringType, true)))), false),
+        StructField(ProductVariables.COLOR, StringType, true),
+        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
 
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))

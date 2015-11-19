@@ -213,6 +213,11 @@ object CampaignProcessor {
     finalCampaign
   }
 
+  /**
+   * Merge EmailCampaigns
+   * @param allCampaignsData
+   * @return
+   */
   def mergeEmailCampaign(allCampaignsData: DataFrame): DataFrame = {
 
     val groupedFields = Array(CampaignMergedFields.EMAIL)
