@@ -6,7 +6,7 @@ import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.order.variables.{SalesItemRevenue, SalesOrderItem}
+import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderItem }
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
