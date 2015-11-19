@@ -564,7 +564,7 @@ object CampaignManager extends Serializable with Logging {
 
         //writing csv file
         CampaignProcessor.splitFileToCSV(iosDF, androidDF, dateFolder)
-      } else if(campaignType == DataSets.EMAIL_CAMPAIGNS) {
+      } else if (campaignType == DataSets.EMAIL_CAMPAIGNS) {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp = "temp"
         val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL, CampaignMergedFields.LIVE_CART_URL + temp)
@@ -603,22 +603,22 @@ object CampaignManager extends Serializable with Logging {
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
-      }else if(campaignType == DataSets.CALENDAR_CAMPAIGNS) {
+      } else if (campaignType == DataSets.CALENDAR_CAMPAIGNS) {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp = "temp"
         val expectedDF = mergedData
           .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
           .withColumn(CampaignMergedFields.CALENDAR_REF_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
-          .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND+"_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
           .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
-          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK+"_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
 
           .withColumn(CampaignMergedFields.CALENDAR_CITY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(5)))
           .withColumn(CampaignMergedFields.CALENDAR_COLOR, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
           .withColumn(CampaignMergedFields.CALENDAR_PRICE_POINT, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
           .withColumn(CampaignMergedFields.CALENDAR_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
 
-//          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
+          //          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
 
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1", lit(""))
           .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "2", lit(""))

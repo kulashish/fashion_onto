@@ -256,7 +256,7 @@ object CampaignInput extends Logging {
    * @return dataframe with call campaigns data
    */
   def loadAllCampaignsData(date: String, campaignType: String): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS,DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     logger.info("Reading last day all campaigns data from hdfs : CampaignType" + campaignType)
     //FIXME:use proper data frame

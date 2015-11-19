@@ -30,8 +30,7 @@ object MostBought extends Logging {
         col(topFieldList) as topField,
         col(ProductVariables.SKU_SIMPLE))
 
-    CampaignUtils.debug(customerTopBrandSku, CampaignCommon.LOVE_CALENDAR_CAMPAIGNS+" customerTopBrandSku after filteredSku ")
-
+    CampaignUtils.debug(customerTopBrandSku, CampaignCommon.LOVE_CALENDAR_CAMPAIGNS + " customerTopBrandSku after filteredSku ")
 
     val customerTopDataWithItr = customerData.join(customerTopBrandSku, customerData(CustomerVariables.FK_CUSTOMER) ===
       customerTopBrandSku(CustomerVariables.FK_CUSTOMER), SQL.INNER).join(itrDataFrame,
@@ -50,7 +49,7 @@ object MostBought extends Logging {
         itrDataFrame(ProductVariables.COLOR),
         itrDataFrame(ProductVariables.PRICE_BAND))
 
-    CampaignUtils.debug(customerTopBrandSku, CampaignCommon.LOVE_CALENDAR_CAMPAIGNS+" customerTopBrandSku inside Most Bought ")
+    CampaignUtils.debug(customerTopBrandSku, CampaignCommon.LOVE_CALENDAR_CAMPAIGNS + " customerTopBrandSku inside Most Bought ")
 
     return customerTopDataWithItr
   }

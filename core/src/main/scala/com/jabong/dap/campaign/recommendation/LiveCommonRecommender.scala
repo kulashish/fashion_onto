@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{SalesAddressVariables, CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
@@ -211,7 +211,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
       referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
-        CampaignUtils.checkNullString(row(liveProdNameIndex),CampaignUtils.checkNullString(row(calendarColorIndex),CampaignUtils.checkNullString(row(calendarCityIndex))))))
+        CampaignUtils.checkNullString(row(liveProdNameIndex), CampaignUtils.checkNullString(row(calendarColorIndex), CampaignUtils.checkNullString(row(calendarCityIndex))))))
 
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)
