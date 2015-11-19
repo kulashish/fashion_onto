@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.data
 import java.io.File
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -268,6 +269,7 @@ object CampaignInput extends Logging {
       val campaignName = campaignDetails.campaignName
 
       df = getCampaignData(campaignName, date, campaignType, campaignPriority)
+      CampaignUtils.debug(df,"loading campaign data "+campaignName + campaignType)
       if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
