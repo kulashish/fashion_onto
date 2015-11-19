@@ -262,14 +262,10 @@ if ($component eq "bobAcqFull1") {
        $AMMUNITION = "--num-executors 7 --executor-memory 4G";
        my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component hottest_x --config $HDFS_CONF/config.json";
        $job_exit = run_component($component, $command);
- } elsif ($component eq "geo_style") {
+ } elsif ($component eq "geo_campaign") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geoStyle --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geo_style.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geo_campaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geoCampaign.json";
     $job_exit = run_component($component, $command);
- }  elsif ($component eq "geo_brand") {
-       $AMMUNITION = "--num-executors 9 --executor-memory 3G";
-       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geoBrand --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geo_brand.json";
-       $job_exit = run_component($component, $command);
  } elsif ($component eq "dcfFeedGenerate") {
     $AMMUNITION = "--num-executors 15 --executor-memory 2G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION  $HIVE_JARS $CORE_JAR --component dcfFeedGenerate --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/dcfFeedGenerate.json";

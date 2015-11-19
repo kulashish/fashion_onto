@@ -1,7 +1,7 @@
 {
   "params": [
     {
-      "source": "geoBrand",
+      "source": "geo_campaign",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }

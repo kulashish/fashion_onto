@@ -119,9 +119,7 @@ class ComponentExecutor extends Serializable with Logging {
 
           case CampaignCommon.HOTTEST_X => CampaignManager.startHottestXCampaign()
 
-          case CampaignCommon.GEO_STYLE => CampaignManager.startGeoStyleCampaign(paramJob)
-
-          case CampaignCommon.GEO_BRAND => CampaignManager.startGeoStyleCampaign(paramJob)
+          case CampaignCommon.GEO_CAMPAIGN => CampaignManager.startGeoCampaigns(paramJob)
 
           // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)

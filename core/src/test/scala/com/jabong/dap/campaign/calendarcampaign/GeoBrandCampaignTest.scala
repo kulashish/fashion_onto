@@ -1,20 +1,17 @@
 package com.jabong.dap.campaign.calendarcampaign
 
-import java.io.File
-
 import com.jabong.dap.campaign.data.CampaignOutput
-import com.jabong.dap.common.constants.campaign.SkuSelection
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext, TestSchema, Spark }
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.{SharedSparkContext, Spark, TestSchema}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ DataFrame, SQLContext }
-import org.scalatest.{ GivenWhenThen, FeatureSpec }
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 /**
- * Created by samathashetty on 17/11/15.
+ * Created by samathashetty on 19/11/15.
  */
-class GeoStyleCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkContext {
+class GeoBrandCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
   @transient var salesOrderItemData: DataFrame = _
@@ -31,18 +28,18 @@ class GeoStyleCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
     salesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "sales_order_item", Schema.salesOrderItem)
     salesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "sales_order", Schema.salesOrder)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "itr", TestSchema.basicSimpleItr)
-    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "recommendation")
+    recommendationsData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "brand_mvp_recommendation")
     salesAddressData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "sales_order_address")
 
     cityWiseData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/geo_campaign", "city_data", TestSchema.cityMapSchema)
   }
 
-  feature("Run geo style campaign") {
-    scenario("generate recommendations with city wise bricks") {
+  feature("Run geo brand campaign") {
+    scenario("generate recommendations with city wise brands") {
       Given("cityWiseData,salesOrder, salesOrderItemData, salesAddressData, yesterdayItrData, brickMvpRecommendation")
-      val geoStyleCampaign = new GeoStyleCampaign()
+      val geoBrandCampaign = new GeoBrandCampaign()
 
-      geoStyleCampaign.runCampaign(salesOrderData, salesOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, recommendationsData)
+      geoBrandCampaign.runCampaign(salesOrderData, salesOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, recommendationsData)
 
     }
   }

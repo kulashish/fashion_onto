@@ -49,6 +49,8 @@ object CampaignCommon {
   val CLEARANCE_CAMPAIGN = "clearance"
   val LOVE_BRAND_CAMPAIGN = "love_brand"
   val LOVE_COLOR_CAMPAIGN = "love_color"
+
+  val GEO_CAMPAIGN = "geo_campaign"
   val GEO_STYLE = "geo_style"
   val GEO_BRAND = "geo_brand"
 

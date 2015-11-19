@@ -1,13 +1,13 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{ GeoBrandCampaign, GeoStyleCampaign, HottestXCampaign, PricepointCampaign }
+import com.jabong.dap.campaign.calendarcampaign.{GeoBrandCampaign, GeoStyleCampaign, HottestXCampaign, PricepointCampaign}
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.{Utils, OptionUtils}
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables.{SalesOrderVariables, ContactListMobileVars, CustomerVariables, PageVisitVariables}
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ ParamInfo, CampaignConfig, CampaignInfo }
@@ -352,15 +352,19 @@ object CampaignManager extends Serializable with Logging {
     followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, itrSkYesterdayData)
   }
 
-  def startGeoStyleCampaign(params: ParamInfo) = {
-    val fullOrderData = CampaignInput.loadFullOrderData()
+  def startGeoCampaigns(params: ParamInfo) = {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val day40_orderData = Utils.getOneDayData(fullOrderData, SalesOrderVariables.UPDATED_AT,  TimeUtils.getDateAfterNDays(-40, TimeConstants.DATE_FORMAT_FOLDER),
+      TimeConstants.DATE_FORMAT_FOLDER)
+    val day50_orderData = Utils.getOneDayData(fullOrderData, SalesOrderVariables.UPDATED_AT,  TimeUtils.getDateAfterNDays(-50, TimeConstants.DATE_FORMAT_FOLDER),
+      TimeConstants.DATE_FORMAT_FOLDER)
+
     val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
+    val genderMvpBrandRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
-
-    val orderData = CampaignInput.loadLastNdaysOrderData(40, fullOrderData, incrDate)
 
     val salesAddressData = CampaignInput.loadSalesAddressData()
 
@@ -369,30 +373,10 @@ object CampaignManager extends Serializable with Logging {
     val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
 
     val geoStyleCampaign = new GeoStyleCampaign
+    geoStyleCampaign.runCampaign(day40_orderData, fullOrderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrickRecos)
 
-    geoStyleCampaign.runCampaign(orderData, fullOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
-
-  }
-
-  def startGeoBrandCampaign(params: ParamInfo) = {
-    val fullOrderData = CampaignInput.loadFullOrderData()
-    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-
-    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE)
-
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
-
-    val orderData = CampaignInput.loadLastNdaysOrderData(50, fullOrderData, incrDate)
-
-    val salesAddressData = CampaignInput.loadSalesAddressData()
-
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
-
-    val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
-
-    val geoBrandCampaign = new GeoBrandCampaign
-
-    geoBrandCampaign.runCampaign(orderData, fullOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+    val geoBrandCampaign =  new GeoBrandCampaign
+    geoBrandCampaign.runCampaign(day50_orderData, fullOrderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrandRecos)
 
   }
 
