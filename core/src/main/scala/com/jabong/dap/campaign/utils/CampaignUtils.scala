@@ -909,6 +909,21 @@ object CampaignUtils extends Logging {
 
   }
 
+  def getFavouriteAttribute(mapData: DataFrame, groupBy: String, attribute: String, count: Int): DataFrame = {
+    val topBricks = mapData.select(groupBy, attribute + "_list"
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int], r._2(r._2.fieldIndex("sum_price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)))
+
+    val topBrick = topBricks.map{
+      case (key, value) =>
+        ({ val arrayLength = value.length; if (arrayLength >= 1) (key, value(0)) else (key, null) })
+    }
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topBrick.toDF(CustomerVariables.CITY, attribute)
+  }
+
   @elidable(FINE) def debug(data: DataFrame, name: String) {
     println("Count of " + name + ":-" + data.count() + "\n")
     data.printSchema()

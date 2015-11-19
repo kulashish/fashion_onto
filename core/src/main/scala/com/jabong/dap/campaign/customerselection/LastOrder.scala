@@ -25,7 +25,7 @@ class LastOrder extends LiveCustomerSelector with Logging {
     }
 
     val groupedFields = Array(SalesOrderVariables.FK_CUSTOMER)
-    val aggFields = Array(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CUSTOMER_EMAIL, SalesOrderVariables.ID_SALES_ORDER)
+    val aggFields = Array(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CUSTOMER_EMAIL, SalesOrderVariables.ID_SALES_ORDER, SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
     val groupedSalesOrder = GroupedUtils.orderGroupBy(salesOrder, groupedFields, aggFields, GroupedUtils.LAST, Schema.lastOrder, SalesOrderVariables.CREATED_AT, GroupedUtils.ASC, TimestampType)
 
     //    val groupedSalesOrder = salesOrder.sort(SalesOrderVariables.CREATED_AT)
@@ -39,7 +39,8 @@ class LastOrder extends LiveCustomerSelector with Logging {
     ).select(
         col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
-        col(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE
+        col(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE,
+        col(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
       )
 
     joinedDf
@@ -51,6 +52,15 @@ class LastOrder extends LiveCustomerSelector with Logging {
 
   override def customerSelection(inData: DataFrame, inData2: DataFrame, ndays: Int): DataFrame = ???
 
-  override def customerSelection(inData: DataFrame, inData2: DataFrame, inData3: DataFrame): DataFrame = ???
+  override def customerSelection(salesOrder: DataFrame, salesOrderItem: DataFrame, salesAddressData: DataFrame): DataFrame = {
+    val salesJoinedDf = customerSelection(salesOrder, salesOrderItem)
+
+    val joinedDf = salesJoinedDf.join(salesAddressData,
+      salesJoinedDf(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING) === salesAddressData(SalesAddressVariables.ID_SALES_ORDER_ADDRESS), SQL.LEFT_OUTER).
+      select(salesJoinedDf("*"),
+        salesAddressData(SalesAddressVariables.CITY))
+
+    joinedDf
+  }
 
 }

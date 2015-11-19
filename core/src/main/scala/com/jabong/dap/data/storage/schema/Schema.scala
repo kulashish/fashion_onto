@@ -616,7 +616,8 @@ object Schema {
   val lastOrder = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
     StructField(SalesOrderVariables.CUSTOMER_EMAIL, StringType, false),
-    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false),
+    StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING, LongType, false)
   ))
 
   val customerOrdersSchema = StructType(Array(

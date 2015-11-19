@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "geoStyle",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

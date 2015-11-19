@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "geoBrand",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

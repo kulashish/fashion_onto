@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{ HottestXCampaign, PricepointCampaign }
+import com.jabong.dap.campaign.calendarcampaign.{ GeoBrandCampaign, GeoStyleCampaign, HottestXCampaign, PricepointCampaign }
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
@@ -352,6 +352,50 @@ object CampaignManager extends Serializable with Logging {
     followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, itrSkYesterdayData)
   }
 
+  def startGeoStyleCampaign(params: ParamInfo) = {
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
+
+    val orderData = CampaignInput.loadLastNdaysOrderData(40, fullOrderData, incrDate)
+
+    val salesAddressData = CampaignInput.loadSalesAddressData()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
+
+    val geoStyleCampaign = new GeoStyleCampaign
+
+    geoStyleCampaign.runCampaign(orderData, fullOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+
+  }
+
+  def startGeoBrandCampaign(params: ParamInfo) = {
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
+
+    val orderData = CampaignInput.loadLastNdaysOrderData(50, fullOrderData, incrDate)
+
+    val salesAddressData = CampaignInput.loadSalesAddressData()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
+
+    val geoBrandCampaign = new GeoBrandCampaign
+
+    geoBrandCampaign.runCampaign(orderData, fullOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+
+  }
+
   def loadCustomerMasterData(): DataFrame = {
 
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
@@ -360,6 +404,15 @@ object CampaignManager extends Serializable with Logging {
     //        val customerMasterData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, "2015/07/29")
     val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
     customerMasterData
+  }
+
+  def loadSalesAddressData(): DataFrame = {
+
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    logger.info("Reading last day sales address from hdfs")
+
+    val salesAddressData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
+    salesAddressData
   }
 
   def initCampaignsConfig(campaignJsonPath: String) = {
