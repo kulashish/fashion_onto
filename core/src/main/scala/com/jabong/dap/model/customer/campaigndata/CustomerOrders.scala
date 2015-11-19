@@ -77,7 +77,7 @@ object CustomerOrders extends DataFeedsModel {
     val salesRevenueIncr = dfMap("salesRevenueIncr")
     val custOrdersStatusPrevMap = dfMap.getOrElse("custOrdersStatusPrevMap", null)
     val custOrdersPrevFull = dfMap.getOrElse("custOrdersPrevFull", null)
-    val cmr = dfMap("cmr")
+    val cmrFull = dfMap("cmrFull")
 
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncrFil, salesRuleFull, salesRuleSetFull)
 
@@ -115,7 +115,7 @@ object CustomerOrders extends DataFeedsModel {
     custOrderFull.printSchema()
     custOrderFull.show(10)
     dfWrite.put("custOrderFull", custOrderFull)
-    dfWrite.put("cmr", cmr)
+    dfWrite.put("cmrFull", cmrFull)
     dfWrite
   }
 
@@ -124,7 +124,7 @@ object CustomerOrders extends DataFeedsModel {
     if (DataWriter.canWrite(saveMode, savePath)) {
       DataWriter.writeParquet(dfWrite("custOrdersStatusMap"), savePath, saveMode)
     }
-    val cmr = dfWrite("cmr")
+    val cmrFull = dfWrite("cmrFull")
 
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, incrDate)
     val custOrderFull = dfWrite("custOrderFull")
@@ -156,7 +156,7 @@ object CustomerOrders extends DataFeedsModel {
       .drop(SalesOrderItemVariables.FAV_BRAND)
       .drop(SalesOrderVariables.LAST_ORDER_DATE)
 
-    val finalCustOrder = custOrdersCsv.join(cmr, cmr(CustomerVariables.ID_CUSTOMER) === custOrdersCsv(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
+    val finalCustOrder = custOrdersCsv.join(cmrFull, cmrFull(CustomerVariables.ID_CUSTOMER) === custOrdersCsv(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
         .select(ContactListMobileVars.UID,
         SalesOrderItemVariables.REVENUE_7,
         SalesOrderItemVariables.REVENUE_30,
