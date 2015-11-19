@@ -528,7 +528,7 @@ object CampaignManager extends Serializable with Logging {
    * @param campaignJsonPath
    */
   def startCampaignMerge(campaignJsonPath: String, campaignType: String) = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS,DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
       //      createCampaignMaps(json)
