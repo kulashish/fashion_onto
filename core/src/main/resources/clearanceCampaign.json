@@ -1,7 +1,7 @@
 {
   "params": [
     {
-      "source": "clearanceCampaign",
+      "source": "clearance",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
