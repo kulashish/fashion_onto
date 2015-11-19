@@ -5,12 +5,12 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, PageVisitVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo, ParamInfo}
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -18,7 +18,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -478,10 +478,10 @@ object CampaignManager extends Serializable with Logging {
     val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
 
     val geoStyleCampaign = new GeoStyleCampaign
-    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
 
-    val geoBrandCampaign =  new GeoBrandCampaign
-    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData,  yesterdayItrData, cityWiseData, genderMvpBrandRecos)
+    val geoBrandCampaign = new GeoBrandCampaign
+    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrandRecos)
 
   }
 
