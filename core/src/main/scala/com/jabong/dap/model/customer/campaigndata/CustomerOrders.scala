@@ -3,8 +3,8 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ Spark, Utils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -13,7 +13,6 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import com.jabong.dap.model.order.variables.SalesOrderItem
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
 
 import scala.collection.mutable.HashMap
 
@@ -116,19 +115,25 @@ object CustomerOrders extends DataFeedsModel {
     // custOrdersStatusMap.show(5)
 
     val salesCatBrick = custTop5Incr.select(
-      custTop5Incr(SalesOrderVariables.FK_CUSTOMER).cast(LongType) as SalesOrderVariables.FK_CUSTOMER,
+      custTop5Incr(SalesOrderVariables.FK_CUSTOMER),
       custTop5Incr("CAT_1") as SalesOrderVariables.CATEGORY_PENETRATION,
       custTop5Incr("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION,
       custTop5Incr("BRAND_1") as SalesOrderItemVariables.FAV_BRAND
     )
-    // salesCatBrick.printSchema()
-    // salesCatBrick.show(5)
+    salesCatBrick.printSchema()
+    salesCatBrick.show(5)
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(saleOrderJoined)
+    salesOrderValueIncr.printSchema()
+    salesOrderValueIncr.show(5)
 
     val custOrdersCalc = merger(salesRevenueIncr, salesDiscountIncr, salesInvalidIncr, salesCatBrick, salesOrderValueIncr, salesOrderAddrFavIncr)
+    custOrdersCalc.printSchema()
+    custOrdersCalc.show(10)
 
     val custOrderFull = joinCustOrder(custOrdersCalc, custOrdersPrevFull)
+    custOrderFull.printSchema()
+    custOrderFull.show(10)
     dfWrite.put("custOrderFull", custOrderFull)
 
     dfWrite
