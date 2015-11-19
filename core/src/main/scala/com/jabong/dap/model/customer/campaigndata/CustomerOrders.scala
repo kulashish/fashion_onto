@@ -101,7 +101,10 @@ object CustomerOrders extends DataFeedsModel {
     // println("salesRevenueFull Count", salesRevenueFull.count())
     // salesRevenueFull.printSchema()
 
-    val salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
+    var salesRevenueIncr = salesRevenueFull
+    if (null != salesRevenuePrevFull) {
+      salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
+    }
     // println("salesRevenueIncr Count", salesRevenueIncr.count())
 
     // salesRevenueIncr.printSchema()
