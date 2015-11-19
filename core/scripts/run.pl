@@ -278,7 +278,7 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brickAffinityCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/brickAffinityCampaign.json";
     $job_exit = run_component($component, $command);
-elsif ($component eq "geoCampaign") {
+}elsif ($component eq "geoCampaign") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geo_campaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geoCampaign.json";
     $job_exit = run_component($component, $command);  
@@ -338,7 +338,7 @@ elsif ($component eq "geoCampaign") {
 } elsif ($component eq "cityWiseData") {
      my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component city_wise_data --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/cityWiseData.json";
      $job_exit = run_component($component, $command);
- } else {
+} else {
     print "not a valid component\n";
     $job_exit = -1;
 }
