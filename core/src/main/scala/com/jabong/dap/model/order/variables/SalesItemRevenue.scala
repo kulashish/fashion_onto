@@ -19,7 +19,7 @@ import scala.collection.mutable.HashMap
 /**
  * Created by pooja on 19/11/15.
  */
-object salesItemRevenue extends DataFeedsModel {
+object SalesItemRevenue extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
 
@@ -78,6 +78,28 @@ object salesItemRevenue extends DataFeedsModel {
       .join(salesOrderItemIncrFil, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncrFil(SalesOrderVariables.FK_SALES_ORDER))
       .drop(salesOrderItemIncrFil(SalesOrderItemVariables.CREATED_AT))
 
+    val (salesRevenueOrdersIncr, salesRevenueFull) = getRevenueOrdersCount(salesOrderJoined, salesRevenuePrevFull, salesRevenue7, salesRevenue30, salesRevenue90)
+
+    val dfWrite = new HashMap[String, DataFrame]()
+    dfWrite.put("salesRevenueFull", salesRevenueFull)
+    dfWrite.put("salesRevenueOrdersIncr", salesRevenueOrdersIncr)
+
+    dfWrite
+  }
+
+  def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, savePath)) {
+      DataWriter.writeParquet(dfWrite("salesRevenueFull"), savePath, saveMode)
+    }
+
+    var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
+    if (DataWriter.canWrite(saveMode, savePathIncr)) {
+      DataWriter.writeParquet(dfWrite("salesRevenueOrdersIncr"), savePathIncr, saveMode)
+    }
+  }
+
+  def getRevenueOrdersCount(salesOrderJoined: DataFrame, salesRevenuePrevFull: DataFrame, salesRevenue7: DataFrame, salesRevenue30: DataFrame, salesRevenue90: DataFrame): (DataFrame, DataFrame) = {
     val salesJoinedDF = salesOrderJoined
       .select(
         salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
@@ -108,23 +130,7 @@ object salesItemRevenue extends DataFeedsModel {
 
     val salesRevenueFull = getRevenueDays(salesRevenue90, res30, 90, 7, 30)
 
-    val dfWrite = new HashMap[String, DataFrame]()
-    dfWrite.put("salesRevenueFull", salesRevenueFull)
-    dfWrite.put("salesRevenueOrdersIncr", salesRevenueOrdersIncr)
-
-    dfWrite
-  }
-
-  def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
-    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
-    if (DataWriter.canWrite(saveMode, savePath)) {
-      DataWriter.writeParquet(dfWrite("salesRevenueFull"), savePath, saveMode)
-    }
-
-    var savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.DAILY_MODE, incrDate)
-    if (DataWriter.canWrite(saveMode, savePathIncr)) {
-      DataWriter.writeParquet(dfWrite("salesRevenueOrdersIncr"), savePathIncr, saveMode)
-    }
+    (salesRevenueOrdersIncr, salesRevenueFull)
   }
 
   //TODO change this method

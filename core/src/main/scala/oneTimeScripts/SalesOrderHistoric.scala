@@ -6,7 +6,7 @@ import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.order.variables.SalesOrderItem
+import com.jabong.dap.model.order.variables.{SalesItemRevenue, SalesOrderItem}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -57,7 +57,7 @@ object SalesOrderHistoric {
       val saleOrderJoined = salesOrderNew.join(salesOrderItemincr, salesOrderNew(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemincr(SalesOrderVariables.FK_SALES_ORDER))
         .drop(salesOrderItemincr(SalesOrderItemVariables.CREATED_AT))
       println("count joined: " + saleOrderJoined.count())
-      val (salesRevenueVarIncr, salesRevenueVarFull) = SalesOrderItem.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
+      val (salesRevenueVarIncr, salesRevenueVarFull) = SalesItemRevenue.getRevenueOrdersCount(saleOrderJoined, prevFull, salesRevenue7, salesRevenue30, salesRevenue90)
       if (null == prevFull) {
         var fullPath = DataWriter.getWritePath(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
         println("Full Count", salesRevenueVarFull.count())
