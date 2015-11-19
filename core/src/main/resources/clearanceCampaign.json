@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "clearance",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
