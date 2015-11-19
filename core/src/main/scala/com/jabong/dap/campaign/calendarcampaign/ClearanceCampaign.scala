@@ -8,7 +8,6 @@ import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCom
 import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.model.order.variables.SalesOrder
 import org.apache.spark.sql.DataFrame
 
 /**
