@@ -2,17 +2,16 @@ package com.jabong.dap.model.order.variables
 
 import java.sql.Timestamp
 
-import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
-import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ Debugging, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by mubarak on 3/7/15.
@@ -205,101 +204,6 @@ object SalesOrderItem {
     val newRdd = res.rdd
     val rev = Spark.getSqlContext().createDataFrame(newRdd, Schema.salesRev)
     rev
-  }
-
-  /**
-   *
-   * @param salesOrderItemIncr
-   * @return
-   */
-  def getSuccessfullOrdersBrand(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame,
-                                dfSuccessOrdersCalcPrevFull: DataFrame, dfFavBrandCalcPrevFull: DataFrame,
-                                yestItr: DataFrame): (DataFrame, DataFrame, DataFrame, DataFrame) = {
-    val soiIncrSelected = salesOrderItemIncr
-      .select(
-        salesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER),
-        salesOrderItemIncr(SalesOrderItemVariables.SKU),
-        Udf.successOrder(salesOrderItemIncr(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS)) as "STATUS"
-      ).cache()
-
-    val salesOrderJoined = soiIncrSelected.join(salesOrderFull, soiIncrSelected(SalesOrderItemVariables.FK_SALES_ORDER) === salesOrderFull(SalesOrderVariables.ID_SALES_ORDER))
-    val (ordersCount, successOrdersUnion) = getSuccessfullOrders(salesOrderJoined, dfSuccessOrdersCalcPrevFull)
-
-    val (favBrandIncr, favBrandUnion) = getMostPreferredBrand(salesOrderJoined, dfFavBrandCalcPrevFull, yestItr)
-
-    (ordersCount, successOrdersUnion, favBrandIncr, favBrandUnion)
-  }
-
-  def getMostPreferredBrand(salesOrderJoined: DataFrame, dfFavBrandCalcPrevFull: DataFrame, yestItr: DataFrame): (DataFrame, DataFrame) = {
-    var salesOrderJoinedIncr = salesOrderJoined
-
-    if (null != dfFavBrandCalcPrevFull) {
-      salesOrderJoinedIncr = salesOrderJoined.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU)
-        .except(dfFavBrandCalcPrevFull.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER, SalesOrderItemVariables.SKU))
-    }
-
-    val mostPrefBrandJoinedIncr = salesOrderJoinedIncr.join(yestItr, salesOrderJoined(SalesOrderItemVariables.SKU) === yestItr(ProductVariables.SKU_SIMPLE))
-      .select(
-        col(SalesOrderVariables.FK_CUSTOMER),
-        col(SalesOrderVariables.ID_SALES_ORDER),
-        col(SalesOrderItemVariables.SKU),
-        col(ProductVariables.BRAND),
-        Udf.bigDecimal2Double(col(ProductVariables.SPECIAL_PRICE)) as ProductVariables.SPECIAL_PRICE
-      )
-
-    var mostPrefBrandIncr = mostPrefBrandJoinedIncr
-
-    var mostPrefBrandUnion = mostPrefBrandJoinedIncr
-
-    if (null != dfFavBrandCalcPrevFull) {
-      mostPrefBrandUnion = dfFavBrandCalcPrevFull.unionAll(mostPrefBrandIncr).dropDuplicates()
-      val fkCustList = mostPrefBrandJoinedIncr.select(SalesOrderVariables.FK_CUSTOMER).distinct
-      mostPrefBrandIncr = mostPrefBrandUnion.join(fkCustList,
-        fkCustList(SalesOrderVariables.FK_CUSTOMER) === mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER))
-        .select(
-          mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER),
-          mostPrefBrandUnion(SalesOrderVariables.ID_SALES_ORDER),
-          mostPrefBrandUnion(SalesOrderItemVariables.SKU),
-          mostPrefBrandUnion(ProductVariables.BRAND),
-          mostPrefBrandUnion(ProductVariables.SPECIAL_PRICE))
-
-      //      mostPrefBrandIncr = mostPrefBrandUnion.filter(mostPrefBrandUnion(SalesOrderVariables.FK_CUSTOMER).contains(mostPrefBrandJoinedIncr(SalesOrderVariables.FK_CUSTOMER)))
-    }
-
-    val SUM_SPECIAL_PRICE = "sum_special_price"
-    val COUNT_BRAND = "count_brand"
-
-    val favBrandIncr = (mostPrefBrandIncr.groupBy(SalesOrderVariables.FK_CUSTOMER, ProductVariables.BRAND)
-      .agg(count(ProductVariables.BRAND) as COUNT_BRAND, sum(ProductVariables.SPECIAL_PRICE) as SUM_SPECIAL_PRICE)
-      .sort(COUNT_BRAND, SUM_SPECIAL_PRICE)
-      .groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(last(ProductVariables.BRAND) as SalesOrderItemVariables.FAV_BRAND)).cache()
-
-    (favBrandIncr, mostPrefBrandUnion)
-  }
-
-  /**
-   *
-   * @param salesOrderJoined
-   * @return
-   */
-  def getSuccessfullOrders(salesOrderJoined: DataFrame, dfSalesOrderItemCalcPrevFull: DataFrame): (DataFrame, DataFrame) = {
-    val successOrdersJoined = salesOrderJoined
-      .select(
-        col(SalesOrderVariables.FK_CUSTOMER),
-        col(SalesOrderItemVariables.FK_SALES_ORDER) as SalesOrderVariables.ID_SALES_ORDER,
-        col("STATUS"))
-      .filter("STATUS = 1")
-      .dropDuplicates()
-    var newOrders = successOrdersJoined
-    var successOrdersUnion = successOrdersJoined
-    if (null != dfSalesOrderItemCalcPrevFull) {
-      newOrders = successOrdersJoined.except(dfSalesOrderItemCalcPrevFull)
-      successOrdersUnion = dfSalesOrderItemCalcPrevFull.unionAll(newOrders)
-    }
-    val ordersCount = (newOrders.groupBy(SalesOrderVariables.FK_CUSTOMER)
-      .agg(count("STATUS") as SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL)).cache()
-    (ordersCount, successOrdersUnion)
   }
 
   /**
@@ -517,8 +421,7 @@ object SalesOrderItem {
 
     val orderIncr = Spark.getSqlContext().createDataFrame(ordersIncrFlat, Schema.salesItemStatus)
 
-    // println("orderIncr Count", orderIncr.count())
-    // orderIncr.printSchema()
+    Debugging.debug(orderIncr, "orderIncr")
 
     var joinedMap: DataFrame = null
 
@@ -532,7 +435,7 @@ object SalesOrderItem {
         )
     }
 
-    // println("joinedMap Count", joinedMap.count())
+    Debugging.debug(joinedMap, "joinedMap")
 
     val incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
@@ -550,43 +453,52 @@ object SalesOrderItem {
 
   val mergeMaps = udf((map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]) => joinMaps(map1, map2))
 
-  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]] = {
-    val full = scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]]()
+  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
+    if (null == map1 && null == map2) {
+      return null
+    } else if (null == map2) {
+      return map1
+    } else if (null == map1) {
+      return map2
+    }
+    val full = scala.collection.mutable.Map[Long, scala.collection.immutable.Map[Long, Int]]()
     map2.keySet.foreach{
       orderId =>
-        val itemMap = map2(orderId)
-        val item = scala.collection.mutable.Map[Long, Int]()
-        itemMap.keySet.foreach{
-          ItemId =>
-            item.put(ItemId, itemMap(ItemId))
-        }
-        full.put(orderId, item)
+        full.put(orderId, map2(orderId))
     }
     map1.keySet.foreach{
       orderId =>
-        if (full.contains(orderId)) {
-          val itemMapPrev = full(orderId)
-          val itemMapNew = map1(orderId)
-          itemMapNew.keySet.foreach{
-            itemId =>
-              if (itemMapPrev.contains(itemId)) {
-                itemMapPrev.update(itemId, itemMapNew(itemId))
-              } else {
-                itemMapPrev.put(itemId, itemMapNew(itemId))
-              }
-          }
-        } else {
-          val itemMap = map1(orderId)
-          val item = scala.collection.mutable.Map[Long, Int]()
-          itemMap.keySet.foreach{
-            ItemId =>
-              item.put(ItemId, itemMap(ItemId))
-          }
-          full.put(orderId, item)
-        }
-
+       if(full.contains(orderId)){
+         val combinedMap = combine2Maps(full(orderId), map1(orderId))
+         full.updated(orderId, combinedMap)
+       } else{
+         full.put(orderId, map1(orderId))
+       }
     }
-    full
+    return full.map(kv => (kv._1, kv._2)).toMap
+  }
+
+  def combine2Maps(map1: scala.collection.immutable.Map[Long, Int], map2: scala.collection.immutable.Map[Long, Int]):scala.collection.immutable.Map[Long, Int]={
+    val full = scala.collection.mutable.Map[Long, Int]()
+    if(null == map1){
+      return map2.toMap
+    }
+    if(null == map2){
+      return map1.toMap
+    }
+    map1.keySet.foreach{
+      key =>
+        full.put(key, map1(key))
+    }
+    map2.keySet.foreach{
+      key =>
+      if(full.contains(key)){
+        full.updated(key, map2(key))
+      } else{
+        full.put(key, map2(key))
+      }
+    }
+    return full.map(kv => (kv._1, kv._2)).toMap
   }
 
   def makeMap4mGroupedData(list: List[(Long, Long, Int, Timestamp)]): (scala.collection.mutable.Map[Long, scala.collection.mutable.Map[Long, Int]], Timestamp) = {
@@ -597,25 +509,25 @@ object SalesOrderItem {
       maxDate = list(0)._4
     }
     list.foreach{
-
       e =>
         val innerMap = scala.collection.mutable.Map[Long, Int]()
         if (maxDate.after(list(0)._4))
           maxDate = list(0)._4
-
-        if(map.contains(e._1)){
+        if (map.contains((e._1))) {
           val inner = map(e._1)
-          if(inner.contains(e._2)){
+          if (inner.contains(e._2)) {
             inner.update(e._2, e._3)
+          } else {
+            inner.put(e._2, e._3)
           }
           map.update(e._1, inner)
-        }
-        else{
+        } else {
           innerMap.put(e._2, e._3)
           map.put(e._1, innerMap)
         }
     }
-    println("Map", map.toString())
+
+    println("Map ", map.toString())
     (map, maxDate)
   }
 
