@@ -105,9 +105,9 @@ object SalesOrderAddress extends DataFeedsModel {
   }
 
   def getValueFromMap(map: scala.collection.mutable.Map[String, Tuple2[String, String]], key: String, field: Int): String = {
-    if (map.contains(key)) {
+    if (map.contains(key.toUpperCase)) {
       if (field == 1)
-        return map(key)._1
+        return map(key.toUpperCase)._1
       else if (field == 2)
         return map(key)._2
       else

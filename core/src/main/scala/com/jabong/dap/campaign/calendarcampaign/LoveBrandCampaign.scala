@@ -31,11 +31,11 @@ class LoveBrandCampaign {
 
     val dfLastOrderCustomerSelected = lastOrderCustomerSelector.customerSelection(last35thDaysSalesOrderData, last35thDaySalesOrderItemData)
 
-    CampaignUtils.debug(dfLastOrderCustomerSelected, CampaignCommon.LOVE_BRAND_CAMPAIGN+"after customer selection")
+    CampaignUtils.debug(dfLastOrderCustomerSelected, CampaignCommon.LOVE_BRAND_CAMPAIGN + "after customer selection")
 
     val filteredSku = MostBought.skuFilter(customerTopData, dfLastOrderCustomerSelected, yesterdayItrSkuSimpleData, "brand_list")
 
-    CampaignUtils.debug(filteredSku, CampaignCommon.LOVE_BRAND_CAMPAIGN+"after filteredSku ")
+    CampaignUtils.debug(filteredSku, CampaignCommon.LOVE_BRAND_CAMPAIGN + "after filteredSku ")
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.LOVE_BRAND_CAMPAIGN, filteredSku, false, brandMvpRecommendations)
 
