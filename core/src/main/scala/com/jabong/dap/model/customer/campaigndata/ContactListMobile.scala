@@ -341,7 +341,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         coalesce(customerMerged(CustomerVariables.LAST_NAME), customerOrdersIncr(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
         customerMerged(ContactListMobileVars.DOB),
         customerMerged(ContactListMobileVars.MVP_TYPE),
-        customerOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
+        customerOrdersIncr(SalesOrderItemVariables.SUCCESSFUL_ORDERS) as ContactListMobileVars.NET_ORDERS,
         customerOrdersIncr(ContactListMobileVars.LAST_ORDER_DATE),
         customerMerged(CustomerVariables.GENDER),
         customerMerged(ContactListMobileVars.REG_DATE),
