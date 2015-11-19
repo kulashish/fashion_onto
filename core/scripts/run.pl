@@ -275,7 +275,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brandInCity --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "brickAffinity") {
-    $AMMUNITION = "--num-executors 27 --executor-memory 2G";
+    $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brickAffinity --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
