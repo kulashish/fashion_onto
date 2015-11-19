@@ -505,7 +505,11 @@ object SalesOrderItem {
           maxDate = list(0)._4
         if (map.contains((e._1))) {
           val inner = map(e._1)
-          inner.put(e._2, e._3)
+          if(inner.contains(e._2)) {
+            inner.update(e._2, e._3)
+          } else {
+            inner.put(e._2, e._3)
+          }
           map.update(e._1, inner)
         } else {
           innerMap.put(e._2, e._3)
