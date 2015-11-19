@@ -105,9 +105,9 @@ object SalesOrderAddress extends DataFeedsModel {
   }
 
   def getValueFromMap(map: scala.collection.mutable.Map[String, Tuple2[String, String]], key: String, field: Int): String = {
-    if (map.contains(key.toUpperCase)) {
+    if (map.contains(key)) {
       if (field == 1)
-        return map(key.toUpperCase)._1
+        return map(key)._1
       else if (field == 2)
         return map(key)._2
       else
@@ -121,23 +121,26 @@ object SalesOrderAddress extends DataFeedsModel {
     val cityMap = scala.collection.mutable.Map[String, Tuple2[String, String]]()
     val cities = cityZone
       .select(ContactListMobileVars.CITY, ContactListMobileVars.TIER1, ContactListMobileVars.ZONE)
-      .map(e => (e(0).toString, e(1).toString, e(2).toString))
-    cities.foreach{
+      .map(e => (e(0).toString.toLowerCase -> (e(1).toString.toLowerCase, e(2).toString.toLowerCase)))
+      .groupByKey().map(e => (e._1 -> e._2.toList(0)))
+
+    cities.collect().foreach{
       e =>
-        val (city, tier, zone) = e
-        if (!cityMap.contains(city)) {
-          cityMap.put(city, Tuple2(tier, zone))
-        }
+        val (city, (tier, zone)) = e
+        cityMap.put(city, Tuple2(tier, zone))
     }
+    // println("CityMap:", cityMap.toString())
 
     val favMap = favIncr.map(e =>
-      (e(0).asInstanceOf[Long] -> (getFav(e(1).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(2).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(3).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        getFav(e(4).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
-        e(5).toString,
-        e(6).toString
-      )
+      (e(0).asInstanceOf[Long] ->
+        (getFav(e(1).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          getFav(e(2).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          getFav(e(3).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          getFav(e(4).asInstanceOf[scala.collection.immutable.Map[String, Int]]),
+          e(5).asInstanceOf[Timestamp],
+          e(6).toString,
+          e(7).toString
+        )
       )
     )
 
@@ -147,10 +150,10 @@ object SalesOrderAddress extends DataFeedsModel {
       e._2._4, //last_name
       getValueFromMap(cityMap, e._2._1, 1), // city_tier
       getValueFromMap(cityMap, e._2._1, 2), // city State_ZONE
-      e._2._5, //first_shipping_city
-      e._2._6, //last_shipping_city
-      getValueFromMap(cityMap, e._2._5, 1), // first_order_city_tier
-      getValueFromMap(cityMap, e._2._6, 1) //last_order_city_tier
+      e._2._6, //first_shipping_city
+      e._2._7, //last_shipping_city
+      getValueFromMap(cityMap, e._2._6, 1), // first_order_city_tier
+      getValueFromMap(cityMap, e._2._7, 1) //last_order_city_tier
     ))
     Spark.getSqlContext().createDataFrame(favAddr, Schema.favSalesOrderAddr)
   }

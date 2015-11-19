@@ -29,8 +29,10 @@ class ClearanceCampaign {
       .getCustomerSelector(CustomerSelection.LAST_ORDER)
 
     val dfCustomerSelected = lastOrderCustomerSelector.customerSelection(salesOrderData, salesOrderItemData)
+    CampaignUtils.debug(dfCustomerSelected, CampaignCommon.CLEARANCE_CAMPAIGN + "after customer selection")
 
     val filteredSku = Daily.skuFilter(dfCustomerSelected, yesterdayItrData)
+    CampaignUtils.debug(filteredSku, CampaignCommon.CLEARANCE_CAMPAIGN + "after filteredSku ")
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.CLEARANCE_CAMPAIGN, filteredSku, false, mvpDiscountRecommendations)
 

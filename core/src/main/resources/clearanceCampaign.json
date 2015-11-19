@@ -1,7 +1,7 @@
 {
   "params": [
     {
-      "source": "brick_affinity",
+      "source": "clearance",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }

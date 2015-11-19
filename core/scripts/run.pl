@@ -238,6 +238,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "emailCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "calendarCampaignMerge") {
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component calendarCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/calendarCampaigns.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "mobilePushCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";
     $job_exit = run_component($component, $command);
@@ -278,6 +281,14 @@ if ($component eq "bobAcqFull1") {
     $AMMUNITION = "--num-executors 27 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component brickAffinityCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/brickAffinityCampaign.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "geoCampaign") {
+    $AMMUNITION = "--num-executors 9 --executor-memory 3G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component geo_campaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/geoCampaign.json";
+    $job_exit = run_component($component, $command);  
+} elsif ($component eq "clearanceCampaign") {
+     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clearance --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clearanceCampaign.json";
+     $job_exit = run_component($component, $command);
 } elsif ($component eq "pricingSKUData") {
     $AMMUNITION = "--num-executors 9 --executor-memory 3G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component pricingSKUData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/pricingSKUData.json";
@@ -340,7 +351,7 @@ if ($component eq "bobAcqFull1") {
  } elsif ($component eq "loveCalendarCampaigns") {
       my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component loveCalendarCampaigns --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/loveCampaigns.json";
       $job_exit = run_component($component, $command);
-  }else {
+ }else {
     print "not a valid component\n";
     $job_exit = -1;
 }

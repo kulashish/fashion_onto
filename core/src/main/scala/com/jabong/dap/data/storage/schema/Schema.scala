@@ -311,7 +311,9 @@ object Schema {
 
   val emailCampaignSchema = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType), StructField(CampaignMergedFields.LIVE_BRAND, StringType), StructField(CampaignMergedFields.LIVE_BRICK, StringType), StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType))), false), true),
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType), StructField(CampaignMergedFields.LIVE_BRAND, StringType),
+      StructField(CampaignMergedFields.LIVE_BRICK, StringType), StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType),StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
+      StructField(CampaignMergedFields.CALENDAR_CITY, StringType))), false), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true)
   ))
@@ -410,7 +412,8 @@ object Schema {
         StructField(ProductVariables.GENDER, StringType, true),
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
-        StructField(ProductVariables.COLOR, StringType, true)))), false)
+        StructField(ProductVariables.COLOR, StringType, true),
+        StructField(SalesAddressVariables.CITY, StringType, true)))), false)
   ))
 
   val referenceSku = StructType(Array(
@@ -423,7 +426,8 @@ object Schema {
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.PRODUCT_NAME, StringType, true),
     StructField(ProductVariables.PRICE_BAND, StringType, true),
-    StructField(ProductVariables.COLOR, StringType, true)))
+    StructField(ProductVariables.COLOR, StringType, true),
+    StructField(SalesAddressVariables.CITY, StringType, true)))
 
   val expectedFinalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
@@ -438,7 +442,8 @@ object Schema {
         StructField(ProductVariables.GENDER, StringType, true),
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
-        StructField(ProductVariables.COLOR, StringType, true)))), false),
+        StructField(ProductVariables.COLOR, StringType, true),
+        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
 
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
@@ -457,7 +462,8 @@ object Schema {
         StructField(ProductVariables.GENDER, StringType, true),
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
-        StructField(ProductVariables.COLOR, StringType, true)))), false),
+        StructField(ProductVariables.COLOR, StringType, true),
+        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
 
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
@@ -636,7 +642,8 @@ object Schema {
   val lastOrder = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, false),
     StructField(SalesOrderVariables.CUSTOMER_EMAIL, StringType, false),
-    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false)
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, false),
+    StructField(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING, LongType, false)
   ))
 
   val customerOrdersSchema = StructType(Array(
