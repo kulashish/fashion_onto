@@ -65,6 +65,56 @@ object CustomerOrders extends DataFeedsModel {
     res
   }
 
+  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
+
+    val dfMap = new HashMap[String, DataFrame]()
+
+    var mode: String = DataSets.FULL_MERGE_MODE
+    if (null == paths) {
+      mode = DataSets.DAILY_MODE
+      val custOrdersPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custOrdersPrevFull", custOrdersPrevFull)
+      val custOrdersStatusPrevMap = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("custOrdersStatusPrevMap", custOrdersStatusPrevMap)
+    }
+
+    val salesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("salesOrderFull", salesOrderFull)
+    val salesRuleFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("salesRuleFull", salesRuleFull)
+    val dateDiffFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+    val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL_FETCH_MODE, dateDiffFormat)
+    dfMap.put("salesRuleSetFull", salesRuleSetFull)
+
+    val salesOrderAddrFavIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
+    dfMap.put("salesOrderAddrFavIncr", salesOrderAddrFavIncr)
+    val custTop5Incr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate)
+    dfMap.put("custTop5Incr", custTop5Incr)
+    val salesRevenueFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
+    val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
+    val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
+    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
+
+    var salesRevenueIncr = salesRevenueFull
+    var salesOrderIncrFil = salesOrderIncr
+    var salesOrderItemIncrFil = salesOrderItemIncr
+
+    if (null == paths) {
+      salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      salesOrderIncrFil = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      salesOrderItemIncrFil = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    }
+
+    dfMap.put("salesRevenueIncr", salesRevenueIncr)
+    dfMap.put("salesOrderIncrFil", salesOrderIncrFil)
+    dfMap.put("salesOrderItemIncrFil", salesOrderItemIncrFil)
+
+    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("cmrFull", cmrFull)
+
+    dfMap
+  }
+
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val salesOrderIncrFil = dfMap("salesOrderIncrFil")
     val salesOrderFull = dfMap("salesOrderFull")
@@ -482,56 +532,5 @@ object CustomerOrders extends DataFeedsModel {
       ContactListMobileVars.STATE_ZONE -> ""
     ))
   }
-
-  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
-
-    val dfMap = new HashMap[String, DataFrame]()
-
-    var mode: String = DataSets.FULL_MERGE_MODE
-    if (null == paths) {
-      mode = DataSets.DAILY_MODE
-      val custOrdersPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.FULL_MERGE_MODE, prevDate)
-      dfMap.put("custOrdersPrevFull", custOrdersPrevFull)
-      val custOrdersStatusPrevMap = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.SALES_ITEM_INVALID_CANCEL, DataSets.FULL_MERGE_MODE, prevDate)
-      dfMap.put("custOrdersStatusPrevMap", custOrdersStatusPrevMap)
-    }
-
-    val salesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("salesOrderFull", salesOrderFull)
-    val salesRuleFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("salesRuleFull", salesRuleFull)
-    val dateDiffFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
-    val salesRuleSetFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_RULE_SET, DataSets.FULL_FETCH_MODE, dateDiffFormat)
-    dfMap.put("salesRuleSetFull", salesRuleSetFull)
-
-    val salesOrderAddrFavIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, mode, incrDate)
-    dfMap.put("salesOrderAddrFavIncr", salesOrderAddrFavIncr)
-    val custTop5Incr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, mode, incrDate)
-    dfMap.put("custTop5Incr", custTop5Incr)
-    val salesRevenueFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, incrDate)
-    val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
-    val salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
-    dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
-
-    var salesRevenueIncr = salesRevenueFull
-    var salesOrderIncrFil = salesOrderIncr
-    var salesOrderItemIncrFil = salesOrderItemIncr
-
-    if (null == paths) {
-      salesRevenueIncr = Utils.getOneDayData(salesRevenueFull, SalesOrderVariables.LAST_ORDER_DATE, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      salesOrderIncrFil = Utils.getOneDayData(salesOrderIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      salesOrderItemIncrFil = Utils.getOneDayData(salesOrderItemIncr, SalesOrderVariables.CREATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-    }
-
-    dfMap.put("salesRevenueIncr", salesRevenueIncr)
-    dfMap.put("salesOrderIncrFil", salesOrderIncrFil)
-    dfMap.put("salesOrderItemIncrFil", salesOrderItemIncrFil)
-
-    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("cmrFull", cmrFull)
-
-    dfMap
-  }
-
 }
 

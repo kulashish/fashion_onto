@@ -138,10 +138,15 @@ object SalesOrderItem {
     }
 
     Debugging.debug(joinedMap, "joinedMap")
+    joinedMap.printSchema()
+    joinedMap.show(10)
 
     var incrData = joinedMap
     if (null != prevMap) {
+      println("inside prevMap not null")
       incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      incrData.printSchema()
+      incrData.show(10)
     }
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
