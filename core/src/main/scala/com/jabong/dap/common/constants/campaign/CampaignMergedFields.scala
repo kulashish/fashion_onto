@@ -58,5 +58,4 @@ object CampaignMergedFields {
   val BRICK = "BRICK"
   val CATEGORY = "CATEGORY"
 
-
 }
