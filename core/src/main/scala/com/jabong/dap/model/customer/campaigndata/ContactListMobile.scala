@@ -242,7 +242,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
         col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
-        col(CustomerVariables.CITY) as ContactListMobileVars.CITY,
+        col(ContactListMobileVars.CITY) as ContactListMobileVars.CITY,
         col(ContactListMobileVars.COUNTRY),
         col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
         col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
