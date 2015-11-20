@@ -314,7 +314,7 @@ object CampaignUtils extends Logging {
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(CustomerVariables.EMAIL), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT)).dropDuplicates()
 
-    CampaignUtils.debug(skuSimpleNotBoughtTillNow," Acart skuNot Bought Till Now")
+    CampaignUtils.debug(skuSimpleNotBoughtTillNow, " Acart skuNot Bought Till Now")
 
     logger.info("Filtered all the sku simple which has been bought")
 

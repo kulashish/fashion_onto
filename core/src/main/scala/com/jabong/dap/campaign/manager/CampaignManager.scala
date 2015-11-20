@@ -153,10 +153,9 @@ object CampaignManager extends Serializable with Logging {
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
 
-    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370,fullSalesOrderData)
+    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData)
 
-    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370,fullSalesOrderItemData)
-
+    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
