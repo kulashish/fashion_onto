@@ -86,30 +86,6 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   }
 
-  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String): Unit = {
-    val incrDf = dfWrite("incrDf")
-    val fullDf = dfWrite("fullDf")
-    val diffDf = dfWrite("diffDf")
-
-    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
-      DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
-    val savePathFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
-      DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, incrDate)
-
-    if (DataWriter.canWrite(savePathIncr, saveMode)) {
-      DataWriter.writeParquet(incrDf, savePathIncr, saveMode)
-    }
-
-    if (DataWriter.canWrite(savePathFull, saveMode)) {
-      DataWriter.writeParquet(fullDf, savePathFull, saveMode)
-    }
-
-    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
-
-    DataWriter.writeCsv(diffDf, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
-
-  }
-
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {
 
     val dfClickData = dfMap("clickIncr")
@@ -174,6 +150,30 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfResultMap.put("custEmailResCsv", result.except(prevFullDf))
 
     dfResultMap
+  }
+
+  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String): Unit = {
+    val custEmailResIncr = dfWrite("custEmailResIncr")
+    val custEmailResFull = dfWrite("custEmailResFull")
+    val custEmailResCsv = dfWrite("custEmailResCsv")
+
+    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
+      DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
+    val savePathFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
+      DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, incrDate)
+
+    if (DataWriter.canWrite(savePathIncr, saveMode)) {
+      DataWriter.writeParquet(custEmailResIncr, savePathIncr, saveMode)
+    }
+
+    if (DataWriter.canWrite(savePathFull, saveMode)) {
+      DataWriter.writeParquet(custEmailResFull, savePathFull, saveMode)
+    }
+
+    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
+
+    DataWriter.writeCsv(custEmailResCsv, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
+
   }
 
   def open_segment(value: String, updateValue: String, endDate: String, incrDateStr: String): String = {
