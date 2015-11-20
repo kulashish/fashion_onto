@@ -1,12 +1,10 @@
 package com.jabong.dap.campaign.manager
 
-import java.sql.Timestamp
-
 import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.{ Utils, OptionUtils }
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -90,9 +88,9 @@ object CampaignManager extends Serializable with Logging {
 
     val last20thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(20, fullOrderItemData)
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
-    val brickPriceBandRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_PRICE_BAND_SUB_TYPE).cache()
+    val brickPriceBandRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_PRICE_BAND_SUB_TYPE, incrDate).cache()
 
     val pricepointCampaign = new PricepointCampaign()
     pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData, incrDate)
@@ -103,7 +101,7 @@ object CampaignManager extends Serializable with Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
-    val fullCustomerSurfAffinity = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_SURF_AFFINITY)
+    val fullCustomerSurfAffinity = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_SURF_AFFINITY, incrDate)
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
@@ -113,9 +111,9 @@ object CampaignManager extends Serializable with Logging {
 
     val last7thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(7, fullOrderItemData)
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
-    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate).cache()
 
     val brickAffinityCampaign = new BrickAffinityCampaign()
     brickAffinityCampaign.runCampaign(fullCustomerSurfAffinity, last7thDaySalesOrderData, last7thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
@@ -126,7 +124,7 @@ object CampaignManager extends Serializable with Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
-    val fullCustomerOrders = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS)
+    val fullCustomerOrders = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS, incrDate)
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
@@ -134,7 +132,9 @@ object CampaignManager extends Serializable with Logging {
         col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
       )
 
-    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate).drop(SalesOrderVariables.CREATED_AT)
+    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate)
+      .drop(SalesOrderVariables.CREATED_AT)
+      .distinct
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
@@ -144,9 +144,9 @@ object CampaignManager extends Serializable with Logging {
 
     val last6thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(6, fullOrderItemData)
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
-    val brandMvpCityRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_CITY_SUB_TYPE).cache()
+    val brandMvpCityRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_CITY_SUB_TYPE, incrDate).cache()
 
     val brandInCityCampaign = new BrandInCityCampaign()
     brandInCityCampaign.runCampaign(last6thDaysCustomerOrderData, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
@@ -163,9 +163,9 @@ object CampaignManager extends Serializable with Logging {
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
-    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate).cache()
 
     val replenishmentCampaign = new ReplenishmentCampaign()
     replenishmentCampaign.runCampaign(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
@@ -435,7 +435,7 @@ object CampaignManager extends Serializable with Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
-    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate)
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
@@ -444,9 +444,9 @@ object CampaignManager extends Serializable with Logging {
 
     val last60DaySalesOrderItemData = CampaignInput.loadNthdayTableData(60, fullOrderItemData)
 
-    val itrYesterdayData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val itrYesterdayData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
-    val hottestXCampaign = new HottestXCampaign
+    val hottestXCampaign = new HottestXCampaign()
 
     hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, itrYesterdayData, genderMvpBrickRecos, incrDate)
 
@@ -474,16 +474,16 @@ object CampaignManager extends Serializable with Logging {
     val day40_orderData = CampaignInput.loadNthdayTableData(40, fullOrderData)
     val day50_orderData = CampaignInput.loadNthdayTableData(50, fullOrderData)
 
-    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
-    val genderMvpBrandRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE).cache()
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate).cache()
+    val genderMvpBrandRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE, incrDate).cache()
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
     val day40_orderItemData = CampaignInput.loadNthdayTableData(40, fullOrderItemData)
     val day50_orderItemData = CampaignInput.loadNthdayTableData(50, fullOrderItemData)
 
-    val salesAddressData = CampaignInput.loadSalesAddressData()
+    val salesAddressData = CampaignInput.loadSalesAddressData(incrDate)
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
 
@@ -504,9 +504,9 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData, incrDate)
 
-    val mvpDiscountRecos = CampaignInput.loadRecommendationData(Recommendation.MVP_DISCOUNT_SUB_TYPE).cache()
+    val mvpDiscountRecos = CampaignInput.loadRecommendationData(Recommendation.MVP_DISCOUNT_SUB_TYPE, incrDate).cache()
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val clearanceCampaign = new ClearanceCampaign
     clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, mvpDiscountRecos, yesterdayItrData)

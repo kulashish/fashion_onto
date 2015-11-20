@@ -829,7 +829,6 @@ object CampaignUtils extends Logging {
         CustomerVariables.FK_CUSTOMER -> 0,
         ProductVariables.SKU_SIMPLE -> "",
         ProductVariables.SPECIAL_PRICE -> 0.0,
-        ProductVariables.BRICK -> "",
         ProductVariables.BRAND -> "",
         ProductVariables.MVP -> 0,
         ProductVariables.GENDER -> "",
