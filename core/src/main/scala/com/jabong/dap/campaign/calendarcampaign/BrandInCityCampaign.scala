@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
  */
 class BrandInCityCampaign {
 
-  def runCampaign(fullCustomerOrders: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame, brandMvpSubType: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
+  def runCampaign(fullCustomerOrders: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame, brandMvpCityRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.CUSTOMER_PREFERRED_DATA)
@@ -21,8 +21,9 @@ class BrandInCityCampaign {
 
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
+    //    val limitOnSkuFilterData = filteredSku.limit(1000)
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRAND_IN_CITY_CAMPAIGN, filteredSku, false, brandMvpSubType)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRAND_IN_CITY_CAMPAIGN, filteredSku, false, brandMvpCityRecommendations)
 
   }
 

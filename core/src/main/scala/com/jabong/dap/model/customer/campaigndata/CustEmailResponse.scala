@@ -173,12 +173,14 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   }
 
-  def open_segment(value: String, updateValue: String, endDate: String, incrDateStr: String): String = {
+  def open_segment(openValue: String, updateValue: String, endDate: String, incrDateStr: String): String = {
 
-    if (null != endDate || (null == value && updateValue == null))
+    //  both incrDate and update date is null
+    if (null != endDate || (null == openValue && updateValue == null))
       "NO"
-    else if (value == null) {
-      val lastUpdtDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
+    else if (openValue == null) {
+      //openDate is null, calculate with the update date
+      val lastUpdtDate = TimeUtils.getDate(updateValue, TimeConstants.DATE_TIME_FORMAT)
       val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
       val time4mToday = TimeUtils.daysBetweenTwoDates(lastUpdtDate, incrDate)
 
@@ -199,11 +201,11 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       segment
 
     } else {
-
+      //open date is not null, take that for calculation
       val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
-      val updDate = TimeUtils.getDate(updateValue, TimeConstants.DATE_FORMAT_FOLDER)
+      val lastOpenDate = TimeUtils.getDate(openValue, TimeConstants.DATE_FORMAT_FOLDER)
 
-      val time4mToday = TimeUtils.daysBetweenTwoDates(updDate, incrDate)
+      val time4mToday = TimeUtils.daysBetweenTwoDates(lastOpenDate, incrDate)
 
       val segment = {
 
