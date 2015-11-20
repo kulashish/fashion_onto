@@ -513,6 +513,8 @@ object CustomerOrders extends DataFeedsModel {
         salesOrderAddrFavIncr(ContactListMobileVars.CITY_TIER),
         salesOrderAddrFavIncr(ContactListMobileVars.STATE_ZONE)
       )
+    println("before filling zeros: ")
+    res.printSchema()
     res.na.fill(scala.collection.immutable.Map(
       SalesOrderItemVariables.REVENUE_7 -> 0.0,
       SalesOrderItemVariables.REVENUE_30 -> 0.0,
