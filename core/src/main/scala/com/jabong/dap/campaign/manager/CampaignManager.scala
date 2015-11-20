@@ -7,7 +7,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
@@ -159,9 +159,15 @@ object CampaignManager extends Serializable with Logging {
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
 
-    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData)
+    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData).
+      select(SalesOrderVariables.FK_CUSTOMER,
+             SalesOrderVariables.CUSTOMER_EMAIL,
+             SalesOrderVariables.ID_SALES_ORDER,
+             SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
 
-    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData)
+    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData).
+      select(SalesOrderItemVariables.FK_SALES_ORDER,
+              SalesOrderItemVariables.SKU)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
