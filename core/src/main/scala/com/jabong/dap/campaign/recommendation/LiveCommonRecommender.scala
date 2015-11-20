@@ -120,6 +120,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       }
 
       case Recommendation.BRAND_MVP_CITY_SUB_TYPE => {
+
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(SalesAddressVariables.CITY) === recommendations(SalesAddressVariables.CITY))
