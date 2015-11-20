@@ -1,12 +1,10 @@
 package com.jabong.dap.campaign.manager
 
-import java.sql.Timestamp
-
 import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.{ Utils, OptionUtils }
+import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
