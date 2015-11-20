@@ -1,13 +1,10 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import java.sql.Timestamp
-
-import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.{ variables, SQL }
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables}
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -16,9 +13,9 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustEmailSchema
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.types.{IntegerType, StringType}
 
 import scala.collection.mutable
 
@@ -282,9 +279,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         cmrResDf(EmailResponseVariables.LAST_CLICK_DATE),
         cmrResDf(EmailResponseVariables.OPENS_LIFETIME),
         cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
-        when(nlSubscribers(NewsletterVariables.STATUS) === "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT))
+        when(nlSubscribers(NewsletterVariables.STATUS) === "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
           .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
-        when(nlSubscribers(NewsletterVariables.UPDATED_AT).isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
+        when(nlSubscribers(NewsletterVariables.UPDATED_AT).isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
           .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)
 
     result
