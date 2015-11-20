@@ -41,7 +41,7 @@ object CategoryReplenishment extends Logging {
 
   def getNonBeauty(df: DataFrame): DataFrame = {
 
-    val filterNonBeauty = df.filter(ProductVariables.CATEGORY + " != 'BEAUTY' and " + ProductVariables.CATEGORY + " ='FRAGRANCE'")
+    val filterNonBeauty = df.filter(ProductVariables.CATEGORY + " != 'BEAUTY' and " + ProductVariables.CATEGORY + " !='FRAGRANCE'")
     val nonBeauty = filterNonBeauty.select(Udf.nonBeauty(filterNonBeauty(ProductVariables.CATEGORY), filterNonBeauty(SalesOrderVariables.CREATED_AT)) as ProductVariables.CATEGORY,
       filterNonBeauty(SalesOrderVariables.FK_CUSTOMER),
       filterNonBeauty(CustomerVariables.EMAIL),

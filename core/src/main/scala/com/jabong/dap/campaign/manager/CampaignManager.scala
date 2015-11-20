@@ -153,22 +153,43 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
+  /**
+   *
+   * @param params
+   */
   def startReplenishmentCampaign(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
-    val contactListMobileFull = CampaignInput.loadFullVariablesData(DataSets.CONTACT_LIST_MOBILE, incrDate)
+    val customerOrderFull = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS, incrDate).
+      select(col(CustomerVariables.FK_CUSTOMER),
+        col(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
+        col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT).distinct
 
     val fullSalesOrderData = CampaignInput.loadFullOrderData(incrDate)
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
+
+    val lastYearCustomerOrderFull = CampaignInput.loadLastNdaysOrderData(370, customerOrderFull, incrDate)
+
+    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData).
+      select(SalesOrderVariables.FK_CUSTOMER,
+        SalesOrderVariables.CUSTOMER_EMAIL,
+        SalesOrderVariables.ID_SALES_ORDER,
+        SalesOrderVariables.CREATED_AT,
+        SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
+
+    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData).
+      select(SalesOrderItemVariables.FK_SALES_ORDER,
+        SalesOrderItemVariables.SKU,
+        SalesOrderItemVariables.CREATED_AT)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate).cache()
 
     val replenishmentCampaign = new ReplenishmentCampaign()
-    replenishmentCampaign.runCampaign(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+    replenishmentCampaign.runCampaign(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
 
   }
 
