@@ -397,7 +397,7 @@ object CustomerOrders extends DataFeedsModel {
         salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
         salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
         salesInvalid(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
-        salesInvalid(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS)+ salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + salesInvalid(SalesOrderItemVariables.SUCCESSFUL_ORDERS) + salesInvalid("others") as SalesOrderItemVariables.GROSS_ORDERS,
+        salesInvalid(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + salesInvalid(SalesOrderItemVariables.SUCCESSFUL_ORDERS) + salesInvalid("others") as SalesOrderItemVariables.GROSS_ORDERS,
         salesInvalid(SalesOrderVariables.LAST_ORDER_UPDATED_AT),
         salesInvalid(SalesOrderVariables.FIRST_ORDER_DATE)
       )
