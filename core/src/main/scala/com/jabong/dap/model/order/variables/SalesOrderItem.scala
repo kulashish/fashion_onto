@@ -133,7 +133,7 @@ object SalesOrderItem {
       joinedMap = prevMap.join(orderIncr, prevMap(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
           mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
-          coalesce(orderIncr("last_order_updated_at"), prevMap("last_order_updated_at")) as "last_order_updated_at"
+          coalesce(orderIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), prevMap(SalesOrderVariables.LAST_ORDER_UPDATED_AT)) as SalesOrderVariables.LAST_ORDER_UPDATED_AT
         )
     }
 
@@ -144,7 +144,7 @@ object SalesOrderItem {
     var incrData = joinedMap
     if (null != prevMap) {
       println("inside prevMap not null")
-      incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      incrData = Utils.getOneDayData(joinedMap, SalesOrderVariables.LAST_ORDER_UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
       incrData.printSchema()
       incrData.show(10)
     }
