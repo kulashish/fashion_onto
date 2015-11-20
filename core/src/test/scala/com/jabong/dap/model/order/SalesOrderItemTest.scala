@@ -41,7 +41,7 @@ class SalesOrderItemTest extends FlatSpec with SharedSparkContext {
   "Testing makeMap4mGroupedData" should "have size 3" in {
     println(df4.count())
     val incrMap = df4.map(e =>
-      (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
+      (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp], e(5).asInstanceOf[Timestamp]))).groupByKey()
     val ordersMapIncr = incrMap.map(e => (e._1, SalesOrderItem.makeMap4mGroupedData(e._2.toList)))
 
     println("ordersMapIncr Count", ordersMapIncr.count())
