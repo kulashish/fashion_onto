@@ -46,8 +46,9 @@ class BrickAffinityCampaign {
     //Generate 8 sku from Brick2 from seller recommendation [email, ref-sku, Brick2 -> [sku1 to sku8]]
     //join Brick1 to Brick2 [email, ref-sku, Brick1 -> [sku1 to sku8], Brick2 -> [sku1 to sku8]]
 
+    val limitFavBrick = joinedToFavBrick.limit(1000)
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRICK_AFFINITY_CAMPAIGN, joinedToFavBrick, false, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRICK_AFFINITY_CAMPAIGN, limitFavBrick, false, brickMvpRecommendations)
 
   }
 }
