@@ -837,14 +837,14 @@ object CampaignUtils extends Logging {
       .withColumn(ProductVariables.BRAND, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
       .withColumn(CampaignMergedFields.PRODUCT_GENDER, lit(""))
       .withColumn(ContactListMobileVars.UID, lit("NA"))
-      .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(0)))
-      .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(1)))
-      .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(2)))
-      .withColumn(CampaignMergedFields.REC_SKU + "4", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(3)))
-      .withColumn(CampaignMergedFields.REC_SKU + "5", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(4)))
-      .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(5)))
-      .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(6)))
-      .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
+      .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(0)))
+      .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(1)))
+      .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(2)))
+      .withColumn(CampaignMergedFields.REC_SKU + "4", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(3)))
+      .withColumn(CampaignMergedFields.REC_SKU + "5", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(4)))
+      .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
+      .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
+      .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
     return replenishmentOutData
   }
