@@ -835,19 +835,12 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.GENDER),
       filteredSku(ProductVariables.PRODUCT_NAME),
       filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND)).filter("email_length = 44")
-      .select(
-        filteredSku(CustomerVariables.EMAIL),
-        filteredSku(CustomerVariables.FK_CUSTOMER),
-        filteredSku(ProductVariables.SKU_SIMPLE),
-        filteredSku(ProductVariables.SPECIAL_PRICE),
-        filteredSku(ProductVariables.BRICK),
-        filteredSku(ProductVariables.BRAND),
-        filteredSku(ProductVariables.MVP),
-        filteredSku(ProductVariables.GENDER),
-        filteredSku(ProductVariables.PRODUCT_NAME),
-        filteredSku(ProductVariables.STOCK),
-        filteredSku(ProductVariables.PRICE_BAND))
+      filteredSku(ProductVariables.PRICE_BAND),
+      filteredSku("BRICK1"),
+      filteredSku("BRICK2"))
+      .filter("email_length = 44")
+
+    val dfFilterCustItr = dfCustItr.filter("email_length = 44")
       .na.fill(
         Map(
           CustomerVariables.EMAIL -> "",
@@ -864,7 +857,7 @@ object CampaignUtils extends Logging {
         )
       )
 
-    val dfBrick1 = dfCustItr.select(
+    val dfBrick1 = dfFilterCustItr.select(
       filteredSku(CustomerVariables.EMAIL),
       filteredSku(CustomerVariables.FK_CUSTOMER),
       filteredSku(ProductVariables.SKU_SIMPLE),
@@ -877,7 +870,7 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.STOCK),
       filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    val dfBrick2 = dfCustItr.select(
+    val dfBrick2 = dfFilterCustItr.select(
       filteredSku(CustomerVariables.EMAIL),
       filteredSku(CustomerVariables.FK_CUSTOMER),
       filteredSku(ProductVariables.SKU_SIMPLE),
