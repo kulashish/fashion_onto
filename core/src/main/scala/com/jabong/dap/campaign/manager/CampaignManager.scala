@@ -7,7 +7,7 @@ import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
@@ -147,7 +147,9 @@ object CampaignManager extends Serializable with Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
-    val contactListMobileFull = CampaignInput.loadFullVariablesData(DataSets.CONTACT_LIST_MOBILE, incrDate)
+    val customerOrderFull = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS, incrDate).
+      select(CustomerVariables.FK_CUSTOMER,
+        SalesOrderItemVariables.SUCCESSFUL_ORDERS)
 
     val fullSalesOrderData = CampaignInput.loadFullOrderData()
 
@@ -162,7 +164,7 @@ object CampaignManager extends Serializable with Logging {
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
     val replenishmentCampaign = new ReplenishmentCampaign()
-    replenishmentCampaign.runCampaign(contactListMobileFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+    replenishmentCampaign.runCampaign(customerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
 
   }
 

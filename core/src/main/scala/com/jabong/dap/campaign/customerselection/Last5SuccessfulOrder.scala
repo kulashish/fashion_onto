@@ -15,16 +15,16 @@ import org.apache.spark.sql.functions._
  */
 class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
 
-  override def customerSelection(customerData: DataFrame, salesOrderData: DataFrame, salesOrderItemData: DataFrame): DataFrame = {
+  override def customerSelection(customerOrderData: DataFrame, salesOrderData: DataFrame, salesOrderItemData: DataFrame): DataFrame = {
 
-    if (customerData == null || salesOrderData == null || salesOrderItemData == null) {
+    if (customerOrderData == null || salesOrderData == null || salesOrderItemData == null) {
 
       logger.error("Data frame should not be null")
 
       return null
     }
 
-    val filterCustomerData = customerData.filter(ContactListMobileVars.NET_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
+    val filterCustomerData = customerOrderData.filter(SalesOrderItemVariables.SUCCESSFUL_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
       .select(CustomerVariables.ID_CUSTOMER)
 
     val coalesceFullSalesOrderData = salesOrderData
