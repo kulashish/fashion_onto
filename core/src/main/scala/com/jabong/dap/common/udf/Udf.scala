@@ -127,7 +127,7 @@ object Udf {
 
   val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: ArrayBuffer[(Row)], i: Int, value: Int))
 
-  val getElementInTupleList = udf((a: mutable.MutableList[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: mutable.MutableList[(Row)], i: Int, value: Int))
+  val getElementInTupleList = udf((a: mutable.MutableList[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleList(a: mutable.MutableList[(Row)], i: Int, value: Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
