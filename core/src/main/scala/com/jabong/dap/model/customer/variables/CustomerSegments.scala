@@ -2,8 +2,8 @@ package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.types.{ IntegerType, StringType, StructField, StructType }
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by raghu on 25/6/15.

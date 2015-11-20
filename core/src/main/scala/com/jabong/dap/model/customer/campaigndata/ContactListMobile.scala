@@ -4,8 +4,8 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, _}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, _ }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -282,13 +282,13 @@ object ContactListMobile extends DataFeedsModel with Logging {
   def mergeIncrData(custIncr: DataFrame, custSegIncr: DataFrame, nlsIncr: DataFrame, customerOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, cmrFull: DataFrame): DataFrame = {
 
     val nlsIncrUnq = nlsIncr.groupBy(NewsletterVariables.EMAIL)
-    .agg(
-      last(NewsletterVariables.FK_CUSTOMER) as NewsletterVariables.FK_CUSTOMER,
-      last(NewsletterVariables.STATUS) as NewsletterVariables.STATUS,
-      last(NewsletterVariables.CREATED_AT) as NewsletterVariables.CREATED_AT,
-      last(NewsletterVariables.UPDATED_AT) as NewsletterVariables.UPDATED_AT,
-      last(NewsletterVariables.UNSUBSCRIBE_KEY) as NewsletterVariables.UNSUBSCRIBE_KEY
-    )
+      .agg(
+        last(NewsletterVariables.FK_CUSTOMER) as NewsletterVariables.FK_CUSTOMER,
+        last(NewsletterVariables.STATUS) as NewsletterVariables.STATUS,
+        last(NewsletterVariables.CREATED_AT) as NewsletterVariables.CREATED_AT,
+        last(NewsletterVariables.UPDATED_AT) as NewsletterVariables.UPDATED_AT,
+        last(NewsletterVariables.UNSUBSCRIBE_KEY) as NewsletterVariables.UNSUBSCRIBE_KEY
+      )
 
     val custIncrUnq = custIncr.groupBy(CustomerVariables.EMAIL)
       .agg(
