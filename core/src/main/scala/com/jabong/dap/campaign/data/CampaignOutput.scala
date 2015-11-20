@@ -29,30 +29,33 @@ object CampaignOutput {
   }
 
   def saveCampaignDataForYesterday(campaignOutput: DataFrame, campaignName: String, campaignType: String = DataSets.PUSH_CAMPAIGNS) = {
+    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+    val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday)
+
     if (testMode) {
       saveTestData(campaignOutput, campaignName, campaignType)
-    } else {
+    }
+    else {
       if (campaignName.equals(CampaignCommon.ACART_HOURLY_CAMPAIGN)) {
-        val dateYesterday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
-        val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateYesterday)
-        if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
-          DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
+        val dateToday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+        val acartPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateToday)
+        if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, acartPath)) {
+          DataWriter.writeParquet(campaignOutput, acartPath, DataSets.IGNORE_SAVEMODE)
         }
         val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
         DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.LAST_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
       } else if(campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)){
-        campaignOutput
+        DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
+        val campaignCsv = campaignOutput
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.REC_SKUS)
           .drop(CampaignMergedFields.REF_SKUS)
           .drop(CampaignMergedFields.CUSTOMER_ID)
 
         val replenishFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_replenishment"
-        DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.DAILY_MODE, TimeUtils.LAST_HOUR_FOLDER, replenishFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
+        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, TimeUtils.LAST_HOUR_FOLDER, replenishFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
 
       } else {
-        val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-        val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday)
 
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
           DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
