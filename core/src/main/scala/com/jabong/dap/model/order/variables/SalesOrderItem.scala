@@ -118,13 +118,13 @@ object SalesOrderItem {
       (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
     val ordersMapIncr = incrMap.map(e => (e._1, makeMap4mGroupedData(e._2.toList)))
 
-    println("salesOrderJoined Count", salesOrderJoined.count())
+   // println("salesOrderJoined Count", salesOrderJoined.count())
 
     val ordersIncrFlat = ordersMapIncr.map(e => Row(e._1, e._2._1, e._2._2))
 
     val orderIncr = Spark.getSqlContext().createDataFrame(ordersIncrFlat, Schema.salesItemStatus)
 
-    println( "orderIncr", orderIncr.count())
+    //println( "orderIncr", orderIncr.count())
     orderIncr.show(10)
     var joinedMap: DataFrame = null
     if (null == prevFull) {
@@ -186,7 +186,6 @@ object SalesOrderItem {
       orderId =>
         if (full.contains(orderId)) {
           val combinedMap = combine2Maps(full(orderId), incrMap(orderId))
-          println("Combined", combinedMap.toString())
           full.updated(orderId, combinedMap)
         } else {
           full.put(orderId, incrMap(orderId))
