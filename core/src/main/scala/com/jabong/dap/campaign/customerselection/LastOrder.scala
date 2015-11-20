@@ -43,7 +43,7 @@ class LastOrder extends LiveCustomerSelector with Logging {
         col(SalesOrderVariables.FK_CUSTOMER),
         col(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
         col(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE,
-        col(SalesOrderVariables.CREATED_AT),
+        col(SalesOrderItemVariables.CREATED_AT),
         col(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
       )
 
