@@ -491,7 +491,7 @@ object Schema {
   val salesItemStatus = StructType(Array(
     StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
     StructField("order_status_map", MapType(LongType, MapType(LongType, IntegerType)), true),
-    StructField("last_order_updated_at", TimestampType, true)
+    StructField(SalesOrderVariables.LAST_ORDER_UPDATED_AT, TimestampType, true)
   ))
 
   val ordersCount = StructType(Array(
@@ -501,7 +501,7 @@ object Schema {
     StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, true),
     StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS, IntegerType, true),
     StructField("others", IntegerType, true),
-    StructField("last_order_updated_at", TimestampType, true)
+    StructField(SalesOrderVariables.LAST_ORDER_UPDATED_AT, TimestampType, true)
   ))
 
   val cusTop5 = StructType(Array(
@@ -662,6 +662,7 @@ object Schema {
     StructField(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS, IntegerType, false),
     StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, false),
     StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_UPDATED_AT, TimestampType, false),
     StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.COUPON_SUM, DecimalType.apply(10, 2), false),
