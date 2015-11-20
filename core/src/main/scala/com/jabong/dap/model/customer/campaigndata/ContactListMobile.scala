@@ -71,36 +71,36 @@ object ContactListMobile extends DataFeedsModel with Logging {
     var mode = DataSets.FULL_MERGE_MODE
     if (null == paths) {
       mode = DataSets.DAILY_MODE
-      val dfCustomerListMobilePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, prevDate)
-      dfMap.put("customerListMobilePrevFull", dfCustomerListMobilePrevFull)
+      val contactListMobilePrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, prevDate)
+      dfMap.put("contactListMobilePrevFull", contactListMobilePrevFull)
     }
 
-    val dfCustomerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, mode, incrDate)
-    dfMap.put("customerIncr", dfCustomerIncr)
+    val customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, mode, incrDate)
+    dfMap.put("customerIncr", customerIncr)
 
-    val dfCustomerSegmentsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_SEGMENTS, mode, incrDate)
-    dfMap.put("customerSegmentsIncr", dfCustomerSegmentsIncr)
+    val customerSegmentsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER_SEGMENTS, mode, incrDate)
+    dfMap.put("customerSegmentsIncr", customerSegmentsIncr)
 
-    val dfNLSIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, mode, incrDate)
-    dfMap.put("nlsIncr", dfNLSIncr)
+    val nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, mode, incrDate)
+    dfMap.put("nlsIncr", nlsIncr)
 
-    val dfCustomerOrdersIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, mode, incrDate)
-    dfMap.put("customerOrdersIncr", dfCustomerOrdersIncr)
+    val customerOrdersIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, mode, incrDate)
+    dfMap.put("customerOrdersIncr", customerOrdersIncr)
 
-    val dfDndFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("dndFull", dfDndFull)
+    val dndFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("dndFull", dndFull)
 
-    val dfSmsOptOutFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.SMS_OPT_OUT, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("smsOptOutFull", dfSmsOptOutFull)
+    val smsOptOutFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.SMS_OPT_OUT, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("smsOptOutFull", smsOptOutFull)
 
-    val dfBlockedNumbersFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("blockedNumbersFull", dfBlockedNumbersFull)
+    val blockedNumbersFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("blockedNumbersFull", blockedNumbersFull)
 
-    val dfZoneCityFull = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
-    dfMap.put("zoneCityFull", dfZoneCityFull)
+    val zoneCityFull = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
+    dfMap.put("zoneCityFull", zoneCityFull)
 
-    val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
-    dfMap.put("cmrFull", dfCmrFull)
+    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("cmrFull", cmrFull)
 
     dfMap
   }
@@ -111,30 +111,30 @@ object ContactListMobile extends DataFeedsModel with Logging {
    */
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
 
-    val dfContactListMobilePrevFull = dfMap.getOrElse("contactListMobilePrevFull", null)
-    val dfCustomerSegmentsIncr = dfMap("customerSegmentsIncr")
-    val dfCustomerIncr = dfMap("customerIncr")
-    val dfNLSIncr = dfMap("nlsIncr")
-    val dfDndFull = dfMap("dndFull")
-    val dfSmsOptOutFull = dfMap("smsOptOutFull")
-    val dfBlockedNumbersFull = dfMap("blockedNumbersFull")
-    val dfZoneCityFull = dfMap("zoneCityFull")
-    val dfCmrFull = dfMap("cmrFull")
-    val dfCustomerOrdersIncr = dfMap("customerOrdersIncr")
+    val contactListMobilePrevFull = dfMap.getOrElse("contactListMobilePrevFull", null)
+    val customerSegmentsIncr = dfMap("customerSegmentsIncr")
+    val customerIncr = dfMap("customerIncr")
+    val nlsIncr = dfMap("nlsIncr")
+    val dndFull = dfMap("dndFull")
+    val smsOptOutFull = dfMap("smsOptOutFull")
+    val blockedNumbersFull = dfMap("blockedNumbersFull")
+    val zoneCityFull = dfMap("zoneCityFull")
+    val cmrFull = dfMap("cmrFull")
+    val customerOrdersIncr = dfMap("customerOrdersIncr")
 
-    if (null == dfCustomerIncr || null == dfNLSIncr || null == dfCustomerSegmentsIncr || null == dfDndFull ||
-      null == dfSmsOptOutFull || null == dfBlockedNumbersFull || null == dfZoneCityFull) {
+    if (null == customerIncr || null == nlsIncr || null == customerSegmentsIncr || null == dndFull ||
+      null == smsOptOutFull || null == blockedNumbersFull || null == zoneCityFull) {
       log("Data frame should not be null")
       return null
     }
 
-    val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(dfCustomerSegmentsIncr)
+    val dfCustSegCalcIncr = CustomerSegments.getCustomerSegments(customerSegmentsIncr)
     //FK_CUSTOMER, MVP_TYPE, SEGMENT, DISCOUNT_SCORE
 
-    val dfSmsOptOutMerged = dfSmsOptOutFull.select(DNDVariables.MOBILE_NUMBER).unionAll(dfBlockedNumbersFull.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
+    val dfSmsOptOutMerged = smsOptOutFull.select(DNDVariables.MOBILE_NUMBER).unionAll(blockedNumbersFull.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    val dfMergedIncr = mergeIncrData(dfCustomerIncr, dfCustSegCalcIncr, dfNLSIncr, dfCustomerOrdersIncr,
-      dfZoneCityFull, dfDndFull, dfSmsOptOutMerged, dfCmrFull)
+    val dfMergedIncr = mergeIncrData(customerIncr, dfCustSegCalcIncr, nlsIncr, customerOrdersIncr,
+      zoneCityFull, dndFull, dfSmsOptOutMerged, cmrFull)
 
     val writeMap = new HashMap[String, DataFrame]()
 
@@ -282,7 +282,6 @@ object ContactListMobile extends DataFeedsModel with Logging {
       val dfContactListPlus = ContactListPlus.getContactListPlus(dfContactListMobileIncrCached, dfContactListMobilePrevFull)
       DataWriter.writeCsv(dfContactListPlus, DataSets.VARIABLES, DataSets.CONTACT_LIST_PLUS, DataSets.DAILY_MODE, incrDate, fileDate + "_Contact_list_Plus", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
-
   }
 
   def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, customerOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, dfCmrFull: DataFrame): DataFrame = {
