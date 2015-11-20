@@ -130,7 +130,7 @@ object CampaignManager extends Serializable with Logging {
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
-        col(CustomerVariables.CITY),
+        col(ContactListMobileVars.CITY) as CustomerVariables.CITY,
         col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
       )
 
