@@ -5,19 +5,19 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ProductVariables, SalesOrderItemVariables, SalesOrderVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ Spark, Utils }
+import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.merge.common.MergeUtils
 import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ DataFrame, Row }
-import scala.collection.mutable.{ HashMap, ListBuffer, Map }
+import org.apache.spark.sql.{DataFrame, Row}
+
+import scala.collection.mutable.{HashMap, ListBuffer, Map}
 
 /**
  * Created by mubarak on 20/10/15.
@@ -51,7 +51,7 @@ import scala.collection.mutable.{ HashMap, ListBuffer, Map }
 object CustTop5 extends DataFeedsModel {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
-    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
+    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
     val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
     val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
     (DataWriter.canWrite(saveMode, fullMapPath) || DataWriter.canWrite(saveMode, incrPath) || DataWriter.canWrite(saveMode, fullPath))
@@ -62,7 +62,7 @@ object CustTop5 extends DataFeedsModel {
     var mode: String = DataSets.FULL_MERGE_MODE
     if (null == path) {
       mode = DataSets.DAILY_MODE
-      val custTop5MapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, prevDate)
+      val custTop5MapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custTop5MapPrevFull", custTop5MapPrevFull)
       val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custTop5PrevFull", custTop5PrevFull)
@@ -110,37 +110,32 @@ object CustTop5 extends DataFeedsModel {
     val custTop5MapFull = dfWrite("custTop5MapFull")
     val custTop5PrevFull = dfWrite.getOrElse("custTop5PrevFull", null)
 
+    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+    DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
+
+    custTop5MapFull.show(10)
+    custTop5MapFull.printSchema()
+
     var top5MapIncr = custTop5MapFull
     if (null != custTop5MapPrevFull) {
       top5MapIncr = Utils.getOneDayData(custTop5MapFull, "last_order_created_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
-    custTop5MapFull.show(10)
-    custTop5MapFull.printSchema()
-    val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_CAT_BRICK_PEN, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
-
-    Spark.getContext().parallelize(custTop5MapFull.head(10)).saveAsTextFile("/user/mubarak/sample.json")
-
-
 
     val (custTop5Incr, categoryCount, categoryAVG) = calcTop5(top5MapIncr, incrDate)
 
+    if (null != custTop5MapPrevFull) {
+      val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
+      DataWriter.writeParquet(custTop5Incr, incrPath, saveMode)
+    } else {
+      val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+      DataWriter.writeParquet(custTop5Incr, fullPath, saveMode)
+    }
+
     custTop5Incr.show(10)
     custTop5Incr.printSchema()
-    val custTop5IncrCached = custTop5Incr.cache().toDF()
-
-    val incrPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(custTop5IncrCached, incrPath, saveMode)
-
-    var custTop5Full = custTop5IncrCached
-    if (null != custTop5PrevFull) {
-      custTop5Full = MergeUtils.InsertUpdateMerge(custTop5PrevFull, custTop5IncrCached, SalesOrderVariables.FK_CUSTOMER)
-    }
-    val fullPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
-    DataWriter.writeParquet(custTop5Full, fullPath, saveMode)
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(custTop5IncrCached, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(custTop5Incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
     //   DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
 
