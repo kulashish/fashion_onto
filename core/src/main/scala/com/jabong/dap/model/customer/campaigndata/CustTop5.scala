@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ProductVariables, SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.read.DataReader
@@ -77,6 +77,8 @@ object CustTop5 extends DataFeedsModel {
     dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
     val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
     dfMap.put("yestItr", yestItr)
+    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    dfMap.put("cmrFull", cmrFull)
     dfMap
   }
 
@@ -85,6 +87,7 @@ object CustTop5 extends DataFeedsModel {
     val top5PrevFull = dfMap.getOrElse("custTop5PrevFull", null)
     var salesOrderIncr = dfMap("salesOrderIncr")
     var salesOrderItemIncr = dfMap("salesOrderItemIncr")
+    val cmrFull = dfMap("cmrFull")
 
     val salesOrderNew = salesOrderIncr.na.fill(scala.collection.immutable.Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
@@ -102,6 +105,7 @@ object CustTop5 extends DataFeedsModel {
     //println("Full COUNT:-" + custTop5Full.count())
     dfWrite.put("custTop5MapPrevFull", top5MapPrevFull)
     dfWrite.put("custTop5PrevFull", top5PrevFull)
+    dfWrite.put("cmrFull", cmrFull)
     dfWrite
   }
 
@@ -109,6 +113,7 @@ object CustTop5 extends DataFeedsModel {
     val custTop5MapPrevFull = dfWrite.getOrElse("custTop5MapPrevFull", null)
     val custTop5MapFull = dfWrite("custTop5MapFull")
     val custTop5PrevFull = dfWrite.getOrElse("custTop5PrevFull", null)
+    val cmrFull = dfWrite("cmrFull")
 
     val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
@@ -134,12 +139,77 @@ object CustTop5 extends DataFeedsModel {
     custTop5Incr.show(10)
     custTop5Incr.printSchema()
 
+    val custTop5Csv = custTop5Incr.join(cmrFull, custTop5Incr(CustomerVariables.FK_CUSTOMER) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
+      .select(
+        cmrFull(ContactListMobileVars.UID),
+        custTop5Incr("BRAND_1"),
+        custTop5Incr("BRAND_2"),
+        custTop5Incr("BRAND_3"),
+        custTop5Incr("BRAND_4"),
+        custTop5Incr("BRAND_5"),
+        custTop5Incr("CAT_1"),
+        custTop5Incr("CAT_2"),
+        custTop5Incr("CAT_3"),
+        custTop5Incr("CAT_4"),
+        custTop5Incr("CAT_5"),
+        custTop5Incr("BRICK_1"),
+        custTop5Incr("BRICK_2"),
+        custTop5Incr("BRICK_3"),
+        custTop5Incr("BRICK_4"),
+        custTop5Incr("BRICK_5"),
+        custTop5Incr("COLOR_1"),
+        custTop5Incr("COLOR_2"),
+        custTop5Incr("COLOR_3"),
+        custTop5Incr("COLOR_4"),
+        custTop5Incr("COLOR_5")
+      )
+
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(custTop5Incr, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(custTop5Csv, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    //   DataWriter.writeCsv(categoryCount, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
+    val categoryCntCsv = categoryCount.join(cmrFull, categoryCount(CustomerVariables.FK_CUSTOMER) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
+      .select(
+        cmrFull(ContactListMobileVars.UID),
+        categoryCount("SUNGLASSES_COUNT"),
+        categoryCount("WOMEN_FOOTWEAR_COUNT"),
+        categoryCount("KIDS_APPAREL_COUNT"),
+        categoryCount("WATCHES_COUNT"),
+        categoryCount("BEAUTY_COUNT"),
+        categoryCount("FURNITURE_COUNT"),
+        categoryCount("SPORT_EQUIPMENT_COUNT"),
+        categoryCount("JEWELLERY_COUNT"),
+        categoryCount("WOMEN_APPAREL_COUNT"),
+        categoryCount("HOME_COUNT"),
+        categoryCount("MEN_FOOTWEAR_COUNT"),
+        categoryCount("MEN_APPAREL_COUNT"),
+        categoryCount("FRAGRANCE_COUNT"),
+        categoryCount("KIDS_FOOTWEAR_COUNT"),
+        categoryCount("TOYS_COUNT"),
+        categoryCount("BAGS_COUNT")
+      )
+    DataWriter.writeCsv(categoryCntCsv, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-    // DataWriter.writeCsv(categoryAVG, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
+    val categoryAvgCsv = categoryAVG.join(cmrFull, categoryAVG(CustomerVariables.FK_CUSTOMER) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
+      .select(
+        cmrFull(ContactListMobileVars.UID),
+        categoryAVG("SUNGLASSES_AVG_ITEM_PRICE"),
+        categoryAVG("WOMEN_FOOTWEAR_AVG_ITEM_PRICE"),
+        categoryAVG("KIDS_APPAREL_AVG_ITEM_PRICE"),
+        categoryAVG("WATCHES_AVG_ITEM_PRICE"),
+        categoryAVG("BEAUTY_AVG_ITEM_PRICE"),
+        categoryAVG("FURNITURE_AVG_ITEM_PRICE"),
+        categoryAVG("SPORT_EQUIPMENT_AVG_ITEM_PRICE"),
+        categoryAVG("JEWELLERY_AVG_ITEM_PRICE"),
+        categoryAVG("WOMEN_APPAREL_AVG_ITEM_PRICE"),
+        categoryAVG("HOME_AVG_ITEM_PRICE"),
+        categoryAVG("MEN_FOOTWEAR_AVG_ITEM_PRICE"),
+        categoryAVG("MEN_APPAREL_AVG_ITEM_PRICE"),
+        categoryAVG("FRAGRANCE_AVG_ITEM_PRICE"),
+        categoryAVG("KIDS_FOOTWEAR_AVG_ITEM_PRICE"),
+        categoryAVG("TOYS_AVG_ITEM_PRICE"),
+        categoryAVG("BAGS_AVG_ITEM_PRICE")
+      )
+    DataWriter.writeCsv(categoryAvgCsv, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
   }
 
   def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
