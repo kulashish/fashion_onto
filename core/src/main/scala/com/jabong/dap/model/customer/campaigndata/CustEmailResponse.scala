@@ -24,7 +24,7 @@ import scala.collection.mutable
  */
 object CustEmailResponse extends DataFeedsModel with Logging {
 
-  var date:String = null
+  var date: String = null
 
   override def canProcess(incrDate: String, saveMode: String): Boolean = {
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
