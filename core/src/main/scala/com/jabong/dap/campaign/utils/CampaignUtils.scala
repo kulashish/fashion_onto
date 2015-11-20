@@ -826,9 +826,9 @@ object CampaignUtils extends Logging {
    * @return
    */
   def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
-//    val cmr = CampaignInput.loadCustomerMasterData()
-   // val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
-     // .drop(CampaignCommon.PRIORITY)
+    //    val cmr = CampaignInput.loadCustomerMasterData()
+    // val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
+    // .drop(CampaignCommon.PRIORITY)
     val replenishmentOutData = input
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
@@ -847,7 +847,7 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
-    debug(replenishmentOutData,"replenishmentOutData")
+    debug(replenishmentOutData, "replenishmentOutData")
     return replenishmentOutData
   }
 
