@@ -8,6 +8,7 @@ import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, Produc
 object Recommendation {
 
   val LIVE_COMMON_RECOMMENDER = "live_common_recommender"
+  val CALENDER_COMMON_RECOMMENDER = "calender_common_recommender"
   val SALES_ORDER_ITEM_SKU = "sales_order_item_sku"
   val NUMBER_LAST_30_DAYS_ORDERED = "number_last_30_days_ordered"
   val LAST_SOLD_DATE = "last_sold_date"

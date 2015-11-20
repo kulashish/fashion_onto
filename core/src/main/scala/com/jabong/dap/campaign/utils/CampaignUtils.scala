@@ -23,6 +23,7 @@ import org.apache.spark.sql.{ Row, DataFrame }
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
+import scala.collection.immutable.HashMap
 
 /**
  * Utility Class
@@ -766,10 +767,10 @@ object CampaignUtils extends Logging {
         CampaignUtils.debug(dfBrick1, "dfBrick1")
         CampaignUtils.debug(dfBrick2, "dfBrick2")
 
-        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, 8)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, 8)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
         val dfJoined = dfBrick1RecommendationData.join(
@@ -802,7 +803,7 @@ object CampaignUtils extends Logging {
         dfJoined
       }
       case CampaignCommon.HOTTEST_X_CAMPAIGN =>
-        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
@@ -819,31 +820,50 @@ object CampaignUtils extends Logging {
    * @return
    */
   def getBrick1Brick2(filteredSku: DataFrame): (DataFrame, DataFrame) = {
-    val dfBrick1 = filteredSku.select(
-      filteredSku(CustomerVariables.EMAIL),
-      filteredSku(CustomerVariables.FK_CUSTOMER),
-      filteredSku(ProductVariables.SKU_SIMPLE),
-      filteredSku(ProductVariables.SPECIAL_PRICE),
-      filteredSku("BRICK1") as ProductVariables.BRICK,
-      filteredSku(ProductVariables.BRAND),
-      filteredSku(ProductVariables.MVP),
-      filteredSku(ProductVariables.GENDER),
-      filteredSku(ProductVariables.PRODUCT_NAME),
-      filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    val dfBrick2 = filteredSku.select(
-      filteredSku(CustomerVariables.EMAIL),
-      filteredSku(CustomerVariables.FK_CUSTOMER),
-      filteredSku(ProductVariables.SKU_SIMPLE),
-      filteredSku(ProductVariables.SPECIAL_PRICE),
-      filteredSku("BRICK2") as ProductVariables.BRICK,
-      filteredSku(ProductVariables.BRAND),
-      filteredSku(ProductVariables.MVP),
-      filteredSku(ProductVariables.GENDER),
-      filteredSku(ProductVariables.PRODUCT_NAME),
-      filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+    CampaignUtils.debug(filteredSku, "filteredSku")
+
+    val dfCustItr = filteredSku.na.fill(
+      Map(
+        CustomerVariables.EMAIL -> "",
+        CustomerVariables.FK_CUSTOMER -> 0,
+        ProductVariables.SKU_SIMPLE -> "",
+        ProductVariables.SPECIAL_PRICE -> 0.0,
+        ProductVariables.BRICK -> "",
+        ProductVariables.BRAND -> "",
+        ProductVariables.MVP -> 0,
+        ProductVariables.GENDER -> "",
+        ProductVariables.PRODUCT_NAME -> "",
+        ProductVariables.STOCK -> 0,
+        ProductVariables.PRICE_BAND -> ""
+      )
+    )
+
+    val dfBrick1 = dfCustItr.select(
+      dfCustItr(CustomerVariables.EMAIL),
+      dfCustItr(CustomerVariables.FK_CUSTOMER),
+      dfCustItr(ProductVariables.SKU_SIMPLE),
+      dfCustItr(ProductVariables.SPECIAL_PRICE),
+      dfCustItr("BRICK1") as ProductVariables.BRICK,
+      dfCustItr(ProductVariables.BRAND),
+      dfCustItr(ProductVariables.MVP),
+      dfCustItr(ProductVariables.GENDER),
+      dfCustItr(ProductVariables.PRODUCT_NAME),
+      dfCustItr(ProductVariables.STOCK),
+      dfCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+
+    val dfBrick2 = dfCustItr.select(
+      dfCustItr(CustomerVariables.EMAIL),
+      dfCustItr(CustomerVariables.FK_CUSTOMER),
+      dfCustItr(ProductVariables.SKU_SIMPLE),
+      dfCustItr(ProductVariables.SPECIAL_PRICE),
+      dfCustItr("BRICK2") as ProductVariables.BRICK,
+      dfCustItr(ProductVariables.BRAND),
+      dfCustItr(ProductVariables.MVP),
+      dfCustItr(ProductVariables.GENDER),
+      dfCustItr(ProductVariables.PRODUCT_NAME),
+      dfCustItr(ProductVariables.STOCK),
+      dfCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
     (dfBrick1, dfBrick2)
   }
@@ -856,13 +876,15 @@ object CampaignUtils extends Logging {
    * @param recommendations
    * @return
    */
-  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = 8): DataFrame = {
+  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = CampaignCommon.CALENDAR_REC_SKUS): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
+    //    val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.CALENDER_COMMON_RECOMMENDER)
+
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), numRecSkus)

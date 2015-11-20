@@ -22,6 +22,7 @@ object RecommendationUtils extends Serializable {
     Recommendation.BRICK_PRICE_BAND_SUB_TYPE -> Array((Recommendation.BRICK_PRICE_BAND_PIVOT, Schema.brickPriceBandRecommendationOutput, DataSets.BRICK_PRICE_BAND_RECOMMENDATIONS)),
     Recommendation.MVP_COLOR_SUB_TYPE -> Array((Recommendation.MVP_COLOR_PIVOT, Schema.mvpColorRecommendationOutput, DataSets.MVP_COLOR_RECOMMENDATIONS)),
     Recommendation.MVP_DISCOUNT_SUB_TYPE -> Array((Recommendation.MVP_DISCOUNT_PIVOT, Schema.mvpDiscountRecommendationOutput, DataSets.MVP_DISCOUNT_RECOMMENDATIONS)),
+    Recommendation.BRAND_MVP_CITY_SUB_TYPE -> Array((Recommendation.BRAND_MVP_CITY_PIVOT, Schema.brandMvpCityRecommendationOutput, DataSets.BRAND_MVP_CITY_RECOMMENDATIONS)),
     Recommendation.BRAND_MVP_CITY_STATE -> Array((Recommendation.BRAND_MVP_CITY_PIVOT, Schema.brandMvpCityRecommendationOutput, DataSets.BRAND_MVP_CITY_RECOMMENDATIONS),
       (Recommendation.BRAND_MVP_STATE_PIVOT, Schema.brandMvpStateRecommendationOutput, DataSets.BRAND_MVP_STATE_RECOMMENDATIONS)),
 

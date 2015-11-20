@@ -773,4 +773,11 @@ object UdfUtils extends Logging {
     return category
 
   }
+
+  def lengthString(string: String): Int = {
+    if (string == null)
+      return 0
+
+    return string.length()
+  }
 }

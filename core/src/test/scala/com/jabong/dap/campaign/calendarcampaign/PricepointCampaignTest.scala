@@ -20,7 +20,7 @@ class PricepointCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
   @transient var sqlContext: SQLContext = _
   @transient var last20thDaySalesOrderData: DataFrame = _
   @transient var last20thDaySalesOrderItemData: DataFrame = _
-  @transient var brickMvpRecommendations: DataFrame = _
+  @transient var brickPriceBandRecommendations: DataFrame = _
   @transient var yesterdayItrData: DataFrame = _
 
   override def beforeAll() {
@@ -30,14 +30,14 @@ class PricepointCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
     last20thDaySalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "sales_order", Schema.salesOrder)
     last20thDaySalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "sales_order_item", Schema.salesOrderItem)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/pricepoint", "itr", TestSchema.basicSimpleItr)
-    brickMvpRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign", "brick_mvp_recommendations")
+    brickPriceBandRecommendations = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign", "brick_price_band_recommendations")
   }
 
   feature("Generate Price Point"){
     scenario("select sku from 20th day last order data"){
       Given("last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val pricePointCampaign = new PricepointCampaign()
-      pricePointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
+      pricePointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
       val pricepointCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)

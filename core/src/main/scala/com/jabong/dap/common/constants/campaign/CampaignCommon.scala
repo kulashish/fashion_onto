@@ -136,6 +136,8 @@ object CampaignCommon {
     CampaignCommon.CLEARANCE_CAMPAIGN -> Recommendation.MVP_DISCOUNT_SUB_TYPE,
     CampaignCommon.LOVE_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE,
     CampaignCommon.LOVE_COLOR_CAMPAIGN -> Recommendation.MVP_COLOR_SUB_TYPE,
-    CampaignCommon.GEO_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE
+    CampaignCommon.GEO_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE,
+    CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> Recommendation.BRAND_MVP_CITY_SUB_TYPE
+
   )
 }
