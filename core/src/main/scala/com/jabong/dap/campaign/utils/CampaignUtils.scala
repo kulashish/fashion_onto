@@ -23,6 +23,7 @@ import org.apache.spark.sql.{ Row, DataFrame }
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
+import scala.collection.immutable.HashMap
 
 /**
  * Utility Class
@@ -819,7 +820,27 @@ object CampaignUtils extends Logging {
    * @return
    */
   def getBrick1Brick2(filteredSku: DataFrame): (DataFrame, DataFrame) = {
-    val dfBrick1 = filteredSku.select(
+
+    CampaignUtils.debug(filteredSku, "filteredSku")
+
+    val dfCustItr = filteredSku.filter("email is not null and length(email) = 44")
+      .na.fill(
+        Map(
+          CustomerVariables.EMAIL -> "",
+          CustomerVariables.FK_CUSTOMER -> 0,
+          ProductVariables.SKU_SIMPLE -> "",
+          ProductVariables.SPECIAL_PRICE -> 0.0,
+          ProductVariables.BRICK -> "",
+          ProductVariables.BRAND -> "",
+          ProductVariables.MVP -> 0,
+          ProductVariables.GENDER -> "",
+          ProductVariables.PRODUCT_NAME -> "",
+          ProductVariables.STOCK -> 0,
+          ProductVariables.PRICE_BAND -> ""
+        )
+      )
+
+    val dfBrick1 = dfCustItr.select(
       filteredSku(CustomerVariables.EMAIL),
       filteredSku(CustomerVariables.FK_CUSTOMER),
       filteredSku(ProductVariables.SKU_SIMPLE),
@@ -832,7 +853,7 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.STOCK),
       filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    val dfBrick2 = filteredSku.select(
+    val dfBrick2 = dfCustItr.select(
       filteredSku(CustomerVariables.EMAIL),
       filteredSku(CustomerVariables.FK_CUSTOMER),
       filteredSku(ProductVariables.SKU_SIMPLE),
