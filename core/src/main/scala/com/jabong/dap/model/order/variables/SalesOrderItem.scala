@@ -107,7 +107,8 @@ object SalesOrderItem {
    */
 
   def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame, prevFull: DataFrame, incrDate: String): (DataFrame, DataFrame) = {
-    val salesOrderJoined = salesOrderFull.drop(SalesOrderItemVariables.UPDATED_AT).join(salesOrderItemIncr.drop(SalesOrderItemVariables.CREATED_AT), salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER))
+    val salesOrderJoined = salesOrderFull.drop(SalesOrderItemVariables.UPDATED_AT)
+      .join(salesOrderItemIncr.drop(SalesOrderItemVariables.CREATED_AT), salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER))
     val incrMap = salesOrderJoined.select(
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
       salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
@@ -153,8 +154,9 @@ object SalesOrderItem {
     var incrData = joinedMap
     if (null != prevFull) {
       incrData = Utils.getOneDayData(joinedMap, SalesOrderVariables.LAST_ORDER_UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      // incrData.printSchema()
-      // incrData.show(10)
+      println("incrData: " + incrData.count())
+      incrData.printSchema()
+      incrData.show(10)
     }
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
@@ -165,7 +167,7 @@ object SalesOrderItem {
     val finalOrdersCount = orderStatusMap.map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._3, e._4))
 
     val res = Spark.getSqlContext().createDataFrame(finalOrdersCount, Schema.ordersCount)
-    // println("res Count", res.count())
+    println("res Count", res.count())
 
     (res, joinedMap)
   }
