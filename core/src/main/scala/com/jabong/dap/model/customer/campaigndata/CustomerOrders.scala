@@ -502,24 +502,11 @@ object CustomerOrders extends DataFeedsModel {
       SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS -> 0,
       SalesOrderItemVariables.COUNT_OF_RET_ORDERS -> 0,
       SalesOrderItemVariables.SUCCESSFUL_ORDERS -> 0,
-      SalesOrderVariables.CATEGORY_PENETRATION -> "",
-      SalesOrderVariables.BRICK_PENETRATION -> "",
-      SalesOrderItemVariables.FAV_BRAND -> "",
       SalesOrderVariables.MAX_ORDER_BASKET_VALUE -> 0.0,
       SalesOrderVariables.MAX_ORDER_ITEM_VALUE -> 0.0,
       SalesOrderVariables.SUM_BASKET_VALUE -> 0.0,
       SalesOrderVariables.COUNT_BASKET_VALUE -> 0,
-      SalesOrderVariables.ORDER_ITEM_COUNT -> 0,
-      SalesAddressVariables.FIRST_SHIPPING_CITY -> "",
-      SalesAddressVariables.FIRST_SHIPPING_CITY_TIER -> "",
-      SalesAddressVariables.LAST_SHIPPING_CITY -> "",
-      SalesAddressVariables.LAST_SHIPPING_CITY_TIER -> "",
-      ContactListMobileVars.CITY -> "",
-      CustomerVariables.PHONE -> "",
-      CustomerVariables.FIRST_NAME -> "",
-      CustomerVariables.LAST_NAME -> "",
-      ContactListMobileVars.CITY_TIER -> "",
-      ContactListMobileVars.STATE_ZONE -> ""
+      SalesOrderVariables.ORDER_ITEM_COUNT -> 0
     ))
   }
 }
