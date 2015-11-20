@@ -1,9 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import java.sql.Timestamp
-
-import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.{ variables, SQL }
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
 import com.jabong.dap.common.schema.SchemaUtils
@@ -16,9 +13,9 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.schema.CustEmailSchema
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.types.{ IntegerType, StringType }
 
 import scala.collection.mutable
 
@@ -89,30 +86,6 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   }
 
-  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String): Unit = {
-    val incrDf = dfWrite("incrDf")
-    val fullDf = dfWrite("fullDf")
-    val diffDf = dfWrite("diffDf")
-
-    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
-      DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
-    val savePathFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
-      DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, incrDate)
-
-    if (DataWriter.canWrite(savePathIncr, saveMode)) {
-      DataWriter.writeParquet(incrDf, savePathIncr, saveMode)
-    }
-
-    if (DataWriter.canWrite(savePathFull, saveMode)) {
-      DataWriter.writeParquet(fullDf, savePathFull, saveMode)
-    }
-
-    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
-
-    DataWriter.writeCsv(diffDf, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
-
-  }
-
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {
 
     val dfClickData = dfMap("clickIncr")
@@ -177,6 +150,30 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfResultMap.put("custEmailResCsv", result.except(prevFullDf))
 
     dfResultMap
+  }
+
+  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String): Unit = {
+    val custEmailResIncr = dfWrite("custEmailResIncr")
+    val custEmailResFull = dfWrite("custEmailResFull")
+    val custEmailResCsv = dfWrite("custEmailResCsv")
+
+    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
+      DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
+    val savePathFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES,
+      DataSets.CUST_EMAIL_RESPONSE, DataSets.FULL_MERGE_MODE, incrDate)
+
+    if (DataWriter.canWrite(savePathIncr, saveMode)) {
+      DataWriter.writeParquet(custEmailResIncr, savePathIncr, saveMode)
+    }
+
+    if (DataWriter.canWrite(savePathFull, saveMode)) {
+      DataWriter.writeParquet(custEmailResFull, savePathFull, saveMode)
+    }
+
+    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
+
+    DataWriter.writeCsv(custEmailResCsv, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
+
   }
 
   def open_segment(value: String, updateValue: String, endDate: String, incrDateStr: String): String = {
@@ -282,9 +279,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         cmrResDf(EmailResponseVariables.LAST_CLICK_DATE),
         cmrResDf(EmailResponseVariables.OPENS_LIFETIME),
         cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
-        when(nlSubscribers(NewsletterVariables.STATUS) === "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT))
+        when(nlSubscribers(NewsletterVariables.STATUS) === "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
           .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
-        when(nlSubscribers(NewsletterVariables.UPDATED_AT).isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT))
+        when(nlSubscribers(NewsletterVariables.UPDATED_AT).isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
           .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)
 
     result

@@ -20,20 +20,23 @@ class HottestXCampaign {
     val day_45past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
 
     val days_45_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_45past, TimeConstants.DATE_FORMAT_FOLDER)
-      .filter(nDaysSalesOrder(SalesOrderVariables.GW_AMOUNT).<=(1000))
+      .filter(nDaysSalesOrder(SalesOrderVariables.GRAND_TOTAL).<=(1000))
 
     val day_60past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
 
     val days_60_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_60past, TimeConstants.DATE_FORMAT_FOLDER)
-      .filter(nDaysSalesOrder(SalesOrderVariables.GW_AMOUNT).>(1000))
+      .filter(nDaysSalesOrder(SalesOrderVariables.GRAND_TOTAL).>(1000))
 
     val sales_45_60_df = days_45_filter.unionAll(days_60_filter)
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
 
-    val hottestX = customerSelection.customerSelection(sales_45_60_df, nDaysSalesOrderItem_60)
+    val dfCustomerSelected = customerSelection.customerSelection(sales_45_60_df, nDaysSalesOrderItem_60)
+    CampaignUtils.debug(dfCustomerSelected, CampaignCommon.HOTTEST_X_CAMPAIGN + "after customer selection")
 
-    val filteredSku = Daily.skuFilter(hottestX, yesterdayItr)
+    val filteredSku = Daily.skuFilter(dfCustomerSelected, yesterdayItr)
+
+    CampaignUtils.debug(filteredSku, CampaignCommon.HOTTEST_X_CAMPAIGN + "after filteredSku ")
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.HOTTEST_X_CAMPAIGN, filteredSku, false,
       recommendations)
