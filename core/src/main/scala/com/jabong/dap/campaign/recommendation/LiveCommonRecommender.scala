@@ -140,7 +140,8 @@ class LiveCommonRecommender extends Recommender with Logging {
         val dfRecommendations = recommendations.select(
           col(ProductVariables.BRAND),
           col(ProductVariables.MVP),
-          Udf.toLowercase(col(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY
+          Udf.toLowercase(col(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY,
+          col(CampaignMergedFields.RECOMMENDATIONS)
         )
 
         dfCompleteRefSku.join(dfRecommendations, dfCompleteRefSku(ProductVariables.BRAND) === dfRecommendations(ProductVariables.BRAND)
