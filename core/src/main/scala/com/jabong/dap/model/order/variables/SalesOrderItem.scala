@@ -125,13 +125,11 @@ object SalesOrderItem {
     val orderIncr = Spark.getSqlContext().createDataFrame(ordersIncrFlat, Schema.salesItemStatus)
 
     //println( "orderIncr", orderIncr.count())
-    orderIncr.show(10)
+    // orderIncr.show(10)
     var joinedMap: DataFrame = null
     if (null == prevFull) {
-      println("Inside If")
       joinedMap = orderIncr
     } else {
-      println("Inside Else")
       val joined = prevFull.join(orderIncr, prevFull(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(
           coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
