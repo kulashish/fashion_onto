@@ -117,9 +117,9 @@ object CampaignCommon {
     "acart_hourly" -> 41,
     CampaignCommon.PRICEPOINT_CAMPAIGN -> 24,
     //FIXME: put correct mail type
-    CampaignCommon.BEAUTY_CAMPAIGN -> 400,
+    // CampaignCommon.BEAUTY_CAMPAIGN -> 400,
     //FIXME: put correct mail type
-    CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN -> 500,
+    CampaignCommon.REPLENISHMENT_CAMPAIGN -> 500,
     //FIXME: put correct mail type
     CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> 800,
     CampaignCommon.BRICK_AFFINITY_CAMPAIGN -> 14,
@@ -137,7 +137,7 @@ object CampaignCommon {
     CampaignCommon.LOVE_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE,
     CampaignCommon.LOVE_COLOR_CAMPAIGN -> Recommendation.MVP_COLOR_SUB_TYPE,
     CampaignCommon.GEO_BRAND_CAMPAIGN -> Recommendation.BRAND_MVP_SUB_TYPE,
+    CampaignCommon.REPLENISHMENT_CAMPAIGN -> Recommendation.BRICK_MVP_SUB_TYPE,
     CampaignCommon.BRAND_IN_CITY_CAMPAIGN -> Recommendation.BRAND_MVP_CITY_SUB_TYPE
-
   )
 }

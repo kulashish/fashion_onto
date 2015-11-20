@@ -3,15 +3,15 @@ package com.jabong.dap.campaign.recommendation
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, Recommendation}
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables, SalesAddressVariables}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesAddressVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.BooleanType
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.collection.mutable
 
@@ -206,13 +206,12 @@ class CalenderCommonRecommender extends Recommender with Logging {
     //val numberRefSku = iterable.size
     //val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
     val row = topRow
-      var i = 1;
-      val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
-        foreach(value => if (!recommendedSkus.contains(value) && i <= numRecSkus) { recommendedSkus += value; i = i + 1; })
+    var i = 1;
+    val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
+      foreach(value => if (!recommendedSkus.contains(value) && i <= numRecSkus) { recommendedSkus += value; i = i + 1; })
 
-      referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
-        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
-
+    referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
+      CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
 
     return (referenceSkus, recommendedSkus, mailType, acartUrl)
   }

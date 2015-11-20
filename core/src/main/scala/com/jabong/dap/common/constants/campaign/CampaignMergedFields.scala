@@ -49,4 +49,10 @@ object CampaignMergedFields {
   val CALENDAR_COLOR = "CLDR_COLOR"
   val CALENDAR_PRICE_POINT = "CLDR_PRICE_POINT"
 
+  // replenish campaign
+  val PURCHASED_DATE = "PURCHASED_DATE"
+  val REC_SKU = "REC_SKU"
+  val LIVE_REF = "LIVE_REF_1"
+  val PRODUCT_GENDER = "PRODUCT_GENDER"
+
 }
