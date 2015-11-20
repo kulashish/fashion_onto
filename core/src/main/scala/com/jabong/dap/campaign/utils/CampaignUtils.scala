@@ -823,7 +823,31 @@ object CampaignUtils extends Logging {
 
     CampaignUtils.debug(filteredSku, "filteredSku")
 
-    val dfCustItr = filteredSku.filter("email is not null and length(email) = 44")
+    val dfCustItr = filteredSku.select(
+      filteredSku(CustomerVariables.EMAIL),
+      Udf.lengthString(filteredSku(CustomerVariables.EMAIL)) as "email_length",
+      filteredSku(CustomerVariables.FK_CUSTOMER),
+      filteredSku(ProductVariables.SKU_SIMPLE),
+      filteredSku(ProductVariables.SPECIAL_PRICE),
+      filteredSku(ProductVariables.BRICK),
+      filteredSku(ProductVariables.BRAND),
+      filteredSku(ProductVariables.MVP),
+      filteredSku(ProductVariables.GENDER),
+      filteredSku(ProductVariables.PRODUCT_NAME),
+      filteredSku(ProductVariables.STOCK),
+      filteredSku(ProductVariables.PRICE_BAND)).filter("email_length = 44")
+      .select(
+        filteredSku(CustomerVariables.EMAIL),
+        filteredSku(CustomerVariables.FK_CUSTOMER),
+        filteredSku(ProductVariables.SKU_SIMPLE),
+        filteredSku(ProductVariables.SPECIAL_PRICE),
+        filteredSku(ProductVariables.BRICK),
+        filteredSku(ProductVariables.BRAND),
+        filteredSku(ProductVariables.MVP),
+        filteredSku(ProductVariables.GENDER),
+        filteredSku(ProductVariables.PRODUCT_NAME),
+        filteredSku(ProductVariables.STOCK),
+        filteredSku(ProductVariables.PRICE_BAND))
       .na.fill(
         Map(
           CustomerVariables.EMAIL -> "",
