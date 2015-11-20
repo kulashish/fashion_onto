@@ -291,22 +291,22 @@ sub upload_email_campaigns_feedFiles {
     # 20150928_CONTACTS_LIST_MOBILE.csv
     $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
     $folderName = "contactListMobile";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_NL_data_list.csv
     $filename = "$date_with_zero_today"."_NL_data_list.csv";
     $folderName = "NL_data_list";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_app_email_feed.csv
     $filename = "$date_with_zero_today"."_app_email_feed.csv";
     $folderName = "app_email_feed";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_Contact_list_Plus.csv
     $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
     $folderName = "Contact_list_Plus";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150927_Customer_App_details.csv
     $filename = "$date_with_zero_today"."_Customer_App_details.csv";
