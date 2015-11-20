@@ -1,13 +1,15 @@
 package com.jabong.dap.campaign.manager
 
+import java.sql.Timestamp
+
 import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.{ Utils, OptionUtils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
+import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
@@ -125,6 +127,14 @@ object CampaignManager extends Serializable with Logging {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val fullCustomerOrders = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS)
+      .select(
+        col(CustomerVariables.FK_CUSTOMER),
+        col(ProductVariables.BRAND),
+        col(CustomerVariables.CITY),
+        col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
+      )
+
+    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate).drop(SalesOrderVariables.CREATED_AT)
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
@@ -139,7 +149,7 @@ object CampaignManager extends Serializable with Logging {
     val brandMvpCityRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_CITY_SUB_TYPE).cache()
 
     val brandInCityCampaign = new BrandInCityCampaign()
-    brandInCityCampaign.runCampaign(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
+    brandInCityCampaign.runCampaign(last6thDaysCustomerOrderData, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
 
   }
 
