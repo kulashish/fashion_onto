@@ -402,7 +402,8 @@ object CustomerOrders extends DataFeedsModel {
         salesInvalid(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
         salesInvalid(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
         salesInvalid(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
-        salesInvalid(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
+        salesInvalid(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
+        salesInvalid("last_order_updated_at")
       )
 
     val catBrickJoined = invalidJoined.join(salesCatBrick, salesCatBrick(SalesOrderVariables.FK_CUSTOMER) === invalidJoined(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
@@ -424,6 +425,7 @@ object CustomerOrders extends DataFeedsModel {
         invalidJoined(SalesRuleSetVariables.COUPON_COUNT),
         invalidJoined(SalesRuleSetVariables.DISCOUNT_SUM),
         invalidJoined(SalesRuleSetVariables.DISCOUNT_COUNT),
+        invalidJoined("last_order_updated_at"),
         salesCatBrick(SalesOrderVariables.CATEGORY_PENETRATION),
         salesCatBrick(SalesOrderVariables.BRICK_PENETRATION),
         salesCatBrick(SalesOrderItemVariables.FAV_BRAND)
@@ -450,6 +452,7 @@ object CustomerOrders extends DataFeedsModel {
         catBrickJoined(SalesOrderVariables.CATEGORY_PENETRATION),
         catBrickJoined(SalesOrderVariables.BRICK_PENETRATION),
         catBrickJoined(SalesOrderItemVariables.FAV_BRAND),
+        catBrickJoined("last_order_updated_at"),
         salesOrderValue(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
         salesOrderValue(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
         salesOrderValue(SalesOrderVariables.SUM_BASKET_VALUE),
@@ -479,6 +482,7 @@ object CustomerOrders extends DataFeedsModel {
         salesValueJoined(SalesOrderVariables.CATEGORY_PENETRATION),
         salesValueJoined(SalesOrderVariables.BRICK_PENETRATION),
         salesValueJoined(SalesOrderItemVariables.FAV_BRAND),
+        salesValueJoined("last_order_updated_at"),
         salesValueJoined(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
         salesValueJoined(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
         salesValueJoined(SalesOrderVariables.SUM_BASKET_VALUE),
