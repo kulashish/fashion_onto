@@ -31,9 +31,12 @@ class HottestXCampaign {
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
 
-    val hottestX = customerSelection.customerSelection(sales_45_60_df, nDaysSalesOrderItem_60)
+    val dfCustomerSelected = customerSelection.customerSelection(sales_45_60_df, nDaysSalesOrderItem_60)
+    CampaignUtils.debug(dfCustomerSelected, CampaignCommon.HOTTEST_X_CAMPAIGN + "after customer selection")
 
-    val filteredSku = Daily.skuFilter(hottestX, yesterdayItr)
+    val filteredSku = Daily.skuFilter(dfCustomerSelected, yesterdayItr)
+
+    CampaignUtils.debug(filteredSku, CampaignCommon.HOTTEST_X_CAMPAIGN + "after filteredSku ")
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.HOTTEST_X_CAMPAIGN, filteredSku, false,
       recommendations)
