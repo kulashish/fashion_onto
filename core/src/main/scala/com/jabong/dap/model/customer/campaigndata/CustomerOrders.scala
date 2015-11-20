@@ -288,7 +288,6 @@ object CustomerOrders extends DataFeedsModel {
           custOrdersIncr(SalesOrderVariables.COUNT_BASKET_VALUE) + custOrdersPrevFull(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.COUNT_BASKET_VALUE,
           custOrdersIncr(SalesOrderVariables.ORDER_ITEM_COUNT) + custOrdersPrevFull(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.ORDER_ITEM_COUNT,
           coalesce(custOrdersIncr(SalesOrderVariables.LAST_ORDER_DATE), custOrdersPrevFull(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE,
-          coalesce(custOrdersPrevFull(SalesOrderVariables.FIRST_ORDER_DATE), custOrdersIncr(SalesOrderVariables.FIRST_ORDER_DATE)) as SalesOrderVariables.FIRST_ORDER_DATE,
           coalesce(custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY), custOrdersPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
           coalesce(custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), custOrdersPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
           coalesce(custOrdersPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY), custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
@@ -299,6 +298,7 @@ object CustomerOrders extends DataFeedsModel {
           custOrdersPrevFull(SalesOrderItemVariables.SUCCESSFUL_ORDERS) + custOrdersIncr(SalesOrderItemVariables.SUCCESSFUL_ORDERS) as SalesOrderItemVariables.SUCCESSFUL_ORDERS,
           custOrdersPrevFull(SalesOrderItemVariables.GROSS_ORDERS) + custOrdersIncr(SalesOrderItemVariables.GROSS_ORDERS) as SalesOrderItemVariables.GROSS_ORDERS,
           coalesce(custOrdersIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), custOrdersPrevFull(SalesOrderVariables.LAST_ORDER_UPDATED_AT)) as SalesOrderVariables.LAST_ORDER_UPDATED_AT,
+          coalesce(custOrdersPrevFull(SalesOrderVariables.FIRST_ORDER_DATE), custOrdersIncr(SalesOrderVariables.FIRST_ORDER_DATE)) as SalesOrderVariables.FIRST_ORDER_DATE,
           when(custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < custOrdersPrevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(custOrdersPrevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
           when(custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > custOrdersPrevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(custOrdersPrevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
           custOrdersIncr(SalesRuleSetVariables.COUPON_SUM) + custOrdersPrevFull(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
@@ -323,47 +323,7 @@ object CustomerOrders extends DataFeedsModel {
         )
       // This is being done as for decimal type columns the precision is becoming 20 and
       // while writing to parquet it is giving error
-      val rdd = custOrdersFull.select(
-        CustomerVariables.FK_CUSTOMER,
-        SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
-        SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
-        SalesOrderVariables.SUM_BASKET_VALUE,
-        SalesOrderVariables.COUNT_BASKET_VALUE,
-        SalesOrderVariables.ORDER_ITEM_COUNT,
-        SalesOrderVariables.LAST_ORDER_DATE,
-        SalesOrderVariables.FIRST_ORDER_DATE,
-        SalesAddressVariables.LAST_SHIPPING_CITY,
-        SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
-        SalesAddressVariables.FIRST_SHIPPING_CITY,
-        SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
-        SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
-        SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-        SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
-        SalesOrderItemVariables.SUCCESSFUL_ORDERS,
-        SalesOrderItemVariables.GROSS_ORDERS,
-        SalesOrderVariables.LAST_ORDER_UPDATED_AT,
-        SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
-        SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
-        SalesRuleSetVariables.COUPON_SUM,
-        SalesRuleSetVariables.COUPON_COUNT,
-        SalesRuleSetVariables.MIN_DISCOUNT_USED,
-        SalesRuleSetVariables.MAX_DISCOUNT_USED,
-        SalesRuleSetVariables.DISCOUNT_SUM,
-        SalesRuleSetVariables.DISCOUNT_COUNT,
-        SalesOrderItemVariables.REVENUE_7,
-        SalesOrderItemVariables.REVENUE_30,
-        SalesOrderItemVariables.REVENUE_LIFE,
-        SalesOrderItemVariables.ORDERS_COUNT_LIFE,
-        SalesOrderVariables.CATEGORY_PENETRATION,
-        SalesOrderVariables.BRICK_PENETRATION,
-        SalesOrderItemVariables.FAV_BRAND,
-        ContactListMobileVars.CITY,
-        CustomerVariables.PHONE,
-        CustomerVariables.FIRST_NAME,
-        CustomerVariables.LAST_NAME,
-        ContactListMobileVars.CITY_TIER,
-        ContactListMobileVars.STATE_ZONE).rdd
-      res = Spark.getSqlContext().createDataFrame(rdd, Schema.customerOrdersSchema)
+      res = Spark.getSqlContext().createDataFrame(custOrdersFull.rdd, Schema.customerOrdersSchema)
     }
     res
   }
