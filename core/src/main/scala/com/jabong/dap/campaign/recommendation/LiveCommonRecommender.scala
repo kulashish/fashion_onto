@@ -42,7 +42,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkusUpdatedSchema(CampaignMergedFields.REF_SKU1),
       refSkusUpdatedSchema(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       refSkusUpdatedSchema(CampaignMergedFields.LIVE_CART_URL),
-      explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields").repartition(800)
+      explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
 
     CampaignUtils.debug(refSkuExploded, "after refSkuExploded")
 
@@ -84,8 +84,8 @@ class LiveCommonRecommender extends Recommender with Logging {
 
     CampaignUtils.debug(recommendationSelected, "after recommendationSelected")
 
-    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value, numRecSkus)) })
-      .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).repartition(800).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value, numRecSkus)) })
+      .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) }).repartition(800)
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
