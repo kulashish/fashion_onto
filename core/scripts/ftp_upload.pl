@@ -268,11 +268,6 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "paybackData";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    # 20150927_Customer_App_details.csv
-    $filename = "$date_with_zero_today"."_Customer_App_details.csv";
-    $folderName = "customerAppDetails";
-    $status ||= fetchFeedFile($filename, $folderName, $base);
-
     # 20151109_CUST_TOP5.csv
     $filename = "$date_with_zero_today"."_CUST_TOP5.csv";
     $folderName = "custTop5";
@@ -288,10 +283,35 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "cat_count";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20150928_CUST_ORDERS.csv
+    $filename = "$date_with_zero_today"."__CUST_ORDERS.csv";
+    $folderName = "customerOrders";
+    $status ||= fetchFeedFile($fname, $folderName, $base);
+
     # 20150928_CONTACTS_LIST_MOBILE.csv
-    # $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
-    # $folderName = "contactListMobile";
-    # $status ||= fetchFeedFile($fname, $folderName, $base);
+    $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
+    $folderName = "contactListMobile";
+    $status ||= fetchFeedFile($fname, $folderName, $base);
+
+    # 20150928_NL_data_list.csv
+    $filename = "$date_with_zero_today"."_NL_data_list.csv";
+    $folderName = "NL_data_list";
+    $status ||= fetchFeedFile($fname, $folderName, $base);
+
+    # 20150928_app_email_feed.csv
+    $filename = "$date_with_zero_today"."_app_email_feed.csv";
+    $folderName = "app_email_feed";
+    $status ||= fetchFeedFile($fname, $folderName, $base);
+
+    # 20150928_Contact_list_Plus.csv
+    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
+    $folderName = "Contact_list_Plus";
+    $status ||= fetchFeedFile($fname, $folderName, $base);
+
+    # 20150927_Customer_App_details.csv
+    $filename = "$date_with_zero_today"."_Customer_App_details.csv";
+    $folderName = "customerAppDetails";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
