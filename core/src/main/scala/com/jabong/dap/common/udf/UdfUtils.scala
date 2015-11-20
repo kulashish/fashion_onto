@@ -736,7 +736,7 @@ object UdfUtils extends Logging {
     a.size
   }
 
-  def nonBeauty(category: String, created_at: String): String = {
+  def nonBeauty(category: String, created_at: Timestamp): String = {
     if (category == null || created_at == null) {
       return null
     }
@@ -747,7 +747,7 @@ object UdfUtils extends Logging {
       return null
     }
 
-    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
       return null
     }
 
@@ -755,7 +755,7 @@ object UdfUtils extends Logging {
 
   }
 
-  def beauty(category: String, created_at: String): String = {
+  def beauty(category: String, created_at: Timestamp): String = {
     if (category == null || created_at == null) {
       return null
     }
@@ -766,7 +766,7 @@ object UdfUtils extends Logging {
       return null
     }
 
-    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
       return null
     }
 

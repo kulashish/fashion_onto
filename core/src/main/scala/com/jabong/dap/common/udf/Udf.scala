@@ -153,9 +153,9 @@ object Udf {
 
   val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
 
-  val nonBeauty = udf((category: String, created_at: String) => UdfUtils.nonBeauty(category: String, created_at: String))
+  val nonBeauty = udf((category: String, created_at: Timestamp) => UdfUtils.nonBeauty(category: String, created_at: Timestamp))
 
-  val beauty = udf((category: String, created_at: String) => UdfUtils.beauty(category: String, created_at: String))
+  val beauty = udf((category: String, created_at: Timestamp) => UdfUtils.beauty(category: String, created_at: Timestamp))
 
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }
