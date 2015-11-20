@@ -589,6 +589,10 @@ object UdfUtils extends Logging {
     if (i >= strings.size) "" else strings(i)
   }
 
+  def getElementList(strings: mutable.MutableList[String], i: Int): String = {
+    if (i >= strings.size) "" else strings(i)
+  }
+
   def allZero2Null(str: String): String = {
     val nullStr: String = null
     if (null != str) {
@@ -632,6 +636,10 @@ object UdfUtils extends Logging {
   }
 
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
+    if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+  }
+
+  def getElementInTupleList(strings: mutable.MutableList[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
 
@@ -736,18 +744,35 @@ object UdfUtils extends Logging {
     a.size
   }
 
-  def nonBeauty(category: String, created_at: String): String = {
+  def nonBeauty(category: String, created_at: Timestamp): String = {
     if (category == null || created_at == null) {
       return null
     }
 
-    val lastPurchaseDay = RecommendationUtils.NonBeautyCategory.getOrElse(category, null)
+    val NonBeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+    NonBeautyCategory += (
+      "SUNGLASSES" -> 365,
+      "WOMEN FOOTWEAR" -> 180,
+      "KIDS APPAREL" -> 180,
+      "WATCHES" -> 365,
+      "FURNITURE" -> 365,
+      "SPORTS EQUIPMENT" -> 180,
+      "WOMEN APPAREL" -> 90,
+      "HOME" -> 365,
+      "MEN FOOTWEAR" -> 180,
+      "MEN APPAREL" -> 180,
+      "JEWELLERY" -> 180,
+      "KIDS FOOTWEAR" -> 180,
+      "BAGS" -> 90,
+      "TOYS" -> 90
+    )
+    val lastPurchaseDay = NonBeautyCategory.getOrElse(category, null)
 
     if (lastPurchaseDay == null) {
       return null
     }
 
-    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
       return null
     }
 
@@ -755,18 +780,24 @@ object UdfUtils extends Logging {
 
   }
 
-  def beauty(category: String, created_at: String): String = {
+  def beauty(category: String, created_at: Timestamp): String = {
     if (category == null || created_at == null) {
       return null
     }
 
-    val lastPurchaseDay = RecommendationUtils.BeautyCategory.getOrElse(category, null)
+    val BeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+    BeautyCategory += (
+      "BEAUTY" -> 90,
+      "FRAGRANCE" -> 180
+    )
+
+    val lastPurchaseDay = BeautyCategory.getOrElse(category, null)
 
     if (lastPurchaseDay == null) {
       return null
     }
 
-    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
       return null
     }
 
