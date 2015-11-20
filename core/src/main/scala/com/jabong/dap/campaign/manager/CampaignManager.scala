@@ -134,7 +134,9 @@ object CampaignManager extends Serializable with Logging {
         col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
       )
 
-    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate).drop(SalesOrderVariables.CREATED_AT)
+    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate)
+      .drop(SalesOrderVariables.CREATED_AT)
+      .distinct
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
