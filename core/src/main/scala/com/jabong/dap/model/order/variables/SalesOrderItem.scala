@@ -5,13 +5,12 @@ import java.sql.Timestamp
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ Debugging, Spark, Utils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{Spark, Utils}
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by mubarak on 3/7/15.
@@ -150,8 +149,8 @@ object SalesOrderItem {
     var incrData = joinedMap
     if (null != prevFull) {
       incrData = Utils.getOneDayData(joinedMap, SalesOrderVariables.LAST_ORDER_UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      incrData.printSchema()
-      incrData.show(10)
+      // incrData.printSchema()
+      // incrData.show(10)
     }
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
