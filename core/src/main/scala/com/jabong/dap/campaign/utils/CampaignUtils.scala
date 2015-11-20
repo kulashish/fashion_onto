@@ -826,9 +826,9 @@ object CampaignUtils extends Logging {
    */
   def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
     val cmr = CampaignInput.loadCustomerMasterData()
-    val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
-      .drop(CampaignCommon.PRIORITY)
-    val replenishmentOutData = replenishmentData
+   // val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
+     // .drop(CampaignCommon.PRIORITY)
+    val replenishmentOutData = input
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
       .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
@@ -836,7 +836,7 @@ object CampaignUtils extends Logging {
       .withColumn(ProductVariables.BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
       .withColumn(ProductVariables.BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
       .withColumn(CampaignMergedFields.PRODUCT_GENDER, lit(""))
-      .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
+     // .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
       .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(0)))
       .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(1)))
       .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(2)))

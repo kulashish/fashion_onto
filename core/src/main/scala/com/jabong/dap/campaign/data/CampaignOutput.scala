@@ -49,7 +49,7 @@ object CampaignOutput {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.REC_SKUS)
           .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.CUSTOMER_ID)
+          //.drop(CampaignMergedFields.CUSTOMER_ID)
 
         val replenishFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_replenishment"
         DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, TimeUtils.YESTERDAY_FOLDER, replenishFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
