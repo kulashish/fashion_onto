@@ -42,7 +42,7 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkusUpdatedSchema(CampaignMergedFields.REF_SKU1),
       refSkusUpdatedSchema(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       refSkusUpdatedSchema(CampaignMergedFields.LIVE_CART_URL),
-      explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields")
+      explode(refSkus(CampaignMergedFields.REF_SKUS)) as "ref_sku_fields").repartition(800)
 
     CampaignUtils.debug(refSkuExploded, "after refSkuExploded")
 
