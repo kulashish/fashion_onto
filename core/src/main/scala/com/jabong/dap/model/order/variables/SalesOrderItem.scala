@@ -63,7 +63,7 @@ object SalesOrderItem {
       .agg(
         min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
         max(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
-        sum(SalesRuleSetVariables.DISCOUNT_PERCENTAGE).cast(DecimalType.apply(10,2)) as "discount_sum",
+        sum(SalesRuleSetVariables.DISCOUNT_PERCENTAGE).cast(DecimalType.apply(10, 2)) as "discount_sum",
         count(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_count"
       )
 
@@ -72,7 +72,7 @@ object SalesOrderItem {
       .agg(
         min(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
         max(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
-        sum(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT).cast(DecimalType.apply(10,2)) as "coupon_sum",
+        sum(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT).cast(DecimalType.apply(10, 2)) as "coupon_sum",
         count(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_count"
       )
 
@@ -300,14 +300,14 @@ object SalesOrderItem {
         salesOrderJoined(SalesOrderVariables.CREATED_AT))
 
     val orderGrp = salesJoined.groupBy(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.ID_SALES_ORDER)
-      .agg(sum(SalesOrderItemVariables.UNIT_PRICE).cast(DecimalType.apply(10,2)) as "basket_value",
+      .agg(sum(SalesOrderItemVariables.UNIT_PRICE).cast(DecimalType.apply(10, 2)) as "basket_value",
         max(SalesOrderItemVariables.UNIT_PRICE) as "max_item",
         count(SalesOrderItemVariables.UNIT_PRICE) as "item_count",
         max(SalesOrderVariables.CREATED_AT) as SalesOrderVariables.CREATED_AT)
 
     val orderValue = orderGrp.groupBy(SalesOrderVariables.FK_CUSTOMER)
       .agg(max("basket_value") as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
-        sum("basket_value").cast(DecimalType.apply(10,2)) as SalesOrderVariables.SUM_BASKET_VALUE,
+        sum("basket_value").cast(DecimalType.apply(10, 2)) as SalesOrderVariables.SUM_BASKET_VALUE,
         count("basket_value") as SalesOrderVariables.COUNT_BASKET_VALUE,
         max("max_item") as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
         sum("item_count") as SalesOrderVariables.ORDER_ITEM_COUNT,
