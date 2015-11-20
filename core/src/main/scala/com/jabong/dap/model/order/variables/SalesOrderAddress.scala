@@ -129,7 +129,7 @@ object SalesOrderAddress extends DataFeedsModel {
         val (city, (tier, zone)) = e
         cityMap.put(city, Tuple2(tier, zone))
     }
-    println("CityMap:", cityMap.toString())
+    // println("CityMap:", cityMap.toString())
 
     val favMap = favIncr.map(e =>
       (e(0).asInstanceOf[Long] ->

@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.data
 import java.io.File
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -256,7 +257,7 @@ object CampaignInput extends Logging {
    * @return dataframe with call campaigns data
    */
   def loadAllCampaignsData(date: String, campaignType: String): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     logger.info("Reading last day all campaigns data from hdfs : CampaignType" + campaignType)
     //FIXME:use proper data frame
@@ -271,6 +272,8 @@ object CampaignInput extends Logging {
       if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
+    CampaignUtils.debug(allCampaignData, "loading campaign data " + campaignType)
+
     return allCampaignData
   }
 
@@ -282,7 +285,7 @@ object CampaignInput extends Logging {
    * @return
    */
   def getCampaignData(name: String, date: String, campaignType: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + campaignType + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading " + name + " campaign data from path:- " + path + ", Type: " + campaignType)
@@ -680,4 +683,11 @@ object CampaignInput extends Logging {
     val pageViewSurfData = hiveContext.sql(hiveQuery)
     return pageViewSurfData
   }
+
+  def loadSalesAddressData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading order item data from hdfs for " + date)
+    val salesAddrData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
+    salesAddrData
+  }
+
 }

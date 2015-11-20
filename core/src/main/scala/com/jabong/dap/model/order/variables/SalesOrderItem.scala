@@ -137,24 +137,24 @@ object SalesOrderItem {
           coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
           orderIncr("order_status_map"),
           prevFull("order_status_map"),
-          coalesce(orderIncr("last_order_updated_at"), prevFull("last_order_updated_at")) as "last_order_updated_at"
+          coalesce(orderIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), prevFull(SalesOrderVariables.LAST_ORDER_UPDATED_AT)) as SalesOrderVariables.LAST_ORDER_UPDATED_AT
         ).map(e=>
         Row(e(0).asInstanceOf[Long],
           joinMaps(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]],
             e(2).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
           e(3).asInstanceOf[Timestamp]
         )
+
         )
       joinedMap = Spark.getSqlContext().createDataFrame(joined, Schema.salesItemStatus)
     }
 
-
     var incrData = joinedMap
     if (null != prevFull) {
-      incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      incrData = Utils.getOneDayData(joinedMap, SalesOrderVariables.LAST_ORDER_UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+      incrData.printSchema()
+      incrData.show(10)
     }
-
-    println("incrData Count: ", incrData.count())
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
       countOrders(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
@@ -169,26 +169,19 @@ object SalesOrderItem {
   }
 
 
-  def joinMaps(incrMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]],
-               prevFullMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]):
-  scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
-    println("Inside UDF")
+  def joinMaps(incrMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], prevFullMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
     if (null == incrMap && null == prevFullMap) {
       return null
     } else if (null == prevFullMap) {
-      println("Incrmap", incrMap.toString())
       return incrMap
     } else if (null == incrMap) {
-      println("fullmap", prevFullMap.toString())
       return prevFullMap
     }
-    println("Inside JoinMaps")
     val full = scala.collection.mutable.Map[Long, scala.collection.immutable.Map[Long, Int]]()
     prevFullMap.keySet.foreach{
       orderId =>
         full.put(orderId, prevFullMap(orderId))
     }
-    println("AfterFirstMap", full.toString())
     incrMap.keySet.foreach{
       orderId =>
         if (full.contains(orderId)) {
@@ -199,7 +192,6 @@ object SalesOrderItem {
           full.put(orderId, incrMap(orderId))
         }
     }
-    println("FullMap", full.toString())
     full.map(kv => (kv._1, kv._2)).toMap
   }
 

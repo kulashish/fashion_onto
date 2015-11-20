@@ -57,11 +57,8 @@ import scala.collection.mutable.HashMap
 object ContactListMobile extends DataFeedsModel with Logging {
 
   def canProcess(incrDate: String, saveMode: String): Boolean = {
-    val pathSalesOrderFavFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
-    var res = DataWriter.canWrite(saveMode, pathSalesOrderFavFull)
-
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
-    res = res || DataWriter.canWrite(saveMode, pathContactListMobileFull)
+    var res = DataWriter.canWrite(saveMode, pathContactListMobileFull)
 
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     res = res || DataWriter.canWrite(saveMode, pathContactListMobile)
@@ -344,8 +341,8 @@ object ContactListMobile extends DataFeedsModel with Logging {
         coalesce(customerMerged(CustomerVariables.LAST_NAME), customerOrdersIncr(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
         customerMerged(ContactListMobileVars.DOB),
         customerMerged(ContactListMobileVars.MVP_TYPE),
-        customerOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_SUCCESSFUL) as ContactListMobileVars.NET_ORDERS,
-        customerOrdersIncr(ContactListMobileVars.LAST_ORDER_DATE),
+        customerOrdersIncr(SalesOrderItemVariables.SUCCESSFUL_ORDERS) as ContactListMobileVars.NET_ORDERS,
+        customerOrdersIncr(SalesOrderVariables.LAST_ORDER_DATE) as ContactListMobileVars.LAST_ORDER_DATE,
         customerMerged(CustomerVariables.GENDER),
         customerMerged(ContactListMobileVars.REG_DATE),
         customerMerged(CustomerSegmentsVariables.SEGMENT),
@@ -353,7 +350,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         customerMerged(ContactListMobileVars.PLATINUM_STATUS),
         customerMerged(ContactListMobileVars.NL_SUB_DATE),
         customerMerged(ContactListMobileVars.VERIFICATION_STATUS),
-        Udf.maxTimestamp(customerOrdersIncr(SalesOrderVariables.UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
+        Udf.maxTimestamp(customerOrdersIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), customerMerged(CustomerVariables.UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
         customerMerged(ContactListMobileVars.UNSUB_KEY),
         customerMerged(CustomerSegmentsVariables.DISCOUNT_SCORE),
         coalesce(customerMerged(CustomerVariables.ID_CUSTOMER), customerOrdersIncr(SalesOrderVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,

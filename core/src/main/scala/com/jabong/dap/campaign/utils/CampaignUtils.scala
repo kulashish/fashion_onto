@@ -73,7 +73,7 @@ object CampaignUtils extends Logging {
    */
   def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
     val referenceSkus = generateReferenceSkus(refSkuData, 100)
-    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String, String, String, String)]].take(NumberSku),
+    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String, String, String, String, String)]].take(NumberSku),
       (t(2).asInstanceOf[List[Row]]))).map(t => Row(t._1, t._2, t._3, createRefSkuAcartUrl(t._4)))
     val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSkuWithACartUrl)
     return refSkuForAcart
@@ -191,7 +191,8 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.GENDER))),
         checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
         checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))),
-        checkNullString(t(t.fieldIndex(ProductVariables.COLOR))))))
+        checkNullString(t(t.fieldIndex(ProductVariables.COLOR))),
+        checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -206,7 +207,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -1027,6 +1028,21 @@ object CampaignUtils extends Logging {
     import sqlContext.implicits._
 
     topSkusBasedOnField.toDF(field, topField, ProductVariables.SKU_SIMPLE)
+  }
+
+  def getFavouriteAttribute(mapData: DataFrame, groupBy: String, attribute: String, count: Int): DataFrame = {
+    val topBricks = mapData.select(groupBy, attribute + "_list"
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int], r._2(r._2.fieldIndex("sum_price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)))
+
+    val topBrick = topBricks.map{
+      case (key, value) =>
+        ({ val arrayLength = value.length; if (arrayLength >= 1) (key, value(0)) else (key, null) })
+    }
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topBrick.toDF(CustomerVariables.CITY, attribute)
   }
 
   @elidable(FINE) def debug(data: DataFrame, name: String) {

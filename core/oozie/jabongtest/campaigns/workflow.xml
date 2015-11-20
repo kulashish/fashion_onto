@@ -398,8 +398,8 @@
         <path start="customerPreferredTimeslotPart1" />
         <path start="customerPreferredTimeslotPart2" />
         <path start="paybackData" />
-        <path start="customerAppDetails" />
         <path start="custTop5" />
+        <path start="custEmailResponse" />
     </fork>
 
     <action name="custWelcomeVoucher">
@@ -466,13 +466,13 @@
         <error to="fail"/>
     </action>
 
-    <action name="customerAppDetails">
+    <action name="custEmailResponse">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>customerAppDetails</argument>
+            <argument>custEmailResponse</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -510,9 +510,14 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="salesOrderAddrFav"/>
+        <ok to="salesOrderFork"/>
         <error to="fail"/>
     </action>
+
+    <fork name="salesOrderFork">
+        <path start="salesOrderAddrFav" />
+        <path start="salesItemRevenue" />
+    </fork>
 
     <action name="salesOrderAddrFav">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -526,7 +531,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="salesItemRevenue"/>
+        <ok to="joinSalesOrder"/>
         <error to="fail"/>
     </action>
 
@@ -542,9 +547,11 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="customerOrders"/>
+        <ok to="joinSalesOrder"/>
         <error to="fail"/>
     </action>
+
+    <join name="joinSalesOrder" to="customerOrders"/>
 
     <action name="customerOrders">
         <shell xmlns="uri:oozie:shell-action:0.3">
