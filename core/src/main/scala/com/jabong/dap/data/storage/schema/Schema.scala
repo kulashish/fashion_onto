@@ -662,6 +662,7 @@ object Schema {
     StructField(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS, IntegerType, false),
     StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS, IntegerType, false),
     StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS, IntegerType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_UPDATED_AT, TimestampType, false),
     StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED, DecimalType.apply(10, 2), false),
     StructField(SalesRuleSetVariables.COUPON_SUM, DecimalType.apply(10, 2), false),
