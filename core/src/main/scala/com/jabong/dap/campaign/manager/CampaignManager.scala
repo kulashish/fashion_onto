@@ -153,26 +153,26 @@ object CampaignManager extends Serializable with Logging {
 
     val customerOrderFull = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS, incrDate).
       select(col(CustomerVariables.FK_CUSTOMER),
-             col(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
-             col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT)
+        col(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
+        col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT)
 
     val fullSalesOrderData = CampaignInput.loadFullOrderData()
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
 
-    val lastYearCustomerOrderFull = CampaignInput.loadLastNdaysOrderData(370,customerOrderFull,incrDate)
+    val lastYearCustomerOrderFull = CampaignInput.loadLastNdaysOrderData(370, customerOrderFull, incrDate)
 
     val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData).
       select(SalesOrderVariables.FK_CUSTOMER,
-             SalesOrderVariables.CUSTOMER_EMAIL,
-             SalesOrderVariables.ID_SALES_ORDER,
-             SalesOrderVariables.CREATED_AT,
-             SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
+        SalesOrderVariables.CUSTOMER_EMAIL,
+        SalesOrderVariables.ID_SALES_ORDER,
+        SalesOrderVariables.CREATED_AT,
+        SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
 
     val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData).
       select(SalesOrderItemVariables.FK_SALES_ORDER,
-              SalesOrderItemVariables.SKU,
-              SalesOrderItemVariables.CREATED_AT)
+        SalesOrderItemVariables.SKU,
+        SalesOrderItemVariables.CREATED_AT)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 

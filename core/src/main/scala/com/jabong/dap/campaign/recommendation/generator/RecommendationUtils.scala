@@ -65,7 +65,6 @@ object RecommendationUtils extends Serializable {
     "TOYS" -> 2
   )
 
-
   def getPivotArray(pivotKey: String): Array[(Array[String], StructType, String)] = {
     if (pivotKey == null) {
       return null

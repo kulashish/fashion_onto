@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.sql.{ Struct, Timestamp }
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
-import com.jabong.dap.campaign.manager.{CampaignProcessor, CampaignProducer}
+import com.jabong.dap.campaign.manager.{ CampaignProcessor, CampaignProducer }
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.{ GroupedUtils, Spark }
@@ -824,13 +824,13 @@ object CampaignUtils extends Logging {
    * @param input
    * @return
    */
-  def getSelectedReplenishAttributes(input :DataFrame): DataFrame ={
+  def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
     val cmr = CampaignInput.loadCustomerMasterData()
-    val replenishmentData =  CampaignProcessor.mapEmailCampaignWithCMR(cmr,input)
+    val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input)
     val replenishmentOutData = replenishmentData
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
-      .withColumn(CampaignMergedFields.LIVE_REF,Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
+      .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
       .withColumn(ProductVariables.CATEGORY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
       .withColumn(ProductVariables.BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
       .withColumn(ProductVariables.BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))

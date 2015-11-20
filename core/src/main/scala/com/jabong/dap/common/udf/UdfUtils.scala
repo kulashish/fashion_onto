@@ -741,7 +741,6 @@ object UdfUtils extends Logging {
       return null
     }
 
-
     val NonBeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
     NonBeautyCategory += (
       "SUNGLASSES" -> 365,
@@ -758,7 +757,7 @@ object UdfUtils extends Logging {
       "KIDS FOOTWEAR" -> 180,
       "BAGS" -> 90,
       "TOYS" -> 90
-      )
+    )
     val lastPurchaseDay = NonBeautyCategory.getOrElse(category, null)
 
     if (lastPurchaseDay == null) {
@@ -778,12 +777,11 @@ object UdfUtils extends Logging {
       return null
     }
 
-
     val BeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
     BeautyCategory += (
       "BEAUTY" -> 90,
       "FRAGRANCE" -> 180
-      )
+    )
 
     val lastPurchaseDay = BeautyCategory.getOrElse(category, null)
 

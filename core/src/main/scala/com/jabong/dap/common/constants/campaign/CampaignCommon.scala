@@ -117,7 +117,7 @@ object CampaignCommon {
     "acart_hourly" -> 41,
     CampaignCommon.PRICEPOINT_CAMPAIGN -> 24,
     //FIXME: put correct mail type
-   // CampaignCommon.BEAUTY_CAMPAIGN -> 400,
+    // CampaignCommon.BEAUTY_CAMPAIGN -> 400,
     //FIXME: put correct mail type
     CampaignCommon.REPLENISHMENT_CAMPAIGN -> 500,
     //FIXME: put correct mail type

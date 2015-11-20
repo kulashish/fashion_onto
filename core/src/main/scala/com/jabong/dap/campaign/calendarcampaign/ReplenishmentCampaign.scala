@@ -28,7 +28,6 @@ class ReplenishmentCampaign {
     //filter sku based on daily filter
     val (dfNonBeautyFrag, dfBeauty) = CategoryReplenishment.skuFilter(dfCustomerSelection, yesterdayItrData)
 
-
     CampaignUtils.debug(dfNonBeautyFrag, "dfNonBeautyFrag")
     CampaignUtils.debug(dfBeauty, "dfBeauty")
 
@@ -37,7 +36,7 @@ class ReplenishmentCampaign {
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN, dfReplenish, false, brickMvpRecommendations)
 
     // ***** BEAUTY email use case
- //   CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BEAUTY_CAMPAIGN, dfBeauty, false, brickMvpRecommendations)
+    //   CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BEAUTY_CAMPAIGN, dfBeauty, false, brickMvpRecommendations)
 
   }
 

@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.data
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignMergedFields, CampaignCommon}
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CampaignCommon }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -34,8 +34,7 @@ object CampaignOutput {
 
     if (testMode) {
       saveTestData(campaignOutput, campaignName, campaignType)
-    }
-    else {
+    } else {
       if (campaignName.equals(CampaignCommon.ACART_HOURLY_CAMPAIGN)) {
         val dateToday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         val acartPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateToday)
@@ -44,7 +43,7 @@ object CampaignOutput {
         }
         val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
         DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.LAST_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
-      } else if(campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)){
+      } else if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
         DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
         val campaignCsv = campaignOutput
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
