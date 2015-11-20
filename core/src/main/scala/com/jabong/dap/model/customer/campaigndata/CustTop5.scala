@@ -118,8 +118,8 @@ object CustTop5 extends DataFeedsModel {
     val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
     DataWriter.writeParquet(custTop5MapFull, fullMapPath, saveMode)
 
-    custTop5MapFull.show(10)
-    custTop5MapFull.printSchema()
+    // custTop5MapFull.show(10)
+    // custTop5MapFull.printSchema()
 
     var top5MapIncr = custTop5MapFull
     if (null != custTop5MapPrevFull) {
@@ -136,8 +136,8 @@ object CustTop5 extends DataFeedsModel {
       DataWriter.writeParquet(custTop5Incr, fullPath, saveMode)
     }
 
-    custTop5Incr.show(10)
-    custTop5Incr.printSchema()
+    // custTop5Incr.show(10)
+    // custTop5Incr.printSchema()
 
     val custTop5Csv = custTop5Incr.join(cmrFull, custTop5Incr(CustomerVariables.FK_CUSTOMER) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
       .select(
