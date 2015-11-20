@@ -154,9 +154,9 @@ object SalesOrderItem {
     var incrData = joinedMap
     if (null != prevFull) {
       incrData = Utils.getOneDayData(joinedMap, SalesOrderVariables.LAST_ORDER_UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
-      println("incrData: " + incrData.count())
-      incrData.printSchema()
-      incrData.show(10)
+      // println("incrData: " + incrData.count())
+      // incrData.printSchema()
+      // incrData.show(10)
     }
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
@@ -167,7 +167,7 @@ object SalesOrderItem {
     val finalOrdersCount = orderStatusMap.map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._3, e._4))
 
     val res = Spark.getSqlContext().createDataFrame(finalOrdersCount, Schema.ordersCount)
-    println("res Count", res.count())
+    // println("res Count", res.count())
 
     (res, joinedMap)
   }
