@@ -12,35 +12,39 @@ import org.apache.spark.sql.functions._
  */
 class CustomerPreferredData extends CustomerSelector with Logging {
 
-  override def customerSelection(fullCustomerOrders: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
+  override def customerSelection(lastSixDaysCustomerOrders: DataFrame, last6thDaySalesOrderData: DataFrame, last6thDaySalesOrderItemData: DataFrame): DataFrame = {
 
-    if (fullCustomerOrders == null || last6thDaySalesOrderData == null || last6thDaySalesOrderItemData == null) {
+    if (lastSixDaysCustomerOrders == null || last6thDaySalesOrderData == null || last6thDaySalesOrderItemData == null) {
       log("Data frame should not be null")
       return null
     }
 
     val successFulOrderItems = CampaignUtils.getSuccessfulOrders(last6thDaySalesOrderItemData)
+      .select(
+        SalesOrderItemVariables.FK_SALES_ORDER,
+        SalesOrderItemVariables.SKU
+      )
 
-    val customerData = fullCustomerOrders.select(
-      fullCustomerOrders(CustomerVariables.FK_CUSTOMER),
-      fullCustomerOrders(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
-      fullCustomerOrders(ContactListMobileVars.CITY) as CustomerVariables.CITY
+    val dfSalesOrder = last6thDaySalesOrderData.select(
+      SalesOrderVariables.ID_SALES_ORDER,
+      SalesOrderVariables.FK_CUSTOMER,
+      SalesOrderVariables.CUSTOMER_EMAIL
     )
 
     //join SalesOrder and SalesOrderItem Data
-    val dfJoinOrderAndItem = last6thDaySalesOrderData.join(successFulOrderItems, successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) === last6thDaySalesOrderData(SalesOrderVariables.ID_SALES_ORDER), SQL.INNER)
+    val dfJoinOrderAndItem = dfSalesOrder.join(successFulOrderItems, successFulOrderItems(SalesOrderItemVariables.FK_SALES_ORDER) === dfSalesOrder(SalesOrderVariables.ID_SALES_ORDER), SQL.INNER)
       .select(
         SalesOrderVariables.FK_CUSTOMER,
         SalesOrderItemVariables.SKU,
         SalesOrderVariables.CUSTOMER_EMAIL
       )
 
-    val dfResult = customerData.join(dfJoinOrderAndItem, customerData(CustomerVariables.FK_CUSTOMER) === dfJoinOrderAndItem(SalesOrderVariables.FK_CUSTOMER), SQL.INNER)
+    val dfResult = lastSixDaysCustomerOrders.join(dfJoinOrderAndItem, lastSixDaysCustomerOrders(CustomerVariables.FK_CUSTOMER) === dfJoinOrderAndItem(SalesOrderVariables.FK_CUSTOMER), SQL.INNER)
       .select(
-        customerData(CustomerVariables.FK_CUSTOMER),
+        lastSixDaysCustomerOrders(CustomerVariables.FK_CUSTOMER),
         dfJoinOrderAndItem(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
-        customerData(CustomerVariables.CITY),
-        customerData(ProductVariables.BRAND) as CustomerVariables.PREFERRED_BRAND,
+        lastSixDaysCustomerOrders(CustomerVariables.CITY),
+        lastSixDaysCustomerOrders(ProductVariables.BRAND) as CustomerVariables.PREFERRED_BRAND,
         dfJoinOrderAndItem(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE
       )
 
