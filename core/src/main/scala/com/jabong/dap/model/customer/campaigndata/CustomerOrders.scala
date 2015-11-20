@@ -129,20 +129,20 @@ object CustomerOrders extends DataFeedsModel {
     val custOrdersPrevFull = dfMap.getOrElse("custOrdersPrevFull", null)
     val cmrFull = dfMap("cmrFull")
 
-    println("salesOrderIncrFil " + salesOrderIncrFil.count())
-    println("salesRuleFull " + salesRuleFull.count())
-    println("salesRuleSetFull " + salesRuleSetFull.count())
+    // println("salesOrderIncrFil " + salesOrderIncrFil.count())
+    // println("salesRuleFull " + salesRuleFull.count())
+    // println("salesRuleSetFull " + salesRuleSetFull.count())
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncrFil, salesRuleFull, salesRuleSetFull)
-    println("salesDiscountIncr " + salesDiscountIncr.count())
-    salesDiscountIncr.show(10)
+    // println("salesDiscountIncr " + salesDiscountIncr.count())
+    // salesDiscountIncr.show(10)
 
     val dfWrite = new HashMap[String, DataFrame]()
-    println("salesOrderItemIncr " + salesOrderItemIncr.count())
-    println("salesOrderFull " + salesOrderFull.count())
+    // println("salesOrderItemIncr " + salesOrderItemIncr.count())
+    // println("salesOrderFull " + salesOrderFull.count())
     val (salesInvalidIncr, custOrdersStatusMap) = SalesOrderItem.getInvalidCancelOrders(salesOrderItemIncr, salesOrderFull, custOrdersStatusPrevMap, incrDateLocal)
     dfWrite.put("custOrdersStatusMap", custOrdersStatusMap)
-    println("custOrdersStatusMap ", custOrdersStatusMap.count())
-    custOrdersStatusMap.show(10)
+    // println("custOrdersStatusMap ", custOrdersStatusMap.count())
+    // custOrdersStatusMap.show(10)
 
     println("custTop5Incr ", custTop5Incr.count())
     val salesCatBrick = custTop5Incr.select(
@@ -279,46 +279,47 @@ object CustomerOrders extends DataFeedsModel {
 
     var res: DataFrame = custOrdersIncr
     if (null != prevFull) {
-      val custOrdersFull = custOrdersIncr.join(prevFull, custOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === prevFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-        .select(coalesce(custOrdersIncr(SalesOrderVariables.FK_CUSTOMER), prevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-          when(custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE) > prevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE), custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(prevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)) as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
-          when(custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE) > prevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE), custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(prevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)) as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
-          custOrdersIncr(SalesOrderVariables.SUM_BASKET_VALUE) + prevFull(SalesOrderVariables.SUM_BASKET_VALUE) as SalesOrderVariables.SUM_BASKET_VALUE,
-          custOrdersIncr(SalesOrderVariables.COUNT_BASKET_VALUE) + prevFull(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.COUNT_BASKET_VALUE,
-          custOrdersIncr(SalesOrderVariables.ORDER_ITEM_COUNT) + prevFull(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.ORDER_ITEM_COUNT,
-          coalesce(custOrdersIncr(SalesOrderVariables.LAST_ORDER_DATE), prevFull(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE,
-          coalesce(prevFull(SalesOrderVariables.FIRST_ORDER_DATE), custOrdersIncr(SalesOrderVariables.FIRST_ORDER_DATE)) as SalesOrderVariables.FIRST_ORDER_DATE,
-          coalesce(custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY), prevFull(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
-          coalesce(custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), prevFull(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
-          coalesce(prevFull(SalesAddressVariables.FIRST_SHIPPING_CITY), custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
-          coalesce(prevFull(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
-          prevFull(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + custOrdersIncr(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
-          prevFull(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + custOrdersIncr(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-          prevFull(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + custOrdersIncr(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) as SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
-          prevFull(SalesOrderItemVariables.SUCCESSFUL_ORDERS) + custOrdersIncr(SalesOrderItemVariables.SUCCESSFUL_ORDERS) as SalesOrderItemVariables.SUCCESSFUL_ORDERS,
-          prevFull(SalesOrderItemVariables.GROSS_ORDERS) + custOrdersIncr(SalesOrderItemVariables.GROSS_ORDERS) as SalesOrderItemVariables.GROSS_ORDERS,
-          coalesce(custOrdersIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), prevFull(SalesOrderVariables.LAST_ORDER_UPDATED_AT)) as SalesOrderVariables.LAST_ORDER_UPDATED_AT,
-          when(custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < prevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(prevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
-          when(custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > prevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(prevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
-          custOrdersIncr(SalesRuleSetVariables.COUPON_SUM) + prevFull(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
-          custOrdersIncr(SalesRuleSetVariables.COUPON_COUNT) + prevFull(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.COUPON_COUNT,
-          when(custOrdersIncr(SalesRuleSetVariables.MIN_DISCOUNT_USED) < prevFull(SalesRuleSetVariables.MIN_DISCOUNT_USED), custOrdersIncr(SalesRuleSetVariables.MIN_DISCOUNT_USED)).otherwise(prevFull(SalesRuleSetVariables.MIN_DISCOUNT_USED)) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
-          when(custOrdersIncr(SalesRuleSetVariables.MAX_DISCOUNT_USED) < prevFull(SalesRuleSetVariables.MAX_DISCOUNT_USED), custOrdersIncr(SalesRuleSetVariables.MAX_DISCOUNT_USED)).otherwise(prevFull(SalesRuleSetVariables.MAX_DISCOUNT_USED)) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
-          custOrdersIncr(SalesRuleSetVariables.DISCOUNT_SUM) + prevFull(SalesRuleSetVariables.DISCOUNT_SUM) as SalesRuleSetVariables.DISCOUNT_SUM,
-          custOrdersIncr(SalesRuleSetVariables.DISCOUNT_COUNT) + prevFull(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.DISCOUNT_COUNT,
-          coalesce(custOrdersIncr(SalesOrderItemVariables.REVENUE_7), prevFull(SalesOrderItemVariables.REVENUE_7)) as SalesOrderItemVariables.REVENUE_7,
-          coalesce(custOrdersIncr(SalesOrderItemVariables.REVENUE_30), prevFull(SalesOrderItemVariables.REVENUE_30)) as SalesOrderItemVariables.REVENUE_30,
-          coalesce(custOrdersIncr(SalesOrderItemVariables.REVENUE_LIFE), prevFull(SalesOrderItemVariables.REVENUE_LIFE)) as SalesOrderItemVariables.REVENUE_LIFE,
-          coalesce(custOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_LIFE), prevFull(SalesOrderItemVariables.ORDERS_COUNT_LIFE)) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
-          coalesce(custOrdersIncr(SalesOrderVariables.CATEGORY_PENETRATION), prevFull(SalesOrderVariables.CATEGORY_PENETRATION)) as SalesOrderVariables.CATEGORY_PENETRATION,
-          coalesce(custOrdersIncr(SalesOrderVariables.BRICK_PENETRATION), prevFull(SalesOrderVariables.BRICK_PENETRATION)) as SalesOrderVariables.BRICK_PENETRATION,
-          coalesce(custOrdersIncr(SalesOrderItemVariables.FAV_BRAND), prevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
-          coalesce(custOrdersIncr(ContactListMobileVars.CITY), prevFull(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
-          coalesce(custOrdersIncr(CustomerVariables.PHONE), prevFull(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
-          coalesce(custOrdersIncr(CustomerVariables.FIRST_NAME), prevFull(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
-          coalesce(custOrdersIncr(CustomerVariables.LAST_NAME), prevFull(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
-          coalesce(custOrdersIncr(ContactListMobileVars.CITY_TIER), prevFull(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
-          coalesce(custOrdersIncr(ContactListMobileVars.STATE_ZONE), prevFull(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE
+      val custOrdersPrevFull = Spark.getSqlContext().createDataFrame(prevFull.rdd, Schema.customerOrdersSchema)
+      val custOrdersFull = custOrdersIncr.join(custOrdersPrevFull, custOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === custOrdersPrevFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+        .select(coalesce(custOrdersIncr(SalesOrderVariables.FK_CUSTOMER), custOrdersPrevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          when(custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE) > custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE), custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)) as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
+          when(custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE) > custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE), custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)) as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
+          custOrdersIncr(SalesOrderVariables.SUM_BASKET_VALUE) + custOrdersPrevFull(SalesOrderVariables.SUM_BASKET_VALUE) as SalesOrderVariables.SUM_BASKET_VALUE,
+          custOrdersIncr(SalesOrderVariables.COUNT_BASKET_VALUE) + custOrdersPrevFull(SalesOrderVariables.COUNT_BASKET_VALUE) as SalesOrderVariables.COUNT_BASKET_VALUE,
+          custOrdersIncr(SalesOrderVariables.ORDER_ITEM_COUNT) + custOrdersPrevFull(SalesOrderVariables.ORDER_ITEM_COUNT) as SalesOrderVariables.ORDER_ITEM_COUNT,
+          coalesce(custOrdersIncr(SalesOrderVariables.LAST_ORDER_DATE), custOrdersPrevFull(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE,
+          coalesce(custOrdersPrevFull(SalesOrderVariables.FIRST_ORDER_DATE), custOrdersIncr(SalesOrderVariables.FIRST_ORDER_DATE)) as SalesOrderVariables.FIRST_ORDER_DATE,
+          coalesce(custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY), custOrdersPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY)) as SalesAddressVariables.LAST_SHIPPING_CITY,
+          coalesce(custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER), custOrdersPrevFull(SalesAddressVariables.LAST_SHIPPING_CITY_TIER)) as SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
+          coalesce(custOrdersPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY), custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY)) as SalesAddressVariables.FIRST_SHIPPING_CITY,
+          coalesce(custOrdersPrevFull(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER), custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER)) as SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
+          custOrdersPrevFull(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) + custOrdersIncr(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
+          custOrdersPrevFull(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) + custOrdersIncr(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS) as SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
+          custOrdersPrevFull(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) + custOrdersIncr(SalesOrderItemVariables.COUNT_OF_RET_ORDERS) as SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
+          custOrdersPrevFull(SalesOrderItemVariables.SUCCESSFUL_ORDERS) + custOrdersIncr(SalesOrderItemVariables.SUCCESSFUL_ORDERS) as SalesOrderItemVariables.SUCCESSFUL_ORDERS,
+          custOrdersPrevFull(SalesOrderItemVariables.GROSS_ORDERS) + custOrdersIncr(SalesOrderItemVariables.GROSS_ORDERS) as SalesOrderItemVariables.GROSS_ORDERS,
+          coalesce(custOrdersIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), custOrdersPrevFull(SalesOrderVariables.LAST_ORDER_UPDATED_AT)) as SalesOrderVariables.LAST_ORDER_UPDATED_AT,
+          when(custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED) < custOrdersPrevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED), custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)).otherwise(custOrdersPrevFull(SalesRuleSetVariables.MIN_COUPON_VALUE_USED)) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
+          when(custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED) > custOrdersPrevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED), custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)).otherwise(custOrdersPrevFull(SalesRuleSetVariables.MAX_COUPON_VALUE_USED)) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
+          custOrdersIncr(SalesRuleSetVariables.COUPON_SUM) + custOrdersPrevFull(SalesRuleSetVariables.COUPON_SUM) as SalesRuleSetVariables.COUPON_SUM,
+          custOrdersIncr(SalesRuleSetVariables.COUPON_COUNT) + custOrdersPrevFull(SalesRuleSetVariables.COUPON_COUNT) as SalesRuleSetVariables.COUPON_COUNT,
+          when(custOrdersIncr(SalesRuleSetVariables.MIN_DISCOUNT_USED) < custOrdersPrevFull(SalesRuleSetVariables.MIN_DISCOUNT_USED), custOrdersIncr(SalesRuleSetVariables.MIN_DISCOUNT_USED)).otherwise(custOrdersPrevFull(SalesRuleSetVariables.MIN_DISCOUNT_USED)) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
+          when(custOrdersIncr(SalesRuleSetVariables.MAX_DISCOUNT_USED) < custOrdersPrevFull(SalesRuleSetVariables.MAX_DISCOUNT_USED), custOrdersIncr(SalesRuleSetVariables.MAX_DISCOUNT_USED)).otherwise(custOrdersPrevFull(SalesRuleSetVariables.MAX_DISCOUNT_USED)) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
+          custOrdersIncr(SalesRuleSetVariables.DISCOUNT_SUM) + custOrdersPrevFull(SalesRuleSetVariables.DISCOUNT_SUM) as SalesRuleSetVariables.DISCOUNT_SUM,
+          custOrdersIncr(SalesRuleSetVariables.DISCOUNT_COUNT) + custOrdersPrevFull(SalesRuleSetVariables.DISCOUNT_COUNT) as SalesRuleSetVariables.DISCOUNT_COUNT,
+          coalesce(custOrdersIncr(SalesOrderItemVariables.REVENUE_7), custOrdersPrevFull(SalesOrderItemVariables.REVENUE_7)) as SalesOrderItemVariables.REVENUE_7,
+          coalesce(custOrdersIncr(SalesOrderItemVariables.REVENUE_30), custOrdersPrevFull(SalesOrderItemVariables.REVENUE_30)) as SalesOrderItemVariables.REVENUE_30,
+          coalesce(custOrdersIncr(SalesOrderItemVariables.REVENUE_LIFE), custOrdersPrevFull(SalesOrderItemVariables.REVENUE_LIFE)) as SalesOrderItemVariables.REVENUE_LIFE,
+          coalesce(custOrdersIncr(SalesOrderItemVariables.ORDERS_COUNT_LIFE), custOrdersPrevFull(SalesOrderItemVariables.ORDERS_COUNT_LIFE)) as SalesOrderItemVariables.ORDERS_COUNT_LIFE,
+          coalesce(custOrdersIncr(SalesOrderVariables.CATEGORY_PENETRATION), custOrdersPrevFull(SalesOrderVariables.CATEGORY_PENETRATION)) as SalesOrderVariables.CATEGORY_PENETRATION,
+          coalesce(custOrdersIncr(SalesOrderVariables.BRICK_PENETRATION), custOrdersPrevFull(SalesOrderVariables.BRICK_PENETRATION)) as SalesOrderVariables.BRICK_PENETRATION,
+          coalesce(custOrdersIncr(SalesOrderItemVariables.FAV_BRAND), custOrdersPrevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
+          coalesce(custOrdersIncr(ContactListMobileVars.CITY), custOrdersPrevFull(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
+          coalesce(custOrdersIncr(CustomerVariables.PHONE), custOrdersPrevFull(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+          coalesce(custOrdersIncr(CustomerVariables.FIRST_NAME), custOrdersPrevFull(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+          coalesce(custOrdersIncr(CustomerVariables.LAST_NAME), custOrdersPrevFull(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+          coalesce(custOrdersIncr(ContactListMobileVars.CITY_TIER), custOrdersPrevFull(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
+          coalesce(custOrdersIncr(ContactListMobileVars.STATE_ZONE), custOrdersPrevFull(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE
         )
       // This is being done as for decimal type columns the precision is becoming 20 and
       // while writing to parquet it is giving error
