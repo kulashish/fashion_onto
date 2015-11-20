@@ -1,12 +1,9 @@
 package com.jabong.dap.model.customer.variables
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerSegmentsVariables }
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ IntegerType, StringType, StructField, StructType }
-import org.apache.spark.sql.{ DataFrame, Row }
+import com.jabong.dap.common.constants.variables.CustomerSegmentsVariables
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
  * Created by raghu on 25/6/15.
@@ -16,46 +13,6 @@ object CustomerSegments {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // DataFrame CustomerSegments operations
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //Name of variable: fk_customer, MVP, Segment0, Segment1,Segment2, Segment3, Segment4, Segment5, Segment6
-  //calculate mvp_score and  latest updated value of mvp_score from customer_segments
-  def getCustomerSegments(dfCustomerSegments: DataFrame): DataFrame = {
-
-    if (dfCustomerSegments == null) {
-
-      log("Data frame should not be null")
-
-      return null
-
-    }
-
-    if (!SchemaUtils.isSchemaEqual(dfCustomerSegments.schema, Schema.customerSegments)) {
-
-      log("schema attributes or data type mismatch")
-
-      return null
-
-    }
-
-    val dfInc = dfCustomerSegments.select(
-      CustomerSegmentsVariables.FK_CUSTOMER,
-      CustomerSegmentsVariables.UPDATED_AT,
-      CustomerSegmentsVariables.MVP_SCORE,
-      CustomerSegmentsVariables.SEGMENT,
-      CustomerSegmentsVariables.DISCOUNT_SCORE
-    )
-      .sort(desc(CustomerSegmentsVariables.UPDATED_AT))
-      .groupBy(CustomerSegmentsVariables.FK_CUSTOMER)
-      .agg(
-        first(CustomerSegmentsVariables.MVP_SCORE) as ContactListMobileVars.MVP_TYPE,
-        first(CustomerSegmentsVariables.SEGMENT) as CustomerSegmentsVariables.SEGMENT,
-        first(CustomerSegmentsVariables.DISCOUNT_SCORE) as CustomerSegmentsVariables.DISCOUNT_SCORE
-      )
-
-    //    val segments = getSeg(dfCustSegVars)
-
-    dfInc
-  }
 
   def getSeg(dfCustSegVars: DataFrame): DataFrame = {
 
