@@ -774,11 +774,11 @@ object UdfUtils extends Logging {
     }
 
     println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
-    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
-      return null
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
+      return category
     }
 
-    return category
+    return null
 
   }
 
@@ -801,11 +801,11 @@ object UdfUtils extends Logging {
     }
     println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
 
-    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
-      return null
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
+      return category
     }
 
-    return category
+    return null
 
   }
 
