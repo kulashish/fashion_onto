@@ -129,22 +129,30 @@ object CustomerOrders extends DataFeedsModel {
     val custOrdersPrevFull = dfMap.getOrElse("custOrdersPrevFull", null)
     val cmrFull = dfMap("cmrFull")
 
+    println("salesOrderIncrFil " + salesOrderIncrFil.count())
+    println("salesRuleFull " + salesRuleFull.count())
+    println("salesRuleSetFull " + salesRuleSetFull.count())
     val salesDiscountIncr = SalesOrderItem.getCouponDisc(salesOrderIncrFil, salesRuleFull, salesRuleSetFull)
+    println("salesDiscountIncr " + salesDiscountIncr.count())
+    salesDiscountIncr.show(10)
 
     val dfWrite = new HashMap[String, DataFrame]()
+    println("salesOrderItemIncr " + salesOrderItemIncr.count())
+    println("salesOrderFull " + salesOrderFull.count())
     val (salesInvalidIncr, custOrdersStatusMap) = SalesOrderItem.getInvalidCancelOrders(salesOrderItemIncr, salesOrderFull, custOrdersStatusPrevMap, incrDateLocal)
     dfWrite.put("custOrdersStatusMap", custOrdersStatusMap)
-    // println("custOrdersStatusMap Count", custOrdersStatusMap.count())
-    // custOrdersStatusMap.show(5)
+    println("custOrdersStatusMap ", custOrdersStatusMap.count())
+    custOrdersStatusMap.show(10)
 
+    println("custTop5Incr ", custTop5Incr.count())
     val salesCatBrick = custTop5Incr.select(
       custTop5Incr(SalesOrderVariables.FK_CUSTOMER),
       custTop5Incr("CAT_1") as SalesOrderVariables.CATEGORY_PENETRATION,
       custTop5Incr("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION,
       custTop5Incr("BRAND_1") as SalesOrderItemVariables.FAV_BRAND
     )
-    salesCatBrick.printSchema()
-    salesCatBrick.show(5)
+    println("salesCatBrick ", salesCatBrick.count())
+    salesCatBrick.show(10)
 
     val salesOrderNew = salesOrderIncrFil.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
