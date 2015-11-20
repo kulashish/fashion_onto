@@ -27,6 +27,8 @@ object CampaignMergedFields {
   val LIVE_PROD_NAME = "LIVE_PROD_NAME"
   val LIVE_CART_URL = "LIVE_CART_URL"
 
+
+
   val RECOMMENDATIONS = "recommendations"
 
   //Expected names
@@ -48,5 +50,15 @@ object CampaignMergedFields {
   val CALENDAR_CITY = "CLDR_CITY"
   val CALENDAR_COLOR = "CLDR_COLOR"
   val CALENDAR_PRICE_POINT = "CLDR_PRICE_POINT"
+
+  // replenish campaign
+  val PURCHASED_DATE = "PURCHASED_DATE"
+  val REC_SKU = "REC_SKU"
+  val LIVE_REF = "LIVE_REF_1"
+  val PRODUCT_GENDER = "PRODUCT_GENDER"
+
+
+
+
 
 }
