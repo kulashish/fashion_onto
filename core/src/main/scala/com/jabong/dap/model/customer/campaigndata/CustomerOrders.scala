@@ -189,48 +189,31 @@ object CustomerOrders extends DataFeedsModel {
       DataWriter.writeParquet(custOrdersIncr, savePath, saveMode)
     }
 
-    val custOrdersCsv = custOrdersIncr
-      .withColumn(SalesOrderVariables.AVG_ORDER_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.COUNT_BASKET_VALUE))
-      .withColumn(SalesOrderVariables.AVG_ORDER_ITEM_VALUE, col(SalesOrderVariables.SUM_BASKET_VALUE) / col(SalesOrderVariables.ORDER_ITEM_COUNT))
-      .withColumn(SalesRuleSetVariables.AVG_COUPON_VALUE_USED, col(SalesRuleSetVariables.COUPON_SUM) / col(SalesRuleSetVariables.COUPON_COUNT))
-      .withColumn(SalesRuleSetVariables.AVERAGE_DISCOUNT_USED, col(SalesRuleSetVariables.DISCOUNT_SUM) / col(SalesRuleSetVariables.DISCOUNT_COUNT))
-      .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
-      .drop(SalesOrderVariables.COUNT_BASKET_VALUE)
-      .drop(SalesOrderVariables.SUM_BASKET_VALUE)
-      .drop(SalesOrderVariables.ORDER_ITEM_COUNT)
-      .drop(SalesRuleSetVariables.COUPON_SUM)
-      .drop(SalesRuleSetVariables.COUPON_COUNT)
-      .drop(SalesRuleSetVariables.DISCOUNT_SUM)
-      .drop(SalesRuleSetVariables.DISCOUNT_COUNT)
-      .drop(SalesOrderItemVariables.SUCCESSFUL_ORDERS)
-      .drop(SalesOrderItemVariables.FAV_BRAND)
-      .drop(SalesOrderVariables.LAST_ORDER_DATE)
-
-    val finalCustOrder = custOrdersCsv.join(cmrFull, cmrFull(CustomerVariables.ID_CUSTOMER) === custOrdersCsv(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
-      .select(ContactListMobileVars.UID,
-        SalesOrderItemVariables.REVENUE_7,
-        SalesOrderItemVariables.REVENUE_30,
-        SalesOrderItemVariables.REVENUE_LIFE,
-        SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
-        SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
-        SalesOrderVariables.AVG_ORDER_VALUE,
-        SalesOrderVariables.AVG_ORDER_ITEM_VALUE,
-        SalesOrderVariables.LAST_ORDER_DATE,
-        SalesOrderItemVariables.COUNT_OF_RET_ORDERS,
-        SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS,
-        SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS,
-        SalesAddressVariables.FIRST_SHIPPING_CITY,
-        SalesAddressVariables.FIRST_SHIPPING_CITY_TIER,
-        SalesAddressVariables.LAST_SHIPPING_CITY,
-        SalesAddressVariables.LAST_SHIPPING_CITY_TIER,
-        SalesOrderVariables.CATEGORY_PENETRATION,
-        SalesOrderVariables.BRICK_PENETRATION,
-        SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
-        SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
-        SalesRuleSetVariables.AVG_COUPON_VALUE_USED,
-        SalesRuleSetVariables.MIN_DISCOUNT_USED,
-        SalesRuleSetVariables.MAX_DISCOUNT_USED,
-        SalesRuleSetVariables.AVERAGE_DISCOUNT_USED
+    val finalCustOrder = custOrdersIncr.join(cmrFull, cmrFull(CustomerVariables.ID_CUSTOMER) === custOrdersIncr(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
+      .select(
+        cmrFull(ContactListMobileVars.UID),
+        custOrdersIncr(SalesOrderItemVariables.REVENUE_7),
+        custOrdersIncr(SalesOrderItemVariables.REVENUE_30),
+        custOrdersIncr(SalesOrderItemVariables.REVENUE_LIFE),
+        custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE),
+        custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE),
+        (custOrdersIncr(SalesOrderVariables.SUM_BASKET_VALUE) / custOrdersIncr(SalesOrderVariables.COUNT_BASKET_VALUE)) as SalesOrderVariables.AVG_ORDER_VALUE,
+        (custOrdersIncr(SalesOrderVariables.SUM_BASKET_VALUE) / custOrdersIncr(SalesOrderVariables.ORDER_ITEM_COUNT)) as SalesOrderVariables.AVG_ORDER_ITEM_VALUE,
+        custOrdersIncr(SalesOrderItemVariables.COUNT_OF_RET_ORDERS),
+        custOrdersIncr(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS),
+        custOrdersIncr(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS),
+        custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY),
+        custOrdersIncr(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER),
+        custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY),
+        custOrdersIncr(SalesAddressVariables.LAST_SHIPPING_CITY_TIER),
+        custOrdersIncr(SalesOrderVariables.CATEGORY_PENETRATION),
+        custOrdersIncr(SalesOrderVariables.BRICK_PENETRATION),
+        custOrdersIncr(SalesRuleSetVariables.MIN_COUPON_VALUE_USED),
+        custOrdersIncr(SalesRuleSetVariables.MAX_COUPON_VALUE_USED),
+        (custOrdersIncr(SalesRuleSetVariables.COUPON_SUM) / custOrdersIncr(SalesRuleSetVariables.COUPON_COUNT)) as SalesRuleSetVariables.AVG_COUPON_VALUE_USED,
+        custOrdersIncr(SalesRuleSetVariables.MIN_DISCOUNT_USED),
+        custOrdersIncr(SalesRuleSetVariables.MAX_DISCOUNT_USED),
+        (custOrdersIncr(SalesRuleSetVariables.DISCOUNT_SUM) / custOrdersIncr(SalesRuleSetVariables.DISCOUNT_COUNT)) as SalesRuleSetVariables.AVERAGE_DISCOUNT_USED
       )
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(finalCustOrder, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_ORDERS", DataSets.IGNORE_SAVEMODE, "true", ";")
