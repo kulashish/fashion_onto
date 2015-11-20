@@ -741,7 +741,25 @@ object UdfUtils extends Logging {
       return null
     }
 
-    val lastPurchaseDay = RecommendationUtils.NonBeautyCategory.getOrElse(category, null)
+
+    val NonBeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+    NonBeautyCategory += (
+      "SUNGLASSES" -> 365,
+      "WOMEN FOOTWEAR" -> 180,
+      "KIDS APPAREL" -> 180,
+      "WATCHES" -> 365,
+      "FURNITURE" -> 365,
+      "SPORTS EQUIPMENT" -> 180,
+      "WOMEN APPAREL" -> 90,
+      "HOME" -> 365,
+      "MEN FOOTWEAR" -> 180,
+      "MEN APPAREL" -> 180,
+      "JEWELLERY" -> 180,
+      "KIDS FOOTWEAR" -> 180,
+      "BAGS" -> 90,
+      "TOYS" -> 90
+      )
+    val lastPurchaseDay = NonBeautyCategory.getOrElse(category, null)
 
     if (lastPurchaseDay == null) {
       return null
@@ -760,7 +778,14 @@ object UdfUtils extends Logging {
       return null
     }
 
-    val lastPurchaseDay = RecommendationUtils.BeautyCategory.getOrElse(category, null)
+
+    val BeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+    BeautyCategory += (
+      "BEAUTY" -> 90,
+      "FRAGRANCE" -> 180
+      )
+
+    val lastPurchaseDay = BeautyCategory.getOrElse(category, null)
 
     if (lastPurchaseDay == null) {
       return null
