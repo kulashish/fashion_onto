@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
  */
 class ReplenishmentCampaign {
 
-  def runCampaign(contactListMobileFull: DataFrame, fullSalesOrderData: DataFrame, fullSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
+  def runCampaign(lastYearCustomerOrderFull: DataFrame, lastYearSalesOrderData: DataFrame, lastYearSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST5_SUCCESSFUL_ORDER)
@@ -23,7 +23,7 @@ class ReplenishmentCampaign {
     //    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
     //    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
 
-    val dfCustomerSelection = customerSelector.customerSelection(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData)
+    val dfCustomerSelection = customerSelector.customerSelection(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData)
 
     //filter sku based on daily filter
     val (dfNonBeautyFrag, dfBeauty) = CategoryReplenishment.skuFilter(dfCustomerSelection, yesterdayItrData)
@@ -31,11 +31,12 @@ class ReplenishmentCampaign {
     CampaignUtils.debug(dfNonBeautyFrag, "dfNonBeautyFrag")
     CampaignUtils.debug(dfBeauty, "dfBeauty")
 
+    val dfReplenish = dfBeauty.unionAll(dfNonBeautyFrag)
     // ***** NON_BEAUTY_FRAG_CAMPAIGN email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN, dfNonBeautyFrag, false, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN, dfReplenish, false, brickMvpRecommendations)
 
     // ***** BEAUTY email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BEAUTY_CAMPAIGN, dfBeauty, false, brickMvpRecommendations)
+    //   CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BEAUTY_CAMPAIGN, dfBeauty, false, brickMvpRecommendations)
 
   }
 

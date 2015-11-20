@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.sql.{ Struct, Timestamp }
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
-import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.manager.{ CampaignProcessor, CampaignProducer }
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.{ GroupedUtils, Spark }
@@ -23,6 +23,7 @@ import org.apache.spark.sql.{ Row, DataFrame }
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
+import scala.collection.immutable.HashMap
 
 /**
  * Utility Class
@@ -313,6 +314,8 @@ object CampaignUtils extends Logging {
         && (inputData(ProductVariables.SKU_SIMPLE) === successfulSalesData(SUCCESS_ + ProductVariables.SKU)), SQL.LEFT_OUTER)
       .filter(SUCCESS_ + SalesOrderItemVariables.FK_SALES_ORDER + " is null or " + SalesOrderItemVariables.UPDATED_AT + " > " + SUCCESS_ + SalesOrderItemVariables.CREATED_AT)
       .select(inputData(CustomerVariables.FK_CUSTOMER), inputData(CustomerVariables.EMAIL), inputData(ProductVariables.SKU_SIMPLE), inputData(ItrVariables.CREATED_AT)).dropDuplicates()
+
+    CampaignUtils.debug(skuSimpleNotBoughtTillNow, " Acart skuNot Bought Till Now")
 
     logger.info("Filtered all the sku simple which has been bought")
 
@@ -766,10 +769,10 @@ object CampaignUtils extends Logging {
         CampaignUtils.debug(dfBrick1, "dfBrick1")
         CampaignUtils.debug(dfBrick2, "dfBrick2")
 
-        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, 8)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, 8)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
         val dfJoined = dfBrick1RecommendationData.join(
@@ -802,8 +805,12 @@ object CampaignUtils extends Logging {
         dfJoined
       }
       case CampaignCommon.HOTTEST_X_CAMPAIGN =>
-        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+      case CampaignCommon.REPLENISHMENT_CAMPAIGN =>
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, 8)
+        val replenishData = getSelectedReplenishAttributes(dfRecommendationData)
+        replenishData
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         dfRecommendationData
@@ -814,36 +821,85 @@ object CampaignUtils extends Logging {
   }
 
   /**
+   *
+   * @param input
+   * @return
+   */
+  def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
+    //    val cmr = CampaignInput.loadCustomerMasterData()
+    // val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
+    // .drop(CampaignCommon.PRIORITY)
+    val replenishmentOutData = input
+      .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
+      .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
+      .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
+      .withColumn(CampaignMergedFields.CATEGORY, lit(""))
+      .withColumn(CampaignMergedFields.BRICK, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+      .withColumn(CampaignMergedFields.BRAND, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+      .withColumn(CampaignMergedFields.PRODUCT_GENDER, lit(""))
+      .withColumn(ContactListMobileVars.UID, lit("NA"))
+      .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(0)))
+      .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(1)))
+      .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(2)))
+      .withColumn(CampaignMergedFields.REC_SKU + "4", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(3)))
+      .withColumn(CampaignMergedFields.REC_SKU + "5", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(4)))
+      .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
+      .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
+      .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
+
+    debug(replenishmentOutData, "replenishmentOutData")
+    return replenishmentOutData
+  }
+
+  /**
    * This method for BrickAffinityCampaign
    * @param filteredSku
    * @return
    */
   def getBrick1Brick2(filteredSku: DataFrame): (DataFrame, DataFrame) = {
-    val dfBrick1 = filteredSku.select(
-      filteredSku(CustomerVariables.EMAIL),
-      filteredSku(CustomerVariables.FK_CUSTOMER),
-      filteredSku(ProductVariables.SKU_SIMPLE),
-      filteredSku(ProductVariables.SPECIAL_PRICE),
-      filteredSku("BRICK1") as ProductVariables.BRICK,
-      filteredSku(ProductVariables.BRAND),
-      filteredSku(ProductVariables.MVP),
-      filteredSku(ProductVariables.GENDER),
-      filteredSku(ProductVariables.PRODUCT_NAME),
-      filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    val dfBrick2 = filteredSku.select(
-      filteredSku(CustomerVariables.EMAIL),
-      filteredSku(CustomerVariables.FK_CUSTOMER),
-      filteredSku(ProductVariables.SKU_SIMPLE),
-      filteredSku(ProductVariables.SPECIAL_PRICE),
-      filteredSku("BRICK2") as ProductVariables.BRICK,
-      filteredSku(ProductVariables.BRAND),
-      filteredSku(ProductVariables.MVP),
-      filteredSku(ProductVariables.GENDER),
-      filteredSku(ProductVariables.PRODUCT_NAME),
-      filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+    CampaignUtils.debug(filteredSku, "filteredSku")
+
+    val dfCustItr = filteredSku.na.fill(
+      Map(
+        CustomerVariables.EMAIL -> "",
+        CustomerVariables.FK_CUSTOMER -> 0,
+        ProductVariables.SKU_SIMPLE -> "",
+        ProductVariables.SPECIAL_PRICE -> 0.0,
+        ProductVariables.BRAND -> "",
+        ProductVariables.MVP -> 0,
+        ProductVariables.GENDER -> "",
+        ProductVariables.PRODUCT_NAME -> "",
+        ProductVariables.STOCK -> 0,
+        ProductVariables.PRICE_BAND -> ""
+      )
+    )
+
+    val dfBrick1 = dfCustItr.select(
+      dfCustItr(CustomerVariables.EMAIL),
+      dfCustItr(CustomerVariables.FK_CUSTOMER),
+      dfCustItr(ProductVariables.SKU_SIMPLE),
+      dfCustItr(ProductVariables.SPECIAL_PRICE),
+      dfCustItr("BRICK1") as ProductVariables.BRICK,
+      dfCustItr(ProductVariables.BRAND),
+      dfCustItr(ProductVariables.MVP),
+      dfCustItr(ProductVariables.GENDER),
+      dfCustItr(ProductVariables.PRODUCT_NAME),
+      dfCustItr(ProductVariables.STOCK),
+      dfCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+
+    val dfBrick2 = dfCustItr.select(
+      dfCustItr(CustomerVariables.EMAIL),
+      dfCustItr(CustomerVariables.FK_CUSTOMER),
+      dfCustItr(ProductVariables.SKU_SIMPLE),
+      dfCustItr(ProductVariables.SPECIAL_PRICE),
+      dfCustItr("BRICK2") as ProductVariables.BRICK,
+      dfCustItr(ProductVariables.BRAND),
+      dfCustItr(ProductVariables.MVP),
+      dfCustItr(ProductVariables.GENDER),
+      dfCustItr(ProductVariables.PRODUCT_NAME),
+      dfCustItr(ProductVariables.STOCK),
+      dfCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
     (dfBrick1, dfBrick2)
   }
@@ -856,13 +912,15 @@ object CampaignUtils extends Logging {
    * @param recommendations
    * @return
    */
-  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = 8): DataFrame = {
+  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = CampaignCommon.CALENDAR_REC_SKUS): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
 
     val refSkusWithCampaignId = CampaignUtils.addCampaignMailType(refSkus, campaignName)
     // create recommendations
+    //    val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.CALENDER_COMMON_RECOMMENDER)
+
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
     val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), numRecSkus)
@@ -1030,6 +1088,14 @@ object CampaignUtils extends Logging {
     topSkusBasedOnField.toDF(field, topField, ProductVariables.SKU_SIMPLE)
   }
 
+  /**
+   *
+   * @param mapData
+   * @param groupBy
+   * @param attribute
+   * @param count
+   * @return
+   */
   def getFavouriteAttribute(mapData: DataFrame, groupBy: String, attribute: String, count: Int): DataFrame = {
     val topBricks = mapData.select(groupBy, attribute + "_list"
     ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int], r._2(r._2.fieldIndex("sum_price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)))

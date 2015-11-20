@@ -3,23 +3,22 @@ package com.jabong.dap.campaign.recommendation
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesAddressVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.types.BooleanType
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.BooleanType
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 /**
  * Created by rahul aneja on 21/8/15.
  */
-class LiveCommonRecommender extends Recommender with Logging {
+class CalenderCommonRecommender extends Recommender with Logging {
   /**
    * Place holder function which will get recommended skus
    * @param refSkus
@@ -84,7 +83,7 @@ class LiveCommonRecommender extends Recommender with Logging {
 
     CampaignUtils.debug(recommendationSelected, "after recommendationSelected")
 
-    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value, numRecSkus)) })
+    val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value, numRecSkus)) })
       .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
@@ -182,14 +181,14 @@ class LiveCommonRecommender extends Recommender with Logging {
   //  }
   /**
    * return recommended skus based on number of reference sku (if ref sku is 1 then all 8 rec sku and if its 2 ,then 4 rec sku each)
-   * @param iterable
+   * @param topRow
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String)], mutable.MutableList[String], Int, String) = {
-    require(iterable != null, "iterable cannot be null")
-    require(iterable.size != 0, "iterable cannot be of size zero")
+  def getRecSkus(topRow: Row, numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String)], mutable.MutableList[String], Int, String) = {
+    //require(iterable != null, "iterable cannot be null")
+    //require(iterable.size != 0, "iterable cannot be of size zero")
 
-    val topRow = iterable.head
+    //val topRow = iterable.head
     val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
     val referenceSkus: mutable.MutableList[(String, String, String, String, String, String)] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
@@ -204,17 +203,16 @@ class LiveCommonRecommender extends Recommender with Logging {
     val calendarColorIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_COLOR)
     val calendarCityIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_CITY)
 
-    val numberRefSku = iterable.size
-    val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
-    for (row <- iterable) {
-      var i = 1;
-      val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
-        foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
+    //val numberRefSku = iterable.size
+    //val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
+    val row = topRow
+    var i = 1;
+    val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
+      foreach(value => if (!recommendedSkus.contains(value) && i <= numRecSkus) { recommendedSkus += value; i = i + 1; })
 
-      referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
-        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
+    referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
+      CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
 
-    }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)
   }
 

@@ -35,6 +35,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     date = incrDate
+    println("incrDate", incrDate)
+    println("date", date)
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
     val fileDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
@@ -96,7 +98,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val outputCsvFormat = udf((s: String) => TimeUtils.changeDateFormat(s: String, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT))
 
-    val incrDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
+    val custEmailResIncr = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
       aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
         outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
@@ -110,13 +112,13 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     val days15Df = dfMap("custEmailResDay15")
     val days30Df = dfMap("custEmailResDay30")
 
-    val effectiveDf = effectiveDFFull(incrDf, prevFullDf, days7Df, days15Df, days30Df)
+    val effectiveDf = effectiveDFFull(custEmailResIncr, prevFullDf, days7Df, days15Df, days30Df)
 
     val cmr = dfMap("cmrFull")
 
     val nlSub = dfMap("nlsIncr")
 
-    val result = merge(effectiveDf, cmr, nlSub).na.fill(Map(
+    val custEmailResFull = merge(effectiveDf, cmr, nlSub).na.fill(Map(
       EmailResponseVariables.OPEN_7DAYS -> 0,
       EmailResponseVariables.OPEN_15DAYS -> 0,
       EmailResponseVariables.OPEN_30DAYS -> 0,
@@ -128,7 +130,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val udfOpenSegFn = udf((s: String, s1: String, s2: String) => open_segment(s: String, s1: String, s2: String, date))
 
-    val diffDf = result.except(prevFullDf).select(
+    val custEmailResCsv = custEmailResFull.except(prevFullDf).select(
       col(ContactListMobileVars.UID),
       udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT),
         col(EmailResponseVariables.END_DATE)),
@@ -141,13 +143,12 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       col(EmailResponseVariables.LAST_OPEN_DATE),
       col(EmailResponseVariables.LAST_CLICK_DATE),
       col(EmailResponseVariables.OPENS_LIFETIME),
-      col(EmailResponseVariables.CLICKS_LIFETIME),
-      col(EmailResponseVariables.END_DATE))
+      col(EmailResponseVariables.CLICKS_LIFETIME))
 
     val dfResultMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
-    dfResultMap.put("custEmailResIncr", incrDf)
-    dfResultMap.put("custEmailResFull", result)
-    dfResultMap.put("custEmailResCsv", result.except(prevFullDf))
+    dfResultMap.put("custEmailResIncr", custEmailResIncr)
+    dfResultMap.put("custEmailResFull", custEmailResFull)
+    dfResultMap.put("custEmailResCsv", custEmailResCsv)
 
     dfResultMap
   }
@@ -176,12 +177,14 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   }
 
-  def open_segment(value: String, updateValue: String, endDate: String, incrDateStr: String): String = {
+  def open_segment(openValue: String, updateValue: String, endDate: String, incrDateStr: String): String = {
 
-    if (null != endDate || (null == value && updateValue == null))
+    //  both incrDate and update date is null
+    if (null != endDate || (null == openValue && updateValue == null))
       "NO"
-    else if (value == null) {
-      val lastUpdtDate = TimeUtils.getDate(value, TimeConstants.DATE_TIME_FORMAT)
+    else if (openValue == null) {
+      //openDate is null, calculate with the update date
+      val lastUpdtDate = TimeUtils.getDate(updateValue, TimeConstants.DATE_TIME_FORMAT)
       val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
       val time4mToday = TimeUtils.daysBetweenTwoDates(lastUpdtDate, incrDate)
 
@@ -202,11 +205,11 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       segment
 
     } else {
-
+      //open date is not null, take that for calculation
       val incrDate = TimeUtils.getDate(incrDateStr, TimeConstants.DATE_FORMAT_FOLDER)
-      val updDate = TimeUtils.getDate(updateValue, TimeConstants.DATE_FORMAT_FOLDER)
+      val lastOpenDate = TimeUtils.getDate(openValue, TimeConstants.DATE_TIME_FORMAT)
 
-      val time4mToday = TimeUtils.daysBetweenTwoDates(updDate, incrDate)
+      val time4mToday = TimeUtils.daysBetweenTwoDates(lastOpenDate, incrDate)
 
       val segment = {
 
@@ -279,7 +282,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         cmrResDf(EmailResponseVariables.LAST_CLICK_DATE),
         cmrResDf(EmailResponseVariables.OPENS_LIFETIME),
         cmrResDf(EmailResponseVariables.CLICKS_LIFETIME),
-        when(nlSubscribers(NewsletterVariables.STATUS) === "Unsubscribed", nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
+        when(nlSubscribers(NewsletterVariables.STATUS).equalTo("Unsubscribed"), nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
           .otherwise(cmrResDf(EmailResponseVariables.END_DATE)) as EmailResponseVariables.END_DATE,
         when(nlSubscribers(NewsletterVariables.UPDATED_AT).isNotNull, nlSubscribers(NewsletterVariables.UPDATED_AT).cast(StringType))
           .otherwise(cmrResDf(NewsletterVariables.UPDATED_AT)) as NewsletterVariables.UPDATED_AT)

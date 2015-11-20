@@ -125,7 +125,11 @@ object Udf {
 
   val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a: ArrayBuffer[String], i: Int))
 
+  val getElementList = udf((a: mutable.MutableList[String], i: Int) => UdfUtils.getElementList(a: mutable.MutableList[String], i: Int))
+
   val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: ArrayBuffer[(Row)], i: Int, value: Int))
+
+  val getElementInTupleList = udf((a: mutable.MutableList[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleList(a: mutable.MutableList[(Row)], i: Int, value: Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
@@ -153,9 +157,11 @@ object Udf {
 
   val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
 
-  val nonBeauty = udf((category: String, created_at: String) => UdfUtils.nonBeauty(category: String, created_at: String))
+  val nonBeauty = udf((category: String, created_at: Timestamp) => UdfUtils.nonBeauty(category: String, created_at: Timestamp))
 
-  val beauty = udf((category: String, created_at: String) => UdfUtils.beauty(category: String, created_at: String))
+  val beauty = udf((category: String, created_at: Timestamp) => UdfUtils.beauty(category: String, created_at: Timestamp))
+
+  val lengthString = udf((string: String) => UdfUtils.lengthString(string: String))
 
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

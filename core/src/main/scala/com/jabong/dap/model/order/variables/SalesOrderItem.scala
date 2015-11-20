@@ -141,8 +141,8 @@ object SalesOrderItem {
             Row(e(0).asInstanceOf[Long],
               joinMaps(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]],
                 e(2).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
-                e(3).asInstanceOf[Timestamp],
-                e(4).asInstanceOf[Timestamp]
+              e(3).asInstanceOf[Timestamp],
+              e(4).asInstanceOf[Timestamp]
             )
 
           )
@@ -230,11 +230,11 @@ object SalesOrderItem {
       e =>
         val innerMap = scala.collection.mutable.Map[Long, Int]()
 
-        if (maxDate.before(e._4)){
+        if (maxDate.before(e._4)) {
           maxDate = e._4
         }
 
-        if(minDate.after(e._5)){
+        if (minDate.after(e._5)) {
           minDate = e._5
         }
 
