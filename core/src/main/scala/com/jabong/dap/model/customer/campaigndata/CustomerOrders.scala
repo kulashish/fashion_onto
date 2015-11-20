@@ -167,14 +167,14 @@ object CustomerOrders extends DataFeedsModel {
     // salesOrderValueIncr.show(10)
 
     val custOrdersCalc = merger(salesRevenueIncr, salesDiscountIncr, salesInvalidIncr, salesCatBrick, salesOrderValueIncr, salesOrderAddrFavIncr)
-    println("custOrdersCalc ", custOrdersCalc.count())
-    custOrdersCalc.printSchema()
-    custOrdersCalc.show(10)
+    // println("custOrdersCalc ", custOrdersCalc.count())
+    // custOrdersCalc.printSchema()
+    // custOrdersCalc.show(10)
 
     val custOrderFull = joinCustOrder(custOrdersCalc, custOrdersPrevFull)
-    println("custOrderFull ", custOrderFull.count())
-    custOrderFull.printSchema()
-    custOrderFull.show(10)
+    // println("custOrderFull ", custOrderFull.count())
+    // custOrderFull.printSchema()
+    // custOrderFull.show(10)
     dfWrite.put("custOrderFull", custOrderFull)
     dfWrite.put("cmrFull", cmrFull)
     dfWrite
@@ -473,8 +473,8 @@ object CustomerOrders extends DataFeedsModel {
         salesOrderAddrFavIncr(ContactListMobileVars.CITY_TIER),
         salesOrderAddrFavIncr(ContactListMobileVars.STATE_ZONE)
       )
-    println("before filling zeros: ")
-    res.printSchema()
+    // println("before filling zeros: ")
+    // res.printSchema()
     res.na.fill(scala.collection.immutable.Map(
       SalesOrderItemVariables.REVENUE_7 -> 0.0,
       SalesOrderItemVariables.REVENUE_30 -> 0.0,
