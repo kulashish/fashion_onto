@@ -838,7 +838,6 @@ object CampaignUtils extends Logging {
       filteredSku(ProductVariables.PRICE_BAND),
       filteredSku("BRICK1"),
       filteredSku("BRICK2"))
-      .filter("email_length = 44")
 
     val dfFilterCustItr = dfCustItr.filter("email_length = 44")
       .na.fill(
