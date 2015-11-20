@@ -19,7 +19,7 @@ class BrandInCityCampaign {
 
     val dfCustomerSelection = customerSelector.customerSelection(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData)
 
-    val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData).repartition(400)
+    val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData).repartition(800)
 
     //    val limitOnSkuFilterData = filteredSku.limit(1000)
     // ***** email use case
