@@ -879,8 +879,8 @@ object CampaignUtils extends Logging {
       dfFilterCustItr(ProductVariables.MVP),
       dfFilterCustItr(ProductVariables.GENDER),
       dfFilterCustItr(ProductVariables.PRODUCT_NAME),
-      dfFilterCustItr(ProductVariables.STOCK),
-      dfFilterCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+      filteredSku(ProductVariables.STOCK),
+      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
     (dfBrick1, dfBrick2)
   }
