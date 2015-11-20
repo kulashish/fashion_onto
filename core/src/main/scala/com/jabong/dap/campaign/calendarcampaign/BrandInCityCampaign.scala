@@ -21,8 +21,9 @@ class BrandInCityCampaign {
 
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
+    val limitOnSkuFilterData = filteredSku.limit(1000)
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRAND_IN_CITY_CAMPAIGN, filteredSku, false, brandMvpSubType)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRAND_IN_CITY_CAMPAIGN, limitOnSkuFilterData, false, brandMvpSubType)
 
   }
 
