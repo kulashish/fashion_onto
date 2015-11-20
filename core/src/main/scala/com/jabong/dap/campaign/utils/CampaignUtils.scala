@@ -172,6 +172,7 @@ object CampaignUtils extends Logging {
     }
 
     //    refSkuData.printSchema()
+    debug(refSkuData, "refSkuData in generateReferenceSkus")
 
     val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -833,9 +834,9 @@ object CampaignUtils extends Logging {
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
       .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
-      .withColumn(ProductVariables.CATEGORY, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
-      .withColumn(ProductVariables.BRICK, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
-      .withColumn(ProductVariables.BRAND, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+      .withColumn(CampaignMergedFields.CATEGORY, lit(""))
+      .withColumn(CampaignMergedFields.BRICK, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+      .withColumn(CampaignMergedFields.BRAND, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
       .withColumn(CampaignMergedFields.PRODUCT_GENDER, lit(""))
       .withColumn(ContactListMobileVars.UID, lit("NA"))
       .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(0)))
