@@ -589,6 +589,10 @@ object UdfUtils extends Logging {
     if (i >= strings.size) "" else strings(i)
   }
 
+  def getElementList(strings: mutable.MutableList[String], i: Int): String = {
+    if (i >= strings.size) "" else strings(i)
+  }
+
   def allZero2Null(str: String): String = {
     val nullStr: String = null
     if (null != str) {
