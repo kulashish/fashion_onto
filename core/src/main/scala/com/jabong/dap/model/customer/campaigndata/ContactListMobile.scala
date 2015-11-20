@@ -131,10 +131,9 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val custSegCalcIncr = CustomerSegments.getCustomerSegments(customerSegmentsIncr)
     //FK_CUSTOMER, MVP_TYPE, SEGMENT, DISCOUNT_SCORE
 
-    val dfSmsOptOutMerged = smsOptOutFull.select(DNDVariables.MOBILE_NUMBER).unionAll(blockedNumbersFull.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
+    val smsOptOutMerged = smsOptOutFull.select(DNDVariables.MOBILE_NUMBER).unionAll(blockedNumbersFull.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    val dfMergedIncr = mergeIncrData(customerIncr, custSegCalcIncr, nlsIncr, customerOrdersIncr,
-      zoneCityFull, dndFull, dfSmsOptOutMerged, cmrFull)
+    val dfMergedIncr = mergeIncrData(customerIncr, custSegCalcIncr, nlsIncr, customerOrdersIncr, zoneCityFull, dndFull, smsOptOutMerged, cmrFull)
 
     val writeMap = new HashMap[String, DataFrame]()
 
