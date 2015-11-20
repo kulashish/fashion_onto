@@ -5,12 +5,12 @@ import java.sql.Timestamp
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{Spark, Utils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{ DataFrame, Row }
 
 /**
  * Created by mubarak on 3/7/15.
@@ -114,10 +114,10 @@ object SalesOrderItem {
       salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS).cast(IntegerType) as SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS,
       salesOrderJoined(SalesOrderItemVariables.UPDATED_AT))
       .map(e =>
-      (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
+        (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
     val ordersMapIncr = incrMap.map(e => (e._1, makeMap4mGroupedData(e._2.toList)))
 
-   // println("salesOrderJoined Count", salesOrderJoined.count())
+    // println("salesOrderJoined Count", salesOrderJoined.count())
 
     val ordersIncrFlat = ordersMapIncr.map(e => Row(e._1, e._2._1, e._2._2))
 
@@ -135,14 +135,14 @@ object SalesOrderItem {
           orderIncr("order_status_map"),
           prevFull("order_status_map"),
           coalesce(orderIncr(SalesOrderVariables.LAST_ORDER_UPDATED_AT), prevFull(SalesOrderVariables.LAST_ORDER_UPDATED_AT)) as SalesOrderVariables.LAST_ORDER_UPDATED_AT
-        ).map(e=>
-        Row(e(0).asInstanceOf[Long],
-          joinMaps(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]],
-            e(2).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
-          e(3).asInstanceOf[Timestamp]
-        )
+        ).map(e =>
+            Row(e(0).asInstanceOf[Long],
+              joinMaps(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]],
+                e(2).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
+              e(3).asInstanceOf[Timestamp]
+            )
 
-        )
+          )
       joinedMap = Spark.getSqlContext().createDataFrame(joined, Schema.salesItemStatus)
     }
 
@@ -164,7 +164,6 @@ object SalesOrderItem {
 
     (res, joinedMap)
   }
-
 
   def joinMaps(incrMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], prevFullMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
     if (null == incrMap && null == prevFullMap) {
