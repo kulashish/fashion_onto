@@ -81,11 +81,14 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(SalesAddressVariables.CITY) as CampaignMergedFields.CALENDAR_CITY,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
+      .filter(completeRefSku(CustomerVariables.EMAIL).isNotNull)
+
+    println("size of recommendationSelected: " + recommendationSelected.count())
 
     CampaignUtils.debug(recommendationSelected, "after recommendationSelected")
 
     val recommendationGrouped = recommendationSelected.map(row => ((row(0)), (row))).repartition(800).groupByKey().map({ case (key, value) => (key.asInstanceOf[String], getRecSkus(value, numRecSkus)) })
-      .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) }).repartition(800)
+      .map({ case (key, value) => (key, value._1, value._2, value._3, value._4) })
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
