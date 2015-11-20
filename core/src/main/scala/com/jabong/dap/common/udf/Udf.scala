@@ -161,5 +161,7 @@ object Udf {
 
   val beauty = udf((category: String, created_at: Timestamp) => UdfUtils.beauty(category: String, created_at: Timestamp))
 
+  val lengthString = udf((string: String) => UdfUtils.lengthString(string: String))
+
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }
