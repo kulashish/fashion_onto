@@ -823,64 +823,47 @@ object CampaignUtils extends Logging {
 
     CampaignUtils.debug(filteredSku, "filteredSku")
 
-    val dfCustItr = filteredSku.select(
-      filteredSku(CustomerVariables.EMAIL),
-      Udf.lengthString(filteredSku(CustomerVariables.EMAIL)) as "email_length",
-      filteredSku(CustomerVariables.FK_CUSTOMER),
-      filteredSku(ProductVariables.SKU_SIMPLE),
-      filteredSku(ProductVariables.SPECIAL_PRICE),
-      filteredSku(ProductVariables.BRICK),
-      filteredSku(ProductVariables.BRAND),
-      filteredSku(ProductVariables.MVP),
-      filteredSku(ProductVariables.GENDER),
-      filteredSku(ProductVariables.PRODUCT_NAME),
-      filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND),
-      filteredSku("BRICK1"),
-      filteredSku("BRICK2"))
-
-    val dfFilterCustItr = dfCustItr.filter("email_length = 44")
-      .na.fill(
-        Map(
-          CustomerVariables.EMAIL -> "",
-          CustomerVariables.FK_CUSTOMER -> 0,
-          ProductVariables.SKU_SIMPLE -> "",
-          ProductVariables.SPECIAL_PRICE -> 0.0,
-          ProductVariables.BRICK -> "",
-          ProductVariables.BRAND -> "",
-          ProductVariables.MVP -> 0,
-          ProductVariables.GENDER -> "",
-          ProductVariables.PRODUCT_NAME -> "",
-          ProductVariables.STOCK -> 0,
-          ProductVariables.PRICE_BAND -> ""
-        )
+    val dfCustItr = filteredSku.na.fill(
+      Map(
+        CustomerVariables.EMAIL -> "",
+        CustomerVariables.FK_CUSTOMER -> 0,
+        ProductVariables.SKU_SIMPLE -> "",
+        ProductVariables.SPECIAL_PRICE -> 0.0,
+        ProductVariables.BRICK -> "",
+        ProductVariables.BRAND -> "",
+        ProductVariables.MVP -> 0,
+        ProductVariables.GENDER -> "",
+        ProductVariables.PRODUCT_NAME -> "",
+        ProductVariables.STOCK -> 0,
+        ProductVariables.PRICE_BAND -> ""
       )
+    )
 
-    val dfBrick1 = dfFilterCustItr.select(
-      dfFilterCustItr(CustomerVariables.EMAIL),
-      dfFilterCustItr(CustomerVariables.FK_CUSTOMER),
-      dfFilterCustItr(ProductVariables.SKU_SIMPLE),
-      dfFilterCustItr(ProductVariables.SPECIAL_PRICE),
-      dfFilterCustItr("BRICK1") as ProductVariables.BRICK,
-      dfFilterCustItr(ProductVariables.BRAND),
-      dfFilterCustItr(ProductVariables.MVP),
-      dfFilterCustItr(ProductVariables.GENDER),
-      dfFilterCustItr(ProductVariables.PRODUCT_NAME),
-      dfFilterCustItr(ProductVariables.STOCK),
-      dfFilterCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+    val dfBrick1 = dfCustItr.select(
+      dfCustItr(CustomerVariables.EMAIL),
+      dfCustItr(CustomerVariables.FK_CUSTOMER),
+      dfCustItr(ProductVariables.SKU_SIMPLE),
+      dfCustItr(ProductVariables.SPECIAL_PRICE),
+      dfCustItr("BRICK1") as ProductVariables.BRICK,
+      dfCustItr(ProductVariables.BRAND),
+      dfCustItr(ProductVariables.MVP),
+      dfCustItr(ProductVariables.GENDER),
+      dfCustItr(ProductVariables.PRODUCT_NAME),
+      dfCustItr(ProductVariables.STOCK),
+      dfCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
-    val dfBrick2 = dfFilterCustItr.select(
-      dfFilterCustItr(CustomerVariables.EMAIL),
-      dfFilterCustItr(CustomerVariables.FK_CUSTOMER),
-      dfFilterCustItr(ProductVariables.SKU_SIMPLE),
-      dfFilterCustItr(ProductVariables.SPECIAL_PRICE),
-      dfFilterCustItr("BRICK2") as ProductVariables.BRICK,
-      dfFilterCustItr(ProductVariables.BRAND),
-      dfFilterCustItr(ProductVariables.MVP),
-      dfFilterCustItr(ProductVariables.GENDER),
-      dfFilterCustItr(ProductVariables.PRODUCT_NAME),
-      filteredSku(ProductVariables.STOCK),
-      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+    val dfBrick2 = dfCustItr.select(
+      dfCustItr(CustomerVariables.EMAIL),
+      dfCustItr(CustomerVariables.FK_CUSTOMER),
+      dfCustItr(ProductVariables.SKU_SIMPLE),
+      dfCustItr(ProductVariables.SPECIAL_PRICE),
+      dfCustItr("BRICK2") as ProductVariables.BRICK,
+      dfCustItr(ProductVariables.BRAND),
+      dfCustItr(ProductVariables.MVP),
+      dfCustItr(ProductVariables.GENDER),
+      dfCustItr(ProductVariables.PRODUCT_NAME),
+      dfCustItr(ProductVariables.STOCK),
+      dfCustItr(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
 
     (dfBrick1, dfBrick2)
   }
