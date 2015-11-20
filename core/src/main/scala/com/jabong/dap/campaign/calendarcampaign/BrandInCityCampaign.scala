@@ -19,7 +19,11 @@ class BrandInCityCampaign {
 
     val dfCustomerSelection = customerSelector.customerSelection(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData)
 
+    CampaignUtils.debug(dfCustomerSelection, "after dfCustomerSelection")
+
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
+
+    CampaignUtils.debug(filteredSku, "after filteredSku")
 
     //    val limitOnSkuFilterData = filteredSku.limit(1000)
     // ***** email use case

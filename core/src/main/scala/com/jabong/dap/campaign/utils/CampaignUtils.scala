@@ -172,6 +172,7 @@ object CampaignUtils extends Logging {
     }
 
     //    refSkuData.printSchema()
+    debug(refSkuData, "refSkuData in generateReferenceSkus")
 
     val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
