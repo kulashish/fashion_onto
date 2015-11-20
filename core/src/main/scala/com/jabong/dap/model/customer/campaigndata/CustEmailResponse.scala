@@ -24,7 +24,7 @@ import scala.collection.mutable
  */
 object CustEmailResponse extends DataFeedsModel with Logging {
 
-  var date = ""
+  var date: String = null
 
   override def canProcess(incrDate: String, saveMode: String): Boolean = {
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate)
@@ -126,14 +126,13 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       EmailResponseVariables.CLICK_7DAYS -> 0,
       EmailResponseVariables.CLICK_15DAYS -> 0,
       EmailResponseVariables.CLICK_30DAYS -> 0,
-      EmailResponseVariables.CLICKS_LIFETIME -> 0))
+      EmailResponseVariables.CLICKS_LIFETIME -> 0)).cache()
 
     val udfOpenSegFn = udf((s: String, s1: String, s2: String) => open_segment(s: String, s1: String, s2: String, date))
 
     val custEmailResCsv = custEmailResFull.except(prevFullDf).select(
       col(ContactListMobileVars.UID),
-      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT),
-        col(EmailResponseVariables.END_DATE)),
+      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT), col(EmailResponseVariables.END_DATE)),
       col(EmailResponseVariables.OPEN_7DAYS),
       col(EmailResponseVariables.OPEN_15DAYS),
       col(EmailResponseVariables.OPEN_30DAYS),
@@ -171,9 +170,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       DataWriter.writeParquet(custEmailResFull, savePathFull, saveMode)
     }
 
-    val fileName = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD) + "_CUST_EMAIL_RESPONSE"
-
-    DataWriter.writeCsv(custEmailResCsv, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileName, saveMode, "true", ";")
+    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeCsv(custEmailResCsv, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_EMAIL_RESPONSE", saveMode, "true", ";")
 
   }
 
