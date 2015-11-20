@@ -419,10 +419,10 @@ object ContactListMobile extends DataFeedsModel with Logging {
         dndMerged(SalesOrderItemVariables.FAV_BRAND),
         dndMerged(ContactListMobileVars.DND)
       )
-
-    val res = dfJoined.join(cmrFull, cmrFull(CustomerVariables.EMAIL) === dfJoined(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
+    val cmrFullFil = cmrFull.filter(cmrFull(CustomerVariables.EMAIL).isNotNull)
+    val res = dfJoined.join(cmrFullFil, cmrFullFil(CustomerVariables.EMAIL) === dfJoined(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
       .select(
-        cmrFull(ContactListMobileVars.UID),
+        cmrFullFil(ContactListMobileVars.UID),
         dfJoined(CustomerVariables.EMAIL),
         dfJoined(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         dfJoined(CustomerVariables.PHONE),
@@ -452,7 +452,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         dfJoined(NewsletterVariables.STATUS),
         dfJoined(SalesOrderItemVariables.FAV_BRAND),
         dfJoined(ContactListMobileVars.DND),
-        Udf.device(cmrFull(PageVisitVariables.DOMAIN), cmrFull(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
+        Udf.device(cmrFullFil(PageVisitVariables.DOMAIN), cmrFullFil(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
       )
     res
   }
