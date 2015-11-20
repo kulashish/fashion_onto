@@ -8,6 +8,7 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ Debugging, Spark, Utils }
 import com.jabong.dap.data.storage.schema.Schema
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{ DataFrame, Row }
@@ -105,8 +106,8 @@ object SalesOrderItem {
    Need to get final count of orders where invalid orderitem count matches total orderitem count
    */
 
-  def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame, prevMap: DataFrame, incrDate: String): (DataFrame, DataFrame) = {
-    val salesOrderJoined = salesOrderFull.drop(SalesOrderItemVariables.UPDATED_AT).join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.RIGHT_OUTER)
+  def getInvalidCancelOrders(salesOrderItemIncr: DataFrame, salesOrderFull: DataFrame, prevFull: DataFrame, incrDate: String): (DataFrame, DataFrame) = {
+    val salesOrderJoined = salesOrderFull.drop(SalesOrderItemVariables.UPDATED_AT).join(salesOrderItemIncr, salesOrderFull(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItemIncr(SalesOrderVariables.FK_SALES_ORDER))
     val incrMap = salesOrderJoined.select(
       salesOrderJoined(SalesOrderVariables.FK_CUSTOMER),
       salesOrderJoined(SalesOrderVariables.ID_SALES_ORDER),
@@ -114,35 +115,46 @@ object SalesOrderItem {
       salesOrderJoined(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS).cast(IntegerType) as SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS,
       salesOrderJoined(SalesOrderItemVariables.UPDATED_AT))
       .map(e =>
-        (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
+      (e(0).asInstanceOf[Long] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[Long], e(3).asInstanceOf[Int], e(4).asInstanceOf[Timestamp]))).groupByKey()
     val ordersMapIncr = incrMap.map(e => (e._1, makeMap4mGroupedData(e._2.toList)))
 
-    // println("ordersMapIncr Count", ordersMapIncr.count())
+    println("salesOrderJoined Count", salesOrderJoined.count())
 
     val ordersIncrFlat = ordersMapIncr.map(e => Row(e._1, e._2._1, e._2._2))
 
     val orderIncr = Spark.getSqlContext().createDataFrame(ordersIncrFlat, Schema.salesItemStatus)
 
-    Debugging.debug(orderIncr, "orderIncr")
-
+    println( "orderIncr", orderIncr.count())
+    orderIncr.show(10)
     var joinedMap: DataFrame = null
-
-    if (null == prevMap) {
+    if (null == prevFull) {
+      println("Inside If")
       joinedMap = orderIncr
     } else {
-      joinedMap = prevMap.join(orderIncr, prevMap(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
-        .select(coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevMap(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
-          mergeMaps(orderIncr("order_status_map"), prevMap("order_status_map")) as "order_status_map",
-          coalesce(orderIncr("last_order_updated_at"), prevMap("last_order_updated_at")) as "last_order_updated_at"
+      println("Inside Else")
+      val joined = prevFull.join(orderIncr, prevFull(SalesOrderVariables.FK_CUSTOMER) === orderIncr(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+        .select(
+          coalesce(orderIncr(SalesOrderVariables.FK_CUSTOMER), prevFull(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
+          orderIncr("order_status_map"),
+          prevFull("order_status_map"),
+          coalesce(orderIncr("last_order_updated_at"), prevFull("last_order_updated_at")) as "last_order_updated_at"
+        ).map(e=>
+        Row(e(0).asInstanceOf[Long],
+          joinMaps(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]],
+            e(2).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
+          e(3).asInstanceOf[Timestamp]
         )
+        )
+      joinedMap = Spark.getSqlContext().createDataFrame(joined, Schema.salesItemStatus)
     }
 
-    Debugging.debug(joinedMap, "joinedMap")
 
     var incrData = joinedMap
-    if (null != prevMap) {
+    if (null != prevFull) {
       incrData = Utils.getOneDayData(joinedMap, "last_order_updated_at", incrDate, TimeConstants.DATE_FORMAT_FOLDER)
     }
+
+    println("incrData Count: ", incrData.count())
 
     val orderStatusMap = incrData.map(e => (e(0).asInstanceOf[Long],
       countOrders(e(1).asInstanceOf[scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]]),
@@ -156,30 +168,38 @@ object SalesOrderItem {
     (res, joinedMap)
   }
 
-  val mergeMaps = udf((map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]) => joinMaps(map1, map2))
 
-  def joinMaps(map1: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]], map2: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]): scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
-    if (null == map1 && null == map2) {
+  def joinMaps(incrMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]],
+               prevFullMap: scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]]):
+  scala.collection.immutable.Map[Long, scala.collection.immutable.Map[Long, Int]] = {
+    println("Inside UDF")
+    if (null == incrMap && null == prevFullMap) {
       return null
-    } else if (null == map2) {
-      return map1
-    } else if (null == map1) {
-      return map2
+    } else if (null == prevFullMap) {
+      println("Incrmap", incrMap.toString())
+      return incrMap
+    } else if (null == incrMap) {
+      println("fullmap", prevFullMap.toString())
+      return prevFullMap
     }
+    println("Inside JoinMaps")
     val full = scala.collection.mutable.Map[Long, scala.collection.immutable.Map[Long, Int]]()
-    map2.keySet.foreach{
+    prevFullMap.keySet.foreach{
       orderId =>
-        full.put(orderId, map2(orderId))
+        full.put(orderId, prevFullMap(orderId))
     }
-    map1.keySet.foreach{
+    println("AfterFirstMap", full.toString())
+    incrMap.keySet.foreach{
       orderId =>
         if (full.contains(orderId)) {
-          val combinedMap = combine2Maps(full(orderId), map1(orderId))
+          val combinedMap = combine2Maps(full(orderId), incrMap(orderId))
+          println("Combined", combinedMap.toString())
           full.updated(orderId, combinedMap)
         } else {
-          full.put(orderId, map1(orderId))
+          full.put(orderId, incrMap(orderId))
         }
     }
+    println("FullMap", full.toString())
     full.map(kv => (kv._1, kv._2)).toMap
   }
 
@@ -293,15 +313,17 @@ object SalesOrderItem {
     orderValue
   }
 
-  //  def main(args: Array[String]) {
-  //    val conf = new SparkConf().setAppName("SparkExamples")
-  //    Spark.init(conf)
-  //    val so = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order/2015/06/01")
-  //    val soi = Spark.getSqlContext().read.parquet("/home/jabong/bobdata/sales_order_item/06/01")
-  //    val (resdf, map) =  getInvalidCancelOrders(soi, so, null, "2015/06/01")
-  //    map.take(5).foreach(println)
-  //    resdf.take(5).foreach(println)
-  //   }
+  /* def main(args: Array[String]) {
+     val conf = new SparkConf().setAppName("SparkExamples")
+     Spark.init(conf)
+     val so = Spark.getSqlContext().read.parquet("/data/input/bob/sales_order/full/2015/11/16/24")
+     val soi = Spark.getSqlContext().read.parquet("/data/input/bob/sales_order_item/daily/2015/11/16")
+     val prevmap = Spark.getSqlContext().read.parquet("/data/test/output/maps/sales_order_invalid_cancel/full/2015/11/15/24")
+     val (resdf, map) =  getInvalidCancelOrders(soi, so, prevmap, "2015/11/16")
+     map.write.parquet("/data/output/ordersmap")
+     map.take(5).foreach(println)
+     resdf.take(5).foreach(println)
+    }*/
 
 }
 
