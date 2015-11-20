@@ -49,6 +49,8 @@ object CampaignOutput {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.REC_SKUS)
           .drop(CampaignMergedFields.REF_SKUS)
+          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
+          .drop(CampaignMergedFields.EMAIL)
         //.drop(CampaignMergedFields.CUSTOMER_ID)
 
         val replenishFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_replenishment"
