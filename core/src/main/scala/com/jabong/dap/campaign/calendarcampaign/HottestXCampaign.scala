@@ -20,12 +20,12 @@ class HottestXCampaign {
     val day_45past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
 
     val days_45_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_45past, TimeConstants.DATE_FORMAT_FOLDER)
-      .filter(nDaysSalesOrder(SalesOrderVariables.GW_AMOUNT).<=(1000))
+      .filter(nDaysSalesOrder(SalesOrderVariables.GRAND_TOTAL).<=(1000))
 
     val day_60past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
 
     val days_60_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_60past, TimeConstants.DATE_FORMAT_FOLDER)
-      .filter(nDaysSalesOrder(SalesOrderVariables.GW_AMOUNT).>(1000))
+      .filter(nDaysSalesOrder(SalesOrderVariables.GRAND_TOTAL).>(1000))
 
     val sales_45_60_df = days_45_filter.unionAll(days_60_filter)
 
