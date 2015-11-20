@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
  */
 class ReplenishmentCampaign {
 
-  def runCampaign(customerOrderFull: DataFrame, lastYearSalesOrderData: DataFrame, lastYearSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
+  def runCampaign(lastYearCustomerOrderFull: DataFrame, lastYearSalesOrderData: DataFrame, lastYearSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST5_SUCCESSFUL_ORDER)
@@ -23,7 +23,7 @@ class ReplenishmentCampaign {
     //    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
     //    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
 
-    val dfCustomerSelection = customerSelector.customerSelection(customerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData)
+    val dfCustomerSelection = customerSelector.customerSelection(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData)
 
     //filter sku based on daily filter
     val (dfNonBeautyFrag, dfBeauty) = CategoryReplenishment.skuFilter(dfCustomerSelection, yesterdayItrData)

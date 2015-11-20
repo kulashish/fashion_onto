@@ -152,12 +152,15 @@ object CampaignManager extends Serializable with Logging {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val customerOrderFull = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS, incrDate).
-      select(CustomerVariables.FK_CUSTOMER,
-             SalesOrderItemVariables.SUCCESSFUL_ORDERS)
+      select(col(CustomerVariables.FK_CUSTOMER),
+             col(SalesOrderItemVariables.SUCCESSFUL_ORDERS),
+             col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT)
 
     val fullSalesOrderData = CampaignInput.loadFullOrderData()
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
+
+    val lastYearCustomerOrderFull = CampaignInput.loadLastNdaysOrderData(370,customerOrderFull,incrDate)
 
     val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData).
       select(SalesOrderVariables.FK_CUSTOMER,
@@ -176,7 +179,7 @@ object CampaignManager extends Serializable with Logging {
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
     val replenishmentCampaign = new ReplenishmentCampaign()
-    replenishmentCampaign.runCampaign(customerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+    replenishmentCampaign.runCampaign(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
 
   }
 

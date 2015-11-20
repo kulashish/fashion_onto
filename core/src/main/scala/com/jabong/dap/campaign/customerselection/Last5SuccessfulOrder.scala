@@ -25,14 +25,14 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
     }
 
     val filterCustomerData = customerOrderData.filter(SalesOrderItemVariables.SUCCESSFUL_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
-      .select(CustomerVariables.FK_CUSTOMER).limit(1000)
+      .select(CustomerVariables.FK_CUSTOMER)
 
     val coalesceFullSalesOrderData = salesOrderData
     val joinedDf = filterCustomerData.join(
       coalesceFullSalesOrderData,
       filterCustomerData(CustomerVariables.FK_CUSTOMER) === coalesceFullSalesOrderData(SalesOrderVariables.FK_CUSTOMER),
       SQL.INNER
-    ).select(coalesceFullSalesOrderData("*")).coalesce(400)
+    ).select(coalesceFullSalesOrderData("*"))
 
     CampaignUtils.debug(joinedDf, "last 5 orders joinedDf")
 
