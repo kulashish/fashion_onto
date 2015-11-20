@@ -129,7 +129,7 @@ object CampaignManager extends Serializable with Logging {
     val fullCustomerOrders = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS)
       .select(
         col(CustomerVariables.FK_CUSTOMER),
-        col(ProductVariables.BRAND),
+        col(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
         col(CustomerVariables.CITY),
         col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
       )
