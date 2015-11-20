@@ -339,16 +339,14 @@ sub upload_calendar_replenish_campaigns {
     system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/");
     my $calendar_status = $?;
 
-    print "hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$replenish_filename $calendar_base/\n";
+    print "hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
 
-    system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$replenish_filename $calendar_base/");
-    my $replenish_status = $?;
+    system("hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
-    my $replenish_status || = $?;
 
-    return $status;
+    return $calendar_status;
 }
 
 
