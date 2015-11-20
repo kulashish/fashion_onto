@@ -120,9 +120,32 @@ class LiveCommonRecommender extends Recommender with Logging {
       }
 
       case Recommendation.BRAND_MVP_CITY_SUB_TYPE => {
-        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
-          && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
-          && completeRefSku(SalesAddressVariables.CITY) === recommendations(SalesAddressVariables.CITY))
+
+        val dfCompleteRefSku = completeRefSku.select(
+          col(CustomerVariables.EMAIL),
+          col(CampaignMergedFields.REF_SKU1),
+          col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+          col(CampaignMergedFields.LIVE_CART_URL),
+          col(ProductVariables.BRICK),
+          col(ProductVariables.MVP),
+          col(ProductVariables.GENDER),
+          col(ProductVariables.BRAND),
+          col(ProductVariables.PRODUCT_NAME),
+          col(ProductVariables.PRICE_BAND),
+          col(ProductVariables.COLOR),
+          Udf.toLowercase(col(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY,
+          col(CampaignMergedFields.REF_SKU)
+        )
+
+        val dfRecommendations = recommendations.select(
+          col(ProductVariables.BRAND),
+          col(ProductVariables.MVP),
+          Udf.toLowercase(col(SalesAddressVariables.CITY)) as SalesAddressVariables.CITY
+        )
+
+        dfCompleteRefSku.join(dfRecommendations, dfCompleteRefSku(ProductVariables.BRAND) === dfRecommendations(ProductVariables.BRAND)
+          && dfCompleteRefSku(ProductVariables.MVP) === dfRecommendations(ProductVariables.MVP)
+          && dfCompleteRefSku(SalesAddressVariables.CITY) === dfRecommendations(SalesAddressVariables.CITY))
       }
 
       case Recommendation.BRICK_PRICE_BAND_SUB_TYPE => {
