@@ -1,0 +1,5 @@
+{"color":"BLACK","mvp":"mass","gender":"MEN","priceBand":"B","recommendations":[{"number_last_30_days_ordered":1,"sku":"ES418WA79UAUINDFAS"}]}
+{"color":"RED","mvp":"mass","gender":"UNISEX","priceBand":"B","recommendations":[{"number_last_30_days_ordered":1,"sku":"ES418WA79UAUINDFAS"}]}
+{"color":"BLUE","mvp":"premium","gender":"WOMEN","priceBand":"A","recommendations":[{"number_last_30_days_ordered":6,"sku":"SO596WA65JLIINDFAS"}]}
+{"color":"GREY MILANGE","mvp":"premium","gender":"UNISEX","recommendations":[{"number_last_30_days_ordered":6,"sku":"SO596WA65JLIINDFAS"},{"number_last_30_days_ordered":4,"sku":"XW574WA62FXXINDFAS"},{"number_last_30_days_ordered":2,"sku":"AD004WA32UCLINDFAS"}]}
+{"color":"YELLOW","mvp":"mass","gender":"MEN","priceBand":"B","recommendations":[{"number_last_30_days_ordered":1,"sku":"ES418WA79UAUINDFAF"}]}

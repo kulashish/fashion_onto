@@ -4,11 +4,12 @@ import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, CustomerVariables, ProductVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.types.BooleanType
 import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 
@@ -28,7 +29,7 @@ class LiveCommonRecommender extends Recommender with Logging {
   override def generateRecommendation(refSkus: DataFrame, recommendations: DataFrame, recType: String = Recommendation.BRICK_MVP_SUB_TYPE, numRecSkus: Int = 8): DataFrame = {
     require(refSkus != null, "refSkus cannot be null")
     require(recommendations != null, "recommendations cannot be null")
-    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE, Recommendation.MVP_DISCOUNT_SUB_TYPE) contains recType, "recommendation type is invalid")
+    require(Array(Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.BRAND_MVP_SUB_TYPE, Recommendation.BRICK_PRICE_BAND_SUB_TYPE, Recommendation.MVP_DISCOUNT_SUB_TYPE, Recommendation.MVP_COLOR_SUB_TYPE) contains recType, "recommendation type is invalid")
     var refSkusUpdatedSchema: DataFrame = refSkus
     if (!SchemaUtils.isSchemaEqual(refSkus.schema, Schema.expectedFinalReferenceSku)) {
       refSkusUpdatedSchema = SchemaUtils.addColumns(refSkus, Schema.expectedFinalReferenceSku)
@@ -58,6 +59,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.brand") as ProductVariables.BRAND,
       refSkuExploded("ref_sku_fields.productName") as ProductVariables.PRODUCT_NAME,
       refSkuExploded("ref_sku_fields.priceBand") as ProductVariables.PRICE_BAND,
+      refSkuExploded("ref_sku_fields.color") as ProductVariables.COLOR,
+      refSkuExploded("ref_sku_fields.city") as SalesAddressVariables.CITY,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     CampaignUtils.debug(completeRefSku, "after completeRefSku")
@@ -74,6 +77,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(ProductVariables.BRAND) as CampaignMergedFields.LIVE_BRAND,
       completeRefSku(ProductVariables.BRICK) as CampaignMergedFields.LIVE_BRICK,
       completeRefSku(ProductVariables.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
+      completeRefSku(ProductVariables.COLOR) as CampaignMergedFields.CALENDAR_COLOR,
+      completeRefSku(SalesAddressVariables.CITY) as CampaignMergedFields.CALENDAR_CITY,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
@@ -107,6 +112,19 @@ class LiveCommonRecommender extends Recommender with Logging {
 
       }
 
+      case Recommendation.MVP_COLOR_SUB_TYPE => {
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.COLOR) === recommendations(ProductVariables.COLOR)
+          && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+          && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
+
+      }
+
+      case Recommendation.BRAND_MVP_CITY_SUB_TYPE => {
+        completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
+          && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
+          && completeRefSku(SalesAddressVariables.CITY) === recommendations(SalesAddressVariables.CITY))
+      }
+
       case Recommendation.BRICK_PRICE_BAND_SUB_TYPE => {
 
         val dfNextPriceBand = completeRefSku.select(
@@ -132,7 +150,7 @@ class LiveCommonRecommender extends Recommender with Logging {
           && completeRefSku(ProductVariables.GENDER) === recommendations(ProductVariables.GENDER))
       }
       case Recommendation.MVP_DISCOUNT_SUB_TYPE => {
-        val completeRefSkuWithDiscountStatus = completeRefSku.withColumn(Recommendation.DISCOUNT_STATUS, lit("true"))
+        val completeRefSkuWithDiscountStatus = completeRefSku.withColumn(Recommendation.DISCOUNT_STATUS, lit(true).cast(BooleanType))
 
         completeRefSkuWithDiscountStatus.join(recommendations, completeRefSkuWithDiscountStatus(Recommendation.DISCOUNT_STATUS) === recommendations(Recommendation.DISCOUNT_STATUS)
           && completeRefSkuWithDiscountStatus(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
@@ -167,13 +185,13 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String)], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
     val topRow = iterable.head
     val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
-    val referenceSkus: mutable.MutableList[(String, String, String, String)] = mutable.MutableList()
+    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String)] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
@@ -183,6 +201,9 @@ class LiveCommonRecommender extends Recommender with Logging {
     val liveBrandIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRAND)
     val liveBrickIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_BRICK)
     val liveProdNameIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_PROD_NAME)
+    val calendarColorIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_COLOR)
+    val calendarCityIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_CITY)
+
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
     for (row <- iterable) {
@@ -190,7 +211,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
-      referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)), CampaignUtils.checkNullString(row(liveProdNameIndex))))
+      referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
+        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
 
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)

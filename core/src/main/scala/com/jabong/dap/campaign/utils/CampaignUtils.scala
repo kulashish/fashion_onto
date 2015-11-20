@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.utils
 
 import java.math.BigDecimal
-import java.sql.Timestamp
+import java.sql.{ Struct, Timestamp }
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.manager.CampaignProducer
@@ -20,7 +20,6 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
 import org.apache.spark.sql.{ Row, DataFrame }
-import org.apache.spark.sql._
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
@@ -74,7 +73,7 @@ object CampaignUtils extends Logging {
    */
   def generateReferenceSkusForAcart(refSkuData: DataFrame, NumberSku: Int): DataFrame = {
     val referenceSkus = generateReferenceSkus(refSkuData, 100)
-    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String, String, String)]].take(NumberSku),
+    val referenceSkusAcart = referenceSkus.rdd.map(t => (t(0), t(1), t(2).asInstanceOf[List[(Double, String, String, String, String, String, String, String, String, String)]].take(NumberSku),
       (t(2).asInstanceOf[List[Row]]))).map(t => Row(t._1, t._2, t._3, createRefSkuAcartUrl(t._4)))
     val refSkuForAcart = sqlContext.createDataFrame(referenceSkusAcart, Schema.finalReferenceSkuWithACartUrl)
     return refSkuForAcart
@@ -175,7 +174,9 @@ object CampaignUtils extends Logging {
 
     val dfFilterd = refSkuData.filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null and  " + CustomerVariables.EMAIL + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
+
     debug(dfFilterd, "In ref skus after filter customerData is not null")
+
     val dfSchemaChange = SchemaUtils.changeSchema(dfFilterd, Schema.referenceSku)
     // DataWriter.writeParquet(customerData,ConfigConstants.OUTPUT_PATH,"test","customerData",DataSets.DAILY, "1")
 
@@ -189,7 +190,9 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.MVP))),
         checkNullString(t(t.fieldIndex(ProductVariables.GENDER))),
         checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
-        checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))))))
+        checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))),
+        checkNullString(t(t.fieldIndex(ProductVariables.COLOR))),
+        checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -204,7 +207,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -681,7 +684,8 @@ object CampaignUtils extends Logging {
       col(ProductVariables.BRICK),
       col(ProductVariables.MVP),
       col(ProductVariables.GENDER),
-      col(ProductVariables.PRODUCT_NAME)
+      col(ProductVariables.PRODUCT_NAME),
+      col(ProductVariables.CATEGORY)
     )
 
     dfResult
@@ -747,8 +751,112 @@ object CampaignUtils extends Logging {
 
   }
 
+  /**
+   *
+   * @param campaignType
+   * @param campaignName
+   * @param filteredSku
+   * @param recommendations
+   */
   def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
 
+    val recs = campaignName match {
+      case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => {
+        val (dfBrick1, dfBrick2) = getBrick1Brick2(filteredSku)
+        CampaignUtils.debug(dfBrick1, "dfBrick1")
+        CampaignUtils.debug(dfBrick2, "dfBrick2")
+
+        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations)
+        CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
+
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations)
+        CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
+
+        val dfJoined = dfBrick1RecommendationData.join(
+          dfBrick2RecommendationData,
+          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
+          SQL.INNER
+        ).select(
+            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
+            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
+            Udf.concatenateListOfString(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+          )
+
+        //          .select(
+        //            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
+        //            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
+        //            dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS),
+        //            dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS),
+        //            //Udf.concatenateListOfString(dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrik1RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+        //            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        //            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+        //          ).rdd.map(row => (row(0).asInstanceOf[String], row(1).asInstanceOf[List[String]], row(2).asInstanceOf[List[String]] ::: row(3).asInstanceOf[List[String]], row(4).asInstanceOf[String], row(5).asInstanceOf[String]))
+        //
+        //        val sqlContext = Spark.getSqlContext()
+        //        import sqlContext.implicits._
+        //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
+        //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
+        CampaignUtils.debug(dfJoined, "dfJoined")
+        dfJoined
+      }
+      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
+        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+      case _ =>
+        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+        dfRecommendationData
+    }
+
+    //save campaign Output for mobile
+    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+  }
+
+  /**
+   * This method for BrickAffinityCampaign
+   * @param filteredSku
+   * @return
+   */
+  def getBrick1Brick2(filteredSku: DataFrame): (DataFrame, DataFrame) = {
+    val dfBrick1 = filteredSku.select(
+      filteredSku(CustomerVariables.EMAIL),
+      filteredSku(CustomerVariables.FK_CUSTOMER),
+      filteredSku(ProductVariables.SKU_SIMPLE),
+      filteredSku(ProductVariables.SPECIAL_PRICE),
+      filteredSku("BRICK1") as ProductVariables.BRICK,
+      filteredSku(ProductVariables.BRAND),
+      filteredSku(ProductVariables.MVP),
+      filteredSku(ProductVariables.GENDER),
+      filteredSku(ProductVariables.PRODUCT_NAME),
+      filteredSku(ProductVariables.STOCK),
+      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+
+    val dfBrick2 = filteredSku.select(
+      filteredSku(CustomerVariables.EMAIL),
+      filteredSku(CustomerVariables.FK_CUSTOMER),
+      filteredSku(ProductVariables.SKU_SIMPLE),
+      filteredSku(ProductVariables.SPECIAL_PRICE),
+      filteredSku("BRICK2") as ProductVariables.BRICK,
+      filteredSku(ProductVariables.BRAND),
+      filteredSku(ProductVariables.MVP),
+      filteredSku(ProductVariables.GENDER),
+      filteredSku(ProductVariables.PRODUCT_NAME),
+      filteredSku(ProductVariables.STOCK),
+      filteredSku(ProductVariables.PRICE_BAND)).filter(ProductVariables.BRICK + " is not null")
+
+    (dfBrick1, dfBrick2)
+  }
+
+  /**
+   *
+   * @param campaignType
+   * @param campaignName
+   * @param filteredSku
+   * @param recommendations
+   * @return
+   */
+  def getCalendarRecommendationData(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, numRecSkus: Int = 8): DataFrame = {
     val refSkus = CampaignUtils.generateReferenceSkus(filteredSku, CampaignCommon.CALENDAR_REF_SKUS)
 
     debug(refSkus, campaignType + "::" + campaignName + " after reference sku generation")
@@ -757,19 +865,11 @@ object CampaignUtils extends Logging {
     // create recommendations
     val recommender = CampaignProducer.getFactory(CampaignCommon.RECOMMENDER).getRecommender(Recommendation.LIVE_COMMON_RECOMMENDER)
 
-    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), CampaignCommon.CALENDAR_REC_SKUS)
+    val campaignOutput = recommender.generateRecommendation(refSkusWithCampaignId, recommendations, CampaignCommon.campaignRecommendationMap.getOrElse(campaignName, Recommendation.BRICK_MVP_SUB_TYPE), numRecSkus)
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
 
-    val recs = campaignName match {
-      case CampaignCommon.HOTTEST_X =>
-        campaignOutput.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
-      case _ => campaignOutput
-
-    }
-
-    //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+    return campaignOutput
   }
 
   /**
@@ -909,8 +1009,46 @@ object CampaignUtils extends Logging {
 
   }
 
+  /**
+   * get top sku for a particular field e.g fk_customer and topField as brand_list
+   * @param topData
+   * @param field
+   * @param topField
+   * @return
+   */
+  def getFavSku(topData: DataFrame, field: String, topField: String): DataFrame = {
+    val topSkus = topData.select(field, topField
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.
+      sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int],
+        r._2(r._2.fieldIndex("price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(e => (e._1, e._2(e._2.fieldIndex("sku")).toString))))
+
+    val topSkusBasedOnField = topSkus.filter(_._2.length > 0).map(x => (x._1, x._2(0)._1, x._2(0)._2))
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topSkusBasedOnField.toDF(field, topField, ProductVariables.SKU_SIMPLE)
+  }
+
+  def getFavouriteAttribute(mapData: DataFrame, groupBy: String, attribute: String, count: Int): DataFrame = {
+    val topBricks = mapData.select(groupBy, attribute + "_list"
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int], r._2(r._2.fieldIndex("sum_price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)))
+
+    val topBrick = topBricks.map{
+      case (key, value) =>
+        ({ val arrayLength = value.length; if (arrayLength >= 1) (key, value(0)) else (key, null) })
+    }
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topBrick.toDF(CustomerVariables.CITY, attribute)
+  }
+
   @elidable(FINE) def debug(data: DataFrame, name: String) {
     println("Count of " + name + ":-" + data.count() + "\n")
+    println("show dataframe " + name + ":-" + data.show(10) + "\n")
+
     data.printSchema()
   }
 

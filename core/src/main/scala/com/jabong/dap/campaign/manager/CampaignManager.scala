@@ -1,16 +1,16 @@
 package com.jabong.dap.campaign.manager
 
-import com.jabong.dap.campaign.calendarcampaign.{ HottestXCampaign, PricepointCampaign }
+import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{ ParamInfo, CampaignConfig, CampaignInfo }
+import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -21,6 +21,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -76,20 +77,121 @@ object CampaignManager extends Serializable with Logging {
     liveRetargetCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
   }
 
-  def startPricepointCampaign() = {
+  def startPricepointCampaign(params: ParamInfo) = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val last20thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(20, fullOrderData)
+    val last20thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(20, fullOrderData, incrDate)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val last20thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(20, fullOrderItemData)
+    //FIXME
+    val last20thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(20, fullOrderItemData, incrDate)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
     val brickPriceBandRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_PRICE_BAND_SUB_TYPE).cache()
 
     val pricepointCampaign = new PricepointCampaign()
-    pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData)
+    pricepointCampaign.runCampaign(last20thDaySalesOrderData, last20thDaySalesOrderItemData, brickPriceBandRecommendations, yesterdayItrData, incrDate)
+
+  }
+
+  def startBrickAffinityCampaign(params: ParamInfo) = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    val fullCustomerSurfAffinity = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_SURF_AFFINITY)
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    //FIXME
+    val last7thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(7, fullOrderData, incrDate)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    //FIXME
+    val last7thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(7, fullOrderItemData, incrDate)
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    val brickAffinityCampaign = new BrickAffinityCampaign()
+    brickAffinityCampaign.runCampaign(fullCustomerSurfAffinity, last7thDaySalesOrderData, last7thDaySalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+
+  }
+
+  def startBrandInCityCampaign(params: ParamInfo) = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    val fullCustomerOrders = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS)
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    //FIXME: loadLastNdaysOrderData
+    val last6thDaySalesOrderData = CampaignInput.loadLastNdaysOrderData(6, fullOrderData, incrDate)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    //FIXME: loadLastNdaysOrderData
+    val last6thDaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(6, fullOrderItemData, incrDate)
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brandMvpCityRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_CITY_SUB_TYPE).cache()
+
+    val brandInCityCampaign = new BrandInCityCampaign()
+    brandInCityCampaign.runCampaign(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
+
+  }
+
+  def startReplenishmentCampaign(params: ParamInfo) = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    val contactListMobileFull = CampaignInput.loadFullVariablesData(DataSets.CONTACT_LIST_MOBILE, incrDate)
+
+    val fullSalesOrderData = CampaignInput.loadFullOrderData()
+
+    val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+
+    val replenishmentCampaign = new ReplenishmentCampaign()
+    replenishmentCampaign.runCampaign(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+
+  }
+
+  /**
+   * starting point of love campaigns
+   * @param params
+   */
+  def startLoveCampaigns(params: ParamInfo): Unit = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeUtils.YESTERDAY_FOLDER))
+    val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
+    val salesOrderItemFullData = CampaignInput.loadFullOrderItemData(incrDate)
+
+    val last35thSalesOrderData = CampaignInput.loadNthdayTableData(35, salesOrderFullData)
+    val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(35, salesOrderItemFullData)
+
+    val customerTopData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
+    val last15thSalesOrderData = CampaignInput.loadNthdayTableData(15, salesOrderFullData)
+    val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(15, salesOrderItemFullData)
+
+    val yesterdayItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
+
+    val brandMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE, incrDate).cache()
+
+    val mvpColorRecommendations = CampaignInput.loadRecommendationData(Recommendation.MVP_COLOR_SUB_TYPE, incrDate).cache()
+
+    val loveBrandCampaign = new LoveBrandCampaign()
+
+    loveBrandCampaign.runCampaign(customerTopData, last35thSalesOrderData, last35thSalesOrderItemData, brandMvpRecommendations, yesterdayItrSkuSimple, incrDate)
+
+    val loveColorCampaign = new LoveColorCampaign()
+
+    loveColorCampaign.runCampaign(customerTopData, last15thSalesOrderData, last15thSalesOrderItemData, mvpColorRecommendations, yesterdayItrSkuSimple, incrDate)
 
   }
 
@@ -319,21 +421,24 @@ object CampaignManager extends Serializable with Logging {
     newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
   }
 
-  def startHottestXCampaign() = {
+  def startHottestXCampaign(params: ParamInfo) = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val fullOrderItemData = CampaignInput.loadFullOrderItemData().cache()
-
-    val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
-    val last60DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(60, fullOrderItemData)
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    //FIXME:
+    val last60DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData, incrDate)
+    //FIXME:
+    val last60DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(60, fullOrderItemData, incrDate)
 
     val itrYesterdayData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
     val hottestXCampaign = new HottestXCampaign
 
-    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, itrYesterdayData, genderMvpBrickRecos)
+    hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, itrYesterdayData, genderMvpBrickRecos, incrDate)
 
   }
 
@@ -350,6 +455,51 @@ object CampaignManager extends Serializable with Logging {
     //Start: FollowUp email Campaign
     val followUpCampaigns = new FollowUpCampaigns()
     followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, itrSkYesterdayData)
+  }
+
+  def startGeoCampaigns(params: ParamInfo) = {
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val day40_orderData = CampaignInput.loadNthdayTableData(40, fullOrderData)
+    val day50_orderData = CampaignInput.loadNthdayTableData(50, fullOrderData)
+
+    val genderMvpBrickRecos = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
+    val genderMvpBrandRecos = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE).cache()
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val day40_orderItemData = CampaignInput.loadNthdayTableData(40, fullOrderItemData)
+    val day50_orderItemData = CampaignInput.loadNthdayTableData(50, fullOrderItemData)
+
+    val salesAddressData = CampaignInput.loadSalesAddressData()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
+
+    val geoStyleCampaign = new GeoStyleCampaign
+    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+
+    val geoBrandCampaign = new GeoBrandCampaign
+    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrandRecos)
+
+  }
+
+  def startClearanceCampaign(params: ParamInfo) = {
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    val fullOrderData = CampaignInput.loadFullOrderData()
+    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, incrDate)
+
+    val fullOrderItemData = CampaignInput.loadFullOrderItemData()
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData, incrDate)
+
+    val mvpDiscountRecos = CampaignInput.loadRecommendationData(Recommendation.MVP_DISCOUNT_SUB_TYPE).cache()
+
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
+
+    val clearanceCampaign = new ClearanceCampaign
+    clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, mvpDiscountRecos, yesterdayItrData)
   }
 
   def loadCustomerMasterData(): DataFrame = {
@@ -424,7 +574,7 @@ object CampaignManager extends Serializable with Logging {
    * @param campaignJsonPath
    */
   def startCampaignMerge(campaignJsonPath: String, campaignType: String) = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
       //      createCampaignMaps(json)
@@ -460,7 +610,7 @@ object CampaignManager extends Serializable with Logging {
 
         //writing csv file
         CampaignProcessor.splitFileToCSV(iosDF, androidDF, dateFolder)
-      } else {
+      } else if (campaignType == DataSets.EMAIL_CAMPAIGNS) {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp = "temp"
         val expectedDF = mergedData.withColumnRenamed(CampaignMergedFields.LIVE_CART_URL, CampaignMergedFields.LIVE_CART_URL + temp)
@@ -499,6 +649,56 @@ object CampaignManager extends Serializable with Logging {
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
+      } else if (campaignType == DataSets.CALENDAR_CAMPAIGNS) {
+        val GARBAGE = "NA" //:TODO replace with correct value
+        val temp = "temp"
+        val expectedDF = mergedData
+          .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+
+          .withColumn(CampaignMergedFields.CALENDAR_CITY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(5)))
+          .withColumn(CampaignMergedFields.CALENDAR_COLOR, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
+          .withColumn(CampaignMergedFields.CALENDAR_PRICE_POINT, lit(""))
+          .withColumn(CampaignMergedFields.CALENDAR_MAIL_TYPE, col(CampaignMergedFields.CAMPAIGN_MAIL_TYPE))
+
+          //          .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
+
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "2", lit(""))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "3", lit(""))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_SKU + "4", lit(""))
+
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "1", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(0)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "2", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "3", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "4", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(3)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "5", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(4)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "6", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(5)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "7", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(6)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "8", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(7)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "9", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(8)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "10", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(9)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "11", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(10)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "12", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(11)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "13", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(12)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "14", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(13)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "15", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(14)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_SKU + "16", Udf.getElementArray(col(CampaignMergedFields.REC_SKUS), lit(15)))
+          .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
+          .drop(CustomerVariables.EMAIL)
+          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+          .drop(CampaignMergedFields.LIVE_CART_URL)
+
+        val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+          .drop(CampaignMergedFields.REF_SKUS)
+          .drop(CampaignMergedFields.REC_SKUS)
+        CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
+        DataWriter.writeParquet(expectedDF, writePath, saveMode)
+        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, calendarCampaignFileName, saveMode, "true", ";")
       }
     }
   }

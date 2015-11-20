@@ -85,6 +85,11 @@ object Udf {
   val columnCount = udf((colList: List[String]) => UdfUtils.getCountColumn(colList: List[String]))
 
   /**
+   * concatenate two List
+   */
+  val concatenateListOfString = udf((l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]) => UdfUtils.concatenateList(l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]))
+
+  /**
    * Removes all zeroes string and null string to emptyString.
    */
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
@@ -147,6 +152,10 @@ object Udf {
   val getLatestEmailOpenDate = udf((s: String, s1: String, s2: String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1: String, s2: String, s3: String))
 
   val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
+
+  val nonBeauty = udf((category: String, created_at: String) => UdfUtils.nonBeauty(category: String, created_at: String))
+
+  val beauty = udf((category: String, created_at: String) => UdfUtils.beauty(category: String, created_at: String))
 
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

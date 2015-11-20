@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "brick_affinity",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

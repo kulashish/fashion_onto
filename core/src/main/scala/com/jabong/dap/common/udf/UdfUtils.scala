@@ -2,9 +2,9 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util
 import java.util.{ Calendar, Date }
 
+import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -434,6 +434,23 @@ object UdfUtils extends Logging {
   }
 
   /**
+   *
+   * @param l1
+   * @param l2
+   * @return
+   */
+  def concatenateList[T](l1: scala.collection.mutable.ArrayBuffer[T], l2: scala.collection.mutable.ArrayBuffer[T]): scala.collection.mutable.ArrayBuffer[T] = {
+
+    if (l1 == null) {
+      return l2
+    }
+    if (l2 == null) {
+      return l1
+    }
+
+    return l1 ++ l2
+  }
+  /**
    * returns dayName with max click given counts for 7 days
    * @param count1
    * @param count2
@@ -717,5 +734,43 @@ object UdfUtils extends Logging {
   def size(a: mutable.MutableList[String]): Int = {
     if (a == null) return 0
     a.size
+  }
+
+  def nonBeauty(category: String, created_at: String): String = {
+    if (category == null || created_at == null) {
+      return null
+    }
+
+    val lastPurchaseDay = RecommendationUtils.NonBeautyCategory.getOrElse(category, null)
+
+    if (lastPurchaseDay == null) {
+      return null
+    }
+
+    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+      return null
+    }
+
+    return category
+
+  }
+
+  def beauty(category: String, created_at: String): String = {
+    if (category == null || created_at == null) {
+      return null
+    }
+
+    val lastPurchaseDay = RecommendationUtils.BeautyCategory.getOrElse(category, null)
+
+    if (lastPurchaseDay == null) {
+      return null
+    }
+
+    if (TimeUtils.daysFromToday(created_at, TimeConstants.DATE_TIME_FORMAT) <= lastPurchaseDay.asInstanceOf[Int]) {
+      return null
+    }
+
+    return category
+
   }
 }

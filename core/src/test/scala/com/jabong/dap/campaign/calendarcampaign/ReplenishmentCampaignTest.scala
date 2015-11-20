@@ -19,13 +19,13 @@ class ReplenishmentCampaignTest extends FeatureSpec with GivenWhenThen with Shar
   @transient var fullSalesOrderItemData: DataFrame = _
   @transient var brickMvpRecommendations: DataFrame = _
   @transient var yesterdayItrData: DataFrame = _
-  @transient var yestCustomerData: DataFrame = _
+  @transient var contactlistMobile: DataFrame = _
 
   override def beforeAll() {
     super.beforeAll()
     sqlContext = Spark.getSqlContext()
     CampaignOutput.setTestMode(true)
-    yestCustomerData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/replenishment", "customer")
+    contactlistMobile = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/replenishment", "contact_list_mobile")
     fullSalesOrderData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/replenishment", "sales_order", Schema.salesOrder)
     fullSalesOrderItemData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/replenishment", "sales_order_item", Schema.salesOrderItem)
     yesterdayItrData = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/calendarcampaign/replenishment", "itr", TestSchema.basicSimpleItr)
@@ -36,15 +36,15 @@ class ReplenishmentCampaignTest extends FeatureSpec with GivenWhenThen with Shar
     scenario("generate Replenish data on the basis of product category "){
       Given("yestCustomerData, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData")
       val replenishmentCampaign = new ReplenishmentCampaign()
-      replenishmentCampaign.runCampaign(yestCustomerData, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData)
+      replenishmentCampaign.runCampaign(contactlistMobile, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
 
       val nonBeautyReplenishmentCampaignOut = CampaignOutput.testData(0)
       //      assert(nonBeautyReplenishmentCampaignOut._1.count() == 1)
-      assert(nonBeautyReplenishmentCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && nonBeautyReplenishmentCampaignOut._2 == CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN)
+      assert(nonBeautyReplenishmentCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && nonBeautyReplenishmentCampaignOut._2 == CampaignCommon.NON_BEAUTY_FRAG_CAMPAIGN)
 
       val beautyReplenishmentCampaignOut = CampaignOutput.testData(1)
       //      assert(nonBeautyReplenishmentCampaignOut._1.count() == 1)
-      assert(beautyReplenishmentCampaignOut._3 == DataSets.EMAIL_CAMPAIGNS && beautyReplenishmentCampaignOut._2 == CampaignCommon.BEAUTY_CAMPAIGN)
+      assert(beautyReplenishmentCampaignOut._3 == DataSets.CALENDAR_CAMPAIGNS && beautyReplenishmentCampaignOut._2 == CampaignCommon.BEAUTY_CAMPAIGN)
 
     }
   }

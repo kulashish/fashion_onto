@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "brand_in_city",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

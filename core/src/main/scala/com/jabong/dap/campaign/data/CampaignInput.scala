@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.data
 import java.io.File
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -14,6 +15,7 @@ import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
@@ -132,6 +134,21 @@ object CampaignInput extends Logging {
   }
 
   /**
+   *
+   * @param n
+   * @param inputData
+   * @return
+   */
+  def loadNthdayTableData(n: Int, inputData: DataFrame): DataFrame = {
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS))
+    val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
+    val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
+
+    val nthDayOrderData = Utils.getTimeBasedDataFrame(inputData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
+    nthDayOrderData
+  }
+
+  /**
    * load yesterdays itr sku simle data
    * @param dateYesterday
    * @return
@@ -240,7 +257,7 @@ object CampaignInput extends Logging {
    * @return dataframe with call campaigns data
    */
   def loadAllCampaignsData(date: String, campaignType: String): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     logger.info("Reading last day all campaigns data from hdfs : CampaignType" + campaignType)
     //FIXME:use proper data frame
@@ -255,6 +272,8 @@ object CampaignInput extends Logging {
       if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
+    CampaignUtils.debug(allCampaignData, "loading campaign data " + campaignType)
+
     return allCampaignData
   }
 
@@ -266,7 +285,7 @@ object CampaignInput extends Logging {
    * @return
    */
   def getCampaignData(name: String, date: String, campaignType: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + campaignType + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading " + name + " campaign data from path:- " + path + ", Type: " + campaignType)
@@ -642,4 +661,33 @@ object CampaignInput extends Logging {
     }
     tableNameUnionData
   }
+
+  def loadFullVariablesData(tableName: String, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading Full" + tableName + "Data data from hdfs")
+    val orderData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, tableName, DataSets.FULL_MERGE_MODE, date)
+    orderData
+  }
+
+  def loadPageViewSurfData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+
+    val hiveContext = Spark.getHiveContext()
+    val monthYear = TimeUtils.getMonthAndYear(date, TimeConstants.DATE_FORMAT_FOLDER)
+    val month = monthYear.month + 1
+    val day = monthYear.day
+    val year = monthYear.year
+
+    val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + ClickStreamConstant.MERGE_PAGEVISIT +
+      " where userid is not null and pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and sessionid != '(null)' and " +
+      "date1 = " + day + " and month1 = " + month + " and year1=" + year
+
+    val pageViewSurfData = hiveContext.sql(hiveQuery)
+    return pageViewSurfData
+  }
+
+  def loadSalesAddressData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading order item data from hdfs for " + date)
+    val salesAddrData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
+    salesAddrData
+  }
+
 }
