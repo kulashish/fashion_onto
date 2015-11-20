@@ -144,15 +144,15 @@ object CustomerOrders extends DataFeedsModel {
     // println("custOrdersStatusMap ", custOrdersStatusMap.count())
     // custOrdersStatusMap.show(10)
 
-    println("custTop5Incr ", custTop5Incr.count())
+    // println("custTop5Incr ", custTop5Incr.count())
     val salesCatBrick = custTop5Incr.select(
       custTop5Incr(SalesOrderVariables.FK_CUSTOMER),
       custTop5Incr("CAT_1") as SalesOrderVariables.CATEGORY_PENETRATION,
       custTop5Incr("BRICK_1") as SalesOrderVariables.BRICK_PENETRATION,
       custTop5Incr("BRAND_1") as SalesOrderItemVariables.FAV_BRAND
     )
-    println("salesCatBrick ", salesCatBrick.count())
-    salesCatBrick.show(10)
+    // println("salesCatBrick ", salesCatBrick.count())
+    // salesCatBrick.show(10)
 
     val salesOrderNew = salesOrderIncrFil.na.fill(Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
@@ -162,9 +162,9 @@ object CustomerOrders extends DataFeedsModel {
       .drop(salesOrderItemIncrFil(SalesOrderItemVariables.CREATED_AT))
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(salesOrderJoined)
-    println("salesOrderValueIncr ", salesOrderValueIncr.count())
-    salesOrderValueIncr.printSchema()
-    salesOrderValueIncr.show(10)
+    // println("salesOrderValueIncr ", salesOrderValueIncr.count())
+    // salesOrderValueIncr.printSchema()
+    // salesOrderValueIncr.show(10)
 
     val custOrdersCalc = merger(salesRevenueIncr, salesDiscountIncr, salesInvalidIncr, salesCatBrick, salesOrderValueIncr, salesOrderAddrFavIncr)
     println("custOrdersCalc ", custOrdersCalc.count())
