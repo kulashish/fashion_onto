@@ -161,7 +161,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
         coalesce(dfIncrVarBC(ContactListMobileVars.MOBILE_PERMISION_STATUS), contactListMobilePrevFull(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
 
-        coalesce(dfIncrVarBC(CustomerVariables.CITY), contactListMobilePrevFull(CustomerVariables.CITY)) as CustomerVariables.CITY,
+        coalesce(dfIncrVarBC(ContactListMobileVars.CITY), contactListMobilePrevFull(CustomerVariables.CITY)) as CustomerVariables.CITY,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.COUNTRY), contactListMobilePrevFull(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
 
