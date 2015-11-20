@@ -153,12 +153,17 @@ object CampaignManager extends Serializable with Logging {
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData()
 
+    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370,fullSalesOrderData)
+
+    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370,fullSalesOrderItemData)
+
+
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
     val replenishmentCampaign = new ReplenishmentCampaign()
-    replenishmentCampaign.runCampaign(contactListMobileFull, fullSalesOrderData, fullSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+    replenishmentCampaign.runCampaign(contactListMobileFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
 
   }
 

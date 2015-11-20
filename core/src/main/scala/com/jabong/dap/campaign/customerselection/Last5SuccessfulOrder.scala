@@ -15,9 +15,9 @@ import org.apache.spark.sql.functions._
  */
 class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
 
-  override def customerSelection(customerData: DataFrame, fullSalesOrderData: DataFrame, fullSalesOrderItemData: DataFrame): DataFrame = {
+  override def customerSelection(customerData: DataFrame, salesOrderData: DataFrame, salesOrderItemData: DataFrame): DataFrame = {
 
-    if (customerData == null || fullSalesOrderData == null || fullSalesOrderItemData == null) {
+    if (customerData == null || salesOrderData == null || salesOrderItemData == null) {
 
       logger.error("Data frame should not be null")
 
@@ -27,7 +27,7 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
     val filterCustomerData = customerData.filter(ContactListMobileVars.NET_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
       .select(CustomerVariables.ID_CUSTOMER)
 
-    val coalesceFullSalesOrderData = fullSalesOrderData
+    val coalesceFullSalesOrderData = salesOrderData
     val joinedDf = filterCustomerData.join(
       coalesceFullSalesOrderData,
       filterCustomerData(CustomerVariables.ID_CUSTOMER) === coalesceFullSalesOrderData(SalesOrderVariables.FK_CUSTOMER),
@@ -37,7 +37,7 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
     CampaignUtils.debug(joinedDf, "last 5 orders joinedDf")
 
     val lastOrder = new LastOrder()
-    val dfCustomerSelection = lastOrder.customerSelection(joinedDf, fullSalesOrderItemData)
+    val dfCustomerSelection = lastOrder.customerSelection(joinedDf, salesOrderItemData)
 
     CampaignUtils.debug(dfCustomerSelection, "last 5 orders dfCustomerSelection")
 
