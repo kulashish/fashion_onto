@@ -47,33 +47,34 @@ object SalesOrderItem {
   def getCouponDisc(salesOrder: DataFrame, salesRuleFull: DataFrame, salesRuleSet: DataFrame): DataFrame = {
     val salesRuleJoined = salesOrder.join(salesRuleFull, salesOrder(SalesOrderVariables.COUPON_CODE) === salesRuleFull(SalesRuleVariables.CODE)).select(
       salesOrder(SalesOrderVariables.FK_CUSTOMER),
-      salesOrder(SalesOrderVariables.ID_SALES_ORDER),
       salesRuleFull(SalesRuleVariables.CODE),
       salesRuleFull(SalesRuleVariables.FK_SALES_RULE_SET)
     )
     val salesSetJoined = salesRuleJoined.join(salesRuleSet, salesRuleSet(SalesRuleSetVariables.ID_SALES_RULE_SET) === salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET))
       .select(salesRuleJoined(SalesOrderVariables.FK_CUSTOMER),
-        salesRuleJoined(SalesOrderVariables.ID_SALES_ORDER),
         salesRuleJoined(SalesRuleVariables.CODE),
         salesRuleJoined(SalesRuleVariables.FK_SALES_RULE_SET),
         salesRuleSet(SalesRuleSetVariables.DISCOUNT_TYPE),
         salesRuleSet(SalesRuleSetVariables.DISCOUNT_PERCENTAGE),
         salesRuleSet(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT)).na.fill(0)
 
-    val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
     val percent = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "percent")
-    val disc = percent.groupBy(SalesOrderVariables.ID_SALES_ORDER)
-      .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+    val disc = percent.groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(
         min(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MIN_DISCOUNT_USED,
         max(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as SalesRuleSetVariables.MAX_DISCOUNT_USED,
         sum(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_sum",
-        count(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_count")
-    val coup = fixed.groupBy(SalesOrderVariables.ID_SALES_ORDER)
-      .agg(first(SalesOrderVariables.FK_CUSTOMER) as SalesOrderVariables.FK_CUSTOMER,
+        count(SalesRuleSetVariables.DISCOUNT_PERCENTAGE) as "discount_count"
+      )
+
+    val fixed = salesSetJoined.filter(salesSetJoined(SalesRuleSetVariables.DISCOUNT_TYPE) === "fixed")
+    val coup = fixed.groupBy(SalesOrderVariables.FK_CUSTOMER)
+      .agg(
         min(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MIN_COUPON_VALUE_USED,
         max(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as SalesRuleSetVariables.MAX_COUPON_VALUE_USED,
         sum(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_sum",
-        count(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_count")
+        count(SalesRuleSetVariables.DISCOUNT_AMOUNT_DEFAULT) as "coupon_count"
+      )
 
     val incr = disc.join(coup, coup(SalesOrderVariables.FK_CUSTOMER) === disc(SalesOrderVariables.FK_CUSTOMER))
       .select(coalesce(coup(SalesOrderVariables.FK_CUSTOMER), disc(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
