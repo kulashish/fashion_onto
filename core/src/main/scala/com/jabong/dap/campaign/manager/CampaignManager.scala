@@ -143,13 +143,17 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
+  /**
+   *
+   * @param params
+   */
   def startReplenishmentCampaign(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val customerOrderFull = CampaignInput.loadFullVariablesData(DataSets.CUSTOMER_ORDERS, incrDate).
       select(CustomerVariables.FK_CUSTOMER,
-        SalesOrderItemVariables.SUCCESSFUL_ORDERS)
+             SalesOrderItemVariables.SUCCESSFUL_ORDERS)
 
     val fullSalesOrderData = CampaignInput.loadFullOrderData()
 
