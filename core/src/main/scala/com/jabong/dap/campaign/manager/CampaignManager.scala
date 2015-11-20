@@ -163,6 +163,7 @@ object CampaignManager extends Serializable with Logging {
       select(SalesOrderVariables.FK_CUSTOMER,
              SalesOrderVariables.CUSTOMER_EMAIL,
              SalesOrderVariables.ID_SALES_ORDER,
+             SalesOrderVariables.CREATED_AT,
              SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
 
     val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData).
