@@ -1,22 +1,19 @@
 package com.jabong.dap.campaign.recommendation
 
-import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesAddressVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.types.BooleanType
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.BooleanType
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 /**
  * Created by rahul aneja on 21/8/15.
@@ -83,10 +80,6 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(SalesAddressVariables.CITY) as CampaignMergedFields.CALENDAR_CITY,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
-
-    CampaignOutput.saveCampaignDataForYesterday(completeRefSku, "completeRefSku", DataSets.CALENDAR_CAMPAIGNS)
-    CampaignOutput.saveCampaignDataForYesterday(recommendationJoined, "recommendationJoined", DataSets.CALENDAR_CAMPAIGNS)
-    CampaignOutput.saveCampaignDataForYesterday(recommendationSelected, "recommendationSelected", DataSets.CALENDAR_CAMPAIGNS)
 
     CampaignUtils.debug(recommendationSelected, "after recommendationSelected")
 
