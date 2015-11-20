@@ -162,14 +162,17 @@ object CustomerOrders extends DataFeedsModel {
       .drop(salesOrderItemIncrFil(SalesOrderItemVariables.CREATED_AT))
 
     val salesOrderValueIncr = SalesOrderItem.getOrderValue(salesOrderJoined)
+    println("salesOrderValueIncr ", salesOrderValueIncr.count())
     salesOrderValueIncr.printSchema()
-    salesOrderValueIncr.show(5)
+    salesOrderValueIncr.show(10)
 
     val custOrdersCalc = merger(salesRevenueIncr, salesDiscountIncr, salesInvalidIncr, salesCatBrick, salesOrderValueIncr, salesOrderAddrFavIncr)
+    println("custOrdersCalc ", custOrdersCalc.count())
     custOrdersCalc.printSchema()
     custOrdersCalc.show(10)
 
     val custOrderFull = joinCustOrder(custOrdersCalc, custOrdersPrevFull)
+    println("custOrderFull ", custOrderFull.count())
     custOrderFull.printSchema()
     custOrderFull.show(10)
     dfWrite.put("custOrderFull", custOrderFull)
