@@ -1129,7 +1129,7 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.STATUS, lit(1))
       .withColumn(CampaignMergedFields.VISIT, lit(41))
       .withColumn(CampaignMergedFields.SPECIAL_TEXT, lit("4"))
-      .withColumn(CampaignMergedFields.SENDING_METHOD, lit(1))
+      .withColumn(CampaignMergedFields.SENDING_METHOD, lit("4-N-N-N-N-N-N-N-N-41"))
       .withColumn(CampaignMergedFields.ARTICLE, when(col(CampaignMergedFields.NUMBER_SKUS) <=4,lit(0)).otherwise(col("numberSkus")-4))
       .withColumn(CampaignMergedFields.URL, col(CampaignMergedFields.LIVE_CART_URL))
       .withColumn(CampaignMergedFields.LIVE_REF_SKU+"1", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
