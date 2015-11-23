@@ -825,7 +825,11 @@ object CampaignUtils extends Logging {
     CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
-
+  /**
+   *
+   * @param iterable
+   * @return
+   */
   def getBrickAffinityData(iterable: Iterable[Row]): Row ={
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
@@ -841,7 +845,7 @@ object CampaignUtils extends Logging {
     var outList = List[String]()
     if(iterable.size==2){
       val l1 = iterable.head(recommendationIndex).asInstanceOf[List[String]]
-      val l2 = iterable.head(recommendationIndex).asInstanceOf[List[String]]
+      val l2 = iterable.last(recommendationIndex).asInstanceOf[List[String]]
 
       val list1Length = l1.length
       val list2Length = l2.length
