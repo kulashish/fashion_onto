@@ -867,7 +867,7 @@ object CampaignUtils extends Logging {
 
     }else{
       val l1 = iterable.head(recommendationIndex).asInstanceOf[List[String]]
-      outList = l1
+      outList = l1.take(l1.length)
 
     }
     return Row(iterable.head(emailIndex),iterable.head(refSkuIndex),outList,iterable.head(campaignMailTypeIndex))
