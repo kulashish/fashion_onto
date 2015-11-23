@@ -16,6 +16,7 @@ object TimeUtils extends Logging {
 
   val YESTERDAY_FOLDER = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
   val LAST_HOUR_FOLDER = TimeUtils.getDateAfterHours(-1, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+  val CURRENT_HOUR_FOLDER = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
 
   val yesterday = TimeUtils.getDateAfterNDays(-1, _: String)
 

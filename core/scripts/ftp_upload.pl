@@ -286,7 +286,7 @@ sub upload_email_campaigns_feedFiles {
     # 20150928_CUST_ORDERS.csv
     $filename = "$date_with_zero_today"."_CUST_ORDERS.csv";
     $folderName = "customerOrders";
-    $status ||= fetchFeedFile($fname, $folderName, $base);
+    $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_CONTACTS_LIST.csv
     $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
