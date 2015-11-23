@@ -451,7 +451,6 @@ object UdfUtils extends Logging {
     return l1 ++ l2
   }
 
-
   /**
    *
    * @param l1
@@ -467,15 +466,14 @@ object UdfUtils extends Logging {
     }
     val list1Length = l1.length
     val list2Length = l2.length
-    if (list1Length < 8){
+    if (list1Length < 8) {
       if (list2Length >= (16 - list1Length)) {
         val takeLength = 16 - list1Length
         return l1.take(list1Length) ++ l2.take(takeLength)
       } else {
         return l1.take(list1Length) ++ l2.take(list2Length)
       }
-  }
-    else if(list2Length < 8) {
+    } else if (list2Length < 8) {
       if (list1Length >= (16 - list2Length)) {
         val takeLength = 16 - list2Length
         return l1.take(takeLength) ++ l2.take(list2Length)
@@ -808,7 +806,7 @@ object UdfUtils extends Logging {
       return null
     }
 
-   // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
+    // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
     if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
       return category
     }
@@ -818,7 +816,7 @@ object UdfUtils extends Logging {
   }
 
   def beauty(category: String, created_at: Timestamp): String = {
-//    println(category,created_at)
+    //    println(category,created_at)
     if (category == null || created_at == null) {
       return null
     }
@@ -834,7 +832,7 @@ object UdfUtils extends Logging {
     if (lastPurchaseDay == null) {
       return null
     }
-   // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
+    // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
 
     if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
       return category
@@ -856,7 +854,7 @@ object UdfUtils extends Logging {
       return 0
 
     val acartData = acartUrl.split("=")
-    if(acartData.length>1){
+    if (acartData.length > 1) {
       return acartData(0).split(",").length
     }
     return 0
