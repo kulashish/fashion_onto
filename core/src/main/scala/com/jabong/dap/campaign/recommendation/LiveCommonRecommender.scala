@@ -1,10 +1,12 @@
 package com.jabong.dap.campaign.recommendation
 
+import java.security.Timestamp
+
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables, SalesAddressVariables }
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, CustomerVariables, ProductVariables, SalesAddressVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
@@ -60,6 +62,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.priceBand") as ProductVariables.PRICE_BAND,
       refSkuExploded("ref_sku_fields.color") as ProductVariables.COLOR,
       refSkuExploded("ref_sku_fields.city") as SalesAddressVariables.CITY,
+      refSkuExploded("ref_sku_fields.created_at") as SalesOrderItemVariables.CREATED_AT,
+      refSkuExploded("ref_sku_fields.paid_price") as SalesOrderItemVariables.PAID_PRICE,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     CampaignUtils.debug(completeRefSku, "after completeRefSku")
@@ -78,6 +82,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(ProductVariables.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
       completeRefSku(ProductVariables.COLOR) as CampaignMergedFields.CALENDAR_COLOR,
       completeRefSku(SalesAddressVariables.CITY) as CampaignMergedFields.CALENDAR_CITY,
+      completeRefSku(SalesOrderItemVariables.CREATED_AT) as CampaignMergedFields.CALENDAR_LAST_PURCHASED,
+      completeRefSku(SalesOrderItemVariables.PAID_PRICE) as CampaignMergedFields.CALENDAR_PRICE_POINT,
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
@@ -184,13 +190,13 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String)], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
     val topRow = iterable.head
     val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
-    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String)] = mutable.MutableList()
+    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
@@ -202,6 +208,8 @@ class LiveCommonRecommender extends Recommender with Logging {
     val liveProdNameIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_PROD_NAME)
     val calendarColorIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_COLOR)
     val calendarCityIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_CITY)
+    val calendarLastPurchasedIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_LAST_PURCHASED)
+    val calendarPricePointIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_PRICE_POINT)
 
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
@@ -211,7 +219,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
       referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
-        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
+        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex)), CampaignUtils.checkNullTimestamp(row(calendarLastPurchasedIndex)).asInstanceOf[Timestamp], CampaignUtils.checkNullDouble(row(calendarPricePointIndex))))
 
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)

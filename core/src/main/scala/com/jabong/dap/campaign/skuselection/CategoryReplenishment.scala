@@ -52,7 +52,8 @@ object CategoryReplenishment extends Logging {
       filterNonBeauty(ProductVariables.MVP),
       filterNonBeauty(ProductVariables.GENDER),
       filterNonBeauty(ProductVariables.PRODUCT_NAME),
-      filterNonBeauty(ProductVariables.STOCK))
+      filterNonBeauty(ProductVariables.STOCK),
+      filterNonBeauty(SalesOrderVariables.CREATED_AT))
       .na.drop("any", Array(ProductVariables.CATEGORY))
 
     nonBeauty
@@ -71,7 +72,8 @@ object CategoryReplenishment extends Logging {
       filterBeauty(ProductVariables.MVP),
       filterBeauty(ProductVariables.GENDER),
       filterBeauty(ProductVariables.PRODUCT_NAME),
-      filterBeauty(ProductVariables.STOCK))
+      filterBeauty(ProductVariables.STOCK),
+      filterBeauty(SalesOrderVariables.CREATED_AT))
       .na.drop("any", Array(ProductVariables.CATEGORY))
 
     beauty
