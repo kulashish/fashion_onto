@@ -770,20 +770,20 @@ object CampaignUtils extends Logging {
         CampaignUtils.debug(dfBrick1, "dfBrick1")
         CampaignUtils.debug(dfBrick2, "dfBrick2")
 
-        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, 8)
+        val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, 8)
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
         CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
 
         val dfJoined = dfBrick1RecommendationData.join(
           dfBrick2RecommendationData,
           dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
-          SQL.INNER
+          SQL.LEFT_OUTER
         ).select(
-            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
+            coalesce(dfBrick1RecommendationData(CampaignMergedFields.EMAIL),dfBrick2RecommendationData(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
             dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
-            Udf.concatenateListOfString(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+            Udf.concatenateRecSkuList(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
             dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
             dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
           )
