@@ -842,10 +842,10 @@ object CampaignUtils extends Logging {
     val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
 
-    var outList = List[String]()
+    var outList = scala.collection.mutable.MutableList[String]()
     if(iterable.size==2){
-      val l1 = iterable.head(recommendationIndex).asInstanceOf[List[String]]
-      val l2 = iterable.last(recommendationIndex).asInstanceOf[List[String]]
+      val l1 = iterable.head(recommendationIndex).asInstanceOf[scala.collection.mutable.MutableList[String]]
+      val l2 = iterable.last(recommendationIndex).asInstanceOf[scala.collection.mutable.MutableList[String]]
 
       val list1Length = l1.length
       val list2Length = l2.length
@@ -866,7 +866,7 @@ object CampaignUtils extends Logging {
       }
 
     }else{
-      val l1 = iterable.head(recommendationIndex).asInstanceOf[List[String]]
+      val l1 = iterable.head(recommendationIndex).asInstanceOf[scala.collection.mutable.MutableList[String]]
       outList = l1.take(l1.length)
 
     }
