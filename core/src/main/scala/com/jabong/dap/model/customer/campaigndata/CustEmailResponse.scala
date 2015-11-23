@@ -77,7 +77,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfMap.put("custEmailResPrevFull", prevFullDf)
 
     val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
-      incrDate).filter(col(CustomerVariables.EMAIL) isNotNull)
+      incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
     dfMap.put("cmrFull", dfCmrFull)
 
     val nlSubscribers = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION,
@@ -100,7 +100,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val custEmailResIncr = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
       aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
-      .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
+      .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as ContactListMobileVars.UID,
         outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
         col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
         col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY).cast(IntegerType) as EmailResponseVariables.CLICKS_TODAY,
@@ -132,7 +132,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val custEmailResCsv = custEmailResFull.except(prevFullDf).select(
       col(ContactListMobileVars.UID),
-      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT), col(EmailResponseVariables.END_DATE), lit(date)),
+      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT), col(EmailResponseVariables.END_DATE), lit(date))
+        as EmailResponseVariables.OPEN_SEGMENT,
       col(EmailResponseVariables.OPEN_7DAYS),
       col(EmailResponseVariables.OPEN_15DAYS),
       col(EmailResponseVariables.OPEN_30DAYS),
@@ -264,7 +265,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   def merge(resultSet: DataFrame, dfCmrFull: DataFrame, nlSubscribers: DataFrame) = {
 
-    val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(CustomerVariables.RESPONSYS_ID) === resultSet(EmailResponseVariables.CUSTOMER_ID),
+    val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(ContactListMobileVars.UID) === resultSet(ContactListMobileVars.UID),
       SQL.LEFT_OUTER)
 
     val result = cmrResDf.join(nlSubscribers, cmrResDf(CustomerVariables.EMAIL) === nlSubscribers(CustomerVariables.EMAIL),
@@ -296,10 +297,10 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     }
 
     val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, CustEmailSchema.reqCsvDf,
-      effective7, CustEmailSchema.reqCsvDf, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      effective7, CustEmailSchema.reqCsvDf, ContactListMobileVars.UID, ContactListMobileVars.UID)
 
     val joined_7_15_summary = joined_7_15.select(
-      coalesce(col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID), col(EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
+      coalesce(col(MergeUtils.NEW_ + ContactListMobileVars.UID), col(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
       col(EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICK_7DAYS,
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICK_15DAYS,
       col(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPEN_7DAYS,
@@ -308,7 +309,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       .withColumn(EmailResponseVariables.OPEN_15DAYS, findOpen(col(EmailResponseVariables.OPEN_15DAYS), col(EmailResponseVariables.CLICK_15DAYS)))
 
     val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, CustEmailSchema.reqCsvDf,
-      joined_7_15_summary, CustEmailSchema.effective7_15Schema, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      joined_7_15_summary, CustEmailSchema.effective7_15Schema, ContactListMobileVars.UID, ContactListMobileVars.UID)
       .na.fill(Map(
         EmailResponseVariables.CLICK_15DAYS -> 0,
         EmailResponseVariables.OPEN_15DAYS -> 0,
@@ -318,8 +319,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY -> 0))
 
     val joined_7_15_30_summary = joined_7_15_30.select(
-      coalesce(col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID), col(EmailResponseVariables.CUSTOMER_ID))
-        as EmailResponseVariables.CUSTOMER_ID,
+      coalesce(col(MergeUtils.NEW_ + ContactListMobileVars.UID), col(ContactListMobileVars.UID))
+        as ContactListMobileVars.UID,
       col(EmailResponseVariables.CLICK_7DAYS) as EmailResponseVariables.CLICK_7DAYS,
       col(EmailResponseVariables.CLICK_15DAYS) as EmailResponseVariables.CLICK_15DAYS,
       col(EmailResponseVariables.OPEN_7DAYS) as EmailResponseVariables.OPEN_7DAYS,
@@ -329,7 +330,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       .withColumn(EmailResponseVariables.OPEN_30DAYS, findOpen(col(EmailResponseVariables.OPEN_30DAYS), col(EmailResponseVariables.CLICK_30DAYS)))
 
     val joinedIncr = MergeUtils.joinOldAndNewDF(incremental, CustEmailSchema.resCustomerEmail,
-      joined_7_15_30_summary, CustEmailSchema.resCustomerEmail, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      joined_7_15_30_summary, CustEmailSchema.resCustomerEmail, ContactListMobileVars.UID, ContactListMobileVars.UID)
       .na.fill(Map(
         EmailResponseVariables.CLICK_15DAYS -> 0,
         EmailResponseVariables.OPEN_15DAYS -> 0,
@@ -341,7 +342,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY -> 0))
 
     val joinedIncrSummary = joinedIncr.select(
-      coalesce(col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID), col(EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
+      coalesce(col(MergeUtils.NEW_ + ContactListMobileVars.UID), col(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY) - col(EmailResponseVariables.CLICK_7DAYS) as EmailResponseVariables.CLICK_7DAYS,
       col(MergeUtils.NEW_ + EmailResponseVariables.OPENS_TODAY) - col(EmailResponseVariables.OPEN_7DAYS) as EmailResponseVariables.OPEN_7DAYS,
       col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY) - col(EmailResponseVariables.CLICK_15DAYS) as EmailResponseVariables.CLICK_15DAYS,
@@ -356,7 +357,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     val prevEffDf = SchemaUtils.addColumns(full, CustEmailSchema.effective_Smry_Schema)
 
     val incrDateFullDf = MergeUtils.joinOldAndNewDF(joinedIncrSummary, CustEmailSchema.effective_Smry_Schema, prevEffDf, CustEmailSchema.effective_Smry_Schema,
-      EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      ContactListMobileVars.UID, ContactListMobileVars.UID)
       .na.fill(
         Map(
           EmailResponseVariables.CLICKS_LIFETIME -> 0,
@@ -377,7 +378,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
           MergeUtils.NEW_ + EmailResponseVariables.OPEN_30DAYS -> 0))
 
     val incrDatefullSummary = incrDateFullDf.select(
-      coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
+      coalesce(col(ContactListMobileVars.UID), col(MergeUtils.NEW_ + ContactListMobileVars.UID)) as ContactListMobileVars.UID,
       Udf.getLatestEmailOpenDate(lit(""), lit(""), col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE),
         col(EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE,
       Udf.getLatestEmailOpenDate(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_OPEN_DATE), col(EmailResponseVariables.LAST_OPEN_DATE),
