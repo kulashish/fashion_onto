@@ -773,11 +773,12 @@ object CampaignUtils extends Logging {
         val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        val dfJoined = dfBrick1RecommendationData
-//        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
-//        CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
-//
-//        val dfJoined = dfBrick1RecommendationData.join(
+        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
+        CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
+
+        val dfJoined = dfBrick2RecommendationData
+
+        //        val dfJoined = dfBrick1RecommendationData.join(
 //          dfBrick2RecommendationData,
 //          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
 //          SQL.LEFT_OUTER
