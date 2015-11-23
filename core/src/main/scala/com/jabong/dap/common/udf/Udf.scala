@@ -163,5 +163,7 @@ object Udf {
 
   val lengthString = udf((string: String) => UdfUtils.lengthString(string: String))
 
+  val getAcartNumberOfSkus = udf((string: String) => UdfUtils.acartNumberOfSkus(string: String))
+
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

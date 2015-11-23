@@ -32,6 +32,8 @@ object CategoryReplenishment extends Logging {
         yesterdayItrData(ProductVariables.CATEGORY)
       ).cache()
 
+    CampaignUtils.debug(filteredSkuJoinedItr, "filteredSkuJoinedItr")
+
     val filterNonBeauty = getNonBeauty(filteredSkuJoinedItr)
 
     val filterBeauty = getBeauty(filteredSkuJoinedItr)

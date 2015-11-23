@@ -55,5 +55,18 @@ object CampaignMergedFields {
   val REC_SKU = "REC_SKU"
   val LIVE_REF = "LIVE_REF_1"
   val PRODUCT_GENDER = "PRODUCT_GENDER"
+  val BRAND = "BRAND"
+  val BRICK = "BRICK"
+  val CATEGORY = "CATEGORY"
+
+  // Acart Hourly Campaign
+
+  val STATUS = "STATUS"
+  val VISIT = "VISIT"
+  val SPECIAL_TEXT = "SPECIALTEXT"
+  val SENDING_METHOD = "SENDING_METHOD"
+  val ARTICLE = "ARTICLE"
+  val URL = "URL"
+  val NUMBER_SKUS = "NUMBER_SKUS"
 
 }
