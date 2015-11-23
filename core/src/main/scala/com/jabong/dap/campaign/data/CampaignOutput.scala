@@ -44,9 +44,9 @@ object CampaignOutput {
       if (campaignName.equals(CampaignCommon.ACART_HOURLY_CAMPAIGN)) {
         val dateToday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         val acartPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateToday)
-        val acartOutData = CampaignUtils.getAcartHourlyFields(campaignOutput)
+        val acartOutData = CampaignUtils.getAcartHourlyFields(campaignOutput).cache()
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, acartPath)) {
-          DataWriter.writeParquet(campaignOutput, acartPath, DataSets.IGNORE_SAVEMODE)
+          DataWriter.writeParquet(acartOutData, acartPath, DataSets.IGNORE_SAVEMODE)
         }
         val campaignCsvOutput = acartOutData
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)

@@ -1114,7 +1114,7 @@ object CampaignUtils extends Logging {
 
   @elidable(FINE) def debug(data: DataFrame, name: String) {
     println("Count of " + name + ":-" + data.count() + "\n")
-    println("show dataframe " + name + ":-" + data.show(10) + "\n")
+    println("show dataframe " + name + ":-" + data.show(100) + "\n")
 
     data.printSchema()
   }
@@ -1123,7 +1123,7 @@ object CampaignUtils extends Logging {
     require(inputData != null, "acart hourly data cannot be null")
 
     val inputDataNumberSkus = inputData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
-    val AcartOutData = inputDataNumberSkus
+    val acartOutData = inputDataNumberSkus
       .withColumn(ContactListMobileVars.UID, lit(""))
       .withColumn(CampaignMergedFields.STATUS, lit(1))
       .withColumn(CampaignMergedFields.VISIT, lit(41))
@@ -1143,8 +1143,8 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
 
-    debug(AcartOutData, "AcartOutData")
-    return AcartOutData
+    debug(acartOutData, "AcartOutData")
+    return acartOutData
   }
 
 }
