@@ -835,7 +835,7 @@ object CampaignUtils extends Logging {
     val emailIndex = topRow.fieldIndex(CampaignMergedFields.EMAIL)
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val acartUrl = CampaignUtils.checkNullString(topRow(acartUrlIndex))
-    val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKU)
+    val refSkuIndex = topRow.fieldIndex(CampaignMergedFields.REF_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
 
     var outList = List[String]()
