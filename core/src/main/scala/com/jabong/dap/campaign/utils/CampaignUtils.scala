@@ -778,21 +778,21 @@ object CampaignUtils extends Logging {
 
         val dfBrickUnion = dfBrick1RecommendationData.unionAll(dfBrick2RecommendationData)
 
-        val brickAffinityData = dfBrickUnion.rdd.map(row => (row(row.fieldIndex(CustomerVariables.EMAIL)).asInstanceOf[String],row)).groupByKey().
-          map{case(key,value) => getBrickAffinityData(value)}
+        val brickAffinityData = dfBrickUnion.rdd.map(row => (row(row.fieldIndex(CustomerVariables.EMAIL)).asInstanceOf[String], row)).groupByKey().
+          map{ case (key, value) => getBrickAffinityData(value) }
 
-        val brickDf = sqlContext.createDataFrame(brickAffinityData,Schema.emailCampaignSchema)
+        val brickDf = sqlContext.createDataFrame(brickAffinityData, Schema.emailCampaignSchema)
 
-//        val dfJoined = dfBrick1RecommendationData.join(
-//          dfBrick2RecommendationData,
-//          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
-//          SQL.LEFT_OUTER
-//        ).select(
-//            coalesce(dfBrick1RecommendationData(CampaignMergedFields.EMAIL), dfBrick2RecommendationData(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
-//            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
-//            Udf.concatenateRecSkuList(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
-//            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-//            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL))
+        //        val dfJoined = dfBrick1RecommendationData.join(
+        //          dfBrick2RecommendationData,
+        //          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
+        //          SQL.LEFT_OUTER
+        //        ).select(
+        //            coalesce(dfBrick1RecommendationData(CampaignMergedFields.EMAIL), dfBrick2RecommendationData(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
+        //            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
+        //            Udf.concatenateRecSkuList(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+        //            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+        //            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL))
         //          ).select(
         //                    dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
         //                    dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
@@ -830,7 +830,7 @@ object CampaignUtils extends Logging {
    * @param iterable
    * @return
    */
-  def getBrickAffinityData(iterable: Iterable[Row]): Row ={
+  def getBrickAffinityData(iterable: Iterable[Row]): Row = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -843,7 +843,7 @@ object CampaignUtils extends Logging {
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
 
     var outList = scala.collection.mutable.MutableList[String]()
-    if(iterable.size==2){
+    if (iterable.size == 2) {
       val l1 = iterable.head(recommendationIndex).asInstanceOf[scala.collection.mutable.MutableList[String]]
       val l2 = iterable.last(recommendationIndex).asInstanceOf[scala.collection.mutable.MutableList[String]]
 
@@ -854,7 +854,7 @@ object CampaignUtils extends Logging {
           val takeLength = 16 - list1Length
           outList = l1.take(list1Length) ++ l2.take(takeLength)
         } else {
-           outList = l1.take(list1Length) ++ l2.take(list2Length)
+          outList = l1.take(list1Length) ++ l2.take(list2Length)
         }
       } else if (list2Length < 8) {
         if (list1Length >= (16 - list2Length)) {
@@ -865,12 +865,12 @@ object CampaignUtils extends Logging {
         }
       }
 
-    }else{
+    } else {
       val l1 = iterable.head(recommendationIndex).asInstanceOf[scala.collection.mutable.MutableList[String]]
       outList = l1.take(l1.length)
 
     }
-    return Row(iterable.head(emailIndex),iterable.head(refSkuIndex),outList,iterable.head(campaignMailTypeIndex))
+    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex))
 
   }
   /**
