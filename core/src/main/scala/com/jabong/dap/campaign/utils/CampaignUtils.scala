@@ -1119,22 +1119,21 @@ object CampaignUtils extends Logging {
     data.printSchema()
   }
 
+  def getAcartHourlyFields(inputData: DataFrame): DataFrame = {
+    require(inputData != null, "acart hourly data cannot be null")
 
-  def getAcartHourlyFields(inputData:DataFrame): DataFrame ={
-    require(inputData!=null,"acart hourly data cannot be null")
-
-    val inputDataNumberSkus = inputData.withColumn("numberSkus",Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
+    val inputDataNumberSkus = inputData.withColumn("numberSkus", Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
     val AcartOutData = inputDataNumberSkus
-      .withColumn(ContactListMobileVars.UID,  lit(""))
+      .withColumn(ContactListMobileVars.UID, lit(""))
       .withColumn(CampaignMergedFields.STATUS, lit(1))
       .withColumn(CampaignMergedFields.VISIT, lit(41))
       .withColumn(CampaignMergedFields.SPECIAL_TEXT, lit("4"))
       .withColumn(CampaignMergedFields.SENDING_METHOD, lit("4-N-N-N-N-N-N-N-N-41"))
-      .withColumn(CampaignMergedFields.ARTICLE, when(col(CampaignMergedFields.NUMBER_SKUS) <=4,lit(0)).otherwise(col("numberSkus")-4))
+      .withColumn(CampaignMergedFields.ARTICLE, when(col(CampaignMergedFields.NUMBER_SKUS) <= 4, lit(0)).otherwise(col("numberSkus") - 4))
       .withColumn(CampaignMergedFields.URL, col(CampaignMergedFields.LIVE_CART_URL))
-      .withColumn(CampaignMergedFields.LIVE_REF_SKU+"1", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
-      .withColumn(CampaignMergedFields.LIVE_REF_SKU+"2", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(1), lit(0)))
-      .withColumn(CampaignMergedFields.LIVE_REF_SKU+"3", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(2), lit(0)))
+      .withColumn(CampaignMergedFields.LIVE_REF_SKU + "1", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
+      .withColumn(CampaignMergedFields.LIVE_REF_SKU + "2", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(1), lit(0)))
+      .withColumn(CampaignMergedFields.LIVE_REF_SKU + "3", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(2), lit(0)))
       .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(0)))
       .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(1)))
       .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(2)))
