@@ -2,7 +2,7 @@
 package com.jabong.dap.campaign.customer
 
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars, NewsletterVariables, EmailResponseVariables}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, NewsletterVariables, EmailResponseVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
