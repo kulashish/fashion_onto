@@ -27,7 +27,7 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 object UdfUtils extends Logging {
 
   def csvDateFormat(s: Timestamp): String = {
-    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
+    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT_MS, TimeConstants.DATE_TIME_FORMAT)
   }
 
   /**
