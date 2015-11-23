@@ -216,9 +216,9 @@ object SalesItemRevenue extends DataFeedsModel {
         SalesOrderItemVariables.REVENUE_WEB_90,
         SalesOrderItemVariables.REVENUE_MWEB_90,
         SalesOrderVariables.LAST_ORDER_DATE).
-      rdd
+        rdd
     val rev = Spark.getSqlContext().createDataFrame(newRdd, Schema.salesRev)
-  rev
+    rev
   }
 
   /**
@@ -245,7 +245,7 @@ object SalesItemRevenue extends DataFeedsModel {
         SalesOrderItemVariables.REVENUE_WEB -> 0.0,
         SalesOrderItemVariables.REVENUE_OTHERS -> 0.0,
 
-      SalesOrderItemVariables.REVENUE -> 0.0
+        SalesOrderItemVariables.REVENUE -> 0.0
       ))
     val res = joined.select(
       coalesce(joined(SalesOrderVariables.FK_CUSTOMER), joined(SalesOrderVariables.FK_CUSTOMER + "NEW")) as SalesOrderVariables.FK_CUSTOMER,
@@ -344,15 +344,15 @@ object SalesItemRevenue extends DataFeedsModel {
     ))
     val res = joinedFill.withColumn(
       SalesOrderItemVariables.REVENUE,
-        joinedFill(SalesOrderItemVariables.REVENUE_APP) +
+      joinedFill(SalesOrderItemVariables.REVENUE_APP) +
         joinedFill(SalesOrderItemVariables.REVENUE_WEB) +
         joinedFill(SalesOrderItemVariables.REVENUE_MWEB) +
         joinedFill(SalesOrderItemVariables.REVENUE_OTHERS)
     ).withColumn(
         SalesOrderItemVariables.ORDERS_COUNT,
-          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) +
+        joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) +
           joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) +
-          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB)+
+          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB) +
           joinedFill(SalesOrderItemVariables.ORDERS_COUNT_OTHERS)
       )
     res
