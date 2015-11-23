@@ -1122,7 +1122,7 @@ object CampaignUtils extends Logging {
   def getAcartHourlyFields(inputData: DataFrame): DataFrame = {
     require(inputData != null, "acart hourly data cannot be null")
 
-    val inputDataNumberSkus = inputData.withColumn("numberSkus", Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
+    val inputDataNumberSkus = inputData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
     val AcartOutData = inputDataNumberSkus
       .withColumn(ContactListMobileVars.UID, lit(""))
       .withColumn(CampaignMergedFields.STATUS, lit(1))

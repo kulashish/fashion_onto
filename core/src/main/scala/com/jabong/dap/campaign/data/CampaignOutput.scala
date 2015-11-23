@@ -28,6 +28,12 @@ object CampaignOutput {
     campaignOutput.write.parquet(outPath)
   }
 
+  /**
+   * save campaignsData
+   * @param campaignOutput
+   * @param campaignName
+   * @param campaignType
+   */
   def saveCampaignDataForYesterday(campaignOutput: DataFrame, campaignName: String, campaignType: String = DataSets.PUSH_CAMPAIGNS) = {
     val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
     val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday)
@@ -50,6 +56,7 @@ object CampaignOutput {
           .drop(CampaignMergedFields.EMAIL)
           .drop(CampaignMergedFields.NUMBER_SKUS)
           .drop(CampaignMergedFields.LIVE_CART_URL)
+        
         val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
         DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.LAST_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
       } else if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {

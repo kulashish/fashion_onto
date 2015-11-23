@@ -745,7 +745,7 @@ object UdfUtils extends Logging {
   }
 
   def nonBeauty(category: String, created_at: Timestamp): String = {
-    println(category,created_at)
+    //println(category,created_at)
     if (category == null || created_at == null) {
       return null
     }
@@ -773,7 +773,7 @@ object UdfUtils extends Logging {
       return null
     }
 
-    println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
+   // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
     if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
       return category
     }
@@ -783,7 +783,7 @@ object UdfUtils extends Logging {
   }
 
   def beauty(category: String, created_at: Timestamp): String = {
-    println(category,created_at)
+//    println(category,created_at)
     if (category == null || created_at == null) {
       return null
     }
@@ -799,7 +799,7 @@ object UdfUtils extends Logging {
     if (lastPurchaseDay == null) {
       return null
     }
-    println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
+   // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
 
     if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
       return category
