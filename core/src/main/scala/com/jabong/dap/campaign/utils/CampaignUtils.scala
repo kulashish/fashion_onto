@@ -773,20 +773,21 @@ object CampaignUtils extends Logging {
         val dfBrick1RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick1, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
         CampaignUtils.debug(dfBrick1RecommendationData, "dfBrick1RecommendationData")
 
-        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
-        CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
-
-        val dfJoined = dfBrick1RecommendationData.join(
-          dfBrick2RecommendationData,
-          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
-          SQL.LEFT_OUTER
-        ).select(
-            coalesce(dfBrick1RecommendationData(CampaignMergedFields.EMAIL),dfBrick2RecommendationData(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
-            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
-            Udf.concatenateRecSkuList(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
-            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
-            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
-          )
+        val dfJoined = dfBrick1RecommendationData
+//        val dfBrick2RecommendationData = getCalendarRecommendationData(campaignType, campaignName, dfBrick2, recommendations, CampaignCommon.CALENDAR_REC_SKUS)
+//        CampaignUtils.debug(dfBrick2RecommendationData, "dfBrick2RecommendationData")
+//
+//        val dfJoined = dfBrick1RecommendationData.join(
+//          dfBrick2RecommendationData,
+//          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
+//          SQL.LEFT_OUTER
+//        ).select(
+//            coalesce(dfBrick1RecommendationData(CampaignMergedFields.EMAIL),dfBrick2RecommendationData(CampaignMergedFields.EMAIL)) as CampaignMergedFields.EMAIL,
+//            dfBrick1RecommendationData(CampaignMergedFields.REF_SKUS),
+//            Udf.concatenateRecSkuList(dfBrick1RecommendationData(CampaignMergedFields.REC_SKUS), dfBrick2RecommendationData(CampaignMergedFields.REC_SKUS)) as CampaignMergedFields.REC_SKUS,
+//            dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
+//            dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
+//          )
 
         //          .select(
         //            dfBrick1RecommendationData(CampaignMergedFields.EMAIL),
@@ -874,7 +875,7 @@ object CampaignUtils extends Logging {
         ProductVariables.STOCK -> 0,
         ProductVariables.PRICE_BAND -> ""
       )
-    )
+    ).drop(ProductVariables.BRICK)
 
     val dfBrick1 = dfCustItr.select(
       dfCustItr(CustomerVariables.EMAIL),
