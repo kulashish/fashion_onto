@@ -57,7 +57,7 @@ object ItemOnDiscount extends Logging {
     //filter yesterday itrData from itr30dayData
     val dfYesterdayItrData = CampaignUtils.getYesterdayItrData(itr30dayData)
     val updatedCustomerSelected = dfCustomerSelected.select(
-      Udf.yyyymmdd(customerSelected(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
+      Udf.yyyymmdd(customerSelected(CustomerVariables.CREATED_AT)) as CustomerVariables.CREATED_AT,
       col(CustomerVariables.FK_CUSTOMER),
       col(CustomerVariables.EMAIL),
       col (ProductVariables.SKU_SIMPLE)
@@ -112,22 +112,22 @@ object ItemOnDiscount extends Logging {
   }
 
   /**
-   * join CustomerProductShortlistVariables and itr30dayData on the basis of SKU and CREATED_AT
+   * join CustomerVariables and itr30dayData on the basis of SKU and CREATED_AT
    * @note From this we can get SPECIAL_PRICE when customer added it into CustomerProductShortlist
    * @param cpsl
    * @param itr30dayData
    */
   def getJoinDF(cpsl: DataFrame, itr30dayData: DataFrame): DataFrame = {
 
-    val joinDf = cpsl.join(itr30dayData, cpsl(CustomerProductShortlistVariables.SKU_SIMPLE) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE)
+    val joinDf = cpsl.join(itr30dayData, cpsl(CustomerVariables.SKU_SIMPLE) === itr30dayData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE)
       &&
-      cpsl(CustomerProductShortlistVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
+      cpsl(CustomerVariables.CREATED_AT) === itr30dayData(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
 
     val dfResult = joinDf.select(
-      CustomerProductShortlistVariables.FK_CUSTOMER,
-      CustomerProductShortlistVariables.EMAIL,
-      CustomerProductShortlistVariables.SKU_SIMPLE,
-      CustomerProductShortlistVariables.SPECIAL_PRICE
+      CustomerVariables.FK_CUSTOMER,
+      CustomerVariables.EMAIL,
+      CustomerVariables.SKU_SIMPLE,
+      CustomerVariables.SPECIAL_PRICE
     )
 
     return dfResult
@@ -154,8 +154,8 @@ object ItemOnDiscount extends Logging {
     val dfYesterdayItrData = getYesterdayItrData(itr30dayData)
 
     val dfSkuLevel = shortListSkuFilter(dfCustomerProductShortlist, dfYesterdayItrData, itr30dayData)
-      .withColumnRenamed(CustomerProductShortlistVariables.SKU, CustomerProductShortlistVariables.SKU_SIMPLE)
-      .withColumnRenamed(CustomerProductShortlistVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.SPECIAL_PRICE)
+      .withColumnRenamed(CustomerVariables.SKU, CustomerVariables.SKU_SIMPLE)
+      .withColumnRenamed(CustomerVariables.AVERAGE_PRICE, CustomerVariables.SPECIAL_PRICE)
 
     //=========calculate SKU_SIMPLE data frame==========================================================================
     val yesterdaySkuSimpleItrData = dfYesterdaySkuSimpleItrData.select(
@@ -169,10 +169,10 @@ object ItemOnDiscount extends Logging {
 
     //=========SKU_SIMPLE is mix of sku and sku-simple in case of shortlist======================================
     //=======select FK_CUSTOMER, EMAIL, SKU_SIMPLE, SPECIAL_PRICE=======================================================
-    val dfResult = dfUnion.select(col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
-      col(CustomerProductShortlistVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
+    val dfResult = dfUnion.select(col(CustomerVariables.FK_CUSTOMER),
+      col(CustomerVariables.EMAIL),
+      col(CustomerVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
+      col(CustomerVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
     )
 
     return dfResult
@@ -188,35 +188,35 @@ object ItemOnDiscount extends Logging {
 
   def shortListSkuFilter(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
 
-    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is null or " + CustomerProductShortlistVariables.PRICE + " is null ")
+    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerVariables.SKU_SIMPLE + " is null or " + CustomerVariables.PRICE + " is null ")
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.CREATED_AT
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU,
+        CustomerVariables.CREATED_AT
       )
 
-    val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.AVERAGE_PRICE)
+    val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE, CustomerVariables.AVERAGE_PRICE)
 
-    val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
+    val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
       &&
-      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
+      skuCustomerProductShortlist(CustomerVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.AVERAGE_PRICE
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU,
+        CustomerVariables.AVERAGE_PRICE
       )
 
     //join yesterdayItrData and joinDf on the basis of SKU
     //filter on the basis of AVERAGE_PRICE
-    val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerProductShortlistVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
-      .filter(CustomerProductShortlistVariables.AVERAGE_PRICE + " > " + ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE)
+    val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
+      .filter(CustomerVariables.AVERAGE_PRICE + " > " + ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE)
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.AVERAGE_PRICE
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU,
+        CustomerVariables.AVERAGE_PRICE
       )
 
     return dfResult
@@ -231,12 +231,12 @@ object ItemOnDiscount extends Logging {
    */
   def shortListSkuSimpleFilter(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
 
-    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is not null and " + CustomerProductShortlistVariables.PRICE + " is not null ")
+    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerVariables.SKU_SIMPLE + " is not null and " + CustomerVariables.PRICE + " is not null ")
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU_SIMPLE,
-        CustomerProductShortlistVariables.PRICE
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU_SIMPLE,
+        CustomerVariables.PRICE
       )
 
     val yesterdayItrData = dfYesterdayItrData.select(
@@ -246,17 +246,17 @@ object ItemOnDiscount extends Logging {
 
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       yesterdayItrData,
-      skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
+      skuSimpleCustomerProductShortlist(CustomerVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
       SQL.INNER
     )
 
-    val dfFilter = dfJoin.filter(CustomerProductShortlistVariables.PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
+    val dfFilter = dfJoin.filter(CustomerVariables.PRICE + " > " + ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
 
     val dfResult = dfFilter.select(
-      col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU_SIMPLE),
-      col(CustomerProductShortlistVariables.PRICE) as CustomerProductShortlistVariables.SPECIAL_PRICE
+      col(CustomerVariables.FK_CUSTOMER),
+      col(CustomerVariables.EMAIL),
+      col(CustomerVariables.SKU_SIMPLE),
+      col(CustomerVariables.PRICE) as CustomerVariables.SPECIAL_PRICE
     )
 
     return dfResult

@@ -435,7 +435,7 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_BAND),
         col(ITR.PRODUCT_NAME),
         col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
+        col(ITR.ITR_DATE) as CustomerVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
 
@@ -458,7 +458,7 @@ object CampaignInput extends Logging {
           col(ITR.PRICE_BAND),
           col(ITR.PRODUCT_NAME),
           col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
+          col(ITR.ITR_DATE) as CustomerVariables.CREATED_AT))
       }
     }
     itr30Day
@@ -551,7 +551,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
     val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
 
-    val nthDayShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nthDayShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nthDayShortlistData
   }
@@ -586,7 +586,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
     val endTimestamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
 
-    val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nDaysShortlistData
   }

@@ -209,4 +209,19 @@ object CustomerVariables {
   val CLICKED_7_DAYS = "clicked_7_days"
   val CLICKED_15_DAYS = "clicked_15_days"
   val CLICKED_30_DAYS = "clicked_30_days"
+
+  //CustomerProductShortlistVariables
+  val ID_CUSTOMER_PRODUCT_SHORTLIST = "id_customer_product_shortlist"
+  val USER_SHORTLIST_KEY = "user_shortlist_key"
+  val USER_TOKEN = "user_token"
+  val SKU = "sku"
+  val SIMPLE_SKU = "simpleSku"
+  val EXTRA_DATA = "extra_data"
+  val STOCK_WHEN_REMOVED = "stock_when_removed"
+  val CUSTOMER_SOURCE = "customer_source"
+  val REMOVED_AT = "removed_at"
+  val PRICE = "price"
+  val AVERAGE_PRICE = "average_price"
+  val SKU_SIMPLE = "skuSimple"
+  val SPECIAL_PRICE = "specialPrice"
 }
