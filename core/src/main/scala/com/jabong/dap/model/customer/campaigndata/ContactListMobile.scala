@@ -10,7 +10,6 @@ import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.customer.variables.CustomerSegments
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -128,12 +127,9 @@ object ContactListMobile extends DataFeedsModel with Logging {
       return null
     }
 
-    val custSegCalcIncr = CustomerSegments.getCustomerSegments(customerSegmentsIncr)
-    //FK_CUSTOMER, MVP_TYPE, SEGMENT, DISCOUNT_SCORE
-
     val smsOptOutMerged = smsOptOutFull.select(DNDVariables.MOBILE_NUMBER).unionAll(blockedNumbersFull.select(DNDVariables.MOBILE_NUMBER)).dropDuplicates()
 
-    val dfMergedIncr = mergeIncrData(customerIncr, custSegCalcIncr, nlsIncr, customerOrdersIncr, zoneCityFull, dndFull, smsOptOutMerged, cmrFull)
+    val dfMergedIncr = mergeIncrData(customerIncr, customerSegmentsIncr, nlsIncr, customerOrdersIncr, zoneCityFull, dndFull, smsOptOutMerged, cmrFull)
 
     val writeMap = new HashMap[String, DataFrame]()
 
@@ -160,7 +156,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
         coalesce(dfIncrVarBC(ContactListMobileVars.MOBILE_PERMISION_STATUS), contactListMobilePrevFull(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.CITY), contactListMobilePrevFull(CustomerVariables.CITY)) as CustomerVariables.CITY,
+        coalesce(dfIncrVarBC(ContactListMobileVars.CITY), contactListMobilePrevFull(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
 
         coalesce(dfIncrVarBC(ContactListMobileVars.COUNTRY), contactListMobilePrevFull(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
 
@@ -246,7 +242,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
         col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
-        col(CustomerVariables.CITY) as ContactListMobileVars.CITY,
+        col(ContactListMobileVars.CITY) as ContactListMobileVars.CITY,
         col(ContactListMobileVars.COUNTRY),
         col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
         col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
@@ -283,47 +279,72 @@ object ContactListMobile extends DataFeedsModel with Logging {
     }
   }
 
-  def mergeIncrData(customerIncr: DataFrame, custSegCalcIncr: DataFrame, nls: DataFrame, customerOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, cmrFull: DataFrame): DataFrame = {
-    val customerNls = customerIncr.join(nls, customerIncr(CustomerVariables.EMAIL) === nls(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
-      .select(
-        coalesce(customerIncr(CustomerVariables.ID_CUSTOMER), nls(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
-        customerIncr(CustomerVariables.EMAIL),
-        Udf.udfEmailOptInStatus(nls(NewsletterVariables.EMAIL), nls(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
-        customerIncr(CustomerVariables.PHONE),
-        customerIncr(CustomerVariables.FIRST_NAME),
-        customerIncr(CustomerVariables.LAST_NAME),
-        customerIncr(CustomerVariables.BIRTHDAY) as ContactListMobileVars.DOB,
-        customerIncr(CustomerVariables.GENDER),
-        Udf.minTimestamp(customerIncr(CustomerVariables.CREATED_AT), nls(NewsletterVariables.CREATED_AT)) as ContactListMobileVars.REG_DATE,
-        Udf.age(customerIncr(CustomerVariables.BIRTHDAY)) as ContactListMobileVars.AGE,
-        Udf.platinumStatus(customerIncr(CustomerVariables.REWARD_TYPE)) as ContactListMobileVars.PLATINUM_STATUS,
-        nls(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
-        customerIncr(CustomerVariables.IS_CONFIRMED) as ContactListMobileVars.VERIFICATION_STATUS,
-        Udf.maxTimestamp(customerIncr(CustomerVariables.UPDATED_AT), nls(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT,
-        nls(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
-        nls(NewsletterVariables.STATUS)
+  def mergeIncrData(custIncr: DataFrame, custSegIncr: DataFrame, nlsIncr: DataFrame, customerOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, cmrFull: DataFrame): DataFrame = {
+
+    val nlsIncrUnq = nlsIncr.groupBy(NewsletterVariables.EMAIL)
+      .agg(
+        last(NewsletterVariables.FK_CUSTOMER) as NewsletterVariables.FK_CUSTOMER,
+        last(NewsletterVariables.STATUS) as NewsletterVariables.STATUS,
+        last(NewsletterVariables.CREATED_AT) as NewsletterVariables.CREATED_AT,
+        last(NewsletterVariables.UPDATED_AT) as NewsletterVariables.UPDATED_AT,
+        last(NewsletterVariables.UNSUBSCRIBE_KEY) as NewsletterVariables.UNSUBSCRIBE_KEY
       )
 
-    val customerMerged = customerNls.join(custSegCalcIncr, customerNls(CustomerVariables.ID_CUSTOMER) === custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+    val custIncrUnq = custIncr.groupBy(CustomerVariables.EMAIL)
+      .agg(
+        last(CustomerVariables.ID_CUSTOMER) as CustomerVariables.ID_CUSTOMER,
+        last(CustomerVariables.PHONE) as CustomerVariables.PHONE,
+        last(CustomerVariables.FIRST_NAME) as CustomerVariables.FIRST_NAME,
+        last(CustomerVariables.LAST_NAME) as CustomerVariables.LAST_NAME,
+        last(CustomerVariables.BIRTHDAY) as CustomerVariables.BIRTHDAY,
+        last(CustomerVariables.GENDER) as CustomerVariables.GENDER,
+        last(CustomerVariables.CREATED_AT) as CustomerVariables.CREATED_AT,
+        last(CustomerVariables.REWARD_TYPE) as CustomerVariables.REWARD_TYPE,
+        last(CustomerVariables.IS_CONFIRMED) as CustomerVariables.IS_CONFIRMED,
+        last(CustomerVariables.UPDATED_AT) as CustomerVariables.UPDATED_AT
+      )
+
+    val customerNls = custIncrUnq.join(nlsIncrUnq, custIncrUnq(CustomerVariables.EMAIL) === nlsIncrUnq(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
       .select(
-        coalesce(customerNls(CustomerVariables.ID_CUSTOMER), custSegCalcIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(custIncrUnq(CustomerVariables.ID_CUSTOMER), nlsIncrUnq(NewsletterVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        custIncrUnq(CustomerVariables.EMAIL),
+        Udf.udfEmailOptInStatus(nlsIncrUnq(NewsletterVariables.EMAIL), nlsIncrUnq(NewsletterVariables.STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        custIncrUnq(CustomerVariables.PHONE),
+        custIncrUnq(CustomerVariables.FIRST_NAME),
+        custIncrUnq(CustomerVariables.LAST_NAME),
+        custIncrUnq(CustomerVariables.BIRTHDAY) as ContactListMobileVars.DOB,
+        custIncrUnq(CustomerVariables.GENDER),
+        Udf.minTimestamp(custIncrUnq(CustomerVariables.CREATED_AT), nlsIncrUnq(NewsletterVariables.CREATED_AT)) as ContactListMobileVars.REG_DATE,
+        Udf.age(custIncrUnq(CustomerVariables.BIRTHDAY)) as ContactListMobileVars.AGE,
+        Udf.platinumStatus(custIncrUnq(CustomerVariables.REWARD_TYPE)) as ContactListMobileVars.PLATINUM_STATUS,
+        nlsIncrUnq(NewsletterVariables.CREATED_AT) as ContactListMobileVars.NL_SUB_DATE,
+        custIncrUnq(CustomerVariables.IS_CONFIRMED) as ContactListMobileVars.VERIFICATION_STATUS,
+        Udf.maxTimestamp(custIncrUnq(CustomerVariables.UPDATED_AT), nlsIncrUnq(NewsletterVariables.UPDATED_AT)) as CustomerVariables.UPDATED_AT,
+        nlsIncrUnq(NewsletterVariables.UNSUBSCRIBE_KEY) as ContactListMobileVars.UNSUB_KEY,
+        nlsIncrUnq(NewsletterVariables.STATUS)
+      )
+    println("customerNls " + customerNls.count())
+
+    val customerMerged = customerNls.join(custSegIncr, customerNls(CustomerVariables.ID_CUSTOMER) === custSegIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+      .select(
+        coalesce(customerNls(CustomerVariables.ID_CUSTOMER), custSegIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         customerNls(CustomerVariables.EMAIL),
         customerNls(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         customerNls(CustomerVariables.PHONE),
         customerNls(CustomerVariables.FIRST_NAME),
         customerNls(CustomerVariables.LAST_NAME),
         customerNls(ContactListMobileVars.DOB),
-        custSegCalcIncr(ContactListMobileVars.MVP_TYPE),
+        custSegIncr(CustomerSegmentsVariables.MVP_SCORE) as ContactListMobileVars.MVP_TYPE,
         customerNls(CustomerVariables.GENDER),
         customerNls(ContactListMobileVars.REG_DATE),
-        custSegCalcIncr(CustomerSegmentsVariables.SEGMENT),
+        custSegIncr(CustomerSegmentsVariables.SEGMENT),
         customerNls(ContactListMobileVars.AGE),
         customerNls(ContactListMobileVars.PLATINUM_STATUS),
         customerNls(ContactListMobileVars.NL_SUB_DATE),
         customerNls(ContactListMobileVars.VERIFICATION_STATUS),
         customerNls(CustomerVariables.UPDATED_AT),
         customerNls(ContactListMobileVars.UNSUB_KEY),
-        custSegCalcIncr(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        custSegIncr(CustomerSegmentsVariables.DISCOUNT_SCORE),
         customerNls(NewsletterVariables.STATUS)
       )
 
@@ -419,10 +440,10 @@ object ContactListMobile extends DataFeedsModel with Logging {
         dndMerged(SalesOrderItemVariables.FAV_BRAND),
         dndMerged(ContactListMobileVars.DND)
       )
-
-    val res = dfJoined.join(cmrFull, cmrFull(CustomerVariables.EMAIL) === dfJoined(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
+    val cmrFullFil = cmrFull.filter(cmrFull(CustomerVariables.EMAIL).isNotNull)
+    val res = dfJoined.join(cmrFullFil, cmrFullFil(CustomerVariables.EMAIL) === dfJoined(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
       .select(
-        cmrFull(ContactListMobileVars.UID),
+        cmrFullFil(ContactListMobileVars.UID),
         dfJoined(CustomerVariables.EMAIL),
         dfJoined(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         dfJoined(CustomerVariables.PHONE),
@@ -452,7 +473,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         dfJoined(NewsletterVariables.STATUS),
         dfJoined(SalesOrderItemVariables.FAV_BRAND),
         dfJoined(ContactListMobileVars.DND),
-        Udf.device(cmrFull(PageVisitVariables.DOMAIN), cmrFull(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
+        Udf.device(cmrFullFil(PageVisitVariables.DOMAIN), cmrFullFil(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
       )
     res
   }
