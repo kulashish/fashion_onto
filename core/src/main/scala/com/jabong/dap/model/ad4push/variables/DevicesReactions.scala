@@ -2,7 +2,7 @@ package com.jabong.dap.model.ad4push.variables
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.Ad4pushVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.acq.common.ParamInfo
@@ -21,12 +21,12 @@ import org.apache.spark.sql.types.IntegerType
  */
 object DevicesReactions extends Logging {
 
-  val new_reaction = MergeUtils.NEW_ + Ad4pushVariables.REACTION
+  val new_reaction = MergeUtils.NEW_ + CustomerVariables.REACTION
 
   def start(params: ParamInfo) = {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    customerResponse(incrDate, saveMode)
+    customerResponse(incrDate, saveMode)  
   }
   /**
    * All read CSV, read perquet, write perquet
@@ -110,14 +110,14 @@ object DevicesReactions extends Logging {
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
-    df.select(Udf.removeAllZero(df(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.CUSTOMER_ID,
-      Udf.removeAllZero(df(Ad4pushVariables.DEVICE_ID)) as Ad4pushVariables.DEVICE_ID,
-      df(Ad4pushVariables.MESSAGE_ID) as Ad4pushVariables.MESSAGE_ID,
-      df(Ad4pushVariables.CAMPAIGN_ID) as Ad4pushVariables.CAMPAIGN_ID,
-      df(Ad4pushVariables.BOUNCE).cast(IntegerType) as Ad4pushVariables.BOUNCE,
-      df(Ad4pushVariables.REACTION).cast(IntegerType) as Ad4pushVariables.REACTION)
-      .filter(!(col(Ad4pushVariables.CUSTOMER_ID) === "" && col(Ad4pushVariables.DEVICE_ID) === ""))
-      .filter(col(Ad4pushVariables.REACTION).gt(0) || col(Ad4pushVariables.BOUNCE).gt(0))
+    df.select(Udf.removeAllZero(df(CustomerVariables.LOGIN_USER_ID)) as CustomerVariables.CUSTOMER_ID,
+      Udf.removeAllZero(df(CustomerVariables.DEVICE_ID)) as CustomerVariables.DEVICE_ID,
+      df(CustomerVariables.MESSAGE_ID) as CustomerVariables.MESSAGE_ID,
+      df(CustomerVariables.CAMPAIGN_ID) as CustomerVariables.CAMPAIGN_ID,
+      df(CustomerVariables.BOUNCE).cast(IntegerType) as CustomerVariables.BOUNCE,
+      df(CustomerVariables.REACTION).cast(IntegerType) as CustomerVariables.REACTION)
+      .filter(!(col(CustomerVariables.CUSTOMER_ID) === "" && col(CustomerVariables.DEVICE_ID) === ""))
+      .filter(col(CustomerVariables.REACTION).gt(0) || col(CustomerVariables.BOUNCE).gt(0))
   }
   /**
    *
@@ -142,72 +142,72 @@ object DevicesReactions extends Logging {
 
     val reducedIncr = reduce(incrementalDF).cache()
 
-    val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(Ad4pushVariables.CUSTOMER_ID, Ad4pushVariables.CUSTOMER_ID)
+    val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(CustomerVariables.CUSTOMER_ID, CustomerVariables.CUSTOMER_ID)
 
     val joinedDF = MergeUtils.joinOldAndNewDF(effective, Ad4pushSchema.effectiveDF, full,
-      Ad4pushSchema.deviceReaction, Ad4pushVariables.DEVICE_ID, Ad4pushVariables.CUSTOMER_ID)
+      Ad4pushSchema.deviceReaction, CustomerVariables.DEVICE_ID, CustomerVariables.CUSTOMER_ID)
       .na.fill(
         Map(
-          Ad4pushVariables.CLICK_7 -> 0,
-          Ad4pushVariables.CLICK_15 -> 0,
-          Ad4pushVariables.CLICK_30 -> 0,
-          Ad4pushVariables.CLICK_LIFETIME -> 0,
-          Ad4pushVariables.CLICKED_TWICE -> 0,
-          Ad4pushVariables.CLICK_MONDAY -> 0,
-          Ad4pushVariables.CLICK_TUESDAY -> 0,
-          Ad4pushVariables.CLICK_WEDNESDAY -> 0,
-          Ad4pushVariables.CLICK_THURSDAY -> 0,
-          Ad4pushVariables.CLICK_FRIDAY -> 0,
-          Ad4pushVariables.CLICK_SATURDAY -> 0,
-          Ad4pushVariables.CLICK_SUNDAY -> 0,
-          MergeUtils.NEW_ + Ad4pushVariables.EFFECTIVE_7_DAYS -> 0,
-          MergeUtils.NEW_ + Ad4pushVariables.EFFECTIVE_15_DAYS -> 0,
-          MergeUtils.NEW_ + Ad4pushVariables.EFFECTIVE_30_DAYS -> 0,
-          MergeUtils.NEW_ + Ad4pushVariables.CLICKED_TODAY -> 0
+          CustomerVariables.CLICK_7 -> 0,
+          CustomerVariables.CLICK_15 -> 0,
+          CustomerVariables.CLICK_30 -> 0,
+          CustomerVariables.CLICK_LIFETIME -> 0,
+          CustomerVariables.CLICKED_TWICE -> 0,
+          CustomerVariables.CLICK_MONDAY -> 0,
+          CustomerVariables.CLICK_TUESDAY -> 0,
+          CustomerVariables.CLICK_WEDNESDAY -> 0,
+          CustomerVariables.CLICK_THURSDAY -> 0,
+          CustomerVariables.CLICK_FRIDAY -> 0,
+          CustomerVariables.CLICK_SATURDAY -> 0,
+          CustomerVariables.CLICK_SUNDAY -> 0,
+          MergeUtils.NEW_ + CustomerVariables.EFFECTIVE_7_DAYS -> 0,
+          MergeUtils.NEW_ + CustomerVariables.EFFECTIVE_15_DAYS -> 0,
+          MergeUtils.NEW_ + CustomerVariables.EFFECTIVE_30_DAYS -> 0,
+          MergeUtils.NEW_ + CustomerVariables.CLICKED_TODAY -> 0
         )
       )
 
     val resultDF = joinedDF.select(
-      coalesce(col(MergeUtils.NEW_ + Ad4pushVariables.DEVICE_ID), col(Ad4pushVariables.DEVICE_ID)) as Ad4pushVariables.DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + Ad4pushVariables.CUSTOMER_ID), col(Ad4pushVariables.CUSTOMER_ID)) as Ad4pushVariables.CUSTOMER_ID,
-      when(col(MergeUtils.NEW_ + Ad4pushVariables.CLICKED_TODAY) > 0, TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)).otherwise(col(Ad4pushVariables.LAST_CLICK_DATE)) as Ad4pushVariables.LAST_CLICK_DATE,
-      (col(Ad4pushVariables.CLICK_7) + col(MergeUtils.NEW_ + Ad4pushVariables.EFFECTIVE_7_DAYS)).cast(IntegerType) as Ad4pushVariables.CLICK_7,
-      (col(Ad4pushVariables.CLICK_15) + col(MergeUtils.NEW_ + Ad4pushVariables.EFFECTIVE_15_DAYS)).cast(IntegerType) as Ad4pushVariables.CLICK_15,
-      (col(Ad4pushVariables.CLICK_30) + col(MergeUtils.NEW_ + Ad4pushVariables.EFFECTIVE_30_DAYS)).cast(IntegerType) as Ad4pushVariables.CLICK_30,
-      (col(Ad4pushVariables.CLICK_LIFETIME) + col(MergeUtils.NEW_ + Ad4pushVariables.CLICKED_TODAY)).cast(IntegerType) as Ad4pushVariables.CLICK_LIFETIME,
-      (when(col(MergeUtils.NEW_ + Ad4pushVariables.CLICKED_TODAY) > 2, col(Ad4pushVariables.CLICKED_TWICE) + 1).otherwise(col(Ad4pushVariables.CLICKED_TWICE))).cast(IntegerType) as Ad4pushVariables.CLICKED_TWICE,
+      coalesce(col(MergeUtils.NEW_ + CustomerVariables.DEVICE_ID), col(CustomerVariables.DEVICE_ID)) as CustomerVariables.DEVICE_ID,
+      coalesce(col(MergeUtils.NEW_ + CustomerVariables.CUSTOMER_ID), col(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+      when(col(MergeUtils.NEW_ + CustomerVariables.CLICKED_TODAY) > 0, TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)).otherwise(col(CustomerVariables.LAST_CLICK_DATE)) as CustomerVariables.LAST_CLICK_DATE,
+      (col(CustomerVariables.CLICK_7) + col(MergeUtils.NEW_ + CustomerVariables.EFFECTIVE_7_DAYS)).cast(IntegerType) as CustomerVariables.CLICK_7,
+      (col(CustomerVariables.CLICK_15) + col(MergeUtils.NEW_ + CustomerVariables.EFFECTIVE_15_DAYS)).cast(IntegerType) as CustomerVariables.CLICK_15,
+      (col(CustomerVariables.CLICK_30) + col(MergeUtils.NEW_ + CustomerVariables.EFFECTIVE_30_DAYS)).cast(IntegerType) as CustomerVariables.CLICK_30,
+      (col(CustomerVariables.CLICK_LIFETIME) + col(MergeUtils.NEW_ + CustomerVariables.CLICKED_TODAY)).cast(IntegerType) as CustomerVariables.CLICK_LIFETIME,
+      (when(col(MergeUtils.NEW_ + CustomerVariables.CLICKED_TODAY) > 2, col(CustomerVariables.CLICKED_TWICE) + 1).otherwise(col(CustomerVariables.CLICKED_TWICE))).cast(IntegerType) as CustomerVariables.CLICKED_TWICE,
 
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase()) + col(MergeUtils.NEW_ + Ad4pushVariables.CLICKED_TODAY)).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase(),
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase())).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase(),
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase())).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase(),
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase())).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase(),
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase())).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase(),
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase())).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase(),
-      (col(Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase())).cast(IntegerType) as Ad4pushVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase()
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase()) + col(MergeUtils.NEW_ + CustomerVariables.CLICKED_TODAY)).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 0).toLowerCase(),
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase())).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 1).toLowerCase(),
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase())).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 2).toLowerCase(),
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase())).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 3).toLowerCase(),
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase())).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 4).toLowerCase(),
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase())).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 5).toLowerCase(),
+      (col(CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase())).cast(IntegerType) as CustomerVariables.CLICK_ + TimeUtils.nextNDay(incrDay, 6).toLowerCase()
     )
 
     val result = resultDF.select(
-      col(Ad4pushVariables.DEVICE_ID),
-      col(Ad4pushVariables.CUSTOMER_ID),
-      col(Ad4pushVariables.LAST_CLICK_DATE),
-      col(Ad4pushVariables.CLICK_7),
-      col(Ad4pushVariables.CLICK_15),
-      col(Ad4pushVariables.CLICK_30),
-      col(Ad4pushVariables.CLICK_LIFETIME),
-      col(Ad4pushVariables.CLICK_MONDAY),
-      col(Ad4pushVariables.CLICK_TUESDAY),
-      col(Ad4pushVariables.CLICK_WEDNESDAY),
-      col(Ad4pushVariables.CLICK_THURSDAY),
-      col(Ad4pushVariables.CLICK_FRIDAY),
-      col(Ad4pushVariables.CLICK_SATURDAY),
-      col(Ad4pushVariables.CLICK_SUNDAY),
-      col(Ad4pushVariables.CLICKED_TWICE),
+      col(CustomerVariables.DEVICE_ID),
+      col(CustomerVariables.CUSTOMER_ID),
+      col(CustomerVariables.LAST_CLICK_DATE),
+      col(CustomerVariables.CLICK_7),
+      col(CustomerVariables.CLICK_15),
+      col(CustomerVariables.CLICK_30),
+      col(CustomerVariables.CLICK_LIFETIME),
+      col(CustomerVariables.CLICK_MONDAY),
+      col(CustomerVariables.CLICK_TUESDAY),
+      col(CustomerVariables.CLICK_WEDNESDAY),
+      col(CustomerVariables.CLICK_THURSDAY),
+      col(CustomerVariables.CLICK_FRIDAY),
+      col(CustomerVariables.CLICK_SATURDAY),
+      col(CustomerVariables.CLICK_SUNDAY),
+      col(CustomerVariables.CLICKED_TWICE),
       Udf.maxClickDayName(
-        col(Ad4pushVariables.CLICK_MONDAY), col(Ad4pushVariables.CLICK_TUESDAY),
-        col(Ad4pushVariables.CLICK_WEDNESDAY), col(Ad4pushVariables.CLICK_THURSDAY),
-        col(Ad4pushVariables.CLICK_FRIDAY), col(Ad4pushVariables.CLICK_SATURDAY),
-        col(Ad4pushVariables.CLICK_SUNDAY)
-      ) as Ad4pushVariables.MOST_CLICK_DAY
+        col(CustomerVariables.CLICK_MONDAY), col(CustomerVariables.CLICK_TUESDAY),
+        col(CustomerVariables.CLICK_WEDNESDAY), col(CustomerVariables.CLICK_THURSDAY),
+        col(CustomerVariables.CLICK_FRIDAY), col(CustomerVariables.CLICK_SATURDAY),
+        col(CustomerVariables.CLICK_SUNDAY)
+      ) as CustomerVariables.MOST_CLICK_DAY
     ).cache()
     logger.info("DeviceReaction for :" + incrDate + "processed")
     (result, reducedIncr)
@@ -225,52 +225,52 @@ object DevicesReactions extends Logging {
     //send DataFrames after using reduce
 
     val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, Ad4pushSchema.reducedDF, effective7,
-      Ad4pushSchema.reducedDF, Ad4pushVariables.DEVICE_ID, Ad4pushVariables.CUSTOMER_ID)
+      Ad4pushSchema.reducedDF, CustomerVariables.DEVICE_ID, CustomerVariables.CUSTOMER_ID)
       .na.fill(
         Map(
-          Ad4pushVariables.REACTION -> 0,
+          CustomerVariables.REACTION -> 0,
           new_reaction -> 0
         )
       )
     val joined_7_15_summary = joined_7_15.select(
-      coalesce(col(Ad4pushVariables.DEVICE_ID), col(MergeUtils.NEW_ + Ad4pushVariables.DEVICE_ID)) as Ad4pushVariables.DEVICE_ID,
-      coalesce(col(Ad4pushVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + Ad4pushVariables.CUSTOMER_ID)) as Ad4pushVariables.CUSTOMER_ID,
-      col(Ad4pushVariables.REACTION) as Ad4pushVariables.EFFECTIVE_7_DAYS,
-      col(new_reaction) as Ad4pushVariables.EFFECTIVE_15_DAYS)
+      coalesce(col(CustomerVariables.DEVICE_ID), col(MergeUtils.NEW_ + CustomerVariables.DEVICE_ID)) as CustomerVariables.DEVICE_ID,
+      coalesce(col(CustomerVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+      col(CustomerVariables.REACTION) as CustomerVariables.EFFECTIVE_7_DAYS,
+      col(new_reaction) as CustomerVariables.EFFECTIVE_15_DAYS)
 
     val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, Ad4pushSchema.reducedDF, joined_7_15_summary,
-      Ad4pushSchema.joined_7_15, Ad4pushVariables.DEVICE_ID, Ad4pushVariables.CUSTOMER_ID)
+      Ad4pushSchema.joined_7_15, CustomerVariables.DEVICE_ID, CustomerVariables.CUSTOMER_ID)
       .na.fill(
         Map(
-          Ad4pushVariables.EFFECTIVE_7_DAYS -> 0,
-          Ad4pushVariables.EFFECTIVE_15_DAYS -> 0,
+          CustomerVariables.EFFECTIVE_7_DAYS -> 0,
+          CustomerVariables.EFFECTIVE_15_DAYS -> 0,
           new_reaction -> 0
         )
       )
 
     val joined_7_15_30_summary = joined_7_15_30.select(
-      coalesce(col(MergeUtils.NEW_ + Ad4pushVariables.DEVICE_ID), col(Ad4pushVariables.DEVICE_ID)) as Ad4pushVariables.DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + Ad4pushVariables.CUSTOMER_ID), col(Ad4pushVariables.CUSTOMER_ID)) as Ad4pushVariables.CUSTOMER_ID,
-      col(Ad4pushVariables.EFFECTIVE_7_DAYS) as Ad4pushVariables.EFFECTIVE_7_DAYS,
-      col(Ad4pushVariables.EFFECTIVE_15_DAYS) as Ad4pushVariables.EFFECTIVE_15_DAYS,
-      col(new_reaction) as Ad4pushVariables.EFFECTIVE_30_DAYS)
+      coalesce(col(MergeUtils.NEW_ + CustomerVariables.DEVICE_ID), col(CustomerVariables.DEVICE_ID)) as CustomerVariables.DEVICE_ID,
+      coalesce(col(MergeUtils.NEW_ + CustomerVariables.CUSTOMER_ID), col(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+      col(CustomerVariables.EFFECTIVE_7_DAYS) as CustomerVariables.EFFECTIVE_7_DAYS,
+      col(CustomerVariables.EFFECTIVE_15_DAYS) as CustomerVariables.EFFECTIVE_15_DAYS,
+      col(new_reaction) as CustomerVariables.EFFECTIVE_30_DAYS)
 
-    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, Ad4pushSchema.reducedDF, joined_7_15_30_summary, Ad4pushSchema.joined_7_15_30, Ad4pushVariables.DEVICE_ID, Ad4pushVariables.CUSTOMER_ID)
+    val joinedAll = MergeUtils.joinOldAndNewDF(incremental, Ad4pushSchema.reducedDF, joined_7_15_30_summary, Ad4pushSchema.joined_7_15_30, CustomerVariables.DEVICE_ID, CustomerVariables.CUSTOMER_ID)
       .na.fill(
         Map(
           new_reaction -> 0,
-          Ad4pushVariables.EFFECTIVE_7_DAYS -> 0,
-          Ad4pushVariables.EFFECTIVE_15_DAYS -> 0,
-          Ad4pushVariables.EFFECTIVE_30_DAYS -> 0
+          CustomerVariables.EFFECTIVE_7_DAYS -> 0,
+          CustomerVariables.EFFECTIVE_15_DAYS -> 0,
+          CustomerVariables.EFFECTIVE_30_DAYS -> 0
         )
       )
     val joinedAllSummary = joinedAll.select(
-      coalesce(col(MergeUtils.NEW_ + Ad4pushVariables.DEVICE_ID), col(Ad4pushVariables.DEVICE_ID)) as Ad4pushVariables.DEVICE_ID,
-      coalesce(col(MergeUtils.NEW_ + Ad4pushVariables.CUSTOMER_ID), col(Ad4pushVariables.CUSTOMER_ID)) as Ad4pushVariables.CUSTOMER_ID,
-      col(new_reaction) - col(Ad4pushVariables.EFFECTIVE_7_DAYS) as Ad4pushVariables.EFFECTIVE_7_DAYS,
-      col(new_reaction) - col(Ad4pushVariables.EFFECTIVE_15_DAYS) as Ad4pushVariables.EFFECTIVE_15_DAYS,
-      col(new_reaction) - col(Ad4pushVariables.EFFECTIVE_30_DAYS) as Ad4pushVariables.EFFECTIVE_30_DAYS,
-      col(new_reaction) as Ad4pushVariables.CLICKED_TODAY)
+      coalesce(col(MergeUtils.NEW_ + CustomerVariables.DEVICE_ID), col(CustomerVariables.DEVICE_ID)) as CustomerVariables.DEVICE_ID,
+      coalesce(col(MergeUtils.NEW_ + CustomerVariables.CUSTOMER_ID), col(CustomerVariables.CUSTOMER_ID)) as CustomerVariables.CUSTOMER_ID,
+      col(new_reaction) - col(CustomerVariables.EFFECTIVE_7_DAYS) as CustomerVariables.EFFECTIVE_7_DAYS,
+      col(new_reaction) - col(CustomerVariables.EFFECTIVE_15_DAYS) as CustomerVariables.EFFECTIVE_15_DAYS,
+      col(new_reaction) - col(CustomerVariables.EFFECTIVE_30_DAYS) as CustomerVariables.EFFECTIVE_30_DAYS,
+      col(new_reaction) as CustomerVariables.CLICKED_TODAY)
 
     return joinedAllSummary
   }
@@ -284,14 +284,14 @@ object DevicesReactions extends Logging {
       logger.info("DataFrame df is null, returning null")
       return null
     }
-    return df.filter(col(Ad4pushVariables.REACTION).gt(0))
+    return df.filter(col(CustomerVariables.REACTION).gt(0))
       .select(
-        Ad4pushVariables.CUSTOMER_ID,
-        Ad4pushVariables.DEVICE_ID,
-        Ad4pushVariables.REACTION)
-      .groupBy(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.CUSTOMER_ID)
-      .agg(sum(Ad4pushVariables.REACTION).cast(IntegerType) as Ad4pushVariables.REACTION)
-      .select(Ad4pushVariables.CUSTOMER_ID, Ad4pushVariables.DEVICE_ID, Ad4pushVariables.REACTION)
+        CustomerVariables.CUSTOMER_ID,
+        CustomerVariables.DEVICE_ID,
+        CustomerVariables.REACTION)
+      .groupBy(CustomerVariables.DEVICE_ID, CustomerVariables.CUSTOMER_ID)
+      .agg(sum(CustomerVariables.REACTION).cast(IntegerType) as CustomerVariables.REACTION)
+      .select(CustomerVariables.CUSTOMER_ID, CustomerVariables.DEVICE_ID, CustomerVariables.REACTION)
   }
 
 }
