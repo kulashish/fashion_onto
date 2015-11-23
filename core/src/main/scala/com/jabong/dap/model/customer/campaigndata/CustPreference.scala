@@ -13,7 +13,6 @@ import com.jabong.dap.model.customer.variables.NewsletterPreferences
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-
 /**
  * Created by mubarak on 4/9/15.
  */
@@ -46,12 +45,12 @@ object CustPreference {
       val res = res1.join(cmr, res1(NewsletterVariables.EMAIL) === cmr(NewsletterVariables.EMAIL), SQL.LEFT_OUTER)
         .select(
           cmr(ContactListMobileVars.UID),
-          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE) ===true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_SALE,
-          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION)===true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_FASHION,
-          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS)===true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS,
-          when(custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS)===true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_ALERTS,
-          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE)===true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_CLEARANCE,
-          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARIVALS)===true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_NEWARIVALS,
+          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_SALE) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_SALE,
+          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_FASHION) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_FASHION,
+          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_RECOMENDATIONS,
+          when(custPrefFull(NewsletterPreferencesVariables.PREF_ALERTS) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_ALERTS,
+          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_CLEARANCE) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_CLEARANCE,
+          when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARIVALS) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_NEWARIVALS,
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ))
         .na.fill("")
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
