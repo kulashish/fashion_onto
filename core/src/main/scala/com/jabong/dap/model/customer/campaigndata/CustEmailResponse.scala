@@ -68,7 +68,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     var prevFullDf: DataFrame = null
     if (null != paths) {
-      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|").coalesce(100)
+      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|").withColumnRenamed(EmailResponseVariables.CUSTOMER_ID,ContactListMobileVars.UID).coalesce(100)
       prevFullDf = SchemaUtils.addColumns(inputCsv, CustEmailSchema.effective_Smry_Schema)
     } else {
       prevFullDf = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
@@ -264,9 +264,35 @@ object CustEmailResponse extends DataFeedsModel with Logging {
   val findOpenDate = udf(openDate)
 
   def merge(resultSet: DataFrame, dfCmrFull: DataFrame, nlSubscribers: DataFrame) = {
+      
+/*      resultSet.printSchema	
+      val x = resultSet.select(ContactListMobileVars.UID)
+      println(x.count)
+      println(x.distinct.count)
+
+      dfCmrFull.printSchema
+      val y = dfCmrFull.select(ContactListMobileVars.UID)
+      println(y.count)
+      println(y.distinct.count)    
+  */  
 
     val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(ContactListMobileVars.UID) === resultSet(ContactListMobileVars.UID),
-      SQL.LEFT_OUTER)
+      SQL.LEFT_OUTER).select(
+        dfCmrFull(ContactListMobileVars.UID),
+        dfCmrFull(CustomerVariables.EMAIL),
+        resultSet(EmailResponseVariables.OPEN_7DAYS),
+        resultSet(EmailResponseVariables.OPEN_15DAYS),
+        resultSet(EmailResponseVariables.OPEN_30DAYS),
+        resultSet(EmailResponseVariables.CLICK_7DAYS),
+        resultSet(EmailResponseVariables.CLICK_15DAYS),
+        resultSet(EmailResponseVariables.CLICK_30DAYS),
+        resultSet(EmailResponseVariables.LAST_OPEN_DATE),
+        resultSet(EmailResponseVariables.LAST_CLICK_DATE),
+        resultSet(EmailResponseVariables.OPENS_LIFETIME),
+        resultSet(EmailResponseVariables.CLICKS_LIFETIME),
+        resultSet(EmailResponseVariables.END_DATE),
+        resultSet(NewsletterVariables.UPDATED_AT)
+)
 
     val result = cmrResDf.join(nlSubscribers, cmrResDf(CustomerVariables.EMAIL) === nlSubscribers(CustomerVariables.EMAIL),
       SQL.LEFT_OUTER).select(
