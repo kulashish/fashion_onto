@@ -18,9 +18,6 @@ object SalesOrderItemVariables {
   val FILTER_APP = "domain ='android' or domain = 'ios' or domain ='windows'"
   val FILTER_WEB = "domain ='w'"
   val FILTER_MWEB = "domain ='m'"
-  val APP = "/app/"
-  val WEB = "/web/"
-  val MOBILE_WEB = "/mobile_web/"
   val UNIT_PRICE = "unit_price"
   val SALES_ORDER_ITEM_STATUS = "fk_sales_order_item_status"
   val REVENUE = "revenue"
@@ -30,7 +27,6 @@ object SalesOrderItemVariables {
   val ORDERS_COUNT_APP = "orders_count_app"
   val ORDERS_COUNT_WEB = "orders_count_web"
   val ORDERS_COUNT_MWEB = "orders_count_mweb"
-  val FILTER_SUCCESSFUL_ORDERS = "fk_sales_order_item_status = 3 or fk_sales_order_item_status = 4 or fk_sales_order_item_status = 5 or fk_sales_order_item_status = 6 or fk_sales_order_item_status = 7 or fk_sales_order_item_status = 11 or fk_sales_order_item_status = 17 or fk_sales_order_item_status = 24 or fk_sales_order_item_status = 33 or fk_sales_order_item_status = 34"
   val ORDERS_COUNT_SUCCESSFUL = "orders_count_successful"
   val FAV_BRAND = "fav_brand"
 
