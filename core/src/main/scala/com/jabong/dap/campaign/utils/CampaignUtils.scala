@@ -1114,8 +1114,7 @@ object CampaignUtils extends Logging {
 
   @elidable(FINE) def debug(data: DataFrame, name: String) {
     println("Count of " + name + ":-" + data.count() + "\n")
-    println("show dataframe " + name + ":-" + data.show(100) + "\n")
-
+    println("show dataframe " + name + ":-" + data.show(10) + "\n")
     data.printSchema()
   }
 
