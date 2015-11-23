@@ -690,6 +690,48 @@ object Schema {
     StructField(ContactListMobileVars.STATE_ZONE, StringType, true)
   ))
 
+  val customerOrdersPrevSchema = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER+"OLD", LongType, false),
+    StructField(SalesOrderVariables.MAX_ORDER_BASKET_VALUE+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesOrderVariables.MAX_ORDER_ITEM_VALUE+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesOrderVariables.SUM_BASKET_VALUE+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesOrderVariables.COUNT_BASKET_VALUE+"OLD", LongType, false),
+    StructField(SalesOrderVariables.ORDER_ITEM_COUNT+"OLD", LongType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE+"OLD", TimestampType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY+"OLD", StringType, false),
+    StructField(SalesAddressVariables.LAST_SHIPPING_CITY_TIER+"OLD", StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY+"OLD", StringType, false),
+    StructField(SalesAddressVariables.FIRST_SHIPPING_CITY_TIER+"OLD", StringType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_INVLD_ORDERS+"OLD", IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_CNCLD_ORDERS+"OLD", IntegerType, false),
+    StructField(SalesOrderItemVariables.COUNT_OF_RET_ORDERS+"OLD", IntegerType, false),
+    StructField(SalesOrderItemVariables.SUCCESSFUL_ORDERS+"OLD", IntegerType, false),
+    StructField(SalesOrderItemVariables.GROSS_ORDERS+"OLD", IntegerType, false),
+    StructField(SalesOrderVariables.LAST_ORDER_UPDATED_AT+"OLD", TimestampType, false),
+    StructField(SalesOrderVariables.FIRST_ORDER_DATE+"OLD", TimestampType, false),
+    StructField(SalesRuleSetVariables.MIN_COUPON_VALUE_USED+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesRuleSetVariables.MAX_COUPON_VALUE_USED+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesRuleSetVariables.COUPON_SUM+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesRuleSetVariables.COUPON_COUNT+"OLD", LongType, false),
+    StructField(SalesRuleSetVariables.MIN_DISCOUNT_USED+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesRuleSetVariables.MAX_DISCOUNT_USED+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_SUM+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesRuleSetVariables.DISCOUNT_COUNT+"OLD", LongType, false),
+    StructField(SalesOrderItemVariables.REVENUE_7+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.REVENUE_30+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE+"OLD", DecimalType.apply(16, 2), false),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_LIFE+"OLD", LongType, false),
+    StructField(SalesOrderVariables.CATEGORY_PENETRATION+"OLD", StringType, false),
+    StructField(SalesOrderVariables.BRICK_PENETRATION+"OLD", StringType, false),
+    StructField(SalesOrderItemVariables.FAV_BRAND+"OLD", StringType, false),
+    StructField(ContactListMobileVars.CITY+"OLD", StringType, true),
+    StructField(CustomerVariables.PHONE+"OLD", StringType, true),
+    StructField(CustomerVariables.FIRST_NAME+"OLD", StringType, true),
+    StructField(CustomerVariables.LAST_NAME+"OLD", StringType, true),
+    StructField(ContactListMobileVars.CITY_TIER+"OLD", StringType, true),
+    StructField(ContactListMobileVars.STATE_ZONE+"OLD", StringType, true)
+  ))
+
   val surfAffinitySchema = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
     StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
