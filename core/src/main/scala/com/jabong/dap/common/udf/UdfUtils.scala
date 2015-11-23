@@ -815,4 +815,15 @@ object UdfUtils extends Logging {
 
     return string.length()
   }
+
+  def acartNumberOfSkus(acartUrl: String): Int = {
+    if (acartUrl == null)
+      return 0
+
+    val acartData = acartUrl.split("=")
+    if(acartData.length>1){
+      return acartData(0).split(",").length
+    }
+    return 0
+  }
 }
