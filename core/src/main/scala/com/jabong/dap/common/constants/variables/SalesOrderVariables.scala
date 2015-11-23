@@ -86,6 +86,4 @@ object SalesOrderVariables {
   val LAST_ORDER_DATE = "last_order_date"
   val LAST_ORDER_UPDATED_AT = "last_order_updated_at"
 
-  val NEW_ = "new_"
-
 }
