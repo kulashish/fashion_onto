@@ -2,8 +2,8 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.skuselection.Wishlist
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, SkuSelection}
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ProductVariables}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, SkuSelection }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ProductVariables }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._

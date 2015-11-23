@@ -58,7 +58,6 @@ object CampaignMergedFields {
   val BRICK = "BRICK"
   val CATEGORY = "CATEGORY"
 
-
   // Acart Hourly Campaign
 
   val STATUS = "STATUS"
@@ -66,7 +65,7 @@ object CampaignMergedFields {
   val SPECIAL_TEXT = "SPECIALTEXT"
   val SENDING_METHOD = "SENDING_METHOD"
   val ARTICLE = "ARTICLE"
-  val URL ="URL"
+  val URL = "URL"
   val NUMBER_SKUS = "NUMBER_SKUS"
 
 }
