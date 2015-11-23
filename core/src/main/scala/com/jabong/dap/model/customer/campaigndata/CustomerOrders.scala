@@ -280,7 +280,7 @@ object CustomerOrders extends DataFeedsModel {
     var res: DataFrame = custOrdersIncr
     if (null != prevFull) {
       val custOrdersPrevFull = Spark.getSqlContext().createDataFrame(prevFull.rdd, Schema.customerOrdersPrevSchema)
-      val custOrdersFull = custOrdersIncr.join(custOrdersPrevFull, custOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === custOrdersPrevFull(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
+      val custOrdersFull = custOrdersIncr.join(custOrdersPrevFull, custOrdersIncr(SalesOrderVariables.FK_CUSTOMER) === custOrdersPrevFull(SalesOrderVariables.FK_CUSTOMER+"_OLD"), SQL.FULL_OUTER)
         .na.fill(scala.collection.immutable.Map(
         SalesOrderItemVariables.REVENUE_7 -> 0.0,
         SalesOrderItemVariables.REVENUE_30 -> 0.0,
