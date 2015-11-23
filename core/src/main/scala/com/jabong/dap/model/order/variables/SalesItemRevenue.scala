@@ -244,8 +244,7 @@ object SalesItemRevenue extends DataFeedsModel {
         SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
         SalesOrderItemVariables.REVENUE_WEB -> 0.0,
         SalesOrderItemVariables.REVENUE_OTHERS -> 0.0,
-
-      SalesOrderItemVariables.REVENUE -> 0.0
+        SalesOrderItemVariables.REVENUE -> 0.0
       ))
     val res = joined.select(
       coalesce(joined(SalesOrderVariables.FK_CUSTOMER), joined(SalesOrderVariables.FK_CUSTOMER + "NEW")) as SalesOrderVariables.FK_CUSTOMER,
@@ -385,10 +384,13 @@ object SalesItemRevenue extends DataFeedsModel {
         SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
         SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
         SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_OTHERS -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_OTHERS -> 0,
         SalesOrderItemVariables.ORDERS_COUNT -> 0,
         SalesOrderItemVariables.REVENUE_APP -> 0.0,
         SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
         SalesOrderItemVariables.REVENUE_WEB -> 0.0,
+        SalesOrderItemVariables.REVENUE_OTHERS -> 0,
         SalesOrderItemVariables.REVENUE -> 0.0
       ))
     val res = joined.select(
@@ -421,10 +423,12 @@ object SalesItemRevenue extends DataFeedsModel {
       joined(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE),
       joined(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE),
       joined(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE),
+      joined(SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE),
       joined(SalesOrderItemVariables.REVENUE_LIFE),
       joined(SalesOrderItemVariables.REVENUE_APP_LIFE),
       joined(SalesOrderItemVariables.REVENUE_WEB_LIFE),
       joined(SalesOrderItemVariables.REVENUE_MWEB_LIFE),
+      joined(SalesOrderItemVariables.REVENUE_OTHERS_LIFE),
       joined(SalesOrderVariables.LAST_ORDER_DATE)
     )
     val newRdd = res
@@ -434,10 +438,12 @@ object SalesItemRevenue extends DataFeedsModel {
         SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
         SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
         SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE,
+        SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE,
         SalesOrderItemVariables.REVENUE_LIFE,
         SalesOrderItemVariables.REVENUE_APP_LIFE,
         SalesOrderItemVariables.REVENUE_WEB_LIFE,
         SalesOrderItemVariables.REVENUE_MWEB_LIFE,
+        SalesOrderItemVariables.REVENUE_OTHERS_LIFE,
         SalesOrderItemVariables.ORDERS_COUNT_7,
         SalesOrderItemVariables.ORDERS_COUNT_APP_7,
         SalesOrderItemVariables.ORDERS_COUNT_WEB_7,
