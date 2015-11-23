@@ -77,7 +77,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfMap.put("custEmailResPrevFull", prevFullDf)
 
     val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
-      incrDate).filter(col(CustomerVariables.EMAIL) isNotNull)
+      incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
     dfMap.put("cmrFull", dfCmrFull)
 
     val nlSubscribers = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION,
@@ -132,7 +132,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val custEmailResCsv = custEmailResFull.except(prevFullDf).select(
       col(ContactListMobileVars.UID),
-      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT), col(EmailResponseVariables.END_DATE), lit(date)),
+      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT), col(EmailResponseVariables.END_DATE), lit(date))
+        as EmailResponseVariables.OPEN_SEGMENT,
       col(EmailResponseVariables.OPEN_7DAYS),
       col(EmailResponseVariables.OPEN_15DAYS),
       col(EmailResponseVariables.OPEN_30DAYS),
@@ -264,7 +265,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   def merge(resultSet: DataFrame, dfCmrFull: DataFrame, nlSubscribers: DataFrame) = {
 
-    val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(CustomerVariables.RESPONSYS_ID) === resultSet(EmailResponseVariables.CUSTOMER_ID),
+    val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(ContactListMobileVars.UID) === resultSet(EmailResponseVariables.CUSTOMER_ID),
       SQL.LEFT_OUTER)
 
     val result = cmrResDf.join(nlSubscribers, cmrResDf(CustomerVariables.EMAIL) === nlSubscribers(CustomerVariables.EMAIL),
