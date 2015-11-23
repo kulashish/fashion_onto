@@ -1,4 +1,4 @@
-package com.jabong.dap.common.constants.valiables
+package com.jabong.dap.common.constants.variables
 
 /**
  * Created by mubarak on 4/9/15.

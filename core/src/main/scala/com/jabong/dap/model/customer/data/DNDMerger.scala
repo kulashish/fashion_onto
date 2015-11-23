@@ -3,7 +3,7 @@ package com.jabong.dap.model.customer.data
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.valiables.DNDVariables
+import com.jabong.dap.common.constants.variables.DNDVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
