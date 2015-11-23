@@ -2,7 +2,7 @@
 package com.jabong.dap.campaign.customer
 
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, NewsletterVariables, EmailResponseVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars, NewsletterVariables, EmailResponseVariables}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
@@ -91,7 +91,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
 
   "testMergeEffectiveDfWithCmrAndNl" should "match expected values" in {
     val effectiveDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective", CustEmailSchema.effective_Smry_Schema)
-    val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr")
+    val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr").filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
     val nl = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "newsletter_subscription")
     val result = merge(effectiveDf, cmr, nl)
     assert(result.count() === 4)
