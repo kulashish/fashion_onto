@@ -39,8 +39,17 @@ object CampaignOutput {
         val dateToday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         val acartPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateToday)
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, acartPath)) {
+          CampaignUtils.getAcartHourlyFields(campaignOutput)
           DataWriter.writeParquet(campaignOutput, acartPath, DataSets.IGNORE_SAVEMODE)
         }
+        val campaignCsvOutput = campaignOutput
+          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+          .drop(CampaignMergedFields.REC_SKUS)
+          .drop(CampaignMergedFields.REF_SKUS)
+          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
+          .drop(CampaignMergedFields.EMAIL)
+          .drop(CampaignMergedFields.NUMBER_SKUS)
+          .drop(CampaignMergedFields.LIVE_CART_URL)
         val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
         DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.LAST_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
       } else if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
