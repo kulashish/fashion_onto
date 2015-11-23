@@ -143,7 +143,7 @@ object SalesItemRevenue extends DataFeedsModel {
 
   //TODO change this method
   def addColumnsforBeforeData(salesRevenue: DataFrame): DataFrame = {
-    salesRevenue.withColumn(SalesOrderItemVariables.ORDERS_COUNT_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
+    val res = salesRevenue.withColumn(SalesOrderItemVariables.ORDERS_COUNT_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
       .withColumn(SalesOrderItemVariables.ORDERS_COUNT_APP_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
       .withColumn(SalesOrderItemVariables.ORDERS_COUNT_WEB_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
       .withColumn(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7, salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP) - salesRevenue(SalesOrderItemVariables.ORDERS_COUNT_APP))
@@ -168,14 +168,57 @@ object SalesItemRevenue extends DataFeedsModel {
       .withColumn(SalesOrderItemVariables.REVENUE_WEB_90, salesRevenue(SalesOrderItemVariables.REVENUE_APP) - salesRevenue(SalesOrderItemVariables.REVENUE_APP))
       .withColumn(SalesOrderItemVariables.REVENUE_MWEB_90, salesRevenue(SalesOrderItemVariables.REVENUE_APP) - salesRevenue(SalesOrderItemVariables.REVENUE_APP))
       .withColumnRenamed(SalesOrderItemVariables.ORDERS_COUNT_APP, SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE)
+      .withColumnRenamed(SalesOrderItemVariables.ORDERS_COUNT_OTHERS, SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.ORDERS_COUNT_WEB, SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.ORDERS_COUNT_MWEB, SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.REVENUE_APP, SalesOrderItemVariables.REVENUE_APP_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.REVENUE_WEB, SalesOrderItemVariables.REVENUE_WEB_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.REVENUE_MWEB, SalesOrderItemVariables.REVENUE_MWEB_LIFE)
+      .withColumnRenamed(SalesOrderItemVariables.REVENUE_OTHERS, SalesOrderItemVariables.REVENUE_OTHERS_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.REVENUE, SalesOrderItemVariables.REVENUE_LIFE)
       .withColumnRenamed(SalesOrderItemVariables.ORDERS_COUNT, SalesOrderItemVariables.ORDERS_COUNT_LIFE)
 
+    val newRdd = res.
+      select(
+        SalesOrderVariables.FK_CUSTOMER,
+        SalesOrderItemVariables.ORDERS_COUNT_LIFE,
+        SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
+        SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
+        SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE,
+        SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE,
+        SalesOrderItemVariables.REVENUE_LIFE,
+        SalesOrderItemVariables.REVENUE_APP_LIFE,
+        SalesOrderItemVariables.REVENUE_WEB_LIFE,
+        SalesOrderItemVariables.REVENUE_MWEB_LIFE,
+        SalesOrderItemVariables.REVENUE_OTHERS_LIFE,
+        SalesOrderItemVariables.ORDERS_COUNT_7,
+        SalesOrderItemVariables.ORDERS_COUNT_APP_7,
+        SalesOrderItemVariables.ORDERS_COUNT_WEB_7,
+        SalesOrderItemVariables.ORDERS_COUNT_MWEB_7,
+        SalesOrderItemVariables.REVENUE_7,
+        SalesOrderItemVariables.REVENUE_APP_7,
+        SalesOrderItemVariables.REVENUE_WEB_7,
+        SalesOrderItemVariables.REVENUE_MWEB_7,
+        SalesOrderItemVariables.ORDERS_COUNT_30,
+        SalesOrderItemVariables.ORDERS_COUNT_APP_30,
+        SalesOrderItemVariables.ORDERS_COUNT_WEB_30,
+        SalesOrderItemVariables.ORDERS_COUNT_MWEB_30,
+        SalesOrderItemVariables.REVENUE_30,
+        SalesOrderItemVariables.REVENUE_APP_30,
+        SalesOrderItemVariables.REVENUE_WEB_30,
+        SalesOrderItemVariables.REVENUE_MWEB_30,
+        SalesOrderItemVariables.ORDERS_COUNT_90,
+        SalesOrderItemVariables.ORDERS_COUNT_APP_90,
+        SalesOrderItemVariables.ORDERS_COUNT_WEB_90,
+        SalesOrderItemVariables.ORDERS_COUNT_MWEB_90,
+        SalesOrderItemVariables.REVENUE_90,
+        SalesOrderItemVariables.REVENUE_APP_90,
+        SalesOrderItemVariables.REVENUE_WEB_90,
+        SalesOrderItemVariables.REVENUE_MWEB_90,
+        SalesOrderVariables.LAST_ORDER_DATE).
+      rdd
+    val rev = Spark.getSqlContext().createDataFrame(newRdd, Schema.salesRev)
+  rev
   }
 
   /**
@@ -195,11 +238,14 @@ object SalesItemRevenue extends DataFeedsModel {
         SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
         SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
         SalesOrderItemVariables.ORDERS_COUNT_MWEB -> 0,
+        SalesOrderItemVariables.ORDERS_COUNT_OTHERS -> 0,
         SalesOrderItemVariables.ORDERS_COUNT -> 0,
         SalesOrderItemVariables.REVENUE_APP -> 0.0,
         SalesOrderItemVariables.REVENUE_MWEB -> 0.0,
         SalesOrderItemVariables.REVENUE_WEB -> 0.0,
-        SalesOrderItemVariables.REVENUE -> 0.0
+        SalesOrderItemVariables.REVENUE_OTHERS -> 0.0,
+
+      SalesOrderItemVariables.REVENUE -> 0.0
       ))
     val res = joined.select(
       coalesce(joined(SalesOrderVariables.FK_CUSTOMER), joined(SalesOrderVariables.FK_CUSTOMER + "NEW")) as SalesOrderVariables.FK_CUSTOMER,
@@ -207,10 +253,12 @@ object SalesItemRevenue extends DataFeedsModel {
       joined(SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE) + joined(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_LIFE,
       joined(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE) + joined(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE,
       joined(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE) + joined(SalesOrderItemVariables.ORDERS_COUNT_MWEB) as SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE,
+      joined(SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE) + joined(SalesOrderItemVariables.ORDERS_COUNT_OTHERS) as SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE,
       joined(SalesOrderItemVariables.REVENUE_LIFE) + joined(SalesOrderItemVariables.REVENUE) as SalesOrderItemVariables.REVENUE_LIFE,
       joined(SalesOrderItemVariables.REVENUE_APP_LIFE) + joined(SalesOrderItemVariables.REVENUE_APP) as SalesOrderItemVariables.REVENUE_APP_LIFE,
       joined(SalesOrderItemVariables.REVENUE_WEB_LIFE) + joined(SalesOrderItemVariables.REVENUE_WEB) as SalesOrderItemVariables.REVENUE_WEB_LIFE,
       joined(SalesOrderItemVariables.REVENUE_MWEB_LIFE) + joined(SalesOrderItemVariables.REVENUE_MWEB) as SalesOrderItemVariables.REVENUE_MWEB_LIFE,
+      joined(SalesOrderItemVariables.REVENUE_OTHERS_LIFE) + joined(SalesOrderItemVariables.REVENUE_OTHERS) as SalesOrderItemVariables.REVENUE_OTHERS_LIFE,
       joined(SalesOrderItemVariables.ORDERS_COUNT_7) + joined(SalesOrderItemVariables.ORDERS_COUNT) as SalesOrderItemVariables.ORDERS_COUNT_7,
       joined(SalesOrderItemVariables.ORDERS_COUNT_APP_7) + joined(SalesOrderItemVariables.ORDERS_COUNT_APP) as SalesOrderItemVariables.ORDERS_COUNT_APP_7,
       joined(SalesOrderItemVariables.ORDERS_COUNT_WEB_7) + joined(SalesOrderItemVariables.ORDERS_COUNT_WEB) as SalesOrderItemVariables.ORDERS_COUNT_WEB_7,
@@ -279,6 +327,8 @@ object SalesItemRevenue extends DataFeedsModel {
         joinedData(SalesOrderItemVariables.REVENUE_APP),
         joinedData(SalesOrderItemVariables.ORDERS_COUNT_MWEB),
         joinedData(SalesOrderItemVariables.REVENUE_MWEB),
+        others(SalesOrderItemVariables.ORDERS_COUNT_OTHERS),
+        others(SalesOrderItemVariables.REVENUE_OTHERS),
         Udf.minTimestamp(joinedData(SalesOrderVariables.LAST_ORDER_DATE), others(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
       )
 
@@ -295,10 +345,16 @@ object SalesItemRevenue extends DataFeedsModel {
     ))
     val res = joinedFill.withColumn(
       SalesOrderItemVariables.REVENUE,
-      joinedFill(SalesOrderItemVariables.REVENUE_APP) + joinedFill(SalesOrderItemVariables.REVENUE_WEB) + joinedFill(SalesOrderItemVariables.REVENUE_MWEB) + joinedFill(SalesOrderItemVariables.REVENUE_OTHERS)
+        joinedFill(SalesOrderItemVariables.REVENUE_APP) +
+        joinedFill(SalesOrderItemVariables.REVENUE_WEB) +
+        joinedFill(SalesOrderItemVariables.REVENUE_MWEB) +
+        joinedFill(SalesOrderItemVariables.REVENUE_OTHERS)
     ).withColumn(
         SalesOrderItemVariables.ORDERS_COUNT,
-        joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB)+ joinedFill(SalesOrderItemVariables.ORDERS_COUNT_OTHERS)
+          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) +
+          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) +
+          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB)+
+          joinedFill(SalesOrderItemVariables.ORDERS_COUNT_OTHERS)
       )
     res
   }

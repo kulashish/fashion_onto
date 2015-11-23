@@ -305,7 +305,7 @@ object CustomerOrders extends DataFeedsModel {
         SalesOrderVariables.COUNT_BASKET_VALUE -> 0,
         SalesOrderVariables.ORDER_ITEM_COUNT -> 0
       ))
-        .select(coalesce(custOrdersIncr(SalesOrderVariables.FK_CUSTOMER), custOrdersPrevFull(SalesOrderVariables.FK_CUSTOMER)+"_OLD") as SalesOrderVariables.FK_CUSTOMER,
+        .select(coalesce(custOrdersIncr(SalesOrderVariables.FK_CUSTOMER), custOrdersPrevFull(SalesOrderVariables.FK_CUSTOMER+"_OLD")) as SalesOrderVariables.FK_CUSTOMER,
           when(custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE) > custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE+"_OLD"), custOrdersIncr(SalesOrderVariables.MAX_ORDER_BASKET_VALUE)).otherwise(custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_BASKET_VALUE+"_OLD")) as SalesOrderVariables.MAX_ORDER_BASKET_VALUE,
           when(custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE) > custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE+"_OLD"), custOrdersIncr(SalesOrderVariables.MAX_ORDER_ITEM_VALUE)).otherwise(custOrdersPrevFull(SalesOrderVariables.MAX_ORDER_ITEM_VALUE+"_OLD")) as SalesOrderVariables.MAX_ORDER_ITEM_VALUE,
           custOrdersIncr(SalesOrderVariables.SUM_BASKET_VALUE) + custOrdersPrevFull(SalesOrderVariables.SUM_BASKET_VALUE+"_OLD") as SalesOrderVariables.SUM_BASKET_VALUE,
