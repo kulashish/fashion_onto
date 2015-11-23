@@ -2,10 +2,12 @@
 package com.jabong.dap.campaign.customer
 
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ NewsletterVariables, EmailResponseVariables }
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, NewsletterVariables, EmailResponseVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
+import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
@@ -14,6 +16,7 @@ import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
 import com.jabong.dap.model.customer.schema.CustEmailSchema
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.IntegerType
 import org.scalatest.FlatSpec
 
 /**
@@ -48,19 +51,24 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     // click counts
     assert(selOpenDf.get(2).toString.equalsIgnoreCase("2"))
 
-    val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
-      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
-      .select(coalesce(aggClickData(EmailResponseVariables.CUSTOMER_ID), aggOpenData(EmailResponseVariables.CUSTOMER_ID)) as EmailResponseVariables.CUSTOMER_ID,
-        aggOpenData(EmailResponseVariables.LAST_OPEN_DATE) as EmailResponseVariables.LAST_OPEN_DATE,
-        aggOpenData(EmailResponseVariables.OPENS_TODAY) as EmailResponseVariables.OPENS_TODAY,
-        aggClickData(EmailResponseVariables.CLICKS_TODAY) as EmailResponseVariables.CLICKS_TODAY,
-        aggClickData(EmailResponseVariables.LAST_CLICK_DATE) as EmailResponseVariables.LAST_CLICK_DATE)
+    val outputCsvFormat = udf((s: String) => TimeUtils.changeDateFormat(s: String, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT))
 
+    val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
+      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as ContactListMobileVars.UID,
+        outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
+        col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
+        col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY).cast(IntegerType) as EmailResponseVariables.CLICKS_TODAY,
+        outputCsvFormat(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE)
+      .withColumn(EmailResponseVariables.OPENS_TODAY, findOpen(col(EmailResponseVariables.OPENS_TODAY), col(EmailResponseVariables.CLICKS_TODAY))).cache()
+
+    print(joinedDf.first().get(joinedDf.first().fieldIndex("UID") ))
     assert(joinedDf.count() == 15)
 
   }
 
   "testReadDataFrame" should "match with expected data" in {
+
     val dfMap = readDF("2015/10/09", "2015/10/08", null)
 
   }
@@ -89,10 +97,30 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
 
   "testMergeEffectiveDfWithCmrAndNl" should "match expected values" in {
     val effectiveDf = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "effective", CustEmailSchema.effective_Smry_Schema)
-    val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr")
+    val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr").filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
     val nl = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "newsletter_subscription")
     val result = merge(effectiveDf, cmr, nl)
     assert(result.count() === 4)
+
+    readDF("2015/11/09", "2015/10/18", null)
+    val udfOpenSegFn = udf((s: String, s1: String, s2: String) => open_segment(s: String, s1: String, s2: String, date))
+
+    val custEmailResCsv = result.select(
+      col(ContactListMobileVars.UID),
+      udfOpenSegFn(col(EmailResponseVariables.LAST_OPEN_DATE), col(NewsletterVariables.UPDATED_AT),
+        col(EmailResponseVariables.END_DATE)),
+      col(EmailResponseVariables.OPEN_7DAYS),
+      col(EmailResponseVariables.OPEN_15DAYS),
+      col(EmailResponseVariables.OPEN_30DAYS),
+      col(EmailResponseVariables.CLICK_7DAYS),
+      col(EmailResponseVariables.CLICK_15DAYS),
+      col(EmailResponseVariables.CLICK_30DAYS),
+      col(EmailResponseVariables.LAST_OPEN_DATE),
+      col(EmailResponseVariables.LAST_CLICK_DATE),
+      col(EmailResponseVariables.OPENS_LIFETIME),
+      col(EmailResponseVariables.CLICKS_LIFETIME))
+
+    println(custEmailResCsv)
 
   }
 
@@ -111,7 +139,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr")
     val nl = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "newsletter_subscription")
     val result = merge(effectiveDFFull, cmr, nl)
-    println(result)
+
   }
 
   "testMergeTodayWithEmpty7_15_30" should "match expected values" in {
