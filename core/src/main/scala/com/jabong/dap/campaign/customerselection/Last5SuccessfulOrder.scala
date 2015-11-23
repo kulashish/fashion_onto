@@ -1,14 +1,11 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.campaign.manager.CampaignProducer
-import com.jabong.dap.campaign.skuselection.Daily._
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.constants.variables._
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
 
 /**
  * Created by raghu on 30/9/15.
@@ -23,12 +20,12 @@ class Last5SuccessfulOrder extends LiveCustomerSelector with Logging {
 
       return null
     }
-    CampaignUtils.debug(customerOrderData,"customerOrder Data")
+    CampaignUtils.debug(customerOrderData, "customerOrder Data")
 
     val filterCustomerData = customerOrderData.filter(SalesOrderItemVariables.SUCCESSFUL_ORDERS + " >= " + CampaignCommon.LAST_FIVE_PURCHASES)
       .select(CustomerVariables.FK_CUSTOMER)
 
-    CampaignUtils.debug(filterCustomerData,"filterCustomerData with 5 successfull orders")
+    CampaignUtils.debug(filterCustomerData, "filterCustomerData with 5 successfull orders")
 
     val coalesceFullSalesOrderData = salesOrderData
     val joinedDf = filterCustomerData.join(

@@ -115,6 +115,7 @@ object CustomerVariables {
   val EVENT_CAPTURED_DT = "EVENT_CAPTURED_DT"
   val ID_CUSTOMER_SESSION = "id_customer_session"
 
+  //Ad4PushVariables
   var DEVICE_ID = "device_id"
   var UDID = "UDID"
   var TOKEN = "token"

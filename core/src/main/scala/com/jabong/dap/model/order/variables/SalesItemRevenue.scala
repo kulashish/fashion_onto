@@ -119,11 +119,11 @@ object SalesItemRevenue extends DataFeedsModel {
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
     val otherOrders = salesJoinedDF.filter(salesJoinedDF(SalesOrderVariables.DOMAIN).isNull
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) ==="w"
+      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "w"
       && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "m"
       && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "ios"
       && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "android"
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "windows" )
+      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "windows")
     val app = getRevenueOrders(appOrders, "_app")
     val web = getRevenueOrders(webOrders, "_web")
     val mWeb = getRevenueOrders(mWebOrders, "_mweb")
@@ -282,7 +282,6 @@ object SalesItemRevenue extends DataFeedsModel {
         Udf.minTimestamp(joinedData(SalesOrderVariables.LAST_ORDER_DATE), others(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
       )
 
-
     val joinedFill = finalJoined.na.fill(Map(
       SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
       SalesOrderItemVariables.ORDERS_COUNT_WEB -> 0,
@@ -298,7 +297,7 @@ object SalesItemRevenue extends DataFeedsModel {
       joinedFill(SalesOrderItemVariables.REVENUE_APP) + joinedFill(SalesOrderItemVariables.REVENUE_WEB) + joinedFill(SalesOrderItemVariables.REVENUE_MWEB) + joinedFill(SalesOrderItemVariables.REVENUE_OTHERS)
     ).withColumn(
         SalesOrderItemVariables.ORDERS_COUNT,
-        joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB)+ joinedFill(SalesOrderItemVariables.ORDERS_COUNT_OTHERS)
+        joinedFill(SalesOrderItemVariables.ORDERS_COUNT_APP) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_WEB) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB) + joinedFill(SalesOrderItemVariables.ORDERS_COUNT_OTHERS)
       )
     res
   }

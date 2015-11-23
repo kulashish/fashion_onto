@@ -26,7 +26,7 @@ object DevicesReactions extends Logging {
   def start(params: ParamInfo) = {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
-    customerResponse(incrDate, saveMode)  
+    customerResponse(incrDate, saveMode)
   }
   /**
    * All read CSV, read perquet, write perquet
