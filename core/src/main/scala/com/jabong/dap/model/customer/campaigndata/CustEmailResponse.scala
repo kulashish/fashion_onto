@@ -42,12 +42,12 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val filename = "53699_CLICK_" + fileDate + ".txt"
     val clickIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE,
-      incrDate, filename, "true", ";")
+      incrDate, filename, "true", ";").coalesce(20)
     dfMap.put("clickIncr", clickIncr)
 
     val openFilename = "53699_OPEN_" + fileDate + ".txt"
     val openIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.OPEN, DataSets.DAILY_MODE,
-      incrDate, openFilename, "true", ";")
+      incrDate, openFilename, "true", ";").coalesce(20)
     dfMap.put("openIncr", openIncr)
 
     val before7daysString = TimeUtils.getDateAfterNDays(-7, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
@@ -68,7 +68,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     var prevFullDf: DataFrame = null
     if (null != paths) {
-      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|")
+      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|").coalesce(100)
       prevFullDf = SchemaUtils.addColumns(inputCsv, CustEmailSchema.effective_Smry_Schema)
     } else {
       prevFullDf = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
@@ -105,9 +105,9 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
         col(MergeUtils.NEW_ + EmailResponseVariables.CLICKS_TODAY).cast(IntegerType) as EmailResponseVariables.CLICKS_TODAY,
         outputCsvFormat(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE)
-      .withColumn(EmailResponseVariables.OPENS_TODAY, findOpen(col(EmailResponseVariables.OPENS_TODAY), col(EmailResponseVariables.CLICKS_TODAY)))
+      .withColumn(EmailResponseVariables.OPENS_TODAY, findOpen(col(EmailResponseVariables.OPENS_TODAY), col(EmailResponseVariables.CLICKS_TODAY))).cache()
 
-    val prevFullDf = dfMap("custEmailResPrevFull")
+    val prevFullDf = dfMap("custEmailResPrevFull").cache()
     val days7Df = dfMap("custEmailResDay7")
     val days15Df = dfMap("custEmailResDay15")
     val days30Df = dfMap("custEmailResDay30")
@@ -128,7 +128,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       EmailResponseVariables.CLICK_30DAYS -> 0,
       EmailResponseVariables.CLICKS_LIFETIME -> 0)).cache()
 
-    val udfOpenSegFn = udf((s: String, s1: String, s2: String) => open_segment(s: String, s1: String, s2: String, date))
+    val udfOpenSegFn = udf((s: String, s1: String, s2: String, s3: String) => open_segment(s: String, s1: String, s2: String, s3: String))
 
     val custEmailResCsv = custEmailResFull.except(prevFullDf).select(
       col(ContactListMobileVars.UID),
