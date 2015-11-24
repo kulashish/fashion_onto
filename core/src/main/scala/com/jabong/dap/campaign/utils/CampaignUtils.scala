@@ -216,7 +216,8 @@ object CampaignUtils extends Logging {
   }
 
   def checkNullDouble(value: Any): Double = {
-    if (value == null) return null.asInstanceOf[Double] else value.asInstanceOf[Double]
+    if (value != null) return value.asInstanceOf[BigDecimal].doubleValue()
+    return null.asInstanceOf[Double]
   }
   def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String, Timestamp, Double)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String, Timestamp, Double)] = {
     require(refSKusList != null, "refSkusList cannot be null")
