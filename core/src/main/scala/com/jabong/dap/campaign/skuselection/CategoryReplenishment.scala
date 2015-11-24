@@ -20,17 +20,13 @@ object CategoryReplenishment extends Logging {
     }
 
     val filteredSkuJoinedItr = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
-      .select(customerSkuData("*"),
-        yesterdayItrData(ProductVariables.SPECIAL_PRICE),
-        yesterdayItrData(ProductVariables.BRICK),
-        yesterdayItrData(ProductVariables.BRAND),
-        yesterdayItrData(ProductVariables.MVP),
-        yesterdayItrData(ProductVariables.GENDER),
-        yesterdayItrData(ProductVariables.PRODUCT_NAME),
-        yesterdayItrData(ProductVariables.STOCK),
-        yesterdayItrData(ProductVariables.PRICE_BAND),
-        yesterdayItrData(ProductVariables.CATEGORY)
-      ).cache()
+      .select(
+        customerSkuData("*"),
+        yesterdayItrData("*")
+      )
+      .drop(yesterdayItrData(ProductVariables.SKU_SIMPLE))
+      .drop(yesterdayItrData(ProductVariables.CREATED_AT))
+      .cache()
 
     CampaignUtils.debug(filteredSkuJoinedItr, "filteredSkuJoinedItr")
 
