@@ -196,7 +196,7 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.COLOR))),
         checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))),
         checkNullTimestamp(t(t.fieldIndex(SalesOrderItemVariables.CREATED_AT))),
-        checkNullDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))))))
+        checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -215,7 +215,7 @@ object CampaignUtils extends Logging {
     if (value == null) return null.asInstanceOf[Timestamp] else value.asInstanceOf[Timestamp]
   }
 
-  def checkNullDouble(value: Any): Double = {
+  def checkNullBigDecimalToDouble(value: Any): Double = {
     if (value != null) return value.asInstanceOf[BigDecimal].doubleValue()
     return null.asInstanceOf[Double]
   }
