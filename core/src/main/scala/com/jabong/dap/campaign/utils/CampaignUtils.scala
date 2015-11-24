@@ -194,7 +194,9 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
         checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))),
         checkNullString(t(t.fieldIndex(ProductVariables.COLOR))),
-        checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))))))
+        checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))),
+        checkNullTimestamp(t(t.fieldIndex(SalesOrderItemVariables.CREATED_AT))),
+        checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -209,7 +211,15 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String)] = {
+  def checkNullTimestamp(value: Any): Timestamp = {
+    if (value == null) return null.asInstanceOf[Timestamp] else value.asInstanceOf[Timestamp]
+  }
+
+  def checkNullBigDecimalToDouble(value: Any): Double = {
+    if (value != null) return value.asInstanceOf[BigDecimal].doubleValue()
+    return null.asInstanceOf[Double]
+  }
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String, Timestamp, Double)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String, Timestamp, Double)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct

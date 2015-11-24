@@ -349,9 +349,16 @@ sub upload_email_campaigns {
     system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
     my $status || = $?;
 
+    $status ||= removeNull("$base/$filename");
+
+    $status ||= removeNull("$base/$followUp_filename");
+
+
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
 
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
 
     system("rm -rf /tmp/$date_with_zero");
@@ -364,21 +371,20 @@ sub upload_calendar_replenish_campaigns {
 
     print "calendar campaigns directory is $calendar_base\n";
     system("mkdir -p $calendar_base");
-;
 
     my $calendar_filename = "$date_with_zero_today"."_DCF_CAMPAIGN.csv";
 
     my $replenish_filename = "$date_with_zero_today"."_replenishment.csv";
 
-
     print "hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/\n";
-
     system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/");
     my $calendar_status = $?;
 
     print "hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
-
     system("hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
+
+    $status ||= removeNull("$calendar_base/$calendar_filename");
+    $status ||= removeNull("$calendar_base/$replenish_filename");
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
