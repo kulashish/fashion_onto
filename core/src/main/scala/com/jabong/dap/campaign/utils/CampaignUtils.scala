@@ -37,7 +37,7 @@ object CampaignUtils extends Logging {
   val sqlContext = Spark.getSqlContext()
 
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    CampaignUtils.debug(skuData, "AcartDaily:-after ref sku generation")
+    CampaignUtils.debug(skuData, "In ref sku generation")
 
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -60,7 +60,7 @@ object CampaignUtils extends Logging {
 
     val customerRefSku = GroupedUtils.orderGroupBy(customerFilteredData, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
-    CampaignUtils.debug(customerRefSku, "AcartDaily:-after ref sku generation")
+    CampaignUtils.debug(customerRefSku, "after ref sku generation")
 
     customerRefSku
 
