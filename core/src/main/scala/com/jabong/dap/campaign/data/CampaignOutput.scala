@@ -44,7 +44,9 @@ object CampaignOutput {
       if (campaignName.equals(CampaignCommon.ACART_HOURLY_CAMPAIGN)) {
         val dateToday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         val acartPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateToday)
-        val acartOutData = CampaignUtils.getAcartHourlyFields(campaignOutput).cache()
+        val cmr = CampaignInput.loadCustomerMasterData()
+
+        val acartOutData = CampaignUtils.getAcartHourlyFields(campaignOutput,cmr).cache()
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, acartPath)) {
           DataWriter.writeParquet(acartOutData, acartPath, DataSets.IGNORE_SAVEMODE)
         }
