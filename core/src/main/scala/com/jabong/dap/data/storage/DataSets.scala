@@ -4,7 +4,6 @@ package com.jabong.dap.data.storage
  * Created by jabong on 28/5/15.
  */
 object DataSets {
-
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
@@ -208,5 +207,11 @@ object DataSets {
 
   // miscellaneous data sets
   val CITY_WISE_DATA = "city_wise_data"
+  val WINBACK_CUSTOMER = "winbackCustomer"
+
+  //CRM tables
+  val CRM_TicketDetails = "CRM_TicketDetails"
+  val CRM_TicketMaster = "CRM_TicketMaster"
+  val CRM_TicketStatusLog = "CRM_TicketStatusLog"
 }
 

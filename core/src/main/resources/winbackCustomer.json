@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "winBackCustomer",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
