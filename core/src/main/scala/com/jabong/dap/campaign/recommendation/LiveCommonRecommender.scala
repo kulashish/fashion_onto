@@ -190,13 +190,13 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String, java.sql.Timestamp, Double)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
     val topRow = iterable.head
     val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
-    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)] = mutable.MutableList()
+    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String, java.sql.Timestamp, Double)] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
@@ -219,7 +219,7 @@ class LiveCommonRecommender extends Recommender with Logging {
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
       referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
-        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex)), CampaignUtils.checkNullTimestamp(row(calendarLastPurchasedIndex)).asInstanceOf[Timestamp], CampaignUtils.checkNullDouble(row(calendarPricePointIndex))))
+        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex)), CampaignUtils.checkNullTimestamp(row(calendarLastPurchasedIndex)), CampaignUtils.checkNullDouble(row(calendarPricePointIndex))))
 
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)

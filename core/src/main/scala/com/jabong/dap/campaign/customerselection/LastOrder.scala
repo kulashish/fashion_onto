@@ -42,8 +42,8 @@ class LastOrder extends LiveCustomerSelector with Logging {
     ).select(
         groupedSalesOrder(SalesOrderVariables.FK_CUSTOMER),
         groupedSalesOrder(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
-        groupedSalesOrder(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE,
         groupedSalesOrder(SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING),
+        salesOrderItem(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE,
         salesOrderItem(SalesOrderItemVariables.CREATED_AT),
         salesOrderItem(SalesOrderItemVariables.PAID_PRICE)
       )

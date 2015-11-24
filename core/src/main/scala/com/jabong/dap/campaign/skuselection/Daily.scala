@@ -22,6 +22,7 @@ object Daily extends Logging {
         customerSkuData("*"),
         yesterdayItrData("*"))
       .drop(yesterdayItrData(ProductVariables.SKU_SIMPLE))
+      .drop(yesterdayItrData(ProductVariables.CREATED_AT))
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
