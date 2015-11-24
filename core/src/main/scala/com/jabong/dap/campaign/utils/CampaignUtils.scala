@@ -809,9 +809,9 @@ object CampaignUtils extends Logging {
         CampaignUtils.debug(campaignOutAfterRecFilter, "campaignOutAfterRecFilter")
         campaignOutAfterRecFilter
       }
-//      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
-//        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
-//        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+      //      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
+      //        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+      //        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case CampaignCommon.REPLENISHMENT_CAMPAIGN =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, 8)
         val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)
@@ -827,7 +827,7 @@ object CampaignUtils extends Logging {
     CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
-  def minRefSkuFilter(recommendationOutPut: DataFrame): DataFrame ={
+  def minRefSkuFilter(recommendationOutPut: DataFrame): DataFrame = {
     recommendationOutPut.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
 
   }
@@ -885,8 +885,8 @@ object CampaignUtils extends Logging {
    * @return
    */
   def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
-     val cmr = CampaignInput.loadCustomerMasterData()
-     val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
+    val cmr = CampaignInput.loadCustomerMasterData()
+    val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY, lit("")))
     val replenishmentOutData = replenishmentData
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
@@ -905,7 +905,6 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
       .drop(CampaignCommon.PRIORITY)
-
 
     debug(replenishmentOutData, "replenishmentOutData")
     return replenishmentOutData
@@ -1182,7 +1181,7 @@ object CampaignUtils extends Logging {
   def getAcartHourlyFields(inputData: DataFrame): DataFrame = {
     require(inputData != null, "acart hourly data cannot be null")
     val cmr = CampaignInput.loadCustomerMasterData()
-    val acartWithUidData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, inputData.withColumn(CampaignCommon.PRIORITY,lit("")))
+    val acartWithUidData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, inputData.withColumn(CampaignCommon.PRIORITY, lit("")))
     val inputDataNumberSkus = acartWithUidData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
     val acartOutData = inputDataNumberSkus
       .withColumn(ContactListMobileVars.UID, lit(""))
