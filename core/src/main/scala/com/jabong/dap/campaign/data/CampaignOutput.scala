@@ -49,13 +49,13 @@ object CampaignOutput {
           DataWriter.writeParquet(acartOutData, acartPath, DataSets.IGNORE_SAVEMODE)
         }
         val campaignCsvOutput = acartOutData
-          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-          .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
-          .drop(CampaignMergedFields.EMAIL)
-          .drop(CampaignMergedFields.NUMBER_SKUS)
-          .drop(CampaignMergedFields.LIVE_CART_URL)
+//          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+//          .drop(CampaignMergedFields.REC_SKUS)
+//          .drop(CampaignMergedFields.REF_SKUS)
+//          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
+//          .drop(CampaignMergedFields.EMAIL)
+//          .drop(CampaignMergedFields.NUMBER_SKUS)
+//          .drop(CampaignMergedFields.LIVE_CART_URL)
 
         val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
         DataWriter.writeCsv(campaignCsvOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
