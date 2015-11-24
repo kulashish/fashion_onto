@@ -450,6 +450,39 @@ object UdfUtils extends Logging {
 
     return l1 ++ l2
   }
+
+  /**
+   *
+   * @param l1
+   * @param l2
+   * @return
+   */
+  def concatenateRecSkuList[T](l1: scala.collection.mutable.ArrayBuffer[T], l2: scala.collection.mutable.ArrayBuffer[T]): scala.collection.mutable.ArrayBuffer[T] = {
+    if (l1 == null) {
+      return l2
+    }
+    if (l2 == null) {
+      return l1
+    }
+    val list1Length = l1.length
+    val list2Length = l2.length
+    if (list1Length < 8) {
+      if (list2Length >= (16 - list1Length)) {
+        val takeLength = 16 - list1Length
+        return l1.take(list1Length) ++ l2.take(takeLength)
+      } else {
+        return l1.take(list1Length) ++ l2.take(list2Length)
+      }
+    } else if (list2Length < 8) {
+      if (list1Length >= (16 - list2Length)) {
+        val takeLength = 16 - list2Length
+        return l1.take(takeLength) ++ l2.take(list2Length)
+      } else {
+        return l1.take(list1Length) ++ l2.take(list2Length)
+      }
+    }
+    return l1.take(8) ++ l2.take(8)
+  }
   /**
    * returns dayName with max click given counts for 7 days
    * @param count1

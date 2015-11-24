@@ -315,7 +315,7 @@ object Schema {
       StructField(CampaignMergedFields.LIVE_BRICK, StringType), StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType), StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
       StructField(CampaignMergedFields.CALENDAR_CITY, StringType))), false), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, StringType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
   ))
 
   val campaign = StructType(Array(
