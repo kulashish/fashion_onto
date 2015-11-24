@@ -1203,7 +1203,7 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
-      .drop(CampaignCommon.PRIORITY)
+//      .drop(CampaignCommon.PRIORITY)
 
     debug(acartOutData, "AcartOutData")
     return acartOutData
