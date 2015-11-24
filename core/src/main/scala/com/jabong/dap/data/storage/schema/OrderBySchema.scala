@@ -23,9 +23,17 @@ object OrderBySchema {
     StructField(CustomerVariables.EMAIL, StringType, false),
     StructField(ContactListMobileVars.UID, StringType, true),
     StructField(CampaignMergedFields.CUSTOMER_ID, LongType, true),
-    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType), StructField(CampaignMergedFields.LIVE_BRAND, StringType), StructField(CampaignMergedFields.LIVE_BRICK, StringType),
-      StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType), StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
-      StructField(CampaignMergedFields.CALENDAR_CITY, StringType))), false), true),
+
+    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(
+      StructField(CampaignMergedFields.LIVE_REF_SKU, StringType),
+      StructField(CampaignMergedFields.LIVE_BRAND, StringType),
+      StructField(CampaignMergedFields.LIVE_BRICK, StringType),
+      StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType),
+      StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
+      StructField(CampaignMergedFields.CALENDAR_CITY, StringType),
+      StructField(SalesOrderItemVariables.CREATED_AT, TimestampType),
+      StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2)))), false), true),
+
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
