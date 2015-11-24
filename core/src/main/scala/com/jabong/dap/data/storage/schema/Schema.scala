@@ -415,7 +415,7 @@ object Schema {
         StructField(ProductVariables.COLOR, StringType, true),
         StructField(SalesAddressVariables.CITY, StringType, true),
         StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
-        StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2), true)))), false)
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))), false)
   ))
 
   val referenceSku = StructType(Array(
@@ -431,7 +431,7 @@ object Schema {
     StructField(ProductVariables.COLOR, StringType, true),
     StructField(SalesAddressVariables.CITY, StringType, true),
     StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
-    StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2), true)))
+    StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))
 
   val expectedFinalReferenceSku = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
@@ -449,7 +449,7 @@ object Schema {
         StructField(ProductVariables.COLOR, StringType, true),
         StructField(SalesAddressVariables.CITY, StringType, true),
         StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
-        StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2), true)))), false),
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))), false),
 
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
