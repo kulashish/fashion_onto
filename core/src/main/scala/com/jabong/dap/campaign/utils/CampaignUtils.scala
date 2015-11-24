@@ -879,10 +879,9 @@ object CampaignUtils extends Logging {
    * @return
    */
   def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
-    //    val cmr = CampaignInput.loadCustomerMasterData()
-    // val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
-    // .drop(CampaignCommon.PRIORITY)
-    val replenishmentOutData = input
+     val cmr = CampaignInput.loadCustomerMasterData()
+     val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
+    val replenishmentOutData = replenishmentData
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
       .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
@@ -899,6 +898,8 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
+      .drop(CampaignCommon.PRIORITY)
+
 
     debug(replenishmentOutData, "replenishmentOutData")
     return replenishmentOutData
@@ -1172,8 +1173,9 @@ object CampaignUtils extends Logging {
 
   def getAcartHourlyFields(inputData: DataFrame): DataFrame = {
     require(inputData != null, "acart hourly data cannot be null")
-
-    val inputDataNumberSkus = inputData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
+    val cmr = CampaignInput.loadCustomerMasterData()
+    val acartWithUidData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, inputData.withColumn(CampaignCommon.PRIORITY,lit("")))
+    val inputDataNumberSkus = acartWithUidData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
     val acartOutData = inputDataNumberSkus
       .withColumn(ContactListMobileVars.UID, lit(""))
       .withColumn(CampaignMergedFields.STATUS, lit(1))
@@ -1193,6 +1195,7 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
+      .drop(CampaignCommon.PRIORITY)
 
     debug(acartOutData, "AcartOutData")
     return acartOutData
