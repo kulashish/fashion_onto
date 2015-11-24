@@ -782,7 +782,7 @@ object CampaignUtils extends Logging {
           map{ case (key, value) => getBrickAffinityData(value) }
 
         val brickDf = sqlContext.createDataFrame(brickAffinityData, Schema.emailCampaignSchema)
-
+        val campaignOutAfterRecFilter = minRefSkuFilter(brickDf)
         //        val dfJoined = dfBrick1RecommendationData.join(
         //          dfBrick2RecommendationData,
         //          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
@@ -806,25 +806,31 @@ object CampaignUtils extends Logging {
         import sqlContext.implicits._
         //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
         //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
-        CampaignUtils.debug(brickDf, "brickDf")
-        brickDf
+        CampaignUtils.debug(campaignOutAfterRecFilter, "campaignOutAfterRecFilter")
+        campaignOutAfterRecFilter
       }
-      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
-        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
-        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+//      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
+//        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+//        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case CampaignCommon.REPLENISHMENT_CAMPAIGN =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, 8)
-        val replenishData = getSelectedReplenishAttributes(dfRecommendationData)
+        val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)
+        val replenishData = getSelectedReplenishAttributes(campaignOutAfterRecFilter)
         replenishData
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
-        dfRecommendationData
+        val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)
+        campaignOutAfterRecFilter
     }
 
     //save campaign Output for mobile
     CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
+  def minRefSkuFilter(recommendationOutPut: DataFrame): DataFrame ={
+    recommendationOutPut.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+
+  }
   /**
    *
    * @param iterable
@@ -1065,7 +1071,9 @@ object CampaignUtils extends Logging {
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
     //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
+    val campaignOutAfterRecFilter = minRefSkuFilter(campaignOutput)
+
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutAfterRecFilter, campaignName, campaignType)
   }
 
   /**
