@@ -1183,7 +1183,7 @@ object CampaignUtils extends Logging {
     val cmr = CampaignInput.loadCustomerMasterData()
     val acartInputData = inputData.withColumn(CampaignCommon.PRIORITY, lit(""))
     val acartWithUidData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, acartInputData)
-    val inputDataNumberSkus = acartWithUidData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
+    val inputDataNumberSkus = inputData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
     val acartOutData = inputDataNumberSkus
       .withColumn(ContactListMobileVars.UID, lit(""))
       .withColumn(CampaignMergedFields.STATUS, lit(1))
