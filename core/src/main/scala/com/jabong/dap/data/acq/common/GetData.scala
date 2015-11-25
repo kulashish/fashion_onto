@@ -39,17 +39,21 @@ object GetData extends Logging {
       logger.info("%s ..... %s".format(minMax.min, minMax.max))
       if (minMax.min == 0 && minMax.max == 0) {
         println("Data for the given date and table is null: " + dbTableQuery)
-        return null
+        context.read.jdbc(dbConn.getConnectionString,
+          dbTableQuery,
+          dbConn.getConnectionProperties
+        )
+      } else {
+        context.read.jdbc(
+          dbConn.getConnectionString,
+          dbTableQuery,
+          primaryKey,
+          minMax.min,
+          minMax.max,
+          3,
+          dbConn.getConnectionProperties
+        )
       }
-      context.read.jdbc(
-        dbConn.getConnectionString,
-        dbTableQuery,
-        primaryKey,
-        minMax.min,
-        minMax.max,
-        3,
-        dbConn.getConnectionProperties
-      )
     }
 
     //    jdbcDF.printSchema()
