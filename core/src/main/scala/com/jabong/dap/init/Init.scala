@@ -132,12 +132,14 @@ object Init {
       case "calendarCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.CALENDAR_CAMPAIGNS)
       case "acartHourlyFeed" => CampaignManager.acartHourlyFeed(DataSets.ACART_HOURLY)
 
-
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
 
       //campaign quality check for email
       case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
+
+      //calendar campaign quality check
+      case "calendarCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.CALENDAR_CAMPAIGNS)
 
       case _ => new ComponentExecutor().start(params.paramJson)
     }
