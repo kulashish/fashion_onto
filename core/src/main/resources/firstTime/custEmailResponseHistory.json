@@ -2,7 +2,7 @@
   "params": [
     {
       "source": "custEmailResponse",
-      "path": "/data/test/output/variables/custEmailResponse/full/2015/11/18/24/CUST_EMAIL_ENGAGEMENT_H_20151120.csv",
+      "path": "/data/test/output/variables/custEmailResponse/full/2015/11/19/24/CUST_EMAIL_ENGAGEMENT_H_20151120.csv",
       "incrMode": "daily",
       "incrDate": "2015/11/19",
       "saveMode": "Ignore",

@@ -3,7 +3,7 @@ package com.jabong.dap.quality.campaign
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignMergedFields, CampaignCommon }
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
@@ -45,8 +45,8 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
   def validate(fullShortlistData: DataFrame, sampleCampaignDF: DataFrame): Boolean = {
 
     val lastDayCustomerSelected = fullShortlistData.select(
-      col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.SKU)
+      col(CustomerVariables.FK_CUSTOMER),
+      col(CustomerVariables.SKU)
     ).dropDuplicates()
 
     val wishlistCampaignDF = sampleCampaignDF.select(

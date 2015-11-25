@@ -1,29 +1,28 @@
 package com.jabong.dap.campaign.utils
 
 import java.math.BigDecimal
-import java.sql.{ Struct, Timestamp }
+import java.sql.Timestamp
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
-import com.jabong.dap.campaign.manager.{ CampaignProcessor, CampaignProducer }
+import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.status.OrderStatus
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
-import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
-import scala.collection.immutable.HashMap
 
 /**
  * Utility Class
@@ -194,7 +193,9 @@ object CampaignUtils extends Logging {
         checkNullString(t(t.fieldIndex(ProductVariables.PRODUCT_NAME))),
         checkNullString(t(t.fieldIndex(ProductVariables.PRICE_BAND))),
         checkNullString(t(t.fieldIndex(ProductVariables.COLOR))),
-        checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))))))
+        checkNullString(t(t.fieldIndex(SalesAddressVariables.CITY))),
+        checkNullTimestamp(t(t.fieldIndex(SalesOrderItemVariables.CREATED_AT))),
+        checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))))))
 
     val customerGroup = customerSkuMap.groupByKey().
       map { case (key, data) => (key.asInstanceOf[String], genListSkus(data.toList, NumberSku)) }.map(x => Row(x._1, x._2(0)._2, x._2))
@@ -209,7 +210,15 @@ object CampaignUtils extends Logging {
     if (value == null) return null else value.toString
   }
 
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String)] = {
+  def checkNullTimestamp(value: Any): Timestamp = {
+    if (value == null) return null.asInstanceOf[Timestamp] else value.asInstanceOf[Timestamp]
+  }
+
+  def checkNullBigDecimalToDouble(value: Any): Double = {
+    if (value != null) return value.asInstanceOf[BigDecimal].doubleValue()
+    return null.asInstanceOf[Double]
+  }
+  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, String, String, String, String, String, String, String, String, Timestamp, Double)], numSKus: Int): List[(Double, String, String, String, String, String, String, String, String, String, Timestamp, Double)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     val refList = refSKusList.sortBy(-_._1).distinct
@@ -513,34 +522,34 @@ object CampaignUtils extends Logging {
 
   def shortListSkuItrJoin(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame, df30DaysItrData: DataFrame): DataFrame = {
 
-    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is null or " + CustomerProductShortlistVariables.PRICE + " is null ")
+    val skuCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerVariables.SKU_SIMPLE + " is null or " + CustomerVariables.PRICE + " is null ")
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.CREATED_AT
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU,
+        CustomerVariables.CREATED_AT
       )
 
-    val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.AVERAGE_PRICE)
+    val irt30Day = df30DaysItrData.withColumnRenamed(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE, CustomerVariables.AVERAGE_PRICE)
 
-    val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerProductShortlistVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
+    val joinDf = skuCustomerProductShortlist.join(irt30Day, skuCustomerProductShortlist(CustomerVariables.SKU) === irt30Day(ItrVariables.ITR_ + ItrVariables.SKU)
       &&
-      skuCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
+      skuCustomerProductShortlist(CustomerVariables.CREATED_AT) === irt30Day(ItrVariables.ITR_ + ItrVariables.CREATED_AT), SQL.INNER)
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.AVERAGE_PRICE
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU,
+        CustomerVariables.AVERAGE_PRICE
       )
 
     //join yesterdayItrData and joinDf on the basis of SKU
     //filter on the basis of AVERAGE_PRICE
-    val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerProductShortlistVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
+    val dfResult = joinDf.join(dfYesterdayItrData, joinDf(CustomerVariables.SKU) === dfYesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU))
       .select(
-        col(CustomerProductShortlistVariables.FK_CUSTOMER),
-        col(CustomerProductShortlistVariables.EMAIL),
-        col(CustomerProductShortlistVariables.SKU),
-        col(CustomerProductShortlistVariables.AVERAGE_PRICE),
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerVariables.EMAIL),
+        col(CustomerVariables.SKU),
+        col(CustomerVariables.AVERAGE_PRICE),
         col(ItrVariables.ITR_ + ItrVariables.AVERAGE_PRICE)
       )
 
@@ -557,12 +566,12 @@ object CampaignUtils extends Logging {
    */
   def shortListSkuSimpleItrJoin(dfCustomerProductShortlist: DataFrame, dfYesterdayItrData: DataFrame): DataFrame = {
 
-    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerProductShortlistVariables.SKU_SIMPLE + " is not null and " + CustomerProductShortlistVariables.PRICE + " is not null ")
+    val skuSimpleCustomerProductShortlist = dfCustomerProductShortlist.filter(CustomerVariables.SKU_SIMPLE + " is not null and " + CustomerVariables.PRICE + " is not null ")
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU_SIMPLE,
-        CustomerProductShortlistVariables.PRICE
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU_SIMPLE,
+        CustomerVariables.PRICE
       )
 
     val yesterdayItrData = dfYesterdayItrData.select(
@@ -572,15 +581,15 @@ object CampaignUtils extends Logging {
 
     val dfJoin = skuSimpleCustomerProductShortlist.join(
       yesterdayItrData,
-      skuSimpleCustomerProductShortlist(CustomerProductShortlistVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
+      skuSimpleCustomerProductShortlist(CustomerVariables.SKU_SIMPLE) === yesterdayItrData(ItrVariables.ITR_ + ItrVariables.SKU_SIMPLE),
       SQL.INNER
     )
 
     val dfResult = dfJoin.select(
-      col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU_SIMPLE),
-      col(CustomerProductShortlistVariables.PRICE),
+      col(CustomerVariables.FK_CUSTOMER),
+      col(CustomerVariables.EMAIL),
+      col(CustomerVariables.SKU_SIMPLE),
+      col(CustomerVariables.PRICE),
       col(ItrVariables.ITR_ + ItrVariables.SPECIAL_PRICE)
     )
 
