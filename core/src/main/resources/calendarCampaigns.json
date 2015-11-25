@@ -1,7 +1,7 @@
 {
   "pushCampaignList": [
     {
-      "campaignName": "price_point",
+      "campaignName": "pricepoint",
       "priority": 22,
       "mailType": 24
     },
