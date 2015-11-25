@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
+import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars}
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -26,12 +26,18 @@ object ContactListPlus extends Logging {
     )
 
     val dfContactListPlus = dfContactListPlusIncr.except(dfContactListPlusPrevFull).select(
-      col(ContactListMobileVars.UID) as "uid",
-      col(CustomerVariables.PHONE) as "mobile",
-      col(CustomerVariables.EMAIL) as "email",
-      col(ContactListMobileVars.MOBILE_PERMISION_STATUS) as "mobile_permission_status",
-      col(ContactListMobileVars.COUNTRY) as "country"
-    ).na.fill("")
+      col(ContactListMobileVars.UID) as CustomerVariables.UID,
+      col(CustomerVariables.PHONE) as CustomerVariables.MOBILE,
+      col(CustomerVariables.EMAIL) as CustomerVariables.EMAIL,
+      col(ContactListMobileVars.MOBILE_PERMISION_STATUS) as CustomerVariables.MOBILE_PERMISSION_STATUS,
+      col(ContactListMobileVars.COUNTRY) as CustomerVariables.COUNTRY
+    ).na.fill(Map(
+      CustomerVariables.UID -> "",
+      CustomerVariables.MOBILE -> "",
+      CustomerVariables.EMAIL -> "",
+      CustomerVariables.MOBILE_PERMISSION_STATUS -> "",
+      CustomerVariables.COUNTRY -> ""
+    ))
 
     dfContactListPlus
   }
