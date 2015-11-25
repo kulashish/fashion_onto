@@ -4,8 +4,8 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, _ }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, _}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -14,6 +14,7 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StringType
 
 import scala.collection.mutable.HashMap
 
@@ -247,22 +248,22 @@ object ContactListMobile extends DataFeedsModel with Logging {
         col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
         col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
         col(ContactListMobileVars.DOB),
-        col(ContactListMobileVars.MVP_TYPE),
-        col(ContactListMobileVars.NET_ORDERS),
+        col(ContactListMobileVars.MVP_TYPE).cast(StringType),
+        col(ContactListMobileVars.NET_ORDERS).cast(StringType),
         Udf.dateCsvFormat(col(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
         col(CustomerVariables.GENDER) as ContactListMobileVars.GENDER,
         Udf.dateCsvFormat(col(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
         col(CustomerSegmentsVariables.SEGMENT) as ContactListMobileVars.SEGMENT,
         col(ContactListMobileVars.AGE),
-        col(ContactListMobileVars.PLATINUM_STATUS),
+        col(ContactListMobileVars.PLATINUM_STATUS).cast(StringType),
         col(ContactListMobileVars.IS_REFERED),
         Udf.dateCsvFormat(col(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
-        col(ContactListMobileVars.VERIFICATION_STATUS),
+        col(ContactListMobileVars.VERIFICATION_STATUS).cast(StringType),
         Udf.dateCsvFormat(col(CustomerVariables.LAST_UPDATED_AT)) as ContactListMobileVars.LAST_UPDATE_DATE,
         col(ContactListMobileVars.UNSUB_KEY),
         col(ContactListMobileVars.CITY_TIER),
         col(ContactListMobileVars.STATE_ZONE),
-        col(CustomerSegmentsVariables.DISCOUNT_SCORE) as ContactListMobileVars.DISCOUNT_SCORE
+        col(CustomerSegmentsVariables.DISCOUNT_SCORE).cast(StringType) as ContactListMobileVars.DISCOUNT_SCORE
       ).na.fill("")
 
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
