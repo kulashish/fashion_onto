@@ -80,9 +80,9 @@ object Ad4pushDeviceMerger extends Logging {
     if (DataWriter.canWrite(saveMode, savePath))
       DataWriter.writeParquet(res, savePath, saveMode)
     if (deviceType.equalsIgnoreCase(DataSets.ANDROID)) {
-      DataWriter.writeCsv(SchemaUtils.dropColumns(res, Ad4pushSchema.Ad4pushDeviceAndroid), DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", ";")
+      DataWriter.writeCsv(SchemaUtils.dropColumns(res, Ad4pushSchema.Ad4pushDeviceAndroid), DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", "\t", 5)
     } else {
-      DataWriter.writeCsv(res, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", "\t")
+      DataWriter.writeCsv(res, DataSets.AD4PUSH, tablename, DataSets.FULL_MERGE_MODE, curDate, filename, saveMode, "true", "\t", 5)
     }
   }
 
