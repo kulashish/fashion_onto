@@ -51,17 +51,17 @@ object CampaignOutput {
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, acartPath)) {
           DataWriter.writeParquet(campaignOutput, acartPath, DataSets.IGNORE_SAVEMODE)
         }
-//        val campaignCsvOutput = acartOutData
-//          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-//          .drop(CampaignMergedFields.REC_SKUS)
-//          .drop(CampaignMergedFields.REF_SKUS)
-//          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
-//          .drop(CampaignMergedFields.EMAIL)
-//          .drop(CampaignMergedFields.NUMBER_SKUS)
-//          .drop(CampaignMergedFields.LIVE_CART_URL)
+        //        val campaignCsvOutput = acartOutData
+        //          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
+        //          .drop(CampaignMergedFields.REC_SKUS)
+        //          .drop(CampaignMergedFields.REF_SKUS)
+        //          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
+        //          .drop(CampaignMergedFields.EMAIL)
+        //          .drop(CampaignMergedFields.NUMBER_SKUS)
+        //          .drop(CampaignMergedFields.LIVE_CART_URL)
 
-//        val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
-//        DataWriter.writeCsv(campaignCsvOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
+        //        val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
+        //        DataWriter.writeCsv(campaignCsvOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
       } else if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
         DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
         val campaignCsv = campaignOutput
@@ -101,8 +101,6 @@ object CampaignOutput {
     testData += Tuple3(campaignOutput, campaignName, campaignType)
   }
 
-
-
   def saveAcartHourlyFeed(inputData: DataFrame, cmr: DataFrame, acartHourlyFileName: String): DataFrame = {
     require(inputData != null, "acart hourly data cannot be null")
     val acartInputData = inputData.withColumn(CampaignCommon.PRIORITY, lit(""))
@@ -139,7 +137,6 @@ object CampaignOutput {
       .drop(CampaignMergedFields.EMAIL)
       .drop(CampaignMergedFields.NUMBER_SKUS)
       .drop(CampaignMergedFields.LIVE_CART_URL)
-
 
     DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, DataSets.ACART_HOURLY, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
 
