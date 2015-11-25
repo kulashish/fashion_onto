@@ -182,19 +182,19 @@ sub upload_ad4push_device_merger {
 
    # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902_[0-4].csv
    print "hadoop fs -mget /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero"."_*.csv $base/\n";
-
-   # /data/tmp/ad4push/devices_android/full/2015/09/02/24/exportDevices_517_20150902.csv
    system("hadoop fs -mget /data/tmp/ad4push/devices_android/full/$date/24/exportDevices_517_$date_with_zero"."_*.csv $base/");
    my $status = $?;
-   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
-   print "hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero"."_*.csv $base/\n";
 
-   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902.csv
+   # /data/tmp/ad4push/devices_ios/full/2015/09/02/24/exportDevices_515_20150902_[0-4].csv
+   print "hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero"."_*.csv $base/\n";
    system("hadoop fs -get /data/tmp/ad4push/devices_ios/full/$date/24/exportDevices_515_$date_with_zero"."_*.csv $base/");
    $status ||= $?;
+
    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_devices_merge/ $base/*; bye\"");
    $status ||= $?;
+
    system("rm -rf /tmp/$date_with_zero");
+
    return $status;
 }
 
