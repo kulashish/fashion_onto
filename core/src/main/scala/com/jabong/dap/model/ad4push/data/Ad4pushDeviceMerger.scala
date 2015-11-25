@@ -3,7 +3,7 @@ package com.jabong.dap.model.ad4push.data
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.Ad4pushVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.ParamInfo
@@ -66,7 +66,7 @@ object Ad4pushDeviceMerger extends Logging {
 
     var full: DataFrame = null
     if (null != fullcsv) {
-      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(Ad4pushVariables.DEVICE_ID, Ad4pushVariables.UDID)
+      full = DataReader.getDataFrame4mCsv(fullcsv, "true", ";").withColumnRenamed(CustomerVariables.DEVICE_ID, CustomerVariables.UDID)
       if (!SchemaUtils.isSchemaEqual(full.schema, Ad4pushSchema.Ad4pushDeviceIOS)) {
         full = SchemaUtils.addColumns(full, Ad4pushSchema.Ad4pushDeviceIOS)
         full = SchemaUtils.dropColumns(full, Ad4pushSchema.Ad4pushDeviceIOS).dropDuplicates()
@@ -88,58 +88,58 @@ object Ad4pushDeviceMerger extends Logging {
 
   def mergeExportData(full: DataFrame, newdf: DataFrame): DataFrame = {
 
-    val joined = full.join(newdf, full(Ad4pushVariables.UDID) === newdf(Ad4pushVariables.UDID), SQL.FULL_OUTER)
-      .select(coalesce(full(Ad4pushVariables.UDID), newdf(Ad4pushVariables.UDID)) as Ad4pushVariables.UDID,
-        coalesce(newdf(Ad4pushVariables.TOKEN), full(Ad4pushVariables.TOKEN)) as Ad4pushVariables.TOKEN,
-        coalesce(newdf(Ad4pushVariables.OPENCOUNT), full(Ad4pushVariables.OPENCOUNT)) as Ad4pushVariables.OPENCOUNT,
-        coalesce(newdf(Ad4pushVariables.FIRSTOPEN), full(Ad4pushVariables.FIRSTOPEN)) as Ad4pushVariables.FIRSTOPEN,
-        coalesce(newdf(Ad4pushVariables.LASTOPEN), full(Ad4pushVariables.LASTOPEN)) as Ad4pushVariables.LASTOPEN,
-        coalesce(newdf(Ad4pushVariables.MODEL), full(Ad4pushVariables.MODEL)) as Ad4pushVariables.MODEL,
-        coalesce(newdf(Ad4pushVariables.VERSION), full(Ad4pushVariables.VERSION)) as Ad4pushVariables.VERSION,
-        coalesce(newdf(Ad4pushVariables.LANGUAGE), full(Ad4pushVariables.LANGUAGE)) as Ad4pushVariables.LANGUAGE,
-        coalesce(newdf(Ad4pushVariables.BUNDLEVERSION), full(Ad4pushVariables.BUNDLEVERSION)) as Ad4pushVariables.BUNDLEVERSION,
-        coalesce(newdf(Ad4pushVariables.LAT), full(Ad4pushVariables.LAT)) as Ad4pushVariables.LAT,
-        coalesce(newdf(Ad4pushVariables.LON), full(Ad4pushVariables.LON)) as Ad4pushVariables.LON,
-        coalesce(newdf(Ad4pushVariables.ALTITUDE), full(Ad4pushVariables.ALTITUDE)) as Ad4pushVariables.ALTITUDE,
-        coalesce(newdf(Ad4pushVariables.GEOLOCATION_CREATED), full(Ad4pushVariables.GEOLOCATION_CREATED)) as Ad4pushVariables.GEOLOCATION_CREATED,
-        coalesce(newdf(Ad4pushVariables.VERSIONSDK), full(Ad4pushVariables.VERSIONSDK)) as Ad4pushVariables.VERSIONSDK,
-        coalesce(newdf(Ad4pushVariables.FEEDBACK), full(Ad4pushVariables.FEEDBACK)) as Ad4pushVariables.FEEDBACK,
-        coalesce(newdf(Ad4pushVariables.TIME_ZONE), full(Ad4pushVariables.TIME_ZONE)) as Ad4pushVariables.TIME_ZONE,
-        coalesce(newdf(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS), full(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS)) as Ad4pushVariables.SYSTEM_OPTIN_NOTIFS,
-        coalesce(newdf(Ad4pushVariables.ENABLED_NOTIFS), full(Ad4pushVariables.ENABLED_NOTIFS)) as Ad4pushVariables.ENABLED_NOTIFS,
-        coalesce(newdf(Ad4pushVariables.ENABLED_INAPPS), full(Ad4pushVariables.ENABLED_INAPPS)) as Ad4pushVariables.ENABLED_INAPPS,
-        coalesce(newdf(Ad4pushVariables.RANDOMID), full(Ad4pushVariables.RANDOMID)) as Ad4pushVariables.RANDOMID,
-        coalesce(newdf(Ad4pushVariables.COUNTRYCODE), full(Ad4pushVariables.COUNTRYCODE)) as Ad4pushVariables.COUNTRYCODE,
-        coalesce(newdf(Ad4pushVariables.AGGREGATED_NUMBER_OF_PURCHASES), full(Ad4pushVariables.AGGREGATED_NUMBER_OF_PURCHASES)) as Ad4pushVariables.AGGREGATED_NUMBER_OF_PURCHASES,
-        coalesce(newdf(Ad4pushVariables.GENDER), full(Ad4pushVariables.GENDER)) as Ad4pushVariables.GENDER,
-        coalesce(newdf(Ad4pushVariables.HAS_SHARED_PRODUCT), full(Ad4pushVariables.HAS_SHARED_PRODUCT)) as Ad4pushVariables.HAS_SHARED_PRODUCT,
-        coalesce(newdf(Ad4pushVariables.LAST_ABANDONED_CART_DATE), full(Ad4pushVariables.LAST_ABANDONED_CART_DATE)) as Ad4pushVariables.LAST_ABANDONED_CART_DATE,
-        coalesce(newdf(Ad4pushVariables.LAST_ABANDONED_CART_PRODUCT), full(Ad4pushVariables.LAST_ABANDONED_CART_PRODUCT)) as Ad4pushVariables.LAST_ABANDONED_CART_PRODUCT,
-        coalesce(newdf(Ad4pushVariables.LASTORDERDATE), full(Ad4pushVariables.LASTORDERDATE)) as Ad4pushVariables.LASTORDERDATE,
-        coalesce(newdf(Ad4pushVariables.LAST_SEARCH), full(Ad4pushVariables.LAST_SEARCH)) as Ad4pushVariables.LAST_SEARCH,
-        coalesce(newdf(Ad4pushVariables.LAST_SEARCH_DATE), full(Ad4pushVariables.LAST_SEARCH_DATE)) as Ad4pushVariables.LAST_SEARCH_DATE,
-        coalesce(newdf(Ad4pushVariables.LEAD), full(Ad4pushVariables.LEAD)) as Ad4pushVariables.LEAD,
-        coalesce(newdf(Ad4pushVariables.LOGIN_USER_ID), full(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
-        coalesce(newdf(Ad4pushVariables.MOST_VISITED_CATEGORY), full(Ad4pushVariables.MOST_VISITED_CATEGORY)) as Ad4pushVariables.MOST_VISITED_CATEGORY,
-        coalesce(newdf(Ad4pushVariables.ORDER_STATUS), full(Ad4pushVariables.ORDER_STATUS)) as Ad4pushVariables.ORDER_STATUS,
-        coalesce(newdf(Ad4pushVariables.PURCHASE), full(Ad4pushVariables.PURCHASE)) as Ad4pushVariables.PURCHASE,
-        coalesce(newdf(Ad4pushVariables.REGISTRATION), full(Ad4pushVariables.REGISTRATION)) as Ad4pushVariables.REGISTRATION,
-        coalesce(newdf(Ad4pushVariables.STATUS_IN_APP), full(Ad4pushVariables.STATUS_IN_APP)) as Ad4pushVariables.STATUS_IN_APP,
-        coalesce(newdf(Ad4pushVariables.WISHLIST_STATUS), full(Ad4pushVariables.WISHLIST_STATUS)) as Ad4pushVariables.WISHLIST_STATUS,
-        coalesce(newdf(Ad4pushVariables.WISHLIST_ADD), full(Ad4pushVariables.WISHLIST_ADD)) as Ad4pushVariables.WISHLIST_ADD,
-        coalesce(newdf(Ad4pushVariables.SHOP_COUNTRY), full(Ad4pushVariables.SHOP_COUNTRY)) as Ad4pushVariables.SHOP_COUNTRY,
-        coalesce(newdf(Ad4pushVariables.AMOUNT_BASKET), full(Ad4pushVariables.AMOUNT_BASKET)) as Ad4pushVariables.AMOUNT_BASKET,
-        coalesce(newdf(Ad4pushVariables.CART), full(Ad4pushVariables.CART)) as Ad4pushVariables.CART,
-        coalesce(newdf(Ad4pushVariables.SPECIFIC_CATEGORY_VISIT_COUNT), full(Ad4pushVariables.SPECIFIC_CATEGORY_VISIT_COUNT)) as Ad4pushVariables.SPECIFIC_CATEGORY_VISIT_COUNT,
-        coalesce(newdf(Ad4pushVariables.USER_NAME), full(Ad4pushVariables.USER_NAME)) as Ad4pushVariables.USER_NAME,
-        coalesce(newdf(Ad4pushVariables.LAST_VIEWED_CATEGORY), full(Ad4pushVariables.LAST_VIEWED_CATEGORY)) as Ad4pushVariables.LAST_VIEWED_CATEGORY,
-        coalesce(newdf(Ad4pushVariables.MAX_VISITED_CATEGORY), full(Ad4pushVariables.MAX_VISITED_CATEGORY)) as Ad4pushVariables.MAX_VISITED_CATEGORY,
-        coalesce(newdf(Ad4pushVariables.MOST_VISITED_COUNTS), full(Ad4pushVariables.MOST_VISITED_COUNTS)) as Ad4pushVariables.MOST_VISITED_COUNTS,
-        coalesce(newdf(Ad4pushVariables.SEARCH_DATE), full(Ad4pushVariables.SEARCH_DATE)) as Ad4pushVariables.SEARCH_DATE,
-        coalesce(newdf(Ad4pushVariables.IDFA), full(Ad4pushVariables.IDFA)) as Ad4pushVariables.IDFA,
-        coalesce(newdf(Ad4pushVariables.LAST_ORDER_DATE), full(Ad4pushVariables.LAST_ORDER_DATE)) as Ad4pushVariables.LAST_ORDER_DATE,
-        coalesce(newdf(Ad4pushVariables.WISHLIST_PRODUCTS_COUNT), full(Ad4pushVariables.WISHLIST_PRODUCTS_COUNT)) as Ad4pushVariables.WISHLIST_PRODUCTS_COUNT,
-        coalesce(newdf(Ad4pushVariables.RATED), full(Ad4pushVariables.RATED)) as Ad4pushVariables.RATED
+    val joined = full.join(newdf, full(CustomerVariables.UDID) === newdf(CustomerVariables.UDID), SQL.FULL_OUTER)
+      .select(coalesce(full(CustomerVariables.UDID), newdf(CustomerVariables.UDID)) as CustomerVariables.UDID,
+        coalesce(newdf(CustomerVariables.TOKEN), full(CustomerVariables.TOKEN)) as CustomerVariables.TOKEN,
+        coalesce(newdf(CustomerVariables.OPENCOUNT), full(CustomerVariables.OPENCOUNT)) as CustomerVariables.OPENCOUNT,
+        coalesce(newdf(CustomerVariables.FIRSTOPEN), full(CustomerVariables.FIRSTOPEN)) as CustomerVariables.FIRSTOPEN,
+        coalesce(newdf(CustomerVariables.LASTOPEN), full(CustomerVariables.LASTOPEN)) as CustomerVariables.LASTOPEN,
+        coalesce(newdf(CustomerVariables.MODEL), full(CustomerVariables.MODEL)) as CustomerVariables.MODEL,
+        coalesce(newdf(CustomerVariables.VERSION), full(CustomerVariables.VERSION)) as CustomerVariables.VERSION,
+        coalesce(newdf(CustomerVariables.LANGUAGE), full(CustomerVariables.LANGUAGE)) as CustomerVariables.LANGUAGE,
+        coalesce(newdf(CustomerVariables.BUNDLEVERSION), full(CustomerVariables.BUNDLEVERSION)) as CustomerVariables.BUNDLEVERSION,
+        coalesce(newdf(CustomerVariables.LAT), full(CustomerVariables.LAT)) as CustomerVariables.LAT,
+        coalesce(newdf(CustomerVariables.LON), full(CustomerVariables.LON)) as CustomerVariables.LON,
+        coalesce(newdf(CustomerVariables.ALTITUDE), full(CustomerVariables.ALTITUDE)) as CustomerVariables.ALTITUDE,
+        coalesce(newdf(CustomerVariables.GEOLOCATION_CREATED), full(CustomerVariables.GEOLOCATION_CREATED)) as CustomerVariables.GEOLOCATION_CREATED,
+        coalesce(newdf(CustomerVariables.VERSIONSDK), full(CustomerVariables.VERSIONSDK)) as CustomerVariables.VERSIONSDK,
+        coalesce(newdf(CustomerVariables.FEEDBACK), full(CustomerVariables.FEEDBACK)) as CustomerVariables.FEEDBACK,
+        coalesce(newdf(CustomerVariables.TIME_ZONE), full(CustomerVariables.TIME_ZONE)) as CustomerVariables.TIME_ZONE,
+        coalesce(newdf(CustomerVariables.SYSTEM_OPTIN_NOTIFS), full(CustomerVariables.SYSTEM_OPTIN_NOTIFS)) as CustomerVariables.SYSTEM_OPTIN_NOTIFS,
+        coalesce(newdf(CustomerVariables.ENABLED_NOTIFS), full(CustomerVariables.ENABLED_NOTIFS)) as CustomerVariables.ENABLED_NOTIFS,
+        coalesce(newdf(CustomerVariables.ENABLED_INAPPS), full(CustomerVariables.ENABLED_INAPPS)) as CustomerVariables.ENABLED_INAPPS,
+        coalesce(newdf(CustomerVariables.RANDOMID), full(CustomerVariables.RANDOMID)) as CustomerVariables.RANDOMID,
+        coalesce(newdf(CustomerVariables.COUNTRYCODE), full(CustomerVariables.COUNTRYCODE)) as CustomerVariables.COUNTRYCODE,
+        coalesce(newdf(CustomerVariables.AGGREGATED_NUMBER_OF_PURCHASES), full(CustomerVariables.AGGREGATED_NUMBER_OF_PURCHASES)) as CustomerVariables.AGGREGATED_NUMBER_OF_PURCHASES,
+        coalesce(newdf(CustomerVariables.GENDER), full(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
+        coalesce(newdf(CustomerVariables.HAS_SHARED_PRODUCT), full(CustomerVariables.HAS_SHARED_PRODUCT)) as CustomerVariables.HAS_SHARED_PRODUCT,
+        coalesce(newdf(CustomerVariables.LAST_ABANDONED_CART_DATE), full(CustomerVariables.LAST_ABANDONED_CART_DATE)) as CustomerVariables.LAST_ABANDONED_CART_DATE,
+        coalesce(newdf(CustomerVariables.LAST_ABANDONED_CART_PRODUCT), full(CustomerVariables.LAST_ABANDONED_CART_PRODUCT)) as CustomerVariables.LAST_ABANDONED_CART_PRODUCT,
+        coalesce(newdf(CustomerVariables.LASTORDERDATE), full(CustomerVariables.LASTORDERDATE)) as CustomerVariables.LASTORDERDATE,
+        coalesce(newdf(CustomerVariables.LAST_SEARCH), full(CustomerVariables.LAST_SEARCH)) as CustomerVariables.LAST_SEARCH,
+        coalesce(newdf(CustomerVariables.LAST_SEARCH_DATE), full(CustomerVariables.LAST_SEARCH_DATE)) as CustomerVariables.LAST_SEARCH_DATE,
+        coalesce(newdf(CustomerVariables.LEAD), full(CustomerVariables.LEAD)) as CustomerVariables.LEAD,
+        coalesce(newdf(CustomerVariables.LOGIN_USER_ID), full(CustomerVariables.LOGIN_USER_ID)) as CustomerVariables.LOGIN_USER_ID,
+        coalesce(newdf(CustomerVariables.MOST_VISITED_CATEGORY), full(CustomerVariables.MOST_VISITED_CATEGORY)) as CustomerVariables.MOST_VISITED_CATEGORY,
+        coalesce(newdf(CustomerVariables.ORDER_STATUS), full(CustomerVariables.ORDER_STATUS)) as CustomerVariables.ORDER_STATUS,
+        coalesce(newdf(CustomerVariables.PURCHASE), full(CustomerVariables.PURCHASE)) as CustomerVariables.PURCHASE,
+        coalesce(newdf(CustomerVariables.REGISTRATION), full(CustomerVariables.REGISTRATION)) as CustomerVariables.REGISTRATION,
+        coalesce(newdf(CustomerVariables.STATUS_IN_APP), full(CustomerVariables.STATUS_IN_APP)) as CustomerVariables.STATUS_IN_APP,
+        coalesce(newdf(CustomerVariables.WISHLIST_STATUS), full(CustomerVariables.WISHLIST_STATUS)) as CustomerVariables.WISHLIST_STATUS,
+        coalesce(newdf(CustomerVariables.WISHLIST_ADD), full(CustomerVariables.WISHLIST_ADD)) as CustomerVariables.WISHLIST_ADD,
+        coalesce(newdf(CustomerVariables.SHOP_COUNTRY), full(CustomerVariables.SHOP_COUNTRY)) as CustomerVariables.SHOP_COUNTRY,
+        coalesce(newdf(CustomerVariables.AMOUNT_BASKET), full(CustomerVariables.AMOUNT_BASKET)) as CustomerVariables.AMOUNT_BASKET,
+        coalesce(newdf(CustomerVariables.CART), full(CustomerVariables.CART)) as CustomerVariables.CART,
+        coalesce(newdf(CustomerVariables.SPECIFIC_CATEGORY_VISIT_COUNT), full(CustomerVariables.SPECIFIC_CATEGORY_VISIT_COUNT)) as CustomerVariables.SPECIFIC_CATEGORY_VISIT_COUNT,
+        coalesce(newdf(CustomerVariables.USER_NAME), full(CustomerVariables.USER_NAME)) as CustomerVariables.USER_NAME,
+        coalesce(newdf(CustomerVariables.LAST_VIEWED_CATEGORY), full(CustomerVariables.LAST_VIEWED_CATEGORY)) as CustomerVariables.LAST_VIEWED_CATEGORY,
+        coalesce(newdf(CustomerVariables.MAX_VISITED_CATEGORY), full(CustomerVariables.MAX_VISITED_CATEGORY)) as CustomerVariables.MAX_VISITED_CATEGORY,
+        coalesce(newdf(CustomerVariables.MOST_VISITED_COUNTS), full(CustomerVariables.MOST_VISITED_COUNTS)) as CustomerVariables.MOST_VISITED_COUNTS,
+        coalesce(newdf(CustomerVariables.SEARCH_DATE), full(CustomerVariables.SEARCH_DATE)) as CustomerVariables.SEARCH_DATE,
+        coalesce(newdf(CustomerVariables.IDFA), full(CustomerVariables.IDFA)) as CustomerVariables.IDFA,
+        coalesce(newdf(CustomerVariables.LAST_ORDER_DATE), full(CustomerVariables.LAST_ORDER_DATE)) as CustomerVariables.LAST_ORDER_DATE,
+        coalesce(newdf(CustomerVariables.WISHLIST_PRODUCTS_COUNT), full(CustomerVariables.WISHLIST_PRODUCTS_COUNT)) as CustomerVariables.WISHLIST_PRODUCTS_COUNT,
+        coalesce(newdf(CustomerVariables.RATED), full(CustomerVariables.RATED)) as CustomerVariables.RATED
       )
     joined
   }

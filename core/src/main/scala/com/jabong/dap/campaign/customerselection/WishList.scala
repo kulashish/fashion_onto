@@ -1,6 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
-import com.jabong.dap.common.constants.variables.CustomerProductShortlistVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.udf.Udf
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -43,18 +43,18 @@ class WishList extends LiveCustomerSelector with Logging {
     //    }
 
     // FIXME - - Order shouldn’t have been placed for the Ref SKU yet
-    val dfResult = dfCustomerProductShortlist.filter("(" + CustomerProductShortlistVariables.FK_CUSTOMER + " is not null or " +
-      CustomerProductShortlistVariables.EMAIL + " is not null ) and " +
-      CustomerProductShortlistVariables.REMOVED_AT + " is null")
+    val dfResult = dfCustomerProductShortlist.filter("(" + CustomerVariables.FK_CUSTOMER + " is not null or " +
+      CustomerVariables.EMAIL + " is not null ) and " +
+      CustomerVariables.REMOVED_AT + " is null")
       .select(
-        col(CustomerProductShortlistVariables.FK_CUSTOMER),
-        col(CustomerProductShortlistVariables.EMAIL),
-        col(CustomerProductShortlistVariables.SKU),
-        col(CustomerProductShortlistVariables.DOMAIN),
-        col(CustomerProductShortlistVariables.USER_DEVICE_TYPE),
-        Udf.yyyymmdd(dfCustomerProductShortlist(CustomerProductShortlistVariables.CREATED_AT)) as CustomerProductShortlistVariables.CREATED_AT,
-        Udf.simpleSkuFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.SKU_SIMPLE,
-        Udf.priceFromExtraData(dfCustomerProductShortlist(CustomerProductShortlistVariables.EXTRA_DATA)) as CustomerProductShortlistVariables.PRICE
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerVariables.EMAIL),
+        col(CustomerVariables.SKU),
+        col(CustomerVariables.DOMAIN),
+        col(CustomerVariables.USER_DEVICE_TYPE),
+        Udf.yyyymmdd(dfCustomerProductShortlist(CustomerVariables.CREATED_AT)) as CustomerVariables.CREATED_AT,
+        Udf.simpleSkuFromExtraData(dfCustomerProductShortlist(CustomerVariables.EXTRA_DATA)) as CustomerVariables.SKU_SIMPLE,
+        Udf.priceFromExtraData(dfCustomerProductShortlist(CustomerVariables.EXTRA_DATA)) as CustomerVariables.PRICE
       )
     dfResult
   }

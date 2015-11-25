@@ -2,7 +2,7 @@ package com.jabong.dap.data.reader
 
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.Ad4pushVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -17,12 +17,12 @@ class DataReaderTest extends FlatSpec with SharedSparkContext with Matchers {
 
   "getDataFrame4mCsv: Data Frame" should "match with expected data" in {
     val dfReaction = DataReader.getDataFrame4mCsv(JsonUtils.TEST_RESOURCES, DataSets.AD4PUSH, DataSets.CSV, DataSets.DAILY_MODE, "2015/07/22", "test.csv", "true", ",")
-    val dfReactionCast = dfReaction.select(dfReaction(Ad4pushVariables.LOGIN_USER_ID) as Ad4pushVariables.LOGIN_USER_ID,
-      dfReaction(Ad4pushVariables.DEVICE_ID) as Ad4pushVariables.DEVICE_ID,
-      dfReaction(Ad4pushVariables.MESSAGE_ID) as Ad4pushVariables.MESSAGE_ID,
-      dfReaction(Ad4pushVariables.CAMPAIGN_ID) as Ad4pushVariables.CAMPAIGN_ID,
-      dfReaction(Ad4pushVariables.BOUNCE).cast(IntegerType) as Ad4pushVariables.BOUNCE,
-      dfReaction(Ad4pushVariables.REACTION).cast(IntegerType) as Ad4pushVariables.REACTION)
+    val dfReactionCast = dfReaction.select(dfReaction(CustomerVariables.LOGIN_USER_ID) as CustomerVariables.LOGIN_USER_ID,
+      dfReaction(CustomerVariables.DEVICE_ID) as CustomerVariables.DEVICE_ID,
+      dfReaction(CustomerVariables.MESSAGE_ID) as CustomerVariables.MESSAGE_ID,
+      dfReaction(CustomerVariables.CAMPAIGN_ID) as CustomerVariables.CAMPAIGN_ID,
+      dfReaction(CustomerVariables.BOUNCE).cast(IntegerType) as CustomerVariables.BOUNCE,
+      dfReaction(CustomerVariables.REACTION).cast(IntegerType) as CustomerVariables.REACTION)
     val dfExpected = JsonUtils.readFromJson(DataSets.AD4PUSH, "testDF", Ad4pushSchema.schemaCsv)
     assert(dfExpected.collect().toSet.equals(dfReactionCast.collect().toSet))
   }
