@@ -137,8 +137,9 @@ object CampaignOutput {
       .drop(CampaignMergedFields.EMAIL)
       .drop(CampaignMergedFields.NUMBER_SKUS)
       .drop(CampaignMergedFields.LIVE_CART_URL)
+      .drop(CampaignMergedFields.CUSTOMER_ID)
 
-    DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, DataSets.ACART_HOURLY, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
 
     return acartOutData
   }
