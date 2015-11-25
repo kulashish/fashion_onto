@@ -477,7 +477,7 @@ object CampaignManager extends Serializable with Logging {
 
     val cmr = CampaignInput.loadCustomerMasterData()
     //    if(campaignName.equals(DataSets.ACART_HOURLY)){
-    val acartHourly = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EMAIL_CAMPAIGNS, DataSets.ACART_HOURLY, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER)
+    val acartHourly = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER)
 
     val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
 
