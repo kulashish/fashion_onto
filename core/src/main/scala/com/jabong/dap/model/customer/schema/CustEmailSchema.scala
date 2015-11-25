@@ -8,7 +8,6 @@ import org.apache.spark.sql.types._
  */
 object CustEmailSchema {
   val resCustomerEmail = StructType(Array(
-    StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
     StructField(ContactListMobileVars.UID, StringType, true),
     StructField(EmailResponseVariables.OPEN_SEGMENT, IntegerType, true),
     StructField(EmailResponseVariables.OPEN_7DAYS, IntegerType, true),
@@ -24,7 +23,7 @@ object CustEmailSchema {
   ))
 
   val reqCsvDf = StructType(Array(
-    StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
+    StructField(ContactListMobileVars.UID, StringType, true),
     StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.LAST_CLICK_DATE, StringType, true),
     StructField(EmailResponseVariables.OPENS_TODAY, IntegerType, true),
@@ -40,14 +39,14 @@ object CustEmailSchema {
   ))
 
   val effectiveSchema = StructType(Array(
-    StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
+    StructField(ContactListMobileVars.UID, StringType, true),
     StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.LAST_CLICK_DATE, StringType, true),
     StructField(EmailResponseVariables.OPENS_LIFETIME, IntegerType, true),
     StructField(EmailResponseVariables.CLICKS_LIFETIME, IntegerType, true)
   ))
   val effective7_15Schema = StructType(Array(
-    StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
+    StructField(ContactListMobileVars.UID, StringType, true),
     StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.LAST_CLICK_DATE, StringType, true),
     StructField(EmailResponseVariables.CLICK_7DAYS, IntegerType, true),
@@ -58,7 +57,7 @@ object CustEmailSchema {
   ))
 
   val effective_Smry_Schema = StructType(Array(
-    StructField(EmailResponseVariables.CUSTOMER_ID, StringType, true),
+    StructField(ContactListMobileVars.UID, StringType, true),
     StructField(EmailResponseVariables.LAST_CLICK_DATE, StringType, true),
     StructField(EmailResponseVariables.LAST_OPEN_DATE, StringType, true),
     StructField(EmailResponseVariables.CLICK_7DAYS, IntegerType, true),

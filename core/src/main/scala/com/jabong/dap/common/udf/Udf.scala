@@ -87,7 +87,7 @@ object Udf {
   /**
    * concatenate two List
    */
-  val concatenateListOfString = udf((l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]) => UdfUtils.concatenateList(l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]))
+  val concatenateRecSkuList = udf((l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]) => UdfUtils.concatenateRecSkuList(l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]))
 
   /**
    * Removes all zeroes string and null string to emptyString.

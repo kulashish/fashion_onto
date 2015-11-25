@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.skuselection
 
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.variables.ProductVariables
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, CustomerVariables, SalesOrderVariables, ProductVariables }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
@@ -18,15 +18,11 @@ object Daily extends Logging {
     }
 
     val filteredSku = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
-      .select(customerSkuData("*"),
-        yesterdayItrData(ProductVariables.SPECIAL_PRICE),
-        yesterdayItrData(ProductVariables.BRICK),
-        yesterdayItrData(ProductVariables.BRAND),
-        yesterdayItrData(ProductVariables.MVP),
-        yesterdayItrData(ProductVariables.GENDER),
-        yesterdayItrData(ProductVariables.PRODUCT_NAME),
-        yesterdayItrData(ProductVariables.STOCK),
-        yesterdayItrData(ProductVariables.PRICE_BAND))
+      .select(
+        customerSkuData("*"),
+        yesterdayItrData("*"))
+      .drop(yesterdayItrData(ProductVariables.SKU_SIMPLE))
+      .drop(yesterdayItrData(ProductVariables.CREATED_AT))
 
     logger.info("Join selected customer sku with sku data and get special price")
     //generate reference skus
