@@ -32,6 +32,7 @@ object DataWriter extends Logging {
         csvdestFile = writePath + File.separator + csvFileName + ".csv"
         DataVerifier.rename(csvSrcFile, csvdestFile)
       } else {
+        //TODO This will work only till 9 partitions. Will need to fix in case we hit more than 9 partitions.
         for(n <- 0 to numParts-1 ) {
           csvSrcFile = writePath + File.separator + "part-0000"+n
           csvdestFile = writePath + File.separator + csvFileName+"_"+n + ".csv"
