@@ -31,13 +31,7 @@ object ContactListPlus extends Logging {
       col(CustomerVariables.EMAIL) as CustomerVariables.EMAIL,
       col(ContactListMobileVars.MOBILE_PERMISION_STATUS) as CustomerVariables.MOBILE_PERMISSION_STATUS,
       col(ContactListMobileVars.COUNTRY) as CustomerVariables.COUNTRY
-    ).na.fill(Map(
-      CustomerVariables.UID -> "",
-      CustomerVariables.MOBILE -> "",
-      CustomerVariables.EMAIL -> "",
-      CustomerVariables.MOBILE_PERMISSION_STATUS -> "",
-      CustomerVariables.COUNTRY -> ""
-    ))
+    ).na.fill("")
 
     dfContactListPlus
   }

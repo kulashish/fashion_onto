@@ -30,12 +30,7 @@ object NewsletterDataList {
       col(CustomerVariables.ID_CUSTOMER) as CustomerVariables.CUSTOMER_ID,
       col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as CustomerVariables.EMAIL_SUBSCRIPTION_STATUS,
       col(NewsletterVariables.STATUS) as CustomerVariables.CUR_NL_STATUS
-    ).na.fill(Map(
-      CustomerVariables.EMAIL -> "",
-      CustomerVariables.CUSTOMER_ID -> "",
-      CustomerVariables.EMAIL_SUBSCRIPTION_STATUS -> "",
-      CustomerVariables.CUR_NL_STATUS -> ""
-    ))
+    ).na.fill("")
 
     dfNlDataList
 

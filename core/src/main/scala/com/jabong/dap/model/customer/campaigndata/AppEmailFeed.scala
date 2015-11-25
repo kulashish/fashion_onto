@@ -38,14 +38,7 @@ object AppEmailFeed {
       col(ContactListMobileVars.NET_ORDERS) as CustomerVariables.NET_ORDERS,
       col(ContactListMobileVars.REG_DATE) as CustomerVariables.REG_DATE,
       lit(todayStartDate) as CustomerVariables.PROCESSED_DATE
-    ).na.fill(Map(
-      CustomerVariables.UID -> "",
-      CampaignMergedFields.deviceId -> "",
-      CustomerVariables.EMAIL -> "",
-      CustomerVariables.NET_ORDERS -> "",
-      CustomerVariables.REG_DATE -> "",
-      CustomerVariables.PROCESSED_DATE -> ""
-    ))
+    ).na.fill("")
 
     dfAppEmailFeed
 
