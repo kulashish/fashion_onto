@@ -479,7 +479,7 @@ object CampaignManager extends Serializable with Logging {
     //    if(campaignName.equals(DataSets.ACART_HOURLY)){
     val acartHourly = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER)
 
-    val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
+    val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD)+"_"+TimeUtils.getHour(TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS),TimeConstants.DD_MMM_YYYY_HH_MM_SS) + "_ACART_HOURLY"
 
     val acartOutData = CampaignOutput.saveAcartHourlyFeed(acartHourly, cmr, acartHourlyFileName)
   }
