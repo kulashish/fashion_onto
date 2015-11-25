@@ -380,7 +380,7 @@ object SalesItemRevenue extends DataFeedsModel {
       SalesOrderItemVariables.REVENUE_WEB -> 0.0,
       SalesOrderItemVariables.REVENUE_OTHERS -> 0.0
     ))
-    val withadditionalColumns = joinedFill.withColumn(
+    val withAdditionalColumns = joinedFill.withColumn(
       SalesOrderItemVariables.REVENUE,
       joinedFill(SalesOrderItemVariables.REVENUE_APP) +
         joinedFill(SalesOrderItemVariables.REVENUE_WEB) +
@@ -393,7 +393,7 @@ object SalesItemRevenue extends DataFeedsModel {
           joinedFill(SalesOrderItemVariables.ORDERS_COUNT_MWEB) +
           joinedFill(SalesOrderItemVariables.ORDERS_COUNT_OTHERS)
       )
-    val rdd = withadditionalColumns.select(
+    val rdd = withAdditionalColumns.select(
       SalesOrderVariables.FK_CUSTOMER,
       SalesOrderItemVariables.ORDERS_COUNT,
       SalesOrderItemVariables.ORDERS_COUNT_APP,
