@@ -387,8 +387,8 @@ sub upload_calendar_replenish_campaigns {
     print "hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
     system("hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
 
-    $status ||= removeNull("$calendar_base/$calendar_filename");
-    $status ||= removeNull("$calendar_base/$replenish_filename");
+    $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
+    $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
