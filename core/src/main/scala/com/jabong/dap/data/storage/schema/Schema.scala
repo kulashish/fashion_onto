@@ -175,19 +175,19 @@ object Schema {
   ))
 
   val customerProductShortlist = StructType(Array(
-    StructField(CustomerProductShortlistVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.USER_SHORTLIST_KEY, StringType, true),
-    StructField(CustomerProductShortlistVariables.USER_TOKEN, StringType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
-    StructField(CustomerProductShortlistVariables.EXTRA_DATA, StringType, true),
-    StructField(CustomerProductShortlistVariables.STOCK_WHEN_REMOVED, IntegerType, true),
-    StructField(CustomerProductShortlistVariables.CUSTOMER_SOURCE, StringType, true),
-    StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true),
-    StructField(CustomerProductShortlistVariables.REMOVED_AT, TimestampType, true),
-    StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
-    StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true)
+    StructField(CustomerVariables.ID_CUSTOMER_PRODUCT_SHORTLIST, LongType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.USER_SHORTLIST_KEY, StringType, true),
+    StructField(CustomerVariables.USER_TOKEN, StringType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU, StringType, true),
+    StructField(CustomerVariables.EXTRA_DATA, StringType, true),
+    StructField(CustomerVariables.STOCK_WHEN_REMOVED, IntegerType, true),
+    StructField(CustomerVariables.CUSTOMER_SOURCE, StringType, true),
+    StructField(CustomerVariables.CREATED_AT, TimestampType, true),
+    StructField(CustomerVariables.REMOVED_AT, TimestampType, true),
+    StructField(CustomerVariables.DOMAIN, StringType, true),
+    StructField(CustomerVariables.USER_DEVICE_TYPE, StringType, true)
   ))
 
   val salesCart = StructType(Array(
