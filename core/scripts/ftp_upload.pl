@@ -16,7 +16,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | email_campaigns | calendar campaigns \n";
+) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
 
 if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
     print "Will upload files only for PROD\n";
@@ -37,6 +37,12 @@ print $date_with_hiphen . "\n";
 my $date_with_zero_today = strftime "%Y%m%d", localtime(time());
 print $date_with_zero_today . "\n";
 
+my $date_today = strftime "%Y/%m/%d", localtime(time());
+print $date_today . "\n";
+
+my $current_hour = strftime "%H", localtime(time());
+print $current_hour . "\n";
+
 my $job_exit;
 
 if ($component eq "campaigns") {
@@ -55,7 +61,9 @@ if ($component eq "campaigns") {
     $job_exit = upload_email_campaigns();
 } elsif ($component eq "calendar_campaigns") {
      $job_exit = upload_calendar_replenish_campaigns();
- } else {
+} elsif ($component eq "acart_hourly_campaign") {
+     $job_exit = upload_acart_hourly_campaign();
+} else {
     print "not a valid component\n";
     $job_exit = -1;
 }
@@ -334,12 +342,26 @@ sub upload_email_campaigns {
 
     my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
 
+    my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv"
+
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
     system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
     my $status = $?;
 
+    print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
+
+    system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
+    my $status || = $?;
+
     $status ||= removeNull("$base/$filename");
+
+    $status ||= removeNull("$base/$followUp_filename");
+
+
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
+
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
@@ -375,6 +397,25 @@ sub upload_calendar_replenish_campaigns {
     return $calendar_status;
 }
 
+
+sub upload_acart_hourly_campaign {
+    my $acart_hourly_base = "/tmp/$date_with_zero/campaigns/acart_hourly";
+
+    print "acart hourly campaigns directory is $acart_hourly_base\n";
+
+    my $acart_hourly_filename = "$date_with_zero_today"."$current_hour"."_ACART_HOURLY.csv";
+
+    print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
+
+    system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/");
+    my $acart_hourly_status = $?;
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
+    $acart_hourly_status ||= $?;
+
+    return $acart_hourly_status;
+
+}
 
 sub dcf_file_format_change{
     my ($file_input,$file_output) = (shift,shift);
