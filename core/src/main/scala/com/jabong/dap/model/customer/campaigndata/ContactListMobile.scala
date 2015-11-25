@@ -263,7 +263,34 @@ object ContactListMobile extends DataFeedsModel with Logging {
         col(ContactListMobileVars.CITY_TIER),
         col(ContactListMobileVars.STATE_ZONE),
         col(CustomerSegmentsVariables.DISCOUNT_SCORE) as ContactListMobileVars.DISCOUNT_SCORE
-      ).na.fill("")
+      ).na.fill(Map(
+        ContactListMobileVars.UID -> "",
+        ContactListMobileVars.EMAIL -> "",
+        ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS -> "",
+        ContactListMobileVars.MOBILE -> "",
+        ContactListMobileVars.MOBILE_PERMISION_STATUS -> "",
+        ContactListMobileVars.CITY -> "",
+        ContactListMobileVars.COUNTRY -> "",
+        ContactListMobileVars.FIRST_NAME -> "",
+        ContactListMobileVars.LAST_NAME -> "",
+        ContactListMobileVars.DOB -> "",
+        ContactListMobileVars.MVP_TYPE -> "",
+        ContactListMobileVars.NET_ORDERS -> "",
+        ContactListMobileVars.LAST_ORDER_DATE -> "",
+        ContactListMobileVars.GENDER -> "",
+        ContactListMobileVars.REG_DATE -> "",
+        ContactListMobileVars.SEGMENT -> "",
+        ContactListMobileVars.AGE -> "",
+        ContactListMobileVars.PLATINUM_STATUS -> "",
+        ContactListMobileVars.IS_REFERED -> "",
+        ContactListMobileVars.NL_SUB_DATE -> "",
+        ContactListMobileVars.VERIFICATION_STATUS -> "",
+        ContactListMobileVars.LAST_UPDATE_DATE -> "",
+        ContactListMobileVars.UNSUB_KEY -> "",
+        ContactListMobileVars.CITY_TIER -> "",
+        ContactListMobileVars.STATE_ZONE -> "",
+        ContactListMobileVars.DISCOUNT_SCORE -> ""
+      ))
 
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(contactListMobilCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
