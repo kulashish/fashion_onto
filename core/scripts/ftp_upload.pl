@@ -403,11 +403,11 @@ sub upload_acart_hourly_campaign {
 
     print "acart hourly campaigns directory is $acart_hourly_base\n";
 
-    my $acart_hourly_filename = "$date_with_zero_today"."$current_hour"."_ACART_HOURLY.csv";
+    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
 
-    print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
+    print "hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 
-    system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/");
+    system("hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/");
     my $acart_hourly_status = $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
