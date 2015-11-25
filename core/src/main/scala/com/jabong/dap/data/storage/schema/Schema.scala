@@ -469,9 +469,10 @@ object Schema {
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
         StructField(ProductVariables.COLOR, StringType, true),
-        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
-
-    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
+        StructField(SalesAddressVariables.CITY, StringType, true),
+        StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))), false),
+        StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
   val customerFavList = StructType(Array(
