@@ -400,6 +400,10 @@ sub upload_calendar_replenish_campaigns {
 sub upload_acart_hourly_campaign {
     my $acart_hourly_base = "/tmp/$date_with_zero/campaigns/acart_hourly";
 
+    print "acart campaigns directory is $acart_hourly_base\n";
+
+    system("mkdir -p $acart_hourly_base");
+
     print "acart hourly campaigns directory is $acart_hourly_base\n";
 
     my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
