@@ -1,7 +1,7 @@
 package com.jabong.dap.model.ad4push
 
 import com.jabong.dap.common.SharedSparkContext
-import com.jabong.dap.common.constants.variables.Ad4pushVariables._
+import com.jabong.dap.common.constants.variables.CustomerVariables._
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets

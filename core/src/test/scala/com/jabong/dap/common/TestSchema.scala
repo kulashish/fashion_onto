@@ -11,8 +11,8 @@ import org.apache.spark.sql.types._
 object TestSchema {
 
   val resultFullSkuFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(ProductVariables.SKU_SIMPLE, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
@@ -49,35 +49,35 @@ object TestSchema {
   ))
 
   val resultCustomerProductShortlist = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
-    StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
-    StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true),
-    StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true),
-    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
-    StructField(CustomerProductShortlistVariables.PRICE, DecimalType(10, 2), true)
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU, StringType, true),
+    StructField(CustomerVariables.DOMAIN, StringType, true),
+    StructField(CustomerVariables.USER_DEVICE_TYPE, StringType, true),
+    StructField(CustomerVariables.CREATED_AT, TimestampType, true),
+    StructField(CustomerVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerVariables.PRICE, DecimalType(10, 2), true)
   ))
 
   val resultGetJoin = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU_SIMPLE, StringType, true),
     StructField(ItrVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuSimpleFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
-    StructField(CustomerProductShortlistVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
-    StructField(CustomerProductShortlistVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU, StringType, true),
+    StructField(CustomerVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
   ))
 
   val campaignOutput = StructType(Array(
