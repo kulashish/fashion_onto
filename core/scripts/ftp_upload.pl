@@ -342,7 +342,7 @@ sub upload_email_campaigns {
 
     my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
 
-    my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv"
+    my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv";
 
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
@@ -352,7 +352,6 @@ sub upload_email_campaigns {
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
 
     system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
-    my $status || = $?;
 
     $status ||= removeNull("$base/$filename");
 
@@ -388,8 +387,8 @@ sub upload_calendar_replenish_campaigns {
     print "hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
     system("hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
 
-    $status ||= removeNull("$calendar_base/$calendar_filename");
-    $status ||= removeNull("$calendar_base/$replenish_filename");
+    $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
+    $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
@@ -401,13 +400,17 @@ sub upload_calendar_replenish_campaigns {
 sub upload_acart_hourly_campaign {
     my $acart_hourly_base = "/tmp/$date_with_zero/campaigns/acart_hourly";
 
+    print "acart campaigns directory is $acart_hourly_base\n";
+
+    system("mkdir -p $acart_hourly_base");
+
     print "acart hourly campaigns directory is $acart_hourly_base\n";
 
     my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
 
-    print "hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
+    print "hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 
-    system("hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/");
+    system("hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/");
     my $acart_hourly_status = $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
