@@ -407,7 +407,7 @@ sub upload_acart_hourly_campaign {
 
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 
-    system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/");
+    system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/acart_hourly/hourly/$date/$current_hour/$acart_hourly_filename $acart_hourly_base/");
     my $acart_hourly_status = $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
