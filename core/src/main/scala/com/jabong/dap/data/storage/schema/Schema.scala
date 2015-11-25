@@ -478,7 +478,6 @@ object Schema {
         StructField(SalesAddressVariables.CITY, StringType, true),
         StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
         StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))), false),
-
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 

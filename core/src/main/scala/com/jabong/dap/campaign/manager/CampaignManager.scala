@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.campaign.data.{CampaignOutput, CampaignInput}
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
@@ -472,6 +472,19 @@ object CampaignManager extends Serializable with Logging {
     hottestXCampaign.runCampaign(last60DaySalesOrderData, last60DaySalesOrderItemData, itrYesterdayData, genderMvpBrickRecos, incrDate)
 
   }
+
+
+  def acartHourlyFeed(campaignName : String): Unit ={
+
+    val cmr = CampaignInput.loadCustomerMasterData()
+//    if(campaignName.equals(DataSets.ACART_HOURLY)){
+    val acartHourly = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH,DataSets.EMAIL_CAMPAIGNS,DataSets.ACART_HOURLY,DataSets.HOURLY_MODE,TimeUtils.CURRENT_HOUR_FOLDER)
+
+    val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_ACART_HOURLY"
+
+    val acartOutData = CampaignOutput.saveAcartHourlyFeed(acartHourly,cmr,acartHourlyFileName)
+      }
+
 
   def startFollowUpCampaigns(params: ParamInfo) = {
     val fullOrderData = CampaignInput.loadFullOrderData()

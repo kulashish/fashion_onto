@@ -16,6 +16,7 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
@@ -1185,36 +1186,6 @@ object CampaignUtils extends Logging {
     println("Count of " + name + ":-" + data.count() + "\n")
     println("show dataframe " + name + ":-" + data.show(10) + "\n")
     data.printSchema()
-  }
-
-  def getAcartHourlyFields(inputData: DataFrame, cmr: DataFrame): DataFrame = {
-    require(inputData != null, "acart hourly data cannot be null")
-    val acartInputData = inputData.withColumn(CampaignCommon.PRIORITY, lit(""))
-    val acartWithUidData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, acartInputData)
-    val inputDataNumberSkus = acartWithUidData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
-    val acartOutData = inputDataNumberSkus
-      .withColumn(ContactListMobileVars.UID, lit(""))
-      .withColumn(CampaignMergedFields.STATUS, lit(1))
-      .withColumn(CampaignMergedFields.VISIT, lit(41))
-      .withColumn(CampaignMergedFields.SPECIAL_TEXT, lit("4"))
-      .withColumn(CampaignMergedFields.SENDING_METHOD, lit("4-N-N-N-N-N-N-N-N-41"))
-      .withColumn(CampaignMergedFields.ARTICLE, when(col(CampaignMergedFields.NUMBER_SKUS) <= 4, lit(0)).otherwise(col(CampaignMergedFields.NUMBER_SKUS) - 4))
-      .withColumn(CampaignMergedFields.URL, col(CampaignMergedFields.LIVE_CART_URL))
-      .withColumn(CampaignMergedFields.REF_SKU + "1", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
-      .withColumn(CampaignMergedFields.REF_SKU + "2", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(1), lit(0)))
-      .withColumn(CampaignMergedFields.REF_SKU + "3", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(2), lit(0)))
-      .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(0)))
-      .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(1)))
-      .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(2)))
-      .withColumn(CampaignMergedFields.REC_SKU + "4", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(3)))
-      .withColumn(CampaignMergedFields.REC_SKU + "5", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(4)))
-      .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
-      .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
-      .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
-      .drop(CampaignCommon.PRIORITY)
-
-    debug(acartOutData, "AcartOutData")
-    return acartOutData
   }
 
 }
