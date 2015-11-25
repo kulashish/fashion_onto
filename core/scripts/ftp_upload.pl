@@ -308,6 +308,11 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "Contact_list_Plus";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20150927_CUST_EMAIL_RESPONSE.csv
+    $filename = "$date_with_zero_today"."_CUST_EMAIL_RESPONSE.csv";
+    $folderName = "custEmailResponse";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     # 20150927_Customer_App_details.csv
     $filename = "$date_with_zero_today"."_Customer_App_details.csv";
     $folderName = "customerAppDetails";
