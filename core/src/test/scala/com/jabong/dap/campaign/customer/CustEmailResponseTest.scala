@@ -5,7 +5,7 @@ import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, NewsletterVariables, EmailResponseVariables }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ SharedSparkContext, Spark }
 import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
@@ -62,7 +62,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
         outputCsvFormat(col(MergeUtils.NEW_ + EmailResponseVariables.LAST_CLICK_DATE)) as EmailResponseVariables.LAST_CLICK_DATE)
       .withColumn(EmailResponseVariables.OPENS_TODAY, findOpen(col(EmailResponseVariables.OPENS_TODAY), col(EmailResponseVariables.CLICKS_TODAY))).cache()
 
-    print(joinedDf.first().get(joinedDf.first().fieldIndex("UID") ))
+    print(joinedDf.first().get(joinedDf.first().fieldIndex("UID")))
     assert(joinedDf.count() == 15)
 
   }

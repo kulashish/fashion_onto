@@ -68,7 +68,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     var prevFullDf: DataFrame = null
     if (null != paths) {
-      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|").withColumnRenamed(EmailResponseVariables.CUSTOMER_ID,ContactListMobileVars.UID).coalesce(100)
+      val inputCsv = DataReader.getDataFrame4mCsv(paths, "true", "|").withColumnRenamed(EmailResponseVariables.CUSTOMER_ID, ContactListMobileVars.UID).coalesce(100)
       prevFullDf = SchemaUtils.addColumns(inputCsv, CustEmailSchema.effective_Smry_Schema)
     } else {
       prevFullDf = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES,
@@ -264,8 +264,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
   val findOpenDate = udf(openDate)
 
   def merge(resultSet: DataFrame, dfCmrFull: DataFrame, nlSubscribers: DataFrame) = {
-      
-/*      resultSet.printSchema	
+
+    /*      resultSet.printSchema	
       val x = resultSet.select(ContactListMobileVars.UID)
       println(x.count)
       println(x.distinct.count)
@@ -274,7 +274,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       val y = dfCmrFull.select(ContactListMobileVars.UID)
       println(y.count)
       println(y.distinct.count)    
-  */  
+  */
 
     val cmrResDf = dfCmrFull.join(resultSet, dfCmrFull(ContactListMobileVars.UID) === resultSet(ContactListMobileVars.UID),
       SQL.LEFT_OUTER).select(
@@ -292,7 +292,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
         resultSet(EmailResponseVariables.CLICKS_LIFETIME),
         resultSet(EmailResponseVariables.END_DATE),
         resultSet(NewsletterVariables.UPDATED_AT)
-)
+      )
 
     val result = cmrResDf.join(nlSubscribers, cmrResDf(CustomerVariables.EMAIL) === nlSubscribers(CustomerVariables.EMAIL),
       SQL.LEFT_OUTER).select(
