@@ -1192,7 +1192,7 @@ object CampaignUtils extends Logging {
     require(inputData != null, "acart hourly data cannot be null")
     val acartInputData = inputData.withColumn(CampaignCommon.PRIORITY, lit(""))
     val acartWithUidData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, acartInputData)
-    val inputDataNumberSkus = inputData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
+    val inputDataNumberSkus = acartWithUidData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
     val acartOutData = inputDataNumberSkus
       .withColumn(ContactListMobileVars.UID, lit(""))
       .withColumn(CampaignMergedFields.STATUS, lit(1))
