@@ -20,17 +20,13 @@ object CategoryReplenishment extends Logging {
     }
 
     val filteredSkuJoinedItr = customerSkuData.join(yesterdayItrData, customerSkuData(ProductVariables.SKU_SIMPLE) === yesterdayItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
-      .select(customerSkuData("*"),
-        yesterdayItrData(ProductVariables.SPECIAL_PRICE),
-        yesterdayItrData(ProductVariables.BRICK),
-        yesterdayItrData(ProductVariables.BRAND),
-        yesterdayItrData(ProductVariables.MVP),
-        yesterdayItrData(ProductVariables.GENDER),
-        yesterdayItrData(ProductVariables.PRODUCT_NAME),
-        yesterdayItrData(ProductVariables.STOCK),
-        yesterdayItrData(ProductVariables.PRICE_BAND),
-        yesterdayItrData(ProductVariables.CATEGORY)
-      ).cache()
+      .select(
+        customerSkuData("*"),
+        yesterdayItrData("*")
+      )
+      .drop(yesterdayItrData(ProductVariables.SKU_SIMPLE))
+      .drop(yesterdayItrData(ProductVariables.CREATED_AT))
+      .cache()
 
     CampaignUtils.debug(filteredSkuJoinedItr, "filteredSkuJoinedItr")
 
@@ -54,7 +50,8 @@ object CategoryReplenishment extends Logging {
       filterNonBeauty(ProductVariables.MVP),
       filterNonBeauty(ProductVariables.GENDER),
       filterNonBeauty(ProductVariables.PRODUCT_NAME),
-      filterNonBeauty(ProductVariables.STOCK))
+      filterNonBeauty(ProductVariables.STOCK),
+      filterNonBeauty(SalesOrderVariables.CREATED_AT))
       .na.drop("any", Array(ProductVariables.CATEGORY))
 
     nonBeauty
@@ -73,7 +70,8 @@ object CategoryReplenishment extends Logging {
       filterBeauty(ProductVariables.MVP),
       filterBeauty(ProductVariables.GENDER),
       filterBeauty(ProductVariables.PRODUCT_NAME),
-      filterBeauty(ProductVariables.STOCK))
+      filterBeauty(ProductVariables.STOCK),
+      filterBeauty(SalesOrderVariables.CREATED_AT))
       .na.drop("any", Array(ProductVariables.CATEGORY))
 
     beauty

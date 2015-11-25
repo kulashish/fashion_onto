@@ -3,18 +3,17 @@ package com.jabong.dap.campaign.recommendation
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.campaign.{ Recommendation, CampaignMergedFields }
-import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, CustomerVariables, ProductVariables }
+import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, CustomerVariables, ProductVariables, SalesAddressVariables }
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.storage.schema.Schema
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.types.BooleanType
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
-
+import org.apache.spark.sql.types.BooleanType
+import org.apache.spark.sql.{ DataFrame, Row }
+import java.sql.Timestamp
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 /**
  * Created by rahul aneja on 21/8/15.
@@ -61,6 +60,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       refSkuExploded("ref_sku_fields.priceBand") as ProductVariables.PRICE_BAND,
       refSkuExploded("ref_sku_fields.color") as ProductVariables.COLOR,
       refSkuExploded("ref_sku_fields.city") as SalesAddressVariables.CITY,
+      refSkuExploded("ref_sku_fields.created_at") as SalesOrderItemVariables.CREATED_AT,
+      refSkuExploded("ref_sku_fields.paid_price") as SalesOrderItemVariables.PAID_PRICE,
       refSkuExploded("ref_sku_fields.skuSimple") as CampaignMergedFields.REF_SKU)
 
     CampaignUtils.debug(completeRefSku, "after completeRefSku")
@@ -79,6 +80,8 @@ class LiveCommonRecommender extends Recommender with Logging {
       completeRefSku(ProductVariables.PRODUCT_NAME) as CampaignMergedFields.LIVE_PROD_NAME,
       completeRefSku(ProductVariables.COLOR) as CampaignMergedFields.CALENDAR_COLOR,
       completeRefSku(SalesAddressVariables.CITY) as CampaignMergedFields.CALENDAR_CITY,
+      completeRefSku(SalesOrderItemVariables.CREATED_AT),
+      completeRefSku(SalesOrderItemVariables.PAID_PRICE),
       completeRefSku(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
       completeRefSku(CampaignMergedFields.LIVE_CART_URL))
 
@@ -120,7 +123,6 @@ class LiveCommonRecommender extends Recommender with Logging {
       }
 
       case Recommendation.BRAND_MVP_CITY_SUB_TYPE => {
-
         completeRefSku.join(recommendations, completeRefSku(ProductVariables.BRAND) === recommendations(ProductVariables.BRAND)
           && completeRefSku(ProductVariables.MVP) === recommendations(ProductVariables.MVP)
           && completeRefSku(SalesAddressVariables.CITY) === recommendations(SalesAddressVariables.CITY))
@@ -186,13 +188,13 @@ class LiveCommonRecommender extends Recommender with Logging {
    * @param iterable
    * @return
    */
-  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String)], mutable.MutableList[String], Int, String) = {
+  def getRecSkus(iterable: Iterable[Row], numRecSkus: Int): (mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)], mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
     val topRow = iterable.head
     val recommendedSkus: mutable.MutableList[String] = mutable.MutableList()
-    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String)] = mutable.MutableList()
+    val referenceSkus: mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)] = mutable.MutableList()
     val recommendationIndex = topRow.fieldIndex(CampaignMergedFields.REC_SKUS)
     val campaignMailTypeIndex = topRow.fieldIndex(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
     val acartUrlIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_CART_URL)
@@ -204,6 +206,8 @@ class LiveCommonRecommender extends Recommender with Logging {
     val liveProdNameIndex = topRow.fieldIndex(CampaignMergedFields.LIVE_PROD_NAME)
     val calendarColorIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_COLOR)
     val calendarCityIndex = topRow.fieldIndex(CampaignMergedFields.CALENDAR_CITY)
+    val calendarCreatedAtIndex = topRow.fieldIndex(SalesOrderItemVariables.CREATED_AT)
+    val calendarPaidPriceIndex = topRow.fieldIndex(SalesOrderItemVariables.PAID_PRICE)
 
     val numberRefSku = iterable.size
     val skuPerIteration = if (numberRefSku == 1) numRecSkus else 4
@@ -212,8 +216,15 @@ class LiveCommonRecommender extends Recommender with Logging {
       val recommendations = row(recommendationIndex).asInstanceOf[scala.collection.mutable.ArrayBuffer[String]].
         foreach(value => if (!recommendedSkus.contains(value) && i <= skuPerIteration) { recommendedSkus += value; i = i + 1; })
 
-      referenceSkus += ((row(refSkuIndex).toString, CampaignUtils.checkNullString(row(liveBrandIndex)), CampaignUtils.checkNullString(row(liveBrickIndex)),
-        CampaignUtils.checkNullString(row(liveProdNameIndex)), CampaignUtils.checkNullString(row(calendarColorIndex)), CampaignUtils.checkNullString(row(calendarCityIndex))))
+      referenceSkus += ((
+        row(refSkuIndex).toString,
+        row(liveBrandIndex).asInstanceOf[String],
+        row(liveBrickIndex).asInstanceOf[String],
+        row(liveProdNameIndex).asInstanceOf[String],
+        row(calendarColorIndex).asInstanceOf[String],
+        row(calendarCityIndex).asInstanceOf[String],
+        row(calendarCreatedAtIndex).asInstanceOf[Timestamp],
+        row(calendarPaidPriceIndex).asInstanceOf[Double]))
 
     }
     return (referenceSkus, recommendedSkus, mailType, acartUrl)
