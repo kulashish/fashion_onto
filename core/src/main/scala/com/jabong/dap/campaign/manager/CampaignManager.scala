@@ -686,7 +686,7 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.COUNTRY_CODE, lit(GARBAGE))
           .drop(CustomerVariables.EMAIL)
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-          .drop(CampaignMergedFields.LIVE_CART_URL + temp)
+          .drop(CampaignMergedFields.LIVE_CART_URL + temp).cache()
 
         val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
         val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
@@ -736,7 +736,7 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.LAST_UPDATED_DATE, lit(TimeUtils.yesterday(TimeConstants.DATE_FORMAT)))
           .drop(CustomerVariables.EMAIL)
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-          .drop(CampaignMergedFields.LIVE_CART_URL)
+          .drop(CampaignMergedFields.LIVE_CART_URL).cache()
 
         val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
         val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
