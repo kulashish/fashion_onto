@@ -850,7 +850,7 @@ object CampaignUtils extends Logging {
    * @param iterable
    * @return
    */
-  def getBrickAffinityData(iterable: Iterable[Row]): (String, List[((String, String, String, String, String, String, Timestamp, Double))], List[String], Int, String) = {
+  def getBrickAffinityData(iterable: Iterable[Row]): (String, scala.collection.mutable.MutableList[((String, String, String, String, String, String, Timestamp, Double))], scala.collection.mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -890,7 +890,7 @@ object CampaignUtils extends Logging {
       outList = l1.take(l1.length)
 
     }
-    return (iterable.head(emailIndex).asInstanceOf[String], iterable.head(refSkuIndex).asInstanceOf[List[(String, String, String, String, String, String, Timestamp, Double)]], outList.asInstanceOf[List[String]], iterable.head(campaignMailTypeIndex).asInstanceOf[Int], iterable.head(acartUrlIndex).asInstanceOf[String])
+    return (iterable.head(emailIndex).asInstanceOf[String], iterable.head(refSkuIndex).asInstanceOf[scala.collection.mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)]], outList.asInstanceOf[scala.collection.mutable.MutableList[String]], iterable.head(campaignMailTypeIndex).asInstanceOf[Int], iterable.head(acartUrlIndex).asInstanceOf[String])
 
   }
   /**
