@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import com.jabong.dap.common.constants.variables.{CustomerVariables, ContactListMobileVars}
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars }
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
