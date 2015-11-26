@@ -275,7 +275,7 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderData = CampaignInput.loadFullOrderData()
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
 
-    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
+    val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
     // val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
 
     // load common recommendations
