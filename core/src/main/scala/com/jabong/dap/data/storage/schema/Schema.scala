@@ -321,7 +321,8 @@ object Schema {
         StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
         StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true))), false), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
   val campaign = StructType(Array(

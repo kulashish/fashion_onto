@@ -886,7 +886,7 @@ object CampaignUtils extends Logging {
       outList = l1.take(l1.length)
 
     }
-    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex))
+    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex), iterable.head(acartUrlIndex))
 
   }
   /**
