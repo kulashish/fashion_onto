@@ -794,7 +794,8 @@ object CampaignUtils extends Logging {
         import sqlContext.implicits._
 
         val brickDf = brickAffinityData.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
-          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL))
+          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
+
         val campaignOutAfterRecFilter = minRefSkuFilter(brickDf)
         //        val dfJoined = dfBrick1RecommendationData.join(
         //          dfBrick2RecommendationData,
@@ -849,7 +850,7 @@ object CampaignUtils extends Logging {
    * @param iterable
    * @return
    */
-  def getBrickAffinityData(iterable: Iterable[Row]): (String,List[((String, String, String, String, String, String, Timestamp, Double))],List[String],Int,String) = {
+  def getBrickAffinityData(iterable: Iterable[Row]): (String, List[((String, String, String, String, String, String, Timestamp, Double))], List[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -889,7 +890,7 @@ object CampaignUtils extends Logging {
       outList = l1.take(l1.length)
 
     }
-    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex),iterable.head(acartUrlIndex))
+    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex), iterable.head(acartUrlIndex))
 
   }
   /**
