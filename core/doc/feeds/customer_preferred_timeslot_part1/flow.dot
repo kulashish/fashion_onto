@@ -1,0 +1,48 @@
+digraph  {
+
+      subgraph cluster_0 {
+          label="FirstTime"
+
+          // 1st time, CPT(Customer Preferred Timeslot)
+          Responsys_OPEN_FEED -> Inc_Open_CPT;
+          Responsys_CLICK_FEED -> Inc_Click_CPT;
+
+          //Join OpenCPT and ClickCPT from CUSTOMER_ID that will make Inc_CPT
+          Inc_Open_CPT -> Today_Inc_CPT
+          Inc_Click_CPT -> Today_Inc_CPT
+
+          //Today_Inc_CPT  save into hdfs Inc and Full
+          Today_Inc_CPT -> Today_Inc_Output_CPT
+          Today_Inc_CPT -> Today_Full_Output_CPT
+
+          {rank = same; Today_Inc_Output_CPT; Today_Full_Output_CPT;}
+      }
+      
+      subgraph cluster_1 {
+          label="Daily"
+
+          Yesterday_Full_CPT [shape=box,color=red];
+
+          Today_Full_Output_CPT -> Yesterday_Full_CPT;
+
+          // daily incremental run
+          Responsys_OPEN_FEED_1 -> Inc_Open_CPT_1;
+          Responsys_CLICK_FEED_1 -> Inc_Click_CPT_1;
+
+          //Join OpenCPT and ClickCPT from CUSTOMER_ID that will make Today_Inc_CPT_1
+          Inc_Open_CPT_1 -> Today_Inc_CPT_1
+          Inc_Click_CPT_1 -> Today_Inc_CPT_1
+
+          //Join Today_Inc_CPT_1 and Yesterday_Full_CPT from CUSTOMER_ID that will make Today_Full_CPT_1
+          Yesterday_Full_CPT -> Today_Full_CPT_1
+          Today_Inc_CPT_1 -> Today_Full_CPT_1
+
+          //Inc_CPT_1  save into hdfs Inc and Full
+          Today_Inc_CPT_1 -> Today_Inc_Output_CPT_1
+          Today_Full_CPT_1 -> Today_Full_Output_CPT_1
+
+          {rank = same; Responsys_OPEN_FEED_1; Responsys_CLICK_FEED_1; Yesterday_Full_CPT;}
+          {rank = same; Today_Inc_CPT_1; Today_Full_CPT_1;}
+          {rank = same; Today_Inc_Output_CPT_1; Today_Full_Output_CPT_1;}
+      }
+}
