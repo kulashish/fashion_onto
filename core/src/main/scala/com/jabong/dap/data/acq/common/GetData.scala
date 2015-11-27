@@ -64,6 +64,7 @@ object GetData extends Logging {
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
     println("Data written successfully using query: " + dbTableQuery)
+    context.clearCache()
   }
 }
 
