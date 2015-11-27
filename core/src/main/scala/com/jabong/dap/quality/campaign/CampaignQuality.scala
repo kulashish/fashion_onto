@@ -143,7 +143,16 @@ object CampaignQuality extends Logging {
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
         for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-          val campDF = dataFrame.filter(col("LIVE_MAIL_TYPE") === campaignDetails.mailType)
+
+          val campDF = {
+            //this filter for Calendar Campaign Quality
+            if (dataFrame.schema.fieldNames.contains(CampaignMergedFields.CALENDAR_MAIL_TYPE)) {
+              dataFrame.filter(col(CampaignMergedFields.CALENDAR_MAIL_TYPE) === campaignDetails.mailType)
+            } else { //this filter for Email/Push Campaign Quality
+              dataFrame.filter(col(CampaignMergedFields.LIVE_MAIL_TYPE) === campaignDetails.mailType)
+            }
+          }
+
           val count = campDF.count()
 
           if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
