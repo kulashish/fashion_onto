@@ -32,7 +32,7 @@ object OrderBySchema {
       StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
       StructField(CampaignMergedFields.CALENDAR_CITY, StringType),
       StructField(SalesOrderItemVariables.CREATED_AT, TimestampType),
-      StructField(SalesOrderItemVariables.PAID_PRICE, DecimalType(10, 2)))), false), true),
+      StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType))), false), true),
 
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
     StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),

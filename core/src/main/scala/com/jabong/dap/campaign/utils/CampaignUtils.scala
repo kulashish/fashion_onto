@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
-import com.jabong.dap.campaign.manager.CampaignProducer
+import com.jabong.dap.campaign.manager.{ CampaignProcessor, CampaignProducer }
 import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
@@ -16,6 +16,7 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
+import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
@@ -36,7 +37,7 @@ object CampaignUtils extends Logging {
   val sqlContext = Spark.getSqlContext()
 
   def generateReferenceSku(skuData: DataFrame, NumberSku: Int): DataFrame = {
-    CampaignUtils.debug(skuData, "AcartDaily:-after ref sku generation")
+    CampaignUtils.debug(skuData, "In ref sku generation")
 
     val customerFilteredData = skuData.filter(CustomerVariables.FK_CUSTOMER + " is not null and "
       + ProductVariables.SKU_SIMPLE + " is not null and " + ProductVariables.SPECIAL_PRICE + " is not null")
@@ -59,7 +60,7 @@ object CampaignUtils extends Logging {
 
     val customerRefSku = GroupedUtils.orderGroupBy(customerFilteredData, groupedFields, aggFields, GroupedUtils.FIRST, Schema.pushReferenceSku, ProductVariables.SPECIAL_PRICE, GroupedUtils.DESC, DecimalType.apply())
 
-    CampaignUtils.debug(customerRefSku, "AcartDaily:-after ref sku generation")
+    CampaignUtils.debug(customerRefSku, "after ref sku generation")
 
     customerRefSku
 
@@ -790,8 +791,12 @@ object CampaignUtils extends Logging {
         val brickAffinityData = dfBrickUnion.rdd.map(row => (row(row.fieldIndex(CustomerVariables.EMAIL)).asInstanceOf[String], row)).groupByKey().
           map{ case (key, value) => getBrickAffinityData(value) }
 
-        val brickDf = sqlContext.createDataFrame(brickAffinityData, Schema.emailCampaignSchema)
+        import sqlContext.implicits._
 
+        val brickDf = brickAffinityData.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
+          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
+
+        val campaignOutAfterRecFilter = minRefSkuFilter(brickDf)
         //        val dfJoined = dfBrick1RecommendationData.join(
         //          dfBrick2RecommendationData,
         //          dfBrick1RecommendationData(CustomerVariables.EMAIL) === dfBrick2RecommendationData(CustomerVariables.EMAIL),
@@ -815,31 +820,37 @@ object CampaignUtils extends Logging {
         import sqlContext.implicits._
         //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
         //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
-        CampaignUtils.debug(brickDf, "brickDf")
-        brickDf
+        CampaignUtils.debug(campaignOutAfterRecFilter, "campaignOutAfterRecFilter")
+        campaignOutAfterRecFilter
       }
-      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
-        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
-        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+      //      case CampaignCommon.HOTTEST_X_CAMPAIGN =>
+      //        val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
+      //        dfRecommendationData.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
       case CampaignCommon.REPLENISHMENT_CAMPAIGN =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, 8)
-        val replenishData = getSelectedReplenishAttributes(dfRecommendationData)
+        val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)
+        val replenishData = getSelectedReplenishAttributes(campaignOutAfterRecFilter)
         replenishData
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
-        dfRecommendationData
+        val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)
+        campaignOutAfterRecFilter
     }
 
     //save campaign Output for mobile
     CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
   }
 
+  def minRefSkuFilter(recommendationOutPut: DataFrame): DataFrame = {
+    recommendationOutPut.filter(Udf.columnAsArraySize(col(CampaignMergedFields.REC_SKUS)).geq(CampaignCommon.CALENDAR_MIN_RECS))
+
+  }
   /**
    *
    * @param iterable
    * @return
    */
-  def getBrickAffinityData(iterable: Iterable[Row]): Row = {
+  def getBrickAffinityData(iterable: Iterable[Row]): (String, scala.collection.mutable.MutableList[((String, String, String, String, String, String, Timestamp, Double))], scala.collection.mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -879,7 +890,7 @@ object CampaignUtils extends Logging {
       outList = l1.take(l1.length)
 
     }
-    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex))
+    return (iterable.head(emailIndex).asInstanceOf[String], iterable.head(refSkuIndex).asInstanceOf[scala.collection.mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)]], outList.asInstanceOf[scala.collection.mutable.MutableList[String]], iterable.head(campaignMailTypeIndex).asInstanceOf[Int], iterable.head(acartUrlIndex).asInstanceOf[String])
 
   }
   /**
@@ -888,10 +899,9 @@ object CampaignUtils extends Logging {
    * @return
    */
   def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
-    //    val cmr = CampaignInput.loadCustomerMasterData()
-    // val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY,lit("")))
-    // .drop(CampaignCommon.PRIORITY)
-    val replenishmentOutData = input
+    val cmr = CampaignInput.loadCustomerMasterData()
+    val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY, lit("")))
+    val replenishmentOutData = replenishmentData
       .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
       .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
@@ -908,6 +918,7 @@ object CampaignUtils extends Logging {
       .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
       .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
       .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
+      .drop(CampaignCommon.PRIORITY)
 
     debug(replenishmentOutData, "replenishmentOutData")
     return replenishmentOutData
@@ -1073,7 +1084,9 @@ object CampaignUtils extends Logging {
 
     debug(campaignOutput, campaignType + "::" + campaignName + " after recommendation sku generation")
     //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
+    val campaignOutAfterRecFilter = minRefSkuFilter(campaignOutput)
+
+    CampaignOutput.saveCampaignDataForYesterday(campaignOutAfterRecFilter, campaignName, campaignType)
   }
 
   /**
@@ -1177,34 +1190,6 @@ object CampaignUtils extends Logging {
     println("Count of " + name + ":-" + data.count() + "\n")
     println("show dataframe " + name + ":-" + data.show(10) + "\n")
     data.printSchema()
-  }
-
-  def getAcartHourlyFields(inputData: DataFrame): DataFrame = {
-    require(inputData != null, "acart hourly data cannot be null")
-
-    val inputDataNumberSkus = inputData.withColumn(CampaignMergedFields.NUMBER_SKUS, Udf.getAcartNumberOfSkus(col(CampaignMergedFields.LIVE_CART_URL)))
-    val acartOutData = inputDataNumberSkus
-      .withColumn(ContactListMobileVars.UID, lit(""))
-      .withColumn(CampaignMergedFields.STATUS, lit(1))
-      .withColumn(CampaignMergedFields.VISIT, lit(41))
-      .withColumn(CampaignMergedFields.SPECIAL_TEXT, lit("4"))
-      .withColumn(CampaignMergedFields.SENDING_METHOD, lit("4-N-N-N-N-N-N-N-N-41"))
-      .withColumn(CampaignMergedFields.ARTICLE, when(col(CampaignMergedFields.NUMBER_SKUS) <= 4, lit(0)).otherwise(col(CampaignMergedFields.NUMBER_SKUS) - 4))
-      .withColumn(CampaignMergedFields.URL, col(CampaignMergedFields.LIVE_CART_URL))
-      .withColumn(CampaignMergedFields.REF_SKU + "1", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
-      .withColumn(CampaignMergedFields.REF_SKU + "2", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(1), lit(0)))
-      .withColumn(CampaignMergedFields.REF_SKU + "3", Udf.getElementInTupleList(col(CampaignMergedFields.REF_SKUS), lit(2), lit(0)))
-      .withColumn(CampaignMergedFields.REC_SKU + "1", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(0)))
-      .withColumn(CampaignMergedFields.REC_SKU + "2", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(1)))
-      .withColumn(CampaignMergedFields.REC_SKU + "3", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(2)))
-      .withColumn(CampaignMergedFields.REC_SKU + "4", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(3)))
-      .withColumn(CampaignMergedFields.REC_SKU + "5", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(4)))
-      .withColumn(CampaignMergedFields.REC_SKU + "6", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(5)))
-      .withColumn(CampaignMergedFields.REC_SKU + "7", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(6)))
-      .withColumn(CampaignMergedFields.REC_SKU + "8", Udf.getElementList(col(CampaignMergedFields.REC_SKUS), lit(7)))
-
-    debug(acartOutData, "AcartOutData")
-    return acartOutData
   }
 
 }

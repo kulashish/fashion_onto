@@ -253,6 +253,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "emailCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component emailCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
     $job_exit =run_component($component, $command);
+} elsif ($component eq "calendarCampaignQuality") {
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component calendarCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/calendarCampaigns.json";
+    $job_exit =run_component($component, $command);
 } elsif ($component eq "campaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
     $job_exit = run_component($component, $command);
@@ -351,7 +354,11 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "cityWiseData") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component city_wise_data --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/cityWiseData.json";
     $job_exit = run_component($component, $command);
-} else {
+} elsif ($component eq "acartHourlyFeed") {
+    my $AMMUNITION = "--num-executors 5 --executor-memory 400M";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acartHourlyFeed --config $HDFS_CONF/config.json";
+    $job_exit = run_component($component, $command);
+  } else {
     print "not a valid component\n";
     $job_exit = -1;
 }

@@ -311,11 +311,18 @@ object Schema {
 
   val emailCampaignSchema = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType), StructField(CampaignMergedFields.LIVE_BRAND, StringType),
-      StructField(CampaignMergedFields.LIVE_BRICK, StringType), StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType), StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
-      StructField(CampaignMergedFields.CALENDAR_CITY, StringType))), false), true),
+    StructField(CampaignMergedFields.REF_SKUS,
+      ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType),
+        StructField(CampaignMergedFields.LIVE_BRAND, StringType),
+        StructField(CampaignMergedFields.LIVE_BRICK, StringType),
+        StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType),
+        StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
+        StructField(CampaignMergedFields.CALENDAR_CITY, StringType),
+        StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true))), false), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
   val campaign = StructType(Array(
@@ -469,8 +476,9 @@ object Schema {
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
         StructField(ProductVariables.COLOR, StringType, true),
-        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
-
+        StructField(SalesAddressVariables.CITY, StringType, true),
+        StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))), false),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
