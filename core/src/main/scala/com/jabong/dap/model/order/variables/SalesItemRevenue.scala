@@ -349,7 +349,7 @@ object SalesItemRevenue extends DataFeedsModel {
         Udf.minTimestamp(mWeb(SalesOrderVariables.LAST_ORDER_DATE), appJoined(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
       )
 
-  //  println("joinedData ", joinedData.count())
+    //  println("joinedData ", joinedData.count())
     var finalJoined: DataFrame = null
     if (null == others || others.count() == 0) {
       finalJoined = joinedData.withColumn(SalesOrderItemVariables.ORDERS_COUNT_OTHERS, joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB))
@@ -370,7 +370,7 @@ object SalesItemRevenue extends DataFeedsModel {
         )
 
     }
-   // println("finalJoined", finalJoined.count())
+    // println("finalJoined", finalJoined.count())
 
     val joinedFill = finalJoined.na.fill(Map(
       SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
