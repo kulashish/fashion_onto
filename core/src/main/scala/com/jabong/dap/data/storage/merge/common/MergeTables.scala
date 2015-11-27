@@ -79,7 +79,7 @@ object MergeTables extends Logging {
 
       filteredDF.write.format(saveFormat).mode(saveMode).save(savePath)
       println("Successfully written data to " + savePath)
-
+      context.clearCache()
     } catch {
       case e: DataNotFound =>
         logger.error("Data not at location: " + e.getMessage)
