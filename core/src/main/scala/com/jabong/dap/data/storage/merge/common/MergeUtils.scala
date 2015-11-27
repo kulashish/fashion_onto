@@ -18,6 +18,8 @@ object MergeUtils extends MergeData {
       return dfIncr
     else if (null == dfIncr)
       return dfBase
+    else if (0 == dfIncr.count())
+      return dfBase
 
     var dfBaseNew = dfBase
     if (!SchemaUtils.isSchemaEqual(dfIncr.schema, dfBase.schema)) {
