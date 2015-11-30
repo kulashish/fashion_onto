@@ -310,11 +310,18 @@ object Schema {
 
   val emailCampaignSchema = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CampaignMergedFields.REF_SKUS, ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType), StructField(CampaignMergedFields.LIVE_BRAND, StringType),
-      StructField(CampaignMergedFields.LIVE_BRICK, StringType), StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType), StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
-      StructField(CampaignMergedFields.CALENDAR_CITY, StringType))), false), true),
+    StructField(CampaignMergedFields.REF_SKUS,
+      ArrayType(StructType(Array(StructField(CampaignMergedFields.LIVE_REF_SKU, StringType),
+        StructField(CampaignMergedFields.LIVE_BRAND, StringType),
+        StructField(CampaignMergedFields.LIVE_BRICK, StringType),
+        StructField(CampaignMergedFields.LIVE_PROD_NAME, StringType),
+        StructField(CampaignMergedFields.CALENDAR_COLOR, StringType),
+        StructField(CampaignMergedFields.CALENDAR_CITY, StringType),
+        StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true))), false), true),
     StructField(CampaignMergedFields.REC_SKUS, ArrayType(StringType), true),
-    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true)
+    StructField(CampaignMergedFields.CAMPAIGN_MAIL_TYPE, IntegerType, true),
+    StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
   val campaign = StructType(Array(
@@ -468,8 +475,9 @@ object Schema {
         StructField(ProductVariables.PRODUCT_NAME, StringType, true),
         StructField(ProductVariables.PRICE_BAND, StringType, true),
         StructField(ProductVariables.COLOR, StringType, true),
-        StructField(SalesAddressVariables.CITY, StringType, true)))), false),
-
+        StructField(SalesAddressVariables.CITY, StringType, true),
+        StructField(SalesOrderItemVariables.CREATED_AT, TimestampType, true),
+        StructField(SalesOrderItemVariables.PAID_PRICE, DoubleType, true)))), false),
     StructField(CampaignMergedFields.LIVE_CART_URL, StringType, true)
   ))
 
@@ -616,35 +624,49 @@ object Schema {
     StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_LIFE, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_LIFE, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_OTHERS_LIFE, LongType, true),
-    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_APP_LIFE, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_WEB_LIFE, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_MWEB_LIFE, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_OTHERS_LIFE, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_LIFE, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_LIFE, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_LIFE, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_LIFE, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_OTHERS_LIFE, DecimalType.apply(12, 2), true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_7, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_7, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_7, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_7, LongType, true),
-    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_APP_7, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_WEB_7, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_MWEB_7, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_7, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_7, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_7, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_7, DecimalType.apply(12, 2), true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_30, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_30, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_30, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_30, LongType, true),
-    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_APP_30, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_WEB_30, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_MWEB_30, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_30, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_30, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_30, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_30, DecimalType.apply(12, 2), true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_90, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_APP_90, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB_90, LongType, true),
     StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB_90, LongType, true),
-    StructField(SalesOrderItemVariables.REVENUE_90, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_APP_90, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_WEB_90, DecimalType.apply(16, 2), true),
-    StructField(SalesOrderItemVariables.REVENUE_MWEB_90, DecimalType.apply(16, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_90, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP_90, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB_90, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB_90, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)))
+
+  val salesRevIncr = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_APP, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_WEB, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_MWEB, LongType, true),
+    StructField(SalesOrderItemVariables.ORDERS_COUNT_OTHERS, LongType, true),
+    StructField(SalesOrderItemVariables.REVENUE, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_APP, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_WEB, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_MWEB, DecimalType.apply(12, 2), true),
+    StructField(SalesOrderItemVariables.REVENUE_OTHERS, DecimalType.apply(12, 2), true),
     StructField(SalesOrderVariables.LAST_ORDER_DATE, TimestampType, true)))
 
   //FIXME: move it into OrderBySchema

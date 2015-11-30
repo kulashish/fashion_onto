@@ -224,4 +224,15 @@ object CustomerVariables {
   val AVERAGE_PRICE = "average_price"
   val SKU_SIMPLE = "skuSimple"
   val SPECIAL_PRICE = "specialPrice"
+
+  //FeedFile variables
+  val EMAIL_SUBSCRIPTION_STATUS = "email_subscription_status"
+  val CUR_NL_STATUS = "cur_nl_status"
+  val PROCESSED_DATE = "processed_date"
+  val NET_ORDERS = "net_orders"
+  val REG_DATE = "reg_date"
+  val UID = "uid"
+  val MOBILE_PERMISSION_STATUS = "mobile_permission_status"
+  val COUNTRY = "country"
+  val MOBILE = "mobile"
 }

@@ -11,12 +11,6 @@ import org.apache.spark.sql.functions._
  */
 object AppEmailFeed {
 
-  val PROCESSED_DATE = "processed_date"
-  val NET_ORDERS = "net_orders"
-  val REG_DATE = "reg_date"
-  val UID = "uid"
-  val DEVICE_ID = "deviceid"
-
   def getAppEmailFeed(dfContactListMobileIncr: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
 
     val dfAppEmailFeedIncr = dfContactListMobileIncr.select(
@@ -38,12 +32,12 @@ object AppEmailFeed {
     val todayStartDate = TimeUtils.getTodayDate(TimeConstants.DATE_FORMAT) + " " + TimeConstants.START_TIME
 
     val dfAppEmailFeed = dfAppEmailFeedIncr.except(dfAppEmailFeedPrevFull).select(
-      col(ContactListMobileVars.UID) as UID,
-      col(CampaignMergedFields.DEVICE_ID) as DEVICE_ID,
+      col(ContactListMobileVars.UID) as CustomerVariables.UID,
+      col(CampaignMergedFields.DEVICE_ID) as CampaignMergedFields.deviceId,
       col(CustomerVariables.EMAIL),
-      col(ContactListMobileVars.NET_ORDERS) as NET_ORDERS,
-      col(ContactListMobileVars.REG_DATE) as REG_DATE,
-      lit(todayStartDate) as PROCESSED_DATE
+      col(ContactListMobileVars.NET_ORDERS) as CustomerVariables.NET_ORDERS,
+      col(ContactListMobileVars.REG_DATE) as CustomerVariables.REG_DATE,
+      lit(todayStartDate) as CustomerVariables.PROCESSED_DATE
     ).na.fill("")
 
     dfAppEmailFeed

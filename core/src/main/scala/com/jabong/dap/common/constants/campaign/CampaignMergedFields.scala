@@ -50,6 +50,8 @@ object CampaignMergedFields {
   val CALENDAR_PRICE_POINT = "CLDR_PRICE_POINT"
   val CALENDAR_LAST_PURCHASED = "CLDR_LAST_PURCHASED"
 
+  val ACART_REF_SKU = "REF_SKU"
+
   // replenish campaign
   val PURCHASED_DATE = "PURCHASED_DATE"
   val REC_SKU = "REC_SKU"

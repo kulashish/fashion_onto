@@ -3,7 +3,7 @@
     {
       "source": "salesItemRevenue",
       "incrMode": "daily",
-      "saveMode": "Overwrite",
+      "saveMode": "Ignore",
       "saveFormat": "parquet"
     }
   ]
