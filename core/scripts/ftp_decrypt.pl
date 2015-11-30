@@ -8,12 +8,9 @@ Getopt::Long::Configure qw(gnu_getopt);
 use Data::Dumper;
 use Time::HiRes qw( time );
 
-my $directory;
+my $folderName;
 my $fileName;
-GetOptions (
-    'directory|d=s' => \$directory,
-    'fileName|f=s' => \$fileName,
-) or die "Usage: $0 --directory|-d -fileName|-f \n";
+my $status;
 
 use POSIX qw(strftime);
 
@@ -22,29 +19,42 @@ my $date = strftime "%Y/%m/%d", localtime(time() - 60*60*24);
 my $date_with_zero = strftime "%Y%m%d", localtime(time());
 
 my $base = "/tmp/decrypt/$date_with_zero";
-print "directory is $base\n";
+print "folderName is $base\n";
 system("mkdir -p $base");
-my $status = $?;
 
-print "hadoop fs -get /data/tmp/variables/$directory/daily/$date/$date_with_zero\_$fileName.csv $base/\n";
-system("hadoop fs -get /data/tmp/variables/$directory/daily/$date/$date_with_zero\_$fileName.csv $base/\n");
+exit download_campaigns();
 
-# renaming the file for test
-print("rename file $base/$date_with_zero\_$fileName.csv to dap_$date_with_zero\_$fileName.csv");
-system("mv $base/$date_with_zero\_$fileName.csv $base/dap_$date_with_zero\_$fileName.csv");
+sub fetchAndRenameFile {
+   my ($fileName, $folderName, $base) = @_;
 
-system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $base/dap_$date_with_zero\_$fileName.csv; bye\"");
+   print "hadoop fs -get /data/test/tmp/variables/$folderName/daily/$date/$fileName $base/\n";
+   system("hadoop fs -get /data/test/tmp/variables/$folderName/daily/$date/$fileName $base/");
 
-system("rm -rf /tmp/decrypt");
+   my $status = $?;
 
-# if we wantt to download the  file
-#        use Net::FTP;
-#        $ftp = Net::FTP->new("some.host.name", Debug => 0)
-#          or die "Cannot connect to some.host.name: $@";
-#        $ftp->login("anonymous",'-anonymous@')
-#          or die "Cannot login ", $ftp->message;
-#        $ftp->cwd("/pub")
-#          or die "Cannot change working directory ", $ftp->message;
-#        $ftp->get("that.file")
-#          or die "get failed ", $ftp->message;
-#        $ftp->quit;
+   $status ||= removeNull("$base/$fileName");
+
+   # renaming the file for test
+   print("rename file $base/$fileName.csv to dap_$fileName.csv");
+   $status ||= system("mv $base/$fileName.csv $base/dap_$fileName.csv");
+
+   return $status;
+}
+
+sub download_campaigns {
+    # 20150928_CONTACTS_LIST.csv
+    $fileName = "$date_with_zero\_CONTACTS_LIST.csv";
+    $folderName = "contactListMobile";
+
+    $status ||= fetchAndRenameFile($fileName, $folderName, $base);
+
+    $fileName = "$date_with_zero\_Contact_list_Plus.csv";
+    $folderName = "Contact_list_Plus";
+
+    $status ||= fetchAndRenameFile($fileName, $folderName, $base);
+
+    system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $base/*.csv; bye\"");
+    $status ||= $?;
+    system("rm -rf /tmp/decrypt");
+    return $status;
+}
