@@ -7,7 +7,7 @@ object CrmTicketVariables {
   val TICKET_ID = "TicketID"
   val CUSTOMER_ID = "CUSTOMER_ID"
   val USER_ID = "UserID"
-  val  CUSTOMER_NO = "CustomerNo"
+  val CUSTOMER_NO = "CustomerNo"
 
   val ORDER_NO = "OrderNo"
   val TICKET_CLOSE_DATE = "ticket_close_date"

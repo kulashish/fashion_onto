@@ -1,12 +1,12 @@
 package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.campaign.data.CampaignOutput
-import com.jabong.dap.common.{Spark, SharedSparkContext}
+import com.jabong.dap.common.{ Spark, SharedSparkContext }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{SQLContext, DataFrame}
-import org.scalatest.{FeatureSpec, GivenWhenThen, FlatSpec}
+import org.apache.spark.sql.{ SQLContext, DataFrame }
+import org.scalatest.{ FeatureSpec, GivenWhenThen, FlatSpec }
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
@@ -23,7 +23,7 @@ class WinbackDataTest extends FeatureSpec with GivenWhenThen with SharedSparkCon
   @transient var crmTicketStatLog: DataFrame = _
   @transient var cmr: DataFrame = _
 
-  override def beforeAll()={
+  override def beforeAll() = {
     super.beforeAll()
 
     CampaignOutput.setTestMode(true)
@@ -34,15 +34,13 @@ class WinbackDataTest extends FeatureSpec with GivenWhenThen with SharedSparkCon
     crmTicketStatLog = JsonUtils.readFromJson(DataSets.CAMPAIGNS + "/winback", "crm_ticket_statuslog", Schema.crmTktStatusLog)
     cmr = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "cmr", Schema.cmr)
 
-
   }
-
 
   feature("Run winback campaign") {
     scenario("R=un win back campaign") {
       Given("salesOrder, crm tables")
 
-      WinbackData.dateStr  = "2015/11/24"
+      WinbackData.dateStr = "2015/11/24"
       val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]
       dfMap.put("crmTicketMasterIncr", crmTicketMaster)
       dfMap.put("crmTicketDetailsIncr", crmTicketDetails)

@@ -8,7 +8,7 @@ import org.apache.spark.sql.types._
  * Created by raghu on 22/6/15.
  */
 object Schema {
-   val customer = StructType(Array(
+  val customer = StructType(Array(
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(CustomerVariables.INCREMENT_ID, StringType, true),
@@ -791,8 +791,5 @@ object Schema {
     StructField(CrmTicketVariables.DG_END_DATE, TimestampType, true),
     StructField(CrmTicketVariables.ADD_DATE, TimestampType, true)
   ))
-
-
-
 
 }
