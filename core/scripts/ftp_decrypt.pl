@@ -34,15 +34,14 @@ sub fetchAndRenameFile {
 
    $status ||= removeNull("$base/$fileName");
 
-   # renaming the file for test
-   print("rename file $base/$fileName.csv to dap_$fileName.csv");
-   $status ||= system("mv $base/$fileName.csv $base/dap_$fileName.csv");
+   print("rename file $base/$fileName to dap_$fileName");
+   $status ||= system("mv $base/$fileName $base/dap_$fileName");
+
 
    return $status;
 }
 
 sub download_campaigns {
-    # 20150928_CONTACTS_LIST.csv
     $fileName = "$date_with_zero\_CONTACTS_LIST.csv";
     $folderName = "contactListMobile";
 
