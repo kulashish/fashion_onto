@@ -3,20 +3,20 @@ digraph  {
           BRICK_MVP_SUBTYPE  -> recommendationType
           CALENDAR_CAMPAIGN -> campaignType
 
-          nDaysSalesOrder -> salesOrder60
-          nDaysSalesOrderItem ->  salesOrderItem60
+          nthDaysSalesOrder -> nthSales40
+          nthDaysSalesOrderItem ->  nthSalesItem40
 
-          salesOrder60 -> nthSales45
-          salesOrder60 -> nthSales60
+          nthSales40 ->  custSelection
+          nthSalesItem40 -> custSelection
+          salesAddressFull -> custSelection
 
-          nthSales45 ->  custSelection
-          nthSales60 -> custSelection
-          salesOrderItem60 -> custSelection
+          citywiseData -> merge
+          custSelection -> merge
 
-          custSelection -> skuFilter
-          itr -> skuFilter
+          merge -> filter
+          itr -> filter
 
-          skuFilter -> recommendations
+          filter -> recommendations
           recommendationType -> recommendations
           campaignType -> recommendations
 
