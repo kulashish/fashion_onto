@@ -74,6 +74,7 @@ object CampaignCommon {
 
   val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
   val EMAIL_CAMPAIGN_QUALITY = "email_campaign_quality"
+  val CALENDAR_CAMPAIGN_QUALITY = "calendar_campaign_quality"
 
   val MIPR_CAMPAIGN = "mipr"
   val NEW_ARRIVALS_BRAND = "new_arrivals_brand"

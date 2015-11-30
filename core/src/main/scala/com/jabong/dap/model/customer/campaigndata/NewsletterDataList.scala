@@ -9,10 +9,6 @@ import org.apache.spark.sql.functions._
  */
 object NewsletterDataList {
 
-  val CUSTOMER_ID = "customer_id"
-  val EMAIL_SUBSCRIPTION_STATUS = "email_subscription_status"
-  val CUR_NL_STATUS = "cur_nl_status"
-
   def getNLDataList(dfContactListMobileIncr: DataFrame, dfContactListMobilePrevFull: DataFrame): DataFrame = {
 
     val dfNLDataListIncr = dfContactListMobileIncr.select(
@@ -31,9 +27,9 @@ object NewsletterDataList {
 
     val dfNlDataList = dfNLDataListIncr.except(dfNLDataListPrevFull).select(
       col(CustomerVariables.EMAIL),
-      col(CustomerVariables.ID_CUSTOMER) as CUSTOMER_ID,
-      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as EMAIL_SUBSCRIPTION_STATUS,
-      col(NewsletterVariables.STATUS) as CUR_NL_STATUS
+      col(CustomerVariables.ID_CUSTOMER) as CustomerVariables.CUSTOMER_ID,
+      col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS) as CustomerVariables.EMAIL_SUBSCRIPTION_STATUS,
+      col(NewsletterVariables.STATUS) as CustomerVariables.CUR_NL_STATUS
     ).na.fill("")
 
     dfNlDataList

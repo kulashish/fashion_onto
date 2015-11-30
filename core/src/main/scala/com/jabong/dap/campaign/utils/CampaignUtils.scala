@@ -791,7 +791,11 @@ object CampaignUtils extends Logging {
         val brickAffinityData = dfBrickUnion.rdd.map(row => (row(row.fieldIndex(CustomerVariables.EMAIL)).asInstanceOf[String], row)).groupByKey().
           map{ case (key, value) => getBrickAffinityData(value) }
 
-        val brickDf = sqlContext.createDataFrame(brickAffinityData, Schema.emailCampaignSchema)
+        import sqlContext.implicits._
+
+        val brickDf = brickAffinityData.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
+          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
+
         val campaignOutAfterRecFilter = minRefSkuFilter(brickDf)
         //        val dfJoined = dfBrick1RecommendationData.join(
         //          dfBrick2RecommendationData,
@@ -846,7 +850,7 @@ object CampaignUtils extends Logging {
    * @param iterable
    * @return
    */
-  def getBrickAffinityData(iterable: Iterable[Row]): Row = {
+  def getBrickAffinityData(iterable: Iterable[Row]): (String, scala.collection.mutable.MutableList[((String, String, String, String, String, String, Timestamp, Double))], scala.collection.mutable.MutableList[String], Int, String) = {
     require(iterable != null, "iterable cannot be null")
     require(iterable.size != 0, "iterable cannot be of size zero")
 
@@ -886,7 +890,7 @@ object CampaignUtils extends Logging {
       outList = l1.take(l1.length)
 
     }
-    return Row(iterable.head(emailIndex), iterable.head(refSkuIndex), outList, iterable.head(campaignMailTypeIndex))
+    return (iterable.head(emailIndex).asInstanceOf[String], iterable.head(refSkuIndex).asInstanceOf[scala.collection.mutable.MutableList[(String, String, String, String, String, String, Timestamp, Double)]], outList.asInstanceOf[scala.collection.mutable.MutableList[String]], iterable.head(campaignMailTypeIndex).asInstanceOf[Int], iterable.head(acartUrlIndex).asInstanceOf[String])
 
   }
   /**

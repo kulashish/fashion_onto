@@ -6,7 +6,7 @@ import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
-import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderItem }
+import com.jabong.dap.model.order.variables.SalesItemRevenue
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -16,11 +16,14 @@ import org.apache.spark.sql.functions._
  */
 object SalesOrderHistoric {
 
-  def processHistoricData() = {
+  def processHistoricData(start: String, end: String) = {
     val WRITE_OUTPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/test/output"
     val INPUT_PATH = "hdfs://dataplatform-master.jabong.com:8020/data/input"
 
-    for (i <- 91 to 1 by -1) {
+    val startInt = Integer.parseInt(start) // should start with 91
+    val endInt = Integer.parseInt(end) // end at 1
+
+    for (i <- startInt to endInt by -1) {
       val date = TimeUtils.getDateAfterNDays(-i - 1, TimeConstants.DATE_FORMAT_FOLDER)
       val incrDate = TimeUtils.getDateAfterNDays(-i, TimeConstants.DATE_FORMAT_FOLDER)
       val prevFull = DataReader.getDataFrameOrNull(WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.SALES_ITEM_REVENUE, DataSets.FULL_MERGE_MODE, date)
@@ -80,7 +83,7 @@ object SalesOrderHistoric {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("SparkExamples")
     Spark.init(conf)
-    processHistoricData()
+    processHistoricData(args(0), args(1))
 
   }
 

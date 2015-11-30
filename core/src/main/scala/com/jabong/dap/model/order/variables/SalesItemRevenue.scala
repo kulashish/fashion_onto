@@ -118,18 +118,15 @@ object SalesItemRevenue extends DataFeedsModel {
     val appOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_APP)
     val webOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_WEB)
     val mWebOrders = salesJoinedDF.filter(SalesOrderItemVariables.FILTER_MWEB)
-    val otherOrders = salesJoinedDF.filter(salesJoinedDF(SalesOrderVariables.DOMAIN).isNull
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "w"
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "m"
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "ios"
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "android"
-      && !salesJoinedDF(SalesOrderVariables.DOMAIN) === "windows")
+    val otherOrders = salesJoinedDF.filter(salesJoinedDF(SalesOrderVariables.DOMAIN).isNull)
+    //println("otherOrders Count", otherOrders.count())
     val app = getRevenueOrders(appOrders, "_app")
     val web = getRevenueOrders(webOrders, "_web")
     val mWeb = getRevenueOrders(mWebOrders, "_mweb")
     val others = getRevenueOrders(otherOrders, "_others")
     val salesRevenueOrdersIncr = joinDataFrames(app, web, mWeb, others)
 
+    //println("salesRevenueOrdersIncr", salesRevenueOrdersIncr.count())
     val mergedData = merge(salesRevenueOrdersIncr, salesRevenuePrevFull)
 
     val res7 = getRevenueDays(salesRevenue7, mergedData, 7, 30, 90)
@@ -351,8 +348,14 @@ object SalesItemRevenue extends DataFeedsModel {
         mWeb(SalesOrderItemVariables.REVENUE_MWEB),
         Udf.minTimestamp(mWeb(SalesOrderVariables.LAST_ORDER_DATE), appJoined(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
       )
+
+    //  println("joinedData ", joinedData.count())
     var finalJoined: DataFrame = null
-    if (null != others) {
+    if (null == others || others.count() == 0) {
+      finalJoined = joinedData.withColumn(SalesOrderItemVariables.ORDERS_COUNT_OTHERS, joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB))
+        .withColumn(SalesOrderItemVariables.REVENUE_OTHERS, joinedData(SalesOrderItemVariables.REVENUE_WEB) - joinedData(SalesOrderItemVariables.REVENUE_WEB))
+
+    } else {
       finalJoined = joinedData.join(others, joinedData(SalesOrderVariables.FK_CUSTOMER) === others(SalesOrderVariables.FK_CUSTOMER), SQL.FULL_OUTER)
         .select(coalesce(joinedData(SalesOrderVariables.FK_CUSTOMER), others(SalesOrderVariables.FK_CUSTOMER)) as SalesOrderVariables.FK_CUSTOMER,
           joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB),
@@ -365,10 +368,9 @@ object SalesItemRevenue extends DataFeedsModel {
           others(SalesOrderItemVariables.REVENUE_OTHERS),
           Udf.minTimestamp(joinedData(SalesOrderVariables.LAST_ORDER_DATE), others(SalesOrderVariables.LAST_ORDER_DATE)) as SalesOrderVariables.LAST_ORDER_DATE
         )
-    } else {
-      finalJoined = joinedData.withColumn(SalesOrderItemVariables.ORDERS_COUNT_OTHERS, joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB) - joinedData(SalesOrderItemVariables.ORDERS_COUNT_WEB))
-        .withColumn(SalesOrderItemVariables.REVENUE_OTHERS, joinedData(SalesOrderItemVariables.REVENUE_WEB) - joinedData(SalesOrderItemVariables.REVENUE_WEB))
+
     }
+    // println("finalJoined", finalJoined.count())
 
     val joinedFill = finalJoined.na.fill(Map(
       SalesOrderItemVariables.ORDERS_COUNT_APP -> 0,
