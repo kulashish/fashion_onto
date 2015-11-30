@@ -35,9 +35,6 @@ class ReplenishmentCampaign {
     // ***** NON_BEAUTY_FRAG_CAMPAIGN email use case
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN, dfReplenish, false, brickMvpRecommendations)
 
-    // ***** BEAUTY email use case
-    //   CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BEAUTY_CAMPAIGN, dfBeauty, false, brickMvpRecommendations)
-
   }
 
 }

@@ -837,8 +837,12 @@ object CampaignUtils extends Logging {
         campaignOutAfterRecFilter
     }
 
-    //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+    if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
+      CampaignOutput.saveCampaignDataForYesterday(recs, CampaignCommon.REPLENISHMENT_CAMPAIGN_NO_CMR, campaignType)
+    } else {
+      CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+    }
+
   }
 
   def minRefSkuFilter(recommendationOutPut: DataFrame): DataFrame = {
