@@ -1,6 +1,6 @@
 package com.jabong.dap.common.udf
 
-import java.sql.{ Date, Timestamp }
+import java.sql.{Date, Timestamp}
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
@@ -164,6 +164,9 @@ object Udf {
   val lengthString = udf((string: String) => UdfUtils.lengthString(string: String))
 
   val getAcartNumberOfSkus = udf((string: String) => UdfUtils.acartNumberOfSkus(string: String))
+
+  val maskForDecrypt   = udf((col: String, mask: String) => UdfUtils.addMaskString(col: String, mask: String))
+
 
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

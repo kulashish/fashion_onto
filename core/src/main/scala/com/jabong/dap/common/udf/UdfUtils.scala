@@ -859,4 +859,12 @@ object UdfUtils extends Logging {
     }
     return 0
   }
+
+  def addMaskString(col: String, mask: String): String = {
+    if(null == col || col.length == 0) {
+      col
+    }
+    mask + col + mask
+  }
+
 }
