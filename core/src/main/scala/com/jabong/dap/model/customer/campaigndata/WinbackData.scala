@@ -18,6 +18,7 @@ import scala.collection.mutable
  * Created by samathashetty on 20/11/15.
  */
 object WinbackData extends DataFeedsModel {
+  var dateStr: String = null
   override def canProcess(incrDate: String, saveMode: String): Boolean = {
     val incrSavePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate)
 
@@ -25,7 +26,10 @@ object WinbackData extends DataFeedsModel {
   }
 
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
-    val crmTicketMasterIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.DAILY_MODE, incrDate)
+    dateStr = incrDate
+
+    val crmTicketMasterIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.FULL_MERGE_MODE, incrDate)
+    println(ConfigConstants.INPUT_PATH  + "/" + DataSets.CRM + "/"  + DataSets.CRM_TicketMaster)
     val crmTicketDetailsIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.DAILY_MODE, incrDate)
     val crmTicketStatLogIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketStatusLog, DataSets.DAILY_MODE, incrDate)
 
@@ -37,7 +41,16 @@ object WinbackData extends DataFeedsModel {
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]
 
     dfMap.put("crmTicketMasterIncr", crmTicketMasterIncr)
+    crmTicketMasterIncr.printSchema()
+    println(crmTicketMasterIncr.count)
+    println(crmTicketMasterIncr.distinct.count)
+
+
     dfMap.put("crmTicketDetailsIncr", crmTicketDetailsIncr)
+    crmTicketDetailsIncr.printSchema()
+    println(crmTicketDetailsIncr.count)
+    println(crmTicketDetailsIncr.distinct.count)
+
     dfMap.put("crmTicketStatLogIncr", crmTicketStatLogIncr)
     dfMap.put("cmrFull", cmrFull)
     dfMap.put("salesOrder", days_45Order)
@@ -61,29 +74,36 @@ object WinbackData extends DataFeedsModel {
     val cmrFull = dfMap("cmrFull")
     val salesOrder = dfMap("salesOrder")
 
-    val yesterday = TimeUtils.yesterday
-    val today = TimeUtils.getTodayDate("dd-MMM-yyyy hh:mm:ss")
+    val yesterday = TimeUtils.getDateAfterNDays(-1,TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
     //TODO: use constant for the status with  meaningful name
-    val result = crmTicketDetailsIncr.join(crmTicketStatLogIncr, crmTicketDetailsIncr(CrmTicketVariables.TICKET_ID) === crmTicketStatLogIncr(CrmTicketVariables.TICKET_ID), SQL.INNER).
+    //TODO:  use  better implementation instead of join for
+    /*
+    select id from cmr where not exists
+    (select fk from salesOrder where fk = id)
+     */
+
+    val result =
+      crmTicketDetailsIncr.
+        join(crmTicketStatLogIncr, crmTicketDetailsIncr(CrmTicketVariables.TICKET_ID) === crmTicketStatLogIncr(CrmTicketVariables.TICKET_ID), SQL.INNER).
       join(crmTicketMasterIncr, crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) === crmTicketDetailsIncr(CrmTicketVariables.ISSUE_ID), SQL.INNER).
-      join(cmrFull, crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_ID) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.INNER).
-      where(crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE).geq(yesterday).
+      join(cmrFull, crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.INNER).
+      join(salesOrder, cmrFull(CustomerVariables.ID_CUSTOMER) === salesOrder(SalesOrderVariables.FK_CUSTOMER)).
+      where(
+        crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE).geq(yesterday).
         and(crmTicketStatLogIncr(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
-        and(crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE).gt(today)).
-        and(crmTicketMasterIncr(CrmTicketVariables.DG_END_DATE).gt(today)).
-        and(crmTicketStatLogIncr(CrmTicketVariables.DG_END_DATE).gt(today)).
+        and(crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
+        and
+        (crmTicketMasterIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
+        and(crmTicketStatLogIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
         and(crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO).notEqual(0)).
         and(cmrFull(CustomerVariables.ID_CUSTOMER).notEqual(0)).
-        and(!cmrFull(CustomerVariables.ID_CUSTOMER).in(
-          (salesOrder(SalesOrderVariables.FK_CUSTOMER))
-        )
-        )
+        and(salesOrder(SalesOrderVariables.ID_SALES_ORDER).isNull)
       ).select(
       cmrFull(ContactListMobileVars.UID) as ContactListMobileVars.UID,
       crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO) as CrmTicketVariables.ORDER_NO,
       crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE) as CrmTicketVariables.ADD_DATE,
-      crmTicketDetailsIncr(CrmTicketVariables.TICKET_CLOSE_DATE) as CrmTicketVariables.TICKET_CLOSE_DATE,
+      crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE) as CrmTicketVariables.TICKET_CLOSE_DATE,
       crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) as CrmTicketVariables.ISSUE_ID,
       crmTicketMasterIncr(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION
     )

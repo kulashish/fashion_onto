@@ -210,8 +210,8 @@ object DataSets {
   val WINBACK_CUSTOMER = "winbackCustomer"
 
   //CRM tables
-  val CRM_TicketDetails = "CRM_TicketDetails"
-  val CRM_TicketMaster = "CRM_TicketMaster"
+  val CRM_TicketDetails = "tblTicketDetails"
+  val CRM_TicketMaster = "tblTicketMaster"
   val CRM_TicketStatusLog = "CRM_TicketStatusLog"
 }
 
