@@ -39,6 +39,11 @@
       "campaignName": "geo_brand",
       "priority": 29,
       "mailType": 23
+    },
+    {
+      "campaignName": "hottestX",
+      "priority": 30,
+      "mailType": 11
     }
   ]
 }
