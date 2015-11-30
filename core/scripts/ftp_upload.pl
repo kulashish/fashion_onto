@@ -413,6 +413,8 @@ sub upload_acart_hourly_campaign {
     system("hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/");
     my $acart_hourly_status = $?;
 
+    $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
     $acart_hourly_status ||= $?;
 
