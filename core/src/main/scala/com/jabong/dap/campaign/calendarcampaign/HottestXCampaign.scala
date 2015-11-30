@@ -22,7 +22,7 @@ class HottestXCampaign {
     val days_45_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_45past, TimeConstants.DATE_FORMAT_FOLDER)
       .filter(nDaysSalesOrder(SalesOrderVariables.GRAND_TOTAL).<=(1000))
 
-    val day_60past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
+    val day_60past = TimeUtils.getDateAfterNDays(-60, TimeConstants.DATE_FORMAT_FOLDER)
 
     val days_60_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_60past, TimeConstants.DATE_FORMAT_FOLDER)
       .filter(nDaysSalesOrder(SalesOrderVariables.GRAND_TOTAL).>(1000))
