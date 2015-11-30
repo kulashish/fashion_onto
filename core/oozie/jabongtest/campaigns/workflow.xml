@@ -648,22 +648,6 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="joinCalendarCampaigns"/>
-        <error to="fail"/>
-    </action>
-
-    <action name="cityWiseData">
-        <shell xmlns="uri:oozie:shell-action:0.3">
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>cityWiseData</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
         <ok to="geoCampaign"/>
         <error to="fail"/>
     </action>
@@ -675,6 +659,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>geoCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="clearanceCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>clearanceCampaign</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
