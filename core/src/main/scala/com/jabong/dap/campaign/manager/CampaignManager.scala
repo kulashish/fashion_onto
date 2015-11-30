@@ -182,7 +182,8 @@ object CampaignManager extends Serializable with Logging {
     val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData).
       select(SalesOrderItemVariables.FK_SALES_ORDER,
         SalesOrderItemVariables.SKU,
-        SalesOrderItemVariables.CREATED_AT)
+        SalesOrderItemVariables.CREATED_AT,
+        SalesOrderItemVariables.PAID_PRICE)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
