@@ -239,9 +239,9 @@ object ContactListMobile extends DataFeedsModel with Logging {
     if (null != contactListMobilePrevFull) {
       val contactListMobilCsv = contactListMobileIncrCached.select(
         col(ContactListMobileVars.UID),
-        col(CustomerVariables.EMAIL) as ContactListMobileVars.EMAIL,
+        Udf.maskForDecrypt(col(CustomerVariables.EMAIL), lit("**")) as ContactListMobileVars.EMAIL,
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
-        col(CustomerVariables.PHONE) as ContactListMobileVars.MOBILE,
+        Udf.maskForDecrypt(col(CustomerVariables.PHONE), lit("##")) as ContactListMobileVars.MOBILE,
         col(ContactListMobileVars.MOBILE_PERMISION_STATUS),
         col(ContactListMobileVars.CITY) as ContactListMobileVars.CITY,
         col(ContactListMobileVars.COUNTRY),

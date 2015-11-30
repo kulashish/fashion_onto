@@ -1,0 +1,24 @@
+digraph  {
+  subgraph cluster_1 {
+          BRICK_MVP_SUBTYPE  -> recommendationType
+          CALENDAR_CAMPAIGN -> campaignType
+
+          nthDaysSalesOrder -> nthSales40
+          nthDaysSalesOrderItem ->  nthSalesItem40
+
+          nthSales40 ->  custSelection
+          nthSalesItem40 -> custSelection
+          salesAddressFull -> custSelection
+
+          citywiseData -> merge
+          custSelection -> merge
+
+          merge -> filter
+          itr -> filter
+
+          filter -> recommendations
+          recommendationType -> recommendations
+          campaignType -> recommendations
+
+      }
+}

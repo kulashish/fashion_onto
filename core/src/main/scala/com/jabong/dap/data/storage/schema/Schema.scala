@@ -8,7 +8,6 @@ import org.apache.spark.sql.types._
  * Created by raghu on 22/6/15.
  */
 object Schema {
-
   val customer = StructType(Array(
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(CustomerVariables.EMAIL, StringType, true),
@@ -768,4 +767,29 @@ object Schema {
     StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
     StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
     StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
+
+  val crmTicketDetails = StructType(Array(
+    StructField(CrmTicketVariables.TICKET_ID, StringType, true),
+    StructField(CrmTicketVariables.CUSTOMER_NO, StringType, true),
+    StructField(CrmTicketVariables.USER_ID, StringType, true),
+    StructField(CrmTicketVariables.ORDER_NO, StringType, true),
+    StructField(CrmTicketVariables.ISSUE_ID, StringType, true),
+    StructField(CrmTicketVariables.DG_END_DATE, TimestampType, true)
+  ))
+
+  val crmTicketMaster = StructType(Array(
+    StructField(CrmTicketVariables.USER_ID, StringType, true),
+    StructField(CrmTicketVariables.ISSUE_ID, StringType, true),
+    StructField(CrmTicketVariables.ISSUE_DESCRIPTION, StringType, true),
+    StructField(CrmTicketVariables.DG_END_DATE, TimestampType, true)
+  ))
+
+  val crmTktStatusLog = StructType(Array(
+    StructField(CrmTicketVariables.TICKET_ID, StringType, true),
+    StructField(CrmTicketVariables.USER_ID, StringType, true),
+    StructField(CrmTicketVariables.EXIT_TICKET_STATUS, StringType, true),
+    StructField(CrmTicketVariables.DG_END_DATE, TimestampType, true),
+    StructField(CrmTicketVariables.ADD_DATE, TimestampType, true)
+  ))
+
 }
