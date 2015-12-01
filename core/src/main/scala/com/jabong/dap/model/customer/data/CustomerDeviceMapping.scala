@@ -110,7 +110,7 @@ object CustomerDeviceMapping extends Logging {
    */
   def start(vars: ParamInfo) = {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
     val path = OptionUtils.getOptValue(vars.path)
     val saveMode = vars.saveMode
     val clickIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, incrDate)
@@ -142,6 +142,25 @@ object CustomerDeviceMapping extends Logging {
           }
           nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
+        } else if ("dcfUID".equals(path)) {
+          val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+          val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
+            prevDate, "CONTACTS_LIST_" + fileDate, "true", "|")
+            .select(
+              col(ContactListMobileVars.UID) as CustomerVariables.UID,
+              col(ContactListMobileVars.EMAIL) as CustomerVariables.EMAIL
+            ).na.drop(ContactListMobileVars.EMAIL).dropDuplicates()
+          println("Total recs in DCF file initially: " + cmrFullDCF.count())
+          val cmrPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+          val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull("EMAIL") === cmrFullDCF("EMAIL"))
+          cmrFull = cmrJoined.select(
+            cmrFullDCF(ContactListMobileVars.UID),
+            cmrPrevFull(CustomerVariables.EMAIL),
+            cmrPrevFull(CustomerVariables.RESPONSYS_ID),
+            cmrPrevFull(CustomerVariables.ID_CUSTOMER),
+            cmrPrevFull(PageVisitVariables.BROWSER_ID),
+            cmrPrevFull(PageVisitVariables.DOMAIN)
+          )
         } else {
           cmrFull = getDataFrameCsv4mDCF(path)
         }
