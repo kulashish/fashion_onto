@@ -53,6 +53,6 @@ class CustomerAppDetailsTest extends FlatSpec with SharedSparkContext {
     val resMaster = resultMap("custAppDetailsFull")
     val resIncr = resultMap("custAppDetailsIncr")
     assert(resMaster.count() == 10 && resIncr.count() == 4)
-    assert(resMaster.count() == resMaster.select("uid","domain").distinct.count())
+    assert(resMaster.count() == resMaster.select("uid", "domain").distinct.count())
   }
 }

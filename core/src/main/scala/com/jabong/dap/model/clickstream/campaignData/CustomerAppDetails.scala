@@ -60,7 +60,6 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     dfMap
   }
 
-
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     logger.info("process called")
     val custAppDetailsPrevFull = dfMap.getOrElse("custAppDetailsPrevFull", null)
@@ -71,21 +70,21 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     //ID_CUSTOMER FIRST_LOGIN_TIME LAST_LOGIN_TIME SESSION_KEY
     //ID_CUSTOMER: DOMAIN, CREATED_AT, ORDER_COUNT
     val trimmedSO = salesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CUSTOMER_SESSION_ID, CREATED_AT, CustomerVariables.DOMAIN)
-                    .filter(col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(DOMAIN).isNotNull)
+      .filter(col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(DOMAIN).isNotNull)
     val custDomain = trimmedSO.select(SalesOrderVariables.FK_CUSTOMER, DOMAIN).filter("domain in ('ios', 'android', 'windows')").distinct
 
-    val custOrderCountCreatedAt = trimmedSO.select(SalesOrderVariables.FK_CUSTOMER,CREATED_AT).groupBy(SalesOrderVariables.FK_CUSTOMER).agg(count(CREATED_AT).cast(IntegerType) as ORDER_COUNT, max(CREATED_AT) as CREATED_AT)
-                                  .withColumnRenamed(SalesOrderVariables.FK_CUSTOMER, TEMP_ + SalesOrderVariables.FK_CUSTOMER)
+    val custOrderCountCreatedAt = trimmedSO.select(SalesOrderVariables.FK_CUSTOMER, CREATED_AT).groupBy(SalesOrderVariables.FK_CUSTOMER).agg(count(CREATED_AT).cast(IntegerType) as ORDER_COUNT, max(CREATED_AT) as CREATED_AT)
+      .withColumnRenamed(SalesOrderVariables.FK_CUSTOMER, TEMP_ + SalesOrderVariables.FK_CUSTOMER)
     val exceptSession = custDomain.join(custOrderCountCreatedAt, custOrderCountCreatedAt(TEMP_ + SalesOrderVariables.FK_CUSTOMER) === custDomain(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
-                                  .drop(TEMP_ + CREATED_AT).drop(TEMP_ + SalesOrderVariables.FK_CUSTOMER)
-                                  .withColumnRenamed(SalesOrderVariables.FK_CUSTOMER, TEMP_ + SalesOrderVariables.FK_CUSTOMER)
-                                  .withColumnRenamed(CREATED_AT, TEMP_ + CREATED_AT)
+      .drop(TEMP_ + CREATED_AT).drop(TEMP_ + SalesOrderVariables.FK_CUSTOMER)
+      .withColumnRenamed(SalesOrderVariables.FK_CUSTOMER, TEMP_ + SalesOrderVariables.FK_CUSTOMER)
+      .withColumnRenamed(CREATED_AT, TEMP_ + CREATED_AT)
     val soWithoutDomain = trimmedSO.drop(DOMAIN)
     val exceptLoginTime = exceptSession.join(soWithoutDomain, col(TEMP_ + SalesOrderVariables.FK_CUSTOMER) === col(SalesOrderVariables.FK_CUSTOMER) && col(CREATED_AT) === col(TEMP_ + CREATED_AT), SQL.LEFT_OUTER)
-                                    .filter(col(CREATED_AT).isNotNull && col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(CUSTOMER_SESSION_ID).isNotNull)
-                                    .drop(TEMP_ +SalesOrderVariables.FK_CUSTOMER)
-                                    .drop(TEMP_ + CREATED_AT)
-                                    .withColumnRenamed(CUSTOMER_SESSION_ID, SESSION_KEY)
+      .filter(col(CREATED_AT).isNotNull && col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(CUSTOMER_SESSION_ID).isNotNull)
+      .drop(TEMP_ + SalesOrderVariables.FK_CUSTOMER)
+      .drop(TEMP_ + CREATED_AT)
+      .withColumnRenamed(CUSTOMER_SESSION_ID, SESSION_KEY)
     //Done: FK_CUSTOMER ORDER_COUNT CREATED_AT DOMAIN SESSION
     //NOW: LOGIN INFO from CUST_SESSION
 
@@ -95,29 +94,29 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
       .agg(min(LOGIN_TIME) as FIRST_LOGIN_TIME, max(LOGIN_TIME) as LAST_LOGIN_TIME)
       .withColumnRenamed(SESSION_KEY, TEMP_ + SESSION_KEY)
     val withLoginTime = exceptLoginTime.join(trimmedCustomerSession, trimmedCustomerSession(TEMP_ + SESSION_KEY) === exceptLoginTime(SESSION_KEY), SQL.LEFT_OUTER)
-                        .drop(TEMP_ + SESSION_KEY)
+      .drop(TEMP_ + SESSION_KEY)
     val trimmedCMR = cmrFull.select("UID", CustomerVariables.ID_CUSTOMER).withColumnRenamed("UID", UID).filter(col(UID).isNotNull && col(CustomerVariables.ID_CUSTOMER).isNotNull)
     val incr = withLoginTime.join(trimmedCMR, withLoginTime(SalesOrderVariables.FK_CUSTOMER) === trimmedCMR(CustomerVariables.ID_CUSTOMER), SQL.INNER)
-                      .filter(col(UID).isNotNull && col(DOMAIN).isNotNull)
-                      .drop(SalesOrderVariables.FK_CUSTOMER)
-                      .drop(CustomerVariables.ID_CUSTOMER)
+      .filter(col(UID).isNotNull && col(DOMAIN).isNotNull)
+      .drop(SalesOrderVariables.FK_CUSTOMER)
+      .drop(CustomerVariables.ID_CUSTOMER)
     val master = SchemaUtils.renameCols(custAppDetailsPrevFull, TEMP_)
     logger.info("Updating master")
-    val updatedMaster = master.join(incr,master(TEMP_ + UID) === incr(UID) && master(TEMP_ + DOMAIN) === incr(DOMAIN), SQL.FULL_OUTER)
-                        .select(
-                            coalesce(master(TEMP_ + UID), incr(UID)) as UID,
-                            coalesce(master(TEMP_ + DOMAIN), incr(DOMAIN)) as DOMAIN,
-                            coalesce(incr(CREATED_AT), master(TEMP_ + CREATED_AT)) as CREATED_AT,
-                            coalesce(master(TEMP_ + FIRST_LOGIN_TIME), incr(FIRST_LOGIN_TIME)) as FIRST_LOGIN_TIME,
-                            coalesce(master(TEMP_ + LAST_LOGIN_TIME), incr(LAST_LOGIN_TIME)) as LAST_LOGIN_TIME,
-                            coalesce(incr(SESSION_KEY), master(TEMP_ + SESSION_KEY)) as SESSION_KEY,
-                            when(incr(ORDER_COUNT).isNotNull && master(TEMP_ + ORDER_COUNT).isNotNull, (incr(ORDER_COUNT) + master(TEMP_ + ORDER_COUNT)).cast(IntegerType))
-                            .otherwise(when(incr(ORDER_COUNT).isNotNull, incr(ORDER_COUNT).cast(IntegerType)).otherwise(master(TEMP_ + ORDER_COUNT).cast(IntegerType))) as ORDER_COUNT)
-                        .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
+    val updatedMaster = master.join(incr, master(TEMP_ + UID) === incr(UID) && master(TEMP_ + DOMAIN) === incr(DOMAIN), SQL.FULL_OUTER)
+      .select(
+        coalesce(master(TEMP_ + UID), incr(UID)) as UID,
+        coalesce(master(TEMP_ + DOMAIN), incr(DOMAIN)) as DOMAIN,
+        coalesce(incr(CREATED_AT), master(TEMP_ + CREATED_AT)) as CREATED_AT,
+        coalesce(master(TEMP_ + FIRST_LOGIN_TIME), incr(FIRST_LOGIN_TIME)) as FIRST_LOGIN_TIME,
+        coalesce(master(TEMP_ + LAST_LOGIN_TIME), incr(LAST_LOGIN_TIME)) as LAST_LOGIN_TIME,
+        coalesce(incr(SESSION_KEY), master(TEMP_ + SESSION_KEY)) as SESSION_KEY,
+        when(incr(ORDER_COUNT).isNotNull && master(TEMP_ + ORDER_COUNT).isNotNull, (incr(ORDER_COUNT) + master(TEMP_ + ORDER_COUNT)).cast(IntegerType))
+          .otherwise(when(incr(ORDER_COUNT).isNotNull, incr(ORDER_COUNT).cast(IntegerType)).otherwise(master(TEMP_ + ORDER_COUNT).cast(IntegerType))) as ORDER_COUNT)
+      .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
 
     val incrDistinctUID = incr.select(UID, DOMAIN).distinct.withColumnRenamed(UID, TEMP_ + UID).withColumnRenamed(DOMAIN, TEMP_ + DOMAIN)
     val incrForExport = incrDistinctUID.join(updatedMaster, incrDistinctUID(TEMP_ + UID) === updatedMaster(UID) && incrDistinctUID(TEMP_ + DOMAIN) === updatedMaster(DOMAIN), SQL.INNER)
-                        .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
+      .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
     val dfWriteMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
     dfWriteMap.put("custAppDetailsFull", updatedMaster)
     dfWriteMap.put("custAppDetailsIncr", incrForExport)
@@ -141,7 +140,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
   }
 
   def getFullOnFirstDay(date: String, cmr: DataFrame, salesOrderFull: DataFrame): DataFrame = {
-    def calculateOtherFields(salesOrderFull: DataFrame) : DataFrame = {
+    def calculateOtherFields(salesOrderFull: DataFrame): DataFrame = {
       logger.info("calculateOtherFields called")
       val custDomainSORenamed = salesOrderFull.select(SalesOrderVariables.FK_CUSTOMER, DOMAIN).distinct
         .withColumnRenamed(SalesOrderVariables.FK_CUSTOMER, TEMP_ + SalesOrderVariables.FK_CUSTOMER)
@@ -163,8 +162,8 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
     val custLastLogin = correctSchemaDF.groupBy(CustomerVariables.ID_CUSTOMER).agg(min(FIRST_LOGIN_TIME) as FIRST_LOGIN_TIME, max(LAST_LOGIN_TIME) as LAST_LOGIN_TIME)
     val custLastLogRenamed = SchemaUtils.renameCols(custLastLogin, TEMP_)
-    val custSessionLastLog = correctSchemaDF.select(CustomerVariables.ID_CUSTOMER, SESSION_KEY,LAST_LOGIN_TIME).groupBy(CustomerVariables.ID_CUSTOMER, LAST_LOGIN_TIME).agg(first(SESSION_KEY) as SESSION_KEY)
-    val custSessionLoginRenamed = custLastLogRenamed.join(custSessionLastLog, custLastLogRenamed(TEMP_ + CustomerVariables.ID_CUSTOMER) === custSessionLastLog(CustomerVariables.ID_CUSTOMER) && custLastLogRenamed(TEMP_ + LAST_LOGIN_TIME)===custSessionLastLog(LAST_LOGIN_TIME), SQL.LEFT_OUTER)
+    val custSessionLastLog = correctSchemaDF.select(CustomerVariables.ID_CUSTOMER, SESSION_KEY, LAST_LOGIN_TIME).groupBy(CustomerVariables.ID_CUSTOMER, LAST_LOGIN_TIME).agg(first(SESSION_KEY) as SESSION_KEY)
+    val custSessionLoginRenamed = custLastLogRenamed.join(custSessionLastLog, custLastLogRenamed(TEMP_ + CustomerVariables.ID_CUSTOMER) === custSessionLastLog(CustomerVariables.ID_CUSTOMER) && custLastLogRenamed(TEMP_ + LAST_LOGIN_TIME) === custSessionLastLog(LAST_LOGIN_TIME), SQL.LEFT_OUTER)
       .drop(custLastLogRenamed(TEMP_ + CustomerVariables.ID_CUSTOMER))
       .drop(custLastLogRenamed(TEMP_ + LAST_LOGIN_TIME))
       .withColumnRenamed(CustomerVariables.ID_CUSTOMER, TEMP_ + CustomerVariables.ID_CUSTOMER)
@@ -180,12 +179,12 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
       .filter(col(DOMAIN).isNotNull)
       .filter("domain in ('ios', 'android', 'windows')")
     val trimmedCMRRenamed = cmr.select("UID", CustomerVariables.ID_CUSTOMER)
-                            .filter(col("UID").isNotNull).filter(col(CustomerVariables.ID_CUSTOMER).isNotNull)
-                            .withColumnRenamed("UID", UID).withColumnRenamed(CustomerVariables.ID_CUSTOMER, "temp_" + CustomerVariables.ID_CUSTOMER).distinct
+      .filter(col("UID").isNotNull).filter(col(CustomerVariables.ID_CUSTOMER).isNotNull)
+      .withColumnRenamed("UID", UID).withColumnRenamed(CustomerVariables.ID_CUSTOMER, "temp_" + CustomerVariables.ID_CUSTOMER).distinct
     val fullWithUID = oneTimeFull.join(trimmedCMRRenamed, oneTimeFull(CustomerVariables.FK_CUSTOMER) === trimmedCMRRenamed(TEMP_ + CustomerVariables.ID_CUSTOMER), SQL.INNER)
-                      .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
-                      .filter(col(UID).isNotNull)
-                      .filter(col(DOMAIN).isNotNull)
+      .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
+      .filter(col(UID).isNotNull)
+      .filter(col(DOMAIN).isNotNull)
     fullWithUID.printSchema()
     fullWithUID
   }
