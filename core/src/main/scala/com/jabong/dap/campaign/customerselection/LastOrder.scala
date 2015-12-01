@@ -35,6 +35,8 @@ class LastOrder extends LiveCustomerSelector with Logging {
 
     CampaignUtils.debug(groupedSalesOrder, "last order groupedSalesOrder")
 
+    CampaignUtils.debug(salesOrderItem, "salesOrderItem")
+
     val joinedDf = groupedSalesOrder.join(
       salesOrderItem,
       groupedSalesOrder(SalesOrderVariables.ID_SALES_ORDER) === salesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER),
