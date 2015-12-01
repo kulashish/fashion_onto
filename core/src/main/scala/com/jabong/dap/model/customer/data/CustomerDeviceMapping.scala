@@ -150,13 +150,13 @@ object CustomerDeviceMapping extends Logging {
             .select(
               col(ContactListMobileVars.UID),
               col(ContactListMobileVars.EMAIL)
-            ).na.drop("any", Array(ContactListMobileVars.EMAIL)).dropDuplicates()
+            ).na.drop("any", Array(ContactListMobileVars.EMAIL, ContactListMobileVars.UID)).dropDuplicates()
           println("Total recs in DCF file initially: " + cmrFullDCF.count())
           val cmrPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
-          val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull(CustomerVariables.EMAIL) === cmrFullDCF(ContactListMobileVars.EMAIL), SQL.LEFT_OUTER)
+          val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull(CustomerVariables.EMAIL) === cmrFullDCF(ContactListMobileVars.EMAIL), SQL.FULL_OUTER)
           cmrFull = cmrJoined.select(
             cmrFullDCF(ContactListMobileVars.UID),
-            cmrPrevFull(CustomerVariables.EMAIL),
+            coalesce(cmrPrevFull(CustomerVariables.EMAIL), cmrFullDCF(ContactListMobileVars.EMAIL)) as CustomerVariables.EMAIL,
             cmrPrevFull(CustomerVariables.RESPONSYS_ID),
             cmrPrevFull(CustomerVariables.ID_CUSTOMER),
             cmrPrevFull(PageVisitVariables.BROWSER_ID),
@@ -175,7 +175,11 @@ object CustomerDeviceMapping extends Logging {
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
+      res.printSchema()
+
       val filledUid = UUIDGenerator.addUid(res)
+
+      filledUid.printSchema()
 
       DataWriter.writeParquet(filledUid, savePath, saveMode)
       // DataWriter.writeParquet(res, savePath, saveMode)
