@@ -23,6 +23,8 @@ class ReplenishmentCampaign {
     //    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
     //    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
 
+    CampaignUtils.debug(lastYearSalesOrderItemData, "lastYearSalesOrderItemData")
+
     val dfCustomerSelection = customerSelector.customerSelection(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData)
 
     //filter sku based on daily filter

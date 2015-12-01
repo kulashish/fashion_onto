@@ -186,6 +186,10 @@ object CampaignManager extends Serializable with Logging {
         SalesOrderItemVariables.CREATED_AT,
         SalesOrderItemVariables.PAID_PRICE)
 
+    CampaignUtils.debug(fullSalesOrderItemData, "fullSalesOrderItemData")
+
+    CampaignUtils.debug(lastYearSalesOrderItemData, "lastYearSalesOrderItemData")
+
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate).cache()
