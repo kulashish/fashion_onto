@@ -2,7 +2,7 @@ package com.jabong.dap.model.dataFeeds
 
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.data.acq.common.{ ParamJobConfig, ParamInfo }
 import org.apache.spark.sql.DataFrame
 
 import scala.collection.mutable.HashMap
@@ -17,8 +17,7 @@ abstract class DataFeedsModel {
     val saveMode = params.saveMode
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
-
-    val isHistory = false
+    val isHistory = OptionUtils.getOptBoolVal(ParamJobConfig.paramJobInfo.isHistory)
 
     if (isHistory == true) {
       val days = TimeUtils.daysFromToday(incrDate, TimeConstants.DATE_FORMAT_FOLDER)
