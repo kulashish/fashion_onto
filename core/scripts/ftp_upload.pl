@@ -253,8 +253,8 @@ sub upload_email_campaigns_decryptFeedFiles {
     my $status = $?;
 
     # 20150928_CONTACTS_LIST.csv
-    $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
-    $folderName = "contactListMobile";
+    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    my $folderName = "contactListMobile";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_Contact_list_Plus.csv
@@ -262,8 +262,8 @@ sub upload_email_campaigns_decryptFeedFiles {
     $folderName = "Contact_list_Plus";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    print("rename file $base/$fileName to dap_$fileName");
-    $status ||= system("mv $base/$fileName $base/dap_$fileName");
+    print("rename file $base/$filename to dap_$filename");
+    $status ||= system("mv $base/$filename $base/dap_$filename");
 
     system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $base/*.csv; bye\"");
     $status ||= $?;
