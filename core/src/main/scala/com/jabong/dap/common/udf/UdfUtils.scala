@@ -2,12 +2,12 @@ package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{ArrayUtils, StringUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
@@ -16,7 +16,7 @@ import org.apache.spark.sql.Row
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 /**
  * Created by raghu on 3/7/15.
