@@ -153,7 +153,7 @@ object CustomerDeviceMapping extends Logging {
             ).na.drop("any", Array(ContactListMobileVars.EMAIL)).dropDuplicates()
           println("Total recs in DCF file initially: " + cmrFullDCF.count())
           val cmrPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
-          val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull(CustomerVariables.EMAIL) === cmrFullDCF(ContactListMobileVars.EMAIL))
+          val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull(CustomerVariables.EMAIL) === cmrFullDCF(ContactListMobileVars.EMAIL), SQL.LEFT_OUTER)
           cmrFull = cmrJoined.select(
             cmrFullDCF(ContactListMobileVars.UID),
             cmrPrevFull(CustomerVariables.EMAIL),
