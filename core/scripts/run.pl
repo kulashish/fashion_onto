@@ -367,7 +367,10 @@ if ($component eq "bobAcqFull1") {
     my $AMMUNITION = "--num-executors 5 --executor-memory 400M";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acartHourlyFeed --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
-  } else {
+} elsif ($component eq "winbackCustomer") {
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component winbackCustomer --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/winbackCustomer.json";
+     $job_exit = run_component($component, $command);
+}else {
     print "not a valid component\n";
     $job_exit = -1;
 }
