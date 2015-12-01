@@ -97,6 +97,7 @@ object CustomerDeviceMapping extends Logging {
           PageVisitVariables.BROWSER_ID -> ""
         )
       ).dropDuplicates()
+
     val resWithout0 = result.filter(col(CustomerVariables.ID_CUSTOMER) > 0)
     println("Total count with id_customer > 0: " + resWithout0.count())
     println("Distinct id_customer count for device Mapping: " + resWithout0.select(CustomerVariables.ID_CUSTOMER).distinct.count())
@@ -172,10 +173,10 @@ object CustomerDeviceMapping extends Logging {
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
-      //val filledUid = UUIDGenerator.addUid(res)
+      val filledUid = UUIDGenerator.addUid(res)
 
-      //DataWriter.writeParquet(filledUid, savePath, saveMode)
-      DataWriter.writeParquet(res, savePath, saveMode)
+      DataWriter.writeParquet(filledUid, savePath, saveMode)
+      // DataWriter.writeParquet(res, savePath, saveMode)
     }
   }
 
