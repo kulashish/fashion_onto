@@ -28,10 +28,10 @@ object WinbackData extends DataFeedsModel {
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     dateStr = incrDate
 
-    val crmTicketMasterIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.FULL_MERGE_MODE, incrDate)
+    val crmTicketMasterIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.DAILY_MODE, incrDate)
     println(ConfigConstants.INPUT_PATH + "/" + DataSets.CRM + "/" + DataSets.CRM_TicketMaster)
-    val crmTicketDetailsIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.DAILY_MODE, incrDate)
-    val crmTicketStatLogIncr = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketStatusLog, DataSets.DAILY_MODE, incrDate)
+    val crmTicketDetailsIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.DAILY_MODE, incrDate)
+    val crmTicketStatLogIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketStatusLog, DataSets.DAILY_MODE, incrDate)
 
     val fullSalesOrder = CampaignInput.loadFullOrderData(incrDate)
     val days_45Order = CampaignInput.loadLastNdaysOrderData(45, fullSalesOrder, prevDate)

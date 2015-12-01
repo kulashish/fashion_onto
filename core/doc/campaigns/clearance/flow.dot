@@ -1,0 +1,24 @@
+digraph  {
+  subgraph cluster_1 {
+          DISCOUNT_MVP_SUBTYPE  -> recommendationType
+          CALENDAR_CAMPAIGN -> campaignType
+
+          nDaysSalesOrder -> salesOrder30
+          nDaysSalesOrderItem ->  salesOrderItem30
+
+          salesOrder30 -> nthSales10
+          salesOrder30 -> nthSales30
+
+          nthSales10 ->  custSelection
+          nthSales30 -> custSelection
+          salesOrderItem30 -> custSelection
+
+          custSelection -> lastOrderFilter
+          itr -> lastOrderFilter
+
+          lastOrderFilter -> recommendations
+          recommendationType -> recommendations
+          campaignType -> recommendations
+
+      }
+}

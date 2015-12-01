@@ -10,6 +10,24 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
 
 object DataReader extends Logging {
+  def getDataFrame4mOrc(basePath: String, source: String, tableName: String, mode: String, date: String): DataFrame = {
+    require(source != null, "Source Type is null")
+    require(tableName != null, "Table Name is null")
+    require(mode != null, "Mode is null")
+    require(date != null, "Date is null")
+
+    try {
+      fetchDataFrame(basePath, source, tableName, mode, date)
+    } catch {
+      case e: DataNotFound =>
+        logger.error("Data not found for the date")
+        throw new DataNotFound
+      case e: ValidFormatNotFound =>
+        logger.error("Format could not be resolved for the given files in directory")
+        throw new ValidFormatNotFound
+    }
+  }
+
 
   /**
    * Method to read raw HDFS data for a source, table and a given date and get a dataFrame for the same.
@@ -109,6 +127,8 @@ object DataReader extends Logging {
     val context = Spark.getContext(saveFormat)
     if (saveFormat.equals(DataSets.CSV)) {
       context.read.format("com.databricks.spark.csv").load(fetchPath)
+    }else if (saveFormat.equals(DataSets.ORC)) {
+      context.read.format("orc").load(fetchPath)
     } else {
       logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)
       if (DataVerifier.dataExists(fetchPath))
