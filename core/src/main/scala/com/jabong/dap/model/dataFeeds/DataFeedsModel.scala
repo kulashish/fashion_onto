@@ -18,7 +18,8 @@ abstract class DataFeedsModel {
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
 
-    val isHistory = true
+    val isHistory = false
+
     if (isHistory == true) {
       val days = TimeUtils.daysFromToday(incrDate, TimeConstants.DATE_FORMAT_FOLDER)
       for (day <- days to 1 by -1) {
