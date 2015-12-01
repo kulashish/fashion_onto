@@ -23,14 +23,6 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore"
-    },
-    {
-      "source": "crm",
-      "tableName": "CRM_TicketMaster",
-      "primaryKey": null,
-      "mode": "full",
-      "saveFormat": "orc",
-      "saveMode": "Ignore"
     }
   ]
 }
