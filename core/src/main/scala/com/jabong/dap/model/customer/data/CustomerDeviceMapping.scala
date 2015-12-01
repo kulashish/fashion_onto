@@ -162,6 +162,8 @@ object CustomerDeviceMapping extends Logging {
             cmrPrevFull(PageVisitVariables.BROWSER_ID),
             cmrPrevFull(PageVisitVariables.DOMAIN)
           )
+          nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
+          customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
         } else {
           cmrFull = getDataFrameCsv4mDCF(path)
         }
