@@ -1,52 +1,84 @@
 {
   "pushCampaignList": [
     {
-      "campaignName": "cat_avg"
+      "campaignName": "cat_avg",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "cat_count"
+      "campaignName": "cat_count",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "city_wise_data"
+      "campaignName": "city_wise_data",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "contactListMobile"
+      "campaignName": "contactListMobile",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "custEmailResponse"
+      "campaignName": "custEmailResponse",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "custPreference"
+      "campaignName": "custPreference",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "custTop5"
+      "campaignName": "custTop5",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "custWelcomeVoucher"
+      "campaignName": "custWelcomeVoucher",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "customerAppDetails"
+      "campaignName": "customerAppDetails",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "customerOrders"
+      "campaignName": "customerOrders",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "customerPreferredTimeslotPart1"
+      "campaignName": "customerPreferredTimeslotPart1",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "customerPreferredTimeslotPart2"
+      "campaignName": "customerPreferredTimeslotPart2",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "customerSurfAffinity"
+      "campaignName": "customerSurfAffinity",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "paybackData"
+      "campaignName": "paybackData",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "salesItemRevenue"
+      "campaignName": "salesItemRevenue",
+      "priority": 0,
+      "mailType": 0
     },
     {
-      "campaignName": "sales_order_address"
+      "campaignName": "sales_order_address",
+      "priority": 0,
+      "mailType": 0
     }
   ]
 }
