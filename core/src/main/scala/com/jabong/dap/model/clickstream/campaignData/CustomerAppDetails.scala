@@ -80,7 +80,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
                                   .drop(TEMP_ + CREATED_AT).drop(TEMP_ + SalesOrderVariables.FK_CUSTOMER)
                                   .withColumnRenamed(SalesOrderVariables.FK_CUSTOMER, TEMP_ + SalesOrderVariables.FK_CUSTOMER)
                                   .withColumnRenamed(CREATED_AT, TEMP_ + CREATED_AT)
-    val soWithoutDomain = trimmedSO.drop(DOMAIN)
+    val soWithoutDomain = trimmedSO.drop(DOMAIN).groupBy(SalesOrderVariables.FK_CUSTOMER, CREATED_AT).agg(first(CUSTOMER_SESSION_ID) as CUSTOMER_SESSION_ID)
     val exceptLoginTime = exceptSession.join(soWithoutDomain, col(TEMP_ + SalesOrderVariables.FK_CUSTOMER) === col(SalesOrderVariables.FK_CUSTOMER) && col(CREATED_AT) === col(TEMP_ + CREATED_AT), SQL.LEFT_OUTER)
                                     .filter(col(CREATED_AT).isNotNull && col(SalesOrderVariables.FK_CUSTOMER).isNotNull && col(CUSTOMER_SESSION_ID).isNotNull)
                                     .drop(TEMP_ +SalesOrderVariables.FK_CUSTOMER)
