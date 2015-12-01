@@ -5,6 +5,7 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -185,12 +186,39 @@ object CampaignManager extends Serializable with Logging {
         SalesOrderItemVariables.CREATED_AT,
         SalesOrderItemVariables.PAID_PRICE)
 
+    CampaignUtils.debug(fullSalesOrderItemData, "fullSalesOrderItemData")
+
+    CampaignUtils.debug(lastYearSalesOrderItemData, "lastYearSalesOrderItemData")
+
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE, incrDate).cache()
 
     val replenishmentCampaign = new ReplenishmentCampaign()
     replenishmentCampaign.runCampaign(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData, brickMvpRecommendations, yesterdayItrData, incrDate)
+
+  }
+
+  def replenishmentFeed(params: ParamInfo): Unit = {
+
+    val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+
+    //    val cmr = CampaignInput.loadCustomerMasterData()
+    //      .select(
+    //        CustomerVariables.EMAIL,
+    //        ContactListMobileVars.UID
+    //      )
+
+    val dfReplenishment = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN_NO_CMR, DataSets.DAILY_MODE, incrDate)
+    //    val dfReplenishmentJoinToCmr = dfReplenishment.join(cmr, dfReplenishment(CustomerVariables.EMAIL) === cmr(CustomerVariables.EMAIL), SQL.INNER)
+    //      .select(
+    //        dfReplenishment("*"),
+    //        cmr(ContactListMobileVars.UID)
+    //      )
+
+    val dfReplenishmentJoinToCmr = CampaignUtils.getSelectedReplenishAttributes(dfReplenishment)
+
+    CampaignOutput.saveCampaignDataForYesterday(dfReplenishmentJoinToCmr, CampaignCommon.REPLENISHMENT_CAMPAIGN, DataSets.CALENDAR_CAMPAIGNS)
 
   }
 

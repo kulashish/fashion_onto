@@ -23,6 +23,8 @@ class ReplenishmentCampaign {
     //    CampaignUtils.debug(brickMvpRecommendations, "brickMvpRecommendations")
     //    CampaignUtils.debug(yesterdayItrData, "yesterdayItrData")
 
+    CampaignUtils.debug(lastYearSalesOrderItemData, "lastYearSalesOrderItemData")
+
     val dfCustomerSelection = customerSelector.customerSelection(lastYearCustomerOrderFull, lastYearSalesOrderData, lastYearSalesOrderItemData)
 
     //filter sku based on daily filter
@@ -34,9 +36,6 @@ class ReplenishmentCampaign {
     val dfReplenish = dfBeauty.unionAll(dfNonBeautyFrag)
     // ***** NON_BEAUTY_FRAG_CAMPAIGN email use case
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN, dfReplenish, false, brickMvpRecommendations)
-
-    // ***** BEAUTY email use case
-    //   CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BEAUTY_CAMPAIGN, dfBeauty, false, brickMvpRecommendations)
 
   }
 
