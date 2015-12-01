@@ -1,0 +1,52 @@
+{
+  "pushCampaignList": [
+    {
+      "campaignName": "cat_avg"
+    },
+    {
+      "campaignName": "cat_count"
+    },
+    {
+      "campaignName": "city_wise_data"
+    },
+    {
+      "campaignName": "contactListMobile"
+    },
+    {
+      "campaignName": "custEmailResponse"
+    },
+    {
+      "campaignName": "custPreference"
+    },
+    {
+      "campaignName": "custTop5"
+    },
+    {
+      "campaignName": "custWelcomeVoucher"
+    },
+    {
+      "campaignName": "customerAppDetails"
+    },
+    {
+      "campaignName": "customerOrders"
+    },
+    {
+      "campaignName": "customerPreferredTimeslotPart1"
+    },
+    {
+      "campaignName": "customerPreferredTimeslotPart2"
+    },
+    {
+      "campaignName": "customerSurfAffinity"
+    },
+    {
+      "campaignName": "paybackData"
+    },
+    {
+      "campaignName": "salesItemRevenue"
+    },
+    {
+      "campaignName": "sales_order_address"
+    }
+  ]
+}

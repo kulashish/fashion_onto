@@ -89,6 +89,8 @@ object CampaignQuality extends Logging {
 
         if (campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
           writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.CALENDAR_CAMPAIGN_QUALITY)
+        } else if (campaignType.equals(DataSets.VARIABLES)) {
+          writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.VARIABLES_QUALITY)
         } else {
           writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
         }
@@ -148,8 +150,10 @@ object CampaignQuality extends Logging {
             //this filter for Calendar Campaign Quality
             if (dataFrame.schema.fieldNames.contains(CampaignMergedFields.CALENDAR_MAIL_TYPE)) {
               dataFrame.filter(col(CampaignMergedFields.CALENDAR_MAIL_TYPE) === campaignDetails.mailType)
-            } else { //this filter for Email/Push Campaign Quality
+            } else if (dataFrame.schema.fieldNames.contains(CampaignMergedFields.LIVE_MAIL_TYPE)) { //this filter for Email/Push Campaign Quality
               dataFrame.filter(col(CampaignMergedFields.LIVE_MAIL_TYPE) === campaignDetails.mailType)
+            } else {
+              dataFrame
             }
           }
 

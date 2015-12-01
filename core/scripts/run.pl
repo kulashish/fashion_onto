@@ -265,6 +265,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "calendarCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component calendarCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/calendarCampaigns.json";
     $job_exit =run_component($component, $command);
+} elsif ($component eq "variablesQuality") {
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component variablesQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/variablesQuality.json";
+    $job_exit =run_component($component, $command);
 } elsif ($component eq "campaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
     $job_exit = run_component($component, $command);

@@ -141,6 +141,8 @@ object Init {
       //calendar campaign quality check
       case "calendarCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.CALENDAR_CAMPAIGNS)
 
+      case "variablesQuality" => CampaignQuality.start(params.campaignsJson, DataSets.VARIABLES)
+
       case _ => new ComponentExecutor().start(params.paramJson)
     }
   }
