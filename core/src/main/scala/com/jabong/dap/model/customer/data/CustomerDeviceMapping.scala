@@ -146,7 +146,7 @@ object CustomerDeviceMapping extends Logging {
         } else if ("dcfUID".equals(path)) {
           val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
           val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
-            prevDate, "CONTACTS_LIST_" + fileDate, "true", "|")
+            prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
             .select(
               col(ContactListMobileVars.UID) as CustomerVariables.UID,
               col(ContactListMobileVars.EMAIL) as CustomerVariables.EMAIL
