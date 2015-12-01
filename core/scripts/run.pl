@@ -368,9 +368,12 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acartHourlyFeed --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "winbackCustomer") {
-     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component winbackCustomer --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/winbackCustomer.json";
-     $job_exit = run_component($component, $command);
-}else {
+    $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
+    $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
+    $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component winbackCustomer --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/winbackCustomer.json";
+    $job_exit = run_component($component, $command);
+} else {
     print "not a valid component\n";
     $job_exit = -1;
 }
