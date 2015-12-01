@@ -1,0 +1,67 @@
+{
+  "acquisition": [
+    {
+      "source": "crm",
+      "tableName": "CRM_tblProductAttributeMaster",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "[Last Modification Date Time]"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_TicketDetails",
+      "primaryKey": "TicketID",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "UPDT"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_OrderDetails",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "LastUpdatedAt"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_ProductDetails",
+      "primaryKey": "ProductId",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "UpdateDate"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_TicketProducts",
+      "primaryKey": "TicketProductsID",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "UpdateDate"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_TicketStatusLog",
+      "primaryKey": "TicketStatusLogID",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "AddDate"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_TicketMaster",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "AddDate"
+    }
+  ]
+}
