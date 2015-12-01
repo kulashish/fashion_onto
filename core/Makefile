@@ -22,4 +22,5 @@ package:
 	cp scripts/responsys.pl $(BASE)/bin/
 	cp -r oozie/* $(BASE)/workflows/
 	cp scripts/clickstream/* $(BASE)/bin/clickstream/
+	cp scripts/ftp_decrypt.pl $(BASE)/bin/
 	tar -zcvf $(PKGNAME) $(BASE)
