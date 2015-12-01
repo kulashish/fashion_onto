@@ -829,8 +829,8 @@ object CampaignUtils extends Logging {
       case CampaignCommon.REPLENISHMENT_CAMPAIGN =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations, 8)
         val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)
-        val replenishData = getSelectedReplenishAttributes(campaignOutAfterRecFilter)
-        replenishData
+        //        val replenishData = getSelectedReplenishAttributes(campaignOutAfterRecFilter)
+        campaignOutAfterRecFilter
       case _ =>
         val dfRecommendationData = getCalendarRecommendationData(campaignType, campaignName, filteredSku, recommendations)
         val campaignOutAfterRecFilter = minRefSkuFilter(dfRecommendationData)

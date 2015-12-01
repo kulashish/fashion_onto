@@ -203,18 +203,21 @@ object CampaignManager extends Serializable with Logging {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
-    val cmr = CampaignInput.loadCustomerMasterData()
-      .select(
-        CustomerVariables.EMAIL,
-        ContactListMobileVars.UID
-      )
+    //    val cmr = CampaignInput.loadCustomerMasterData()
+    //      .select(
+    //        CustomerVariables.EMAIL,
+    //        ContactListMobileVars.UID
+    //      )
 
     val dfReplenishment = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN_NO_CMR, DataSets.DAILY_MODE, incrDate)
-    val dfReplenishmentJoinToCmr = dfReplenishment.join(cmr, dfReplenishment(CustomerVariables.EMAIL) === cmr(CustomerVariables.EMAIL), SQL.INNER)
-      .select(
-        dfReplenishment("*"),
-        cmr(ContactListMobileVars.UID)
-      )
+    //    val dfReplenishmentJoinToCmr = dfReplenishment.join(cmr, dfReplenishment(CustomerVariables.EMAIL) === cmr(CustomerVariables.EMAIL), SQL.INNER)
+    //      .select(
+    //        dfReplenishment("*"),
+    //        cmr(ContactListMobileVars.UID)
+    //      )
+
+    val dfReplenishmentJoinToCmr = CampaignUtils.getSelectedReplenishAttributes(dfReplenishment)
+
     CampaignOutput.saveCampaignDataForYesterday(dfReplenishmentJoinToCmr, CampaignCommon.REPLENISHMENT_CAMPAIGN, DataSets.CALENDAR_CAMPAIGNS)
 
   }
