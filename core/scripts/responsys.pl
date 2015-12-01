@@ -29,9 +29,14 @@ system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c dndMerger");
 system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c smsOptOutMerger");
 
 #copying to test folder for jabongtest run of contactListMobile.
-system("hadoop fs -cp /data/output/responsys/sms_opt_out/full/$date /data/test/output/responsys/sms_opt_out/full/$date");
-system("hadoop fs -cp /data/output/responsys/DND/full/$date /data/test/output/responsys/DND/full/$date");
-system("hadoop fs -cp /data/output/solutionsInfiniti/block_list_numbers/full/$date /data/test/output/solutionsInfiniti/block_list_numbers/full/$date");
+system("hadoop fs -mkdir -p /data/test/output/responsys/sms_opt_out/full/$date");
+system("hadoop fs -cp /data/output/responsys/sms_opt_out/full/$date/* /data/test/output/responsys/sms_opt_out/full/$date/.");
+
+system("hadoop fs -mkdir -p /data/test/output/responsys/DND/full/$date");
+system("hadoop fs -cp /data/output/responsys/DND/full/$date/* /data/test/output/responsys/DND/full/$date/.");
+
+system("hadoop fs -mkdir -p /data/test/output/solutionsInfiniti/block_list_numbers/full/$date");
+system("hadoop fs -cp /data/output/solutionsInfiniti/block_list_numbers/full/$date/* /data/test/output/solutionsInfiniti/block_list_numbers/full/$date/.");
 
 system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mget download/53699_OPEN_$date_with_zero" . "_* ;'");
 # copy data to hdfs
