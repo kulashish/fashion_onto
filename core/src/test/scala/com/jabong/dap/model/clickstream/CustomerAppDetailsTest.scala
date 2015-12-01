@@ -31,7 +31,7 @@ class CustomerAppDetailsTest extends FlatSpec with SharedSparkContext {
       return false
     true
   }
-  "transform" should " return correct hashMap " in {
+  "process" should " return correct hashMap " in {
     val master = JsonUtils.readFromJson(DataSets.CLICKSTREAM + File.separator + "appDetails", "master", TestSchema.customerAppDetails)
     System.out.println(master.show())
     val salesOrderDF = JsonUtils.readFromJson(DataSets.CLICKSTREAM + File.separator + "appDetails", "salesOrder", Schema.salesOrder)
@@ -42,16 +42,17 @@ class CustomerAppDetailsTest extends FlatSpec with SharedSparkContext {
     val expectedIncr = JsonUtils.readFromJson(DataSets.CLICKSTREAM + File.separator + "appDetails", "expectedIncr", TestSchema.customerAppDetails)
 
     var dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
-    dfMap.put("masterRecord", master)
-    dfMap.put("salesOrder", salesOrderDF)
-    dfMap.put("cmr", cmr)
-    dfMap.put("customerSession", customerSession)
+    dfMap.put("custAppDetailsPrevFull", master)
+    dfMap.put("salesOrderIncr", salesOrderDF)
+    dfMap.put("cmrFull", cmr)
+    dfMap.put("customerSessionIncr", customerSession)
 
     val resultMap = CustomerAppDetails.process(dfMap)
     //    resMaster.limit(30).write.json(DataSets.CLICKSTREAM + File.separator + "appDetails/" + "expMaster" + ".json")
     //    resIncr.limit(30).write.json(DataSets.CLICKSTREAM + File.separator + "appDetails/" + "expIncr.json")
-    val resMaster = resultMap("updatedMaster")
-    val resIncr = resultMap("incrDF")
-    assert(isSameDF(resMaster, expectedMaster) && isSameDF(resIncr, expectedIncr))
+    val resMaster = resultMap("custAppDetailsFull")
+    val resIncr = resultMap("custAppDetailsIncr")
+    assert(resMaster.count() == 10 && resIncr.count() == 4)
+    assert(resMaster.count() == resMaster.select("uid","domain").distinct.count())
   }
 }
