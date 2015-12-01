@@ -400,6 +400,7 @@
         <path start="paybackData" />
         <path start="custTop5" />
         <path start="custEmailResponse" />
+        <path start="customerAppDetails" />
     </fork>
 
     <action name="custWelcomeVoucher">
@@ -473,6 +474,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>custEmailResponse</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="customerAppDetails">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerAppDetails</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
