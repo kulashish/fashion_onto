@@ -133,6 +133,7 @@ class ComponentExecutor extends Serializable with Logging {
 
           // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
+          case DataSets.WINBACK_CUSTOMER => WinbackData.start(paramJob)
 
           case _ => logger.error("Unknown source.")
 
