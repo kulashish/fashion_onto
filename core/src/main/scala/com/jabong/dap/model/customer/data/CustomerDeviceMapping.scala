@@ -145,7 +145,7 @@ object CustomerDeviceMapping extends Logging {
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
         } else if ("dcfUID".equals(path)) {
           val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-          val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL_MERGE_MODE,
+          val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
             prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
             .select(
               col(ContactListMobileVars.UID) as CustomerVariables.UID,
