@@ -16,7 +16,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
+) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | decryptFeedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
 
 if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
     print "Will upload files only for PROD\n";
@@ -57,6 +57,8 @@ if ($component eq "campaigns") {
     $job_exit = upload_pricing_sku_data();
 } elsif ($component eq "feedFiles") {
     $job_exit = upload_email_campaigns_feedFiles();
+} elsif ($component eq "decryptFeedFiles") {
+    $job_exit = upload_email_campaigns_decryptFeedFiles();
 } elsif ($component eq "email_campaigns") {
     $job_exit = upload_email_campaigns();
 } elsif ($component eq "calendar_campaigns") {
@@ -244,6 +246,33 @@ sub fetchFeedFile {
    return $status;
 }
 
+sub upload_email_campaigns_decryptFeedFiles {
+    my $base = "/tmp/$date_with_zero/decryptFeedFiles";
+    print "directory is $base\n";
+    system("mkdir -p $base");
+    my $status = $?;
+
+    # 20150928_CONTACTS_LIST.csv
+    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    my $folderName = "contactListMobile";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    print("rename file $base/$filename to dap_$filename");
+    $status ||= system("mv $base/$filename $base/dap_$filename");
+
+    # 20150928_Contact_list_Plus.csv
+    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
+    $folderName = "Contact_list_Plus";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    print("rename file $base/$filename to dap_$filename");
+    $status ||= system("mv $base/$filename $base/dap_$filename");
+
+    system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $base/*.csv; bye\"");
+    $status ||= $?;
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
+}
 
 sub upload_email_campaigns_feedFiles {
     my $base = "/tmp/$date_with_zero/feedFiles";
@@ -296,11 +325,6 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerOrders";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    # 20150928_CONTACTS_LIST.csv
-    $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
-    $folderName = "contactListMobile";
-    $status ||= fetchFeedFile($filename, $folderName, $base);
-
     # 20150928_NL_data_list.csv
     $filename = "$date_with_zero_today"."_NL_data_list.csv";
     $folderName = "NL_data_list";
@@ -309,11 +333,6 @@ sub upload_email_campaigns_feedFiles {
     # 20150928_app_email_feed.csv
     $filename = "$date_with_zero_today"."_app_email_feed.csv";
     $folderName = "app_email_feed";
-    $status ||= fetchFeedFile($filename, $folderName, $base);
-
-    # 20150928_Contact_list_Plus.csv
-    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
-    $folderName = "Contact_list_Plus";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150927_CUST_EMAIL_RESPONSE.csv

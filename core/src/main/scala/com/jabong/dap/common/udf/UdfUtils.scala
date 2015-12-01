@@ -4,18 +4,15 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
 
-import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
+import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{ DataFrame, Row }
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.Row
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
@@ -838,7 +835,7 @@ object UdfUtils extends Logging {
       return category
     }
 
-    return null
+    null
 
   }
 
@@ -846,7 +843,7 @@ object UdfUtils extends Logging {
     if (string == null)
       return 0
 
-    return string.length()
+    string.length()
   }
 
   def acartNumberOfSkus(acartUrl: String): Int = {
@@ -857,14 +854,14 @@ object UdfUtils extends Logging {
     if (acartData.length > 1) {
       return acartData(0).split(",").length
     }
-    return 0
+    0
   }
 
   def addMaskString(col: String, mask: String): String = {
     if (null == col || col.length == 0) {
-      col
+      return ""
     }
-    mask + col + mask
+    (mask + col + mask)
   }
 
 }
