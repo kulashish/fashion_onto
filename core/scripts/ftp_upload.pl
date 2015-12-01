@@ -257,6 +257,9 @@ sub upload_email_campaigns_decryptFeedFiles {
     my $folderName = "contactListMobile";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    print("rename file $base/$filename to dap_$filename");
+    $status ||= system("mv $base/$filename $base/dap_$filename");
+
     # 20150928_Contact_list_Plus.csv
     $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
     $folderName = "Contact_list_Plus";
