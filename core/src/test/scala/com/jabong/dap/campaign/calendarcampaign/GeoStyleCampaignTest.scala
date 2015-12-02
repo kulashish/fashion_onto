@@ -3,11 +3,11 @@ package com.jabong.dap.campaign.calendarcampaign
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.time.TimeUtils
-import com.jabong.dap.common.{SharedSparkContext, Spark, TestSchema}
+import com.jabong.dap.common.{ SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{DataFrame, SQLContext}
-import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.apache.spark.sql.{ DataFrame, SQLContext }
+import org.scalatest.{ FeatureSpec, GivenWhenThen }
 
 /**
  * Created by samathashetty on 17/11/15.
