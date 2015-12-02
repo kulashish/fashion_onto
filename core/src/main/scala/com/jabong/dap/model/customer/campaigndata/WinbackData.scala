@@ -11,6 +11,8 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.functions._
+
 
 import scala.collection.mutable
 
@@ -67,20 +69,33 @@ object WinbackData extends DataFeedsModel {
 
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {
 
-    val crmTicketMasterIncr = dfMap("crmTicketMasterIncr")
-    val crmTicketDetailsIncr = dfMap("crmTicketDetailsIncr")
-    val crmTicketStatLogIncr = dfMap("crmTicketStatLogIncr")
+    val crmTicketMasterIncr = dfMap("crmTicketMasterIncr").select(
+      col(CrmTicketVariables.ISSUE_ID),
+      col(CrmTicketVariables.IN_DT) as CrmTicketVariables.DG_END_DATE,
+      col(CrmTicketVariables.ISSUE_DESCRIPTION)
+    )
+
+
+    val crmTicketDetailsIncr = dfMap("crmTicketDetailsIncr").select(
+      col(CrmTicketVariables.ISSUE_ID),
+      col(CrmTicketVariables.TICKET_ID),
+      col(CrmTicketVariables.IN_DT) as CrmTicketVariables.DG_END_DATE,
+      col(CrmTicketVariables.CUSTOMER_NO),
+      col(CrmTicketVariables.ORDER_NO)
+    )
+
+    val crmTicketStatLogIncr = dfMap("crmTicketStatLogIncr").select(
+      col(CrmTicketVariables.TICKET_ID),
+      col(CrmTicketVariables.ADD_DATE),
+      col(CrmTicketVariables.EXIT_TICKET_STATUS),
+      col(CrmTicketVariables.IN_DT) as CrmTicketVariables.DG_END_DATE
+    )
     val cmrFull = dfMap("cmrFull")
     val salesOrder = dfMap("salesOrder")
 
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, dateStr)
 
     //TODO: use constant for the status with  meaningful name
-    //TODO:  use  better implementation instead of join for
-    /*
-    select id from cmr where not exists
-    (select fk from salesOrder where fk = id)
-     */
 
     val result =
       crmTicketDetailsIncr.
@@ -88,7 +103,6 @@ object WinbackData extends DataFeedsModel {
         join(crmTicketMasterIncr, crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) === crmTicketDetailsIncr(CrmTicketVariables.ISSUE_ID), SQL.INNER).
         join(cmrFull, crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.INNER).
         join(salesOrder, cmrFull(CustomerVariables.ID_CUSTOMER) === salesOrder(SalesOrderVariables.FK_CUSTOMER)).
-      withColumnRenamed(CrmTicketVariables.IN_DT, CrmTicketVariables.DG_END_DATE).
         where(
           crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE).geq(yesterday).
             and(crmTicketStatLogIncr(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
