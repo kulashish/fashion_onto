@@ -52,4 +52,3 @@ sub removeUnformatLines  {
     print("sed -i.bak -e '/\\([^$delimiter]*$delimiter\\)\{$numColumns\\}/!d' $filePath");
     system("sed -i.bak -e '/\\([^$delimiter]*$delimiter\\)\\{$numColumns\\}/!d' $filePath");
 }
-
