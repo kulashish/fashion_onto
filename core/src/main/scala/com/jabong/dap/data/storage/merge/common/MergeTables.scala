@@ -17,7 +17,7 @@ import grizzled.slf4j.Logging
 
 object MergeTables extends Logging {
 
-  def merge(mergeInfo: MergeInfo) = {
+  def merge(mergeInfo: MergeInfo): Unit = {
     val primaryKey = mergeInfo.primaryKey
     val saveMode = mergeInfo.saveMode
     val source = mergeInfo.source
