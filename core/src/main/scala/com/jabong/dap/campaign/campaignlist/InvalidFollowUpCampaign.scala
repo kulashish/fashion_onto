@@ -1,11 +1,9 @@
 package com.jabong.dap.campaign.campaignlist
 
-import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.FollowUp
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.campaign.traceability.PastCampaignCheck
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CustomerSelection}
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
@@ -14,7 +12,8 @@ import org.apache.spark.sql.DataFrame
  */
 class InvalidFollowUpCampaign {
 
-  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
+  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, itrData: DataFrame,
+                  brickMvpRecommendations: DataFrame, incrDate: String) = {
 
     val invalidCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.INVALID)
@@ -26,10 +25,10 @@ class InvalidFollowUpCampaign {
     val filteredSku = FollowUp.skuFilter(selectedCustomers, itrData).cache()
 
     // ***** mobile push use case
-    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku)
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku, true, null, incrDate)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.INVALID_FOLLOWUP_CAMPAIGN, filteredSku, true, brickMvpRecommendations, incrDate)
 
   }
 

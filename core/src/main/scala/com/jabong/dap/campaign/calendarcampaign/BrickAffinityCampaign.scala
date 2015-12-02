@@ -3,13 +3,12 @@ package com.jabong.dap.campaign.calendarcampaign
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.Daily
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.{ Utils, Spark }
+import com.jabong.dap.common.Utils
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.{ CampaignMergedFields, CustomerSelection, CampaignCommon }
-import com.jabong.dap.common.constants.variables.{ ProductVariables, CustomerVariables }
-import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CustomerSelection}
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.data.storage.DataSets
-import org.apache.spark.sql.{ Row, DataFrame }
+import org.apache.spark.sql.DataFrame
 
 /**
  * Created by raghu on 29/10/15.
@@ -47,7 +46,7 @@ class BrickAffinityCampaign {
     //join Brick1 to Brick2 [email, ref-sku, Brick1 -> [sku1 to sku8], Brick2 -> [sku1 to sku8]]
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRICK_AFFINITY_CAMPAIGN, joinedToFavBrick, false, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.BRICK_AFFINITY_CAMPAIGN, joinedToFavBrick, false, brickMvpRecommendations, incrDate)
 
   }
 }

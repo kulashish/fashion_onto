@@ -752,8 +752,8 @@ object CampaignUtils extends Logging {
    * * @param campaignType
    * @param filteredSku
    */
-  def campaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, pastCampaignCheck: Boolean = true, recommendations: DataFrame = null, incrDate: String) = {
-
+  def campaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, pastCampaignCheck: Boolean,
+                          recommendations: DataFrame, incrDate: String) = {
     if (campaignType.equalsIgnoreCase(DataSets.PUSH_CAMPAIGNS)) {
       pushCampaignPostProcess(campaignType, campaignName, filteredSku, pastCampaignCheck, incrDate)
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
@@ -761,7 +761,6 @@ object CampaignUtils extends Logging {
     } else if (campaignType.equalsIgnoreCase(DataSets.CALENDAR_CAMPAIGNS)) {
       calendarCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, incrDate)
     }
-
   }
 
   /**

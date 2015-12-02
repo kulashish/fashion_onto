@@ -9,7 +9,8 @@ import org.apache.spark.sql.DataFrame
  */
 class LiveRetargetCampaign {
 
-  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
+  def runCampaign(customerOrderData: DataFrame, orderItemData: DataFrame, yesterdayItrData: DataFrame,
+                  brickMvpRecommendations: DataFrame, incrDate: String) = {
 
     // x = run retargeting campaign common customer selection
     val returnCancelCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
@@ -23,11 +24,11 @@ class LiveRetargetCampaign {
 
     //run cancel retargeting campaign
     val cancelCampaign = new LiveCancelReTargetCampaign()
-    cancelCampaign.runCampaign(targetCustomersWithOrderItems, yesterdayItrData, brickMvpRecommendations)
+    cancelCampaign.runCampaign(targetCustomersWithOrderItems, yesterdayItrData, brickMvpRecommendations, incrDate)
 
     // run return retargeting campaign
     val returnCampaign = new LiveReturnReTargetCampaign()
-    returnCampaign.runCampaign(targetCustomersWithOrderItems, yesterdayItrData, brickMvpRecommendations)
+    returnCampaign.runCampaign(targetCustomersWithOrderItems, yesterdayItrData, brickMvpRecommendations, incrDate)
 
   }
 }
