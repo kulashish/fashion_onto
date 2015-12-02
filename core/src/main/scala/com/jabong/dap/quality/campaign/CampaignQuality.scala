@@ -78,22 +78,28 @@ object CampaignQuality extends Logging {
 
       } else {
 
-        val df = cachedfCampaignQuality.select(
-          col(CAMPAIGNNAME),
-          col(TOTALCOUNT),
-          col(CUSTID_ZERO) as EMAIL_NULL,
-          col(CUSTID_NONZERO) as EMAIL_NON_NULL,
-          col(PRIORITYMERGE)).cache()
+        val df = campaignType match {
+          case DataSets.VARIABLES => {
+            cachedfCampaignQuality.select(
+              col(CAMPAIGNNAME) as "VariablesName",
+              col(TOTALCOUNT),
+              col(CUSTID_ZERO) as "NullValuesCount",
+              col(CUSTID_NONZERO) as "NotNullValuesCount"
+            )
+          }
+          case _ => {
+            cachedfCampaignQuality.select(
+              col(CAMPAIGNNAME),
+              col(TOTALCOUNT),
+              col(CUSTID_ZERO) as EMAIL_NULL,
+              col(CUSTID_NONZERO) as EMAIL_NON_NULL,
+              col(PRIORITYMERGE)
+            )
+          }
+        }
 
         sendMail(df, campaignType, dateYesterday)
-
-        if (campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
-          writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.CALENDAR_CAMPAIGN_QUALITY)
-        } else if (campaignType.equals(DataSets.VARIABLES)) {
-          writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.VARIABLES_QUALITY)
-        } else {
-          writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
-        }
+        writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), DataSets.CALENDAR_CAMPAIGNS + "_QUALITY")
 
       }
 
