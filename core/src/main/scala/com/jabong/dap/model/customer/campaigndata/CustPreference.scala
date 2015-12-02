@@ -53,7 +53,10 @@ object CustPreference {
           when(custPrefFull(NewsletterPreferencesVariables.PREF_NL_NEWARIVALS) === true, 1).otherwise(0) as NewsletterPreferencesVariables.PREF_NL_NEWARIVALS,
           custPrefFull(NewsletterPreferencesVariables.PREF_NL_FREQ))
         .na.fill("")
+
+      val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.DAILY_MODE, incrDate)
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+      DataWriter.writeParquet(res, savePathIncr, saveMode)
       DataWriter.writeCsv(res, DataSets.VARIABLES, DataSets.CUST_PREFERENCE, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_PREFERENCE", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
   }
