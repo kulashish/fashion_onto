@@ -39,7 +39,7 @@
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>erpAcqIncr</argument>
+            <argument>crmAcqIncr</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -55,7 +55,7 @@
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>erpMerge</argument>
+            <argument>crmMerge</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
