@@ -21,7 +21,7 @@ class NewArrivalsBrandCampaign {
     val filteredSku = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.NEW_ARRIVALS_BRAND, filteredSku, false, brandMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.NEW_ARRIVALS_BRAND, filteredSku, true, brandMvpRecommendations)
 
   }
 }
