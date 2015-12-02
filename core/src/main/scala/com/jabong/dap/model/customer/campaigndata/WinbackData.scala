@@ -28,7 +28,8 @@ object WinbackData extends DataFeedsModel {
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     dateStr = incrDate
 
-    val crmTicketMasterIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.FULL, incrDate)
+    val dateDiffFormat = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+    val crmTicketMasterIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.FULL_FETCH_MODE, dateDiffFormat)
     println(ConfigConstants.INPUT_PATH + "/" + DataSets.CRM + "/" + DataSets.CRM_TicketMaster)
     val crmTicketDetailsIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.DAILY_MODE, incrDate)
     val crmTicketStatLogIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketStatusLog, DataSets.DAILY_MODE, incrDate)
@@ -87,6 +88,7 @@ object WinbackData extends DataFeedsModel {
         join(crmTicketMasterIncr, crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) === crmTicketDetailsIncr(CrmTicketVariables.ISSUE_ID), SQL.INNER).
         join(cmrFull, crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.INNER).
         join(salesOrder, cmrFull(CustomerVariables.ID_CUSTOMER) === salesOrder(SalesOrderVariables.FK_CUSTOMER)).
+      withColumnRenamed(CrmTicketVariables.IN_DT, CrmTicketVariables.DG_END_DATE).
         where(
           crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE).geq(yesterday).
             and(crmTicketStatLogIncr(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).

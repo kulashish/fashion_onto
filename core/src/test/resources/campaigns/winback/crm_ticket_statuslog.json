@@ -1,3 +1,3 @@
-{"TicketStatusLogID":99999, "TicketID":12345,"ExitTicketStatus":"Not Resolved", "UserID":"ABCDE","AddDate":"2015-11-24 00:00:00", "DG_END_DATE":"2015-11-25 00:00:00"}
-{"TicketStatusLogID":99998, "TicketID":98765,"ExitTicketStatus":null, "UserID":"BCDEF","AddDate":"2015-11-24 00:00:00", "DG_END_DATE":"2015-11-25 00:00:00"}
-{"TicketStatusLogID":99997, "TicketID":69579,"ExitTicketStatus":null, "UserID":"GUHHBHJH","AddDate":"2015-11-24 00:00:00", "DG_END_DATE":"2015-11-25 00:00:00"}
+{"ticketstatuslogId":99999, "ticketid":12345,"exitticketstatus":"Not Resolved", "userid":"aBCde","adddate":"2015-11-24 00:00:00", "indt":"2015-11-25 00:00:00"}
+{"ticketstatuslogId":99998, "ticketid":98765,"exitticketstatus":null, "userid":"BCdeF","adddate":"2015-11-24 00:00:00", "indt":"2015-11-25 00:00:00"}
+{"ticketstatuslogId":99997, "ticketid":69579,"exitticketstatus":null, "userid":"GUHHBHJH","adddate":"2015-11-24 00:00:00", "indt":"2015-11-25 00:00:00"}
