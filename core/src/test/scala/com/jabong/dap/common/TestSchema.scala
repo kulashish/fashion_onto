@@ -115,7 +115,6 @@ object TestSchema {
 
   val customerDeviceMapping = StructType(Array(
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.RESPONSYS_ID, StringType, true),
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true)

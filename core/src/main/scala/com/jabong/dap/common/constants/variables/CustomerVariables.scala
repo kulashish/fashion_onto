@@ -67,7 +67,6 @@ object CustomerVariables {
 
   val APP_FILTER = "_app_"
   val APP_TYPE = "app_type"
-  val RESPONSYS_ID = "responsys_id"
   val PREFERRED_BRAND = "preferred_brand"
 
   val CUSTOMER_ID = "customer_id"
