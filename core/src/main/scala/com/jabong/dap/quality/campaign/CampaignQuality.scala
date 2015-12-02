@@ -186,26 +186,21 @@ object CampaignQuality extends Logging {
 
           var countNull: Long = 0
           var countNotNull: Long = 0
-          dataFrame.schema.fieldNames.contains(CustomerVariables.FK_CUSTOMER) match {
-            case CustomerVariables.FK_CUSTOMER => {
-              countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
-              countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
-            }
-            case CampaignMergedFields.CUSTOMER_ID => {
-              countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
-              countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
-            }
-            case CampaignMergedFields.EMAIL => {
-              countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
-              countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
-            }
-            case ContactListMobileVars.UID => {
-              countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
-              countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
-            }
-            case _ => {
-              countNotNull = dataFrame.count()
-            }
+          val fieldNames = dataFrame.schema.fieldNames
+          if (fieldNames.contains(CustomerVariables.EMAIL)) {
+            countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
+          } else if (fieldNames.contains(CustomerVariables.CUSTOMER_ID)) {
+            countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
+          } else if (fieldNames.contains(ContactListMobileVars.UID)) {
+            countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
+            countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
+          } else if (fieldNames.contains(CustomerVariables.FK_CUSTOMER)) {
+            countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
+          } else {
+            countNotNull = dataFrame.count()
           }
 
           row = Row(campaignName, dataFrame.count(), countNull, countNotNull, zero, zero, zero, zero)
