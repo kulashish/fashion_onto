@@ -60,7 +60,8 @@ object WinbackData extends DataFeedsModel {
   override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     val result = dfWrite("result")
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-
+    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeParquet(result, savePathIncr, saveMode)
     DataWriter.writeCsv(result, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate, fileDate + "winback_customer_data", saveMode, "true", ";")
   }
 
