@@ -2,8 +2,7 @@ package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.variables.{ SalesOrderItemVariables, SalesOrderVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.ParamInfo
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -32,12 +31,12 @@ object CampaignQualityEntry extends Logging {
       }
     }
     // if status is false means :- at least one of the campaign quality check has failed, Please check the log to actually see which campaign has failed
-    if (status == false) {
+    if (false == status) {
       throw new FailedStatusException
     }
   }
 
-  def loadCommonDataSets(date: String): Unit = {
+  def loadCommonDataSets(date: String) = {
     orderItemFullData = CampaignInput.loadFullOrderItemData(date)
     orderItem30DaysData = CampaignInput.loadLastNdaysOrderItemData(30, orderItemFullData, date).cache()
     orderItem3DaysData = CampaignInput.loadLastNdaysOrderItemData(3, orderItem30DaysData, date)

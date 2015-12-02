@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -33,7 +34,7 @@ class ShortlistReminderCampaignTest extends FeatureSpec with GivenWhenThen with 
     scenario("3rd day Shortlist Reminder Data"){
       Given("shortlist3rdDayData, recommendationsData, yesterdayItrData")
       val shortlistReminderCampaign = new ShortlistReminderCampaign()
-      shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, yesterdayItrData)
+      shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, yesterdayItrData, TimeUtils.YESTERDAY_FOLDER)
 
       val ShortlistReminderCampaignOut = CampaignOutput.testData.head
       //      assert(ShortlistReminderCampaignOut._1.count() == 1)

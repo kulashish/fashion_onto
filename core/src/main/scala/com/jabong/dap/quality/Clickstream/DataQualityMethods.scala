@@ -14,7 +14,7 @@ import org.apache.spark.sql.hive.HiveContext
  */
 object DataQualityMethods extends Logging {
 
-  def start(params: ParamInfo): Unit = {
+  def start(params: ParamInfo) = {
 
     logger.info("clickstreamDataQualityCheck started")
     val hiveContext = Spark.getHiveContext()
