@@ -41,7 +41,6 @@ object UUIDGenerator {
     val res = cmr.select(
       addUids(cmr(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
       cmr(CustomerVariables.EMAIL),
-      cmr(CustomerVariables.RESPONSYS_ID),
       cmr(CustomerVariables.ID_CUSTOMER),
       cmr(PageVisitVariables.BROWSER_ID),
       cmr(PageVisitVariables.DOMAIN)

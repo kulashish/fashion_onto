@@ -78,7 +78,6 @@ object CustomerDeviceMapping extends Logging {
       .select(
         cmr(ContactListMobileVars.UID),
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
-        cmr(CustomerVariables.RESPONSYS_ID),
         coalesce(joinedDf(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         coalesce(joinedDf(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
         coalesce(joinedDf(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
@@ -157,7 +156,6 @@ object CustomerDeviceMapping extends Logging {
           cmrFull = cmrJoined.select(
             cmrFullDCF(ContactListMobileVars.UID),
             coalesce(cmrPrevFull(CustomerVariables.EMAIL), cmrFullDCF(ContactListMobileVars.EMAIL)) as CustomerVariables.EMAIL,
-            cmrPrevFull(CustomerVariables.RESPONSYS_ID),
             cmrPrevFull(CustomerVariables.ID_CUSTOMER),
             cmrPrevFull(PageVisitVariables.BROWSER_ID),
             cmrPrevFull(PageVisitVariables.DOMAIN)
@@ -276,7 +274,7 @@ object CustomerDeviceMapping extends Logging {
 
       val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), SQL.LEFT_OUTER)
         .select(
-          coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as CustomerVariables.RESPONSYS_ID,
+          coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as ContactListMobileVars.UID,
           coalesce(correctRecs(NEW_ID_CUSTOMER), df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
