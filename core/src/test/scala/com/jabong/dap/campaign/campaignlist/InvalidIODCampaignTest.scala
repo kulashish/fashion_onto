@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.{ DataFrame, SQLContext }
@@ -38,7 +39,7 @@ class InvalidIODCampaignTest extends FeatureSpec with GivenWhenThen with SharedS
     scenario("Customer has invalid IOD the cart yesterday") {
       Given("salesOrderData,salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
       val invalidIODCampaign = new InvalidIODCampaign()
-      invalidIODCampaign.runCampaign(salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
+      invalidIODCampaign.runCampaign(salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData, TimeUtils.YESTERDAY_FOLDER)
 
       val invalidIODCampaignOut = CampaignOutput.testData.head
       val resultDF = invalidIODCampaignOut._1

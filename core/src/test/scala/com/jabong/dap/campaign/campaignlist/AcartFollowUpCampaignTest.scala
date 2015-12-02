@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -35,7 +36,7 @@ class AcartFollowUpCampaignTest extends FeatureSpec with GivenWhenThen with Shar
     scenario("Customer has abondoned the cart three days back") {
       Given("salescartData,salesOrder, salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
       val acartFollowUpCampaign = new AcartFollowUpCampaign()
-      acartFollowUpCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
+      acartFollowUpCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData, TimeUtils.YESTERDAY_FOLDER)
       val acartPushCampaignOut = CampaignOutput.testData.head
       val acartEmailCamapignOut = CampaignOutput.testData(1)
       assert(acartPushCampaignOut._3 == "push_campaigns" && acartPushCampaignOut._2 == "acart_followup")
