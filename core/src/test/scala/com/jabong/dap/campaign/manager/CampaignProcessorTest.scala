@@ -48,7 +48,7 @@ class CampaignProcessorTest extends FlatSpec with Serializable with SharedSparkC
   }
 
   "Test mergeCampaigns" should "return 2" in {
-    val res = CampaignProcessor.mergepushCampaigns(res1, itr)
+    val res = CampaignProcessor.mergePushCampaigns(res1, itr)
     println("mergeCampaigns:")
     res.collect().foreach(println)
     assert(res.count() == 2)

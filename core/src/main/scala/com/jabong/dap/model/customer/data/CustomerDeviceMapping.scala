@@ -233,10 +233,11 @@ object CustomerDeviceMapping extends Logging {
    * @return DataFrame
    */
   def getDataFrameCsv4mDCF(path: String): DataFrame = {
+    val RESPONSYS_ID = "responsys_id"
     try {
       val df = DataReader.getDataFrame4mCsv(path, "true", ";")
         .select(
-          col("RESPONSYS_ID") as CustomerVariables.RESPONSYS_ID,
+          col("RESPONSYS_ID") as RESPONSYS_ID,
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
           col("BID") as PageVisitVariables.BROWSER_ID,
@@ -254,7 +255,7 @@ object CustomerDeviceMapping extends Logging {
       // duplicate.printSchema()
       // duplicate.show(9)
 
-      val NEW_RESPONSYS_ID = MergeUtils.NEW_ + CustomerVariables.RESPONSYS_ID
+      val NEW_RESPONSYS_ID = MergeUtils.NEW_ + RESPONSYS_ID
       val NEW_ID_CUSTOMER = MergeUtils.NEW_ + CustomerVariables.ID_CUSTOMER
       val NEW_EMAIL = MergeUtils.NEW_ + CustomerVariables.EMAIL
       val NEW_BROWSER_ID = MergeUtils.NEW_ + PageVisitVariables.BROWSER_ID
@@ -262,7 +263,7 @@ object CustomerDeviceMapping extends Logging {
 
       val correctRecs = df.join(duplicate, df(CustomerVariables.ID_CUSTOMER) === duplicate(CustomerVariables.ID_CUSTOMER) && df(CustomerVariables.EMAIL) === duplicate(CustomerVariables.EMAIL))
         .select(
-          df(CustomerVariables.RESPONSYS_ID) as NEW_RESPONSYS_ID,
+          df(RESPONSYS_ID) as NEW_RESPONSYS_ID,
           df(CustomerVariables.ID_CUSTOMER) as NEW_ID_CUSTOMER,
           df(CustomerVariables.EMAIL) as NEW_EMAIL,
           df(PageVisitVariables.BROWSER_ID) as NEW_BROWSER_ID,
@@ -274,7 +275,7 @@ object CustomerDeviceMapping extends Logging {
 
       val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), SQL.LEFT_OUTER)
         .select(
-          coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as ContactListMobileVars.UID,
+          coalesce(correctRecs(NEW_RESPONSYS_ID), df(RESPONSYS_ID)) as ContactListMobileVars.UID,
           coalesce(correctRecs(NEW_ID_CUSTOMER), df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
