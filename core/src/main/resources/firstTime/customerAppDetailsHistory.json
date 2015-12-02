@@ -16,22 +16,6 @@
       "fullDate": "2015/11/26",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
-    },
-    {
-      "source": "customerAppDetails",
-      "incrMode": "daily",
-      "incrDate": "2015/11/28",
-      "fullDate": "2015/11/27",
-      "saveMode": "Ignore",
-      "saveFormat": "parquet"
-    },
-    {
-      "source": "customerAppDetails",
-      "incrMode": "daily",
-      "incrDate": "2015/11/29",
-      "fullDate": "2015/11/28",
-      "saveMode": "Ignore",
-      "saveFormat": "parquet"
     }
   ]
 }
