@@ -59,7 +59,7 @@ class SalesCart extends CustomerSelector with Logging {
 
     CampaignUtils.debug(dfUnion, "dfUnion")
 
-    return dfUnion
+    return dfUnion.filter(!(dfUnion(SalesOrderVariables.FK_CUSTOMER).isNull && dfUnion(CustomerVariables.EMAIL).isNull))
   }
 
   override def customerSelection(salesCart30Day: DataFrame): DataFrame = ???
