@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
 import com.jabong.dap.common.mail.ScalaMail
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -105,7 +105,7 @@ object CampaignQuality extends Logging {
 
     CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
 
-    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+    //    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
     val emailSubscribers = OptionUtils.getOptValue(CampaignInfo.campaigns.emailSubscribers, "tech.dap@jabong.com")
 
@@ -177,11 +177,38 @@ object CampaignQuality extends Logging {
           val countZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
           val countNonZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
           row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
-        } else {
+        } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS) || campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
 
           val countNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
           val countNonNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
           row = Row(campaignName, dataFrame.count(), countNullEmail, countNonNullEmail, zero, zero, zero, zero)
+        } else {
+
+          var countNull: Long = 0
+          var countNotNull: Long = 0
+          dataFrame.schema.fieldNames.contains(CustomerVariables.FK_CUSTOMER) match {
+            case CustomerVariables.FK_CUSTOMER => {
+              countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
+              countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
+            }
+            case CampaignMergedFields.CUSTOMER_ID => {
+              countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
+              countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
+            }
+            case CampaignMergedFields.EMAIL => {
+              countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
+              countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
+            }
+            case ContactListMobileVars.UID => {
+              countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
+              countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
+            }
+            case _ => {
+              countNotNull = dataFrame.count()
+            }
+          }
+
+          row = Row(campaignName, dataFrame.count(), countNull, countNotNull, zero, zero, zero, zero)
         }
 
         list += row
