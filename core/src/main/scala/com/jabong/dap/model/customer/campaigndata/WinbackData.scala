@@ -28,7 +28,7 @@ object WinbackData extends DataFeedsModel {
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     dateStr = incrDate
 
-    val crmTicketMasterIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.DAILY_MODE, incrDate)
+    val crmTicketMasterIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.FULL, incrDate)
     println(ConfigConstants.INPUT_PATH + "/" + DataSets.CRM + "/" + DataSets.CRM_TicketMaster)
     val crmTicketDetailsIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.DAILY_MODE, incrDate)
     val crmTicketStatLogIncr = DataReader.getDataFrame4mOrc(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketStatusLog, DataSets.DAILY_MODE, incrDate)

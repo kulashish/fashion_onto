@@ -17,7 +17,8 @@ object DataReader extends Logging {
     require(date != null, "Date is null")
 
     try {
-      fetchDataFrame(basePath, source, tableName, mode, date)
+      val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
+      fetchDataFrame(basePath, source, tableName, mode,date)
     } catch {
       case e: DataNotFound =>
         logger.error("Data not found for the date")
@@ -127,8 +128,6 @@ object DataReader extends Logging {
     val context = Spark.getContext(saveFormat)
     if (saveFormat.equals(DataSets.CSV)) {
       context.read.format("com.databricks.spark.csv").load(fetchPath)
-    }else if (saveFormat.equals(DataSets.ORC)) {
-      context.read.format("orc").load(fetchPath)
     } else {
       logger.info("Reading data from hdfs: " + fetchPath + " in format " + saveFormat)
       if (DataVerifier.dataExists(fetchPath))
