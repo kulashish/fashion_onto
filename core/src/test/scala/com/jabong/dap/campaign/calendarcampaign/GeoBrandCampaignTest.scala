@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.calendarcampaign
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -39,7 +40,7 @@ class GeoBrandCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
       Given("cityWiseData,salesOrder, salesOrderItemData, salesAddressData, yesterdayItrData, brickMvpRecommendation")
       val geoBrandCampaign = new GeoBrandCampaign()
 
-      geoBrandCampaign.runCampaign(salesOrderData, salesOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, recommendationsData)
+      geoBrandCampaign.runCampaign(salesOrderData, salesOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, recommendationsData, TimeUtils.YESTERDAY_FOLDER)
 
     }
   }

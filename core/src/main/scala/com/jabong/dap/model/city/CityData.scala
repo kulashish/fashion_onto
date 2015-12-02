@@ -51,7 +51,7 @@ object CityData extends DataFeedsModel with Logging {
     dfMap
   }
 
-  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String): Unit = {
+  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     val dfCityWiseMapData = dfWrite("cityWiseMapOut")
     logger.info("writing city Wise Map Data")
     val writeOutPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)

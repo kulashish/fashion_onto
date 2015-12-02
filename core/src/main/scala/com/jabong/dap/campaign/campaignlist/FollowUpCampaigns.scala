@@ -18,7 +18,7 @@ class FollowUpCampaigns {
    * @param salesOrderLast3Days
    * @param itrSkuYesterdayData
    */
-  def runCampaign(campaignMergedData: DataFrame, salesOrderLast3Days: DataFrame, itrSkuYesterdayData: DataFrame): Unit = {
+  def runCampaign(campaignMergedData: DataFrame, salesOrderLast3Days: DataFrame, itrSkuYesterdayData: DataFrame, incrDate: String) = {
 
     val selectedData = CampaignUtils.campaignFollowUpSelection(campaignMergedData, salesOrderLast3Days)
 
@@ -27,7 +27,7 @@ class FollowUpCampaigns {
     //    val refSku3Out = CampaignUtils.campaignSkuStockFilter(refSku2Out, itrSkuSimpleYesterdayData, CampaignMergedFields.LIVE_REF_SKU + "3", 3)
 
     val fileName = TimeUtils.getDateAfterNDays(-1, TimeConstants.YYYYMMDD) + "_live_campaign_followup.csv"
-    CampaignOutput.saveCampaignDataForYesterday(refSku2Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS)
+    CampaignOutput.saveCampaignData(refSku2Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, incrDate)
 
     CampaignOutput.saveCampaignCSVForYesterday(refSku2Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, fileName, DataSets.EMAIL_CAMPAIGNS)
   }

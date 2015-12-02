@@ -1,8 +1,7 @@
 {
   "params": [
     {
-      "source": "cityWiseData",
-      "incrMode": "daily",
+      "source": "replenishment_feed",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }

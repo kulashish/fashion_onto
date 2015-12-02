@@ -206,7 +206,7 @@ object DataSets {
   val ACART_HOURLY = "acartHourly"
 
   // miscellaneous data sets
-  val CITY_WISE_DATA = "city_wise_data"
+  val CITY_WISE_DATA = "cityWiseData"
   val WINBACK_CUSTOMER = "winbackCustomer"
 
   //CRM tables

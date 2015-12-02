@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -32,7 +33,8 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
     scenario("Yesterday New Arrivals Brand"){
       Given("salesCart30Days, recommendationsData, yesterdayItrData")
       val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-      newArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData)
+      val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+      newArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData, yestDate)
 
       val NewArrivalsBrandCampaignOut = CampaignOutput.testData.head
       //      assert(NewArrivalsBrandCampaignOut._1.count() == 1)

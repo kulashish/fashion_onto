@@ -18,7 +18,7 @@ class NewsletterPreferencesTest extends FlatSpec with SharedSparkContext {
   @transient var newsletterPreferences: DataFrame = _
   @transient var expectedNewsletterPreferences: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll() = {
     super.beforeAll()
     newsletterSubscription = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, DataSets.NEWSLETTER_SUBSCRIPTION, Schema.nls)
     expectedNewsletterPreferences = JsonUtils.readFromJson(TestConstants.NEWSLETTER_PREFERENCES, TestConstants.NEWSLETTER_PREFERENCES, NewsletterPrefSchema.newsletterPreferences)

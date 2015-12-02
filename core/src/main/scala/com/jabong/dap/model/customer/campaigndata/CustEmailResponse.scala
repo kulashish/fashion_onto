@@ -153,7 +153,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     dfResultMap
   }
 
-  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String): Unit = {
+  override def write(dfWrite: mutable.HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     val custEmailResIncr = dfWrite("custEmailResIncr")
     val custEmailResFull = dfWrite("custEmailResFull")
     val custEmailResCsv = dfWrite("custEmailResCsv")

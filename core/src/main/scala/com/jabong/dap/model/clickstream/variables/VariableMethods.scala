@@ -21,7 +21,7 @@ import scala.util.control._
 
 object VariableMethods extends java.io.Serializable {
 
-  def appCheck(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, UserObj: GroupData, hiveContext: HiveContext): Unit = {
+  def appCheck(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, UserObj: GroupData, hiveContext: HiveContext) = {
     val domain = UserObj.domain
     val userDomain = GroupedData.mapValues(x => scala.collection.mutable.Set(x(domain).toString))
     val appcheck = userDomain.reduceByKey((x, y) => appCheckReducer(x, y))
@@ -141,7 +141,7 @@ object VariableMethods extends java.io.Serializable {
     return brands
   }
 
-  def lastDomain(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, hiveContext: HiveContext): Unit = {
+  def lastDomain(GroupedData: RDD[(String, Row)], pagevisit: DataFrame, hiveContext: HiveContext) = {
     val col = pagevisit.columns
     var visitts: Int = 0
     var domain: Int = 0

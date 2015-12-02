@@ -13,7 +13,7 @@ import org.apache.spark.sql.DataFrame
  */
 class GeoStyleCampaign {
   def runCampaign(day40_SalesOrder: DataFrame, day40_SalesOrderItem: DataFrame, salesAddressData: DataFrame, yesterdayItrData: DataFrame, cityWiseData: DataFrame,
-                  recommendationsData: DataFrame) = {
+                  recommendationsData: DataFrame, incrDate: String) = {
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
 
@@ -36,7 +36,7 @@ class GeoStyleCampaign {
         yesterdayItrData(ProductVariables.STOCK),
         yesterdayItrData(ProductVariables.PRICE_BAND))
 
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_STYLE_CAMPAIGN, custFilter, false, recommendationsData)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_STYLE_CAMPAIGN, custFilter, false, recommendationsData, incrDate)
 
   }
 

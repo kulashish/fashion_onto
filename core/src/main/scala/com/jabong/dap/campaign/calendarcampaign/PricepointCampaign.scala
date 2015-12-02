@@ -12,7 +12,8 @@ import org.apache.spark.sql.DataFrame
  */
 class PricepointCampaign {
 
-  def runCampaign(last20thDaySalesOrderData: DataFrame, last20thDaySalesOrderItemData: DataFrame, brickPriceBandRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
+  def runCampaign(last20thDaySalesOrderData: DataFrame, last20thDaySalesOrderItemData: DataFrame,
+                  brickPriceBandRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST_ORDER)
@@ -23,7 +24,8 @@ class PricepointCampaign {
     val filteredSku = Daily.skuFilter(dfCustomerSelection, yesterdayItrData)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.PRICEPOINT_CAMPAIGN, filteredSku, false, brickPriceBandRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.PRICEPOINT_CAMPAIGN, filteredSku, false,
+      brickPriceBandRecommendations, incrDate)
 
   }
 

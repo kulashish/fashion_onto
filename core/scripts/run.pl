@@ -265,6 +265,9 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "calendarCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component calendarCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/calendarCampaigns.json";
     $job_exit =run_component($component, $command);
+} elsif ($component eq "variablesQuality") {
+    my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component variablesQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/variablesQuality.json";
+    $job_exit =run_component($component, $command);
 } elsif ($component eq "campaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component campaignQuality --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/campaignQuality.json";
     $job_exit = run_component($component, $command);
@@ -293,6 +296,10 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "replenishmentCampaign") {
     $AMMUNITION = "--num-executors 25 --executor-memory 2G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component replenishmentCampaign --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/replenishmentCampaign.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "replenishmentCampaignFeed") {
+    $AMMUNITION = "--num-executors 15 --executor-memory 2G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component replenishmentCampaignFeed --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/replenishmentCampaignFeed.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "brandInCityCampaign") {
     $AMMUNITION = "--num-executors 25 --executor-memory 4G";
@@ -361,7 +368,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component custEmailResponse --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/custEmailResponse.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "cityWiseData") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component city_wise_data --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/cityWiseData.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component cityWiseData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/cityWiseData.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "acartHourlyFeed") {
     my $AMMUNITION = "--num-executors 5 --executor-memory 400M";

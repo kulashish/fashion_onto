@@ -1,6 +1,7 @@
 package com.jabong.dap.model.customer.data
 
 import java.util.UUID
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, PageVisitVariables, CustomerVariables }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -29,15 +30,21 @@ object UUIDGenerator {
     if (null == uid) {
       newId = getUid(uidsList)
       uidsList += newId
-      return newId
+      newId
     } else {
       uidsList += uid
-      return uid
+      uid
     }
   }
 
   def addUid(cmr: DataFrame): DataFrame = {
-    val res = cmr.select(addUids(cmr("uid")) as "uid", cmr("email"), cmr("browserid"), cmr("domain"))
+    val res = cmr.select(
+      addUids(cmr(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
+      cmr(CustomerVariables.EMAIL),
+      cmr(CustomerVariables.ID_CUSTOMER),
+      cmr(PageVisitVariables.BROWSER_ID),
+      cmr(PageVisitVariables.DOMAIN)
+    )
     res
   }
 

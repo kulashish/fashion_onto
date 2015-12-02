@@ -43,6 +43,8 @@ object CampaignCommon {
   val BRAND_IN_CITY_CAMPAIGN = "brand_in_city"
   val PRICEPOINT_CAMPAIGN = "pricepoint"
   val REPLENISHMENT_CAMPAIGN = "replenishment"
+  val REPLENISHMENT_CAMPAIGN_FEED = "replenishment_feed"
+  val REPLENISHMENT_CAMPAIGN_NO_CMR = "replenishment_no_cmr"
   val BRICK_AFFINITY_CAMPAIGN = "brick_affinity"
   val NON_BEAUTY_FRAG_CAMPAIGN = "non_beauty_replenish"
   val BEAUTY_CAMPAIGN = "beauty_replinish"
@@ -75,6 +77,8 @@ object CampaignCommon {
   val MOBILE_PUSH_CAMPAIGN_QUALITY = "mobile_push_campaign_quality"
   val EMAIL_CAMPAIGN_QUALITY = "email_campaign_quality"
   val CALENDAR_CAMPAIGN_QUALITY = "calendar_campaign_quality"
+
+  val VARIABLES_QUALITY = "variables_quality"
 
   val MIPR_CAMPAIGN = "mipr"
   val NEW_ARRIVALS_BRAND = "new_arrivals_brand"

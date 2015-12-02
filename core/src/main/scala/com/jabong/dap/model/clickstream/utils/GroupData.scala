@@ -54,7 +54,7 @@ class GroupData() extends java.io.Serializable {
     return ug
   }
 
-  def calculateColumns(useridDeviceidFrame: DataFrame): Unit = {
+  def calculateColumns(useridDeviceidFrame: DataFrame) = {
     val res = useridDeviceidFrame.columns
     for (i <- 1 to (res.length - 1)) {
       if (res(i) == "pagetype")

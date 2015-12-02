@@ -78,7 +78,6 @@ object CustomerDeviceMapping extends Logging {
       .select(
         cmr(ContactListMobileVars.UID),
         coalesce(cmr(CustomerVariables.EMAIL), joinedDf(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
-        cmr(CustomerVariables.RESPONSYS_ID),
         coalesce(joinedDf(CustomerVariables.ID_CUSTOMER), cmr(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
         coalesce(joinedDf(PageVisitVariables.BROWSER_ID), cmr(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
         coalesce(joinedDf(PageVisitVariables.DOMAIN), cmr(PageVisitVariables.DOMAIN)) as PageVisitVariables.DOMAIN
@@ -97,6 +96,7 @@ object CustomerDeviceMapping extends Logging {
           PageVisitVariables.BROWSER_ID -> ""
         )
       ).dropDuplicates()
+
     val resWithout0 = result.filter(col(CustomerVariables.ID_CUSTOMER) > 0)
     println("Total count with id_customer > 0: " + resWithout0.count())
     println("Distinct id_customer count for device Mapping: " + resWithout0.select(CustomerVariables.ID_CUSTOMER).distinct.count())
@@ -110,7 +110,7 @@ object CustomerDeviceMapping extends Logging {
    */
   def start(vars: ParamInfo) = {
     val incrDate = OptionUtils.getOptValue(vars.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-2, TimeConstants.DATE_FORMAT_FOLDER))
+    val prevDate = OptionUtils.getOptValue(vars.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
     val path = OptionUtils.getOptValue(vars.path)
     val saveMode = vars.saveMode
     val clickIncr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.CLICKSTREAM, DataSets.USER_DEVICE_MAP_APP, DataSets.DAILY_MODE, incrDate)
@@ -142,6 +142,26 @@ object CustomerDeviceMapping extends Logging {
           }
           nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
+        } else if ("dcfUID".equals(path)) {
+          val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+          val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
+            prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
+            .select(
+              col(ContactListMobileVars.UID),
+              col(ContactListMobileVars.EMAIL)
+            ).na.drop("any", Array(ContactListMobileVars.EMAIL, ContactListMobileVars.UID)).dropDuplicates()
+          println("Total recs in DCF file initially: " + cmrFullDCF.count())
+          val cmrPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+          val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull(CustomerVariables.EMAIL) === cmrFullDCF(ContactListMobileVars.EMAIL), SQL.FULL_OUTER)
+          cmrFull = cmrJoined.select(
+            cmrFullDCF(ContactListMobileVars.UID),
+            coalesce(cmrPrevFull(CustomerVariables.EMAIL), cmrFullDCF(ContactListMobileVars.EMAIL)) as CustomerVariables.EMAIL,
+            cmrPrevFull(CustomerVariables.ID_CUSTOMER),
+            cmrPrevFull(PageVisitVariables.BROWSER_ID),
+            cmrPrevFull(PageVisitVariables.DOMAIN)
+          )
+          nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
+          customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
         } else {
           cmrFull = getDataFrameCsv4mDCF(path)
         }
@@ -153,10 +173,14 @@ object CustomerDeviceMapping extends Logging {
 
       val res = getLatestDevice(clickIncr, cmrFull, customerIncr, nlsIncr)
 
-      //val filledUid = UUIDGenerator.addUid(res)
+      res.printSchema()
 
-      //DataWriter.writeParquet(filledUid, savePath, saveMode)
-      DataWriter.writeParquet(res, savePath, saveMode)
+      val filledUid = UUIDGenerator.addUid(res)
+
+      filledUid.printSchema()
+
+      DataWriter.writeParquet(filledUid, savePath, saveMode)
+      // DataWriter.writeParquet(res, savePath, saveMode)
     }
   }
 
@@ -209,10 +233,11 @@ object CustomerDeviceMapping extends Logging {
    * @return DataFrame
    */
   def getDataFrameCsv4mDCF(path: String): DataFrame = {
+    val RESPONSYS_ID = "responsys_id"
     try {
       val df = DataReader.getDataFrame4mCsv(path, "true", ";")
         .select(
-          col("RESPONSYS_ID") as CustomerVariables.RESPONSYS_ID,
+          col("RESPONSYS_ID") as RESPONSYS_ID,
           col("CUSTOMER_ID").cast(LongType) as CustomerVariables.ID_CUSTOMER,
           Udf.populateEmail(col("EMAIL"), col("BID")) as CustomerVariables.EMAIL,
           col("BID") as PageVisitVariables.BROWSER_ID,
@@ -230,7 +255,7 @@ object CustomerDeviceMapping extends Logging {
       // duplicate.printSchema()
       // duplicate.show(9)
 
-      val NEW_RESPONSYS_ID = MergeUtils.NEW_ + CustomerVariables.RESPONSYS_ID
+      val NEW_RESPONSYS_ID = MergeUtils.NEW_ + RESPONSYS_ID
       val NEW_ID_CUSTOMER = MergeUtils.NEW_ + CustomerVariables.ID_CUSTOMER
       val NEW_EMAIL = MergeUtils.NEW_ + CustomerVariables.EMAIL
       val NEW_BROWSER_ID = MergeUtils.NEW_ + PageVisitVariables.BROWSER_ID
@@ -238,7 +263,7 @@ object CustomerDeviceMapping extends Logging {
 
       val correctRecs = df.join(duplicate, df(CustomerVariables.ID_CUSTOMER) === duplicate(CustomerVariables.ID_CUSTOMER) && df(CustomerVariables.EMAIL) === duplicate(CustomerVariables.EMAIL))
         .select(
-          df(CustomerVariables.RESPONSYS_ID) as NEW_RESPONSYS_ID,
+          df(RESPONSYS_ID) as NEW_RESPONSYS_ID,
           df(CustomerVariables.ID_CUSTOMER) as NEW_ID_CUSTOMER,
           df(CustomerVariables.EMAIL) as NEW_EMAIL,
           df(PageVisitVariables.BROWSER_ID) as NEW_BROWSER_ID,
@@ -250,7 +275,7 @@ object CustomerDeviceMapping extends Logging {
 
       val res = df.join(correctRecs, df(CustomerVariables.ID_CUSTOMER) === correctRecs(NEW_ID_CUSTOMER), SQL.LEFT_OUTER)
         .select(
-          coalesce(correctRecs(NEW_RESPONSYS_ID), df(CustomerVariables.RESPONSYS_ID)) as CustomerVariables.RESPONSYS_ID,
+          coalesce(correctRecs(NEW_RESPONSYS_ID), df(RESPONSYS_ID)) as ContactListMobileVars.UID,
           coalesce(correctRecs(NEW_ID_CUSTOMER), df(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
           coalesce(correctRecs(NEW_EMAIL), df(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
           coalesce(correctRecs(NEW_BROWSER_ID), df(PageVisitVariables.BROWSER_ID)) as PageVisitVariables.BROWSER_ID,
