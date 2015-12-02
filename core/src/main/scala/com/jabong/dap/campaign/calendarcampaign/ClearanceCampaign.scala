@@ -17,7 +17,7 @@ class ClearanceCampaign {
 
   def runCampaign(last30DaysSalesOrderData: DataFrame, last30DaysSalesOrderItemData: DataFrame, mvpDiscountRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
-    val date = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT) + TimeConstants.END_TIME
+    val date = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT) + " " + TimeConstants.END_TIME
 
     val last10thSalesOrderData = Utils.getOneDayData(last30DaysSalesOrderData, SalesOrderVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-10, TimeConstants.DATE_TIME_FORMAT, date), TimeConstants.DATE_TIME_FORMAT)
     val last10thSalesOrderItemData = Utils.getOneDayData(last30DaysSalesOrderItemData, SalesOrderItemVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-10, TimeConstants.DATE_TIME_FORMAT, date), TimeConstants.DATE_TIME_FORMAT)
