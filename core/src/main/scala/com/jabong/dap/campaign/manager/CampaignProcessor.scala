@@ -51,7 +51,6 @@ object CampaignProcessor {
       .filter(col(CustomerVariables.ID_CUSTOMER) > 0)
       .select(
         cmr(CustomerVariables.EMAIL),
-        cmr(CustomerVariables.RESPONSYS_ID),
         cmr(CustomerVariables.ID_CUSTOMER),
         cmr(PageVisitVariables.BROWSER_ID),
         cmr(PageVisitVariables.DOMAIN)
@@ -100,7 +99,6 @@ object CampaignProcessor {
       .select(
         cmr(ContactListMobileVars.UID),
         cmr(CustomerVariables.EMAIL),
-        cmr(CustomerVariables.RESPONSYS_ID),
         cmr(CustomerVariables.ID_CUSTOMER),
         cmr(PageVisitVariables.BROWSER_ID),
         cmr(PageVisitVariables.DOMAIN)
