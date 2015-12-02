@@ -83,8 +83,8 @@ object CampaignQuality extends Logging {
             cachedfCampaignQuality.select(
               col(CAMPAIGNNAME) as "VariablesName",
               col(TOTALCOUNT),
-              col(CUSTID_ZERO) as "NullValuesCount",
-              col(CUSTID_NONZERO) as "NotNullValuesCount"
+              col(CUSTID_ZERO) as "NullCount",
+              col(CUSTID_NONZERO) as "NotNullCount"
             )
           }
           case _ => {
