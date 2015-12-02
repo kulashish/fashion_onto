@@ -30,7 +30,7 @@ object CampaignOutput {
    * @param campaignName
    * @param campaignType
    */
-  def saveCampaignData(campaignOutput: DataFrame, campaignName: String, campaignType: String = DataSets.PUSH_CAMPAIGNS, incrDate: String) = {
+  def saveCampaignData(campaignOutput: DataFrame, campaignName: String, campaignType: String, incrDate: String) = {
     val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, incrDate)
 
     if (testMode) {
