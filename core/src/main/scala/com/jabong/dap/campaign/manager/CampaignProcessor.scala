@@ -142,7 +142,7 @@ object CampaignProcessor {
     val groupedFields = Array(groupKey)
     val aggFields = Array(groupKey, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.REF_SKU1, CampaignMergedFields.EMAIL, CampaignMergedFields.DOMAIN)
 
-    val campaignMerged = GroupedUtils.orderGroupBy(inputCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.pushCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
+    val campaignMerged = GroupedUtils.orderGroupBy(inputCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.pushCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.ASC, IntegerType)
 
     campaignMerged
   }
@@ -153,7 +153,7 @@ object CampaignProcessor {
    * @param itr
    * @return
    */
-  def mergepushCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
+  def mergePushCampaigns(allCampaign: DataFrame, itr: DataFrame): DataFrame = {
     println("Inside priority based merge")
 
     // filtering based on domain as this is only for push campaigns and only for ios and android. Windows is also not needed.
@@ -224,7 +224,7 @@ object CampaignProcessor {
     val groupedFields = Array(CampaignMergedFields.EMAIL)
     val aggFields = Array(CampaignMergedFields.EMAIL, ContactListMobileVars.UID, CampaignMergedFields.CUSTOMER_ID, CampaignMergedFields.REF_SKUS, CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
 
-    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.DESC, IntegerType)
+    val campaignMerged = GroupedUtils.orderGroupBy(allCampaignsData, groupedFields, aggFields, GroupedUtils.FIRST, OrderBySchema.emailCampaignSchema, CampaignCommon.PRIORITY, GroupedUtils.ASC, IntegerType)
 
     CampaignUtils.debug(campaignMerged, "data after campaign merge in campaign Processor")
 
