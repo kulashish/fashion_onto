@@ -12,10 +12,10 @@ import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
-import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
+import com.jabong.dap.model.clickstream.variables.{GetSurfVariables, SurfVariablesMain}
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut }
-import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderAddress }
+import com.jabong.dap.model.customer.data.{CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut}
+import com.jabong.dap.model.order.variables.{SalesItemRevenue, SalesOrderAddress}
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
@@ -24,7 +24,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 /**
  * Created by pooja on 9/7/15.
@@ -99,6 +99,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
           case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
           case DataSets.SALES_ITEM_REVENUE => SalesItemRevenue.start(paramJob)
+          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
           //CUSTOMER_SURF_AFFINITY from surf data
           case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
@@ -115,8 +116,6 @@ class ComponentExecutor extends Serializable with Logging {
 
           // campaigns
           case DataSets.ACART_HOURLY => CampaignManager.startAcartHourlyCampaign(paramJob)
-
-          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
 
           case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
 
