@@ -662,7 +662,7 @@ object CampaignManager extends Serializable with Logging {
         if (DataSets.PUSH_CAMPAIGNS == campaignType) {
           val allCamp = CampaignProcessor.mapDeviceFromCMR(cmr, allCampaignsData)
           val itr = CampaignInput.loadYesterdayItrSkuDataForCampaignMerge()
-          CampaignProcessor.mergepushCampaigns(allCamp, itr).coalesce(1).cache()
+          CampaignProcessor.mergePushCampaigns(allCamp, itr).coalesce(1).cache()
         } else {
           val allCamp = CampaignProcessor.mapEmailCampaignWithCMR(cmr, allCampaignsData)
           CampaignProcessor.mergeEmailCampaign(allCamp)
