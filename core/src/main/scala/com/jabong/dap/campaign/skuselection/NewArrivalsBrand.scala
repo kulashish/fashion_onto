@@ -25,13 +25,14 @@ object NewArrivalsBrand extends Logging {
     val yesterdayDateTime = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT)
     val yesterdayDate = yesterdayDateTime.substring(0, yesterdayDateTime.indexOf(" ") + 1) + TimeConstants.START_TIME
 
-    val dfItrGrouped = itrData.filter(ProductVariables.ACTIVATED_AT + " > '" + yesterdayDate + "'")
-      .groupBy(ProductVariables.BRAND, ProductVariables.GENDER).agg(count(ProductVariables.BRAND) as "count", first(ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE, first(ProductVariables.BRICK) as ProductVariables.BRICK, first(ProductVariables.MVP) as ProductVariables.MVP, first(ProductVariables.PRODUCT_NAME) as ProductVariables.PRODUCT_NAME, first(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE)
+    val dfItrCount = itrData.filter(ProductVariables.ACTIVATED_AT + " > '" + yesterdayDate + "'")
+      .groupBy(ProductVariables.BRAND, ProductVariables.GENDER).agg(count(ProductVariables.BRAND) as "count")
+    //, first(ProductVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE, first(ProductVariables.BRICK) as ProductVariables.BRICK, first(ProductVariables.MVP) as ProductVariables.MVP, first(ProductVariables.PRODUCT_NAME) as ProductVariables.PRODUCT_NAME, first(ProductVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE)
 
-    val dfItrFilteredSku = dfItrGrouped.filter(col("count").geq(CampaignCommon.COUNT_NEW_ARRIVALS))
-      .select(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.PRODUCT_NAME, ProductVariables.MVP, ProductVariables.SKU_SIMPLE, ProductVariables.SPECIAL_PRICE)
+    //    val dfItrFilteredSku = dfItrCount.filter(col("count").geq(CampaignCommon.COUNT_NEW_ARRIVALS))
+    //      .select(ProductVariables.BRAND, ProductVariables.BRICK, ProductVariables.GENDER, ProductVariables.PRODUCT_NAME, ProductVariables.MVP, ProductVariables.SKU_SIMPLE, ProductVariables.SPECIAL_PRICE)
 
-    val dfResult = customerSelected.join(dfItrFilteredSku, customerSelected(SalesCartVariables.SKU) === dfItrFilteredSku(ProductVariables.SKU_SIMPLE), SQL.INNER)
+    val dfcsJoinToItr = customerSelected.join(itrData, customerSelected(SalesCartVariables.SKU) === itrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(
         col(SalesCartVariables.FK_CUSTOMER),
         col(SalesCartVariables.EMAIL),
@@ -43,6 +44,13 @@ object NewArrivalsBrand extends Logging {
         col(ProductVariables.MVP),
         col(ProductVariables.PRODUCT_NAME)
       )
+
+    val dfResult = dfcsJoinToItr.join(dfItrCount,
+      dfcsJoinToItr(ProductVariables.BRAND) === dfItrCount(ProductVariables.BRAND) && dfcsJoinToItr(ProductVariables.GENDER) === dfItrCount(ProductVariables.GENDER), SQL.INNER)
+      .filter(col("count").geq(CampaignCommon.COUNT_NEW_ARRIVALS))
+      .drop(dfItrCount(ProductVariables.BRAND))
+      .drop(dfItrCount(ProductVariables.GENDER))
+      .drop(dfItrCount("count"))
 
     return dfResult
   }

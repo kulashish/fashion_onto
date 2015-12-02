@@ -476,9 +476,11 @@ object CampaignManager extends Serializable with Logging {
     miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData)
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
 
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
+
     //Start: New Arrival email Campaign
     val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-    newArrivalsBrandCampaign.runCampaign(last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
+    newArrivalsBrandCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
   }
 
   def startHottestXCampaign(params: ParamInfo) = {

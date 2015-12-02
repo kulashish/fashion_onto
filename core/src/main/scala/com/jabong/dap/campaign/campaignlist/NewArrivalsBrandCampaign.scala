@@ -11,12 +11,12 @@ import org.apache.spark.sql.DataFrame
  * Created by raghu on 7/9/15.
  */
 class NewArrivalsBrandCampaign {
-  def runCampaign(salesCart30Days: DataFrame, brandMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, salesCart30Days: DataFrame, brandMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
 
     val newArivalsBrandCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.SALES_CART)
 
-    val customerSelected = newArivalsBrandCustomerSelector.customerSelection(salesCart30Days)
+    val customerSelected = newArivalsBrandCustomerSelector.customerSelection(last30DaySalesOrderData, last30DaySalesOrderItemData, salesCart30Days)
 
     val filteredSku = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
 
