@@ -15,6 +15,8 @@ import org.scalatest.{ FeatureSpec, GivenWhenThen }
 class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkContext {
 
   @transient var sqlContext: SQLContext = _
+  @transient var last30DaySalesOrderData: DataFrame = _
+  @transient var last30DaySalesOrderItemData: DataFrame = _
   @transient var salesCart30Days: DataFrame = _
   @transient var recommendationsData: DataFrame = _
   @transient var yesterdayItrData: DataFrame = _
@@ -32,7 +34,7 @@ class NewArrivalsBrandCampaignTest extends FeatureSpec with GivenWhenThen with S
     scenario("Yesterday New Arrivals Brand"){
       Given("salesCart30Days, recommendationsData, yesterdayItrData")
       val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-      newArrivalsBrandCampaign.runCampaign(salesCart30Days, recommendationsData, yesterdayItrData)
+      newArrivalsBrandCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, salesCart30Days, recommendationsData, yesterdayItrData)
 
       val NewArrivalsBrandCampaignOut = CampaignOutput.testData.head
       //      assert(NewArrivalsBrandCampaignOut._1.count() == 1)
