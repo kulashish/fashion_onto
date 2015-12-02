@@ -12,14 +12,14 @@ import scala.collection.mutable.HashMap
  */
 abstract class DataFeedsModel {
 
-  def start(params: ParamInfo): Unit = {
+  def start(params: ParamInfo) = {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
     val saveMode = params.saveMode
     val paths = OptionUtils.getOptValue(params.path)
     val prevDate = OptionUtils.getOptValue(params.fullDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER, incrDate))
     val isHistory = OptionUtils.getOptBoolVal(ParamJobConfig.paramJobInfo.isHistory)
 
-    if (isHistory == true) {
+    if (true == isHistory) {
       val days = TimeUtils.daysFromToday(incrDate, TimeConstants.DATE_FORMAT_FOLDER)
       for (day <- days to 1 by -1) {
         val incr = TimeUtils.getDateAfterNDays(-day, TimeConstants.DATE_FORMAT_FOLDER)

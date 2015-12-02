@@ -39,7 +39,7 @@ class HottestXCampaign {
     CampaignUtils.debug(filteredSku, CampaignCommon.HOTTEST_X_CAMPAIGN + "after filteredSku ")
 
     CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.HOTTEST_X_CAMPAIGN, filteredSku, false,
-      recommendations)
+      recommendations, incrDate)
 
   }
 

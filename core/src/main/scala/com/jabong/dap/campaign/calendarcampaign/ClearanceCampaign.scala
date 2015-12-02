@@ -15,12 +15,14 @@ import org.apache.spark.sql.DataFrame
  */
 class ClearanceCampaign {
 
-  def runCampaign(last30DaysSalesOrderData: DataFrame, last30DaysSalesOrderItemData: DataFrame, mvpDiscountRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_TIME_FORMAT)) = {
+  def runCampaign(last30DaysSalesOrderData: DataFrame, last30DaysSalesOrderItemData: DataFrame, mvpDiscountRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
-    val last10thSalesOrderData = Utils.getOneDayData(last30DaysSalesOrderData, SalesOrderVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-10, TimeConstants.DATE_TIME_FORMAT, incrDate), TimeConstants.DATE_TIME_FORMAT)
-    val last10thSalesOrderItemData = Utils.getOneDayData(last30DaysSalesOrderItemData, SalesOrderItemVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-10, TimeConstants.DATE_TIME_FORMAT, incrDate), TimeConstants.DATE_TIME_FORMAT)
-    val last30thSalesOrderData = Utils.getOneDayData(last30DaysSalesOrderData, SalesOrderVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_TIME_FORMAT, incrDate), TimeConstants.DATE_TIME_FORMAT)
-    val last30thSalesOrderItemData = Utils.getOneDayData(last30DaysSalesOrderItemData, SalesOrderItemVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_TIME_FORMAT, incrDate), TimeConstants.DATE_TIME_FORMAT)
+    val date = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT) + TimeConstants.END_TIME
+
+    val last10thSalesOrderData = Utils.getOneDayData(last30DaysSalesOrderData, SalesOrderVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-10, TimeConstants.DATE_TIME_FORMAT, date), TimeConstants.DATE_TIME_FORMAT)
+    val last10thSalesOrderItemData = Utils.getOneDayData(last30DaysSalesOrderItemData, SalesOrderItemVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-10, TimeConstants.DATE_TIME_FORMAT, date), TimeConstants.DATE_TIME_FORMAT)
+    val last30thSalesOrderData = Utils.getOneDayData(last30DaysSalesOrderData, SalesOrderVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_TIME_FORMAT, date), TimeConstants.DATE_TIME_FORMAT)
+    val last30thSalesOrderItemData = Utils.getOneDayData(last30DaysSalesOrderItemData, SalesOrderItemVariables.CREATED_AT, TimeUtils.getDateAfterNDays(-30, TimeConstants.DATE_TIME_FORMAT, date), TimeConstants.DATE_TIME_FORMAT)
 
     val salesOrderData = last10thSalesOrderData.unionAll(last30thSalesOrderData)
     val salesOrderItemData = last10thSalesOrderItemData.unionAll(last30thSalesOrderItemData)
@@ -34,7 +36,7 @@ class ClearanceCampaign {
     val filteredSku = Daily.skuFilter(dfCustomerSelected, yesterdayItrData)
     CampaignUtils.debug(filteredSku, CampaignCommon.CLEARANCE_CAMPAIGN + "after filteredSku ")
 
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.CLEARANCE_CAMPAIGN, filteredSku, false, mvpDiscountRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.CLEARANCE_CAMPAIGN, filteredSku, false, mvpDiscountRecommendations, incrDate)
 
   }
 }

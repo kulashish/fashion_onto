@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -35,7 +36,7 @@ class MIPRCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
     scenario("In order: All item status closed"){
       Given("last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, yesterdayItrData")
       val miprCampaign = new MIPRCampaign()
-      miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, yesterdayItrData)
+      miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, recommendationsData, yesterdayItrData, TimeUtils.YESTERDAY_FOLDER)
 
       val MIPRCampaignOut = CampaignOutput.testData.head
       //      assert(MIPRCampaignOut._1.count() == 1)

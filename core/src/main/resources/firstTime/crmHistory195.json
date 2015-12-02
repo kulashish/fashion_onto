@@ -4,55 +4,55 @@
       "source": "crm",
       "tableName": "CRM_tblProductAttributeMaster",
       "primaryKey": null,
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "[Last Modification Date Time]"
+      "filterCondition": "[Last Modification Date Time] <= '2015-11-30 23:59:59'"
     },
     {
       "source": "crm",
       "tableName": "CRM_TicketDetails",
       "primaryKey": "TicketID",
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "UPDT"
-    },
-    {
-      "source": "crm",
-      "tableName": "CRM_OrderDetails",
-      "primaryKey": null,
-      "mode": "daily",
-      "saveFormat": "orc",
-      "saveMode": "Ignore",
-      "dateColumn": "LastUpdatedAt"
-    },
-    {
-      "source": "crm",
-      "tableName": "CRM_ProductDetails",
-      "primaryKey": "ProductId",
-      "mode": "daily",
-      "saveFormat": "orc",
-      "saveMode": "Ignore",
-      "dateColumn": "UpdateDate"
+      "filterCondition": "UPDT <= '2015-11-30 23:59:59'"
     },
     {
       "source": "crm",
       "tableName": "CRM_TicketProducts",
       "primaryKey": "TicketProductsID",
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "UpdateDate"
+      "filterCondition": "UpdateDate <= '2015-11-30 23:59:59'"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_OrderDetails",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "filterCondition": "LastUpdatedAt <= '2015-11-30 23:59:59'"
+    },
+    {
+      "source": "crm",
+      "tableName": "CRM_ProductDetails",
+      "primaryKey": "ProductId",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "filterCondition": "UpdateDate <= '2015-11-30 23:59:59'"
     },
     {
       "source": "crm",
       "tableName": "CRM_TicketStatusLog",
       "primaryKey": "TicketStatusLogID",
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "AddDate"
+      "filterCondition": "AddDate <= '2015-11-30 23:59:59'"
     }
   ]
 }

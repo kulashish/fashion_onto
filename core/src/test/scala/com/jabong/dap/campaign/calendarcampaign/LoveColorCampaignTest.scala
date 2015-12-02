@@ -36,7 +36,7 @@ class LoveColorCampaignTest extends FeatureSpec with GivenWhenThen with SharedSp
     scenario("select sku from 20th day last order data"){
       Given("last15thDaysSalesOrderData, last15thDaysSalesOrderItemData, mvpColorRecommendations, yesterdayItrSkuSimpleData")
       val loveColorCampaign = new LoveColorCampaign()
-      loveColorCampaign.runCampaign(customerTopData, last15thDaysSalesOrderData, last15thDaysSalesOrderItemData, mvpColorRecommendations, yesterdayItrData, "2015-11-13 23:43:43.0")
+      loveColorCampaign.runCampaign(customerTopData, last15thDaysSalesOrderData, last15thDaysSalesOrderItemData, mvpColorRecommendations, yesterdayItrData, "2015/11/13")
 
       val loveBrandCampaignOut = CampaignOutput.testData.head
       //      assert(pricepointCampaignOut._1.count() == 1)

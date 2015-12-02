@@ -3,6 +3,7 @@ package com.jabong.dap.campaign.campaignlist
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -49,6 +50,8 @@ class WishListCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
 
       val wishListCampaign = new WishListCampaign()
 
+      val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+
       wishListCampaign.runCampaign(
         shortlistYesterdayData,
         shortlistLast30DayData,
@@ -59,7 +62,8 @@ class WishListCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
         last30DaySalesOrderData,
         last30DaySalesOrderItemData,
         itrSku30DayData,
-        brickMvpRecommendations)
+        brickMvpRecommendations,
+        yestDate)
 
       val wishlistFollowupPushCampaignOut = CampaignOutput.testData(0)
       val wishlistFollowupEmailCampaignOut = CampaignOutput.testData(1)

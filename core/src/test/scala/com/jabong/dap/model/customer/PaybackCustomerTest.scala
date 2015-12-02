@@ -18,7 +18,7 @@ class PaybackCustomerTest extends FlatSpec with SharedSparkContext {
   @transient var dfPaybackRedeem: DataFrame = _
   @transient var expectedPaybackCustomers: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll() = {
     super.beforeAll()
     dfSalesOrder = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER, Schema.salesOrder)
     dfPaybackEarn = JsonUtils.readFromJson(TestConstants.PAYBACK_CUSTOMER, DataSets.SALES_ORDER_PAYBACK_EARN, TestSchema.salesOrderPaybackEarn)

@@ -9,7 +9,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 class WishlistFollowupCampaign {
-  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame, orderItemData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
+  def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame, orderData: DataFrame,
+                  orderItemData: DataFrame, brickMvpRecommendations: DataFrame, incrDate: String) = {
 
     // select customers who have added one or more items to wishlist during last day
 
@@ -42,10 +43,10 @@ class WishlistFollowupCampaign {
     ).cache()
 
     // ***** mobile push use case
-    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false)
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false, null, incrDate)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, dfUnion, false, brickMvpRecommendations, incrDate)
   }
 
 }

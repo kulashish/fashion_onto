@@ -99,6 +99,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
           case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
           case DataSets.SALES_ITEM_REVENUE => SalesItemRevenue.start(paramJob)
+          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
           //CUSTOMER_SURF_AFFINITY from surf data
           case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
@@ -115,8 +116,6 @@ class ComponentExecutor extends Serializable with Logging {
 
           // campaigns
           case DataSets.ACART_HOURLY => CampaignManager.startAcartHourlyCampaign(paramJob)
-
-          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
 
           case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
 
