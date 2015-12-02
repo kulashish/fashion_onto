@@ -11,7 +11,7 @@ import org.apache.spark.sql.DataFrame
  * Created by raghu on 7/9/15.
  */
 class NewArrivalsBrandCampaign {
-  def runCampaign(last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, salesCart30Days: DataFrame, brandMvpRecommendations: DataFrame, yesterdayItrData: DataFrame) = {
+  def runCampaign(last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, salesCart30Days: DataFrame, brandMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, yestDate: String) = {
 
     val newArivalsBrandCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.SALES_CART)
@@ -21,7 +21,7 @@ class NewArrivalsBrandCampaign {
     val filteredSku = NewArrivalsBrand.skuFilter(customerSelected, yesterdayItrData)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.NEW_ARRIVALS_BRAND, filteredSku, true, brandMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.NEW_ARRIVALS_BRAND, filteredSku, true, brandMvpRecommendations, yestDate)
 
   }
 }

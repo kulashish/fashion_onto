@@ -483,7 +483,7 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: MIPR email Campaign
     val miprCampaign = new MIPRCampaign()
-    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData, yestDate)
+    //    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData, yestDate)
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
 
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
