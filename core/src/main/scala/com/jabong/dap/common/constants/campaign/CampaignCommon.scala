@@ -78,6 +78,8 @@ object CampaignCommon {
   val EMAIL_CAMPAIGN_QUALITY = "email_campaign_quality"
   val CALENDAR_CAMPAIGN_QUALITY = "calendar_campaign_quality"
 
+  val VARIABLES_QUALITY = "variables_quality"
+
   val MIPR_CAMPAIGN = "mipr"
   val NEW_ARRIVALS_BRAND = "new_arrivals_brand"
   val SHORTLIST_REMINDER = "shortlist_reminder"
