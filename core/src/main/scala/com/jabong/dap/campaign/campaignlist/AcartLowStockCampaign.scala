@@ -1,11 +1,9 @@
 package com.jabong.dap.campaign.campaignlist
 
-import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.campaign.skuselection.LowStock
-import com.jabong.dap.campaign.traceability.PastCampaignCheck
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.constants.campaign.{ SkuSelection, CustomerSelection, CampaignCommon }
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
 
@@ -14,7 +12,8 @@ import org.apache.spark.sql.DataFrame
  */
 class AcartLowStockCampaign {
 
-  def runCampaign(last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame, yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame): Unit = {
+  def runCampaign(last30DayAcartData: DataFrame, last30DaySalesOrderData: DataFrame, last30DaySalesOrderItemData: DataFrame,
+                  yesterdayItrData: DataFrame, brickMvpRecommendations: DataFrame, incrDate: String) = {
 
     val acartCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.ACART)
@@ -28,10 +27,10 @@ class AcartLowStockCampaign {
 
     CampaignUtils.debug(filteredSku, "AcartLowStockCampaigns filteredSku ")
     // ***** mobile push use case
-    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku)
+    CampaignUtils.campaignPostProcess(DataSets.PUSH_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, null, incrDate)
 
     // ***** email use case
-    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_LOWSTOCK_CAMPAIGN, filteredSku, true, brickMvpRecommendations, incrDate)
 
   }
 

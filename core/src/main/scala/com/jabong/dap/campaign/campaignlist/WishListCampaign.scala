@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.campaignlist
 
-import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import org.apache.spark.sql.DataFrame
@@ -19,7 +18,8 @@ class WishListCampaign {
                   last30DaySalesOrderData: DataFrame,
                   last30DaySalesOrderItemData: DataFrame,
                   itrSku30DayData: DataFrame,
-                  brickMvpRecommendations: DataFrame): Unit = {
+                  brickMvpRecommendations: DataFrame,
+                  incrDate: String) = {
 
     val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.WISH_LIST)
@@ -27,13 +27,13 @@ class WishListCampaign {
     val last30DaysCustomerSelected = wishListCustomerSelector.customerSelection(shortlistLast30DayData)
 
     val wishlistFollowupCampaign = new WishlistFollowupCampaign()
-    wishlistFollowupCampaign.runCampaign(lastDayCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations)
+    wishlistFollowupCampaign.runCampaign(lastDayCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, incrDate)
 
     val wishListLowStockCampaign = new WishlistLowStockCampaign()
-    wishListLowStockCampaign.runCampaign(last30DaysCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations)
+    wishListLowStockCampaign.runCampaign(last30DaysCustomerSelected, itrSkuYesterdayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations, incrDate)
 
     val wishListIODCampaign = new WishlistIODCampaign()
-    wishListIODCampaign.runCampaign(last30DaysCustomerSelected, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations)
+    wishListIODCampaign.runCampaign(last30DaysCustomerSelected, itrSkuYesterdayData, itrSku30DayData, itrSkuSimpleYesterdayData, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations, incrDate)
 
   }
 

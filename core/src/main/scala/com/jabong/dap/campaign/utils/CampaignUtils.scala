@@ -16,7 +16,6 @@ import com.jabong.dap.common.udf.{ Udf, UdfUtils }
 import com.jabong.dap.common.{ GroupedUtils, Spark }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.{ OrderBySchema, Schema }
-import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DecimalType
@@ -753,16 +752,15 @@ object CampaignUtils extends Logging {
    * * @param campaignType
    * @param filteredSku
    */
-  def campaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, pastCampaignCheck: Boolean = true, recommendations: DataFrame = null) = {
-
+  def campaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, pastCampaignCheck: Boolean,
+                          recommendations: DataFrame, incrDate: String) = {
     if (campaignType.equalsIgnoreCase(DataSets.PUSH_CAMPAIGNS)) {
-      pushCampaignPostProcess(campaignType, campaignName, filteredSku, pastCampaignCheck)
+      pushCampaignPostProcess(campaignType, campaignName, filteredSku, pastCampaignCheck, incrDate)
     } else if (campaignType.equalsIgnoreCase(DataSets.EMAIL_CAMPAIGNS)) {
-      emailCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, pastCampaignCheck)
+      emailCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, pastCampaignCheck, incrDate)
     } else if (campaignType.equalsIgnoreCase(DataSets.CALENDAR_CAMPAIGNS)) {
-      calendarCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations)
+      calendarCampaignPostProcess(campaignType, campaignName, filteredSku, recommendations, incrDate)
     }
-
   }
 
   /**
@@ -772,7 +770,7 @@ object CampaignUtils extends Logging {
    * @param filteredSku
    * @param recommendations
    */
-  def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame) = {
+  def calendarCampaignPostProcess(campaignType: String, campaignName: String, filteredSku: DataFrame, recommendations: DataFrame, incrDate: String) = {
 
     val recs = campaignName match {
       case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => {
@@ -816,8 +814,6 @@ object CampaignUtils extends Logging {
         //                    dfBrick1RecommendationData(CampaignMergedFields.CAMPAIGN_MAIL_TYPE),
         //                    dfBrick1RecommendationData(CampaignMergedFields.LIVE_CART_URL)
         //                  ).rdd.map(row => (row(0).asInstanceOf[String], row(1).asInstanceOf[List[String]], row(2).asInstanceOf[List[String]] ::: row(3).asInstanceOf[List[String]], row(4).asInstanceOf[String], row(5).asInstanceOf[String]))
-
-        import sqlContext.implicits._
         //        val dfJoined = joinedRdd.toDF(CustomerVariables.EMAIL, CampaignMergedFields.REF_SKUS,
         //          CampaignMergedFields.REC_SKUS, CampaignMergedFields.CAMPAIGN_MAIL_TYPE, CampaignMergedFields.LIVE_CART_URL)
         CampaignUtils.debug(campaignOutAfterRecFilter, "campaignOutAfterRecFilter")
@@ -838,9 +834,9 @@ object CampaignUtils extends Logging {
     }
 
     if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
-      CampaignOutput.saveCampaignDataForYesterday(recs, CampaignCommon.REPLENISHMENT_CAMPAIGN_NO_CMR, campaignType)
+      CampaignOutput.saveCampaignData(recs, CampaignCommon.REPLENISHMENT_CAMPAIGN_NO_CMR, campaignType, incrDate)
     } else {
-      CampaignOutput.saveCampaignDataForYesterday(recs, campaignName, campaignType)
+      CampaignOutput.saveCampaignData(recs, campaignName, campaignType, incrDate)
     }
 
   }
@@ -1017,7 +1013,7 @@ object CampaignUtils extends Logging {
    * @param campaignName
    * @param custFiltered
    */
-  def pushCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, pastCampaignCheck: Boolean) = {
+  def pushCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, pastCampaignCheck: Boolean, incrDate: String) = {
 
     var refSkus: DataFrame = null
     var custFilteredPastCampaign: DataFrame = custFiltered
@@ -1041,7 +1037,7 @@ object CampaignUtils extends Logging {
     val campaignOutput = CampaignUtils.addCampaignMailType(refSkus, campaignName)
 
     //save campaign Output for mobile
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutput, campaignName, campaignType)
+    CampaignOutput.saveCampaignData(campaignOutput, campaignName, campaignType, incrDate)
   }
 
   /**
@@ -1050,7 +1046,7 @@ object CampaignUtils extends Logging {
    * @param campaignName
    * @param custFiltered
    */
-  def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame, pastCampaignCheck: Boolean) = {
+  def emailCampaignPostProcess(campaignType: String, campaignName: String, custFiltered: DataFrame, recommendations: DataFrame, pastCampaignCheck: Boolean, incrDate: String) = {
     var custFilteredWithEmail = custFiltered
     if (!testMode && !campaignName.startsWith("surf")) {
       val cmr = CampaignInput.loadCustomerMasterData()
@@ -1094,7 +1090,7 @@ object CampaignUtils extends Logging {
     //save campaign Output for mobile
     val campaignOutAfterRecFilter = minRefSkuFilter(campaignOutput)
 
-    CampaignOutput.saveCampaignDataForYesterday(campaignOutAfterRecFilter, campaignName, campaignType)
+    CampaignOutput.saveCampaignData(campaignOutAfterRecFilter, campaignName, campaignType, incrDate)
   }
 
   /**

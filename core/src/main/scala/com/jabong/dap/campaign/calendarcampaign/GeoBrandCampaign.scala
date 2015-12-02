@@ -14,7 +14,7 @@ import org.apache.spark.sql.DataFrame
 class GeoBrandCampaign {
 
   def runCampaign(day50_SalesOrder: DataFrame, day50_SalesOrderItem: DataFrame, salesAddressData: DataFrame, yesterdayItrData: DataFrame, cityWiseData: DataFrame,
-                  recommendationsData: DataFrame) = {
+                  recommendationsData: DataFrame, incrDate: String) = {
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
 
@@ -37,7 +37,7 @@ class GeoBrandCampaign {
         yesterdayItrData(ProductVariables.STOCK),
         yesterdayItrData(ProductVariables.PRICE_BAND))
 
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_BRAND_CAMPAIGN, custFilter, false, recommendationsData)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.GEO_BRAND_CAMPAIGN, custFilter, false, recommendationsData, incrDate)
 
   }
 

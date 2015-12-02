@@ -1,6 +1,5 @@
 package com.jabong.dap.campaign.recommendation.generator
 
-import com.jabong.dap.campaign.recommendation.generator.PivotRecommendation._
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.Recommendation
 import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables }
@@ -19,7 +18,7 @@ object PivotAddressRecommendation extends CommonRecommendation with Serializable
    * @param incrDate
    * @return
    */
-  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String): Unit = {
+  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String) = {
 
     val salesAddressFullData = RecommendationInput.salesAddressFullData
     val salesOrder30DaysData = RecommendationInput.salesOrder30DaysData

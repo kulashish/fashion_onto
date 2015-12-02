@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.{ CampaignOutput, CampaignInput }
+import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
 import com.jabong.dap.common.constants.SQL
@@ -66,6 +66,7 @@ object CampaignManager extends Serializable with Logging {
 
   def startRetargetCampaigns() = {
     val liveRetargetCampaign = new LiveRetargetCampaign()
+    val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val orderItemData = CampaignInput.loadYesterdayOrderItemData().cache()
     val fullOrderData = CampaignInput.loadFullOrderData()
@@ -75,7 +76,7 @@ object CampaignManager extends Serializable with Logging {
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
-    liveRetargetCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
+    liveRetargetCampaign.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
   }
 
   def startPricepointCampaign(params: ParamInfo) = {
@@ -199,7 +200,7 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-  def replenishmentFeed(params: ParamInfo): Unit = {
+  def replenishmentFeed(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
@@ -218,7 +219,7 @@ object CampaignManager extends Serializable with Logging {
 
     val dfReplenishmentJoinToCmr = CampaignUtils.getSelectedReplenishAttributes(dfReplenishment)
 
-    CampaignOutput.saveCampaignDataForYesterday(dfReplenishmentJoinToCmr, CampaignCommon.REPLENISHMENT_CAMPAIGN, DataSets.CALENDAR_CAMPAIGNS)
+    CampaignOutput.saveCampaignData(dfReplenishmentJoinToCmr, CampaignCommon.REPLENISHMENT_CAMPAIGN, DataSets.CALENDAR_CAMPAIGNS, incrDate)
 
   }
 
@@ -226,7 +227,7 @@ object CampaignManager extends Serializable with Logging {
    * starting point of love campaigns
    * @param params
    */
-  def startLoveCampaigns(params: ParamInfo): Unit = {
+  def startLoveCampaigns(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeUtils.YESTERDAY_FOLDER))
     val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
@@ -257,6 +258,7 @@ object CampaignManager extends Serializable with Logging {
 
   def startInvalidCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
+    val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
@@ -275,7 +277,7 @@ object CampaignManager extends Serializable with Logging {
 
     val last30DaysItrData = CampaignInput.load30DayItrSkuSimpleData()
     val invalidFollowUp = new InvalidFollowUpCampaign()
-    invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations)
+    invalidFollowUp.runCampaign(orderData, orderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
     // invalid lowstock
     // last 30 days of order item data
@@ -285,11 +287,11 @@ object CampaignManager extends Serializable with Logging {
     val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
 
     val invalidLowStock = new InvalidLowStockCampaign()
-    invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations)
+    invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
     // invalid iod campaign
     val invalidIODCampaign = new InvalidIODCampaign()
-    invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations)
+    invalidIODCampaign.runCampaign(orderData, orderItemData, last30DaysItrData, brickMvpRecommendations, yestDate)
   }
 
   /**
@@ -298,6 +300,7 @@ object CampaignManager extends Serializable with Logging {
    */
   def startAbandonedCartCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
+    val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     // acart daily, acart followup, acart low stock, acart iod
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
@@ -316,7 +319,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdaySalesOrderItemData = CampaignInput.loadYesterdayOrderItemData() // created_at
     val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
     val acartDaily = new AcartDailyCampaign()
-    acartDaily.runCampaign(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
+    acartDaily.runCampaign(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
     // acart followup - only = 3rd days acart, still not bought ref skus, qty >= 10, yesterdayItrData
     val prev3rdDayAcartData = CampaignInput.loadNthdayAcartData(3, last30DayAcartData)
@@ -324,7 +327,7 @@ object CampaignManager extends Serializable with Logging {
     val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
 
     val acartFollowup = new AcartFollowUpCampaign()
-    acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
+    acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
     // FIXME: part of customerselction for iod and lowstock can be merged
 
@@ -334,7 +337,7 @@ object CampaignManager extends Serializable with Logging {
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
     val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
     val acartLowStock = new AcartLowStockCampaign()
-    acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations)
+    acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
     // item on discount
     // last30DayAcartData
@@ -345,7 +348,7 @@ object CampaignManager extends Serializable with Logging {
     val last30daysItrData = CampaignInput.load30DayItrSkuSimpleData()
 
     val acartIOD = new AcartIODCampaign() //FIXME: RUN ACart Campaigns
-    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData, brickMvpRecommendations)
+    acartIOD.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, last30daysItrData, brickMvpRecommendations, yestDate)
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
@@ -367,7 +370,7 @@ object CampaignManager extends Serializable with Logging {
 
     val acartHourly = new AcartHourlyCampaign()
 
-    acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations)
+    acartHourly.runCampaign(salesCartHourly, salesOrderHourly, salesOrderItemHourly, yesterdayItrData, brickMvpRecommendations, incrDateWithHour)
 
   }
   //  val campaignPriority = udf((mailType: Int) => CampaignUtils.getCampaignPriority(mailType: Int, mailTypePriorityMap: scala.collection.mutable.HashMap[Int, Int]))
@@ -375,6 +378,8 @@ object CampaignManager extends Serializable with Logging {
   def startWishlistCampaigns(campaignsConfig: String) = {
 
     CampaignManager.initCampaignsConfig(campaignsConfig)
+
+    val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val fullOrderData = CampaignInput.loadFullOrderData()
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
@@ -412,20 +417,22 @@ object CampaignManager extends Serializable with Logging {
       last30DaySalesOrderData,
       last30DaySalesOrderItemData,
       itrSku30DayData,
-      brickMvpRecommendations)
+      brickMvpRecommendations,
+      yestDate)
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
     val shortlist3rdDayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 3, todayDate)
 
     val shortlistReminderCampaign = new ShortlistReminderCampaign()
-    shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData)
+    shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData, yestDate)
 
   }
 
   def startSurfCampaigns(campaignsConfig: String) = {
 
     CampaignManager.initCampaignsConfig(campaignsConfig)
+    val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
     val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData().cache()
     val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData().cache()
@@ -453,13 +460,16 @@ object CampaignManager extends Serializable with Logging {
       lastDaySurf3Data,
       last30DaySalesOrderData,
       last30DaySalesOrderItemData,
-      brickMvpRecommendations
+      brickMvpRecommendations,
+      yestDate
     )
 
   }
 
   def startMiscellaneousCampaigns(campaignsConfig: String) = {
     CampaignManager.initCampaignsConfig(campaignsConfig)
+    val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+
     //loading brickmvp recommendations
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
     //loading brandmvp recommendations
@@ -473,14 +483,14 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: MIPR email Campaign
     val miprCampaign = new MIPRCampaign()
-    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData)
+    miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData, yestDate)
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
 
     val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
 
     //Start: New Arrival email Campaign
     val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
-    newArrivalsBrandCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData)
+    newArrivalsBrandCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, last30DayAcartData, brandMvpRecommendations, itrSkuSimpleYesterdayData, yestDate)
   }
 
   def startHottestXCampaign(params: ParamInfo) = {
@@ -508,7 +518,7 @@ object CampaignManager extends Serializable with Logging {
    *  save acart hourly campaign Feed
    * @param campaignName
    */
-  def acartHourlyFeed(campaignName: String): Unit = {
+  def acartHourlyFeed(campaignName: String) = {
 
     val cmr = CampaignInput.loadCustomerMasterData()
     //    if(campaignName.equals(DataSets.ACART_HOURLY)){
@@ -531,7 +541,7 @@ object CampaignManager extends Serializable with Logging {
     val ThirdDayCampaignMergedData = CampaignInput.loadNthDayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS, 3, incrDate)
     //Start: FollowUp email Campaign
     val followUpCampaigns = new FollowUpCampaigns()
-    followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, itrSkYesterdayData)
+    followUpCampaigns.runCampaign(ThirdDayCampaignMergedData, last3DaySalesOrderData, itrSkYesterdayData, incrDate)
   }
 
   def startGeoCampaigns(params: ParamInfo) = {
@@ -555,10 +565,10 @@ object CampaignManager extends Serializable with Logging {
     val cityWiseData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CITY_WISE_DATA, DataSets.FULL_MERGE_MODE, incrDate)
 
     val geoStyleCampaign = new GeoStyleCampaign
-    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos)
+    geoStyleCampaign.runCampaign(day40_orderData, day40_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrickRecos, incrDate)
 
     val geoBrandCampaign = new GeoBrandCampaign
-    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrandRecos)
+    geoBrandCampaign.runCampaign(day50_orderData, day50_orderItemData, salesAddressData, yesterdayItrData, cityWiseData, genderMvpBrandRecos, incrDate)
 
   }
 
@@ -576,7 +586,7 @@ object CampaignManager extends Serializable with Logging {
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val clearanceCampaign = new ClearanceCampaign
-    clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, mvpDiscountRecos, yesterdayItrData)
+    clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, mvpDiscountRecos, yesterdayItrData, incrDate)
   }
 
   def loadCustomerMasterData(): DataFrame = {

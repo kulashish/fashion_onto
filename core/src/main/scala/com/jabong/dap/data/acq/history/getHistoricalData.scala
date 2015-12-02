@@ -9,7 +9,7 @@ import com.jabong.dap.data.storage.DataSets
  * Created by pooja on 13/7/15.
  */
 class getHistoricalData extends java.io.Serializable {
-  def fetchData(tableInfo: TableInfo): Unit = {
+  def fetchData(tableInfo: TableInfo) = {
     val dbConn = new DbConnection(tableInfo.source)
     val minDate = OptionUtils.getOptValue(tableInfo.rangeStart)
 

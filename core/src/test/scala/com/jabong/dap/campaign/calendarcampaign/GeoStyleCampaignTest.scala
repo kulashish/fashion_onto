@@ -1,15 +1,13 @@
 package com.jabong.dap.campaign.calendarcampaign
 
-import java.io.File
-
 import com.jabong.dap.campaign.data.CampaignOutput
-import com.jabong.dap.common.constants.campaign.SkuSelection
-import com.jabong.dap.common.{ TestConstants, SharedSparkContext, TestSchema, Spark }
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.{SharedSparkContext, Spark, TestSchema}
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
-import org.apache.spark.sql.{ DataFrame, SQLContext }
-import org.scalatest.{ GivenWhenThen, FeatureSpec }
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 /**
  * Created by samathashetty on 17/11/15.
@@ -42,7 +40,7 @@ class GeoStyleCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
       Given("cityWiseData,salesOrder, salesOrderItemData, salesAddressData, yesterdayItrData, brickMvpRecommendation")
       val geoStyleCampaign = new GeoStyleCampaign()
 
-      geoStyleCampaign.runCampaign(salesOrderData, salesOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, recommendationsData)
+      geoStyleCampaign.runCampaign(salesOrderData, salesOrderItemData, salesAddressData, yesterdayItrData, cityWiseData, recommendationsData, TimeUtils.YESTERDAY_FOLDER)
 
     }
   }

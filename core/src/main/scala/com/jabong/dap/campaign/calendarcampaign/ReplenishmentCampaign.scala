@@ -12,7 +12,8 @@ import org.apache.spark.sql.DataFrame
  */
 class ReplenishmentCampaign {
 
-  def runCampaign(lastYearCustomerOrderFull: DataFrame, lastYearSalesOrderData: DataFrame, lastYearSalesOrderItemData: DataFrame, brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
+  def runCampaign(lastYearCustomerOrderFull: DataFrame, lastYearSalesOrderData: DataFrame, lastYearSalesOrderItemData: DataFrame,
+                  brickMvpRecommendations: DataFrame, yesterdayItrData: DataFrame, incrDate: String) = {
 
     val customerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.LAST5_SUCCESSFUL_ORDER)
@@ -35,7 +36,8 @@ class ReplenishmentCampaign {
 
     val dfReplenish = dfBeauty.unionAll(dfNonBeautyFrag)
     // ***** NON_BEAUTY_FRAG_CAMPAIGN email use case
-    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN, dfReplenish, false, brickMvpRecommendations)
+    CampaignUtils.campaignPostProcess(DataSets.CALENDAR_CAMPAIGNS, CampaignCommon.REPLENISHMENT_CAMPAIGN, dfReplenish, false,
+      brickMvpRecommendations, incrDate)
 
   }
 
