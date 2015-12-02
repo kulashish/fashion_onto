@@ -18,7 +18,7 @@ object DataReader extends Logging {
 
     try {
       val fetchPath = PathBuilder.buildPath(basePath, source, tableName, mode, date)
-      fetchDataFrame(basePath, source, tableName, mode,date)
+      fetchDataFrame(basePath, source, tableName, mode, date)
     } catch {
       case e: DataNotFound =>
         logger.error("Data not found for the date")
@@ -28,7 +28,6 @@ object DataReader extends Logging {
         throw new ValidFormatNotFound
     }
   }
-
 
   /**
    * Method to read raw HDFS data for a source, table and a given date and get a dataFrame for the same.

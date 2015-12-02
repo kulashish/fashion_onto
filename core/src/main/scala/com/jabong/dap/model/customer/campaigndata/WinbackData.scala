@@ -13,7 +13,6 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.functions._
 
-
 import scala.collection.mutable
 
 /**
@@ -71,10 +70,9 @@ object WinbackData extends DataFeedsModel {
 
     val crmTicketMasterIncr = dfMap("crmTicketMasterIncr").select(
       col(CrmTicketVariables.ISSUE_ID),
-      col(CrmTicketVariables.IN_DT) as CrmTicketVariables.DG_END_DATE,
+      col(CrmTicketVariables.ADD_DATE) as CrmTicketVariables.DG_END_DATE,
       col(CrmTicketVariables.ISSUE_DESCRIPTION)
     )
-
 
     val crmTicketDetailsIncr = dfMap("crmTicketDetailsIncr").select(
       col(CrmTicketVariables.ISSUE_ID),
