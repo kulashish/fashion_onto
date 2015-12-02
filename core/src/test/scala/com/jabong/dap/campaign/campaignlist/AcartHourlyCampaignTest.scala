@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -35,7 +36,7 @@ class AcartHourlyCampaignTest extends FeatureSpec with GivenWhenThen with Shared
     scenario("Customer has abondoned the cart one hour back") {
       Given("salescartData,salesOrder, salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
       val acartDailyCampaign = new AcartDailyCampaign()
-      acartDailyCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
+      acartDailyCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData, TimeUtils.YESTERDAY_FOLDER)
       val acartEmailCamapignOut = CampaignOutput.testData.head
       assert(acartEmailCamapignOut._3 == "email_campaigns" && acartEmailCamapignOut._2 == "acart_hourly")
     }
