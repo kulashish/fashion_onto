@@ -98,8 +98,8 @@ object CampaignQuality extends Logging {
           }
         }
 
-        sendMail(df, campaignType, dateYesterday)
-        writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), DataSets.CALENDAR_CAMPAIGNS + "_QUALITY")
+        sendMail(df, campaignType + "_quality", dateYesterday)
+        writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), campaignType + "_quality")
 
       }
 
@@ -109,7 +109,7 @@ object CampaignQuality extends Logging {
 
   def sendMail(df: DataFrame, campaignType: String, date: String) = {
 
-    CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
+    //    CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
 
     //    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
