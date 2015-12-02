@@ -229,6 +229,8 @@ object CustomerOrders extends DataFeedsModel {
         (custOrdersIncr(SalesRuleSetVariables.DISCOUNT_SUM) / custOrdersIncr(SalesRuleSetVariables.DISCOUNT_COUNT)) as SalesRuleSetVariables.AVERAGE_DISCOUNT_USED
       ).na.fill("")
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeParquet(finalCustOrder, savePathIncr, saveMode)
     DataWriter.writeCsv(finalCustOrder, DataSets.VARIABLES, DataSets.CUSTOMER_ORDERS, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_ORDERS", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
