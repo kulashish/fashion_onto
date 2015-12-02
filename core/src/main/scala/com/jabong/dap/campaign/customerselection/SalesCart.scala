@@ -1,5 +1,6 @@
 package com.jabong.dap.campaign.customerselection
 
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables._
 import grizzled.slf4j.Logging
@@ -25,6 +26,13 @@ class SalesCart extends CustomerSelector with Logging {
         SalesCartVariables.EMAIL,
         SalesCartVariables.SKU
       )
+    CampaignUtils.debug(last30DaySalesOrderData, "last30DaySalesOrderData")
+
+    CampaignUtils.debug(last30DaySalesOrderItemData, "last30DaySalesOrderItemData")
+
+    CampaignUtils.debug(salesCart30Days, "salesCart30Days")
+
+    CampaignUtils.debug(dfSalesCart, "dfSalesCart")
 
     val salesOrder = last30DaySalesOrderData.select(
       SalesOrderVariables.ID_SALES_ORDER,
@@ -45,7 +53,11 @@ class SalesCart extends CustomerSelector with Logging {
         salesOrderItem(SalesOrderItemVariables.SKU)
       )
 
-    val dfUnion = joinedDf.unionAll(dfSalesCart)
+    CampaignUtils.debug(joinedDf, "joinedDf")
+
+    val dfUnion = joinedDf.unionAll(dfSalesCart).distinct
+
+    CampaignUtils.debug(dfUnion, "dfUnion")
 
     return dfUnion
   }
