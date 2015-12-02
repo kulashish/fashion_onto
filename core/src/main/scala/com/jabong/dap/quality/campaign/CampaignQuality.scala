@@ -73,10 +73,10 @@ object CampaignQuality extends Logging {
 
       if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
 
-        writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dateYesterday)
+        sendMail(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dateYesterday)
         writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
 
-      } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS) || campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
+      } else {
 
         val df = cachedfCampaignQuality.select(
           col(CAMPAIGNNAME),
@@ -85,7 +85,7 @@ object CampaignQuality extends Logging {
           col(CUSTID_NONZERO) as EMAIL_NON_NULL,
           col(PRIORITYMERGE)).cache()
 
-        writeDataAndSendMail(df, campaignType, dateYesterday)
+        sendMail(df, campaignType, dateYesterday)
 
         if (campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
           writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.CALENDAR_CAMPAIGN_QUALITY)
@@ -101,7 +101,7 @@ object CampaignQuality extends Logging {
 
   }
 
-  def writeDataAndSendMail(df: DataFrame, campaignType: String, date: String) = {
+  def sendMail(df: DataFrame, campaignType: String, date: String) = {
 
     CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
 
