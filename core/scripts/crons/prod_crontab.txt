@@ -14,11 +14,7 @@
 
 40 3 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/campaigns/job.properties -run
 
-# 30 4 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c dcf_feed >>/opt/alchemy-core/logs/dcf_feed.txt
-
-# 0 5 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c pricing_sku_data >>/opt/alchemy-core/logs/pricing_sku_data.txt
-
-# 30 6 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c campaigns >>/opt/alchemy-core/logs/campaigns_upload_logs.txt
+0 6 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/crmAcq/job.properties -run
 
 0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
