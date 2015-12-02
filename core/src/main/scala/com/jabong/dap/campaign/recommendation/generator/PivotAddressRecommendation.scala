@@ -2,7 +2,7 @@ package com.jabong.dap.campaign.recommendation.generator
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.Recommendation
-import com.jabong.dap.common.constants.variables.{SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables}
+import com.jabong.dap.common.constants.variables.{ SalesAddressVariables, SalesOrderItemVariables, SalesOrderVariables }
 import org.apache.spark.sql.DataFrame
 
 /**
