@@ -210,6 +210,14 @@
     },
     {
       "source": "bob",
+      "tableName": "catalog_config_group",
+      "primaryKey": "id_catalog_config_group",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
       "tableName": "catalog_attribute_option_global_color",
       "primaryKey": "id_catalog_attribute_option_global_color",
       "mode": "full",
