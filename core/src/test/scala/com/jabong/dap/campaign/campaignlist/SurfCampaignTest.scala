@@ -5,7 +5,7 @@ import java.io.File
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon }
 import com.jabong.dap.common.json.JsonUtils
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ TestConstants, TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -54,8 +54,6 @@ class SurfCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
 
       val surfCampaign = new SurfCampaign()
       val incrDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-
-
 
       surfCampaign.runCampaign(
         yestSurfSessionData,

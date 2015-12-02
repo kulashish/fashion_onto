@@ -1,7 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.manager.CampaignProducer
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CustomerSelection}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CustomerSelection }
 import org.apache.spark.sql.DataFrame
 
 /**
