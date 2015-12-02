@@ -25,26 +25,18 @@ object CampaignOutput {
   }
 
   /**
-   * List of (customerID, ref skus, recommendations)
-   * @param campaignOutput
-   */
-  def saveCampaignData(campaignOutput: DataFrame, outPath: String) = {
-    campaignOutput.write.parquet(outPath)
-  }
-
-  /**
    * save campaignsData
    * @param campaignOutput
    * @param campaignName
    * @param campaignType
    */
-  def saveCampaignDataForYesterday(campaignOutput: DataFrame, campaignName: String, campaignType: String = DataSets.PUSH_CAMPAIGNS) = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday)
+  def saveCampaignData(campaignOutput: DataFrame, campaignName: String, campaignType: String = DataSets.PUSH_CAMPAIGNS, incrDate: String) = {
+    val path = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.DAILY_MODE, incrDate)
 
     if (testMode) {
       saveTestData(campaignOutput, campaignName, campaignType)
     } else {
+      // not implemented old run for acart hourly
       if (campaignName.equals(CampaignCommon.ACART_HOURLY_CAMPAIGN)) {
         val dateToday = TimeUtils.getDateAfterHours(0, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
         val acartPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, dateToday)
@@ -72,16 +64,13 @@ object CampaignOutput {
           .drop(CampaignMergedFields.EMAIL)
         //.drop(CampaignMergedFields.CUSTOMER_ID)
 
-        val replenishFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_replenishment"
-        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, TimeUtils.YESTERDAY_FOLDER, replenishFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
-
+        val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, incrDate, fileDate + "_replenishment", DataSets.IGNORE_SAVEMODE, "true", ";")
       } else {
-
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
           DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
         }
       }
-
     }
   }
 

@@ -101,7 +101,7 @@ object CampaignQuality extends Logging {
 
   def writeDataAndSendMail(df: DataFrame, campaignType: String, date: String) = {
 
-    CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
+    CampaignOutput.saveCampaignData(df, campaignType)
 
     DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
