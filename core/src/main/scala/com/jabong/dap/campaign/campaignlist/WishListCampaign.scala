@@ -19,7 +19,7 @@ class WishListCampaign {
                   last30DaySalesOrderItemData: DataFrame,
                   itrSku30DayData: DataFrame,
                   brickMvpRecommendations: DataFrame,
-                  incrDate: String): Unit = {
+                  incrDate: String) = {
 
     val wishListCustomerSelector = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR)
       .getCustomerSelector(CustomerSelection.WISH_LIST)

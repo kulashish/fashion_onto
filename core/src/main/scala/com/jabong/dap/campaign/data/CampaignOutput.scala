@@ -19,7 +19,7 @@ object CampaignOutput {
   var testMode: Boolean = false
   var testData: mutable.MutableList[(DataFrame, String, String)] = null
 
-  def setTestMode(newMode: Boolean): Unit = {
+  def setTestMode(newMode: Boolean) = {
     testMode = newMode
     CampaignUtils.testMode = newMode
   }
@@ -83,7 +83,7 @@ object CampaignOutput {
     }
   }
 
-  def saveTestData(campaignOutput: DataFrame, campaignName: String, campaignType: String): Unit = {
+  def saveTestData(campaignOutput: DataFrame, campaignName: String, campaignType: String) = {
     if (null == testData) {
       testData = new mutable.MutableList[(DataFrame, String, String)]
     }

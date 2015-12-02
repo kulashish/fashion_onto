@@ -8,7 +8,7 @@ import grizzled.slf4j.Logging
  * Runs the merge job for every json element in the merge job list.
  */
 class Merger extends java.io.Serializable with Logging {
-  def merge(isHistory: Boolean): Unit = {
+  def merge(isHistory: Boolean) = {
     val mergeMode = MergeJobConfig.mergeInfo.mergeMode
 
     mergeMode match {

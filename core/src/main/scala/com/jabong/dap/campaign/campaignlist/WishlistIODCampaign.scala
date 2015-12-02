@@ -12,7 +12,7 @@ class WishlistIODCampaign {
 
   // wishlist iod stock - 30 days wishlist data, last 30 days order item, 30 days order, last day itr, 30 day itr sku
   def runCampaign(customerSelected: DataFrame, itrSkuYesterdayData: DataFrame, itrSku30DayData: DataFrame, itrSkuSimpleYesterdayData: DataFrame,
-                  orderData: DataFrame, orderItemData: DataFrame, brickMvpRecommendations: DataFrame, incrDate: String): Unit = {
+                  orderData: DataFrame, orderItemData: DataFrame, brickMvpRecommendations: DataFrame, incrDate: String) = {
     // select customers who have added one or more items to wishlist during 30 days
 
     // sku filter

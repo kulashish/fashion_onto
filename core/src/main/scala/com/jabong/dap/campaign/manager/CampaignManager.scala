@@ -199,7 +199,7 @@ object CampaignManager extends Serializable with Logging {
 
   }
 
-  def replenishmentFeed(params: ParamInfo): Unit = {
+  def replenishmentFeed(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
@@ -226,7 +226,7 @@ object CampaignManager extends Serializable with Logging {
    * starting point of love campaigns
    * @param params
    */
-  def startLoveCampaigns(params: ParamInfo): Unit = {
+  def startLoveCampaigns(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeUtils.YESTERDAY_FOLDER))
     val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
@@ -515,7 +515,7 @@ object CampaignManager extends Serializable with Logging {
    *  save acart hourly campaign Feed
    * @param campaignName
    */
-  def acartHourlyFeed(campaignName: String): Unit = {
+  def acartHourlyFeed(campaignName: String) = {
 
     val cmr = CampaignInput.loadCustomerMasterData()
     //    if(campaignName.equals(DataSets.ACART_HOURLY)){
