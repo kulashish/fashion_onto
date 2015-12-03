@@ -4,6 +4,7 @@ import java.io.File
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -21,6 +22,7 @@ import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+
 
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
@@ -146,6 +148,12 @@ object CampaignInput extends Logging {
 
     val nthDayOrderData = Utils.getTimeBasedDataFrame(inputData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
     nthDayOrderData
+  }
+  
+  def loadNthDayModData(inputData: DataFrame, incrDate:String, nthDay: Int, modBase: Int): DataFrame = {
+    var n = nthDay
+    if (n == modBase)  n = 0
+    inputData.filter(Udf.dateModeFilter(col("created_at"), lit(incrDate), lit(n), lit(modBase)) === true)
   }
 
   /**
