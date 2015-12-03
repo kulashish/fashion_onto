@@ -64,13 +64,13 @@ object WinbackData extends DataFeedsModel {
     println(crmTicketStatLogIncr.distinct.count)
 
     dfMap.put("cmrFull", cmrFull)
-    println("Status Data AT read")
+    println("CMR AT read")
     cmrFull.printSchema()
     println(cmrFull.count)
     println(cmrFull.distinct.count)
 
     dfMap.put("salesOrder", days_45Order)
-    println("Status Data AT read")
+    println("Sales AT read")
     days_45Order.printSchema()
     println(days_45Order.count)
     println(days_45Order.distinct.count)
@@ -118,10 +118,14 @@ object WinbackData extends DataFeedsModel {
       col(CrmTicketVariables.EXIT_TICKET_STATUS),
       col(CrmTicketVariables.IN_DT) as CrmTicketVariables.DG_END_DATE
     )
+
+
     println("Status Log Data")
     println(crmTicketStatLogIncr.count())
     println(crmTicketStatLogIncr.distinct.count())
     crmTicketStatLogIncr.printSchema()
+    val uniqueTicketStatLog = crmTicketStatLogIncr.dropDuplicates()
+    println(uniqueTicketStatLog.count())
 
     val cmrFull = dfMap("cmrFull")
     println("CMR Log Data")
@@ -141,35 +145,43 @@ object WinbackData extends DataFeedsModel {
 
     val result =
       crmTicketDetailsIncr.
-        join(crmTicketStatLogIncr, crmTicketDetailsIncr(CrmTicketVariables.TICKET_ID) === crmTicketStatLogIncr(CrmTicketVariables.TICKET_ID), SQL.INNER).
+        join(uniqueTicketStatLog, crmTicketDetailsIncr(CrmTicketVariables.TICKET_ID) === uniqueTicketStatLog(CrmTicketVariables.TICKET_ID), SQL.INNER).
         join(crmTicketMasterIncr, crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) === crmTicketDetailsIncr(CrmTicketVariables.ISSUE_ID), SQL.INNER).
         join(cmrFull, crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.INNER).
-        join(salesOrder, cmrFull(CustomerVariables.ID_CUSTOMER) === salesOrder(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER).
         where(
-          crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE).geq(yesterday).
-            and(crmTicketStatLogIncr(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
+          uniqueTicketStatLog(CrmTicketVariables.ADD_DATE).geq(yesterday).
+            and(uniqueTicketStatLog(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
             and(crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
             and (crmTicketMasterIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
-            and(crmTicketStatLogIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
+            and(uniqueTicketStatLog(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
             and(crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO).notEqual(0)).
-            and(cmrFull(CustomerVariables.ID_CUSTOMER).notEqual(0)).
-            and(salesOrder(SalesOrderVariables.ID_SALES_ORDER).isNull)
+            and(cmrFull(CustomerVariables.ID_CUSTOMER).notEqual(0))
         ).select(
             cmrFull(ContactListMobileVars.UID) as ContactListMobileVars.UID,
             crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO) as CrmTicketVariables.ORDER_NO,
-            crmTicketStatLogIncr(CrmTicketVariables.ADD_DATE) as CrmTicketVariables.ADD_DATE,
+            uniqueTicketStatLog(CrmTicketVariables.ADD_DATE) as CrmTicketVariables.ADD_DATE,
             crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE) as CrmTicketVariables.TICKET_CLOSE_DATE,
             crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) as CrmTicketVariables.ISSUE_ID,
-            crmTicketMasterIncr(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION
+            crmTicketMasterIncr(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION,
+            cmrFull(CustomerVariables.ID_CUSTOMER)
           )
 
     println("Result Log Data")
     println(result.count())
     println(result.distinct.count())
     result.printSchema()
+
+    val resultMinusSales = result.join(salesOrder, result(CustomerVariables.ID_CUSTOMER) === salesOrder(SalesOrderVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
+    .filter(salesOrder(SalesOrderVariables.ID_SALES_ORDER).isNull)
+
+    println("Result Log Data")
+    println(resultMinusSales.count())
+    println(resultMinusSales.distinct.count())
+    resultMinusSales.printSchema()
+
     val incrMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]
 
-    incrMap.put("result", result)
+    incrMap.put("result", resultMinusSales)
 
     incrMap
 
