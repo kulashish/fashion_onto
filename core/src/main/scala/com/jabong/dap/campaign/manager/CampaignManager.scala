@@ -82,13 +82,16 @@ object CampaignManager extends Serializable with Logging {
   def startPricepointCampaign(params: ParamInfo) = {
 
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
+    val incrDate1 = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
-    val last20thDaySalesOrderData = CampaignInput.loadNthdayTableData(20, fullOrderData)
+    //val last20thDaySalesOrderData = CampaignInput.loadNthdayTableData(20, fullOrderData)
+    val last20thDaySalesOrderData = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 20, 30)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val last20thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(20, fullOrderItemData)
+    //val last20thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(20, fullOrderItemData)
+    val last20thDaySalesOrderItemData = CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 20, 30)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
@@ -107,11 +110,15 @@ object CampaignManager extends Serializable with Logging {
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
-    val last7thDaySalesOrderData = CampaignInput.loadNthdayTableData(7, fullOrderData)
+    val incrDate1 = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+
+    //val last7thDaySalesOrderData = CampaignInput.loadNthdayTableData(7, fullOrderData)
+    val last7thDaySalesOrderData = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 7, 30)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val last7thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(7, fullOrderItemData)
+    //val last7thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(7, fullOrderItemData)
+    val last7thDaySalesOrderItemData = CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 7, 30) 
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
@@ -237,13 +244,19 @@ object CampaignManager extends Serializable with Logging {
     val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
     val salesOrderItemFullData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val last35thSalesOrderData = CampaignInput.loadNthdayTableData(35, salesOrderFullData)
-    val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(35, salesOrderItemFullData)
+    val incrDate1 = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+
+    //val last35thSalesOrderData = CampaignInput.loadNthdayTableData(35, salesOrderFullData)
+    //val last35thSalesOrderItemData = CampaignInput.loadNthdayTableData(35, salesOrderItemFullData)
+    val last35thSalesOrderData = CampaignInput.loadNthDayModData(salesOrderFullData, incrDate1, 35, 60)
+    val last35thSalesOrderItemData = CampaignInput.loadNthDayModData(salesOrderItemFullData, incrDate1, 35, 60)
 
     val customerTopData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
-    val last15thSalesOrderData = CampaignInput.loadNthdayTableData(15, salesOrderFullData)
-    val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(15, salesOrderItemFullData)
-
+    //val last15thSalesOrderData = CampaignInput.loadNthdayTableData(15, salesOrderFullData)
+    //val last15thSalesOrderItemData = CampaignInput.loadNthdayTableData(15, salesOrderItemFullData)
+    val last15thSalesOrderData = CampaignInput.loadNthDayModData(salesOrderFullData, incrDate1, 15, 30)
+    val last15thSalesOrderItemData = CampaignInput.loadNthDayModData(salesOrderItemFullData, incrDate1, 15, 30)
+    
     val yesterdayItrSkuSimple = CampaignInput.loadYesterdayItrSimpleData(incrDate)
 
     val brandMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_SUB_TYPE, incrDate).cache()
@@ -580,17 +593,17 @@ object CampaignManager extends Serializable with Logging {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.YESTERDAY_FOLDER)
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
-    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, incrDate)
+    //val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, incrDate)
 
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
-    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData, incrDate)
+    //val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData, incrDate)
 
     val mvpDiscountRecos = CampaignInput.loadRecommendationData(Recommendation.MVP_DISCOUNT_SUB_TYPE, incrDate).cache()
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val clearanceCampaign = new ClearanceCampaign
-    clearanceCampaign.runCampaign(last30DaySalesOrderData, last30DaySalesOrderItemData, mvpDiscountRecos, yesterdayItrData, incrDate)
+    clearanceCampaign.runCampaign(fullOrderData, fullOrderItemData, mvpDiscountRecos, yesterdayItrData, incrDate)
   }
 
   def loadCustomerMasterData(): DataFrame = {
