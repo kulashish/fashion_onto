@@ -655,7 +655,7 @@
             <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
             <capture-output/>
         </shell>
-        <ok to="end"/>
+        <ok to="calendarCampaignsStart"/>
         <error to="fail"/>
     </action>
 
@@ -854,6 +854,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>calendarCampaignQuality</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="variablesQuality"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="variablesQuality">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>variablesQuality</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
