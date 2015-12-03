@@ -153,7 +153,7 @@ object CampaignInput extends Logging {
   def loadNthDayModData(inputData: DataFrame, incrDate:String, nthDay: Int, modBase: Int): DataFrame = {
     var n = nthDay
     if (n == modBase)  n = 0
-    inputData.filter(Udf.dateModeFilter(col("created_at"), lit(incrDate), lit(n), lit(modBase)) === true)
+    inputData.filter(Udf.dateModeFilter(col(SalesOrderVariables.CREATED_AT), lit(incrDate), lit(n), lit(modBase)) === true)
   }
 
   /**
