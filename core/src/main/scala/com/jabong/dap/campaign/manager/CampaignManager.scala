@@ -130,28 +130,32 @@ object CampaignManager extends Serializable with Logging {
       .select(
         col(CustomerVariables.FK_CUSTOMER),
         col(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
-        col(ContactListMobileVars.CITY) as CustomerVariables.CITY,
-        col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
-      )
+        col(ContactListMobileVars.CITY) as CustomerVariables.CITY
+        //col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
+      ).distinct
 
-    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate)
+    /*val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate)
       .drop(SalesOrderVariables.CREATED_AT)
-      .distinct
+      .distinct*/
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
-    val last6thDaySalesOrderData = CampaignInput.loadNthdayTableData(6, fullOrderData)
+//    val last6thDaySalesOrderData = CampaignInput.loadNthdayTableData(6, fullOrderData)
 
+    val incrDate1 = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
+    val last6thDaySalesOrderData = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 5, 30)
+    
     val fullOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val last6thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(6, fullOrderItemData)
-
+    // val last6thDaySalesOrderItemData = CampaignInput.loadNthdayTableData(6, fullOrderItemData)
+    val last6thDaySalesOrderItemData = CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 5, 30)
+    
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData(incrDate).cache()
 
     val brandMvpCityRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_CITY_SUB_TYPE, incrDate).cache()
 
     val brandInCityCampaign = new BrandInCityCampaign()
-    brandInCityCampaign.runCampaign(last6thDaysCustomerOrderData, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
+    brandInCityCampaign.runCampaign(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
 
   }
 
