@@ -131,12 +131,12 @@ object CampaignManager extends Serializable with Logging {
         col(CustomerVariables.FK_CUSTOMER),
         col(SalesOrderItemVariables.FAV_BRAND) as ProductVariables.BRAND,
         col(ContactListMobileVars.CITY) as CustomerVariables.CITY,
-        col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
-      )
+        //col(SalesOrderVariables.LAST_ORDER_DATE) as SalesOrderVariables.CREATED_AT
+      ).distinct
 
-    val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate)
+    /*val last6thDaysCustomerOrderData = CampaignInput.loadLastNdaysOrderData(7, fullCustomerOrders, incrDate)
       .drop(SalesOrderVariables.CREATED_AT)
-      .distinct
+      .distinct*/
 
     val fullOrderData = CampaignInput.loadFullOrderData(incrDate)
 
@@ -155,7 +155,7 @@ object CampaignManager extends Serializable with Logging {
     val brandMvpCityRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRAND_MVP_CITY_SUB_TYPE, incrDate).cache()
 
     val brandInCityCampaign = new BrandInCityCampaign()
-    brandInCityCampaign.runCampaign(last6thDaysCustomerOrderData, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
+    brandInCityCampaign.runCampaign(fullCustomerOrders, last6thDaySalesOrderData, last6thDaySalesOrderItemData, brandMvpCityRecommendations, yesterdayItrData, incrDate)
 
   }
 
