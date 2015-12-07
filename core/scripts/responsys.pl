@@ -57,9 +57,11 @@ system("hadoop fs -copyFromLocal 53699_CLICK_$date_with_zero" . "_*.txt /data/in
 
 system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mget archive/53699_33838_$date_with_zero_yesterday" . "_LIVE_CAMPAIGN.csv.zip ;'");
 
+<<<<<<< Temporary merge branch 1
+=======
 sub removeUnformatLines  {
     my($filePath, $delimiter, $numColumns) = @_;
     print("sed -i.bak -e '/\\([^$delimiter]*$delimiter\\)\{$numColumns\\}/!d' $filePath");
     system("sed -i.bak -e '/\\([^$delimiter]*$delimiter\\)\\{$numColumns\\}/!d' $filePath");
-
 }
+>>>>>>> Temporary merge branch 2
