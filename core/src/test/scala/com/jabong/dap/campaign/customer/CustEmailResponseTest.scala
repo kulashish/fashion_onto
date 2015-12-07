@@ -11,6 +11,7 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
 import com.jabong.dap.model.customer.schema.CustEmailSchema
@@ -153,5 +154,6 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val expectedDF = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "expected_res_wo_any", CustEmailSchema.effective_Smry_Schema)
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
+
 
 }

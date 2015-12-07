@@ -29,7 +29,7 @@ system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c dndMerger");
 system("perl /opt/alchemy-core/current/bin/run.pl -t PROD -c smsOptOutMerger");
 
 system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mget download/53699_OPEN_$date_with_zero" . "_* ;'");
-removeUnformatLines('53699_OPEN_$date_with_zero', ';', 16);
+removeUnformatLines("53699_OPEN_$date_with_zero" . "_*", ';', 16);
 # copy data to hdfs
 system("hadoop fs -mkdir -p /data/input/responsys/open/daily/$date/");
 system("hadoop fs -copyFromLocal 53699_OPEN_$date_with_zero" . "_*.txt /data/input/responsys/open/daily/$date/53699_OPEN_$date_with_zero" . ".txt");
@@ -40,7 +40,7 @@ system("hadoop fs -mkdir -p /data/input/responsys/bounce/daily/$date/");
 system("hadoop fs -copyFromLocal 53699_BOUNCE_$date_with_zero" . "_*.txt /data/input/responsys/bounce/daily/$date/53699_BOUNCE_$date_with_zero" . ".txt");
 
 system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mget download/53699_CLICK_$date_with_zero" . "_* ;'");
-removeUnformatLines('53699_CLICK_$date_with_zero', ';', 20);
+removeUnformatLines("53699_CLICK_$date_with_zero" . "_*", ';', 20);
 # copy data to hdfs
 system("hadoop fs -mkdir -p /data/input/responsys/click/daily/$date/");
 system("hadoop fs -copyFromLocal 53699_CLICK_$date_with_zero" . "_*.txt /data/input/responsys/click/daily/$date/53699_CLICK_$date_with_zero" . ".txt");
