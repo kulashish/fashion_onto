@@ -20,10 +20,13 @@ class HottestXCampaign {
   def runCampaign(fullOrderData: DataFrame, fullOrderItemData: DataFrame, yesterdayItr: DataFrame, recommendations: DataFrame, incrDate: String) {
     val incrDate1 = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT)
 
-    val last60DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60).filter(last60DaySalesOrderData(SalesOrderVariables.GRAND_TOTAL).>(1000))
+    val last60DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60)
+    val last60DaySalesOrderFiltered = last60DaySalesOrderData.filter(last60DaySalesOrderData(SalesOrderVariables.GRAND_TOTAL).>(1000))
     val last60DaySalesOrderItemData: DataFrame =  CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 60, 60)
 
-    val last45DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60).filter(last45DaySalesOrderData(SalesOrderVariables.GRAND_TOTAL).<=(1000))
+    val last45DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60) 
+    val last45DaySalesOrderFiltered = last45DaySalesOrderData.filter(last45DaySalesOrderData(SalesOrderVariables.GRAND_TOTAL).<=(1000))
+    
     val last45DaySalesOrderItemData: DataFrame =  CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 60, 60)
     
 /*    
@@ -40,7 +43,7 @@ class HottestXCampaign {
     val sales_45_60_df = days_45_filter.unionAll(days_60_filter)
     */
 
-    val sales_45_60_df = last45DaySalesOrderData.unionAll(last60DaySalesOrderData)
+    val sales_45_60_df = last60DaySalesOrderFiltered.unionAll(last45DaySalesOrderFiltered)
     val sales_item_45_60_df = last45DaySalesOrderItemData.unionAll(last60DaySalesOrderItemData)
 
     val customerSelection = CampaignProducer.getFactory(CampaignCommon.CUSTOMER_SELECTOR).getCustomerSelector(CustomerSelection.LAST_ORDER)
