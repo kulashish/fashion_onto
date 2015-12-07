@@ -155,11 +155,5 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
 
-"testWrite" should "check for comment escape"  in {
-  val df = JsonUtils.readFromJson(DataSets.CUST_EMAIL_RESPONSE, "test_file", CustEmailSchema.test)
-    DataWriter.writeCsv(df, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, "2015/12/03", "winback_customer_data", "Overwrite", "true", ";")
-
-}
-
 
 }

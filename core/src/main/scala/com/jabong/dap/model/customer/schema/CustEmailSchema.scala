@@ -7,10 +7,6 @@ import org.apache.spark.sql.types._
  * Created by samatha on 13/10/15.
  */
 object CustEmailSchema {
-  val test: StructType = StructType(Array(
-    StructField(CustomerVariables.PHONE, StringType, true),
-      StructField(CustomerVariables.EMAIL, StringType, true)
-  ))
 
   val resCustomerEmail = StructType(Array(
     StructField(ContactListMobileVars.UID, StringType, true),
