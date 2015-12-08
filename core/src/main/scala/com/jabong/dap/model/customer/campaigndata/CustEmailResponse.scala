@@ -35,8 +35,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
   override def readDF(incrDate: String, prevDate: String, paths: String): mutable.HashMap[String, DataFrame] = {
     date = incrDate
-    println("incrDate", incrDate)
-    println("date", date)
+    // println("incrDate", incrDate)
+    // println("date", date)
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
     val fileDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 

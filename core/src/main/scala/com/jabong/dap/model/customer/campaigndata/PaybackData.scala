@@ -51,7 +51,7 @@ object PaybackData extends DataFeedsModel {
 
     if (paths == null) {
       mode = DataSets.DAILY_MODE
-      val paybackDataPrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.FULL_MERGE_MODE, prevDate)
+      val paybackDataPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("paybackDataPrevFull", paybackDataPrevFull)
     }
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
