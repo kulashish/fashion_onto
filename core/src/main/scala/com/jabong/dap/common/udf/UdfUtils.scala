@@ -531,13 +531,14 @@ object UdfUtils extends Logging {
    */
   def getEmailOptInStatus(nls_email: String, status: String): String = {
 
-    if (nls_email == null) {
+    if (null == nls_email) {
       return "O"
     }
 
     status match {
       case "subscribed" => "I"
       case "unsubscribed" => "U"
+      case _ => "U"
     }
 
   }
