@@ -226,7 +226,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
       DataWriter.writeParquet(contactListMobileFull, pathContactListMobileFull, saveMode)
     }
 
-    val contactListMobileIncr = Utils.getOneDayData(contactListMobileFull, CustomerVariables.UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+    val contactListMobileIncr = Utils.getOneDayData(contactListMobileFull, CustomerVariables.LAST_UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
 
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobile)) {
