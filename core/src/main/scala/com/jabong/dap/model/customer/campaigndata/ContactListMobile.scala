@@ -2,7 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import java.sql.{ Date, Timestamp }
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{Utils, Spark}
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -137,7 +137,6 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
     val writeMap = new HashMap[String, DataFrame]()
 
-    var contactListMobileIncr = dfMergedIncr
     var contactListMobileFull = dfMergedIncr
 
     if (null != contactListMobilePrevFull) {
@@ -212,13 +211,8 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
         coalesce(dfIncrVarBC(ContactListMobileVars.DND), contactListMobilePrevFull(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
       )
-      contactListMobileIncr = contactListMobileFull.except(contactListMobilePrevFull)
     }
-
     writeMap.put("contactListMobileFull", contactListMobileFull)
-
-    val contactListMobileIncrCached = contactListMobileIncr.cache()
-    writeMap.put("contactListMobileIncrCached", contactListMobileIncrCached)
 
     writeMap.put("contactListMobilePrevFull", contactListMobilePrevFull)
 
@@ -227,20 +221,22 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     val pathContactListMobileFull = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
+    val contactListMobileFull =  dfWrite("contactListMobileFull")
     if (DataWriter.canWrite(saveMode, pathContactListMobileFull)) {
-      DataWriter.writeParquet(dfWrite("contactListMobileFull"), pathContactListMobileFull, saveMode)
+      DataWriter.writeParquet(contactListMobileFull, pathContactListMobileFull, saveMode)
     }
 
-    val contactListMobileIncrCached = dfWrite("contactListMobileIncrCached")
+    val contactListMobileIncr = Utils.getOneDayData(contactListMobileFull, CustomerVariables.UPDATED_AT, incrDate, TimeConstants.DATE_FORMAT_FOLDER)
+
     val pathContactListMobile = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, pathContactListMobile)) {
-      DataWriter.writeParquet(contactListMobileIncrCached, pathContactListMobile, saveMode)
+      DataWriter.writeParquet(contactListMobileIncr, pathContactListMobile, saveMode)
     }
 
     val contactListMobilePrevFull = dfWrite.getOrElse("contactListMobilePrevFull", null)
 
     if (null != contactListMobilePrevFull) {
-      val contactListMobilCsv = contactListMobileIncrCached.select(
+      val contactListMobilCsv = contactListMobileIncr.select(
         col(ContactListMobileVars.UID),
         Udf.maskForDecrypt(col(CustomerVariables.EMAIL), lit("**")) as ContactListMobileVars.EMAIL,
         col(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
@@ -275,27 +271,21 @@ object ContactListMobile extends DataFeedsModel with Logging {
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(contactListMobilCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val nlDataList = NewsletterDataList.getNLDataList(contactListMobileIncrCached, contactListMobilePrevFull)
+      val nlDataList = NewsletterDataList.getNLDataList(contactListMobileIncr, contactListMobilePrevFull)
       savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate)
       DataWriter.writeParquet(nlDataList, savePath, saveMode)
       DataWriter.writeCsv(nlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val appEmailFeed = AppEmailFeed.getAppEmailFeed(contactListMobileIncrCached, contactListMobilePrevFull)
+      val appEmailFeed = AppEmailFeed.getAppEmailFeed(contactListMobileIncr, contactListMobilePrevFull)
       savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate)
       DataWriter.writeParquet(appEmailFeed, savePath, saveMode)
       DataWriter.writeCsv(appEmailFeed, DataSets.VARIABLES, DataSets.APP_EMAIL_FEED, DataSets.DAILY_MODE, incrDate, fileDate + "_app_email_feed", DataSets.IGNORE_SAVEMODE, "true", ";")
 
-      val contactListPlus = ContactListPlus.getContactListPlus(contactListMobileIncrCached, contactListMobilePrevFull)
+      val contactListPlus = ContactListPlus.getContactListPlus(contactListMobileIncr, contactListMobilePrevFull)
       savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_PLUS, DataSets.DAILY_MODE, incrDate)
       DataWriter.writeParquet(contactListPlus, savePath, saveMode)
       DataWriter.writeCsv(contactListPlus, DataSets.VARIABLES, DataSets.CONTACT_LIST_PLUS, DataSets.DAILY_MODE, incrDate, fileDate + "_Contact_list_Plus", DataSets.IGNORE_SAVEMODE, "true", ";")
     }
-  }
-
-  def subList(l1: scala.collection.immutable.List[Long], l2: scala.collection.immutable.List[Long]): scala.collection.immutable.List[Long] = {
-
-    l1.diff(l2)
-
   }
 
   def getlatestNl(l: List[(Long, String, Timestamp, Timestamp, String)]): (Long, String, Timestamp, Timestamp, String) = {
