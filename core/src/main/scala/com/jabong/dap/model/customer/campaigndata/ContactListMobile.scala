@@ -1,6 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
-import java.sql.{Date, Timestamp}
+import java.sql.{ Date, Timestamp }
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
@@ -15,7 +15,7 @@ import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
@@ -292,52 +292,50 @@ object ContactListMobile extends DataFeedsModel with Logging {
     }
   }
 
-  def subList(l1: scala.collection.immutable.List[Long], l2: scala.collection.immutable.List[Long]):scala.collection.immutable.List[Long] ={
+  def subList(l1: scala.collection.immutable.List[Long], l2: scala.collection.immutable.List[Long]): scala.collection.immutable.List[Long] = {
 
-  l1.diff(l2)
+    l1.diff(l2)
 
   }
 
-
-  def getlatestNl(l: List[(Long, String, Timestamp, Timestamp, String)]):(Long, String, Timestamp, Timestamp, String)={
+  def getlatestNl(l: List[(Long, String, Timestamp, Timestamp, String)]): (Long, String, Timestamp, Timestamp, String) = {
     var t = Tuple5(l(0)._1, l(0)._2, l(0)._3, l(0)._4, l(0)._5)
     var maxts = TimeUtils.MIN_TIMESTAMP
     l.foreach{
-      e=>
-      if(e._4.after(maxts)){
-        t = Tuple5(e._1, e._2, e._3, e._4, e._5)
-        maxts = e._4
-      }
-    }
-    t
-  }
-
-  def getlatestCus(l: List[(Long, String, String, String, Date, String, Timestamp, String, Integer, Timestamp)]):(Long, String, String, String, Date, String, Timestamp, String, Integer, Timestamp)={
-    var t = Tuple10(l(0)._1, l(0)._2, l(0)._3, l(0)._4, l(0)._5, l(0)._6, l(0)._7, l(0)._8, l(0)._9, l(0)._10)
-    var maxts = TimeUtils.MIN_TIMESTAMP
-    l.foreach{
-      e=>
-        if(e._10.after(maxts)){
-          t = Tuple10(e._1, e._2, e._3, e._4, e._5, e._6, e._7, e._8, e._9, e._10)
-          maxts= e._10
+      e =>
+        if (e._4.after(maxts)) {
+          t = Tuple5(e._1, e._2, e._3, e._4, e._5)
+          maxts = e._4
         }
     }
     t
   }
 
+  def getlatestCus(l: List[(Long, String, String, String, Date, String, Timestamp, String, Integer, Timestamp)]): (Long, String, String, String, Date, String, Timestamp, String, Integer, Timestamp) = {
+    var t = Tuple10(l(0)._1, l(0)._2, l(0)._3, l(0)._4, l(0)._5, l(0)._6, l(0)._7, l(0)._8, l(0)._9, l(0)._10)
+    var maxts = TimeUtils.MIN_TIMESTAMP
+    l.foreach{
+      e =>
+        if (e._10.after(maxts)) {
+          t = Tuple10(e._1, e._2, e._3, e._4, e._5, e._6, e._7, e._8, e._9, e._10)
+          maxts = e._10
+        }
+    }
+    t
+  }
 
   def mergeIncrData(custIncr: DataFrame, custSegIncr: DataFrame, nlsIncr: DataFrame, customerOrdersIncr: DataFrame, cityZone: DataFrame, dnd: DataFrame, smsOptOut: DataFrame, cmrFull: DataFrame): DataFrame = {
 
-    val schema1 =  StructType(Array(
-        StructField(NewsletterVariables.EMAIL, StringType, true),
-        StructField(NewsletterVariables.FK_CUSTOMER, LongType, true),
-        StructField(NewsletterVariables.STATUS, StringType, true),
-        StructField(NewsletterVariables.CREATED_AT, TimestampType, true),
-        StructField(NewsletterVariables.UPDATED_AT, TimestampType, true),
-        StructField(NewsletterVariables.UNSUBSCRIBE_KEY, StringType, true)
-      ))
+    val schema1 = StructType(Array(
+      StructField(NewsletterVariables.EMAIL, StringType, true),
+      StructField(NewsletterVariables.FK_CUSTOMER, LongType, true),
+      StructField(NewsletterVariables.STATUS, StringType, true),
+      StructField(NewsletterVariables.CREATED_AT, TimestampType, true),
+      StructField(NewsletterVariables.UPDATED_AT, TimestampType, true),
+      StructField(NewsletterVariables.UNSUBSCRIBE_KEY, StringType, true)
+    ))
 
-    val schema2 =  StructType(Array(
+    val schema2 = StructType(Array(
       StructField(CustomerVariables.EMAIL, StringType, true),
       StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
       StructField(CustomerVariables.PHONE, StringType, true),
@@ -351,36 +349,34 @@ object ContactListMobile extends DataFeedsModel with Logging {
       StructField(CustomerVariables.UPDATED_AT, TimestampType, true)
     ))
 
-
     val nlsIncrMap = nlsIncr.select(NewsletterVariables.EMAIL,
       NewsletterVariables.FK_CUSTOMER,
-        NewsletterVariables.STATUS,
-        NewsletterVariables.CREATED_AT,
-        NewsletterVariables.UPDATED_AT,
-        NewsletterVariables.UNSUBSCRIBE_KEY)
-      .map(e=>(e(0).asInstanceOf[String]->(e(1).asInstanceOf[Long], e(2).asInstanceOf[String], e(3).asInstanceOf[Timestamp],  e(4).asInstanceOf[Timestamp],  e(5).asInstanceOf[String]))).groupByKey()
+      NewsletterVariables.STATUS,
+      NewsletterVariables.CREATED_AT,
+      NewsletterVariables.UPDATED_AT,
+      NewsletterVariables.UNSUBSCRIBE_KEY)
+      .map(e => (e(0).asInstanceOf[String] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[String], e(3).asInstanceOf[Timestamp], e(4).asInstanceOf[Timestamp], e(5).asInstanceOf[String]))).groupByKey()
 
-    val n = nlsIncrMap.map(e=> (e._1, getlatestNl(e._2.toList))).map( e=> Row(e._1, e._2._1, e._2._2 , e._2._3 , e._2._4 , e._2._5))
+    val n = nlsIncrMap.map(e => (e._1, getlatestNl(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5))
 
     val nlsIncrUnq = Spark.getSqlContext().createDataFrame(n, schema1)
     val custIncrMap = custIncr.select(CustomerVariables.EMAIL,
-        CustomerVariables.ID_CUSTOMER,
-        CustomerVariables.PHONE,
-        CustomerVariables.FIRST_NAME,
-        CustomerVariables.LAST_NAME,
-        CustomerVariables.BIRTHDAY,
-        CustomerVariables.GENDER,
-        CustomerVariables.CREATED_AT,
-        CustomerVariables.REWARD_TYPE,
-        CustomerVariables.IS_CONFIRMED,
-        CustomerVariables.UPDATED_AT)
-      .map(e=>(e(0).asInstanceOf[String]->(e(1).asInstanceOf[Long], e(2).asInstanceOf[String],
-      e(3).asInstanceOf[String], e(4).asInstanceOf[String], e(5).asInstanceOf[Date],  e(6).asInstanceOf[String],
-      e(7).asInstanceOf[Timestamp], e(8).asInstanceOf[String],
-      e(9).asInstanceOf[Integer], e(10).asInstanceOf[Timestamp]))).groupByKey()
-    val c = custIncrMap.map(e=> (e._1, getlatestCus(e._2.toList))).map(e=> Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._2._6, e._2._7, e._2._8, e._2._9, e._2._10 ))
+      CustomerVariables.ID_CUSTOMER,
+      CustomerVariables.PHONE,
+      CustomerVariables.FIRST_NAME,
+      CustomerVariables.LAST_NAME,
+      CustomerVariables.BIRTHDAY,
+      CustomerVariables.GENDER,
+      CustomerVariables.CREATED_AT,
+      CustomerVariables.REWARD_TYPE,
+      CustomerVariables.IS_CONFIRMED,
+      CustomerVariables.UPDATED_AT)
+      .map(e => (e(0).asInstanceOf[String] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[String],
+        e(3).asInstanceOf[String], e(4).asInstanceOf[String], e(5).asInstanceOf[Date], e(6).asInstanceOf[String],
+        e(7).asInstanceOf[Timestamp], e(8).asInstanceOf[String],
+        e(9).asInstanceOf[Integer], e(10).asInstanceOf[Timestamp]))).groupByKey()
+    val c = custIncrMap.map(e => (e._1, getlatestCus(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._2._6, e._2._7, e._2._8, e._2._9, e._2._10))
     val custIncrUnq = Spark.getSqlContext().createDataFrame(c, schema2)
-
 
     val nlsJoined = custIncrUnq.join(nlsIncrUnq, custIncrUnq(CustomerVariables.EMAIL) === nlsIncrUnq(NewsletterVariables.EMAIL), SQL.FULL_OUTER)
       .select(
@@ -431,7 +427,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         customerOrdersIncr(SalesOrderItemVariables.FAV_BRAND)
       )
 
-  //  println("custOrdersJoined", custOrdersJoined.count())
+    //  println("custOrdersJoined", custOrdersJoined.count())
     val custSegJoined = custOrdersJoined.join(custSegIncr, custOrdersJoined(CustomerVariables.ID_CUSTOMER) === custSegIncr(CustomerSegmentsVariables.FK_CUSTOMER), SQL.LEFT_OUTER)
       .select(
         coalesce(custOrdersJoined(CustomerVariables.ID_CUSTOMER), custSegIncr(CustomerSegmentsVariables.FK_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
@@ -460,8 +456,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         custOrdersJoined(ContactListMobileVars.NET_ORDERS),
         custOrdersJoined(ContactListMobileVars.LAST_ORDER_DATE)
       )
-  //  println("custSegJoined " + custSegJoined.count())
-
+    //  println("custSegJoined " + custSegJoined.count())
 
     val dndBc = Spark.getContext().broadcast(dnd).value
 
