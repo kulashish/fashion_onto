@@ -33,11 +33,12 @@ object DNDMerger {
    * @param incrDate
    */
   def processData(tablename: String, prevDate: String, incrDate: String, saveMode: String, fullcsv: String) {
-    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
+    // As this is being just merged and then later used as the input to other files.
+    val savePath = DataWriter.getWritePath(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, savePath)) {
       var prevFull: DataFrame = null
       if (null == fullcsv) {
-        prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, prevDate)
+        prevFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.DND, DataSets.FULL_MERGE_MODE, prevDate)
       } else {
         prevFull = DataReader.getDataFrame4mCsv(fullcsv, "true", ",")
       }
