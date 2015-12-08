@@ -18,7 +18,7 @@ GetOptions (
     'debug|d' => \$debug,
 ) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | decryptFeedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
 
-if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
+if ($target ne "PROD") {
     print "Will upload files only for PROD\n";
     exit 0;
 }
