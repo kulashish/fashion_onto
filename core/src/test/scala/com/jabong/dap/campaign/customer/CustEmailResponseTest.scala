@@ -11,6 +11,7 @@ import com.jabong.dap.data.acq.common.ParamInfo
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
+import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
 import com.jabong.dap.model.customer.schema.CustEmailSchema

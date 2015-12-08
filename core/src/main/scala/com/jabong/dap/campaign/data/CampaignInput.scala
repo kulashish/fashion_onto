@@ -4,6 +4,7 @@ import java.io.File
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -146,6 +147,12 @@ object CampaignInput extends Logging {
 
     val nthDayOrderData = Utils.getTimeBasedDataFrame(inputData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
     nthDayOrderData
+  }
+
+  def loadNthDayModData(inputData: DataFrame, incrDate: String, nthDay: Int, modBase: Int): DataFrame = {
+    var n = nthDay
+    if (n == modBase) n = 0
+    inputData.filter(Udf.dateModeFilter(col(SalesOrderVariables.CREATED_AT), lit(incrDate), lit(n), lit(modBase)) === true)
   }
 
   /**
