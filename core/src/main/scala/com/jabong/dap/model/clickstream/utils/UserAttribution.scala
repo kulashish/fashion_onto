@@ -95,7 +95,7 @@ class UserAttribution(hiveContext: HiveContext, sqlContext: SQLContext, pagevisi
     return list
   }
 
-  def calculateColumns(pagevisit: DataFrame): Unit =
+  def calculateColumns(pagevisit: DataFrame) =
     {
       val res = pagevisit.columns
       for (i <- 1 to (res.length - 1)) {

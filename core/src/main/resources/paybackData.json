@@ -1,10 +1,10 @@
 {
-"params": [
-{
-"source": "paybackData",
-"incrMode": "daily",
-"saveMode": "Ignore",
-"saveFormat": "parquet"
-}
-]
+  "params": [
+    {
+      "source": "paybackData",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
 }

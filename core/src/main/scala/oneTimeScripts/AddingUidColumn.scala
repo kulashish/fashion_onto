@@ -18,7 +18,6 @@ object AddingUidColumn {
 
     val res = cmr.join(contactList, cmr(CustomerVariables.EMAIL) === contactList(ContactListMobileVars.EMAIL), SQL.LEFT_OUTER)
       .select(
-        cmr(CustomerVariables.RESPONSYS_ID),
         cmr(CustomerVariables.ID_CUSTOMER),
         cmr(CustomerVariables.EMAIL),
         cmr(PageVisitVariables.BROWSER_ID),

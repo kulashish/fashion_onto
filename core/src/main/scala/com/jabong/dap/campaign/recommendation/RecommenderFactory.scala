@@ -18,6 +18,8 @@ class RecommenderFactory extends CampaignFactory {
       return null
     } else if (recType.equalsIgnoreCase(Recommendation.LIVE_COMMON_RECOMMENDER)) {
       return new LiveCommonRecommender()
+    } else if (recType.equalsIgnoreCase(Recommendation.CALENDER_COMMON_RECOMMENDER)) {
+      return new CalenderCommonRecommender()
     } else if (recType.equalsIgnoreCase("Null")) {
       return new NullRecommender()
     }

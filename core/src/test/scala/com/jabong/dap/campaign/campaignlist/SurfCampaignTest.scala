@@ -5,6 +5,7 @@ import java.io.File
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.constants.campaign.{ SkuSelection, CampaignCommon }
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ TestConstants, TestSchema, Spark, SharedSparkContext }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -52,6 +53,7 @@ class SurfCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
       Given(" past30DayCampaignMergedData, yestSurfSessionData, yestItrSkuData, customerMasterData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, lastDaySurf3Data, last30DaySalesOrderData, last30DaySalesOrderItemData, brickMvpRecommendations")
 
       val surfCampaign = new SurfCampaign()
+      val incrDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
 
       surfCampaign.runCampaign(
         yestSurfSessionData,
@@ -62,7 +64,8 @@ class SurfCampaignTest extends FeatureSpec with GivenWhenThen with SharedSparkCo
         lastDaySurf3Data,
         last30DaySalesOrderData,
         last30DaySalesOrderItemData,
-        brickMvpRecommendations
+        brickMvpRecommendations,
+        incrDate
       )
 
       val surf1PushCampaignOut = CampaignOutput.testData(0)

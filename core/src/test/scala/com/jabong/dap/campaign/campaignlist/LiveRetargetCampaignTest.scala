@@ -1,6 +1,7 @@
 package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
+import com.jabong.dap.common.time.{ TimeUtils, TimeConstants }
 import com.jabong.dap.common.{ TestSchema, SharedSparkContext, Spark }
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
@@ -33,7 +34,8 @@ class LiveRetargetCampaignTest extends FeatureSpec with GivenWhenThen with Share
     scenario("Order which has been cancelled ") {
       Given("salesOrder, salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
       val liveRetargetCampaign = new LiveRetargetCampaign()
-      liveRetargetCampaign.runCampaign(salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
+      val yestDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
+      liveRetargetCampaign.runCampaign(salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData, yestDate)
       val cancelRetargetOutput = CampaignOutput.testData.head
       val returnRetargetOutput = CampaignOutput.testData(2)
       assert(cancelRetargetOutput._3 == "push_campaigns" && cancelRetargetOutput._2 == "cancel_retarget")

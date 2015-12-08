@@ -1,0 +1,5 @@
+{"brick":"test","mvp":"mass","gender":"MEN","priceBand":"B","recommendations":[{"number_last_30_days_ordered":1,"sku":"ES418WA79UAUINDFAS"}]}
+{"brick":"test","mvp":"mass","gender":"UNISEX","priceBand":"B","recommendations":[{"number_last_30_days_ordered":1,"sku":"ES418WA79UAUINDFAS"}]}
+{"brick":"test","mvp":"premium","gender":"WOMEN","priceBand":"A","recommendations":[{"number_last_30_days_ordered":6,"sku":"SO596WA65JLIINDFAS"}]}
+{"brick":"shirts","mvp":"premium","gender":"UNISEX","recommendations":[{"number_last_30_days_ordered":6,"sku":"SO596WA65JLIINDFAS"},{"number_last_30_days_ordered":4,"sku":"XW574WA62FXXINDFAS"},{"number_last_30_days_ordered":2,"sku":"AD004WA32UCLINDFAS"}]}
+{"brick":"test","mvp":"mass","gender":"MEN","priceBand":"B","recommendations":[{"number_last_30_days_ordered":1,"sku":"ES418WA79UAUINDFAF"}]}

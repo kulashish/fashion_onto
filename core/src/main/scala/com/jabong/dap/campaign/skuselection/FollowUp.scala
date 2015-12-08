@@ -55,14 +55,14 @@ object FollowUp extends Logging {
 
     val dfSkuLevel = CampaignUtils.shortListSkuItrJoin(dfCustomerProductShortlist, dfYesterdayItrData, itr30dayData)
       .select(
-        CustomerProductShortlistVariables.FK_CUSTOMER,
-        CustomerProductShortlistVariables.EMAIL,
-        CustomerProductShortlistVariables.SKU,
-        CustomerProductShortlistVariables.AVERAGE_PRICE
+        CustomerVariables.FK_CUSTOMER,
+        CustomerVariables.EMAIL,
+        CustomerVariables.SKU,
+        CustomerVariables.AVERAGE_PRICE
       )
 
-      .withColumnRenamed(CustomerProductShortlistVariables.SKU, CustomerProductShortlistVariables.SKU_SIMPLE)
-      .withColumnRenamed(CustomerProductShortlistVariables.AVERAGE_PRICE, CustomerProductShortlistVariables.SPECIAL_PRICE)
+      .withColumnRenamed(CustomerVariables.SKU, CustomerVariables.SKU_SIMPLE)
+      .withColumnRenamed(CustomerVariables.AVERAGE_PRICE, CustomerVariables.SPECIAL_PRICE)
 
     //=========calculate SKU_SIMPLE data frame==========================================================================
     val yesterdaySkuSimpleItrData = dfYesterdaySkuSimpleItrData.select(
@@ -71,20 +71,20 @@ object FollowUp extends Logging {
     )
     val dfSkuSimpleLevel = CampaignUtils.shortListSkuSimpleItrJoin(dfCustomerProductShortlist, yesterdaySkuSimpleItrData)
       .select(
-        col(CustomerProductShortlistVariables.FK_CUSTOMER),
-        col(CustomerProductShortlistVariables.EMAIL),
-        col(CustomerProductShortlistVariables.SKU_SIMPLE),
-        col(CustomerProductShortlistVariables.PRICE) as CustomerProductShortlistVariables.SPECIAL_PRICE
+        col(CustomerVariables.FK_CUSTOMER),
+        col(CustomerVariables.EMAIL),
+        col(CustomerVariables.SKU_SIMPLE),
+        col(CustomerVariables.PRICE) as CustomerVariables.SPECIAL_PRICE
       )
     //=======union both sku and sku simple==============================================================================
     val dfUnion = dfSkuLevel.unionAll(dfSkuSimpleLevel)
 
     //=========SKU_SIMPLE is mix of sku and sku-simple in case of shortlist======================================
     //=======select FK_CUSTOMER, EMAIL, SKU_SIMPLE, SPECIAL_PRICE=======================================================
-    val dfResult = dfUnion.select(col(CustomerProductShortlistVariables.FK_CUSTOMER),
-      col(CustomerProductShortlistVariables.EMAIL),
-      col(CustomerProductShortlistVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
-      col(CustomerProductShortlistVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
+    val dfResult = dfUnion.select(col(CustomerVariables.FK_CUSTOMER),
+      col(CustomerVariables.EMAIL),
+      col(CustomerVariables.SKU_SIMPLE) as ProductVariables.SKU_SIMPLE,
+      col(CustomerVariables.SPECIAL_PRICE) as ProductVariables.SPECIAL_PRICE
     )
 
     return dfResult

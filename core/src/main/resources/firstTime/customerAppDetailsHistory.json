@@ -1,11 +1,19 @@
 {
-  "isHistory": true,
   "params": [
     {
       "source": "customerAppDetails",
       "path": "first time",
       "incrMode": "daily",
-      "incrDate": "2015/07/10",
+      "incrDate": "2015/11/26",
+      "fullDate": "2015/11/25",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "customerAppDetails",
+      "incrMode": "daily",
+      "incrDate": "2015/11/27",
+      "fullDate": "2015/11/26",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }

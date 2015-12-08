@@ -3,10 +3,17 @@ package com.jabong.dap.common
 import java.math.BigDecimal
 
 import com.jabong.dap.campaign.utils.CampaignUtils._
+import com.jabong.dap.common.constants.SQL
+import com.jabong.dap.common.constants.campaign.Recommendation
+import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesAddressVariables, ProductVariables }
 import com.jabong.dap.common.time.TimeUtils
+import com.jabong.dap.common.udf.UdfUtils._
+import com.jabong.dap.common.udf.{ Udf, UdfUtils }
+import com.jabong.dap.data.storage.schema.OrderBySchema
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.{ Row, DataFrame }
-import org.apache.spark.sql.types.{ DoubleType, IntegerType, DataType, StructType }
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
 
 /**
  * Created by mubarak on 21/10/15.
@@ -87,6 +94,269 @@ input:- row  and fields: field array
     }
     val data = Row.fromSeq(sequence)
     return data
+  }
+
+  def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
+
+    val dfOpenFiltered = dfIn.select(Udf.allZero2NullUdf(dfIn(dfIn.columns(0)).cast(StringType)) as dfIn.columns(0), Udf.timeToSlot(dfIn(dfIn.columns(1)).cast(StringType), lit(dateFormat)) as dfIn.columns(1))
+      .na.drop("any", Array(dfIn.columns(0), dfIn.columns(1)))
+
+    val dfSelect = dfOpenFiltered.sort(dfOpenFiltered.columns(0), dfOpenFiltered.columns(1))
+
+    val mapReduce = dfSelect.map(r => ((r(0), r(1)), 1)).reduceByKey(_ + _)
+
+    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
+
+    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, getCompleteSlotData(value)) }
+
+    val rowRDD = grouped.map({
+      case (key, value) =>
+        Row(
+          key,
+          value._1,
+          value._2,
+          value._3,
+          value._4,
+          value._5,
+          value._6,
+          value._7,
+          value._8,
+          value._9,
+          value._10,
+          value._11,
+          value._12,
+          value._13)
+    })
+
+    // Apply the schema to the RDD.
+    val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+
+    df.dropDuplicates()
+  }
+
+  /**
+   * this method will create a slot data
+   * @param iterable
+   * @return Tuple2[String, Int]
+   */
+  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
+
+    logger.info("Enter in getCompleteSlotData:")
+
+    val timeSlotArray = new Array[Int](12)
+
+    var maxSlot: Int = 0
+
+    var max: Int = 0
+
+    iterable.foreach {
+      case (slot, value) =>
+        if (value > max) { maxSlot = slot; max = value }
+        timeSlotArray(slot) = value
+    }
+
+    logger.info("Exit from  getCompleteSlotData: ")
+
+    new Tuple13(
+      timeSlotArray(0),
+      timeSlotArray(1),
+      timeSlotArray(2),
+      timeSlotArray(3),
+      timeSlotArray(4),
+      timeSlotArray(5),
+      timeSlotArray(6),
+      timeSlotArray(7),
+      timeSlotArray(8),
+      timeSlotArray(9),
+      timeSlotArray(10),
+      timeSlotArray(11),
+      maxSlot)
+
+  }
+
+  /**
+   * To generate top map based on dimension.e.g Top brick,brand in the city
+   * @param inputDataFrame
+   * @param pivotFields
+   * @param attributeField
+   * @param valueFields
+   * @param outputSchema
+   * @return
+   */
+  def generateTopMap(inputDataFrame: DataFrame, pivotFields: Array[String], attributeField: Array[String], valueFields: Array[String], outputSchema: StructType): DataFrame = {
+    require(inputDataFrame != null, "input dataframe cannot be null")
+    require(Array("count", "sum_price") contains valueFields(0), "value field not supported")
+
+    val keyRdd = inputDataFrame.rdd.keyBy(row => Utils.createKey(row, pivotFields))
+    val outRDD = keyRdd.groupByKey().map({ case (key, value) => (key, genMap(value, attributeField, valueFields)) })
+      .map{ case (key, value) => (Row.fromSeq(key.toSeq ++ value.toSeq.sortBy(_._1).map(_._2))) }
+
+    val outDataFrame = sqlContext.createDataFrame(outRDD, outputSchema)
+
+    outDataFrame
+
+  }
+
+  /**
+   *
+   * @param iterable
+   * @param dimensions
+   * @param values
+   * @return
+   */
+  def genMap(iterable: Iterable[Row], dimensions: Array[String], values: Array[String]): scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Row]] = {
+    val dimensionSMap = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Row]]()
+    for (row <- iterable) {
+      for (dimension <- dimensions) {
+
+        val rowKey = row(row.fieldIndex(dimension)).toString
+        val dimensionMap = dimensionSMap.getOrElse(dimension, scala.collection.mutable.Map[String, Row]())
+        var rowValue: Row = null
+        if (dimensionMap != null) rowValue = dimensionMap.getOrElse(rowKey, null)
+        if (dimensionMap != null && rowValue != null) {
+          var valueSeq = rowValue.toSeq
+          for (value <- values) {
+            //          val valueSeq: Seq[Any] = Seq()
+            value match {
+              case "count" => valueSeq = valueSeq.updated(0, valueSeq.apply(0).asInstanceOf[Int] + 1)
+              case "sum_price" => valueSeq = valueSeq.updated(1, valueSeq.apply(1).asInstanceOf[Double] + row(row.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue())
+              //            case "avg_price" => valueSeq :+ row(row.fieldIndex(ProductVariables.SPECIAL_PRICE))
+            }
+          }
+          dimensionMap.put(rowKey, Row.fromSeq(valueSeq))
+
+        } else {
+          var valueSeq: Seq[Any] = Seq()
+          for (value <- values) {
+
+            value match {
+              case "count" => valueSeq = valueSeq :+ (1)
+              case "sum_price" => valueSeq = valueSeq :+ row(row.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue()
+              //            case "avg_price" => valueSeq :+ row(row.fieldIndex(ProductVariables.SPECIAL_PRICE))
+            }
+
+          }
+          dimensionMap.put(rowKey, Row.fromSeq(valueSeq))
+
+        }
+        dimensionSMap.put(dimension, dimensionMap)
+      }
+
+    }
+
+    return dimensionSMap
+
+  }
+
+  /**
+   * merge two maps with count and sum price in row e.g Banglalore -> Row(84(count),99989.98(sum_price)
+   * @param prevMap
+   * @param newMap
+   * @return
+   */
+  def mergeMaps(prevMap: scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]): scala.collection.immutable.Map[String, Row] = {
+    require(prevMap != null || newMap != null, "prevMap and newMap cannot be null")
+    if (prevMap == null) return newMap
+    if (newMap == null) return prevMap
+    newMap.keys.foreach {
+      key =>
+
+        if (prevMap.contains(key)) {
+          var updatedRow: Row = null
+          val prevRowValue = prevMap(key)
+          val newRowValue = newMap(key)
+          if (newRowValue.size == 1) {
+            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
+          } else {
+            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
+              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
+          }
+          prevMap + (key -> updatedRow)
+        } else {
+          prevMap + (key -> newMap(key))
+        }
+    }
+    return prevMap
+  }
+
+  /**
+   * merge Two data frames of map columns e.g city , brand_list(MapType)
+   * @param prev
+   * @param inc
+   * @param joinedKey
+   * @param outputSchema
+   * @return
+   */
+  def mergeTopMapDataFrame(prev: DataFrame, inc: DataFrame, joinedKey: String, outputSchema: StructType): DataFrame = {
+
+    val rddJoined = prev.join(inc, prev(joinedKey) === inc(joinedKey), SQL.FULL_OUTER).rdd.map(row => Row(Utils.getNonNull(row(0), row(5)).asInstanceOf[String],
+      Utils.mergeMaps(row(1).asInstanceOf[Map[String, Row]], row(6).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(2).asInstanceOf[Map[String, Row]], row(7).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(3).asInstanceOf[Map[String, Row]], row(8).asInstanceOf[Map[String, Row]]),
+      Utils.mergeMaps(row(4).asInstanceOf[Map[String, Row]], row(9).asInstanceOf[Map[String, Row]])))
+    val dfMergeTopMapDataFrame = sqlContext.createDataFrame(rddJoined, outputSchema)
+
+    return dfMergeTopMapDataFrame
+  }
+
+  //  /**
+  //   * merge two maps
+  //   * @param prevMap
+  //   * @param newMap
+  //   * @return
+  //   */
+  //  def mergeMaps(prevMap: scala.collection.mutable.Map[String, Row], newMap: scala.collection.mutable.Map[String, Row]): scala.collection.mutable.Map[String, Row] = {
+  //    require(prevMap != null && newMap != null, "prevMap and newMap cannot be null")
+  //    if (prevMap == null) return newMap
+  //    if (newMap == null) return prevMap
+  //
+  //    newMap.keys.foreach {
+  //      key =>
+  //        if (prevMap.contains(key)) {
+  //          var updatedRow: Row = null
+  //          val prevRowValue = prevMap(key)
+  //          val newRowValue = newMap(key)
+  //          if (newRowValue.size == 1) {
+  //            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int])
+  //          } else {
+  //            updatedRow = Row(prevRowValue(prevRowValue.fieldIndex("count")).asInstanceOf[Int] + newRowValue(newRowValue.fieldIndex("count")).asInstanceOf[Int],
+  //              prevRowValue(prevRowValue.fieldIndex("sum_price")).asInstanceOf[Double] + newRowValue(newRowValue.fieldIndex("sum_price")).asInstanceOf[Double])
+  //          }
+  //          prevMap.put(key, updatedRow)
+  //        } else {
+  //          prevMap.put(key, newMap(key))
+  //        }
+  //    }
+  //    return prevMap
+  //  }
+
+  /**
+   *
+   * @param a1
+   * @param a2
+   * @return
+   */
+  def getNonNull(a1: Any, a2: Any): Any = {
+    if (a1 == null) return a2
+    else a1
+  }
+
+  /**
+   *
+   * @param customerSurfAffinity
+   * @return
+   */
+  def getCustomerFavBrick(customerSurfAffinity: DataFrame): DataFrame = {
+    val topBricks = customerSurfAffinity.select(CustomerVariables.EMAIL, "brick_list"
+    ).rdd.map(r => (r(0).toString, r(1).asInstanceOf[Map[String, Row]].toSeq.sortBy(r => (r._2(r._2.fieldIndex("count")).asInstanceOf[Int], r._2(r._2.fieldIndex("sum_price")).asInstanceOf[Double])) (Ordering.Tuple2(Ordering.Int.reverse, Ordering.Double.reverse)).map(_._1)))
+
+    val topTwoBricks = topBricks.map{ case (key, value) => ({ val arrayLength = value.length; if (arrayLength >= 2) (key, value(0), value(1)) else if (arrayLength == 1) (key, value(0), null) else (key, null, null) }) }
+
+    val sqlContext = Spark.getSqlContext()
+    import sqlContext.implicits._
+
+    topTwoBricks.toDF(CustomerVariables.EMAIL, "BRICK1", "BRICK2")
+
   }
 
 }

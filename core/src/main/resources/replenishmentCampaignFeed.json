@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "replenishment_feed",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

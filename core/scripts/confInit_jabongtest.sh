@@ -8,6 +8,7 @@ hadoop fs -put /opttest/alchemy-core/current/conf/*.json /apps/test/alchemy/conf
 # copy workflow files to hdfs
 hadoop fs -rm -r -skipTrash /apps/test/alchemy/workflows/*
 hadoop fs -put /opttest/alchemy-core/current/workflows/jabongtest/* /apps/test/alchemy/workflows/
+hadoop fs -put /opttest/alchemy-core/current/workflows/prod/clickstream/* /apps/test/alchemy/workflows/clickstream/.
 
 # copying lib to hdfs
 hadoop fs -mkdir -p /apps/test/alchemy/workflows/lib/

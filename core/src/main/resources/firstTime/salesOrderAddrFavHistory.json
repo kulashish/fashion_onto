@@ -1,0 +1,18 @@
+{
+  "params": [
+    {
+      "source": "salesOrderAddrFav",
+      "path": "first time",
+      "incrDate": "2015/11/24",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    },
+    {
+      "source": "salesOrderAddrFav",
+      "fullDate": "2015/11/24",
+      "incrDate": "2015/11/25",
+      "saveMode": "Overwrite",
+      "saveFormat": "parquet"
+    }
+  ]
+}

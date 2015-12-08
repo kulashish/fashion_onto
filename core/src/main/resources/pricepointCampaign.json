@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "pricepoint",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

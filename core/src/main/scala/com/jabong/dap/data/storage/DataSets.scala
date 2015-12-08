@@ -4,7 +4,6 @@ package com.jabong.dap.data.storage
  * Created by jabong on 28/5/15.
  */
 object DataSets {
-
   //sales
   val SALES_ORDER = "sales_order"
   val SALES_ORDER_ITEM = "sales_order_item"
@@ -122,6 +121,7 @@ object DataSets {
   val EXTRAS = "extras"
 
   val VARIABLES = "variables"
+  val MAPS = "maps"
 
   //item master
   val ITEM_MASTER_COMPLETE_DUMP = "item_master_complete_dump"
@@ -141,6 +141,8 @@ object DataSets {
   val BRICK_PRICE_BAND_RECOMMENDATIONS = "brick_price_band"
   val MVP_COLOR_RECOMMENDATIONS = "mvp_color"
   val MVP_DISCOUNT_RECOMMENDATIONS = "mvp_discount"
+  val BRAND_MVP_CITY_RECOMMENDATIONS = "brand_mvp_city"
+  val BRAND_MVP_STATE_RECOMMENDATIONS = "brand_mvp_state"
 
   // contact list
   val CONTACT_LIST_MOBILE = "contactListMobile"
@@ -154,6 +156,7 @@ object DataSets {
   val APP_EMAIL_FEED = "app_email_feed"
   val CUSTOMER_JC_DETAILS = "customerJCDetails"
   val PAYBACK_DATA = "paybackData"
+  val SALES_ORDER_ADDR_FAV = "salesOrderAddrFav"
   val DND = "DND"
   val SMS_DELIVERED = "sms_delivered"
   val SMS_OPT_OUT = "sms_opt_out"
@@ -168,6 +171,7 @@ object DataSets {
   // type of campaigns
   val PUSH_CAMPAIGNS = "push_campaigns"
   val EMAIL_CAMPAIGNS = "email_campaigns"
+  val CALENDAR_CAMPAIGNS = "calendar_campaigns"
 
   val AD4PUSH_ID = "ad4pushId"
   //Clickstream Data Quality
@@ -178,13 +182,18 @@ object DataSets {
 
   val CLICKSTREAM_SURF3_VARIABLE = "clickstreamSurf3Variable"
 
+  val SURF1_PROCESSED_VARIABLE = "Surf1ProcessedVariable"
+
+  val CUSTOMER_SURF_AFFINITY = "customerSurfAffinity"
+
   val CLICKSTREAM_SURF3_MERGED_DATA30 = "clickstreamSurf3MergeData30"
 
   val OPEN = "open"
   val CLICK = "click"
+  val CUST_EMAIL_RESPONSE = "custEmailResponse"
 
   //SalesOrderItemVariables-->Customerorders.csv
-  val SALES_ITEM_REVENUE = "sales_item_revenue"
+  val SALES_ITEM_REVENUE = "salesItemRevenue"
   val SALES_ITEM_COUPON_DISC = "sales_item_coupon_disc"
   val SALES_ITEM_INVALID_CANCEL = "sales_order_invalid_cancel"
   val SALES_ITEM_CAT_BRICK_PEN = "sales_item_cat_brick_pen"
@@ -192,4 +201,17 @@ object DataSets {
   val SALES_ADDRESS_FIRST = "sales_address_first"
   val CAT_COUNT = "cat_count"
   val CAT_AVG = "cat_avg"
+
+  // campaigns
+  val ACART_HOURLY = "acartHourly"
+
+  // miscellaneous data sets
+  val CITY_WISE_DATA = "cityWiseData"
+  val WINBACK_CUSTOMER = "winbackCustomer"
+
+  //CRM tables
+  val CRM_TicketDetails = "CRM_TicketDetails"
+  val CRM_TicketMaster = "CRM_TicketMaster"
+  val CRM_TicketStatusLog = "CRM_TicketStatusLog"
 }
+

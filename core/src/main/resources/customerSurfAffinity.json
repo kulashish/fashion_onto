@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "customerSurfAffinity",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ package com.jabong.dap.campaign.campaignlist
 
 import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.common.{ SharedSparkContext, Spark, TestSchema }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.schema.Schema
@@ -35,7 +36,7 @@ class AcartIODCampaignTest extends FeatureSpec with GivenWhenThen with SharedSpa
     scenario("Customer has abondoned the cart in the last 30 days and the ref sku has less price now comapred to the day customer has added in cart") {
       Given("salescartData,salesOrder, salesOrderItemData, yesterdayItrData, brickMvpRecommendation")
       val acartIODCampaign = new AcartIODCampaign()
-      acartIODCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData)
+      acartIODCampaign.runCampaign(salesCartData, salesOrderData, salesOrderItemData, yesterdayItrData, recommendationsData, TimeUtils.YESTERDAY_FOLDER)
       val acartPushCampaignOut = CampaignOutput.testData.head
       val acartEmailCamapignOut = CampaignOutput.testData(1)
       assert(acartPushCampaignOut._3 == "push_campaigns" && acartPushCampaignOut._2 == "acart_iod")

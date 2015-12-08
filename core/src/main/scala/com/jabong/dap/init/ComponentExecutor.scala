@@ -1,17 +1,21 @@
 package com.jabong.dap.init
 
+import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.campaign.recommendation.generator.RecommendationGenerator
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
+import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderAddress }
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
 import com.jabong.dap.quality.Clickstream.DataQualityMethods
@@ -93,10 +97,16 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2 => CustomerPreferredTimeslotPart2.start(paramJob)
           case DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1 => CustomerPreferredTimeslotPart1.start(paramJob)
           case DataSets.PAYBACK_DATA => PaybackData.start(paramJob)
+          case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
+          case DataSets.SALES_ITEM_REVENUE => SalesItemRevenue.start(paramJob)
+          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
+          //CUSTOMER_SURF_AFFINITY from surf data
+          case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 
           // responsys files
           case DataSets.DND_MERGER => DNDMerger.start(paramJob)
           case DataSets.SMS_OPT_OUT_MERGER => SmsOptOut.start(paramJob)
+          case DataSets.CUST_EMAIL_RESPONSE => CustEmailResponse.start(paramJob)
 
           //// clickstream use cases
           case DataSets.CLICKSTREAM_YESTERDAY_SESSION => SurfVariablesMain.startClickstreamYesterdaySessionVariables(paramJob)
@@ -104,7 +114,26 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CLICKSTREAM_SURF3_MERGED_DATA30 => GetSurfVariables.getSurf3mergedForLast30Days(paramJob)
           case DataSets.CLICKSTREAM_DATA_QUALITY => DataQualityMethods.start(paramJob)
 
-          case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
+          // campaigns
+          case DataSets.ACART_HOURLY => CampaignManager.startAcartHourlyCampaign(paramJob)
+
+          case CampaignCommon.FOLLOW_UP_CAMPAIGNS => CampaignManager.startFollowUpCampaigns(paramJob)
+
+          //calendar campaigns
+          case CampaignCommon.PRICEPOINT_CAMPAIGN => CampaignManager.startPricepointCampaign(paramJob)
+          case CampaignCommon.HOTTEST_X_CAMPAIGN => CampaignManager.startHottestXCampaign(paramJob)
+          case CampaignCommon.REPLENISHMENT_CAMPAIGN => CampaignManager.startReplenishmentCampaign(paramJob)
+          case CampaignCommon.REPLENISHMENT_CAMPAIGN_FEED => CampaignManager.replenishmentFeed(paramJob)
+          case CampaignCommon.BRAND_IN_CITY_CAMPAIGN => CampaignManager.startBrandInCityCampaign(paramJob)
+          case CampaignCommon.BRICK_AFFINITY_CAMPAIGN => CampaignManager.startBrickAffinityCampaign(paramJob)
+          case CampaignCommon.GEO_CAMPAIGN => CampaignManager.startGeoCampaigns(paramJob)
+          case CampaignCommon.LOVE_CALENDAR_CAMPAIGNS => CampaignManager.startLoveCampaigns(paramJob)
+          case CampaignCommon.CLEARANCE_CAMPAIGN => CampaignManager.startClearanceCampaign(paramJob)
+
+          // miscellaneous data
+          case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
+          case DataSets.WINBACK_CUSTOMER => WinbackData.start(paramJob)
+
           case _ => logger.error("Unknown source.")
 
         }

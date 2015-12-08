@@ -71,8 +71,8 @@ object PaybackData extends DataFeedsModel {
     val paymentBankPriorityFull = dfMap("paymentBankPriorityFull")
     val paybackEarnIncr = dfMap("paybackEarnIncr")
     val paybackRedeemIncr = dfMap("paybackRedeemIncr")
-    val cmrFull = dfMap("salesOrderIncr")
-    val paybackDataPrevFull = dfMap("cmrFull")
+    val cmrFull = dfMap("cmrFull")
+    val paybackDataPrevFull = dfMap.getOrElse("paybackDataPrevFull", null)
 
     val dfIcici = salesOrderIncr.join(paymentPrepaidTransactionDataIncr, salesOrderIncr(SalesOrderVariables.ID_SALES_ORDER) === paymentPrepaidTransactionDataIncr(SalesOrderVariables.FK_SALES_ORDER), SQL.INNER)
       .join(paymentBankPriorityFull, paymentPrepaidTransactionDataIncr(BANK_CODE) === paymentBankPriorityFull(BANK_CODE), SQL.INNER)
@@ -149,6 +149,8 @@ object PaybackData extends DataFeedsModel {
     }
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeParquet(dfWrite("paybackIncr"), savePathIncr, saveMode)
     DataWriter.writeCsv(dfWrite("paybackIncr").na.fill(""), DataSets.VARIABLES, DataSets.PAYBACK_DATA, DataSets.DAILY_MODE, incrDate, fileDate + "_payback_data", DataSets.IGNORE_SAVEMODE, "true", ";")
   }
 }

@@ -5,13 +5,13 @@ import java.sql.{ Date, Timestamp }
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by raghu on 3/7/15.
  */
 object Udf {
-
   /**
    * minTimestamp will return min of Timestamp t1 or t2
    */
@@ -82,7 +82,12 @@ object Udf {
   /**
    * countSku will return total no of sku
    */
-  val countSku = udf((skuArrayBuffer: List[String]) => UdfUtils.getCountSku(skuArrayBuffer: List[String]))
+  val columnCount = udf((colList: List[String]) => UdfUtils.getCountColumn(colList: List[String]))
+
+  /**
+   * concatenate two List
+   */
+  val concatenateRecSkuList = udf((l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]) => UdfUtils.concatenateRecSkuList(l1: scala.collection.mutable.ArrayBuffer[String], l2: scala.collection.mutable.ArrayBuffer[String]))
 
   /**
    * Removes all zeroes string and null string to emptyString.
@@ -90,6 +95,8 @@ object Udf {
   val removeAllZero = udf((str: String) => UdfUtils.removeAllZero(str: String))
 
   val allZero2NullUdf = udf((str: String) => UdfUtils.allZero2Null(str: String))
+
+  val timeToSlot = udf((str: String, dateFormat: String) => UdfUtils.timeToSlot(str: String, dateFormat: String))
 
   /**
    * For populating empty email id from dcf data as _app_deviceid
@@ -118,7 +125,11 @@ object Udf {
 
   val getElementArray = udf((a: ArrayBuffer[String], i: Int) => UdfUtils.getElementArray(a: ArrayBuffer[String], i: Int))
 
+  val getElementList = udf((a: mutable.MutableList[String], i: Int) => UdfUtils.getElementList(a: mutable.MutableList[String], i: Int))
+
   val getElementInTupleArray = udf((a: ArrayBuffer[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleArray(a: ArrayBuffer[(Row)], i: Int, value: Int))
+
+  val getElementInTupleList = udf((a: mutable.MutableList[(Row)], i: Int, value: Int) => UdfUtils.getElementInTupleList(a: mutable.MutableList[(Row)], i: Int, value: Int))
 
   val toLowercase = udf((s: String) => UdfUtils.toLower(s: String))
 
@@ -134,8 +145,28 @@ object Udf {
 
   val mps = udf((s: String) => UdfUtils.markMps(s: String))
 
+  val followUpCampaignMailType = udf((mailType: Int) => UdfUtils.followUpCampaignMailTypes(mailType: Int))
+
   val BigDecimalToDouble = udf((value: java.math.BigDecimal) => UdfUtils.BigDecimalToDouble(value: java.math.BigDecimal))
 
   val platinumStatus = udf((s: String) => UdfUtils.platinumStatus(s: String))
 
+  val nextPriceBand = udf((priceBand: String) => UdfUtils.nextPriceBand(priceBand: String))
+
+  val getLatestEmailOpenDate = udf((s: String, s1: String, s2: String, s3: String) => UdfUtils.latestEmailOpenDate(s: String, s1: String, s2: String, s3: String))
+
+  val columnAsArraySize = udf((colList: mutable.MutableList[String]) => UdfUtils.size(colList: scala.collection.mutable.MutableList[String]))
+
+  val nonBeauty = udf((category: String, created_at: Timestamp) => UdfUtils.nonBeauty(category: String, created_at: Timestamp))
+
+  val beauty = udf((category: String, created_at: Timestamp) => UdfUtils.beauty(category: String, created_at: Timestamp))
+
+  val lengthString = udf((string: String) => UdfUtils.lengthString(string: String))
+
+  val getAcartNumberOfSkus = udf((string: String) => UdfUtils.acartNumberOfSkus(string: String))
+
+  val maskForDecrypt = udf((col: String, mask: String) => UdfUtils.addMaskString(col: String, mask: String))
+  
+  val dateModeFilter = udf((created_at: Timestamp, incrDate:String, n: Int, modBase: Int) => UdfUtils.modeFilter(created_at: Timestamp, incrDate: String, n: Int, modBase: Int))
+  // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }

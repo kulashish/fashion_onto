@@ -11,8 +11,8 @@ import org.apache.spark.sql.types._
 object TestSchema {
 
   val resultFullSkuFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
     StructField(ProductVariables.SKU_SIMPLE, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
@@ -49,35 +49,35 @@ object TestSchema {
   ))
 
   val resultCustomerProductShortlist = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
-    StructField(CustomerProductShortlistVariables.DOMAIN, StringType, true),
-    StructField(CustomerProductShortlistVariables.USER_DEVICE_TYPE, StringType, true),
-    StructField(CustomerProductShortlistVariables.CREATED_AT, TimestampType, true),
-    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
-    StructField(CustomerProductShortlistVariables.PRICE, DecimalType(10, 2), true)
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU, StringType, true),
+    StructField(CustomerVariables.DOMAIN, StringType, true),
+    StructField(CustomerVariables.USER_DEVICE_TYPE, StringType, true),
+    StructField(CustomerVariables.CREATED_AT, TimestampType, true),
+    StructField(CustomerVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerVariables.PRICE, DecimalType(10, 2), true)
   ))
 
   val resultGetJoin = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU_SIMPLE, StringType, true),
     StructField(ItrVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuSimpleFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU_SIMPLE, StringType, true),
-    StructField(CustomerProductShortlistVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU_SIMPLE, StringType, true),
+    StructField(CustomerVariables.SPECIAL_PRICE, DecimalType(10, 2), true)
   ))
 
   val resultSkuFilter = StructType(Array(
-    StructField(CustomerProductShortlistVariables.FK_CUSTOMER, LongType, true),
-    StructField(CustomerProductShortlistVariables.EMAIL, StringType, true),
-    StructField(CustomerProductShortlistVariables.SKU, StringType, true),
-    StructField(CustomerProductShortlistVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(CustomerVariables.EMAIL, StringType, true),
+    StructField(CustomerVariables.SKU, StringType, true),
+    StructField(CustomerVariables.AVERAGE_PRICE, DecimalType(10, 2), true)
   ))
 
   val campaignOutput = StructType(Array(
@@ -114,8 +114,8 @@ object TestSchema {
   ))
 
   val customerDeviceMapping = StructType(Array(
+    StructField(ContactListMobileVars.UID, StringType, true),
     StructField(CustomerVariables.EMAIL, StringType, true),
-    StructField(CustomerVariables.RESPONSYS_ID, StringType, true),
     StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(PageVisitVariables.BROWSER_ID, StringType, true),
     StructField(PageVisitVariables.DOMAIN, StringType, true)
@@ -214,8 +214,10 @@ object TestSchema {
     StructField(ProductVariables.CATEGORY, StringType, true),
     StructField(ProductVariables.GENDER, StringType, true),
     StructField(ProductVariables.PRODUCT_NAME, StringType, true),
+    StructField(ProductVariables.PRICE_BAND, StringType, true),
     StructField(ProductVariables.SPECIAL_PRICE, DecimalType(10, 2), true),
     StructField(ProductVariables.STOCK, LongType, true),
+    StructField(ProductVariables.COLOR, LongType, true),
     StructField(ProductVariables.ACTIVATED_AT, TimestampType, true),
     StructField(ProductVariables.CREATED_AT, StringType, true)
   ))
@@ -255,4 +257,28 @@ object TestSchema {
     StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
     StructField(SalesOrderVariables.UPDATED_AT, TimestampType, true)
   ))
+
+  val salesOrderItemJoined = StructType(Array(
+    StructField(CustomerVariables.FK_CUSTOMER, LongType, true),
+    StructField(SalesOrderVariables.ID_SALES_ORDER, LongType, true),
+    StructField(SalesOrderItemVariables.ID_SALES_ORDER_ITEM, LongType, true),
+    StructField(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS, IntegerType, true),
+    StructField(SalesOrderItemVariables.UPDATED_AT, TimestampType, true)
+  ))
+
+  val customerFavList = StructType(Array(
+    StructField(SalesOrderVariables.FK_CUSTOMER, LongType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false), StructField("sku", StringType, false)))), true),
+    StructField("catagory_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("brick_list", MapType(StringType, MapType(IntegerType, DoubleType)), true),
+    StructField("color_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, false), StructField("price", DoubleType, false)))), true),
+    StructField("last_order_created_at", TimestampType, true)
+  ))
+
+  val cityMapSchema = StructType(Array(
+    StructField(SalesAddressVariables.CITY, StringType, true),
+    StructField("brand_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("brick_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("gender_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true)),
+    StructField("mvp_list", MapType(StringType, StructType(Array(StructField("count", IntegerType, true), StructField("sum_price", DoubleType, true))), true))))
 }

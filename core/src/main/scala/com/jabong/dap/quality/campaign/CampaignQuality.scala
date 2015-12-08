@@ -4,7 +4,7 @@ import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
 import com.jabong.dap.common.mail.ScalaMail
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.{ OptionUtils, Spark }
@@ -73,30 +73,45 @@ object CampaignQuality extends Logging {
 
       if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
 
-        writeDataAndSendMail(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dateYesterday)
+        sendMail(cachedfCampaignQuality, CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY, dateYesterday)
         writeForJDaRe(cachedfCampaignQuality.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.MOBILE_PUSH_CAMPAIGN_QUALITY)
 
-      } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
+      } else {
 
-        val df = cachedfCampaignQuality.select(
-          col(CAMPAIGNNAME),
-          col(TOTALCOUNT),
-          col(CUSTID_ZERO) as EMAIL_NULL,
-          col(CUSTID_NONZERO) as EMAIL_NON_NULL,
-          col(PRIORITYMERGE)).cache()
-        writeDataAndSendMail(df, CampaignCommon.EMAIL_CAMPAIGN_QUALITY, dateYesterday)
-        writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), CampaignCommon.EMAIL_CAMPAIGN_QUALITY)
+        val df = campaignType match {
+          case DataSets.VARIABLES => {
+            cachedfCampaignQuality.select(
+              col(CAMPAIGNNAME) as "VariablesName",
+              col(TOTALCOUNT),
+              col(CUSTID_ZERO) as "NullCount",
+              col(CUSTID_NONZERO) as "NotNullCount"
+            )
+          }
+          case _ => {
+            cachedfCampaignQuality.select(
+              col(CAMPAIGNNAME),
+              col(TOTALCOUNT),
+              col(CUSTID_ZERO) as EMAIL_NULL,
+              col(CUSTID_NONZERO) as EMAIL_NON_NULL,
+              col(PRIORITYMERGE)
+            )
+          }
+        }
+
+        sendMail(df, campaignType + "_quality", dateYesterday)
+        writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), campaignType + "_quality")
+
       }
 
     }
 
   }
 
-  def writeDataAndSendMail(df: DataFrame, campaignType: String, date: String) = {
+  def sendMail(df: DataFrame, campaignType: String, date: String) = {
 
-    CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
+    //    CampaignOutput.saveCampaignDataForYesterday(df, campaignType)
 
-    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
+    //    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, date, campaignType, DataSets.OVERWRITE_SAVEMODE, "true", ";")
 
     val emailSubscribers = OptionUtils.getOptValue(CampaignInfo.campaigns.emailSubscribers, "tech.dap@jabong.com")
 
@@ -136,7 +151,18 @@ object CampaignQuality extends Logging {
       if (campaignName.equals(CampaignCommon.MERGED_CAMPAIGN)) {
 
         for (campaignDetails <- CampaignInfo.campaigns.pushCampaignList) {
-          val campDF = dataFrame.filter(col("LIVE_MAIL_TYPE") === campaignDetails.mailType)
+
+          val campDF = {
+            //this filter for Calendar Campaign Quality
+            if (dataFrame.schema.fieldNames.contains(CampaignMergedFields.CALENDAR_MAIL_TYPE)) {
+              dataFrame.filter(col(CampaignMergedFields.CALENDAR_MAIL_TYPE) === campaignDetails.mailType)
+            } else if (dataFrame.schema.fieldNames.contains(CampaignMergedFields.LIVE_MAIL_TYPE)) { //this filter for Email/Push Campaign Quality
+              dataFrame.filter(col(CampaignMergedFields.LIVE_MAIL_TYPE) === campaignDetails.mailType)
+            } else {
+              dataFrame
+            }
+          }
+
           val count = campDF.count()
 
           if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
@@ -157,11 +183,36 @@ object CampaignQuality extends Logging {
           val countZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
           val countNonZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
           row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
-        } else {
+        } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS) || campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
 
           val countNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
           val countNonNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
           row = Row(campaignName, dataFrame.count(), countNullEmail, countNonNullEmail, zero, zero, zero, zero)
+        } else {
+
+          var countNull: Long = 0
+          var countNotNull: Long = 0
+          val fieldNames = dataFrame.schema.fieldNames
+          if (fieldNames.contains(CustomerVariables.EMAIL)) {
+            countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
+          } else if (fieldNames.contains(CustomerVariables.CUSTOMER_ID)) {
+            countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
+          } else if (fieldNames.contains(ContactListMobileVars.UID)) {
+            countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
+            countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
+          } else if (fieldNames.contains(CustomerVariables.UID)) {
+            countNull = dataFrame.filter(col(CustomerVariables.UID).isNull).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.UID).isNotNull).count()
+          } else if (fieldNames.contains(CustomerVariables.FK_CUSTOMER)) {
+            countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
+            countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
+          } else {
+            countNotNull = dataFrame.count()
+          }
+
+          row = Row(campaignName, dataFrame.count(), countNull, countNotNull, zero, zero, zero, zero)
         }
 
         list += row

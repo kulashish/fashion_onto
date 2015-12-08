@@ -3,7 +3,7 @@ package oneTimeScripts
 import java.io.File
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.constants.variables.Ad4pushVariables
+import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
@@ -25,11 +25,11 @@ object Ad4pushSelectedFields {
     println("Starting for " + domain)
     println(devicesData.count())
     val res = devicesData.select(
-      Udf.allZero2NullUdf(col(Ad4pushVariables.LOGIN_USER_ID)) as Ad4pushVariables.LOGIN_USER_ID,
-      col(Ad4pushVariables.LASTOPEN),
-      col(Ad4pushVariables.SYSTEM_OPTIN_NOTIFS),
-      col(Ad4pushVariables.FEEDBACK)
-    ).na.drop(Array(Ad4pushVariables.LOGIN_USER_ID)).dropDuplicates()
+      Udf.allZero2NullUdf(col(CustomerVariables.LOGIN_USER_ID)) as CustomerVariables.LOGIN_USER_ID,
+      col(CustomerVariables.LASTOPEN),
+      col(CustomerVariables.SYSTEM_OPTIN_NOTIFS),
+      col(CustomerVariables.FEEDBACK)
+    ).na.drop(Array(CustomerVariables.LOGIN_USER_ID)).dropDuplicates()
 
     val SELECTED = domain + "_selected"
     val csvFileName = "exportDevices_" + code + "_" + curDate

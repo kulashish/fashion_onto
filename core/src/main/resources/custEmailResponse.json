@@ -1,0 +1,11 @@
+{
+  "params": [
+    {
+      "source": "custEmailResponse",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
+

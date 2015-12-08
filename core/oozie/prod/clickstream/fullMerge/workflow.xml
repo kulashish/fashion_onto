@@ -1,0 +1,136 @@
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='merge-desktop-app-clickstream-wf'>
+	<global>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+			<property>
+				<name>mapred.job.queue.name</name>
+				<value>${queueName}</value>
+			</property>
+			<property>
+				<name>mapred.compress.map.output</name>
+				<value>true</value>
+			</property>
+			<property>
+				<name>hive.execution.engine</name>
+				<value>tez</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.connect.retry.delay</name>
+				<value>5</value>
+			</property>
+			<property>
+				<name>hive.metastore.client.socket.timeout</name>
+				<value>1800</value>
+			</property>
+		</configuration>
+	</global>
+	<start to='prepare_variables' />
+	<action name='prepare_variables'>
+		<shell xmlns="uri:oozie:shell-action:0.3">
+			<exec>${clickstreamPipeline_fullMerge_prepareVariablesPath}</exec>
+			<argument>${clickstreamPipeline_fullMerge_HiveOutput}</argument>
+			<file>${clickstreamPipeline_fullMerge_prepareVariablesPath}</file>
+			<capture-output/>
+		</shell>
+		<ok to='make_dirs' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='make_dirs'>
+		<fs>
+			<mkdir path="${clickstreamPipeline_fullMerge_mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}" />
+			<mkdir path="${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports" />
+		</fs>
+		<ok to='web_and_app_merge' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='web_and_app_merge'>
+		<hive xmlns="uri:oozie:hive-action:0.5">
+			<configuration>
+				<property>
+					<name>hive.execution.engine</name>
+					<value>mr</value>
+				</property>
+			</configuration>
+			<script>${clickstreamPipeline_fullMerge_webAppMergeScript}</script>
+			<param>hivedb=${clickstreamPipeline_partitionedDb}</param>
+			<param>MergeDir=${clickstreamPipeline_fullMerge_mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<param>DesktopMergeTable=${clickstreamPipeline_desktopMergePartitionTable}</param>
+			<param>appsTable=${clickstreamPipeline_appsPartitionTable}</param>
+			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
+			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
+			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+		</hive>
+		<ok to='full_merge_partition' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='full_merge_partition'>
+		<hive xmlns="uri:oozie:hive-action:0.5">
+			<script>${clickstreamPipeline_fullMerge_createMergedPartitionScript}</script>
+			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
+			<param>loc=${clickstreamPipeline_fullMerge_mergeDir}/${wf:actionData('prepare_variables')['LAST_YEAR']}/${wf:actionData('prepare_variables')['LAST_MONTH']}/${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
+			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
+			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<param>tableName=${clickstreamPipeline_mergeTable}</param>
+		</hive>
+		<ok to='hive_priority_reports' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='hive_priority_reports'>
+		<hive xmlns="uri:oozie:hive-action:0.5">
+			<configuration>
+				<property>
+						<name>set hive.optimize.reducededuplication</name>
+						<value>false</value>
+				</property>
+			</configuration>
+			<script>${clickstreamPipeline_fullMerge_hivePriorityReportsScript}</script>
+			<param>FieldSeparator=${clickstreamPipeline_fieldSeparator}</param>
+			<param>dbname=${clickstreamPipeline_partitionedDb}</param>
+			<param>pagevisitTable=${clickstreamPipeline_mergeTable}</param>
+			<param>year1=${wf:actionData('prepare_variables')['LAST_YEAR']}</param>
+			<param>month1=${wf:actionData('prepare_variables')['LAST_MONTH']}</param>
+			<param>date1=${wf:actionData('prepare_variables')['LAST_DAY']}</param>
+			<param>OUTPUT=${wf:actionData('prepare_variables')['DailyHiveOutput']}/reports</param>
+		</hive>
+		<ok to='ftp_priority_reports' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='ftp_priority_reports'>
+		<shell xmlns="uri:oozie:shell-action:0.3">
+			<exec>${clickstreamPipeline_fullMerge_ftpPriorityReportsScript}</exec>
+			<argument>${wf:actionData('prepare_variables')['ftp_date']}</argument>
+			<argument>${clickstreamPipeline_FTP_HOST}</argument>
+			<argument>${clickstreamPipeline_FTP_USER}</argument>
+			<argument>${clickstreamPipeline_FTP_PASSWD}</argument>
+			<argument>${clickstreamPipeline_REMOTE_PATH}</argument>
+			<argument>${wf:actionData('prepare_variables')['DailyHiveOutput']}</argument>
+			<file>${clickstreamPipeline_fullMerge_ftpPriorityReportsScript}</file>
+		</shell>
+		<ok to='mail_on_success' />
+		<error to='mail_on_error' />
+	</action>
+	<action name='mail_on_error'>
+		<email xmlns="uri:oozie:email-action:0.2">
+			<to>${clickstreamPipeline_mailRecepients}</to>
+			<subject>${clickstreamPipeline_env} Workflow for desktop-app-merge for ${wf:actionData('prepare_variables')['DATER']} failed.</subject>
+			<body>Node: [${wf:lastErrorNode()}]  Error: [${wf:errorMessage(wf:lastErrorNode())}]</body>
+		</email>
+		<ok to='step_failure' />
+		<error to='step_failure' />
+	</action>
+	<action name='mail_on_success'>
+		<email xmlns="uri:oozie:email-action:0.2">
+			<to>${clickstreamPipeline_mailRecepients}</to>
+			<subject> ${clickstreamPipeline_env} Workflow for desktop-app-merge for ${wf:actionData('prepare_variables')['DATER']} was successful.</subject>
+			<body></body>
+		</email>
+		<ok to='end' />
+		<error to='end' />
+	</action>
+	<kill name='step_failure'>
+		<message>Script failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+	<end name='end' />
+</workflow-app>
