@@ -1,0 +1,13 @@
+{
+  "acquisition": [
+    {
+      "source": "unicommerce",
+      "tableName": "vendoritemmaster",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "Updated"
+    }
+  ]
+}

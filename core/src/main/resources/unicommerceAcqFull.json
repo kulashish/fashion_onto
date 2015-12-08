@@ -1,0 +1,20 @@
+{
+  "acquisition": [
+    {
+      "source": "unicommerce",
+      "tableName": "facilityitemmaster",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "unicommerce",
+      "tableName": "vendors",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    }
+  ]
+}

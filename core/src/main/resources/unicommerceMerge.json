@@ -1,0 +1,11 @@
+{
+  "merge": [
+    {
+      "source": "unicommerce",
+      "tableName": "vendoritemmaster",
+      "primaryKey": null,
+      "mergeMode": "full",
+      "saveMode": "Ignore"
+    }
+  ]
+}
