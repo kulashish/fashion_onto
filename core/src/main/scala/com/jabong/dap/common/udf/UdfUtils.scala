@@ -863,10 +863,10 @@ object UdfUtils extends Logging {
     }
     (mask + col + mask)
   }
-  
-  def modeFilter(created_at: Timestamp, incrDate:String, n: Int, modBase: Int): Boolean = {
+
+  def modeFilter(created_at: Timestamp, incrDate: String, n: Int, modBase: Int): Boolean = {
     // calculate days since today
-    val daysSince= TimeUtils.daysFromIncrDate(created_at.toString, incrDate + " " + TimeConstants.END_TIME, TimeConstants.DATE_TIME_FORMAT)
+    val daysSince = TimeUtils.daysFromIncrDate(created_at.toString, incrDate + " " + TimeConstants.END_TIME, TimeConstants.DATE_TIME_FORMAT)
     if ((daysSince == 0) && (n == 0)) return false
     if (daysSince % modBase == n) true
     else false
