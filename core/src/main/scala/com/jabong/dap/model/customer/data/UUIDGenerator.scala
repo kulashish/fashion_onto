@@ -31,8 +31,9 @@ object UUIDGenerator {
       newId = getUid(uidsList)
       uidsList += newId
       newId
+    } else {
+      uid
     }
-    newId
   }
 
   def addUid(cmr: DataFrame): DataFrame = {
