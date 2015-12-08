@@ -23,7 +23,6 @@ import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
  */
@@ -149,10 +148,10 @@ object CampaignInput extends Logging {
     val nthDayOrderData = Utils.getTimeBasedDataFrame(inputData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
     nthDayOrderData
   }
-  
-  def loadNthDayModData(inputData: DataFrame, incrDate:String, nthDay: Int, modBase: Int): DataFrame = {
+
+  def loadNthDayModData(inputData: DataFrame, incrDate: String, nthDay: Int, modBase: Int): DataFrame = {
     var n = nthDay
-    if (n == modBase)  n = 0
+    if (n == modBase) n = 0
     inputData.filter(Udf.dateModeFilter(col(SalesOrderVariables.CREATED_AT), lit(incrDate), lit(n), lit(modBase)) === true)
   }
 

@@ -22,14 +22,14 @@ class HottestXCampaign {
 
     val last60DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60)
     val last60DaySalesOrderFiltered = last60DaySalesOrderData.filter(last60DaySalesOrderData(SalesOrderVariables.GRAND_TOTAL).>(1000))
-    val last60DaySalesOrderItemData: DataFrame =  CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 60, 60)
+    val last60DaySalesOrderItemData: DataFrame = CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 60, 60)
 
-    val last45DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60) 
+    val last45DaySalesOrderData: DataFrame = CampaignInput.loadNthDayModData(fullOrderData, incrDate1, 60, 60)
     val last45DaySalesOrderFiltered = last45DaySalesOrderData.filter(last45DaySalesOrderData(SalesOrderVariables.GRAND_TOTAL).<=(1000))
-    
-    val last45DaySalesOrderItemData: DataFrame =  CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 60, 60)
-    
-/*    
+
+    val last45DaySalesOrderItemData: DataFrame = CampaignInput.loadNthDayModData(fullOrderItemData, incrDate1, 60, 60)
+
+    /*    
     val day_45past = TimeUtils.getDateAfterNDays(-45, TimeConstants.DATE_FORMAT_FOLDER)
 
     val days_45_filter = Utils.getOneDayData(nDaysSalesOrder, SalesOrderVariables.CREATED_AT, day_45past, TimeConstants.DATE_FORMAT_FOLDER)
