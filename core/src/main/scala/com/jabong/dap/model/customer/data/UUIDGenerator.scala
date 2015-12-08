@@ -31,13 +31,15 @@ object UUIDGenerator {
       newId = getUid(uidsList)
       uidsList += newId
       newId
-    } else {
-      uidsList += uid
-      uid
     }
+    newId
   }
 
   def addUid(cmr: DataFrame): DataFrame = {
+    val ids = cmr.select(ContactListMobileVars.UID).map(e=>e(0).asInstanceOf[String]).toArray().toList
+    ids.foreach{
+      e=> uidsList += e
+    }
     val res = cmr.select(
       addUids(cmr(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
       cmr(CustomerVariables.EMAIL),
