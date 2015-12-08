@@ -37,7 +37,7 @@ object UUIDGenerator {
   }
 
   def addUid(cmr: DataFrame): DataFrame = {
-    val ids = cmr.select(ContactListMobileVars.UID).map(e=>e(0).asInstanceOf[String]).toArray().toList
+    val ids = cmr.select(ContactListMobileVars.UID).map(e=>(e(0).asInstanceOf[String])).toArray().toList
     ids.foreach{
       e=> uidsList += e
     }
