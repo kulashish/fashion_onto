@@ -40,11 +40,12 @@ object SmsOptOut {
    * @param incrDate
    */
   def processDataResponsys(tablename: String, prevDate: String, incrDate: String, saveMode: String, fullcsv: String) {
-    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, incrDate)
+    // As this is just being merged here and then later used as input to other files.
+    val savePath = DataWriter.getWritePath(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, incrDate)
     if (DataWriter.canWrite(saveMode, savePath)) {
       var prevFull: DataFrame = null
       if (null == fullcsv) {
-        prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, prevDate)
+        prevFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, tablename, DataSets.FULL_MERGE_MODE, prevDate)
       } else {
         prevFull = DataReader.getDataFrame4mCsv(fullcsv.trim(), "true", ",").withColumnRenamed("MOBILE", DNDVariables.MOBILE_NUMBER)
       }
@@ -68,14 +69,15 @@ object SmsOptOut {
    * @param incrDate
    */
   def processDataSolutionsInfinity(prevDate: String, incrDate: String, saveMode: String, fullcsvPath: String) {
-    val savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
+    // As here we just doing a merge and after merge we just write on the INPUT_PATH
+    val savePath = DataWriter.getWritePath(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, incrDate)
     val newDate = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     val filename1 = "blocklist_numbers_jabong" + newDate + ".csv"
     val filename2 = "blocklist_numbers_jabongdnd" + newDate + ".csv"
     if (DataWriter.canWrite(saveMode, savePath)) {
       var prevFull: DataFrame = null
       if (null == fullcsvPath) {
-        prevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, prevDate)
+        prevFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.SOLUTIONS_INFINITI, DataSets.BLOCK_LIST_NUMBERS, DataSets.FULL_MERGE_MODE, prevDate)
       } else {
         prevFull = DataReader.getDataFrame4mCsv(fullcsvPath.trim() + File.separator + "blocklist_numbers_jabong.csv", "true", ",").unionAll(DataReader.getDataFrame4mCsv(fullcsvPath.trim() + File.separator + "blocklist_numbers_jabongdnd.csv", "true", ",")).dropDuplicates()
       }

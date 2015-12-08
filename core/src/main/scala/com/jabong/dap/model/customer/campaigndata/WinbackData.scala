@@ -2,8 +2,8 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{CrmTicketVariables, SalesOrderVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ CrmTicketVariables, SalesOrderVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -73,7 +73,6 @@ object WinbackData extends DataFeedsModel {
     println(crmTicketMasterIncr.select(CrmTicketVariables.ISSUE_ID).count)
     crmTicketMasterIncr.printSchema()
 
-
     val crmTicketDetailsIncr = dfMap("crmTicketDetailsIncr").select(
       col(CrmTicketVariables.ISSUE_ID),
       col(CrmTicketVariables.TICKET_ID),
@@ -95,7 +94,6 @@ object WinbackData extends DataFeedsModel {
       col(CrmTicketVariables.IN_DT) as CrmTicketVariables.DG_END_DATE
     )
 
-
     val yesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT, dateStr)
 
     //TODO: use constant for the status with  meaningful name
@@ -104,22 +102,22 @@ object WinbackData extends DataFeedsModel {
       crmTicketDetailsIncr.
         join(crmTicketStatLogIncr, crmTicketDetailsIncr(CrmTicketVariables.TICKET_ID).equalTo(crmTicketStatLogIncr(CrmTicketVariables.TICKET_ID)), SQL.INNER).
         join(crmTicketMasterIncr, crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID).===(crmTicketDetailsIncr(CrmTicketVariables.ISSUE_ID)), SQL.INNER).
-//        where(
-//          //uniqueTicketStatLog(CrmTicketVariables.ADD_DATE).geq(yesterday).
-//            (uniqueTicketStatLog(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
-//            //and(crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
-//            //and (crmTicketMasterIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
-//            //and(uniqueTicketStatLog(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
-//            and(crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO).notEqual(0)).
-//            and(crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO).notEqual(0))
-//        ).
- select(
-            crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO) as CrmTicketVariables.ORDER_NO,
-            //uniqueTicketStatLog(CrmTicketVariables.ADD_DATE) as CrmTicketVariables.ADD_DATE,
-            //crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE) as CrmTicketVariables.TICKET_CLOSE_DATE,
-            crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) as CrmTicketVariables.ISSUE_ID,
-            crmTicketMasterIncr(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION,
-            crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO)           )
+        //        where(
+        //          //uniqueTicketStatLog(CrmTicketVariables.ADD_DATE).geq(yesterday).
+        //            (uniqueTicketStatLog(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
+        //            //and(crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
+        //            //and (crmTicketMasterIncr(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
+        //            //and(uniqueTicketStatLog(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
+        //            and(crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO).notEqual(0)).
+        //            and(crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO).notEqual(0))
+        //        ).
+        select(
+          crmTicketDetailsIncr(CrmTicketVariables.ORDER_NO) as CrmTicketVariables.ORDER_NO,
+          //uniqueTicketStatLog(CrmTicketVariables.ADD_DATE) as CrmTicketVariables.ADD_DATE,
+          //crmTicketDetailsIncr(CrmTicketVariables.DG_END_DATE) as CrmTicketVariables.TICKET_CLOSE_DATE,
+          crmTicketMasterIncr(CrmTicketVariables.ISSUE_ID) as CrmTicketVariables.ISSUE_ID,
+          crmTicketMasterIncr(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION,
+          crmTicketDetailsIncr(CrmTicketVariables.CUSTOMER_NO))
 
     println("Result Log Data")
     println(result.count())

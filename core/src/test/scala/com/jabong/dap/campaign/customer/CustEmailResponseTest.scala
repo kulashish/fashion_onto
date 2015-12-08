@@ -155,5 +155,4 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     assert(expectedDF.collect().toSet.equals(effectiveDFFull.collect().toSet))
   }
 
-
 }

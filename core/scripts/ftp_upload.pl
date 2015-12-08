@@ -18,7 +18,7 @@ GetOptions (
     'debug|d' => \$debug,
 ) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | decryptFeedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
 
-if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
+if ($target ne "PROD") {
     print "Will upload files only for PROD\n";
     exit 0;
 }
@@ -235,10 +235,10 @@ sub fetchFeedFile {
    my ($filename, $folderName, $base) = @_;
 
    # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/20150927_CUST_WELCOME_VOUCHERS.csv
-   print "hadoop fs -get /data/test/tmp/variables/$folderName/daily/$date/$filename $base/\n";
+   print "hadoop fs -get /data/tmp/variables/$folderName/daily/$date/$filename $base/\n";
 
    # /data/tmp/variables/custWelcomeVoucher/daily/2015/09/26/20150927_CUST_WELCOME_VOUCHERS.csv
-   system("hadoop fs -get /data/test/tmp/variables/$folderName/daily/$date/$filename $base/");
+   system("hadoop fs -get /data/tmp/variables/$folderName/daily/$date/$filename $base/");
    my $status = $?;
 
    $status ||= removeNull("$base/$filename");
@@ -363,14 +363,14 @@ sub upload_email_campaigns {
 
     my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv";
 
-    print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
+    print "hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
-    system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
+    system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
     my $status = $?;
 
-    print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
+    print "hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
 
-    system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
+    system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
 
     $status ||= removeNull("$base/$filename");
 
@@ -399,12 +399,12 @@ sub upload_calendar_replenish_campaigns {
 
     my $replenish_filename = "$date_with_zero_today"."_replenishment.csv";
 
-    print "hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/\n";
-    system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/");
+    print "hadoop fs -get /data/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/\n";
+    system("hadoop fs -get /data/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/");
     my $calendar_status = $?;
 
-    print "hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
-    system("hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
+    print "hadoop fs -get /data/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
+    system("hadoop fs -get /data/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
 
     $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
     $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
@@ -427,9 +427,9 @@ sub upload_acart_hourly_campaign {
 
     my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
 
-    print "hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
+    print "hadoop fs -get /data/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 
-    system("hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/");
+    system("hadoop fs -get /data/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/");
     my $acart_hourly_status = $?;
 
     $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");

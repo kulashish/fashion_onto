@@ -45,7 +45,7 @@
     {
       "source": "crm",
       "tableName": "CRM_TicketMaster",
-      "primaryKey": null,
+      "primaryKey": "IssueID",
       "mergeMode": "full",
       "saveMode": "Ignore"
     }
