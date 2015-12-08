@@ -3,7 +3,7 @@ package com.jabong.dap.quality.campaign
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignProducer
 import com.jabong.dap.common.constants.campaign.{ CustomerSelection, CampaignMergedFields, CampaignCommon }
-import com.jabong.dap.common.constants.variables.CustomerVariables
+import com.jabong.dap.common.constants.variables.{ SalesOrderVariables, CustomerVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
@@ -70,11 +70,11 @@ object WishlistCampaignQuality extends BaseCampaignQuality with Logging {
 
     val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS)
 
-    val shortlistYesterdayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 1, todayDate)
+    val shortlistYesterdayData = CampaignInput.loadNthDayTableData(1, fullShortlistData, SalesOrderVariables.CREATED_AT, todayDate)
 
     val lastDayCustomerShortlistData = wishListCustomerSelector.customerSelection(shortlistYesterdayData)
 
-    val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30, todayDate)
+    val shortlistLast30DayData = CampaignInput.loadLastNDaysTableData(30, fullShortlistData, CustomerVariables.CREATED_AT, todayDate)
     val last30DaysCustomerShortlistData = wishListCustomerSelector.customerSelection(shortlistLast30DayData)
 
     val wishlistFollowupCampaignDF = CampaignInput.getCampaignData(CampaignCommon.WISHLIST_FOLLOWUP_CAMPAIGN, DataSets.PUSH_CAMPAIGNS, date)

@@ -70,7 +70,7 @@ object CampaignManager extends Serializable with Logging {
 
     val orderItemData = CampaignInput.loadYesterdayOrderItemData().cache()
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val orderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData().cache()
 
@@ -183,16 +183,16 @@ object CampaignManager extends Serializable with Logging {
 
     val fullSalesOrderItemData = CampaignInput.loadFullOrderItemData(incrDate)
 
-    val lastYearCustomerOrderFull = CampaignInput.loadLastNdaysOrderData(370, customerOrderFull, incrDate)
+    val lastYearCustomerOrderFull = CampaignInput.loadLastNDaysTableData(370, customerOrderFull, SalesOrderVariables.CREATED_AT, incrDate)
 
-    val lastYearSalesOrderData = CampaignInput.loadLastNdaysOrderData(370, fullSalesOrderData).
+    val lastYearSalesOrderData = CampaignInput.loadLastNDaysTableData(370, fullSalesOrderData, SalesOrderVariables.CREATED_AT).
       select(SalesOrderVariables.FK_CUSTOMER,
         SalesOrderVariables.CUSTOMER_EMAIL,
         SalesOrderVariables.ID_SALES_ORDER,
         SalesOrderVariables.CREATED_AT,
         SalesOrderVariables.FK_SALES_ORDER_ADDRESS_SHIPPING)
 
-    val lastYearSalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(370, fullSalesOrderItemData).
+    val lastYearSalesOrderItemData = CampaignInput.loadLastNDaysTableData(370, fullSalesOrderItemData, SalesOrderVariables.UPDATED_AT).
       select(SalesOrderItemVariables.FK_SALES_ORDER,
         SalesOrderItemVariables.SKU,
         SalesOrderItemVariables.CREATED_AT,
@@ -281,13 +281,13 @@ object CampaignManager extends Serializable with Logging {
     val fullOrderData = CampaignInput.loadFullOrderData()
 
     val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
-    val orderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val orderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
 
     // last 3 days of orderitem data
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val orderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData)
+    val orderItemData = CampaignInput.loadLastNDaysTableData(3, fullOrderItemData, SalesOrderVariables.UPDATED_AT)
 
     // yesterday itr - Qty of Ref SKU to be greater than/equal to 10
     val yesterdayItrData = CampaignInput.loadYesterdayItrSimpleData()
@@ -298,10 +298,10 @@ object CampaignManager extends Serializable with Logging {
 
     // invalid lowstock
     // last 30 days of order item data
-    val last30DayOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData)
+    val last30DayOrderItemData = CampaignInput.loadLastNDaysTableData(30, fullOrderItemData, SalesOrderVariables.UPDATED_AT)
 
     // last 2 months order data
-    val last60DayOrderData = CampaignInput.loadLastNdaysOrderData(60, fullOrderData)
+    val last60DayOrderData = CampaignInput.loadLastNDaysTableData(60, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val invalidLowStock = new InvalidLowStockCampaign()
     invalidLowStock.runCampaign(last60DayOrderData, last30DayOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
@@ -332,16 +332,16 @@ object CampaignManager extends Serializable with Logging {
     // acart daily - last day acart data, ref sku not bought on last day
     // no previous campaign check
     // FIXME: search for email
-    val yesterdayAcartData = CampaignInput.loadNthdayAcartData(1, last30DayAcartData)
+    val yesterdayAcartData = CampaignInput.loadNthDayTableData(1, last30DayAcartData, SalesOrderVariables.CREATED_AT)
     val yesterdaySalesOrderItemData = CampaignInput.loadYesterdayOrderItemData() // created_at
-    val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
+    val yesterdaySalesOrderData = CampaignInput.loadLastNDaysTableData(1, fullOrderData, SalesOrderVariables.CREATED_AT)
     val acartDaily = new AcartDailyCampaign()
     acartDaily.runCampaign(yesterdayAcartData, yesterdaySalesOrderData, yesterdaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
     // acart followup - only = 3rd days acart, still not bought ref skus, qty >= 10, yesterdayItrData
-    val prev3rdDayAcartData = CampaignInput.loadNthdayAcartData(3, last30DayAcartData)
-    val last3DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(3, fullOrderItemData) // created_at
-    val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData)
+    val prev3rdDayAcartData = CampaignInput.loadNthDayTableData(3, last30DayAcartData, SalesOrderVariables.CREATED_AT)
+    val last3DaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(3, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
+    val last3DaySalesOrderData = CampaignInput.loadLastNDaysTableData(3, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val acartFollowup = new AcartFollowUpCampaign()
     acartFollowup.runCampaign(prev3rdDayAcartData, last3DaySalesOrderData, last3DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
@@ -351,8 +351,8 @@ object CampaignManager extends Serializable with Logging {
     // low stock - last 30 day acart (last30DayAcartData), yesterdayItrData, qty <=10
     //  yesterdayItrData
     // have not placed the order
-    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
-    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(30, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
     val acartLowStock = new AcartLowStockCampaign()
     acartLowStock.runCampaign(last30DayAcartData, last30DaySalesOrderData, last30DaySalesOrderItemData, yesterdayItrData, brickMvpRecommendations, yestDate)
 
@@ -403,17 +403,17 @@ object CampaignManager extends Serializable with Logging {
 
     val fullShortlistData = CampaignInput.loadFullShortlistData()
 
-    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
-    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(30, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
 
-    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
-    val yesterdaySalesOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
+    val yesterdaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(1, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
+    val yesterdaySalesOrderData = CampaignInput.loadLastNDaysTableData(1, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS)
 
-    val shortlistYesterdayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 1, todayDate)
+    val shortlistYesterdayData = CampaignInput.loadNthDayTableData(1, fullShortlistData, SalesOrderVariables.CREATED_AT, todayDate)
 
-    val shortlistLast30DayData = CampaignInput.loadNDaysShortlistData(fullShortlistData, 30, todayDate)
+    val shortlistLast30DayData = CampaignInput.loadLastNDaysTableData(30, fullShortlistData, CustomerVariables.CREATED_AT, todayDate)
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
 
@@ -439,7 +439,7 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
-    val shortlist3rdDayData = CampaignInput.loadNthDayShortlistData(fullShortlistData, 3, todayDate)
+    val shortlist3rdDayData = CampaignInput.loadNthDayTableData(3, fullShortlistData, SalesOrderVariables.CREATED_AT, todayDate)
 
     val shortlistReminderCampaign = new ShortlistReminderCampaign()
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData, yestDate)
@@ -455,13 +455,13 @@ object CampaignManager extends Serializable with Logging {
     val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData().cache()
     val customerMasterData = loadCustomerMasterData()
     val fullOrderData = CampaignInput.loadFullOrderData()
-    val yestOrderData = CampaignInput.loadLastNdaysOrderData(1, fullOrderData)
+    val yestOrderData = CampaignInput.loadLastNDaysTableData(1, fullOrderData, SalesOrderVariables.CREATED_AT)
     val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData()
 
     //surf3
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
-    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(30, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
     val lastDaySurf3Data = CampaignInput.loadLastDaySurf3Data()
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
@@ -494,8 +494,8 @@ object CampaignManager extends Serializable with Logging {
 
     val fullOrderData = CampaignInput.loadFullOrderData()
     val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val last30DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData)
-    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
+    val last30DaySalesOrderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
+    val yesterdaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(1, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
 
     //Start: MIPR email Campaign
@@ -503,7 +503,7 @@ object CampaignManager extends Serializable with Logging {
     miprCampaign.runCampaign(last30DaySalesOrderData, yesterdaySalesOrderItemData, brickMvpRecommendations, itrSkuSimpleYesterdayData, yestDate)
     val last30DayAcartData = CampaignInput.loadLast30daysAcartData()
 
-    val last30DaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(30, fullOrderItemData) // created_at
+    val last30DaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(30, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
 
     //Start: New Arrival email Campaign
     val newArrivalsBrandCampaign = new NewArrivalsBrandCampaign()
@@ -551,7 +551,7 @@ object CampaignManager extends Serializable with Logging {
     val incrDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
 
     //  val fullOrderItemData = CampaignInput.loadFullOrderItemData()
-    val last3DaySalesOrderData = CampaignInput.loadLastNdaysOrderData(3, fullOrderData, incrDate)
+    val last3DaySalesOrderData = CampaignInput.loadLastNDaysTableData(3, fullOrderData, SalesOrderVariables.CREATED_AT, incrDate)
     //    val yesterdaySalesOrderItemData = CampaignInput.loadLastNdaysOrderItemData(1, fullOrderItemData) // created_at
     val itrSkYesterdayData = CampaignInput.loadYesterdayItrSkuData()
 
