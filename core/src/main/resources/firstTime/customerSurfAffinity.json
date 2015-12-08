@@ -1,0 +1,20 @@
+{
+  "isHistory": true,
+  "params": [
+    {
+    "source": "customerSurfAffinity",
+    "path": "first time",
+    "mode": "full",
+    "incrDate": "2015/09/18",
+    "saveMode": "Ignore",
+    "saveFormat": "parquet"
+    },
+    {
+    "source": "customerSurfAffinity",
+    "fullDate": "2015/09/18",
+    "incrDate": "2015/09/19",
+    "saveMode": "Ignore",
+    "saveFormat": "parquet"
+    }
+  ]
+}

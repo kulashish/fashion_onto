@@ -1,6 +1,8 @@
 package com.jabong.dap.campaign.recommendation.generate
 
 import com.jabong.dap.campaign.recommendation.generator.RecommendationUtils
+import com.jabong.dap.common.json.JsonUtils
+import org.apache.spark.sql.functions._
 import org.scalatest.FlatSpec
 
 /**
@@ -36,6 +38,13 @@ class RecommendationUtilsTest extends FlatSpec {
   "MEN gender value" should "return MEN,UNISEX recommended gender" in {
     val recommendedGender = RecommendationUtils.getRecommendationGender("MEN")
     assert(recommendedGender == "MEN!UNISEX")
+  }
+
+  "testFiloterCount" should "check if the filter on count works" in {
+    val df = JsonUtils.readFromJson("campaigns/recommendation", "filter_data")
+    val filtered = df.filter(count(df("")).>(3))
+    println(filtered)
+
   }
 
 }

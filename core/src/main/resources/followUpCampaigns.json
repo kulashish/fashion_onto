@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "follow_up_campaigns",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
+    }
+  ]
+}

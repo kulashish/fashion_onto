@@ -43,7 +43,7 @@ object Init {
    * action passed.
    * @param args Array[String]
    */
-  def options(args: Array[String]): Unit = {
+  def options(args: Array[String]) = {
     val defaultParams = Params()
 
     val parser = new OptionParser[Params]("Alchemy") {
@@ -112,7 +112,7 @@ object Init {
    * Trigger action based upon the component passed
    * @param params
    */
-  def run(params: Params): Unit = {
+  def run(params: Params) = {
     params.component match {
       case "itr" => new Itr().start()
 
@@ -129,12 +129,19 @@ object Init {
 
       case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
+      case "calendarCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.CALENDAR_CAMPAIGNS)
+      case "acartHourlyFeed" => CampaignManager.acartHourlyFeed(DataSets.ACART_HOURLY)
 
       //campaign quality check for mobile
       case "mobilePushCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
 
       //campaign quality check for email
       case "emailCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
+
+      //calendar campaign quality check
+      case "calendarCampaignQuality" => CampaignQuality.start(params.campaignsJson, DataSets.CALENDAR_CAMPAIGNS)
+
+      case "variablesQuality" => CampaignQuality.start(params.campaignsJson, DataSets.VARIABLES)
 
       case _ => new ComponentExecutor().start(params.paramJson)
     }

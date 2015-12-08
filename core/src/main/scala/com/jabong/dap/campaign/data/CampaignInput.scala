@@ -3,6 +3,8 @@ package com.jabong.dap.campaign.data
 import java.io.File
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -14,16 +16,20 @@ import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.schema.Schema
+import com.jabong.dap.model.clickstream.ClickStreamConstant
 import com.jabong.dap.model.product.itr.variables.ITR
 import grizzled.slf4j.Logging
 import org.apache.spark.SparkException
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
+
 /**
  * Created by rahul for providing camapaign input on 15/6/15.
  */
 object CampaignInput extends Logging {
+
+  val SALES_HOUR_DIFF = 1
 
   def readCustomerData(path: String, date: String): DataFrame = {
 
@@ -129,6 +135,32 @@ object CampaignInput extends Logging {
     nthDayOrderData
   }
 
+  /**
+   *
+   * @param n
+   * @param inputData
+   * @return
+   */
+  def loadNthdayTableData(n: Int, inputData: DataFrame): DataFrame = {
+    val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_TIME_FORMAT_MS))
+    val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
+    val nDayOldEndTime = TimeUtils.getEndTimestampMS(nDayOldTime)
+
+    val nthDayOrderData = Utils.getTimeBasedDataFrame(inputData, SalesOrderVariables.CREATED_AT, nDayOldStartTime.toString, nDayOldEndTime.toString)
+    nthDayOrderData
+  }
+  
+  def loadNthDayModData(inputData: DataFrame, incrDate:String, nthDay: Int, modBase: Int): DataFrame = {
+    var n = nthDay
+    if (n == modBase)  n = 0
+    inputData.filter(Udf.dateModeFilter(col(SalesOrderVariables.CREATED_AT), lit(incrDate), lit(n), lit(modBase)) === true)
+  }
+
+  /**
+   * load yesterdays itr sku simle data
+   * @param dateYesterday
+   * @return
+   */
   def loadYesterdayItrSimpleData(dateYesterday: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)) = {
     logger.info("Reading last day basic itr simple data from hdfs")
     val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
@@ -233,7 +265,7 @@ object CampaignInput extends Logging {
    * @return dataframe with call campaigns data
    */
   def loadAllCampaignsData(date: String, campaignType: String): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     logger.info("Reading last day all campaigns data from hdfs : CampaignType" + campaignType)
     //FIXME:use proper data frame
@@ -248,6 +280,8 @@ object CampaignInput extends Logging {
       if (null != allCampaignData && null != df) allCampaignData = allCampaignData.unionAll(df) else if (null == allCampaignData) allCampaignData = df
     }
     logger.info("merging full campaign done for type: " + campaignType)
+    CampaignUtils.debug(allCampaignData, "loading campaign data " + campaignType)
+
     return allCampaignData
   }
 
@@ -259,7 +293,7 @@ object CampaignInput extends Logging {
    * @return
    */
   def getCampaignData(name: String, date: String, campaignType: String, priority: Int = CampaignCommon.VERY_LOW_PRIORITY): DataFrame = {
-    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS) contains campaignType)
+    require(Array(DataSets.EMAIL_CAMPAIGNS, DataSets.PUSH_CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS) contains campaignType)
 
     val path: String = ConfigConstants.READ_OUTPUT_PATH + File.separator + campaignType + File.separator + name + File.separator + DataSets.DAILY_MODE + File.separator + date
     logger.info(" Reading " + name + " campaign data from path:- " + path + ", Type: " + campaignType)
@@ -409,7 +443,7 @@ object CampaignInput extends Logging {
         col(ITR.PRICE_BAND),
         col(ITR.PRODUCT_NAME),
         col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-        col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT)
+        col(ITR.ITR_DATE) as CustomerVariables.CREATED_AT)
 
     for (i <- 2 to 30) {
 
@@ -432,7 +466,7 @@ object CampaignInput extends Logging {
           col(ITR.PRICE_BAND),
           col(ITR.PRODUCT_NAME),
           col(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-          col(ITR.ITR_DATE) as CustomerProductShortlistVariables.CREATED_AT))
+          col(ITR.ITR_DATE) as CustomerVariables.CREATED_AT))
       }
     }
     itr30Day
@@ -463,6 +497,19 @@ object CampaignInput extends Logging {
       }
     }
     campaignMerged30Day
+  }
+
+  /**
+   * to get campaign data for a particular date
+   * @param campaignType
+   * @param nDays
+   * @return
+   */
+  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, nDays: Int = -1, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    val date = TimeUtils.getDateAfterNDays(-nDays, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+    val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
+
+    mergedCampaignData
   }
 
   def loadYesterdayMobilePushCampaignQualityData(): DataFrame = {
@@ -512,7 +559,7 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
     val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
 
-    val nthDayShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nthDayShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nthDayShortlistData
   }
@@ -547,8 +594,108 @@ object CampaignInput extends Logging {
     val startTimestamp = TimeUtils.getStartTimestampMS(Timestamp.valueOf(dateBeforeNdays))
     val endTimestamp = TimeUtils.getEndTimestampMS(Timestamp.valueOf(yesterdayDate))
 
-    val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerProductShortlistVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
+    val nDaysShortlistData = Utils.getTimeBasedDataFrame(fullShortlistData, CustomerVariables.CREATED_AT, startTimestamp.toString, endTimestamp.toString)
 
     return nDaysShortlistData
   }
+
+  /**
+   *
+   * @param tableName
+   * @param lastHour
+   * @return
+   */
+  def loadNthHourTableData(tableName: String, lastHour: Int, date: String): DataFrame = {
+    val incrDateHour: String = TimeUtils.getDateAfterNHours(lastHour, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
+    val tableData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
+    return tableData
+  }
+
+  /**
+   *
+   * @param tableName
+   * @param lastHour
+   * @return
+   */
+  def loadNHoursTableData(tableName: String, lastHour: Int, date: String): DataFrame = {
+
+    var tableNameUnionData: DataFrame = null
+
+    for (i <- lastHour to -1) {
+
+      val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
+
+      logger.info("Reading last " + i + " hours " + tableName + " data from hdfs")
+
+      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.INPUT_PATH, DataSets.BOB, tableName, DataSets.HOURLY_MODE, incrDateHour)
+      if (null != tableNameData) {
+        if (tableNameUnionData == null) {
+          tableNameUnionData = tableNameData
+        } else {
+          tableNameUnionData = tableNameUnionData.unionAll(tableNameData)
+        }
+      }
+    }
+    tableNameUnionData
+  }
+
+  /**
+   *
+   * @param campaignName
+   * @param campaignType
+   * @param date
+   * @return
+   */
+  def loadNHoursCampaignData(campaignName: String, campaignType: String, date: String = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)): DataFrame = {
+
+    var tableNameUnionData: DataFrame = null
+
+    val lastHour = TimeUtils.getHour(date, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER)
+
+    for (i <- lastHour to 1 by -1) {
+
+      val incrDateHour: String = TimeUtils.getDateAfterNHours(i, TimeConstants.DATE_TIME_FORMAT_HRS_FOLDER, date)
+
+      logger.info("Reading last " + i + " hours " + campaignName + "data from hdfs")
+
+      val tableNameData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, campaignName, DataSets.HOURLY_MODE, incrDateHour)
+      if (null != tableNameData) {
+        if (tableNameUnionData == null) {
+          tableNameUnionData = tableNameData
+        } else {
+          tableNameUnionData = tableNameUnionData.unionAll(tableNameData)
+        }
+      }
+    }
+    tableNameUnionData
+  }
+
+  def loadFullVariablesData(tableName: String, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading Full" + tableName + "Data data from hdfs")
+    val orderData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, tableName, DataSets.FULL_MERGE_MODE, date)
+    orderData
+  }
+
+  def loadPageViewSurfData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+
+    val hiveContext = Spark.getHiveContext()
+    val monthYear = TimeUtils.getMonthAndYear(date, TimeConstants.DATE_FORMAT_FOLDER)
+    val month = monthYear.month + 1
+    val day = monthYear.day
+    val year = monthYear.year
+
+    val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + ClickStreamConstant.MERGE_PAGEVISIT +
+      " where userid is not null and pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and sessionid != '(null)' and " +
+      "date1 = " + day + " and month1 = " + month + " and year1=" + year
+
+    val pageViewSurfData = hiveContext.sql(hiveQuery)
+    return pageViewSurfData
+  }
+
+  def loadSalesAddressData(date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    logger.info("Reading order item data from hdfs for " + date)
+    val salesAddrData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
+    salesAddrData
+  }
+
 }

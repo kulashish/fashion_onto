@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "geo_campaign",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

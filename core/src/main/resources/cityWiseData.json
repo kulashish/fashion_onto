@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "cityWiseData",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

@@ -3,14 +3,14 @@
     {
       "source": "custTop5",
       "path": "first time",
-      "incrDate": "2015/10/30",
+      "incrDate": "2015/11/24",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
       "source": "custTop5",
-      "fullDate": "2015/10/30",
-      "incrDate": "2015/10/31",
+      "fullDate": "2015/11/24",
+      "incrDate": "2015/11/25",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }

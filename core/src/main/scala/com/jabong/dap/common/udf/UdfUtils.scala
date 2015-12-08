@@ -1,19 +1,20 @@
 package com.jabong.dap.common.udf
 
 import java.sql.Timestamp
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.{ Calendar, Date }
 
 import com.jabong.dap.campaign.utils.CampaignUtils
+import com.jabong.dap.common.constants.campaign.CampaignCommon
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ ArrayUtils, Spark, StringUtils }
+import com.jabong.dap.common.{ ArrayUtils, StringUtils }
 import com.jabong.dap.data.storage.DataSets
 import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{ DataFrame, Row }
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.Row
 
+import scala.collection.immutable.HashMap
 import scala.collection.mutable
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
@@ -23,7 +24,7 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 object UdfUtils extends Logging {
 
   def csvDateFormat(s: Timestamp): String = {
-    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT, TimeConstants.DATE_FORMAT)
+    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT_MS, TimeConstants.DATE_TIME_FORMAT)
   }
 
   /**
@@ -215,46 +216,6 @@ object UdfUtils extends Logging {
     }
 
     return maxSlot
-  }
-
-  /**
-   * this method will create a slot data
-   * @param iterable
-   * @return Tuple2[String, Int]
-   */
-  def getCompleteSlotData(iterable: Iterable[(Int, Int)]): Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int] = {
-
-    logger.info("Enter in getCompleteSlotData:")
-
-    val timeSlotArray = new Array[Int](12)
-
-    var maxSlot: Int = 0
-
-    var max: Int = 0
-
-    iterable.foreach {
-      case (slot, value) =>
-        if (value > max) { maxSlot = slot; max = value }
-        timeSlotArray(slot) = value
-    }
-
-    logger.info("Exit from  getCompleteSlotData: ")
-
-    new Tuple13(
-      timeSlotArray(0),
-      timeSlotArray(1),
-      timeSlotArray(2),
-      timeSlotArray(3),
-      timeSlotArray(4),
-      timeSlotArray(5),
-      timeSlotArray(6),
-      timeSlotArray(7),
-      timeSlotArray(8),
-      timeSlotArray(9),
-      timeSlotArray(10),
-      timeSlotArray(11),
-      maxSlot)
-
   }
 
   /**
@@ -456,19 +417,69 @@ object UdfUtils extends Logging {
 
   /**
    *
-   * @param skuList
+   * @param colList
    * @tparam T
    * @return
    */
-  def getCountSku[T](skuList: List[T]): Int = {
+  def getCountColumn[T](colList: List[T]): Int = {
 
-    if (skuList == null || skuList.isEmpty) {
+    if (colList == null || colList.isEmpty) {
       return 0
     }
 
-    return skuList.length
+    return colList.length
   }
 
+  /**
+   *
+   * @param l1
+   * @param l2
+   * @return
+   */
+  def concatenateList[T](l1: scala.collection.mutable.ArrayBuffer[T], l2: scala.collection.mutable.ArrayBuffer[T]): scala.collection.mutable.ArrayBuffer[T] = {
+
+    if (l1 == null) {
+      return l2
+    }
+    if (l2 == null) {
+      return l1
+    }
+
+    return l1 ++ l2
+  }
+
+  /**
+   *
+   * @param l1
+   * @param l2
+   * @return
+   */
+  def concatenateRecSkuList[T](l1: scala.collection.mutable.ArrayBuffer[T], l2: scala.collection.mutable.ArrayBuffer[T]): scala.collection.mutable.ArrayBuffer[T] = {
+    if (l1 == null) {
+      return l2
+    }
+    if (l2 == null) {
+      return l1
+    }
+    val list1Length = l1.length
+    val list2Length = l2.length
+    if (list1Length < 8) {
+      if (list2Length >= (16 - list1Length)) {
+        val takeLength = 16 - list1Length
+        return l1.take(list1Length) ++ l2.take(takeLength)
+      } else {
+        return l1.take(list1Length) ++ l2.take(list2Length)
+      }
+    } else if (list2Length < 8) {
+      if (list1Length >= (16 - list2Length)) {
+        val takeLength = 16 - list2Length
+        return l1.take(takeLength) ++ l2.take(list2Length)
+      } else {
+        return l1.take(list1Length) ++ l2.take(list2Length)
+      }
+    }
+    return l1.take(8) ++ l2.take(8)
+  }
   /**
    * returns dayName with max click given counts for 7 days
    * @param count1
@@ -608,6 +619,10 @@ object UdfUtils extends Logging {
     if (i >= strings.size) "" else strings(i)
   }
 
+  def getElementList(strings: mutable.MutableList[String], i: Int): String = {
+    if (i >= strings.size) "" else strings(i)
+  }
+
   def allZero2Null(str: String): String = {
     val nullStr: String = null
     if (null != str) {
@@ -621,7 +636,40 @@ object UdfUtils extends Logging {
     str
   }
 
+  /**
+   *
+   * @param dateString
+   * @param dateFormat
+   * @return Int
+   */
+  def timeToSlot(dateString: String, dateFormat: String): Int = {
+
+    logger.info("Enter in  timeToSlot:")
+    val nullStr: Int = null.asInstanceOf[Int]
+    var timeToSlotMap = new HashMap[Int, Int]
+    timeToSlotMap += (7 -> 0, 8 -> 0, 9 -> 1, 10 -> 1, 11 -> 2, 12 -> 2, 13 -> 3, 14 -> 3, 15 -> 4, 16 -> 4, 17 -> 5, 18 -> 5, 19 -> 6, 20 -> 6, 21 -> 7, 22 -> 7, 23 -> 8, 0 -> 8, 1 -> 9, 2 -> 9, 3 -> 10, 4 -> 10, 5 -> 11, 6 -> 11)
+
+    try {
+      val formatter = new SimpleDateFormat(dateFormat)
+      var date: java.util.Date = null
+      date = formatter.parse(dateString)
+
+      val calendar = Calendar.getInstance()
+      calendar.setTime(date)
+      val hours = calendar.get(Calendar.HOUR_OF_DAY)
+      val timeSlot = timeToSlotMap.getOrElse(hours, 0)
+      logger.info("Exit from  timeToSlot: ")
+      return timeSlot
+    } catch {
+      case _: Throwable => return nullStr
+    }
+  }
+
   def getElementInTupleArray(strings: ArrayBuffer[Row], i: Int, value: Int): String = {
+    if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
+  }
+
+  def getElementInTupleList(strings: mutable.MutableList[Row], i: Int, value: Int): String = {
     if (i >= strings.size) "" else CampaignUtils.checkNullString(strings(i)(value))
   }
 
@@ -672,39 +720,156 @@ object UdfUtils extends Logging {
 
   }
 
-  def getCPOT(dfIn: DataFrame, schema: StructType, dateFormat: String): DataFrame = {
+  /**
+   * follow up campaign map
+   * @param mailType
+   * @return
+   */
+  def followUpCampaignMailTypes(mailType: Int): Int = {
+    val followUpCampaignMap = collection.immutable.HashMap(
+      CampaignCommon.SURF1_MAIL_TYPE -> CampaignCommon.SURF1_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF2_MAIL_TYPE -> CampaignCommon.SURF2_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF3_MAIL_TYPE -> CampaignCommon.SURF3_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.SURF6_MAIL_TYPE -> CampaignCommon.SURF6_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.CANCEL_RETARGET_MAIL_TYPE -> CampaignCommon.CANCEL_RETARGET_FOLLOW_UP_MAIL_TYPE,
+      CampaignCommon.RETURN_RETARGET_MAIL_TYPE -> CampaignCommon.RETURN_RETARGET_FOLLOW_UP_MAIL_TYPE)
 
-    val dfSelect = dfIn.sort(dfIn.columns(0), dfIn.columns(1))
+    return followUpCampaignMap.getOrElse(mailType, 0)
+  }
 
-    val mapReduce = dfSelect.map(r => ((r(0), TimeUtils.timeToSlot(r(1).toString, dateFormat)), 1)).reduceByKey(_ + _)
+  def nextPriceBand(priceBand: String): String = {
+    if (priceBand == null || priceBand.equals("E")) {
+      return priceBand
+    } else {
+      return (priceBand.charAt(0) + 1).toChar.toString
+    }
+  }
 
-    val newMap = mapReduce.map{ case (key, value) => (key._1, (key._2.asInstanceOf[Int], value.toInt)) }
+  // The last click date will be calculated based on click dates alone and the open dates are passed empty.
+  // If the open dates are are null or empty, we need to check the values in click date to set the final open date  value.
+  def latestEmailOpenDate(openDate: String, yesOpenDate: String, clickDate: String, yesClickDate: String): String = {
+    var maxDateString: String = "2001-01-01 00:00:00"
+    var maxDate: Date = TimeUtils.getDate(maxDateString, TimeConstants.DATE_TIME_FORMAT)
+    var date: Date = null
+    if (null != openDate && openDate.length > 0) {
+      date = TimeUtils.getDate(openDate, TimeConstants.DATE_TIME_FORMAT)
+    } else if (null != yesOpenDate && yesOpenDate.length > 0) {
+      date = TimeUtils.getDate(yesOpenDate, TimeConstants.DATE_TIME_FORMAT)
+    }
+    if (date != null && date.after(maxDate)) {
+      maxDateString = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT).format(date)
+    } else {
+      if (null != clickDate && clickDate.length > 0) {
+        maxDate = TimeUtils.getDate(clickDate, TimeConstants.DATE_TIME_FORMAT)
+      } else if (null != yesClickDate && yesClickDate.length > 0) {
+        maxDate = TimeUtils.getDate(yesClickDate, TimeConstants.DATE_TIME_FORMAT)
+      }
+      maxDateString = new SimpleDateFormat(TimeConstants.DATE_TIME_FORMAT).format(maxDate)
+    }
+    maxDateString
+  }
 
-    val grouped = newMap.groupByKey().map{ case (key, value) => (key.toString, UdfUtils.getCompleteSlotData(value)) }
+  def size(a: mutable.MutableList[String]): Int = {
+    if (a == null) return 0
+    a.size
+  }
 
-    val rowRDD = grouped.map({
-      case (key, value) =>
-        Row(
-          key,
-          value._1,
-          value._2,
-          value._3,
-          value._4,
-          value._5,
-          value._6,
-          value._7,
-          value._8,
-          value._9,
-          value._10,
-          value._11,
-          value._12,
-          value._13)
-    })
+  def nonBeauty(category: String, created_at: Timestamp): String = {
+    //println(category,created_at)
+    if (category == null || created_at == null) {
+      return null
+    }
 
-    // Apply the schema to the RDD.
-    val df = Spark.getSqlContext().createDataFrame(rowRDD, schema)
+    val NonBeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+    NonBeautyCategory += (
+      "SUNGLASSES" -> 365,
+      "WOMEN FOOTWEAR" -> 180,
+      "KIDS APPAREL" -> 180,
+      "WATCHES" -> 365,
+      "FURNITURE" -> 365,
+      "SPORTS EQUIPMENT" -> 180,
+      "WOMEN APPAREL" -> 90,
+      "HOME" -> 365,
+      "MEN FOOTWEAR" -> 180,
+      "MEN APPAREL" -> 180,
+      "JEWELLERY" -> 180,
+      "KIDS FOOTWEAR" -> 180,
+      "BAGS" -> 90,
+      "TOYS" -> 90
+    )
+    val lastPurchaseDay = NonBeautyCategory.getOrElse(category, null)
 
-    df.dropDuplicates()
+    if (lastPurchaseDay == null) {
+      return null
+    }
+
+    // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
+      return category
+    }
+
+    return null
+
+  }
+
+  def beauty(category: String, created_at: Timestamp): String = {
+    //    println(category,created_at)
+    if (category == null || created_at == null) {
+      return null
+    }
+
+    val BeautyCategory = scala.collection.mutable.HashMap.empty[String, Int]
+    BeautyCategory += (
+      "BEAUTY" -> 90,
+      "FRAGRANCE" -> 180
+    )
+
+    val lastPurchaseDay = BeautyCategory.getOrElse(category, null)
+
+    if (lastPurchaseDay == null) {
+      return null
+    }
+    // println(TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT),lastPurchaseDay.asInstanceOf[Int])
+
+    if (TimeUtils.daysFromToday(created_at.toString, TimeConstants.DATE_TIME_FORMAT) == lastPurchaseDay.asInstanceOf[Int]) {
+      return category
+    }
+
+    null
+
+  }
+
+  def lengthString(string: String): Int = {
+    if (string == null)
+      return 0
+
+    string.length()
+  }
+
+  def acartNumberOfSkus(acartUrl: String): Int = {
+    if (acartUrl == null)
+      return 0
+
+    val acartData = acartUrl.split("=")
+    if (acartData.length > 1) {
+      return acartData(0).split(",").length
+    }
+    0
+  }
+
+  def addMaskString(col: String, mask: String): String = {
+    if (null == col || col.length == 0) {
+      return ""
+    }
+    (mask + col + mask)
+  }
+  
+  def modeFilter(created_at: Timestamp, incrDate:String, n: Int, modBase: Int): Boolean = {
+    // calculate days since today
+    val daysSince= TimeUtils.daysFromIncrDate(created_at.toString, incrDate + " " + TimeConstants.END_TIME, TimeConstants.DATE_TIME_FORMAT)
+    if ((daysSince == 0) && (n == 0)) return false
+    if (daysSince % modBase == n) true
+    else false
   }
 
 }

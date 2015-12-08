@@ -1,0 +1,49 @@
+{
+  "pushCampaignList": [
+    {
+      "campaignName": "pricepoint",
+      "priority": 22,
+      "mailType": 24
+    },
+    {
+      "campaignName": "brand_in_city",
+      "priority": 23,
+      "mailType": 800
+    },
+    {
+      "campaignName": "love_brand",
+      "priority": 26,
+      "mailType": 13
+    },
+    {
+      "campaignName": "clearance",
+      "priority": 25,
+      "mailType": 20
+    },
+    {
+      "campaignName": "brick_affinity",
+      "priority": 28,
+      "mailType": 14
+    },
+    {
+      "campaignName": "love_color",
+      "priority": 27,
+      "mailType": 15
+    },
+    {
+      "campaignName": "geo_style",
+      "priority": 24,
+      "mailType": 12
+    },
+    {
+      "campaignName": "geo_brand",
+      "priority": 29,
+      "mailType": 23
+    },
+    {
+      "campaignName": "hottestX",
+      "priority": 30,
+      "mailType": 11
+    }
+  ]
+}

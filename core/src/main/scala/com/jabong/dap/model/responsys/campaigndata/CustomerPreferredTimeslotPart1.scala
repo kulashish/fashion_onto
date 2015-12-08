@@ -1,6 +1,6 @@
 package com.jabong.dap.model.responsys.campaigndata
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.CustomerVariables
@@ -43,7 +43,7 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
     val dfClickIncr = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, DataSets.RESPONSYS, DataSets.CLICK, DataSets.DAILY_MODE, incrDate, "53699_" + "CLICK_" + fileDate + ".txt", "true", ";")
     dfMap.put("clickIncr", dfClickIncr)
 
-    if (paths == null) {
+    if (null == paths) {
       val dfCPOTPart1PrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cpotPart1PrevFull", dfCPOTPart1PrevFull)
     }
@@ -55,9 +55,9 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
     var dfCPOTPart1Incr = getIncCPOTPart1(dfMap("openIncr"), dfMap("clickIncr"))
     var dfCPOTPart1Full = dfCPOTPart1Incr
 
-    val dfCPOTPart1PrevFull = dfMap("cpotPart1PrevFull")
+    val dfCPOTPart1PrevFull = dfMap.getOrElse("cpotPart1PrevFull", null)
 
-    if (dfCPOTPart1PrevFull != null) {
+    if (null != dfCPOTPart1PrevFull) {
 
       val dfIncrVarBC = Spark.getContext().broadcast(dfCPOTPart1Incr).value
       //join old and new data frame
@@ -163,8 +163,9 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
     if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart1Full)) {
       DataWriter.writeParquet(dfWrite("dfCPOTPart1Full"), pathCustomerPreferredTimeslotPart1Full, saveMode)
     }
-
+    val pathCustomerPreferredTimeslotPart1Incr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.DAILY_MODE, incrDate)
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    DataWriter.writeParquet(dfWrite("dfCPOTPart1Incr"), pathCustomerPreferredTimeslotPart1Incr, saveMode)
     DataWriter.writeCsv(dfWrite("dfCPOTPart1Incr").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part1", DataSets.IGNORE_SAVEMODE, "true", ";")
 
   }
@@ -177,8 +178,8 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
    */
   def getIncCPOTPart1(dfOpen: DataFrame, dfClick: DataFrame): DataFrame = {
 
-    val dfOpenCPOT = UdfUtils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
-    val dfClickCPOT = UdfUtils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfOpenCPOT = Utils.getCPOT(dfOpen.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailOpen, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
+    val dfClickCPOT = Utils.getCPOT(dfClick.select("CUSTOMER_ID", CustomerVariables.EVENT_CAPTURED_DT), CustVarSchema.emailClick, TimeConstants.DD_MMM_YYYY_HH_MM_SS)
 
     val dfIncCPOTPart1 = dfOpenCPOT.join(dfClickCPOT, dfOpenCPOT(CustomerVariables.CUSTOMER_ID) === dfClickCPOT(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
       .select(

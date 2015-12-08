@@ -96,5 +96,4 @@ object DataWriter extends Logging {
 
     true
   }
-
 }

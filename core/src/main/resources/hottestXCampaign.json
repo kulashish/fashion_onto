@@ -1,0 +1,9 @@
+{
+"params": [
+{
+"source": "hottestX",
+"saveMode": "Ignore",
+"saveFormat": "parquet"
+}
+]
+}

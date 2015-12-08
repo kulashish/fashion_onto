@@ -16,7 +16,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | email_campaigns \n";
+) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | decryptFeedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
 
 if ($target ne "PROD" && ($component eq "campaigns" || $component eq "dcf_feed" || $component eq "pricing_sku_data")) {
     print "Will upload files only for PROD\n";
@@ -37,6 +37,12 @@ print $date_with_hiphen . "\n";
 my $date_with_zero_today = strftime "%Y%m%d", localtime(time());
 print $date_with_zero_today . "\n";
 
+my $date_today = strftime "%Y/%m/%d", localtime(time());
+print $date_today . "\n";
+
+my $current_hour = strftime "%H", localtime(time());
+print $current_hour . "\n";
+
 my $job_exit;
 
 if ($component eq "campaigns") {
@@ -51,8 +57,14 @@ if ($component eq "campaigns") {
     $job_exit = upload_pricing_sku_data();
 } elsif ($component eq "feedFiles") {
     $job_exit = upload_email_campaigns_feedFiles();
+} elsif ($component eq "decryptFeedFiles") {
+    $job_exit = upload_email_campaigns_decryptFeedFiles();
 } elsif ($component eq "email_campaigns") {
     $job_exit = upload_email_campaigns();
+} elsif ($component eq "calendar_campaigns") {
+     $job_exit = upload_calendar_replenish_campaigns();
+} elsif ($component eq "acart_hourly_campaign") {
+     $job_exit = upload_acart_hourly_campaign();
 } else {
     print "not a valid component\n";
     $job_exit = -1;
@@ -234,6 +246,33 @@ sub fetchFeedFile {
    return $status;
 }
 
+sub upload_email_campaigns_decryptFeedFiles {
+    my $base = "/tmp/$date_with_zero/decryptFeedFiles";
+    print "directory is $base\n";
+    system("mkdir -p $base");
+    my $status = $?;
+
+    # 20150928_CONTACTS_LIST.csv
+    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    my $folderName = "contactListMobile";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    print("rename file $base/$filename to dap_$filename");
+    $status ||= system("mv $base/$filename $base/dap_$filename");
+
+    # 20150928_Contact_list_Plus.csv
+    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
+    $folderName = "Contact_list_Plus";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    print("rename file $base/$filename to dap_$filename");
+    $status ||= system("mv $base/$filename $base/dap_$filename");
+
+    system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $base/*.csv; bye\"");
+    $status ||= $?;
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
+}
 
 sub upload_email_campaigns_feedFiles {
     my $base = "/tmp/$date_with_zero/feedFiles";
@@ -266,15 +305,45 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "paybackData";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20151109_CUST_TOP5.csv
+    $filename = "$date_with_zero_today"."_CUST_TOP5.csv";
+    $folderName = "custTop5";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20151109_CUST_CAT_PURCH_PRICE.csv
+    $filename = "$date_with_zero_today"."_CUST_CAT_PURCH_PRICE.csv";
+    $folderName = "cat_avg";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20151109_CUST_CAT_PURCH_COUNT.csv
+    $filename = "$date_with_zero_today"."_CUST_CAT_PURCH_COUNT.csv";
+    $folderName = "cat_count";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150928_CUST_ORDERS.csv
+    $filename = "$date_with_zero_today"."_CUST_ORDERS.csv";
+    $folderName = "customerOrders";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150928_NL_data_list.csv
+    $filename = "$date_with_zero_today"."_NL_data_list.csv";
+    $folderName = "NL_data_list";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150928_app_email_feed.csv
+    $filename = "$date_with_zero_today"."_app_email_feed.csv";
+    $folderName = "app_email_feed";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150927_CUST_EMAIL_RESPONSE.csv
+    $filename = "$date_with_zero_today"."_CUST_EMAIL_RESPONSE.csv";
+    $folderName = "custEmailResponse";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     # 20150927_Customer_App_details.csv
     $filename = "$date_with_zero_today"."_Customer_App_details.csv";
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
-
-    # 20150928_CONTACTS_LIST_MOBILE.csv
-    # $filename = "$date_with_zero_today"."_CONTACTS_LIST_MOBILE.csv";
-    # $folderName = "contactListMobile";
-    # $status ||= fetchFeedFile($fname, $folderName, $base);
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
@@ -292,16 +361,84 @@ sub upload_email_campaigns {
 
     my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
 
+    my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv";
+
     print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
 
     system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
     my $status = $?;
+
+    print "hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
+
+    system("hadoop fs -get /data/test/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
+
+    $status ||= removeNull("$base/$filename");
+
+    $status ||= removeNull("$base/$followUp_filename");
+
+
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
+
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
 
     system("rm -rf /tmp/$date_with_zero");
     return $status;
+}
+
+
+sub upload_calendar_replenish_campaigns {
+    my $calendar_base = "/tmp/$date_with_zero/campaigns/calendar_campaigns";
+
+    print "calendar campaigns directory is $calendar_base\n";
+    system("mkdir -p $calendar_base");
+
+    my $calendar_filename = "$date_with_zero_today"."_DCF_CAMPAIGN.csv";
+
+    my $replenish_filename = "$date_with_zero_today"."_replenishment.csv";
+
+    print "hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/\n";
+    system("hadoop fs -get /data/test/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/");
+    my $calendar_status = $?;
+
+    print "hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
+    system("hadoop fs -get /data/test/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/");
+
+    $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
+    $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
+    $calendar_status ||= $?;
+
+    return $calendar_status;
+}
+
+
+sub upload_acart_hourly_campaign {
+    my $acart_hourly_base = "/tmp/$date_with_zero/campaigns/acart_hourly";
+
+    print "acart campaigns directory is $acart_hourly_base\n";
+
+    system("mkdir -p $acart_hourly_base");
+
+    print "acart hourly campaigns directory is $acart_hourly_base\n";
+
+    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
+
+    print "hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
+
+    system("hadoop fs -get /data/test/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/");
+    my $acart_hourly_status = $?;
+
+    $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
+    $acart_hourly_status ||= $?;
+
+    return $acart_hourly_status;
+
 }
 
 sub dcf_file_format_change{

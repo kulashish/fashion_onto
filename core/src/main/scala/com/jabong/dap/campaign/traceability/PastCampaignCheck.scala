@@ -3,7 +3,7 @@ package com.jabong.dap.campaign.traceability
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.SQL
-import com.jabong.dap.common.constants.campaign.CampaignMergedFields
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.variables.{ PageVisitVariables, CustomerVariables, ContactListMobileVars, ProductVariables }
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
@@ -19,6 +19,8 @@ object PastCampaignCheck extends Logging {
 
   val past30DayMobileCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS)
   val past30DayEmailCampaignMergedData: DataFrame = CampaignInput.load30DayCampaignMergedData(DataSets.EMAIL_CAMPAIGNS)
+  val todayAcartHourlyEmailCampaignData: DataFrame = CampaignInput.loadNHoursCampaignData(DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN)
+
   /**
    *
    * @param pastCampaignData
@@ -83,6 +85,10 @@ object PastCampaignCheck extends Logging {
     var pastCampaignData: DataFrame = null
 
     if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
+      if (campaignMailType.equals(CampaignCommon.campaignMailTypeMap(CampaignCommon.ACART_HOURLY_CAMPAIGN))) {
+        pastCampaignData = todayAcartHourlyEmailCampaignData
+        return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
+      }
       if (past30DayEmailCampaignMergedData != null) past30DayEmailCampaignMergedData.cache()
       pastCampaignData = past30DayEmailCampaignMergedData
       return emailCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
@@ -91,6 +97,7 @@ object PastCampaignCheck extends Logging {
       pastCampaignData = past30DayMobileCampaignMergedData
       return pushCampaignRefSkuCheck(pastCampaignData, customerSkuSimpleSelected, campaignMailType, nDays)
     }
+
     logger.info("Invalid campaign Type :- returning the same  customer selected data ")
     return customerSkuSimpleSelected
   }
@@ -181,7 +188,7 @@ object PastCampaignCheck extends Logging {
             ||
             (customerSkuSelected(ProductVariables.SKU) === pastCampaignSendCustomers(CampaignMergedFields.LIVE_REF_SKU + "3"))), SQL.LEFT_OUTER)
       .filter(
-        CampaignMergedFields.EMAIL + " is null "
+        pastCampaignSendCustomers(ContactListMobileVars.EMAIL).isNull
       )
       .select(
         customerSkuSimpleSelected("*")

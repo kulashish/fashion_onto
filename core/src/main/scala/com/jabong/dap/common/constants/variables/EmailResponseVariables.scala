@@ -1,0 +1,26 @@
+package com.jabong.dap.common.constants.variables
+
+/**
+ * Created by samatha on 13/10/15.
+ */
+object EmailResponseVariables {
+  // Email Response
+  val OPEN_SEGMENT = "OPEN_SEGMENT"
+  val OPEN_7DAYS = "OPEN_7DAYS"
+  val OPEN_15DAYS = "OPEN_15DAYS"
+  val OPEN_30DAYS = "OPEN_30DAYS"
+  val CLICK_7DAYS = "CLICK_7DAYS"
+  val CLICK_15DAYS = "CLICK_15DAYS"
+  val CLICK_30DAYS = "CLICK_30DAYS"
+  val LAST_OPEN_DATE = "LAST_OPEN_DATE"
+  val LAST_CLICK_DATE = "LAST_CLICK_DATE"
+  val OPENS_LIFETIME = "OPENS_LIFETIME"
+  val CLICKS_LIFETIME = "CLICKS_LIFETIME"
+  val CUSTOMER_ID = "CUSTOMER_ID"
+  val EVENT_CAPTURED_DT = "EVENT_CAPTURED_DT"
+  val EVENT_STORED_DT = "EVENT_STORED_DT"
+  val CLICKS_TODAY = "CLICKS_TODAY"
+  val OPENS_TODAY = "OPENS_TODAY"
+  val END_DATE = "END_DATE"
+
+}
