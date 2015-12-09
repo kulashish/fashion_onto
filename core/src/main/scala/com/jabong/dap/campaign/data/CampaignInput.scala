@@ -60,26 +60,36 @@ object CampaignInput extends Logging {
     return null
   }
 
-  def loadCustomerMasterData(incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-
+  def loadCustomerMasterData(incrDate: String): DataFrame = {
     var n = 0
-    var customerMasterData: DataFrame = null
-    while (n < 7 && customerMasterData == null) {
+    var cmrData: DataFrame = null
+    while (n < 7 && cmrData == null) {
       val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       n = n + 1
-      try {
-        customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
-        logger.info("Reading customer master data from hdfs, date: " + date)
-      } catch {
-        case e: DataNotFound =>
-          logger.error("Data not found for the date: " + date)
-      }
+      cmrData = getDfCmr(date)
     }
 
-    if (customerMasterData == null)
+    if (cmrData == null)
       throw new DataNotFound
+    cmrData
+  }
 
-    customerMasterData
+  def getDfCmr(incrDate: String): DataFrame = {
+    var df: DataFrame = null
+    try {
+      df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+      logger.info("Reading customer master data from hdfs, incrDate: " + incrDate)
+    } catch {
+      case e: DataNotFound => {
+        logger.error("DataNotFound for date: " + incrDate)
+        return null
+      }
+      case e: AssertionError => {
+        logger.error("AssertionError for date: " + incrDate)
+        return null
+      }
+    }
+    df
   }
 
   def loadYesterdayOrderItemData() = loadOrderItemData()
