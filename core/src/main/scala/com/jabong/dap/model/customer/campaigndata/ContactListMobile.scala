@@ -292,12 +292,6 @@ object ContactListMobile extends DataFeedsModel with Logging {
     }
   }
 
-  def subList(l1: scala.collection.immutable.List[Long], l2: scala.collection.immutable.List[Long]): scala.collection.immutable.List[Long] = {
-
-    l1.diff(l2)
-
-  }
-
   def getlatestNl(l: List[(Long, String, Timestamp, Timestamp, String)]): (Long, String, Timestamp, Timestamp, String) = {
     var t = Tuple5(l(0)._1, l(0)._2, l(0)._3, l(0)._4, l(0)._5)
     var maxts = TimeUtils.MIN_TIMESTAMP
