@@ -12,7 +12,8 @@ import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.acq.common.CampaignInfo
-import com.jabong.dap.data.read.{ DataReader, PathBuilder }
+import com.jabong.dap.data.read.DataReader._
+import com.jabong.dap.data.read.{ DataNotFound, DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.schema.Schema
@@ -60,11 +61,25 @@ object CampaignInput extends Logging {
     return null
   }
 
-  def loadCustomerMasterData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last day customer master data from hdfs")
+  def loadCustomerMasterData(incrDate: String): DataFrame = {
 
-    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
+    var n = 0
+    var customerMasterData: DataFrame = null
+    while (n < 7 && customerMasterData == null) {
+      val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+      n = n + 1
+      try {
+        customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
+        logger.info("Reading customer master data from hdfs, date: " + date)
+      } catch {
+        case e: DataNotFound =>
+          logger.error("Data not found for the date: " + date)
+      }
+    }
+
+    if (customerMasterData == null)
+      throw new DataNotFound
+
     customerMasterData
   }
 

@@ -228,7 +228,7 @@ object CampaignManager extends Serializable with Logging {
     //        cmr(ContactListMobileVars.UID)
     //      )
 
-    val dfReplenishmentJoinToCmr = CampaignUtils.getSelectedReplenishAttributes(dfReplenishment)
+    val dfReplenishmentJoinToCmr = CampaignUtils.getSelectedReplenishAttributes(dfReplenishment, incrDate)
 
     CampaignOutput.saveCampaignData(dfReplenishmentJoinToCmr, CampaignCommon.REPLENISHMENT_CAMPAIGN, DataSets.CALENDAR_CAMPAIGNS, incrDate)
 
