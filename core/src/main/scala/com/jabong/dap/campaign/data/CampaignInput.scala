@@ -579,9 +579,22 @@ object CampaignInput extends Logging {
     salesAddrData
   }
 
-  def loadLastNDaysTableData(n: Int, fullData: DataFrame, timeField: String, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+  /**
+   * @example
+   * given date of 2015/12/03
+   * n = 1
+   * we will search from 2015/12/03 - 00:00:00 to 2015/12/03:23:59:59
+   * n = 2
+   * we will search from 2015/12/02 - 00:00:00 to 2015/12/03:23:59:59
+   * @param n
+   * @param fullData
+   * @param timeField
+   * @param incrDate
+   * @return
+   */
+  def loadLastNDaysTableData(n: Int, fullData: DataFrame, timeField: String, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
 
-    val dateTimeMs = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
+    val dateTimeMs = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
     val nDayOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-(n - 1), TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
     val nDayOldStartTime = TimeUtils.getStartTimestampMS(nDayOldTime)
     val dateTime = Timestamp.valueOf(dateTimeMs)
@@ -597,12 +610,12 @@ object CampaignInput extends Logging {
    * @param n
    * @param fullData
    * @param timeField
-   * @param date
+   * @param incrDate
    * @return
    */
-  def loadNthDayTableData(n: Int, fullData: DataFrame, timeField: String, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+  def loadNthDayTableData(n: Int, fullData: DataFrame, timeField: String, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
 
-    val dateTimeMs = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
+    val dateTimeMs = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
     val timestamp = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-(n - 1), TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
     val startTimestamp = TimeUtils.getStartTimestampMS(timestamp)
     val endTimestamp = TimeUtils.getEndTimestampMS(timestamp)
@@ -615,11 +628,11 @@ object CampaignInput extends Logging {
   /**
    * to get campaign data for a particular date
    * @param campaignType
-   * @param nDays
+   * @param n
    * @return
    */
-  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, nDays: Int = 1, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    val date = TimeUtils.getDateAfterNDays(-(nDays - 1), TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+  def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, n: Int = 1, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    val date = TimeUtils.getDateAfterNDays(-(n - 1), TimeConstants.DATE_FORMAT_FOLDER, incrDate)
     val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
 
     mergedCampaignData

@@ -409,11 +409,11 @@ object CampaignManager extends Serializable with Logging {
     val yesterdaySalesOrderItemData = CampaignInput.loadLastNDaysTableData(1, fullOrderItemData, SalesOrderVariables.UPDATED_AT) // created_at
     val yesterdaySalesOrderData = CampaignInput.loadLastNDaysTableData(1, fullOrderData, SalesOrderVariables.CREATED_AT)
 
-    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS)
+    //    val todayDate = TimeUtils.getTodayDate(TimeConstants.DATE_TIME_FORMAT_MS)
 
-    val shortlistYesterdayData = CampaignInput.loadNthDayTableData(1, fullShortlistData, SalesOrderVariables.CREATED_AT, todayDate)
+    val shortlistYesterdayData = CampaignInput.loadNthDayTableData(1, fullShortlistData, SalesOrderVariables.CREATED_AT)
 
-    val shortlistLast30DayData = CampaignInput.loadLastNDaysTableData(30, fullShortlistData, CustomerVariables.CREATED_AT, todayDate)
+    val shortlistLast30DayData = CampaignInput.loadLastNDaysTableData(30, fullShortlistData, CustomerVariables.CREATED_AT)
     val itrSkuYesterdayData = CampaignInput.loadYesterdayItrSkuData()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData()
 
@@ -439,7 +439,7 @@ object CampaignManager extends Serializable with Logging {
 
     //Start: Shortlist Reminder email Campaign
     val recommendationsData = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE)
-    val shortlist3rdDayData = CampaignInput.loadNthDayTableData(3, fullShortlistData, SalesOrderVariables.CREATED_AT, todayDate)
+    val shortlist3rdDayData = CampaignInput.loadNthDayTableData(3, fullShortlistData, SalesOrderVariables.CREATED_AT)
 
     val shortlistReminderCampaign = new ShortlistReminderCampaign()
     shortlistReminderCampaign.runCampaign(shortlist3rdDayData, recommendationsData, itrSkuSimpleYesterdayData, yestDate)

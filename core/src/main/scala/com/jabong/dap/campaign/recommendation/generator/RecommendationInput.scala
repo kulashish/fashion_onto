@@ -21,17 +21,17 @@ object RecommendationInput {
   /**
    *
    */
-  def loadCommonDataSets(date: String) {
-    orderItemFullData = CampaignInput.loadFullOrderItemData(date)
-    val salesOrderFullData = CampaignInput.loadFullOrderData(date)
-    salesOrder30DaysData = CampaignInput.loadLastNDaysTableData(30, salesOrderFullData, SalesOrderVariables.CREATED_AT, date)
+  def loadCommonDataSets(incrDate: String) {
+    orderItemFullData = CampaignInput.loadFullOrderItemData(incrDate)
+    val salesOrderFullData = CampaignInput.loadFullOrderData(incrDate)
+    salesOrder30DaysData = CampaignInput.loadLastNDaysTableData(30, salesOrderFullData, SalesOrderVariables.CREATED_AT, incrDate)
     cityZoneMapping = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
-    salesAddressFullData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, date)
-    lastdayItrData = CampaignInput.loadYesterdayItrSkuData(date).cache()
+    salesAddressFullData = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ADDRESS, DataSets.FULL_MERGE_MODE, incrDate)
+    lastdayItrData = CampaignInput.loadYesterdayItrSkuData(incrDate).cache()
   }
 
-  def lastNdaysData(inputDataFrame: DataFrame, days: Int, date: String = TimeUtils.YESTERDAY_FOLDER, field: String = SalesOrderVariables.CREATED_AT): DataFrame = {
-    val dateTimeMs = TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
+  def lastNdaysData(inputDataFrame: DataFrame, days: Int, incrDate: String = TimeUtils.YESTERDAY_FOLDER, field: String = SalesOrderVariables.CREATED_AT): DataFrame = {
+    val dateTimeMs = TimeUtils.changeDateFormat(incrDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_TIME_FORMAT_MS)
     val ndaysOldTime = Timestamp.valueOf(TimeUtils.getDateAfterNDays(-days, TimeConstants.DATE_TIME_FORMAT_MS, dateTimeMs))
     val ndaysOldStartTime = TimeUtils.getStartTimestampMS(ndaysOldTime)
 
