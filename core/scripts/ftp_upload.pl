@@ -368,9 +368,9 @@ sub upload_email_campaigns {
     system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
     my $status = $?;
 
-    print "hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
+    print "hadoop fs -get /data/tmp/email_campaigns/follow_up_campaigns/daily/$date/$followUp_filename $base/\n";
 
-    system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
+    system("hadoop fs -get /data/tmp/email_campaigns/follow_up_campaigns/daily/$date/$followUp_filename $base/");
 
     $status ||= removeNull("$base/$filename");
 
