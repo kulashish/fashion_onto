@@ -60,7 +60,7 @@ object CampaignInput extends Logging {
     return null
   }
 
-  def loadCustomerMasterData(incrDate: String): DataFrame = {
+  def loadCustomerMasterData(incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     var n = 0
     var cmrData: DataFrame = null
     while (n < 7 && cmrData == null) {
