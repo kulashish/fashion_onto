@@ -345,6 +345,16 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20150928_CONTACTS_LIST.csv
+    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    my $folderName = "contactListMobile";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150928_Contact_list_Plus.csv
+    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
+    $folderName = "Contact_list_Plus";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
     # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
@@ -375,8 +385,6 @@ sub upload_email_campaigns {
     $status ||= removeNull("$base/$filename");
 
     $status ||= removeNull("$base/$followUp_filename");
-
-
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
 
