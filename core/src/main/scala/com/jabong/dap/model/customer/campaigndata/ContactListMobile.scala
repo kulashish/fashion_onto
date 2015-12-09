@@ -108,6 +108,19 @@ object ContactListMobile extends DataFeedsModel with Logging {
     dfMap
   }
 
+
+  def getlatest(l: List[(Long, String, Timestamp, Timestamp, String)]): (Long, String, Timestamp, Timestamp, String) = {
+    var t = Tuple5(l(0)._1, l(0)._2, l(0)._3, l(0)._4, l(0)._5)
+    var maxts = TimeUtils.MIN_TIMESTAMP
+    l.foreach{
+      e =>
+        if (e._4.after(maxts)) {
+          t = Tuple5(e._1, e._2, e._3, e._4, e._5)
+          maxts = e._4
+        }
+    }
+    t
+  }
   /**
    * Process Method for the contact_list_mobile.csv generation for email campaigns.
    * @param dfMap Input parameters like dfs Read by readDF
@@ -142,75 +155,81 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
     if (null != contactListMobilePrevFull) {
 
-      val dfIncrVarBC = Spark.getContext().broadcast(dfMergedIncr).value
+
+      val dfIncrVarBC = Spark.getContext().broadcast(dfMergedIncr).value.filter(col(ContactListMobileVars.UID).isNotNull)
+      dfMergedIncr.write.parquet("/user/mubarak/dfMergedIncr")
+      println("dfMergedIncr", dfMergedIncr.count())
+      println("dfMergedIncr Email", dfMergedIncr.select("email").distinct.count)
+      println("dfMergedIncr UID", dfMergedIncr.select("UID").distinct.count)
+      val contactListMobilePrevFil = contactListMobilePrevFull.filter(col(ContactListMobileVars.UID).isNotNull)
 
       //join old and new data frame
-      val joinDF = contactListMobilePrevFull.join(dfIncrVarBC, contactListMobilePrevFull(CustomerVariables.EMAIL) === dfIncrVarBC(CustomerVariables.EMAIL), SQL.FULL_OUTER)
+      val joinDF = contactListMobilePrevFil.join(dfIncrVarBC, contactListMobilePrevFil(ContactListMobileVars.UID) === dfIncrVarBC(ContactListMobileVars.UID), SQL.FULL_OUTER)
 
       //merge old and new data frame
-      val contactListMobileFull = joinDF.select(
+      contactListMobileFull = joinDF.select(
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.UID), contactListMobilePrevFull(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
+        coalesce(dfIncrVarBC(ContactListMobileVars.UID), contactListMobilePrevFil(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
 
-        coalesce(dfIncrVarBC(CustomerVariables.EMAIL), contactListMobilePrevFull(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
+        coalesce(dfIncrVarBC(CustomerVariables.EMAIL), contactListMobilePrevFil(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), contactListMobilePrevFull(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        coalesce(dfIncrVarBC(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), contactListMobilePrevFil(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
 
-        coalesce(dfIncrVarBC(CustomerVariables.PHONE), contactListMobilePrevFull(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+        coalesce(dfIncrVarBC(CustomerVariables.PHONE), contactListMobilePrevFil(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.MOBILE_PERMISION_STATUS), contactListMobilePrevFull(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
+        coalesce(dfIncrVarBC(ContactListMobileVars.MOBILE_PERMISION_STATUS), contactListMobilePrevFil(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.CITY), contactListMobilePrevFull(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
+        coalesce(dfIncrVarBC(ContactListMobileVars.CITY), contactListMobilePrevFil(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.COUNTRY), contactListMobilePrevFull(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
+        coalesce(dfIncrVarBC(ContactListMobileVars.COUNTRY), contactListMobilePrevFil(ContactListMobileVars.COUNTRY)) as ContactListMobileVars.COUNTRY,
 
-        coalesce(dfIncrVarBC(CustomerVariables.FIRST_NAME), contactListMobilePrevFull(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+        coalesce(dfIncrVarBC(CustomerVariables.FIRST_NAME), contactListMobilePrevFil(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
 
-        coalesce(dfIncrVarBC(CustomerVariables.LAST_NAME), contactListMobilePrevFull(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
+        coalesce(dfIncrVarBC(CustomerVariables.LAST_NAME), contactListMobilePrevFil(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.DOB), contactListMobilePrevFull(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
+        coalesce(dfIncrVarBC(ContactListMobileVars.DOB), contactListMobilePrevFil(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.MVP_TYPE), contactListMobilePrevFull(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
+        coalesce(dfIncrVarBC(ContactListMobileVars.MVP_TYPE), contactListMobilePrevFil(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
 
-        dfIncrVarBC(ContactListMobileVars.NET_ORDERS).+(contactListMobilePrevFull(ContactListMobileVars.NET_ORDERS)) as ContactListMobileVars.NET_ORDERS,
+        dfIncrVarBC(ContactListMobileVars.NET_ORDERS).+(contactListMobilePrevFil(ContactListMobileVars.NET_ORDERS)) as ContactListMobileVars.NET_ORDERS,
 
-        Udf.maxTimestamp(dfIncrVarBC(ContactListMobileVars.LAST_ORDER_DATE), contactListMobilePrevFull(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
+        Udf.maxTimestamp(dfIncrVarBC(ContactListMobileVars.LAST_ORDER_DATE), contactListMobilePrevFil(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
 
-        coalesce(dfIncrVarBC(CustomerVariables.GENDER), contactListMobilePrevFull(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
+        coalesce(dfIncrVarBC(CustomerVariables.GENDER), contactListMobilePrevFil(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
 
-        Udf.minTimestamp(dfIncrVarBC(ContactListMobileVars.REG_DATE), contactListMobilePrevFull(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
+        Udf.minTimestamp(dfIncrVarBC(ContactListMobileVars.REG_DATE), contactListMobilePrevFil(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
 
-        coalesce(dfIncrVarBC(CustomerSegmentsVariables.SEGMENT), contactListMobilePrevFull(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
+        coalesce(dfIncrVarBC(CustomerSegmentsVariables.SEGMENT), contactListMobilePrevFil(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.AGE), contactListMobilePrevFull(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
+        coalesce(dfIncrVarBC(ContactListMobileVars.AGE), contactListMobilePrevFil(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.PLATINUM_STATUS), contactListMobilePrevFull(ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
+        coalesce(dfIncrVarBC(ContactListMobileVars.PLATINUM_STATUS), contactListMobilePrevFil(ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.IS_REFERED), contactListMobilePrevFull(ContactListMobileVars.IS_REFERED)) as ContactListMobileVars.IS_REFERED, //IS_REFERRED
+        coalesce(dfIncrVarBC(ContactListMobileVars.IS_REFERED), contactListMobilePrevFil(ContactListMobileVars.IS_REFERED)) as ContactListMobileVars.IS_REFERED, //IS_REFERRED
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.NL_SUB_DATE), contactListMobilePrevFull(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
+        coalesce(dfIncrVarBC(ContactListMobileVars.NL_SUB_DATE), contactListMobilePrevFil(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.VERIFICATION_STATUS), contactListMobilePrevFull(ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
+        coalesce(dfIncrVarBC(ContactListMobileVars.VERIFICATION_STATUS), contactListMobilePrevFil(ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
 
-        Udf.maxTimestamp(dfIncrVarBC(CustomerVariables.LAST_UPDATED_AT), contactListMobilePrevFull(CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
+        Udf.maxTimestamp(dfIncrVarBC(CustomerVariables.LAST_UPDATED_AT), contactListMobilePrevFil(CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.UNSUB_KEY), contactListMobilePrevFull(ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
+        coalesce(dfIncrVarBC(ContactListMobileVars.UNSUB_KEY), contactListMobilePrevFil(ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.CITY_TIER), contactListMobilePrevFull(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
+        coalesce(dfIncrVarBC(ContactListMobileVars.CITY_TIER), contactListMobilePrevFil(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.STATE_ZONE), contactListMobilePrevFull(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE,
+        coalesce(dfIncrVarBC(ContactListMobileVars.STATE_ZONE), contactListMobilePrevFil(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE,
 
-        coalesce(dfIncrVarBC(CustomerSegmentsVariables.DISCOUNT_SCORE), contactListMobilePrevFull(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
+        coalesce(dfIncrVarBC(CustomerSegmentsVariables.DISCOUNT_SCORE), contactListMobilePrevFil(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
 
-        coalesce(dfIncrVarBC(CustomerVariables.ID_CUSTOMER), contactListMobilePrevFull(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(dfIncrVarBC(CustomerVariables.ID_CUSTOMER), contactListMobilePrevFil(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
 
-        coalesce(dfIncrVarBC(CampaignMergedFields.DEVICE_ID), contactListMobilePrevFull(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID,
+        coalesce(dfIncrVarBC(CampaignMergedFields.DEVICE_ID), contactListMobilePrevFil(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID,
 
-        coalesce(dfIncrVarBC(SalesOrderItemVariables.FAV_BRAND), contactListMobilePrevFull(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
+        coalesce(dfIncrVarBC(SalesOrderItemVariables.FAV_BRAND), contactListMobilePrevFil(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
 
-        coalesce(dfIncrVarBC(NewsletterVariables.STATUS), contactListMobilePrevFull(NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
+        coalesce(dfIncrVarBC(NewsletterVariables.STATUS), contactListMobilePrevFil(NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
 
-        coalesce(dfIncrVarBC(ContactListMobileVars.DND), contactListMobilePrevFull(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
+        coalesce(dfIncrVarBC(ContactListMobileVars.DND), contactListMobilePrevFil(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
       )
       contactListMobileIncr = contactListMobileFull.except(contactListMobilePrevFull)
     }
@@ -515,41 +534,121 @@ object ContactListMobile extends DataFeedsModel with Logging {
         dndMerged(SalesOrderItemVariables.FAV_BRAND),
         dndMerged(ContactListMobileVars.DND)
       )
+
     val cmrFullFil = cmrFull.filter(cmrFull(CustomerVariables.EMAIL).isNotNull)
-    val res = smsOptJoined.join(cmrFullFil, cmrFullFil(CustomerVariables.EMAIL) === smsOptJoined(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
+    val smsEmail = smsOptJoined.filter(smsOptJoined(CustomerVariables.EMAIL).isNotNull)
+    val smsID = smsOptJoined.filter(smsOptJoined(CustomerVariables.EMAIL).isNull)
+    val resEmail = smsEmail.join(cmrFullFil, cmrFullFil(CustomerVariables.EMAIL) === smsEmail(CustomerVariables.EMAIL), SQL.LEFT_OUTER)
       .select(
         cmrFullFil(ContactListMobileVars.UID),
-        smsOptJoined(CustomerVariables.EMAIL),
-        smsOptJoined(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
-        smsOptJoined(CustomerVariables.PHONE),
-        smsOptJoined(ContactListMobileVars.MOBILE_PERMISION_STATUS),
-        smsOptJoined(ContactListMobileVars.CITY),
+        smsEmail(CustomerVariables.EMAIL),
+        smsEmail(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
+        smsEmail(CustomerVariables.PHONE),
+        smsEmail(ContactListMobileVars.MOBILE_PERMISION_STATUS),
+        smsEmail(ContactListMobileVars.CITY),
         lit("IN") as ContactListMobileVars.COUNTRY,
-        smsOptJoined(CustomerVariables.FIRST_NAME),
-        smsOptJoined(CustomerVariables.LAST_NAME),
-        smsOptJoined(ContactListMobileVars.DOB),
-        smsOptJoined(ContactListMobileVars.MVP_TYPE),
-        smsOptJoined(ContactListMobileVars.NET_ORDERS),
-        smsOptJoined(ContactListMobileVars.LAST_ORDER_DATE),
-        smsOptJoined(CustomerVariables.GENDER),
-        smsOptJoined(ContactListMobileVars.REG_DATE),
-        smsOptJoined(CustomerSegmentsVariables.SEGMENT),
-        smsOptJoined(ContactListMobileVars.AGE),
-        smsOptJoined(ContactListMobileVars.PLATINUM_STATUS),
+        smsEmail(CustomerVariables.FIRST_NAME),
+        smsEmail(CustomerVariables.LAST_NAME),
+        smsEmail(ContactListMobileVars.DOB),
+        smsEmail(ContactListMobileVars.MVP_TYPE),
+        smsEmail(ContactListMobileVars.NET_ORDERS),
+        smsEmail(ContactListMobileVars.LAST_ORDER_DATE),
+        smsEmail(CustomerVariables.GENDER),
+        smsEmail(ContactListMobileVars.REG_DATE),
+        smsEmail(CustomerSegmentsVariables.SEGMENT),
+        smsEmail(ContactListMobileVars.AGE),
+        smsEmail(ContactListMobileVars.PLATINUM_STATUS),
         lit("") as ContactListMobileVars.IS_REFERED,
-        smsOptJoined(ContactListMobileVars.NL_SUB_DATE),
-        smsOptJoined(ContactListMobileVars.VERIFICATION_STATUS),
-        smsOptJoined(CustomerVariables.LAST_UPDATED_AT),
-        smsOptJoined(ContactListMobileVars.UNSUB_KEY),
-        smsOptJoined(ContactListMobileVars.CITY_TIER),
-        smsOptJoined(ContactListMobileVars.STATE_ZONE),
-        smsOptJoined(CustomerSegmentsVariables.DISCOUNT_SCORE),
-        smsOptJoined(CustomerVariables.ID_CUSTOMER),
-        smsOptJoined(NewsletterVariables.STATUS),
-        smsOptJoined(SalesOrderItemVariables.FAV_BRAND),
-        smsOptJoined(ContactListMobileVars.DND),
+        smsEmail(ContactListMobileVars.NL_SUB_DATE),
+        smsEmail(ContactListMobileVars.VERIFICATION_STATUS),
+        smsEmail(CustomerVariables.LAST_UPDATED_AT),
+        smsEmail(ContactListMobileVars.UNSUB_KEY),
+        smsEmail(ContactListMobileVars.CITY_TIER),
+        smsEmail(ContactListMobileVars.STATE_ZONE),
+        smsEmail(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        smsEmail(CustomerVariables.ID_CUSTOMER),
+        smsEmail(NewsletterVariables.STATUS),
+        smsEmail(SalesOrderItemVariables.FAV_BRAND),
+        smsEmail(ContactListMobileVars.DND),
         Udf.device(cmrFullFil(PageVisitVariables.DOMAIN), cmrFullFil(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
+      ).filter(col("UID").isNotNull)
+
+    println("resEmail" ,resEmail.count())
+    println("resEmail UID" ,resEmail.select("UID").distinct.count())
+    println("resEmail UID is not null" ,resEmail.select("UID").filter("UID is not null").count())
+
+    val resID = smsID.join(cmrFullFil, cmrFullFil(CustomerVariables.ID_CUSTOMER) === smsID(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
+      .select(
+        cmrFullFil(ContactListMobileVars.UID),
+        smsID(CustomerVariables.EMAIL),
+        smsID(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
+        smsID(CustomerVariables.PHONE),
+        smsID(ContactListMobileVars.MOBILE_PERMISION_STATUS),
+        smsID(ContactListMobileVars.CITY),
+        lit("IN") as ContactListMobileVars.COUNTRY,
+        smsID(CustomerVariables.FIRST_NAME),
+        smsID(CustomerVariables.LAST_NAME),
+        smsID(ContactListMobileVars.DOB),
+        smsID(ContactListMobileVars.MVP_TYPE),
+        smsID(ContactListMobileVars.NET_ORDERS),
+        smsID(ContactListMobileVars.LAST_ORDER_DATE),
+        smsID(CustomerVariables.GENDER),
+        smsID(ContactListMobileVars.REG_DATE),
+        smsID(CustomerSegmentsVariables.SEGMENT),
+        smsID(ContactListMobileVars.AGE),
+        smsID(ContactListMobileVars.PLATINUM_STATUS),
+        lit("") as ContactListMobileVars.IS_REFERED,
+        smsID(ContactListMobileVars.NL_SUB_DATE),
+        smsID(ContactListMobileVars.VERIFICATION_STATUS),
+        smsID(CustomerVariables.LAST_UPDATED_AT),
+        smsID(ContactListMobileVars.UNSUB_KEY),
+        smsID(ContactListMobileVars.CITY_TIER),
+        smsID(ContactListMobileVars.STATE_ZONE),
+        smsID(CustomerSegmentsVariables.DISCOUNT_SCORE),
+        smsID(CustomerVariables.ID_CUSTOMER),
+        smsID(NewsletterVariables.STATUS),
+        smsID(SalesOrderItemVariables.FAV_BRAND),
+        smsID(ContactListMobileVars.DND),
+        Udf.device(cmrFullFil(PageVisitVariables.DOMAIN), cmrFullFil(PageVisitVariables.BROWSER_ID), lit(null)) as CampaignMergedFields.DEVICE_ID
+      ).filter(col("UID").isNotNull)
+
+    println("resID" ,resID.count())
+    println("resID UID" ,resID.select("UID").distinct.count())
+    println("resID UID is not null" ,resID.select("UID").filter("UID is not null").count())
+    val res = resEmail.join(resID, resEmail(ContactListMobileVars.UID) === resID(ContactListMobileVars.UID), SQL.FULL_OUTER)
+                .select(
+        coalesce(resEmail(ContactListMobileVars.UID), resID(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
+        coalesce(resEmail(CustomerVariables.EMAIL), resID(ContactListMobileVars.EMAIL)) as ContactListMobileVars.EMAIL,
+        coalesce(resEmail(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), resID(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
+        coalesce(resEmail(CustomerVariables.PHONE), resID(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
+        coalesce(resEmail(ContactListMobileVars.MOBILE_PERMISION_STATUS), resID(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
+        coalesce(resEmail(ContactListMobileVars.CITY), resID(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
+        lit("IN") as ContactListMobileVars.COUNTRY,
+        coalesce(resEmail(CustomerVariables.FIRST_NAME), resID(ContactListMobileVars.FIRST_NAME)) as ContactListMobileVars.FIRST_NAME,
+        coalesce(resEmail(CustomerVariables.LAST_NAME), resID(ContactListMobileVars.LAST_NAME)) as ContactListMobileVars.LAST_NAME,
+        coalesce(resEmail(ContactListMobileVars.DOB), resID(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
+        coalesce(resEmail(ContactListMobileVars.MVP_TYPE), resID(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
+        coalesce(resEmail(ContactListMobileVars.NET_ORDERS), resID(ContactListMobileVars.NET_ORDERS)) as ContactListMobileVars.NET_ORDERS,
+        coalesce(resEmail(ContactListMobileVars.LAST_ORDER_DATE), resID(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
+        coalesce(resEmail(CustomerVariables.GENDER), resID(ContactListMobileVars.GENDER)) as ContactListMobileVars.GENDER,
+        coalesce(resEmail(ContactListMobileVars.REG_DATE), resID(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
+        coalesce(resEmail(CustomerSegmentsVariables.SEGMENT), resID(ContactListMobileVars.SEGMENT)) as ContactListMobileVars.SEGMENT,
+        coalesce(resEmail(ContactListMobileVars.AGE), resID(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
+        coalesce(resEmail(ContactListMobileVars.PLATINUM_STATUS), resID(ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
+        lit("") as ContactListMobileVars.IS_REFERED,
+        coalesce(resEmail(ContactListMobileVars.NL_SUB_DATE), resID(ContactListMobileVars.NL_SUB_DATE)) as ContactListMobileVars.NL_SUB_DATE,
+        coalesce(resEmail(ContactListMobileVars.VERIFICATION_STATUS), resID(ContactListMobileVars.VERIFICATION_STATUS)) as ContactListMobileVars.VERIFICATION_STATUS,
+        coalesce(resEmail(CustomerVariables.LAST_UPDATED_AT), resID(CustomerVariables.LAST_UPDATED_AT)) as CustomerVariables.LAST_UPDATED_AT,
+        coalesce(resEmail(ContactListMobileVars.UNSUB_KEY), resID(ContactListMobileVars.UNSUB_KEY)) as ContactListMobileVars.UNSUB_KEY,
+        coalesce(resEmail(ContactListMobileVars.CITY_TIER), resID(ContactListMobileVars.CITY_TIER)) as ContactListMobileVars.CITY_TIER,
+        coalesce(resEmail(ContactListMobileVars.STATE_ZONE), resID(ContactListMobileVars.STATE_ZONE)) as ContactListMobileVars.STATE_ZONE,
+        coalesce(resEmail(CustomerSegmentsVariables.DISCOUNT_SCORE), resID(CustomerSegmentsVariables.DISCOUNT_SCORE)) as CustomerSegmentsVariables.DISCOUNT_SCORE,
+        coalesce(resEmail(CustomerVariables.ID_CUSTOMER), resID(CustomerVariables.ID_CUSTOMER)) as CustomerVariables.ID_CUSTOMER,
+        coalesce(resEmail(NewsletterVariables.STATUS), resID(NewsletterVariables.STATUS)) as NewsletterVariables.STATUS,
+        coalesce(resEmail(SalesOrderItemVariables.FAV_BRAND), resID(SalesOrderItemVariables.FAV_BRAND)) as SalesOrderItemVariables.FAV_BRAND,
+        coalesce(resEmail(ContactListMobileVars.DND), resID(ContactListMobileVars.DND)) as ContactListMobileVars.DND,
+        coalesce(resEmail(CampaignMergedFields.DEVICE_ID), resID(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID
       )
-    res
+  res
   }
 }
