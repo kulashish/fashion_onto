@@ -164,16 +164,13 @@
         <error to="fail"/>
     </action>
 
-    <join name="ItrCmrJoin" to="campaignsStart"/>
+    <join name="ItrCmrJoin" to="campaignsStart1"/>
 
-    <fork name="campaignsStart">
+    <fork name="campaignsStart1">
         <path start="surfCampaigns" />
         <path start="retargetCampaigns" />
         <path start="invalidCampaigns" />
         <path start="abandonedCartCampaigns" />
-        <path start="wishlistCampaigns" />
-        <path start="miscellaneousCampaigns"/>
-        <path start="followUpCampaigns"/>
     </fork>
 
     <action name="surfCampaigns">
@@ -188,7 +185,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
 
@@ -204,7 +201,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
 
@@ -220,7 +217,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
     <action name="abandonedCartCampaigns">
@@ -235,9 +232,18 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
+
+    <join name="campaignsJoin1" to="campaignsStart2" />
+
+    <fork name="campaignsStart2">
+        <path start="wishlistCampaigns" />
+        <path start="miscellaneousCampaigns"/>
+        <path start="followUpCampaigns"/>
+    </fork>
+
     <action name="wishlistCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
@@ -250,7 +256,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
@@ -266,7 +272,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
@@ -282,11 +288,11 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
-    <join name="campaignsJoin" to="campaignMerge"/>
+    <join name="campaignsJoin2" to="campaignMerge"/>
 
 
     <fork name="campaignMerge">
