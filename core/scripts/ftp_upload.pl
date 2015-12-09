@@ -246,6 +246,7 @@ sub fetchFeedFile {
    return $status;
 }
 
+
 sub upload_email_campaigns_decryptFeedFiles {
     my $base = "/tmp/$date_with_zero/decryptFeedFiles";
     print "directory is $base\n";
@@ -257,6 +258,8 @@ sub upload_email_campaigns_decryptFeedFiles {
     my $folderName = "contactListMobile";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    $status ||= removeQuotes("$base/$filename");
+
     print("rename file $base/$filename to dap_$filename");
     $status ||= system("mv $base/$filename $base/dap_$filename");
 
@@ -264,6 +267,8 @@ sub upload_email_campaigns_decryptFeedFiles {
     $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
     $folderName = "Contact_list_Plus";
     $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    $status ||= removeQuotes("$base/$filename");
 
     print("rename file $base/$filename to dap_$filename");
     $status ||= system("mv $base/$filename $base/dap_$filename");
@@ -273,6 +278,7 @@ sub upload_email_campaigns_decryptFeedFiles {
     system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
+
 
 sub upload_email_campaigns_feedFiles {
     my $base = "/tmp/$date_with_zero/feedFiles";
@@ -510,5 +516,23 @@ sub removeNull {
     $status ||= $?;
 
     return $status;
+}
+
+
+sub removeQuotes {
+    my ($inputFile) = @_;
+
+    system("mv $inputFile $inputFile._old");
+    my $status = $?;
+
+    system("cat $inputFile._old | sed -e 's/\"#/#/g' | sed -e 's/#\"/#/g' > $inputFile");
+
+    $status ||= $?;
+
+    system("rm $inputFile._old");
+    $status ||= $?;
+
+    return $status;
+
 }
 
