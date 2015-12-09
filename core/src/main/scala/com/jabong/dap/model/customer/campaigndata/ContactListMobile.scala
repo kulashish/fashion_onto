@@ -145,7 +145,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
       val dfIncrVarBC = Spark.getContext().broadcast(dfMergedIncr).value
 
       //join old and new data frame
-      val joinDF = contactListMobilePrevFull.join(dfIncrVarBC, contactListMobilePrevFull(CustomerVariables.ID_CUSTOMER) === dfIncrVarBC(CustomerVariables.ID_CUSTOMER), SQL.FULL_OUTER)
+      val joinDF = contactListMobilePrevFull.join(dfIncrVarBC, contactListMobilePrevFull(CustomerVariables.EMAIL) === dfIncrVarBC(CustomerVariables.EMAIL), SQL.FULL_OUTER)
 
       //merge old and new data frame
       val contactListMobileFull = joinDF.select(
