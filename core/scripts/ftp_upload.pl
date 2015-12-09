@@ -246,6 +246,7 @@ sub fetchFeedFile {
    return $status;
 }
 
+
 sub upload_email_campaigns_decryptFeedFiles {
     my $base = "/tmp/$date_with_zero/decryptFeedFiles";
     print "directory is $base\n";
@@ -257,6 +258,8 @@ sub upload_email_campaigns_decryptFeedFiles {
     my $folderName = "contactListMobile";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    $status ||= removeQuotes("$base/$filename");
+
     print("rename file $base/$filename to dap_$filename");
     $status ||= system("mv $base/$filename $base/dap_$filename");
 
@@ -264,6 +267,8 @@ sub upload_email_campaigns_decryptFeedFiles {
     $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
     $folderName = "Contact_list_Plus";
     $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    $status ||= removeQuotes("$base/$filename");
 
     print("rename file $base/$filename to dap_$filename");
     $status ||= system("mv $base/$filename $base/dap_$filename");
@@ -273,6 +278,7 @@ sub upload_email_campaigns_decryptFeedFiles {
     system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
+
 
 sub upload_email_campaigns_feedFiles {
     my $base = "/tmp/$date_with_zero/feedFiles";
@@ -345,6 +351,16 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    # 20150928_CONTACTS_LIST.csv
+    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    my $folderName = "contactListMobile";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
+    # 20150928_Contact_list_Plus.csv
+    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
+    $folderName = "Contact_list_Plus";
+    $status ||= fetchFeedFile($filename, $folderName, $base);
+
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
     # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
@@ -368,15 +384,13 @@ sub upload_email_campaigns {
     system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
     my $status = $?;
 
-    print "hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/\n";
+    print "hadoop fs -get /data/tmp/email_campaigns/follow_up_campaigns/daily/$date/$followUp_filename $base/\n";
 
-    system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$followUp_filename $base/");
+    system("hadoop fs -get /data/tmp/email_campaigns/follow_up_campaigns/daily/$date/$followUp_filename $base/");
 
     $status ||= removeNull("$base/$filename");
 
     $status ||= removeNull("$base/$followUp_filename");
-
-
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
 
@@ -502,5 +516,23 @@ sub removeNull {
     $status ||= $?;
 
     return $status;
+}
+
+
+sub removeQuotes {
+    my ($inputFile) = @_;
+
+    system("mv $inputFile $inputFile._old");
+    my $status = $?;
+
+    system("cat $inputFile._old | sed -e 's/\"#/#/g' | sed -e 's/#\"/#/g' > $inputFile");
+
+    $status ||= $?;
+
+    system("rm $inputFile._old");
+    $status ||= $?;
+
+    return $status;
+
 }
 
