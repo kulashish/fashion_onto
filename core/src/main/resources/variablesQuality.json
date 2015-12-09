@@ -11,11 +11,6 @@
       "mailType": 0
     },
     {
-      "campaignName": "cityWiseData",
-      "priority": 0,
-      "mailType": 0
-    },
-    {
       "campaignName": "contactListMobile",
       "priority": 0,
       "mailType": 0
@@ -57,11 +52,6 @@
     },
     {
       "campaignName": "customerPreferredTimeslotPart2",
-      "priority": 0,
-      "mailType": 0
-    },
-    {
-      "campaignName": "customerSurfAffinity",
       "priority": 0,
       "mailType": 0
     },
