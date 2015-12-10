@@ -4,7 +4,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.schema.SchemaUtils
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{Column, DataFrame, Row}
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */
@@ -97,6 +97,21 @@ object MergeUtils extends MergeData {
     val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
 
     joinedDF
+  }
+
+  /**
+   * This join is null safe (<=>).
+   * @param oldDF
+   * @param newDF
+   * @param keys
+   * @param joinType
+   * @return return the result with newDF schema renamed with prefix "new_" to each field name
+   */
+  def joinOldAndNew(oldDF: DataFrame, newDF:DataFrame, keys: List[(String, String)], joinType: String): DataFrame ={
+    if(keys.length<1) return null
+    val newDFRenamed = SchemaUtils.renameCols(newDF, NEW_)
+    val joinExpr:Column = keys.slice(1,keys.size).foldLeft(oldDF(keys(0)._1) <=> newDFRenamed(NEW_ + keys(0)._2))((m: Column, n: (String, String)) => m && oldDF(n._1) <=> newDFRenamed(NEW_ + n._2))
+    oldDF.join(newDFRenamed, joinExpr, joinType)
   }
 
   /**
