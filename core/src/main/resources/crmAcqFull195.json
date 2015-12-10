@@ -2,7 +2,7 @@
   "acquisition": [
     {
       "source": "crm",
-      "tableName": "CRM_TicketMaster",
+      "tableName": "[dbo].[CRM_TicketMaster]",
       "primaryKey": "IssueID",
       "mode": "full",
       "saveFormat": "orc",
@@ -10,7 +10,7 @@
     },
     {
       "source": "crm",
-      "tableName": "CRM_tblBrickReasonCodeMapping",
+      "tableName": "[dbo].[CRM_tblBrickReasonCodeMapping]",
       "primaryKey": "AutoId",
       "mode": "full",
       "saveFormat": "orc",
@@ -18,7 +18,7 @@
     },
     {
       "source": "crm",
-      "tableName": "CRM_tblReturnReasonType",
+      "tableName": "[dbo].[CRM_tblReturnReasonType]",
       "primaryKey": "ResunID",
       "mode": "full",
       "saveFormat": "orc",
