@@ -5,7 +5,6 @@ import com.jabong.dap.campaign.campaignlist._
 import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -812,7 +811,7 @@ object CampaignManager extends Serializable with Logging {
     }
   }
 
-  def campaginMergeFeed(campaignType: String) = {
+  def campaignMergeFeed(campaignType: String) = {
 
     val saveMode = DataSets.OVERWRITE_SAVEMODE
     val dateFolder = TimeUtils.YESTERDAY_FOLDER
@@ -826,6 +825,6 @@ object CampaignManager extends Serializable with Logging {
     }
 
     val df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-    DataWriter.writeCsv(df, DataSets.CAMPAIGNS, campaignType, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";")
+    DataWriter.writeCsv(df, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";")
   }
 }

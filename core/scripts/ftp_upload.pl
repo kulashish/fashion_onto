@@ -16,7 +16,7 @@ GetOptions (
     'target|t=s' => \$target,
     'component|c=s' => \$component,
     'debug|d' => \$debug,
-) or die "Usage: $0 --debug --component|-c campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | decryptFeedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
+) or die "Usage: $0 --debug --component|-c push_campaigns | dcf_feed | pricing_sku_data | ad4push_customer_response | ad4push_device_merger | feedFiles | decryptFeedFiles | email_campaigns | calendar_campaigns | acart_hourly_campaign \n";
 
 if ($target ne "PROD") {
     print "Will upload files only for PROD\n";
@@ -45,8 +45,8 @@ print $current_hour . "\n";
 
 my $job_exit;
 
-if ($component eq "campaigns") {
-    $job_exit = uploadCampaign();
+if ($component eq "push_campaigns") {
+    $job_exit = upload_push_campaigns();
 } elsif ($component eq "ad4push_customer_response") {
     $job_exit = upload_ad4push_customer_response();
 } elsif ($component eq "ad4push_device_merger") {
@@ -74,12 +74,12 @@ exit $job_exit;
 
 sub fetchCampaign {
    my ($id, $cname, $base) = @_;
-   #system("hadoop fs -get /data/tmp/campaigns/$cname" . "_$id/daily/$date/staticlist_$cname" . "_$id" . "_$date_with_zero.csv $base/");
+   #system("hadoop fs -get /data/tmp/push_campaigns/$cname" . "_$id/daily/$date/staticlist_$cname" . "_$id" . "_$date_with_zero.csv $base/");
    my $name = "staticlist_$cname" . "_$id" . "_$date_with_zero.csv";
    my $nametxt = "staticlist_$cname" . "_$id" . "_$date_with_zero.txt";
 
    #my $tmpName = "$base/tmp/staticlist_$cname" . "_$id" . "_$date_with_zero.csv";
-   system("hadoop fs -get /data/tmp/campaigns/$cname" . "_$id/daily/$date/$name $base/$name");
+   system("hadoop fs -get /data/tmp/push_campaigns/$cname" . "_$id/daily/$date/$name $base/$name");
    system("touch $base/$nametxt");
 
    #system("sed 1i'\"deviceId\"' $tmpName | sed 's/\(\[\|\]\)//g' > $name");
@@ -87,28 +87,28 @@ sub fetchCampaign {
 }
 
 
-sub uploadCampaign {
-    my $base = "/tmp/$date_with_zero/campaigns";
+sub upload_push_campaigns {
+    my $base = "/tmp/$date_with_zero/push_campaigns";
     print "directory is $base\n";
     system("mkdir -p $base");
     #system("mkdir -p $base/tmp");
 
 
-    # /data/tmp/campaigns/acart_daily42_515/daily/2015/07/30/staticlist_acart_daily42_515_20150730.csv
+    # /data/tmp/push_campaigns/acart_daily42_515/daily/2015/07/30/staticlist_acart_daily42_515_20150730.csv
     for (my $i = 0; $i <= 1 ; $i++) {
        my $id = "515";  # ios
        if ($i == 1) {
            $id = "517";
-           system("hadoop fs -get /data/tmp/campaigns/android/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
+           system("hadoop fs -get /data/tmp/push_campaigns/android/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
            system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
 
-           #system("hadoop fs -get /data/tmp/campaigns/android/daily/$date/ $base/UpdateDevices_$id" . "_$date_with_zero.csv");
+           #system("hadoop fs -get /data/tmp/push_campaigns/android/daily/$date/ $base/UpdateDevices_$id" . "_$date_with_zero.csv");
            
        } else {
-           system("hadoop fs -get /data/tmp/campaigns/ios/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
+           system("hadoop fs -get /data/tmp/push_campaigns/ios/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
            system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
 
-           #system("hadoop fs -get /data/tmp/campaigns/ios/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
+           #system("hadoop fs -get /data/tmp/push_campaigns/ios/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
 
        }
 
@@ -352,8 +352,8 @@ sub upload_email_campaigns_feedFiles {
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_CONTACTS_LIST.csv
-    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
-    my $folderName = "contactListMobile";
+    $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    $folderName = "contactListMobile";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_Contact_list_Plus.csv
@@ -370,7 +370,7 @@ sub upload_email_campaigns_feedFiles {
 }
 
 sub upload_email_campaigns {
-    my $base = "/tmp/$date_with_zero/campaigns/email_campaigns";
+    my $base = "/tmp/$date_with_zero/email_campaigns";
 
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
@@ -379,9 +379,9 @@ sub upload_email_campaigns {
 
     my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv";
 
-    print "hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$filename $base/\n";
+    print "hadoop fs -get /data/tmp/email_campaigns/merged/daily/$date/$filename $base/\n";
 
-    system("hadoop fs -get /data/tmp/campaigns/email_campaigns/daily/$date/$filename $base/");
+    system("hadoop fs -get /data/tmp/email_campaigns/merged/daily/$date/$filename $base/");
     my $status = $?;
 
     print "hadoop fs -get /data/tmp/email_campaigns/follow_up_campaigns/daily/$date/$followUp_filename $base/\n";
@@ -404,7 +404,7 @@ sub upload_email_campaigns {
 
 
 sub upload_calendar_replenish_campaigns {
-    my $calendar_base = "/tmp/$date_with_zero/campaigns/calendar_campaigns";
+    my $calendar_base = "/tmp/$date_with_zero/calendar_campaigns";
 
     print "calendar campaigns directory is $calendar_base\n";
     system("mkdir -p $calendar_base");
@@ -413,8 +413,8 @@ sub upload_calendar_replenish_campaigns {
 
     my $replenish_filename = "$date_with_zero_today"."_replenishment.csv";
 
-    print "hadoop fs -get /data/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/\n";
-    system("hadoop fs -get /data/tmp/campaigns/calendar_campaigns/daily/$date/$calendar_filename $calendar_base/");
+    print "hadoop fs -get /data/tmp/calendar_campaigns/merged/daily/$date/$calendar_filename $calendar_base/\n";
+    system("hadoop fs -get /data/tmp/calendar_campaigns/merged/daily/$date/$calendar_filename $calendar_base/");
     my $calendar_status = $?;
 
     print "hadoop fs -get /data/tmp/calendar_campaigns/replenishment/daily/$date/$replenish_filename $calendar_base/\n";
