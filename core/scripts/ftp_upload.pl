@@ -7,7 +7,7 @@ use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 use Data::Dumper;
 use Time::HiRes qw( time );
-#use Mail::Sendmail;
+use Mail::Sendmail;
 
 my $debug;
 my $component;
