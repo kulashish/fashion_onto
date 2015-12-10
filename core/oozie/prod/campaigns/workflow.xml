@@ -322,7 +322,7 @@
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>campaigns</argument>
+            <argument>push_campaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
