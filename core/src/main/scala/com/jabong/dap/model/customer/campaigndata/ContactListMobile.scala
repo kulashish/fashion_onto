@@ -110,20 +110,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
     dfMap
   }
-
-
-  def getlatest(l: List[(Long, String, Timestamp, Timestamp, String)]): (Long, String, Timestamp, Timestamp, String) = {
-    var t = Tuple5(l(0)._1, l(0)._2, l(0)._3, l(0)._4, l(0)._5)
-    var maxts = TimeUtils.MIN_TIMESTAMP
-    l.foreach{
-      e =>
-        if (e._4.after(maxts)) {
-          t = Tuple5(e._1, e._2, e._3, e._4, e._5)
-          maxts = e._4
-        }
-    }
-    t
-  }
+  
   /**
    * Process Method for the contact_list_mobile.csv generation for email campaigns.
    * @param dfMap Input parameters like dfs Read by readDF
