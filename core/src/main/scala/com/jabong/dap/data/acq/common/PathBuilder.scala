@@ -19,7 +19,7 @@ object PathBuilder {
     var tableName = tableInfo.tableName
     if (source.equals(DataSets.CRM)) {
       //adding the replaceAll for the CRM 195 server tablenames.
-      tableName = tableName.replaceAll("[dbo].[", "").replaceAll("]", "")
+      tableName = tableName.replaceAll("\[dbo\].\[", "").replaceAll("\]", "")
     }
     val rangeStart = OptionUtils.getOptValue(tableInfo.rangeStart)
     val rangeEnd = OptionUtils.getOptValue(tableInfo.rangeEnd)
