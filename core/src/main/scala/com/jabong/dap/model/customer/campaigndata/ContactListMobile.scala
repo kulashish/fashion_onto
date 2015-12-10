@@ -156,7 +156,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     if (null != contactListMobilePrevFull) {
 
 
-      val dfIncrVarBC = Spark.getContext().broadcast(dfMergedIncr).value.filter(col(ContactListMobileVars.UID).isNotNull)
+      val dfIncrVarBC = Spark.getContext().broadcast(dfMergedIncr).value
       dfMergedIncr.write.parquet("/user/mubarak/dfMergedIncr")
       println("dfMergedIncr", dfMergedIncr.count())
       println("dfMergedIncr Email", dfMergedIncr.select("email").distinct.count)
@@ -234,7 +234,11 @@ object ContactListMobile extends DataFeedsModel with Logging {
       contactListMobileIncr = contactListMobileFull.except(contactListMobilePrevFull)
     }
 
+    println("contactListMobilePrevFull", contactListMobilePrevFull.count())
     writeMap.put("contactListMobileFull", contactListMobileFull)
+    println("contactListMobileIncr", contactListMobileIncr.count())
+    println("contactListMobileFull", contactListMobileFull.count())
+
 
     val contactListMobileIncrCached = contactListMobileIncr.cache()
     writeMap.put("contactListMobileIncrCached", contactListMobileIncrCached)
@@ -575,11 +579,13 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
     println("resEmail" ,resEmail.count())
     println("resEmail UID" ,resEmail.select("UID").distinct.count())
+    println("null UID" ,resEmail.select("UID").filter("UID is null").count())
+
     println("resEmail UID is not null" ,resEmail.select("UID").filter("UID is not null").count())
 
     val resID = smsID.join(cmrFullFil, cmrFullFil(CustomerVariables.ID_CUSTOMER) === smsID(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
       .select(
-        cmrFullFil(ContactListMobileVars.UID),
+        cmrFullFil(ContactListMobileVars.UID) as "UID_",
         smsID(CustomerVariables.EMAIL),
         smsID(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS),
         smsID(CustomerVariables.PHONE),
@@ -613,26 +619,27 @@ object ContactListMobile extends DataFeedsModel with Logging {
       ).filter(col("UID").isNotNull)
 
     println("resID" ,resID.count())
-    println("resID UID" ,resID.select("UID").distinct.count())
-    println("resID UID is not null" ,resID.select("UID").filter("UID is not null").count())
-    val res = resEmail.join(resID, resEmail(ContactListMobileVars.UID) === resID(ContactListMobileVars.UID), SQL.FULL_OUTER)
+    println("resID UID" ,resID.select("UID_").distinct.count())
+    println("null UID" ,resID.select("UID_").filter("UID_ is null").count())
+    println("resID UID is not null" ,resID.select("UID_").filter("UID_ is not null").count())
+    val res = resEmail.join(resID, resEmail(ContactListMobileVars.UID) === resID("UID_"), SQL.FULL_OUTER)
                 .select(
-        coalesce(resEmail(ContactListMobileVars.UID), resID(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
-        coalesce(resEmail(CustomerVariables.EMAIL), resID(ContactListMobileVars.EMAIL)) as ContactListMobileVars.EMAIL,
+        uidMerger(resEmail(ContactListMobileVars.UID), resID("UID_")) as ContactListMobileVars.UID,
+        uidMerger(resEmail(CustomerVariables.EMAIL), resID(CustomerVariables.EMAIL)) as CustomerVariables.EMAIL,
         coalesce(resEmail(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS), resID(ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS)) as ContactListMobileVars.EMAIL_SUBSCRIPTION_STATUS,
         coalesce(resEmail(CustomerVariables.PHONE), resID(CustomerVariables.PHONE)) as CustomerVariables.PHONE,
         coalesce(resEmail(ContactListMobileVars.MOBILE_PERMISION_STATUS), resID(ContactListMobileVars.MOBILE_PERMISION_STATUS)) as ContactListMobileVars.MOBILE_PERMISION_STATUS,
         coalesce(resEmail(ContactListMobileVars.CITY), resID(ContactListMobileVars.CITY)) as ContactListMobileVars.CITY,
         lit("IN") as ContactListMobileVars.COUNTRY,
-        coalesce(resEmail(CustomerVariables.FIRST_NAME), resID(ContactListMobileVars.FIRST_NAME)) as ContactListMobileVars.FIRST_NAME,
-        coalesce(resEmail(CustomerVariables.LAST_NAME), resID(ContactListMobileVars.LAST_NAME)) as ContactListMobileVars.LAST_NAME,
+        coalesce(resEmail(CustomerVariables.FIRST_NAME), resID(CustomerVariables.FIRST_NAME)) as CustomerVariables.FIRST_NAME,
+        coalesce(resEmail(CustomerVariables.LAST_NAME), resID(CustomerVariables.LAST_NAME)) as CustomerVariables.LAST_NAME,
         coalesce(resEmail(ContactListMobileVars.DOB), resID(ContactListMobileVars.DOB)) as ContactListMobileVars.DOB,
         coalesce(resEmail(ContactListMobileVars.MVP_TYPE), resID(ContactListMobileVars.MVP_TYPE)) as ContactListMobileVars.MVP_TYPE,
         coalesce(resEmail(ContactListMobileVars.NET_ORDERS), resID(ContactListMobileVars.NET_ORDERS)) as ContactListMobileVars.NET_ORDERS,
         coalesce(resEmail(ContactListMobileVars.LAST_ORDER_DATE), resID(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,
-        coalesce(resEmail(CustomerVariables.GENDER), resID(ContactListMobileVars.GENDER)) as ContactListMobileVars.GENDER,
+        coalesce(resEmail(CustomerVariables.GENDER), resID(CustomerVariables.GENDER)) as CustomerVariables.GENDER,
         coalesce(resEmail(ContactListMobileVars.REG_DATE), resID(ContactListMobileVars.REG_DATE)) as ContactListMobileVars.REG_DATE,
-        coalesce(resEmail(CustomerSegmentsVariables.SEGMENT), resID(ContactListMobileVars.SEGMENT)) as ContactListMobileVars.SEGMENT,
+        coalesce(resEmail(CustomerSegmentsVariables.SEGMENT), resID(CustomerSegmentsVariables.SEGMENT)) as CustomerSegmentsVariables.SEGMENT,
         coalesce(resEmail(ContactListMobileVars.AGE), resID(ContactListMobileVars.AGE)) as ContactListMobileVars.AGE,
         coalesce(resEmail(ContactListMobileVars.PLATINUM_STATUS), resID(ContactListMobileVars.PLATINUM_STATUS)) as ContactListMobileVars.PLATINUM_STATUS,
         lit("") as ContactListMobileVars.IS_REFERED,
@@ -649,6 +656,23 @@ object ContactListMobile extends DataFeedsModel with Logging {
         coalesce(resEmail(ContactListMobileVars.DND), resID(ContactListMobileVars.DND)) as ContactListMobileVars.DND,
         coalesce(resEmail(CampaignMergedFields.DEVICE_ID), resID(CampaignMergedFields.DEVICE_ID)) as CampaignMergedFields.DEVICE_ID
       )
+
+  println("UID count:", res.select("UID").distinct.count)
   res
+  }
+
+
+  val uidMerger = udf((s: String, s1: String) => mergeUids(s: String, s1: String))
+
+
+  def mergeUids(s: String, s1: String): String={
+    if(null == s1 && null == s){
+      return null
+    }
+    if(null == s){
+      return s1
+    } else {
+      return s
+    }
   }
 }
