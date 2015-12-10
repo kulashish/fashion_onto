@@ -19,9 +19,8 @@ class ContactListFullToCsv {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("ContactListFullToCsv")
     Spark.init(conf)
-    val fullPath = args(0).trim
 
-    val incrDate = args(1).trim
+    val incrDate = args(0).trim
 
     val clm = DataReader.getDataFrame("hdfs://dataplatform-master.jabong.com:8020/data/output", DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.FULL_MERGE_MODE, incrDate)
 
