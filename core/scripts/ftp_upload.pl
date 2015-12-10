@@ -370,7 +370,7 @@ sub upload_email_campaigns_feedFiles {
 }
 
 sub upload_email_campaigns {
-    my $base = "/tmp/$date_with_zero/campaigns/email_campaigns";
+    my $base = "/tmp/$date_with_zero/email_campaigns";
 
     print "email campaigns directory is $base\n";
     system("mkdir -p $base");
@@ -404,7 +404,7 @@ sub upload_email_campaigns {
 
 
 sub upload_calendar_replenish_campaigns {
-    my $calendar_base = "/tmp/$date_with_zero/campaigns/calendar_campaigns";
+    my $calendar_base = "/tmp/$date_with_zero/calendar_campaigns";
 
     print "calendar campaigns directory is $calendar_base\n";
     system("mkdir -p $calendar_base");
