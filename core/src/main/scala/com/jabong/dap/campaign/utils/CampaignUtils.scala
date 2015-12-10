@@ -898,8 +898,8 @@ object CampaignUtils extends Logging {
    * @param input
    * @return
    */
-  def getSelectedReplenishAttributes(input: DataFrame): DataFrame = {
-    val cmr = CampaignInput.loadCustomerMasterData()
+  def getSelectedReplenishAttributes(input: DataFrame, incrDate: String): DataFrame = {
+    val cmr = CampaignInput.loadCustomerMasterData(incrDate)
 
     debug(input, "input")
     debug(cmr, "cmr")

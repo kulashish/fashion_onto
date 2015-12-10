@@ -2,57 +2,57 @@
   "acquisition": [
     {
       "source": "crm",
-      "tableName": "CRM_tblProductAttributeMaster",
+      "tableName": "[dbo].[CRM_tblProductAttributeMaster]",
       "primaryKey": null,
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "[Last Modification Date Time] <= '2015-11-30 23:59:59'"
+      "filterCondition": "[Last Modification Date Time] <= '2015-12-08 23:59:59.9'"
     },
     {
       "source": "crm",
-      "tableName": "CRM_TicketDetails",
+      "tableName": "[dbo].[CRM_TicketDetails]",
       "primaryKey": "TicketID",
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "UPDT <= '2015-11-30 23:59:59'"
+      "filterCondition": "UPDT <= '2015-12-08 23:59:59.9'"
     },
     {
       "source": "crm",
-      "tableName": "CRM_TicketProducts",
+      "tableName": "[dbo].[CRM_TicketProducts]",
       "primaryKey": "TicketProductsID",
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "UpdateDate <= '2015-11-30 23:59:59'"
+      "filterCondition": "UpdateDate <= '2015-12-08 23:59:59.9'"
     },
     {
       "source": "crm",
-      "tableName": "CRM_OrderDetails",
+      "tableName": "[dbo].[CRM_OrderDetails]",
       "primaryKey": null,
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "LastUpdatedAt <= '2015-11-30 23:59:59'"
+      "filterCondition": "LastUpdatedAt <= '2015-12-08 23:59:59.9'"
     },
     {
       "source": "crm",
-      "tableName": "CRM_ProductDetails",
+      "tableName": "[dbo].[CRM_ProductDetails]",
       "primaryKey": "ProductId",
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "UpdateDate <= '2015-11-30 23:59:59'"
+      "filterCondition": "UpdateDate <= '2015-12-08 23:59:59.9'"
     },
     {
       "source": "crm",
-      "tableName": "CRM_TicketStatusLog",
+      "tableName": "[dbo].[CRM_TicketStatusLog]",
       "primaryKey": "TicketStatusLogID",
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "AddDate <= '2015-11-30 23:59:59'"
+      "filterCondition": "AddDate <= '2015-12-08 23:59:59.9'"
     }
   ]
 }

@@ -211,7 +211,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component clickstreamSurf3Variable --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/clickstreamSurf3Variable.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerDeviceMapping") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION --driver-memory 9G $CORE_JAR --component customerDeviceMapping --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerDeviceMapping.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "surfCampaigns") {
     $AMMUNITION = "--num-executors 15 --executor-memory 9G";
@@ -253,8 +253,16 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "emailCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/emailCampaigns.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "emailCampaignMergeFeed") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component emailCampaignMergeFeed --config $HDFS_CONF/config.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "calendarCampaignMerge") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component calendarCampaignMerge --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/calendarCampaigns.json";
+    $job_exit = run_component($component, $command);
+} elsif ($component eq "calendarCampaignMergeFeed") {
+    $AMMUNITION = "--num-executors 3 --executor-memory 9G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component calendarCampaignMergeFeed --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "mobilePushCampaignQuality") {
     my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component mobilePushCampaignQuality --config $HDFS_CONF/config.json --campaignsJson $HDFS_CONF/pushCampaigns.json";

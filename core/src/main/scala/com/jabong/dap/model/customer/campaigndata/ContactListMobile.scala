@@ -390,9 +390,9 @@ object ContactListMobile extends DataFeedsModel with Logging {
       CustomerVariables.IS_CONFIRMED,
       CustomerVariables.UPDATED_AT)
       .map(e => (e(0).asInstanceOf[String] -> (e(1).asInstanceOf[Long], e(2).asInstanceOf[String],
-      e(3).asInstanceOf[String], e(4).asInstanceOf[String], e(5).asInstanceOf[Date], e(6).asInstanceOf[String],
-      e(7).asInstanceOf[Timestamp], e(8).asInstanceOf[String],
-      e(9).asInstanceOf[Integer], e(10).asInstanceOf[Timestamp]))).groupByKey()
+        e(3).asInstanceOf[String], e(4).asInstanceOf[String], e(5).asInstanceOf[Date], e(6).asInstanceOf[String],
+        e(7).asInstanceOf[Timestamp], e(8).asInstanceOf[String],
+        e(9).asInstanceOf[Integer], e(10).asInstanceOf[Timestamp]))).groupByKey()
     val c = custIncrMap.map(e => (e._1, getlatestCus(e._2.toList))).map(e => Row(e._1, e._2._1, e._2._2, e._2._3, e._2._4, e._2._5, e._2._6, e._2._7, e._2._8, e._2._9, e._2._10))
     val custIncrUnq = Spark.getSqlContext().createDataFrame(c, schema2)
 

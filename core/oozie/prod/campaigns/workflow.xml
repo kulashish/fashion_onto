@@ -164,16 +164,13 @@
         <error to="fail"/>
     </action>
 
-    <join name="ItrCmrJoin" to="campaignsStart"/>
+    <join name="ItrCmrJoin" to="campaignsStart1"/>
 
-    <fork name="campaignsStart">
+    <fork name="campaignsStart1">
         <path start="surfCampaigns" />
-        <path start="retargetCampaigns" />
+        <path start="wishlistCampaigns" />
         <path start="invalidCampaigns" />
         <path start="abandonedCartCampaigns" />
-        <path start="wishlistCampaigns" />
-        <path start="miscellaneousCampaigns"/>
-        <path start="followUpCampaigns"/>
     </fork>
 
     <action name="surfCampaigns">
@@ -188,23 +185,23 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
 
-    <action name="retargetCampaigns">
+    <action name="wishlistCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>retargetCampaigns</argument>
+            <argument>wishlistCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
 
@@ -220,7 +217,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
     <action name="abandonedCartCampaigns">
@@ -235,22 +232,31 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
-    <action name="wishlistCampaigns">
+
+    <join name="campaignsJoin1" to="campaignsStart2" />
+
+    <fork name="campaignsStart2">
+        <path start="retargetCampaigns" />
+        <path start="miscellaneousCampaigns"/>
+        <path start="followUpCampaigns"/>
+    </fork>
+
+    <action name="retargetCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>wishlistCampaigns</argument>
+            <argument>retargetCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
@@ -266,7 +272,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
@@ -282,11 +288,11 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
-    <join name="campaignsJoin" to="campaignMerge"/>
+    <join name="campaignsJoin2" to="campaignMerge"/>
 
 
     <fork name="campaignMerge">
@@ -316,7 +322,7 @@
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>campaigns</argument>
+            <argument>push_campaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
@@ -349,6 +355,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>emailCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMergeFeed</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -822,6 +844,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>calendarCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calendarCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="calendarCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendarCampaignMergeFeed</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>

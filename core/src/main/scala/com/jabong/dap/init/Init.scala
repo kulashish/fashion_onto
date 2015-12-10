@@ -129,7 +129,9 @@ object Init {
 
       case "pushCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.PUSH_CAMPAIGNS)
       case "emailCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.EMAIL_CAMPAIGNS)
+      case "emailCampaignMergeFeed" => CampaignManager.campaignMergeFeed(DataSets.EMAIL_CAMPAIGNS)
       case "calendarCampaignMerge" => CampaignManager.startCampaignMerge(params.campaignsJson, DataSets.CALENDAR_CAMPAIGNS)
+      case "calendarCampaignMergeFeed" => CampaignManager.campaignMergeFeed(DataSets.CALENDAR_CAMPAIGNS)
       case "acartHourlyFeed" => CampaignManager.acartHourlyFeed(DataSets.ACART_HOURLY)
 
       //campaign quality check for mobile
