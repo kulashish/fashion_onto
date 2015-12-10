@@ -360,6 +360,22 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
+        <ok to="emailCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMergeFeed</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
         <ok to="emailCampaignFtpUpload"/>
         <error to="fail"/>
     </action>
@@ -828,6 +844,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>calendarCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calendarCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="calendarCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendarCampaignMergeFeed</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
