@@ -352,8 +352,8 @@ sub upload_email_campaigns_feedFiles {
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_CONTACTS_LIST.csv
-    my $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
-    my $folderName = "contactListMobile";
+    $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
+    $folderName = "contactListMobile";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
     # 20150928_Contact_list_Plus.csv
