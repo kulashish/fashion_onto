@@ -423,8 +423,8 @@ sub upload_calendar_replenish_campaigns {
     $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
     $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
 
-     #upload DCF file to dapshare
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/$calendar_filename ; bye\"");
+    #upload both files to dapshare
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
 
     #upload Replenish file for decryption of email
