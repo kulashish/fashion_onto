@@ -4,15 +4,15 @@ import java.io.File
 import java.sql.Timestamp
 
 import com.jabong.dap.campaign.utils.CampaignUtils
-import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.acq.common.CampaignInfo
-import com.jabong.dap.data.read.{ DataReader, PathBuilder }
+import com.jabong.dap.data.read.{ DataNotFound, DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.storage.schema.Schema
@@ -60,12 +60,36 @@ object CampaignInput extends Logging {
     return null
   }
 
-  def loadCustomerMasterData(): DataFrame = {
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last day customer master data from hdfs")
+  def loadCustomerMasterData(incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    var n = 0
+    var cmrData: DataFrame = null
+    while (n < 7 && cmrData == null) {
+      val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+      n = n + 1
+      cmrData = getDfCmr(date)
+    }
 
-    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
-    customerMasterData
+    if (cmrData == null)
+      throw new DataNotFound
+    cmrData
+  }
+
+  def getDfCmr(incrDate: String): DataFrame = {
+    var df: DataFrame = null
+    try {
+      df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+      logger.info("Reading customer master data from hdfs, incrDate: " + incrDate)
+    } catch {
+      case e: DataNotFound => {
+        logger.error("DataNotFound for date: " + incrDate)
+        return null
+      }
+      case e: AssertionError => {
+        logger.error("AssertionError for date: " + incrDate)
+        return null
+      }
+    }
+    df
   }
 
   def loadYesterdayOrderItemData() = loadOrderItemData()
