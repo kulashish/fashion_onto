@@ -2,49 +2,49 @@
   "merge": [
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_tblProductAttributeMaster]",
+      "tableName": "CRM_tblProductAttributeMaster",
       "primaryKey": "sku",
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_TicketDetails]",
+      "tableName": "CRM_TicketDetails",
       "primaryKey": "TicketID",
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_OrderDetails]",
+      "tableName": "CRM_OrderDetails",
       "primaryKey": "OrderNo",
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_ProductDetails]",
+      "tableName": "CRM_ProductDetails",
       "primaryKey": "ProductId",
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_TicketProducts]",
+      "tableName": "CRM_TicketProducts",
       "primaryKey": "TicketProductsID",
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_TicketStatusLog]",
+      "tableName": "CRM_TicketStatusLog",
       "primaryKey": "TicketStatusLogID",
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
-      "tableName": "[dbo].[CRM_TicketMaster]",
+      "tableName": "CRM_TicketMaster",
       "primaryKey": "IssueID",
       "mergeMode": "full",
       "saveMode": "Ignore"
