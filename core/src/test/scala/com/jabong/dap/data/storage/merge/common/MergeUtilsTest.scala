@@ -79,22 +79,4 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     val mergedNewNull2 = MergeUtils.joinOldAndNew(null, newSchema, oldDF, oldSchema, keys, SQL.FULL_OUTER)
     assert(mergedNewNull2.collect().size == 6)
   }
-  //  override def afterAll() {
-  //    super.afterAll()
-  //  }
-  "joinOldAndNewDF & joinOldAndNew" should "return same values" in {
-    val oldSchema = StructType(Array(
-      StructField("age", LongType, true),
-      StructField("name", StringType, true)))
-    val newSchema = StructType(Array(
-      StructField("age", LongType, true),
-      StructField("name", StringType, true)))
-    val keys = List(("name", "name"),("age","age"))
-    val mergedOld = MergeUtils.joinOldAndNewDF(newDF, newSchema, oldDF, oldSchema,"name","age")
-    val mergedNew = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys, SQL.FULL_OUTER)
-
-    assert(mergedOld.schema == mergedNew.schema)
-    //assert(mergedOld.collect().toSet == mergedNew.collect().toSet)
-
-  }
 }
