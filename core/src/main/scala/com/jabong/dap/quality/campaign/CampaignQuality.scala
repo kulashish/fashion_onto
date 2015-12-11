@@ -64,6 +64,14 @@ object CampaignQuality extends Logging {
         list.appendAll(getCampaignQuality(campaignDetails.campaignName, dateYesterday, campaignType))
       }
 
+      if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
+        list.appendAll(getCampaignQuality(CampaignCommon.REPLENISHMENT_CAMPAIGN, dateYesterday, campaignType))
+      }
+
+      if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
+        list.appendAll(getCampaignQuality(CampaignCommon.FOLLOW_UP_CAMPAIGNS, dateYesterday, campaignType))
+      }
+
       val rdd = Spark.getContext().parallelize[Row](list.toSeq)
       val dfCampaignQuality = Spark.getSqlContext().createDataFrame(rdd, schema)
 

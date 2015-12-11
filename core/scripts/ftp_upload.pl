@@ -93,7 +93,7 @@ sub upload_push_campaigns {
     system("mkdir -p $base");
     #system("mkdir -p $base/tmp");
 
-
+    # master file
     # /data/tmp/push_campaigns/acart_daily42_515/daily/2015/07/30/staticlist_acart_daily42_515_20150730.csv
     for (my $i = 0; $i <= 1 ; $i++) {
        my $id = "515";  # ios
@@ -101,18 +101,10 @@ sub upload_push_campaigns {
            $id = "517";
            system("hadoop fs -get /data/tmp/push_campaigns/android/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
            system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
-
-           #system("hadoop fs -get /data/tmp/push_campaigns/android/daily/$date/ $base/UpdateDevices_$id" . "_$date_with_zero.csv");
-           
        } else {
            system("hadoop fs -get /data/tmp/push_campaigns/ios/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
            system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
-
-           #system("hadoop fs -get /data/tmp/push_campaigns/ios/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
-
        }
-
-       # master file
 
        # acart daily
        my $cname = "acart_daily42";

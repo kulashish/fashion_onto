@@ -11,7 +11,8 @@ import org.apache.spark.sql.DataFrame
 object GetData extends Logging {
 
   def cleanString(str: String): String = {
-    str.replaceAll("( |-|%)", "")
+    val cleanedString = str.replaceAll("( |-|%)", "")
+    cleanedString.replaceAll("(/|:|\\(|\\))", "")
   }
 
   def getData(dbConn: DbConnection, tableInfo: TableInfo): Any = {
@@ -22,7 +23,7 @@ object GetData extends Logging {
       return
     }
 
-    val condition = ConditionBuilder.getCondition(tableInfo)
+    val condition = ConditionBuilder.getCondition(dbConn.getDriver, tableInfo)
     logger.info(condition)
 
     val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition, tableInfo)

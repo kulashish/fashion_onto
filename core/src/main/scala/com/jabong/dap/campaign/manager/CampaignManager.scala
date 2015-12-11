@@ -279,7 +279,7 @@ object CampaignManager extends Serializable with Logging {
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
 
-    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS)
     val orderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
@@ -750,13 +750,13 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.LIVE_CART_URL + temp)
 
-        //                  val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
-        //                  val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
-        //          .drop(CampaignMergedFields.REF_SKUS)
-        //          .drop(CampaignMergedFields.REC_SKUS)
+        //        val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        //        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+        // .drop(CampaignMergedFields.REF_SKUS)
+        // .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
-        //                DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
+        //        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
       } else if (campaignType == DataSets.CALENDAR_CAMPAIGNS) {
         val GARBAGE = "NA" //:TODO replace with correct value
         val temp = "temp"
@@ -802,8 +802,8 @@ object CampaignManager extends Serializable with Logging {
 
         //        val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
         //        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
-        //          .drop(CampaignMergedFields.REF_SKUS)
-        //          .drop(CampaignMergedFields.REC_SKUS)
+        // .drop(CampaignMergedFields.REF_SKUS)
+        // .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         //        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, calendarCampaignFileName, saveMode, "true", ";")
@@ -825,7 +825,6 @@ object CampaignManager extends Serializable with Logging {
     }
 
     val df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-
     val csvDataFrame = df.drop(CampaignMergedFields.CUSTOMER_ID)
       .drop(CampaignMergedFields.REF_SKUS)
       .drop(CampaignMergedFields.REC_SKUS)
