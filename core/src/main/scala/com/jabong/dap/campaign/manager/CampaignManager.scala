@@ -279,7 +279,7 @@ object CampaignManager extends Serializable with Logging {
     // invalid followup
     val fullOrderData = CampaignInput.loadFullOrderData()
 
-    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData()
+    val past30DayCampaignMergedData = CampaignInput.load30DayCampaignMergedData(DataSets.PUSH_CAMPAIGNS)
     val orderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT)
 
     val brickMvpRecommendations = CampaignInput.loadRecommendationData(Recommendation.BRICK_MVP_SUB_TYPE).cache()
