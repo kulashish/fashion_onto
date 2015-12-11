@@ -687,8 +687,7 @@ object CampaignManager extends Serializable with Logging {
     if (CampaignManager.initCampaignsConfigJson(campaignJsonPath)) {
       //      createCampaignMaps(json)
       val saveMode = DataSets.OVERWRITE_SAVEMODE
-      //      val dateFolder = TimeUtils.YESTERDAY_FOLDER
-      val dateFolder = "2015/12/09"
+      val dateFolder = TimeUtils.YESTERDAY_FOLDER
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, campaignType)
       val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
 
@@ -815,16 +814,13 @@ object CampaignManager extends Serializable with Logging {
   def campaignMergeFeed(campaignType: String) = {
 
     val saveMode = DataSets.OVERWRITE_SAVEMODE
-    //    val dateFolder = TimeUtils.YESTERDAY_FOLDER
-    val dateFolder = "2015/12/09"
+    val dateFolder = TimeUtils.YESTERDAY_FOLDER
+
     val campaignFileName = {
       if (campaignType == DataSets.EMAIL_CAMPAIGNS) {
-        //TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
-        "20151209" + "_LIVE_CAMPAIGN"
+        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
       } else {
-        //        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
-        "20151209" + "_DCF_CAMPAIGN"
-
+        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
       }
     }
 
