@@ -16,7 +16,7 @@
       "mode": "daily",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "null"
+      "dateColumn": "GRNDate"
     }
   ]
 }
