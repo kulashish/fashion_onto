@@ -8,7 +8,7 @@ import com.jabong.dap.data.storage.DataSets
  * Builds the condition for the query to fetch the data and get the min and max values of primary key.
  */
 object ConditionBuilder {
-  def getCondition(tableInfo: TableInfo): String = {
+  def getCondition(driver: String, tableInfo: TableInfo): String = {
 
     val mode = tableInfo.mode
     val dateColumn = OptionUtils.getOptValue(tableInfo.dateColumn)
@@ -25,7 +25,7 @@ object ConditionBuilder {
     if (null == rangeStart && null == rangeEnd && DataSets.DAILY_MODE == mode) {
       var startTime = TimeConstants.START_TIME
       var endTime = TimeConstants.END_TIME
-      if (DataSets.CRM.equals(source)) {
+      if (DataSets.SQLSERVER.equals(driver)) {
         startTime = TimeConstants.START_TIME + ".0"
         endTime = TimeConstants.END_TIME + ".9"
       }
@@ -35,7 +35,7 @@ object ConditionBuilder {
     } else if (null == rangeStart && null == rangeEnd && DataSets.HOURLY_MODE == mode) {
       var startMin = TimeConstants.START_MIN
       var endMin = TimeConstants.END_MIN
-      if (DataSets.CRM.equals(source)) {
+      if (DataSets.SQLSERVER.equals(driver)) {
         startMin = TimeConstants.START_MIN + ".0"
         endMin = TimeConstants.END_MIN + ".9"
       }
