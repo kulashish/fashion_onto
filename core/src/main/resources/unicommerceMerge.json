@@ -1,0 +1,25 @@
+{
+  "merge": [
+    {
+      "source": "unicommerce",
+      "tableName": "facilityitemmaster",
+      "primaryKey": null,
+      "mergeMode": "full",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "unicommerce",
+      "tableName": "vendors",
+      "primaryKey": null,
+      "mergeMode": "full",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "unicommerce",
+      "tableName": "vendoritemmaster",
+      "primaryKey": null,
+      "mergeMode": "full",
+      "saveMode": "Ignore"
+    }
+  ]
+}

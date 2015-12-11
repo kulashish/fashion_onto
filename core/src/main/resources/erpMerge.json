@@ -6,6 +6,13 @@
       "primaryKey": "No_",
       "mergeMode": "full",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "erp",
+      "tableName": "XerionSaleMovementView",
+      "primaryKey": "No_",
+      "mergeMode": "full",
+      "saveMode": "Ignore"
     }
   ]
 }
