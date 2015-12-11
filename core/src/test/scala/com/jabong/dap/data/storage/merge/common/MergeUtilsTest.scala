@@ -50,23 +50,33 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     assert(mergedDF.collect.size == 3)
   }
 
+
   "joinOldAndNew" should "return correct result" in {
-    val keys = List(("name", "name"),("age","age"))
-    val inner = MergeUtils.joinOldAndNew(oldDF,newDF,keys,SQL.INNER)
-    val leftOuter = MergeUtils.joinOldAndNew(oldDF,newDF,keys,SQL.LEFT_OUTER)
-    val fullOuter = MergeUtils.joinOldAndNew(oldDF,newDF,keys,SQL.FULL_OUTER)
-    assert(inner.count() == 4)
-    assert(leftOuter.count() == 6)
-    assert(fullOuter.count() == 7)
     val expectedSchema = StructType(Array(
       StructField("age", LongType, true),
       StructField("name", StringType, true),
       StructField("new_age", LongType, true),
       StructField("new_name", StringType, true)))
-    assert(inner.schema == leftOuter.schema && leftOuter.schema == fullOuter.schema && fullOuter.schema == expectedSchema)
-  }
-  //  override def afterAll() {
-  //    super.afterAll()
-  //  }
+    val oldSchema = StructType(Array(
+      StructField("age", LongType, true),
+      StructField("name", StringType, true)))
+    val newSchema = StructType(Array(
+      StructField("age", LongType, true),
+      StructField("name", StringType, true)))
+    val keys = List(("name", "name"),("age","age"))
+    val inner = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.INNER)
+    val leftOuter = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.LEFT_OUTER)
+    val fullOuter = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.FULL_OUTER)
+    assert(inner.count() == 4)
+    assert(leftOuter.count() == 6)
+    assert(fullOuter.count() == 7)
 
+    assert(inner.schema == leftOuter.schema && leftOuter.schema == fullOuter.schema && fullOuter.schema == expectedSchema)
+
+    val mergedNewNull1 = MergeUtils.joinOldAndNew(newDF, newSchema, null, oldSchema,  keys, SQL.FULL_OUTER)
+    assert(mergedNewNull1.collect().size == 5)
+
+    val mergedNewNull2 = MergeUtils.joinOldAndNew(null, newSchema, oldDF, oldSchema, keys, SQL.FULL_OUTER)
+    assert(mergedNewNull2.collect().size == 6)
+  }
 }
