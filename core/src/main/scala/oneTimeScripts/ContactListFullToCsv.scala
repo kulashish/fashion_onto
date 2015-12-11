@@ -3,13 +3,13 @@ package oneTimeScripts
 import java.io.File
 
 import com.jabong.dap.common.Spark
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import com.jabong.dap.data.write.DataWriter
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.apache.spark.sql.{ DataFrame, SaveMode }
 
 /**
  * Created by mubarak on 10/12/15.
