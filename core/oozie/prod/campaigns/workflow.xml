@@ -168,7 +168,7 @@
 
     <fork name="campaignsStart1">
         <path start="surfCampaigns" />
-        <path start="retargetCampaigns" />
+        <path start="wishlistCampaigns" />
         <path start="invalidCampaigns" />
         <path start="abandonedCartCampaigns" />
     </fork>
@@ -189,13 +189,13 @@
         <error to="fail"/>
     </action>
 
-    <action name="retargetCampaigns">
+    <action name="wishlistCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>retargetCampaigns</argument>
+            <argument>wishlistCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -239,18 +239,18 @@
     <join name="campaignsJoin1" to="campaignsStart2" />
 
     <fork name="campaignsStart2">
-        <path start="wishlistCampaigns" />
+        <path start="retargetCampaigns" />
         <path start="miscellaneousCampaigns"/>
         <path start="followUpCampaigns"/>
     </fork>
 
-    <action name="wishlistCampaigns">
+    <action name="retargetCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>wishlistCampaigns</argument>
+            <argument>retargetCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -322,7 +322,7 @@
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>campaigns</argument>
+            <argument>push_campaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
@@ -355,6 +355,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>emailCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMergeFeed</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -828,6 +844,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>calendarCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calendarCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="calendarCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendarCampaignMergeFeed</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
