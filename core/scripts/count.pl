@@ -71,14 +71,3 @@ sub count_campaigns {
 	    }
 	}
 }
-
-A
-A
-A
-A
-A
-A
-A
-A
-
-
