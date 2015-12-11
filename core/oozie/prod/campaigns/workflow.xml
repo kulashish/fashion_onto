@@ -169,7 +169,6 @@
     <fork name="campaignsStart1">
         <path start="surfCampaigns" />
         <path start="wishlistCampaigns" />
-        <path start="invalidCampaigns" />
         <path start="abandonedCartCampaigns" />
     </fork>
 
@@ -205,21 +204,6 @@
         <error to="fail"/>
     </action>
 
-    <action name="invalidCampaigns">
-        <shell xmlns="uri:oozie:shell-action:0.3">
-            <exec>run.pl</exec>
-            <argument>-t</argument>
-            <argument>${jobEnv}</argument>
-            <argument>-c</argument>
-            <argument>invalidCampaigns</argument>
-            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
-            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
-            <file>${scriptHome}/run.pl#run.pl</file>
-            <capture-output/>
-        </shell>
-        <ok to="campaignsJoin1"/>
-        <error to="fail"/>
-    </action>
     <action name="abandonedCartCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
@@ -239,18 +223,19 @@
     <join name="campaignsJoin1" to="campaignsStart2" />
 
     <fork name="campaignsStart2">
-        <path start="retargetCampaigns" />
+        <path start="invalidCampaigns" />
         <path start="miscellaneousCampaigns"/>
+        <path start="retargetCampaigns" />
         <path start="followUpCampaigns"/>
     </fork>
 
-    <action name="retargetCampaigns">
+    <action name="invalidCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>retargetCampaigns</argument>
+            <argument>invalidCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
@@ -267,6 +252,22 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>miscellaneousCampaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin2"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="retargetCampaigns">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>retargetCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
