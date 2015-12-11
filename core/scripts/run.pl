@@ -357,6 +357,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerOrders --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerOrders.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "contactListMobile") {
+    $AMMUNITION = "--num-executors 18 --executor-memory 9G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component contactListMobile --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/contactListMobile.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerPreferredTimeslotPart2") {
