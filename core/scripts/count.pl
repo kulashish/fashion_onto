@@ -42,15 +42,13 @@ foreach my $feed (@feeds) {
     print "feed file is $feed_file\n";
     down_from_responsys($feed_file);
     if ($feed eq "53699_33838_date_LIVE_CAMPAIGN.csv") {
-	count_campaigns($feed_file,3);
+	    count_campaigns($feed_file,3);
     } elsif ($feed eq "53699_33859_date_DCF_CAMPAIGN.csv") {
-	count_campaigns($feed_file,9);
+	    count_campaigns($feed_file,9);
     } else {
-	my $lc  = `wc -l $feed_file | cut -d ' ' -f 1`;
-	print("Count ". $lc);
+	    my $lc  = `wc -l $feed_file | cut -d ' ' -f 1`;
+	    print("Count ". $lc);
     }
-    
-
 }
 
 
@@ -71,14 +69,3 @@ sub count_campaigns {
 	    }
 	}
 }
-
-A
-A
-A
-A
-A
-A
-A
-A
-
-
