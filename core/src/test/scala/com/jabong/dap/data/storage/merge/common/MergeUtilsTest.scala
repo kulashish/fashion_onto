@@ -64,19 +64,19 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
       StructField("age", LongType, true),
       StructField("name", StringType, true)))
     val keys = List(("name", "name"),("age","age"))
-    val inner = MergeUtils.joinOldAndNew(oldDF,newDF,oldSchema, newSchema,keys,SQL.INNER)
-    val leftOuter = MergeUtils.joinOldAndNew(oldDF,newDF,oldSchema, newSchema,keys,SQL.LEFT_OUTER)
-    val fullOuter = MergeUtils.joinOldAndNew(oldDF,newDF,oldSchema, newSchema,keys,SQL.FULL_OUTER)
+    val inner = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.INNER)
+    val leftOuter = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.LEFT_OUTER)
+    val fullOuter = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.FULL_OUTER)
     assert(inner.count() == 4)
     assert(leftOuter.count() == 6)
     assert(fullOuter.count() == 7)
 
     assert(inner.schema == leftOuter.schema && leftOuter.schema == fullOuter.schema && fullOuter.schema == expectedSchema)
 
-    val mergedNewNull1 = MergeUtils.joinOldAndNew(null, newDF, oldSchema, newSchema, keys, SQL.FULL_OUTER)
+    val mergedNewNull1 = MergeUtils.joinOldAndNew(newDF, newSchema, null, oldSchema,  keys, SQL.FULL_OUTER)
     assert(mergedNewNull1.collect().size == 5)
 
-    val mergedNewNull2 = MergeUtils.joinOldAndNew(oldDF, null, oldSchema, newSchema, keys, SQL.FULL_OUTER)
+    val mergedNewNull2 = MergeUtils.joinOldAndNew(null, newSchema, oldDF, oldSchema, keys, SQL.FULL_OUTER)
     assert(mergedNewNull2.collect().size == 6)
   }
   //  override def afterAll() {
@@ -91,7 +91,7 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
       StructField("name", StringType, true)))
     val keys = List(("name", "name"),("age","age"))
     val mergedOld = MergeUtils.joinOldAndNewDF(newDF, newSchema, oldDF, oldSchema,"name","age")
-    val mergedNew = MergeUtils.joinOldAndNew(oldDF, newDF, oldSchema, newSchema, keys, SQL.FULL_OUTER)
+    val mergedNew = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys, SQL.FULL_OUTER)
 
     assert(mergedOld.schema == mergedNew.schema)
     //assert(mergedOld.collect().toSet == mergedNew.collect().toSet)

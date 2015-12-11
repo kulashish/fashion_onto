@@ -107,7 +107,7 @@ object MergeUtils extends MergeData {
    * @param joinType default is given for unambiguity
    * @return return the result with newDF schema renamed with prefix "new_" to each field name
    */
-  def joinOldAndNew(oldDF: DataFrame, newDF:DataFrame, oldSchema:StructType, newSchema:StructType, keys: List[(String, String)], joinType: String): DataFrame ={
+  def joinOldAndNew(newDF:DataFrame, newSchema:StructType, oldDF: DataFrame, oldSchema:StructType, keys: List[(String, String)], joinType: String): DataFrame ={
     if(keys.length<1) return null
 
     val oldNullSafe = if (null == oldDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], oldSchema) else oldDF
