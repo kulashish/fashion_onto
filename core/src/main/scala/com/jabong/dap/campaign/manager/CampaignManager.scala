@@ -815,13 +815,16 @@ object CampaignManager extends Serializable with Logging {
   def campaignMergeFeed(campaignType: String) = {
 
     val saveMode = DataSets.OVERWRITE_SAVEMODE
-    val dateFolder = TimeUtils.YESTERDAY_FOLDER
-
+    //    val dateFolder = TimeUtils.YESTERDAY_FOLDER
+    val dateFolder = "2015/12/09"
     val campaignFileName = {
       if (campaignType == DataSets.EMAIL_CAMPAIGNS) {
-        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        //TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        "20151209" + "_LIVE_CAMPAIGN"
       } else {
-        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        //        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        "20151209" + "_DCF_CAMPAIGN"
+
       }
     }
 
