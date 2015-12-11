@@ -12,7 +12,7 @@ object GetData extends Logging {
 
   def cleanString(str: String): String = {
     val cleanedString = str.replaceAll("( |-|%)", "")
-    cleanedString.replaceAll("(/|:|\\(|\\))","")
+    cleanedString.replaceAll("(/|:|\\(|\\))", "")
   }
 
   def getData(dbConn: DbConnection, tableInfo: TableInfo): Any = {
