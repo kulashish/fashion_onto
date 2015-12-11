@@ -750,10 +750,10 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.LIVE_CART_URL + temp)
 
-          //        val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
-          //        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.REC_SKUS)
+        //        val emailCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        //        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+        // .drop(CampaignMergedFields.REF_SKUS)
+        // .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         //        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, emailCampaignFileName, saveMode, "true", ";")
@@ -800,10 +800,10 @@ object CampaignManager extends Serializable with Logging {
           .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
           .drop(CampaignMergedFields.LIVE_CART_URL)
 
-          //        val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
-          //        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.REC_SKUS)
+        //        val calendarCampaignFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        //        val csvDataFrame = expectedDF.drop(CampaignMergedFields.CUSTOMER_ID)
+        // .drop(CampaignMergedFields.REF_SKUS)
+        // .drop(CampaignMergedFields.REC_SKUS)
         CampaignUtils.debug(expectedDF, "expectedDF final before writing data frame for" + campaignType)
         DataWriter.writeParquet(expectedDF, writePath, saveMode)
         //        DataWriter.writeCsv(csvDataFrame, DataSets.CAMPAIGNS, DataSets.CALENDAR_CAMPAIGNS, DataSets.DAILY_MODE, dateFolder, calendarCampaignFileName, saveMode, "true", ";")
@@ -825,6 +825,10 @@ object CampaignManager extends Serializable with Logging {
     }
 
     val df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-    DataWriter.writeCsv(df, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";")
+    val csvDataFrame = df.drop(CampaignMergedFields.CUSTOMER_ID)
+      .drop(CampaignMergedFields.REF_SKUS)
+      .drop(CampaignMergedFields.REC_SKUS)
+
+    DataWriter.writeCsv(csvDataFrame, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";")
   }
 }
