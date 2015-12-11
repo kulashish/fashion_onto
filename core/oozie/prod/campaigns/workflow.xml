@@ -164,12 +164,11 @@
         <error to="fail"/>
     </action>
 
-    <join name="ItrCmrJoin" to="campaignsStart1"/>
+    <join name="ItrCmrJoin" to="campaignsStart"/>
 
-    <fork name="campaignsStart1">
+    <fork name="campaignsStart">
         <path start="surfCampaigns" />
-        <path start="wishlistCampaigns" />
-        <path start="abandonedCartCampaigns" />
+        <path start="campaignsStart1" />
     </fork>
 
     <action name="surfCampaigns">
@@ -184,9 +183,15 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin1"/>
+        <ok to="campaignsJoin"/>
         <error to="fail"/>
     </action>
+
+    <fork name="campaignsStart1">
+        <path start="wishlistCampaigns" />
+        <path start="abandonedCartCampaigns" />
+        <path start="invalidCampaigns" />
+    </fork>
 
     <action name="wishlistCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -220,15 +225,6 @@
         <error to="fail"/>
     </action>
 
-    <join name="campaignsJoin1" to="campaignsStart2" />
-
-    <fork name="campaignsStart2">
-        <path start="invalidCampaigns" />
-        <path start="miscellaneousCampaigns"/>
-        <path start="retargetCampaigns" />
-        <path start="followUpCampaigns"/>
-    </fork>
-
     <action name="invalidCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
@@ -241,9 +237,17 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin2"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
+
+    <join name="campaignsJoin1" to="campaignsStart2" />
+
+    <fork name="campaignsStart2">
+        <path start="miscellaneousCampaigns"/>
+        <path start="retargetCampaigns" />
+        <path start="followUpCampaigns"/>
+    </fork>
 
     <action name="miscellaneousCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -293,8 +297,9 @@
         <error to="fail"/>
     </action>
 
-    <join name="campaignsJoin2" to="campaignMerge"/>
+    <join name="campaignsJoin2" to="campaignsJoin"/>
 
+    <join name="campaignsJoin" to="campaignMerge"/>
 
     <fork name="campaignMerge">
         <path start="pushCampaignMerge" />

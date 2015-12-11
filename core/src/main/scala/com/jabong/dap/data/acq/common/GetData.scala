@@ -22,7 +22,7 @@ object GetData extends Logging {
       return
     }
 
-    val condition = ConditionBuilder.getCondition(tableInfo)
+    val condition = ConditionBuilder.getCondition(dbConn.getDriver, tableInfo)
     logger.info(condition)
 
     val dbTableQuery = QueryBuilder.getDataQuery(dbConn.getDriver, condition, tableInfo)
