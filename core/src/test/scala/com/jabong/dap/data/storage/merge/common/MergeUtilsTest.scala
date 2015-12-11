@@ -50,23 +50,51 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     assert(mergedDF.collect.size == 3)
   }
 
+
   "joinOldAndNew" should "return correct result" in {
-    val keys = List(("name", "name"),("age","age"))
-    val inner = MergeUtils.joinOldAndNew(oldDF,newDF,keys,SQL.INNER)
-    val leftOuter = MergeUtils.joinOldAndNew(oldDF,newDF,keys,SQL.LEFT_OUTER)
-    val fullOuter = MergeUtils.joinOldAndNew(oldDF,newDF,keys,SQL.FULL_OUTER)
-    assert(inner.count() == 4)
-    assert(leftOuter.count() == 6)
-    assert(fullOuter.count() == 7)
     val expectedSchema = StructType(Array(
       StructField("age", LongType, true),
       StructField("name", StringType, true),
       StructField("new_age", LongType, true),
       StructField("new_name", StringType, true)))
+    val oldSchema = StructType(Array(
+      StructField("age", LongType, true),
+      StructField("name", StringType, true)))
+    val newSchema = StructType(Array(
+      StructField("age", LongType, true),
+      StructField("name", StringType, true)))
+    val keys = List(("name", "name"),("age","age"))
+    val inner = MergeUtils.joinOldAndNew(oldDF,newDF,oldSchema, newSchema,keys,SQL.INNER)
+    val leftOuter = MergeUtils.joinOldAndNew(oldDF,newDF,oldSchema, newSchema,keys,SQL.LEFT_OUTER)
+    val fullOuter = MergeUtils.joinOldAndNew(oldDF,newDF,oldSchema, newSchema,keys,SQL.FULL_OUTER)
+    assert(inner.count() == 4)
+    assert(leftOuter.count() == 6)
+    assert(fullOuter.count() == 7)
+
     assert(inner.schema == leftOuter.schema && leftOuter.schema == fullOuter.schema && fullOuter.schema == expectedSchema)
+
+    val mergedNewNull1 = MergeUtils.joinOldAndNew(null, newDF, oldSchema, newSchema, keys, SQL.FULL_OUTER)
+    assert(mergedNewNull1.collect().size == 5)
+
+    val mergedNewNull2 = MergeUtils.joinOldAndNew(oldDF, null, oldSchema, newSchema, keys, SQL.FULL_OUTER)
+    assert(mergedNewNull2.collect().size == 6)
   }
   //  override def afterAll() {
   //    super.afterAll()
   //  }
+  "joinOldAndNewDF & joinOldAndNew" should "return same values" in {
+    val oldSchema = StructType(Array(
+      StructField("age", LongType, true),
+      StructField("name", StringType, true)))
+    val newSchema = StructType(Array(
+      StructField("age", LongType, true),
+      StructField("name", StringType, true)))
+    val keys = List(("name", "name"),("age","age"))
+    val mergedOld = MergeUtils.joinOldAndNewDF(newDF, newSchema, oldDF, oldSchema,"name","age")
+    val mergedNew = MergeUtils.joinOldAndNew(oldDF, newDF, oldSchema, newSchema, keys, SQL.FULL_OUTER)
 
+    assert(mergedOld.schema == mergedNew.schema)
+    //assert(mergedOld.collect().toSet == mergedNew.collect().toSet)
+
+  }
 }

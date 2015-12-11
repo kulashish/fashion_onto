@@ -76,6 +76,19 @@ object MergeUtils extends MergeData {
   }
 
   def joinOldAndNewDF(dfIncr: DataFrame, incrSchema: StructType, dfPrevVarFull: DataFrame, prevVarFullSchema: StructType, primaryKey1: String, primaryKey2: String): DataFrame = {
+    def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey1: String, primaryKey2: String): DataFrame = {
+
+      var dfIncrVar = dfIncr.dropDuplicates()
+
+      dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
+
+      dfIncrVar = SchemaUtils.renameCols(dfIncrVar, NEW_)
+
+      // join old and new data frame on primary key
+      val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
+
+      joinedDF
+    }
     var dfIncrVar: DataFrame = dfIncr
     if (null == dfIncr) dfIncrVar = Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], incrSchema)
 
@@ -85,33 +98,24 @@ object MergeUtils extends MergeData {
     joinOldAndNewDF(dfIncrVar, dfPrevVarFullVar, primaryKey1, primaryKey2)
   }
 
-  def joinOldAndNewDF(dfIncr: DataFrame, dfPrevVarFull: DataFrame, primaryKey1: String, primaryKey2: String): DataFrame = {
-
-    var dfIncrVar = dfIncr.dropDuplicates()
-
-    dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
-
-    dfIncrVar = SchemaUtils.renameCols(dfIncrVar, NEW_)
-
-    // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey1) === dfIncrVar(NEW_ + primaryKey1) && dfPrevVarFull(primaryKey2) === dfIncrVar(NEW_ + primaryKey2), SQL.FULL_OUTER)
-
-    joinedDF
-  }
 
   /**
    * This join is null safe (<=>).
-   * @param oldDF
-   * @param newDF
-   * @param keys
-   * @param joinType
+   * @param oldDF can be null
+   * @param newDF can be null
+   * @param keys tuple2 of keys pair
+   * @param joinType default is given for unambiguity
    * @return return the result with newDF schema renamed with prefix "new_" to each field name
    */
-  def joinOldAndNew(oldDF: DataFrame, newDF:DataFrame, keys: List[(String, String)], joinType: String): DataFrame ={
+  def joinOldAndNew(oldDF: DataFrame, newDF:DataFrame, oldSchema:StructType, newSchema:StructType, keys: List[(String, String)], joinType: String): DataFrame ={
     if(keys.length<1) return null
-    val newDFRenamed = SchemaUtils.renameCols(newDF, NEW_)
-    val joinExpr:Column = keys.slice(1,keys.size).foldLeft(oldDF(keys(0)._1) <=> newDFRenamed(NEW_ + keys(0)._2))((m: Column, n: (String, String)) => m && oldDF(n._1) <=> newDFRenamed(NEW_ + n._2))
-    oldDF.join(newDFRenamed, joinExpr, joinType)
+
+    val oldNullSafe = if (null == oldDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], oldSchema) else oldDF
+    val newNullSafe = if (null == newDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], newSchema) else newDF
+
+    val newDFNullSafeRenamed = SchemaUtils.renameCols(newNullSafe, NEW_)
+    val joinExpr:Column = keys.slice(1,keys.size).foldLeft(oldNullSafe(keys(0)._1) <=> newDFNullSafeRenamed(NEW_ + keys(0)._2))((m: Column, n: (String, String)) => m && oldNullSafe(n._1) <=> newDFNullSafeRenamed(NEW_ + n._2))
+    oldNullSafe.join(newDFNullSafeRenamed, joinExpr, joinType)
   }
 
   /**
