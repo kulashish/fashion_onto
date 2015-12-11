@@ -458,7 +458,7 @@ object CampaignInput extends Logging {
     itr30Day
   }
 
-  def load30DayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS): DataFrame = {
+  def load30DayCampaignMergedData(campaignType: String): DataFrame = {
 
     var campaignMerged30Day: DataFrame = null
 
@@ -468,7 +468,7 @@ object CampaignInput extends Logging {
 
       logger.info("Reading last " + i + " day basic campaign Merged datafrom hdfs")
 
-      val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
+      val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, date)
       if (null != mergedCampaignData) {
         if (campaignMerged30Day == null) {
           campaignMerged30Day = mergedCampaignData
@@ -657,7 +657,7 @@ object CampaignInput extends Logging {
    */
   def loadNthDayCampaignMergedData(campaignType: String = DataSets.PUSH_CAMPAIGNS, n: Int = 1, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     val date = TimeUtils.getDateAfterNDays(-(n - 1), TimeConstants.DATE_FORMAT_FOLDER, incrDate)
-    val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, "merged", DataSets.DAILY_MODE, date)
+    val mergedCampaignData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, date)
 
     mergedCampaignData
   }
