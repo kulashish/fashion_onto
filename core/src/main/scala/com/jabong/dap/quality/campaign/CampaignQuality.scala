@@ -190,7 +190,14 @@ object CampaignQuality extends Logging {
         var countNull: Long = 0
         var countNotNull: Long = 0
         val fieldNames = dataFrame.schema.fieldNames
-        if (fieldNames.contains(CustomerVariables.EMAIL)) {
+
+        if (fieldNames.contains(ContactListMobileVars.UID)) {
+          countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
+          countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
+        } else if (fieldNames.contains(CustomerVariables.UID)) {
+          countNull = dataFrame.filter(col(CustomerVariables.UID).isNull).count()
+          countNotNull = dataFrame.filter(col(CustomerVariables.UID).isNotNull).count()
+        } else if (fieldNames.contains(CustomerVariables.EMAIL)) {
           countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
           countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
         } else if (fieldNames.contains(ContactListMobileVars.EMAIL)) {
@@ -199,12 +206,6 @@ object CampaignQuality extends Logging {
         } else if (fieldNames.contains(CustomerVariables.CUSTOMER_ID)) {
           countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
           countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
-        } else if (fieldNames.contains(ContactListMobileVars.UID)) {
-          countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
-          countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
-        } else if (fieldNames.contains(CustomerVariables.UID)) {
-          countNull = dataFrame.filter(col(CustomerVariables.UID).isNull).count()
-          countNotNull = dataFrame.filter(col(CustomerVariables.UID).isNotNull).count()
         } else if (fieldNames.contains(CustomerVariables.FK_CUSTOMER)) {
           countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
           countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
