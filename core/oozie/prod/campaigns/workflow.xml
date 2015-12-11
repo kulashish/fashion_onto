@@ -164,14 +164,13 @@
         <error to="fail"/>
     </action>
 
-    <join name="ItrCmrJoin" to="campaignsStart"/>
+    <join name="ItrCmrJoin" to="campaignsStart1"/>
 
-    <fork name="campaignsStart">
+    <fork name="campaignsStart1">
         <path start="surfCampaigns" />
-        <path start="retargetCampaigns" />
+        <path start="wishlistCampaigns" />
         <path start="invalidCampaigns" />
         <path start="abandonedCartCampaigns" />
-        <path start="wishlistCampaigns" />
     </fork>
 
     <action name="surfCampaigns">
@@ -186,23 +185,23 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
 
-    <action name="retargetCampaigns">
+    <action name="wishlistCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>retargetCampaigns</argument>
+            <argument>wishlistCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
 
@@ -218,7 +217,7 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
     <action name="abandonedCartCampaigns">
@@ -233,26 +232,73 @@
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin1"/>
         <error to="fail"/>
     </action>
-    <action name="wishlistCampaigns">
+
+    <join name="campaignsJoin1" to="campaignsStart2" />
+
+    <fork name="campaignsStart2">
+        <path start="retargetCampaigns" />
+        <path start="miscellaneousCampaigns"/>
+        <path start="followUpCampaigns"/>
+    </fork>
+
+    <action name="retargetCampaigns">
         <shell xmlns="uri:oozie:shell-action:0.3">
             <exec>run.pl</exec>
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>wishlistCampaigns</argument>
+            <argument>retargetCampaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>
             <capture-output/>
         </shell>
-        <ok to="campaignsJoin"/>
+        <ok to="campaignsJoin2"/>
         <error to="fail"/>
     </action>
 
-    <join name="campaignsJoin" to="pushCampaignMerge"/>
+    <action name="miscellaneousCampaigns">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>miscellaneousCampaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin2"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="followUpCampaigns">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>followUpCampaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignsJoin2"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="campaignsJoin2" to="campaignMerge"/>
+
+
+    <fork name="campaignMerge">
+        <path start="pushCampaignMerge" />
+        <path start="emailCampaignMerge" />
+    </fork>
 
     <action name="pushCampaignMerge">
         <shell xmlns="uri:oozie:shell-action:0.3">
@@ -276,7 +322,7 @@
             <argument>-t</argument>
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
-            <argument>campaigns</argument>
+            <argument>push_campaigns</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
@@ -293,6 +339,575 @@
             <argument>${jobEnv}</argument>
             <argument>-c</argument>
             <argument>mobilePushCampaignQuality</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignMergeJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignMerge">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignMergeFeed</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>email_campaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="emailCampaignQuality"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="emailCampaignQuality">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>emailCampaignQuality</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="campaignMergeJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="campaignMergeJoin" to="emailCampaignVars"/>
+
+    <fork name="emailCampaignVars">
+        <path start="custWelcomeVoucher" />
+        <path start="custPreference" />
+        <path start="customerPreferredTimeslotPart1" />
+        <path start="customerPreferredTimeslotPart2" />
+        <path start="paybackData" />
+        <path start="custTop5" />
+        <path start="custEmailResponse" />
+        <path start="customerAppDetails" />
+    </fork>
+
+    <action name="custWelcomeVoucher">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custWelcomeVoucher</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="custPreference">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custPreference</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="customerPreferredTimeslotPart1">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerPreferredTimeslotPart1</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="customerPreferredTimeslotPart2">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerPreferredTimeslotPart2</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="custEmailResponse">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custEmailResponse</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="customerAppDetails">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerAppDetails</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="paybackData">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>paybackData</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinEmailCampaignVars"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="custTop5">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>custTop5</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="salesOrderFork"/>
+        <error to="fail"/>
+    </action>
+
+    <fork name="salesOrderFork">
+        <path start="salesOrderAddrFav" />
+        <path start="salesItemRevenue" />
+    </fork>
+
+    <action name="salesOrderAddrFav">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>salesOrderAddrFav</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinSalesOrder"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="salesItemRevenue">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>salesItemRevenue</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinSalesOrder"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="joinSalesOrder" to="customerOrders"/>
+
+    <action name="customerOrders">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerOrders</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="postCustOrderFork"/>
+        <error to="fail"/>
+    </action>
+
+    <fork name="postCustOrderFork">
+        <path start="contactListMobile" />
+        <path start="replenishmentCampaign" />
+    </fork>
+
+    <action name="contactListMobile">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>contactListMobile</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinPostCustOrder"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="replenishmentCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>replenishmentCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="replenishmentCampaignFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="replenishmentCampaignFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>replenishmentCampaignFeed</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinPostCustOrder"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="joinPostCustOrder" to="joinEmailCampaignVars"/>
+
+    <join name="joinEmailCampaignVars" to="feedFilesFtpUpload"/>
+
+    <action name="feedFilesFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>feedFiles</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calendarCampaignsStart"/>
+        <error to="fail"/>
+    </action>
+
+    <fork name="calendarCampaignsStart">
+        <path start="cityWiseData" />
+        <path start="clearanceCampaign" />
+        <path start="hottestXCampaign" />
+        <path start="pricepointCampaign" />
+        <path start="loveCalendarCampaigns" />
+        <path start="brandInCityCampaign" />
+        <path start="customerSurfAffinity"/>
+    </fork>
+
+    <action name="cityWiseData">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>cityWiseData</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="geoCampaign"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="geoCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>geoCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="clearanceCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>clearanceCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="hottestXCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>hottestXCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="pricepointCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>pricepointCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="loveCalendarCampaigns">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>loveCalendarCampaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="brandInCityCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>brandInCityCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="customerSurfAffinity">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>customerSurfAffinity</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="brickAffinityCampaign"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="brickAffinityCampaign">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>brickAffinityCampaign</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="joinCalendarCampaigns"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="joinCalendarCampaigns" to="calendarCampaignMerge"/>
+
+    <action name="calendarCampaignMerge">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendarCampaignMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calendarCampaignMergeFeed"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="calendarCampaignMergeFeed">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendarCampaignMergeFeed</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calCampaignFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="calCampaignFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendar_campaigns</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="calendarCampaignQuality"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="calendarCampaignQuality">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>calendarCampaignQuality</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="variablesQuality"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="variablesQuality">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>variablesQuality</argument>
             <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>${scriptHome}/run.pl#run.pl</file>

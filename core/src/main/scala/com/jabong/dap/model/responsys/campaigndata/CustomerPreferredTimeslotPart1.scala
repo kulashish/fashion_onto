@@ -44,7 +44,7 @@ object CustomerPreferredTimeslotPart1 extends DataFeedsModel {
     dfMap.put("clickIncr", dfClickIncr)
 
     if (null == paths) {
-      val dfCPOTPart1PrevFull = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
+      val dfCPOTPart1PrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART1, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("cpotPart1PrevFull", dfCPOTPart1PrevFull)
     }
     dfMap

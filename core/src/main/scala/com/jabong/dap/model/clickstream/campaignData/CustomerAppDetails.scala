@@ -43,14 +43,17 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
 
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
     logger.info("readDF called")
-    val salesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate) //:TODO need to check path
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
     val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
     val customerSessionIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, incrDate)
 
     val custAppDetailsPrevFull =
-      if (null != paths) getFullOnFirstDay(prevDate, cmrFull, salesOrderFull)
-      else DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, prevDate)
+      if (null != paths) {
+        val salesOrderFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.FULL_MERGE_MODE, incrDate) //:TODO need to check path
+        getFullOnFirstDay(prevDate, cmrFull, salesOrderFull)
+      } else {
+        DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.FULL_MERGE_MODE, prevDate)
+      }
 
     val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
     dfMap.put("custAppDetailsPrevFull", custAppDetailsPrevFull)

@@ -3,7 +3,7 @@
     {
       "source": "customerDeviceMapping",
       "incrMode": "daily",
-      "incrDate": "2015/11/30",
+      "incrDate": "2015/12/09",
       "path": "dcfUID",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"

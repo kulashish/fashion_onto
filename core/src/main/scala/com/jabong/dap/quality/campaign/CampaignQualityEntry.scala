@@ -2,6 +2,7 @@ package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.constants.variables.SalesOrderVariables
 import com.jabong.dap.common.time.TimeUtils
 import com.jabong.dap.data.acq.common.ParamInfo
 import grizzled.slf4j.Logging
@@ -38,13 +39,13 @@ object CampaignQualityEntry extends Logging {
 
   def loadCommonDataSets(date: String) = {
     orderItemFullData = CampaignInput.loadFullOrderItemData(date)
-    orderItem30DaysData = CampaignInput.loadLastNdaysOrderItemData(30, orderItemFullData, date).cache()
-    orderItem3DaysData = CampaignInput.loadLastNdaysOrderItemData(3, orderItem30DaysData, date)
-    orderItemData = CampaignInput.loadLastNdaysOrderItemData(1, orderItem3DaysData, date)
+    orderItem30DaysData = CampaignInput.loadLastNDaysTableData(30, orderItemFullData, SalesOrderVariables.UPDATED_AT, date).cache()
+    orderItem3DaysData = CampaignInput.loadLastNDaysTableData(3, orderItem30DaysData, SalesOrderVariables.UPDATED_AT, date)
+    orderItemData = CampaignInput.loadLastNDaysTableData(1, orderItem3DaysData, SalesOrderVariables.UPDATED_AT, date)
     fullOrderData = CampaignInput.loadFullOrderData(date)
-    last30DaysOrderData = CampaignInput.loadLastNdaysOrderData(30, fullOrderData, date).cache()
+    last30DaysOrderData = CampaignInput.loadLastNDaysTableData(30, fullOrderData, SalesOrderVariables.CREATED_AT, date).cache()
     salesCart30DaysData = CampaignInput.loadLast30daysAcartData(date).cache()
-    salesCart3rdDayData = CampaignInput.loadNthdayAcartData(3, salesCart30DaysData)
+    salesCart3rdDayData = CampaignInput.loadNthDayTableData(3, salesCart30DaysData, SalesOrderVariables.CREATED_AT)
     yestSessionData = CampaignInput.loadYesterdaySurfSessionData()
   }
 

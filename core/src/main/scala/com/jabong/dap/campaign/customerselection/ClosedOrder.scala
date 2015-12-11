@@ -26,7 +26,7 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
 
     }
 
-    val dfClosedOrder = yesterdaySalesOrderItemData.filter(yesterdaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) === OrderStatus.CLOSED_ORDER)
+    val dfClosedOrder = yesterdaySalesOrderItemData.filter(yesterdaySalesOrderItemData(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) === OrderStatus.CLOSED)
       .select(SalesOrderItemVariables.FK_SALES_ORDER, SalesOrderItemVariables.SKU)
 
     val groupedSalesOrderItem = yesterdaySalesOrderItemData.groupBy(SalesOrderItemVariables.FK_SALES_ORDER).agg(max(SalesOrderItemVariables.FK_SALES_ORDER_ITEM_STATUS) as MAX_STATUS,
@@ -36,7 +36,7 @@ class ClosedOrder extends LiveCustomerSelector with Logging {
         col(MAX_STATUS),
         col(MIN_STATUS)
       )
-    val filterdSalesOrderItem = groupedSalesOrderItem.filter(groupedSalesOrderItem(MAX_STATUS) === OrderStatus.CLOSED_ORDER and groupedSalesOrderItem(MIN_STATUS) === OrderStatus.CLOSED_ORDER)
+    val filterdSalesOrderItem = groupedSalesOrderItem.filter(groupedSalesOrderItem(MAX_STATUS) === OrderStatus.CLOSED and groupedSalesOrderItem(MIN_STATUS) === OrderStatus.CLOSED)
 
     //FIXME: optimize
     val dfJoin = dfClosedOrder.join(filterdSalesOrderItem, filterdSalesOrderItem(SalesOrderItemVariables.FK_SALES_ORDER + CLOSED) === dfClosedOrder(SalesOrderItemVariables.FK_SALES_ORDER), SQL.INNER)

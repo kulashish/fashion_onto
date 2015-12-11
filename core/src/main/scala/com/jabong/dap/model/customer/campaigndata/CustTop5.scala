@@ -64,8 +64,6 @@ object CustTop5 extends DataFeedsModel {
       mode = DataSets.DAILY_MODE
       val custTop5MapPrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
       dfMap.put("custTop5MapPrevFull", custTop5MapPrevFull)
-      val custTop5PrevFull = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, prevDate)
-      dfMap.put("custTop5PrevFull", custTop5PrevFull)
     }
     var salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, mode, incrDate)
     var salesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, mode, incrDate)
@@ -84,7 +82,6 @@ object CustTop5 extends DataFeedsModel {
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
     val top5MapPrevFull = dfMap.getOrElse("custTop5MapPrevFull", null)
-    val top5PrevFull = dfMap.getOrElse("custTop5PrevFull", null)
     var salesOrderIncr = dfMap("salesOrderIncr")
     var salesOrderItemIncr = dfMap("salesOrderItemIncr")
     val cmrFull = dfMap("cmrFull")
@@ -104,7 +101,6 @@ object CustTop5 extends DataFeedsModel {
     dfWrite.put("custTop5MapFull", custTop5MapFull)
     //println("Full COUNT:-" + custTop5Full.count())
     dfWrite.put("custTop5MapPrevFull", top5MapPrevFull)
-    dfWrite.put("custTop5PrevFull", top5PrevFull)
     dfWrite.put("cmrFull", cmrFull)
     dfWrite
   }
@@ -112,7 +108,6 @@ object CustTop5 extends DataFeedsModel {
   def write(dfWrite: HashMap[String, DataFrame], saveMode: String, incrDate: String) = {
     val custTop5MapPrevFull = dfWrite.getOrElse("custTop5MapPrevFull", null)
     val custTop5MapFull = dfWrite("custTop5MapFull")
-    val custTop5PrevFull = dfWrite.getOrElse("custTop5PrevFull", null)
     val cmrFull = dfWrite("cmrFull")
 
     val fullMapPath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.MAPS, DataSets.CUST_TOP5, DataSets.FULL_MERGE_MODE, incrDate)
