@@ -22,7 +22,7 @@ object DataWriter extends Logging {
    * @param date
    */
   def writeCsv(df: DataFrame, source: String, tableName: String, mode: String, date: String, csvFileName: String,
-               saveMode: String, header: String, delimeter: String, numParts: Int = 1) {
+               saveMode: String, header: String, delimeter: String, numParts: Int) {
     val writePath = DataWriter.getWritePath(ConfigConstants.TMP_PATH, source, tableName, mode, date)
     if (DataWriter.canWrite(saveMode, writePath)) {
       DataWriter.writeCsv(df, writePath, saveMode, header, delimeter, numParts)
@@ -34,7 +34,11 @@ object DataWriter extends Logging {
       } else {
         //TODO This will work only till 9 partitions. Will need to fix in case we hit more than 9 partitions.
         for (n <- 0 to numParts - 1) {
-          csvSrcFile = writePath + File.separator + "part-0000" + n
+          if (n > 9) {
+            csvSrcFile = writePath + File.separator + "part-000" + n
+          } else {
+            csvSrcFile = writePath + File.separator + "part-0000" + n
+          }
           csvdestFile = writePath + File.separator + csvFileName + "_" + n + ".csv"
           DataVerifier.rename(csvSrcFile, csvdestFile)
         }

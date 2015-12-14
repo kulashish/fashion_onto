@@ -70,7 +70,7 @@ object CampaignOutput {
           )
 
         val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, incrDate, fileDate + "_replenishment", DataSets.IGNORE_SAVEMODE, "true", ";")
+        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, incrDate, fileDate + "_replenishment", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
       } else {
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
           DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
@@ -84,7 +84,7 @@ object CampaignOutput {
       saveTestData(campaignOutput, campaignName, campaignType)
     } else {
       val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-      DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday, fileName, DataSets.IGNORE_SAVEMODE, "true", ",")
+      DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday, fileName, DataSets.IGNORE_SAVEMODE, "true", ",", 1)
     }
   }
 
@@ -133,7 +133,7 @@ object CampaignOutput {
       .drop(CampaignMergedFields.LIVE_CART_URL)
       .drop(CampaignMergedFields.CUSTOMER_ID)
 
-    DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
     return acartOutData
   }
