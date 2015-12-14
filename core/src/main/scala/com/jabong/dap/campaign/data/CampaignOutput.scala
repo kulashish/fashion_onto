@@ -57,12 +57,17 @@ object CampaignOutput {
       } else if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
         DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
         val campaignCsv = campaignOutput
-          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-          .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
-          .drop(CampaignMergedFields.EMAIL)
-        //.drop(CampaignMergedFields.CUSTOMER_ID)
+          .select(
+            ContactListMobileVars.EMAIL,
+            CampaignMergedFields.PURCHASED_DATE,
+            CampaignMergedFields.LIVE_REF_SKU1,
+            CampaignMergedFields.CATEGORY,
+            CampaignMergedFields.BRICK,
+            CampaignMergedFields.BRAND,
+            CampaignMergedFields.PRODUCT_GENDER,
+            ContactListMobileVars.UID,
+            CampaignMergedFields.REC_SKU
+          )
 
         val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
         DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, incrDate, fileDate + "_replenishment", DataSets.IGNORE_SAVEMODE, "true", ";")

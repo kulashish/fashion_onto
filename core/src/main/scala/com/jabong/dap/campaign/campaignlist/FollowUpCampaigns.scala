@@ -28,7 +28,12 @@ class FollowUpCampaigns {
 
     CampaignOutput.saveCampaignData(refSku2Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, DataSets.EMAIL_CAMPAIGNS, incrDate)
 
+    val dfCSV = refSku2Out
+      .drop(CampaignMergedFields.CUSTOMER_ID)
+      .drop(CampaignMergedFields.REC_SKUS)
+      .drop(CampaignMergedFields.REF_SKUS)
+
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    CampaignOutput.saveCampaignCSVForYesterday(refSku2Out, CampaignCommon.FOLLOW_UP_CAMPAIGNS, fileDate + "_live_campaign_followup", DataSets.EMAIL_CAMPAIGNS)
+    CampaignOutput.saveCampaignCSVForYesterday(dfCSV, CampaignCommon.FOLLOW_UP_CAMPAIGNS, fileDate + "_live_campaign_followup", DataSets.EMAIL_CAMPAIGNS)
   }
 }
