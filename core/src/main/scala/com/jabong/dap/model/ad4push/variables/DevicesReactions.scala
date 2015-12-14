@@ -107,7 +107,7 @@ object DevicesReactions extends Logging {
     }
 
     val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + incrDateInFileFormat
-    DataWriter.writeCsv(unionFinalDF, DataSets.AD4PUSH, DataSets.CUSTOMER_RESPONSE, DataSets.FULL, incrDate, filename, saveMode, "true", ",")
+    DataWriter.writeCsv(unionFinalDF, DataSets.AD4PUSH, DataSets.CUSTOMER_RESPONSE, DataSets.FULL, incrDate, filename, saveMode, "true", ",", 1)
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {
@@ -145,7 +145,7 @@ object DevicesReactions extends Logging {
 
     val effective = effectiveDFFull(reducedIncr, reduced7, reduced15, reduced30).withColumnRenamed(CustomerVariables.CUSTOMER_ID, CustomerVariables.CUSTOMER_ID)
 
-    val joinedDF = MergeUtils.joinOldAndNew(effective, Ad4pushSchema.effectiveDF, full, Ad4pushSchema.deviceReaction, List((CustomerVariables.DEVICE_ID,CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID,CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
+    val joinedDF = MergeUtils.joinOldAndNew(effective, Ad4pushSchema.effectiveDF, full, Ad4pushSchema.deviceReaction, List((CustomerVariables.DEVICE_ID, CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID, CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
       .na.fill(
         Map(
           CustomerVariables.CLICK_7 -> 0,
@@ -225,7 +225,7 @@ object DevicesReactions extends Logging {
     //send DataFrames after using reduce
 
     val joined_7_15 = MergeUtils.joinOldAndNew(effective15, Ad4pushSchema.reducedDF, effective7,
-      Ad4pushSchema.reducedDF, List((CustomerVariables.DEVICE_ID,CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID,CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
+      Ad4pushSchema.reducedDF, List((CustomerVariables.DEVICE_ID, CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID, CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
       .na.fill(
         Map(
           CustomerVariables.REACTION -> 0,
@@ -239,7 +239,7 @@ object DevicesReactions extends Logging {
       col(new_reaction) as CustomerVariables.EFFECTIVE_15_DAYS)
 
     val joined_7_15_30 = MergeUtils.joinOldAndNew(effective30, Ad4pushSchema.reducedDF, joined_7_15_summary,
-      Ad4pushSchema.joined_7_15, List((CustomerVariables.DEVICE_ID,CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID,CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
+      Ad4pushSchema.joined_7_15, List((CustomerVariables.DEVICE_ID, CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID, CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
       .na.fill(
         Map(
           CustomerVariables.EFFECTIVE_7_DAYS -> 0,
@@ -255,7 +255,7 @@ object DevicesReactions extends Logging {
       col(CustomerVariables.EFFECTIVE_15_DAYS) as CustomerVariables.EFFECTIVE_15_DAYS,
       col(new_reaction) as CustomerVariables.EFFECTIVE_30_DAYS)
 
-    val joinedAll = MergeUtils.joinOldAndNew(incremental, Ad4pushSchema.reducedDF, joined_7_15_30_summary, Ad4pushSchema.joined_7_15_30, List((CustomerVariables.DEVICE_ID,CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID,CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
+    val joinedAll = MergeUtils.joinOldAndNew(incremental, Ad4pushSchema.reducedDF, joined_7_15_30_summary, Ad4pushSchema.joined_7_15_30, List((CustomerVariables.DEVICE_ID, CustomerVariables.DEVICE_ID), (CustomerVariables.CUSTOMER_ID, CustomerVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
       .na.fill(
         Map(
           new_reaction -> 0,

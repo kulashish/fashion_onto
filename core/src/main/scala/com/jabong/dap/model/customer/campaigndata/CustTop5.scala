@@ -161,7 +161,7 @@ object CustTop5 extends DataFeedsModel {
     var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(custTop5Csv, savePath, saveMode)
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(custTop5Csv, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(custTop5Csv, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
     val categoryCntCsv = categoryCount.join(cmrFull, categoryCount(CustomerVariables.FK_CUSTOMER) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
       .select(
@@ -185,7 +185,7 @@ object CustTop5 extends DataFeedsModel {
       )
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(categoryCntCsv, savePath, saveMode)
-    DataWriter.writeCsv(categoryCntCsv, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(categoryCntCsv, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
     val categoryAvgCsv = categoryAVG.join(cmrFull, categoryAVG(CustomerVariables.FK_CUSTOMER) === cmrFull(CustomerVariables.ID_CUSTOMER), SQL.LEFT_OUTER)
       .select(
@@ -209,7 +209,7 @@ object CustTop5 extends DataFeedsModel {
       )
     savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(categoryAvgCsv, savePath, saveMode)
-    DataWriter.writeCsv(categoryAvgCsv, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(categoryAvgCsv, DataSets.VARIABLES, DataSets.CAT_AVG, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_PRICE", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
   }
 
   def calcTop5(top5Incr: DataFrame, incrDate: String): (DataFrame, DataFrame, DataFrame) = {
