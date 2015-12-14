@@ -2,8 +2,8 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CrmTicketVariables, SalesOrderVariables }
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.constants.variables.{CrmTicketVariables, SalesOrderVariables}
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -11,8 +11,6 @@ import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-import scala.annotation.elidable
-import scala.annotation.elidable._
 import scala.collection.mutable
 
 /**
@@ -57,7 +55,7 @@ object WinbackData extends DataFeedsModel {
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     val savePathIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(result, savePathIncr, saveMode)
-    DataWriter.writeCsv(result, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate, fileDate + "winback_customer_data", saveMode, "true", ";")
+    DataWriter.writeCsv(result, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate, fileDate + "winback_customer_data", saveMode, "true", ";", 1)
   }
 
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {

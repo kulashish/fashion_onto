@@ -172,7 +172,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     }
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(custEmailResCsv, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_EMAIL_RESPONSE", saveMode, "true", ";")
+    DataWriter.writeCsv(custEmailResCsv, DataSets.VARIABLES, DataSets.CUST_EMAIL_RESPONSE, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_EMAIL_RESPONSE", saveMode, "true", ";", 1)
 
   }
 

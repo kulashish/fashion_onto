@@ -250,8 +250,8 @@ object CampaignProcessor {
       val filenameI = "staticlist_" + fileI + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       val filenameA = "staticlist_" + fileA + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
 
-      DataWriter.writeCsv(iosSplitDF, DataSets.PUSH_CAMPAIGNS, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";")
-      DataWriter.writeCsv(androidSplitDF, DataSets.PUSH_CAMPAIGNS, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";")
+      DataWriter.writeCsv(iosSplitDF, DataSets.PUSH_CAMPAIGNS, fileI, DataSets.DAILY_MODE, date, filenameI, saveMode, "true", ";", 1)
+      DataWriter.writeCsv(androidSplitDF, DataSets.PUSH_CAMPAIGNS, fileA, DataSets.DAILY_MODE, date, filenameA, saveMode, "true", ";", 1)
     }
   }
 
@@ -283,7 +283,7 @@ object CampaignProcessor {
     //    dfResult.printSchema()
     //    dfResult.show(10)
 
-    DataWriter.writeCsv(dfResult, DataSets.PUSH_CAMPAIGNS, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";")
+    DataWriter.writeCsv(dfResult, DataSets.PUSH_CAMPAIGNS, tablename, DataSets.DAILY_MODE, date, fileName, saveMode, "true", ";", 1)
   }
 
   def addAd4pushId(ad4push: DataFrame, campaigns: DataFrame): DataFrame = {

@@ -107,7 +107,7 @@ object DevicesReactions extends Logging {
     }
 
     val filename = DataSets.AD4PUSH + "_" + DataSets.CUSTOMER_RESPONSE + "_" + incrDateInFileFormat
-    DataWriter.writeCsv(unionFinalDF, DataSets.AD4PUSH, DataSets.CUSTOMER_RESPONSE, DataSets.FULL, incrDate, filename, saveMode, "true", ",")
+    DataWriter.writeCsv(unionFinalDF, DataSets.AD4PUSH, DataSets.CUSTOMER_RESPONSE, DataSets.FULL, incrDate, filename, saveMode, "true", ",", 1)
   }
 
   def dfCorrectSchema(df: DataFrame): DataFrame = {

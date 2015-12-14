@@ -829,6 +829,6 @@ object CampaignManager extends Serializable with Logging {
       .drop(CampaignMergedFields.REF_SKUS)
       .drop(CampaignMergedFields.REC_SKUS)
 
-    DataWriter.writeCsv(csvDataFrame, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";")
+    DataWriter.writeCsv(csvDataFrame, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";", 1)
   }
 }
