@@ -1,20 +1,20 @@
 package com.jabong.dap.quality.campaign
 
 import com.jabong.dap.campaign.manager.CampaignManager
-import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields}
+import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables }
 import com.jabong.dap.common.mail.ScalaMail
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
-import com.jabong.dap.common.{OptionUtils, Spark}
-import com.jabong.dap.data.acq.common.{CampaignInfo, DbConnection}
-import com.jabong.dap.data.read.{DataReader, PathBuilder}
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.{ OptionUtils, Spark }
+import com.jabong.dap.data.acq.common.{ CampaignInfo, DbConnection }
+import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row, SaveMode}
+import org.apache.spark.sql.{ DataFrame, Row, SaveMode }
 
 import scala.collection.mutable.ListBuffer
 
