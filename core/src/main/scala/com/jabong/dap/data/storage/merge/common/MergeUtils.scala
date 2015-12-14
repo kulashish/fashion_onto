@@ -4,7 +4,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.schema.SchemaUtils
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{Column, DataFrame, Row}
+import org.apache.spark.sql.{ Column, DataFrame, Row }
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */
@@ -83,14 +83,14 @@ object MergeUtils extends MergeData {
    * @param joinType default is given for unambiguity
    * @return return the result with newDF schema renamed with prefix "new_" to each field name
    */
-  def joinOldAndNew(newDF:DataFrame, newSchema:StructType, oldDF: DataFrame, oldSchema:StructType, keys: List[(String, String)], joinType: String): DataFrame ={
-    if(keys.length<1) return null
+  def joinOldAndNew(newDF: DataFrame, newSchema: StructType, oldDF: DataFrame, oldSchema: StructType, keys: List[(String, String)], joinType: String): DataFrame = {
+    if (keys.length < 1) return null
 
     val oldNullSafe = if (null == oldDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], oldSchema) else oldDF
     val newNullSafe = if (null == newDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], newSchema) else newDF
 
     val newDFNullSafeRenamed = SchemaUtils.renameCols(newNullSafe, NEW_)
-    val joinExpr:Column = keys.slice(1,keys.size).foldLeft(oldNullSafe(keys(0)._1) <=> newDFNullSafeRenamed(NEW_ + keys(0)._2))((m: Column, n: (String, String)) => m && oldNullSafe(n._1) <=> newDFNullSafeRenamed(NEW_ + n._2))
+    val joinExpr: Column = keys.slice(1, keys.size).foldLeft(oldNullSafe(keys(0)._1) <=> newDFNullSafeRenamed(NEW_ + keys(0)._2))((m: Column, n: (String, String)) => m && oldNullSafe(n._1) <=> newDFNullSafeRenamed(NEW_ + n._2))
     oldNullSafe.join(newDFNullSafeRenamed, joinExpr, joinType)
   }
 

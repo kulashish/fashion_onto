@@ -56,7 +56,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val outputCsvFormat = udf((s: String) => TimeUtils.changeDateFormat(s: String, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT))
 
     val joinedDf = MergeUtils.joinOldAndNew(aggClickData, CustEmailSchema.effectiveSchema,
-      aggOpenData, CustEmailSchema.effectiveSchema, List((EmailResponseVariables.CUSTOMER_ID,EmailResponseVariables.CUSTOMER_ID), (EmailResponseVariables.CUSTOMER_ID,EmailResponseVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
+      aggOpenData, CustEmailSchema.effectiveSchema, List((EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID), (EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)), SQL.FULL_OUTER)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as ContactListMobileVars.UID,
         outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
         col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
