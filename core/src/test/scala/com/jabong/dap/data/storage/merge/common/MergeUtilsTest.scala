@@ -6,7 +6,7 @@ import com.jabong.dap.common.constants.variables.CustomerVariables
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.data.storage.DataSets
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.types.{StringType, LongType, StructField, StructType}
+import org.apache.spark.sql.types.{ StringType, LongType, StructField, StructType }
 import org.scalatest.FlatSpec
 
 class MergeUtilsTest extends FlatSpec with SharedSparkContext {
@@ -50,7 +50,6 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     assert(mergedDF.collect.size == 3)
   }
 
-
   "joinOldAndNew" should "return correct result" in {
     val expectedSchema = StructType(Array(
       StructField("age", LongType, true),
@@ -63,17 +62,17 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     val newSchema = StructType(Array(
       StructField("age", LongType, true),
       StructField("name", StringType, true)))
-    val keys = List(("name", "name"),("age","age"))
-    val inner = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.INNER)
-    val leftOuter = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.LEFT_OUTER)
-    val fullOuter = MergeUtils.joinOldAndNew(newDF, newSchema,oldDF, oldSchema, keys,SQL.FULL_OUTER)
+    val keys = List(("name", "name"), ("age", "age"))
+    val inner = MergeUtils.joinOldAndNew(newDF, newSchema, oldDF, oldSchema, keys, SQL.INNER)
+    val leftOuter = MergeUtils.joinOldAndNew(newDF, newSchema, oldDF, oldSchema, keys, SQL.LEFT_OUTER)
+    val fullOuter = MergeUtils.joinOldAndNew(newDF, newSchema, oldDF, oldSchema, keys, SQL.FULL_OUTER)
     assert(inner.count() == 4)
     assert(leftOuter.count() == 6)
     assert(fullOuter.count() == 7)
 
     assert(inner.schema == leftOuter.schema && leftOuter.schema == fullOuter.schema && fullOuter.schema == expectedSchema)
 
-    val mergedNewNull1 = MergeUtils.joinOldAndNew(newDF, newSchema, null, oldSchema,  keys, SQL.FULL_OUTER)
+    val mergedNewNull1 = MergeUtils.joinOldAndNew(newDF, newSchema, null, oldSchema, keys, SQL.FULL_OUTER)
     assert(mergedNewNull1.collect().size == 5)
 
     val mergedNewNull2 = MergeUtils.joinOldAndNew(null, newSchema, oldDF, oldSchema, keys, SQL.FULL_OUTER)
