@@ -275,6 +275,8 @@ sub upload_email_campaigns_decryptFeedFiles {
 
 
 sub upload_email_campaigns_feedFiles {
+    chdir("/data/responsys/");
+
     my $base = "/tmp/$date_with_zero/feedFiles";
     print "directory is $base\n";
     system("mkdir -p $base");
@@ -345,7 +347,7 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*; bye\"");
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
@@ -378,7 +380,9 @@ sub upload_email_campaigns {
 
     $status ||= removeNull("$base/$followUp_filename");
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*; bye\"");
+    chdir("/data/responsys/");
+
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
@@ -413,7 +417,9 @@ sub upload_calendar_replenish_campaigns {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filename; bye\"");
+    chdir("/data/responsys/");
+
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filename;'");
     $calendar_status ||= $?;
 
     #rename and upload Replenish file for decryption of email
@@ -445,7 +451,9 @@ sub upload_acart_hourly_campaign {
 
     $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*; bye\"");
+    chdir("/data/responsys/");
+
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*;'");
     $acart_hourly_status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
