@@ -132,7 +132,7 @@ object CampaignInput extends Logging {
   def loadYesterdayItrSimpleData(incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
     var n = 0
     var itrSimpleData: DataFrame = null
-    while (n < 7 && itrSimpleData == null) {
+    while (n < 2 && itrSimpleData == null) {
       val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       n = n + 1
       itrSimpleData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
