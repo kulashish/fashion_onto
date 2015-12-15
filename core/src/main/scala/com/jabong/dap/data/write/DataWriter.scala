@@ -9,7 +9,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, DataFrame, SaveMode}
+import org.apache.spark.sql.{ Row, DataFrame, SaveMode }
 import sys.process._
 
 /**
@@ -104,21 +104,20 @@ object DataWriter extends Logging {
     true
   }
 
-
-  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, numPartitions: Int=1): Unit = {
+  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, numPartitions: Int = 1): Unit = {
     val cols = df.columns
-    val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter)).coalesce(1)
+    val map1 = df.map(e => (addExtraQuotes(e))).map(e => e.mkString(delimiter)).coalesce(1)
     val map2 = Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter)))
-    if(canWrite(saveMode, savePath)){
+    if (canWrite(saveMode, savePath)) {
       map1.coalesce(1).saveAsTextFile(savePath)
-      map2.coalesce(1).saveAsTextFile(savePath+"/header")
+      map2.coalesce(1).saveAsTextFile(savePath + "/header")
     }
   }
 
-  def addExtraQuotes(row: Row): Row={
+  def addExtraQuotes(row: Row): Row = {
     var s = new Array[String](row.size)
-    for(i<- 0 to (row.size-1)){
-        s(i) = "\""+row(i)+"\""
+    for (i <- 0 to (row.size - 1)) {
+      s(i) = "\"" + row(i) + "\""
     }
     Row.fromSeq(s)
   }
