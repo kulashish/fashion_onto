@@ -323,7 +323,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     }
 
     val joined_7_15 = MergeUtils.joinOldAndNew(effective15, CustEmailSchema.reqCsvDf,
-      effective7, CustEmailSchema.reqCsvDf, List((ContactListMobileVars.UID,ContactListMobileVars.UID)), SQL.FULL_OUTER)
+      effective7, CustEmailSchema.reqCsvDf, List((ContactListMobileVars.UID, ContactListMobileVars.UID)), SQL.FULL_OUTER)
 
     val joined_7_15_summary = joined_7_15.select(
       coalesce(col(MergeUtils.NEW_ + ContactListMobileVars.UID), col(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
