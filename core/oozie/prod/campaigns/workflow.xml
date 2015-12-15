@@ -683,6 +683,22 @@
             <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
             <capture-output/>
         </shell>
+        <ok to="decryptFeedFilesFtpUpload"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="decryptFeedFilesFtpUpload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>ftp_upload.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>decryptFeedFiles</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/ftp_upload.pl#ftp_upload.pl</file>
+            <capture-output/>
+        </shell>
         <ok to="calendarCampaignsStart"/>
         <error to="fail"/>
     </action>
