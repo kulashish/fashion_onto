@@ -143,9 +143,12 @@ object CustomerDeviceMapping extends Logging {
           nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
         } else if ("dcfUID".equals(path)) {
-          val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+          // val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+          // val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
+          // prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
+          val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, curDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
           val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
-            prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
+            curDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
             .select(
               col(ContactListMobileVars.UID),
               col(ContactListMobileVars.EMAIL)
