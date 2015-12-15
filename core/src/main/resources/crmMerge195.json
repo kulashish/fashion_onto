@@ -41,13 +41,6 @@
       "primaryKey": "TicketStatusLogID",
       "mergeMode": "full",
       "saveMode": "Ignore"
-    },
-    {
-      "source": "crm",
-      "tableName": "CRM_TicketMaster",
-      "primaryKey": "IssueID",
-      "mergeMode": "full",
-      "saveMode": "Ignore"
     }
   ]
 }

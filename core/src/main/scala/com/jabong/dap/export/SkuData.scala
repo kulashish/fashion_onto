@@ -41,7 +41,7 @@ object SkuData {
     }
 
     val filename = DataSets.SKU_DATA + "_" + DataSets.PRICING + "_" + TimeUtils.changeDateFormat(date, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(result, DataSets.SKU_DATA, DataSets.PRICING, DataSets.DAILY_MODE, date, filename, saveMode, "true", ";")
+    DataWriter.writeCsv(result, DataSets.SKU_DATA, DataSets.PRICING, DataSets.DAILY_MODE, date, filename, saveMode, "true", ";", 1)
   }
 
   def skuBasedProcess(df: DataFrame, date: String): DataFrame = {

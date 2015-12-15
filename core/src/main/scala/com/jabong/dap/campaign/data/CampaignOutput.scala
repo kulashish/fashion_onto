@@ -56,16 +56,31 @@ object CampaignOutput {
         //        DataWriter.writeCsv(campaignCsvOutput, campaignType, campaignName, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
       } else if (campaignName.equals(CampaignCommon.REPLENISHMENT_CAMPAIGN)) {
         DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
+
         val campaignCsv = campaignOutput
-          .drop(CampaignMergedFields.CAMPAIGN_MAIL_TYPE)
-          .drop(CampaignMergedFields.REC_SKUS)
-          .drop(CampaignMergedFields.REF_SKUS)
-          .drop(CampaignMergedFields.LIVE_MAIL_TYPE)
-          .drop(CampaignMergedFields.EMAIL)
-        //.drop(CampaignMergedFields.CUSTOMER_ID)
+          .select(
+            ContactListMobileVars.EMAIL,
+            CampaignMergedFields.PURCHASED_DATE,
+            CampaignMergedFields.LIVE_REF,
+            CampaignMergedFields.CATEGORY,
+            CampaignMergedFields.BRICK,
+            CampaignMergedFields.BRAND,
+            CampaignMergedFields.PRODUCT_GENDER,
+            ContactListMobileVars.UID,
+            CampaignMergedFields.REC_SKU + "1",
+            CampaignMergedFields.REC_SKU + "2",
+            CampaignMergedFields.REC_SKU + "3",
+            CampaignMergedFields.REC_SKU + "4",
+            CampaignMergedFields.REC_SKU + "5",
+            CampaignMergedFields.REC_SKU + "6",
+            CampaignMergedFields.REC_SKU + "7",
+            CampaignMergedFields.REC_SKU + "8"
+          )
+
+        CampaignUtils.debug(campaignCsv, "campaignCsv")
 
         val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, incrDate, fileDate + "_replenishment", DataSets.IGNORE_SAVEMODE, "true", ";")
+        DataWriter.writeCsv(campaignCsv, campaignType, campaignName, DataSets.DAILY_MODE, incrDate, fileDate + "_replenishment", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
       } else {
         if (DataWriter.canWrite(DataSets.IGNORE_SAVEMODE, path)) {
           DataWriter.writeParquet(campaignOutput, path, DataSets.IGNORE_SAVEMODE)
@@ -79,7 +94,7 @@ object CampaignOutput {
       saveTestData(campaignOutput, campaignName, campaignType)
     } else {
       val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-      DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday, fileName, DataSets.IGNORE_SAVEMODE, "true", ",")
+      DataWriter.writeCsv(campaignOutput, campaignType, campaignName, DataSets.DAILY_MODE, dateYesterday, fileName, DataSets.IGNORE_SAVEMODE, "true", ",", 1)
     }
   }
 
@@ -128,7 +143,7 @@ object CampaignOutput {
       .drop(CampaignMergedFields.LIVE_CART_URL)
       .drop(CampaignMergedFields.CUSTOMER_ID)
 
-    DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";")
+    DataWriter.writeCsv(campaignCsvOutput, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER, acartHourlyFileName, DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
     return acartOutData
   }

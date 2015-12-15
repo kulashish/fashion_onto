@@ -1,6 +1,5 @@
 package com.jabong.dap.quality.campaign
 
-import com.jabong.dap.campaign.data.CampaignOutput
 import com.jabong.dap.campaign.manager.CampaignManager
 import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields }
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -12,7 +11,6 @@ import com.jabong.dap.data.acq.common.{ CampaignInfo, DbConnection }
 import com.jabong.dap.data.read.{ DataReader, PathBuilder }
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
-import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -64,6 +62,14 @@ object CampaignQuality extends Logging {
         list.appendAll(getCampaignQuality(campaignDetails.campaignName, dateYesterday, campaignType))
       }
 
+      if (campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
+        list.appendAll(getCampaignQuality(CampaignCommon.REPLENISHMENT_CAMPAIGN, dateYesterday, campaignType))
+      }
+
+      if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS)) {
+        list.appendAll(getCampaignQuality(CampaignCommon.FOLLOW_UP_CAMPAIGNS, dateYesterday, campaignType))
+      }
+
       val rdd = Spark.getContext().parallelize[Row](list.toSeq)
       val dfCampaignQuality = Spark.getSqlContext().createDataFrame(rdd, schema)
 
@@ -102,9 +108,7 @@ object CampaignQuality extends Logging {
         writeForJDaRe(df.withColumn("date", lit(TimeUtils.changeDateFormat(dateYesterday, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.DATE_FORMAT))), campaignType + "_quality")
 
       }
-
     }
-
   }
 
   def sendMail(df: DataFrame, campaignType: String, date: String) = {
@@ -179,41 +183,33 @@ object CampaignQuality extends Logging {
 
       } else {
 
-        if (campaignType.equals(DataSets.PUSH_CAMPAIGNS)) {
-          val countZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
-          val countNonZeroFkCustomer = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
-          row = Row(campaignName, dataFrame.count(), countZeroFkCustomer, countNonZeroFkCustomer, zero, zero, zero, zero)
-        } else if (campaignType.equals(DataSets.EMAIL_CAMPAIGNS) || campaignType.equals(DataSets.CALENDAR_CAMPAIGNS)) {
+        var countNull: Long = 0
+        var countNotNull: Long = 0
+        val fieldNames = dataFrame.schema.fieldNames
 
-          val countNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
-          val countNonNullEmail = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
-          row = Row(campaignName, dataFrame.count(), countNullEmail, countNonNullEmail, zero, zero, zero, zero)
+        if (fieldNames.contains(ContactListMobileVars.UID)) {
+          countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
+          countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
+        } else if (fieldNames.contains(CustomerVariables.UID)) {
+          countNull = dataFrame.filter(col(CustomerVariables.UID).isNull).count()
+          countNotNull = dataFrame.filter(col(CustomerVariables.UID).isNotNull).count()
+        } else if (fieldNames.contains(CustomerVariables.EMAIL)) {
+          countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
+          countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
+        } else if (fieldNames.contains(ContactListMobileVars.EMAIL)) {
+          countNull = dataFrame.filter(col(ContactListMobileVars.EMAIL).isNull).count()
+          countNotNull = dataFrame.filter(col(ContactListMobileVars.EMAIL).isNotNull).count()
+        } else if (fieldNames.contains(CustomerVariables.CUSTOMER_ID)) {
+          countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
+          countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
+        } else if (fieldNames.contains(CustomerVariables.FK_CUSTOMER)) {
+          countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
+          countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
         } else {
-
-          var countNull: Long = 0
-          var countNotNull: Long = 0
-          val fieldNames = dataFrame.schema.fieldNames
-          if (fieldNames.contains(CustomerVariables.EMAIL)) {
-            countNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNull).count()
-            countNotNull = dataFrame.filter(col(CustomerVariables.EMAIL).isNotNull).count()
-          } else if (fieldNames.contains(CustomerVariables.CUSTOMER_ID)) {
-            countNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNull).count()
-            countNotNull = dataFrame.filter(col(CustomerVariables.CUSTOMER_ID).isNotNull).count()
-          } else if (fieldNames.contains(ContactListMobileVars.UID)) {
-            countNull = dataFrame.filter(col(ContactListMobileVars.UID).isNull).count()
-            countNotNull = dataFrame.filter(col(ContactListMobileVars.UID).isNotNull).count()
-          } else if (fieldNames.contains(CustomerVariables.UID)) {
-            countNull = dataFrame.filter(col(CustomerVariables.UID).isNull).count()
-            countNotNull = dataFrame.filter(col(CustomerVariables.UID).isNotNull).count()
-          } else if (fieldNames.contains(CustomerVariables.FK_CUSTOMER)) {
-            countNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNull || col(CustomerVariables.FK_CUSTOMER).leq(0)).count()
-            countNotNull = dataFrame.filter(col(CustomerVariables.FK_CUSTOMER).isNotNull && col(CustomerVariables.FK_CUSTOMER).gt(0)).count()
-          } else {
-            countNotNull = dataFrame.count()
-          }
-
-          row = Row(campaignName, dataFrame.count(), countNull, countNotNull, zero, zero, zero, zero)
+          countNotNull = dataFrame.count()
         }
+
+        row = Row(campaignName, dataFrame.count(), countNull, countNotNull, zero, zero, zero, zero)
 
         list += row
       }

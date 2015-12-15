@@ -139,7 +139,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
       DataWriter.writeParquet(custAppDetailsIncr, incrSavePath, saveMode)
     }
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(custAppDetailsIncr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_App_details", saveMode, "true", ";")
+    DataWriter.writeCsv(custAppDetailsIncr, DataSets.VARIABLES, DataSets.CUSTOMER_APP_DETAILS, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_App_details", saveMode, "true", ";", 1)
   }
 
   def getFullOnFirstDay(date: String, cmr: DataFrame, salesOrderFull: DataFrame): DataFrame = {

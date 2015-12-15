@@ -51,7 +51,7 @@ object DcfFeedGenerator extends Logging {
 
     DataWriter.writeParquet(joinedData, writePath, saveMode)
 
-    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat + "_1", DataSets.ERROR_SAVEMODE, "false", ",")
+    DataWriter.writeCsv(joinedData, DataSets.DCF_FEED, DataSets.CLICKSTREAM_MERGED_FEED, DataSets.FULL, executeDate, DataSets.DCF_FEED_FILENAME + changedDateFormat + "_1", DataSets.ERROR_SAVEMODE, "false", ",", 1)
 
     logger.info("dcf feed generation process ended")
   }

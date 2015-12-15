@@ -93,7 +93,7 @@ sub upload_push_campaigns {
     system("mkdir -p $base");
     #system("mkdir -p $base/tmp");
 
-
+    # master file
     # /data/tmp/push_campaigns/acart_daily42_515/daily/2015/07/30/staticlist_acart_daily42_515_20150730.csv
     for (my $i = 0; $i <= 1 ; $i++) {
        my $id = "515";  # ios
@@ -101,18 +101,10 @@ sub upload_push_campaigns {
            $id = "517";
            system("hadoop fs -get /data/tmp/push_campaigns/android/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
            system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
-
-           #system("hadoop fs -get /data/tmp/push_campaigns/android/daily/$date/ $base/UpdateDevices_$id" . "_$date_with_zero.csv");
-           
        } else {
            system("hadoop fs -get /data/tmp/push_campaigns/ios/daily/$date/updateDevices_$id" . "_$date_with_zero.csv $base/");
            system("touch $base/updateDevices_$id" . "_$date_with_zero.txt");
-
-           #system("hadoop fs -get /data/tmp/push_campaigns/ios/daily/$date/part-00000 $base/UpdateDevices_$id" . "_$date_with_zero.csv");
-
        }
-
-       # master file
 
        # acart daily
        my $cname = "acart_daily42";
@@ -423,7 +415,14 @@ sub upload_calendar_replenish_campaigns {
     $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
     $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
 
+    #upload both files to dapshare
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
+    $calendar_status ||= $?;
+
+    #rename and upload Replenish file for decryption of email
+    print("rename file $calendar_base/$replenish_filename to dap_$replenish_filename");
+    $calendar_status ||= system("mv $calendar_base/$replenish_filename $calendar_base/dap_$replenish_filename");
+    system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $calendar_base/dap_$replenish_filename; bye\"");
     $calendar_status ||= $?;
 
     return $calendar_status;
@@ -535,4 +534,3 @@ sub removeQuotes {
     return $status;
 
 }
-
