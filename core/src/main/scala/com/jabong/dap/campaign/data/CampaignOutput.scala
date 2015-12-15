@@ -75,7 +75,7 @@ object CampaignOutput {
             CampaignMergedFields.REC_SKU + "6",
             CampaignMergedFields.REC_SKU + "7",
             CampaignMergedFields.REC_SKU + "8"
-          )
+          ).na.fill("")
 
         CampaignUtils.debug(campaignCsv, "campaignCsv")
 
