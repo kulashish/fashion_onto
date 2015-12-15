@@ -1,18 +1,15 @@
 
 package com.jabong.dap.campaign.customer
 
-import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ CustomerVariables, ContactListMobileVars, NewsletterVariables, EmailResponseVariables }
+import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables}
 import com.jabong.dap.common.json.JsonUtils
 import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
-import com.jabong.dap.common.{ SharedSparkContext, Spark }
-import com.jabong.dap.data.acq.common.ParamInfo
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.{SharedSparkContext, Spark}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
-import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse
 import com.jabong.dap.model.customer.campaigndata.CustEmailResponse._
 import com.jabong.dap.model.customer.schema.CustEmailSchema
@@ -56,7 +53,7 @@ class CustEmailResponseTest extends FlatSpec with SharedSparkContext {
     val outputCsvFormat = udf((s: String) => TimeUtils.changeDateFormat(s: String, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT))
 
     val joinedDf = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
-      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as ContactListMobileVars.UID,
         outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
         col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
