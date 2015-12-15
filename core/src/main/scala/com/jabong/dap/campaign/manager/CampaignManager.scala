@@ -452,7 +452,7 @@ object CampaignManager extends Serializable with Logging {
 
     val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData().cache()
     val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData().cache()
-    val customerMasterData = loadCustomerMasterData()
+    val customerMasterData = CampaignInput.loadCustomerMasterData()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val yestOrderData = CampaignInput.loadLastNDaysTableData(1, fullOrderData, SalesOrderVariables.CREATED_AT)
     val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData()
@@ -610,16 +610,6 @@ object CampaignManager extends Serializable with Logging {
     clearanceCampaign.runCampaign(fullOrderData, fullOrderItemData, mvpDiscountRecos, yesterdayItrData, incrDate)
   }
 
-  def loadCustomerMasterData(): DataFrame = {
-
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last day customer master data from hdfs")
-
-    //        val customerMasterData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, "2015/07/29")
-    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
-    customerMasterData
-  }
-
   def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
@@ -689,7 +679,7 @@ object CampaignManager extends Serializable with Logging {
       val saveMode = DataSets.OVERWRITE_SAVEMODE
       val dateFolder = TimeUtils.YESTERDAY_FOLDER
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, campaignType)
-      val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val cmr = CampaignInput.loadCustomerMasterData(dateFolder)
 
       val mergedData =
         if (DataSets.PUSH_CAMPAIGNS == campaignType) {
