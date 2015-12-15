@@ -2,6 +2,7 @@ package com.jabong.dap.model.customer.campaigndata
 
 import java.sql.{ Date, Timestamp }
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -104,7 +105,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val zoneCityFull = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
     dfMap.put("zoneCityFull", zoneCityFull)
 
-    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val cmrFull = CampaignInput.loadCustomerMasterData(incrDate)
     dfMap.put("cmrFull", cmrFull)
 
     dfMap

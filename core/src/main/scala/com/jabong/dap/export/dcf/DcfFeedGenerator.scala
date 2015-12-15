@@ -2,6 +2,7 @@ package com.jabong.dap.export.dcf
 
 import java.sql.Timestamp
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
@@ -35,7 +36,7 @@ object DcfFeedGenerator extends Logging {
     val date = monthYear.day
     val year = monthYear.year
 
-    val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, executeDate)
+    val cmr = CampaignInput.loadCustomerMasterData(executeDate)
 
     val hiveQuery = "SELECT userid, productsku,pagets,sessionid FROM " + clickstreamTable +
       " where pagetype in ('CPD','QPD','DPD') and pagets is not null and sessionid is not null and sessionid != '(null)' and " +
