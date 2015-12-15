@@ -107,14 +107,36 @@ object DataWriter extends Logging {
 
   def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, numPartitions: Int=1): Unit = {
     val cols = df.columns
-    val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter)).coalesce(1)
-    val map2 = Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter)))
+    val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter))
+    val map2 = {
+      Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter)))
+    }
+
+    val result =  (map2).++(map1)
     if(canWrite(saveMode, savePath)){
-      map1.coalesce(1).saveAsTextFile(savePath)
-      map2.coalesce(1).saveAsTextFile(savePath+"/header")
+      result.coalesce(1).saveAsTextFile(savePath)
+    }
+
+    var csvSrcFile, csvdestFile: String = ""
+
+    if (numPartitions == 1) {
+      csvSrcFile = savePath + File.separator + "part-00000"
+      csvdestFile = savePath + File.separator + "TRIAL" + ".csv"
+      DataVerifier.rename(csvSrcFile, csvdestFile)
+    } else {
+
+
+      for (n <- 0 to numPartitions - 1) {
+        if (n > 9) {
+          csvSrcFile = savePath + File.separator + "part-000" + n
+        } else {
+          csvSrcFile = savePath + File.separator + "part-0000" + n
+        }
+        csvdestFile = savePath + File.separator + "TRIAL" + "_" + n + ".csv"
+        DataVerifier.rename(csvSrcFile, csvdestFile)
+      }
     }
   }
-
   def addExtraQuotes(row: Row): Row={
     var s = new Array[String](row.size)
     for(i<- 0 to (row.size-1)){

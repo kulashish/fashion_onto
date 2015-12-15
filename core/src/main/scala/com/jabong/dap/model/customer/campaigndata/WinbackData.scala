@@ -31,7 +31,7 @@ object WinbackData extends DataFeedsModel {
 
     val crmTicketMasterIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketMaster, DataSets.FULL_FETCH_MODE, dateDiffFormat)
     println(ConfigConstants.INPUT_PATH + "/" + DataSets.CRM + "/" + DataSets.CRM_TicketMaster)
-    val crmTicketDetailsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.FULL_FETCH_MODE, dateDiffFormat)
+    val crmTicketDetailsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketDetails, DataSets.FULL_MERGE_MODE, dateDiffFormat)
     val crmTicketStatLogIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.CRM, DataSets.CRM_TicketStatusLog, DataSets.DAILY_MODE, incrDate)
 
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]
