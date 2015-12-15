@@ -275,6 +275,8 @@ sub upload_email_campaigns_decryptFeedFiles {
 
 
 sub upload_email_campaigns_feedFiles {
+    chdir("/data/responsys/");
+
     my $base = "/tmp/$date_with_zero/feedFiles";
     print "directory is $base\n";
     system("mkdir -p $base");
@@ -344,8 +346,6 @@ sub upload_email_campaigns_feedFiles {
     $filename = "$date_with_zero_today"."_Customer_App_details.csv";
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
-
-    chdir("/data/responsys/");
 
     system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
