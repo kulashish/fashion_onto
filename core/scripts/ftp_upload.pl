@@ -445,8 +445,8 @@ sub upload_acart_hourly_campaign {
 
     $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
 
-    #system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*; bye\"");
-    #$acart_hourly_status ||= $?;
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*; bye\"");
+    $acart_hourly_status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
     $acart_hourly_status ||= $?;
