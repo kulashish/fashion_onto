@@ -153,10 +153,10 @@ sub upload_push_campaigns {
        fetchCampaign($id, $cname, $base);
     }
 
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_campaigns/ $base/*; bye\"");
-    my $status = $?;
+    # system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/push_campaigns/ $base/*; bye\"");
+    # my $status = $?;
     system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
-    $status ||= $?;
+    my $status ||= $?;
     system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
@@ -252,8 +252,8 @@ sub upload_email_campaigns_decryptFeedFiles {
 
     $status ||= removeQuotes("$base/$filename");
 
-    print("rename file $base/$filename to dap_$filename");
-    $status ||= system("mv $base/$filename $base/dap_$filename");
+    #print("rename file $base/$filename to dap_$filename");
+    #$status ||= system("mv $base/$filename $base/dap_$filename");
 
     # 20150928_Contact_list_Plus.csv
     $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
@@ -262,10 +262,12 @@ sub upload_email_campaigns_decryptFeedFiles {
 
     $status ||= removeQuotes("$base/$filename");
 
-    print("rename file $base/$filename to dap_$filename");
-    $status ||= system("mv $base/$filename $base/dap_$filename");
+    #print("rename file $base/$filename to dap_$filename");
+    #$status ||= system("mv $base/$filename $base/dap_$filename");
 
     system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $base/*.csv; bye\"");
+    $status ||= $?;
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
     system("rm -rf /tmp/$date_with_zero");
     return $status;
@@ -343,20 +345,12 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    # 20150928_CONTACTS_LIST.csv
-    $filename = "$date_with_zero_today"."_CONTACTS_LIST.csv";
-    $folderName = "contactListMobile";
-    $status ||= fetchFeedFile($filename, $folderName, $base);
-
-    # 20150928_Contact_list_Plus.csv
-    $filename = "$date_with_zero_today"."_Contact_list_Plus.csv";
-    $folderName = "Contact_list_Plus";
-    $status ||= fetchFeedFile($filename, $folderName, $base);
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*; bye\"");
+    $status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
     $status ||= $?;
-    # system("lftp -c \"open -u jabong,oJei-va8opue7jey sftp://sftp.ad4push.msp.fr.clara.net ;  mput -O imports/ $base/*; bye\"");
-    # $status ||= $?;
+
     system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
@@ -384,8 +378,8 @@ sub upload_email_campaigns {
 
     $status ||= removeNull("$base/$followUp_filename");
 
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
-
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*; bye\"");
+    $status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
     $status ||= $?;
@@ -419,10 +413,14 @@ sub upload_calendar_replenish_campaigns {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
 
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filename; bye\"");
+    $calendar_status ||= $?;
+
     #rename and upload Replenish file for decryption of email
-    print("rename file $calendar_base/$replenish_filename to dap_$replenish_filename");
-    $calendar_status ||= system("mv $calendar_base/$replenish_filename $calendar_base/dap_$replenish_filename");
-    system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $calendar_base/dap_$replenish_filename; bye\"");
+    # print("rename file $calendar_base/$replenish_filename to dap_$replenish_filename");
+    # $calendar_status ||= system("mv $calendar_base/$replenish_filename $calendar_base/dap_$replenish_filename");
+    # system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $calendar_base/dap_$replenish_filename; bye\"");
+    system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $calendar_base/$replenish_filename; bye\"");
     $calendar_status ||= $?;
 
     return $calendar_status;
@@ -446,6 +444,9 @@ sub upload_acart_hourly_campaign {
     my $acart_hourly_status = $?;
 
     $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
+
+    #system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*; bye\"");
+    #$acart_hourly_status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
     $acart_hourly_status ||= $?;
