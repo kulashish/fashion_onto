@@ -66,30 +66,12 @@ object CampaignInput extends Logging {
     while (n < 7 && cmrData == null) {
       val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       n = n + 1
-      cmrData = getDf(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
+      cmrData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
     }
 
     if (cmrData == null)
       throw new DataNotFound
     cmrData
-  }
-
-  def getDf(basePath: String, source: String, tableName: String, mode: String, incrDate: String): DataFrame = {
-    var df: DataFrame = null
-    try {
-      df = DataReader.getDataFrame(basePath, source, tableName, mode, incrDate)
-      logger.info("Reading data from hdfs, incrDate: " + incrDate)
-    } catch {
-      case e: DataNotFound => {
-        logger.error("DataNotFound for date: " + incrDate)
-        return null
-      }
-      case e: AssertionError => {
-        logger.error("AssertionError for date: " + incrDate)
-        return null
-      }
-    }
-    df
   }
 
   def loadYesterdayOrderItemData() = loadOrderItemData()
@@ -153,7 +135,7 @@ object CampaignInput extends Logging {
     while (n < 7 && itrSimpleData == null) {
       val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       n = n + 1
-      itrSimpleData = getDf(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+      itrSimpleData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
     }
 
     if (itrSimpleData == null)
