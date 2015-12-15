@@ -19,7 +19,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       saveFormat = "parquet", saveMode = "overwrite", dateColumn = dateCol, rangeStart = null, rangeEnd = null,
       limit = lmt, filterCondition = null,
       joinTables = jnTbls)
-    ConditionBuilder.getCondition(tableInfo) should be ("")
+    ConditionBuilder.getCondition("mysql", tableInfo) should be ("")
   }
 
   "getCondition" should "return correct condition when filterCondition is not null and mode is full" in {
@@ -28,7 +28,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       limit = lmt, filterCondition = fltrCond,
       joinTables = jnTbls)
     val output = "WHERE tableColumn NOT LIKE 'R%'"
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when filterCondition is null and mode is full" in {
@@ -37,7 +37,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val output = ""
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd, and filterCondition are null" in {
@@ -47,7 +47,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       joinTables = jnTbls)
     val prevDayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' ".format(prevDayDate, prevDayDate)
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily and rangeStart, rangeEnd are null and filterCondition is not null" in {
@@ -57,7 +57,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       joinTables = jnTbls)
     val prevDayDate = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT)
     val output = "WHERE t1.dateColumn >= '%s 00:00:00' AND t1.dateColumn <= '%s 23:59:59' AND tableColumn NOT LIKE 'R..'".format(prevDayDate, prevDayDate)
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is hourly and filterCondition is null" in {
@@ -66,7 +66,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       rangeEnd = rngEnd, limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is hourly and filterCondition is not null" in {
@@ -75,7 +75,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       rangeEnd = rngEnd, limit = lmt, filterCondition = fltrCond,
       joinTables = jnTbls)
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' AND tableColumn NOT LIKE 'R%'"
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition null" in {
@@ -84,7 +84,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       rangeEnd = rngEnd, limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is daily with ranges not null and filterCondition is not null" in {
@@ -93,7 +93,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       rangeEnd = rngEnd, limit = lmt, filterCondition = fltrCond,
       joinTables = jnTbls)
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' AND tableColumn NOT LIKE 'R%'"
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
   "getCondition" should "return correct condition when mode is monthly with ranges not null and filterCondition null" in {
@@ -102,7 +102,7 @@ class ConditionBuilderTest extends FlatSpec with Matchers {
       rangeEnd = rngEnd, limit = lmt, filterCondition = null,
       joinTables = jnTbls)
     val output = "WHERE t1.dateColumn >= 'rangeStart' AND t1.dateColumn <= 'rangeEnd' "
-    ConditionBuilder.getCondition(tableInfo) should be (output)
+    ConditionBuilder.getCondition("mysql", tableInfo) should be (output)
   }
 
 }
