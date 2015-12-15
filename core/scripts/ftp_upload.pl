@@ -345,6 +345,8 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
+    chdir("/data/responsys/");
+
     system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
 
@@ -377,6 +379,8 @@ sub upload_email_campaigns {
     $status ||= removeNull("$base/$filename");
 
     $status ||= removeNull("$base/$followUp_filename");
+
+    chdir("/data/responsys/");
 
     system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
@@ -413,6 +417,8 @@ sub upload_calendar_replenish_campaigns {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
 
+    chdir("/data/responsys/");
+
     system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filename;'");
     $calendar_status ||= $?;
 
@@ -444,6 +450,8 @@ sub upload_acart_hourly_campaign {
     my $acart_hourly_status = $?;
 
     $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
+
+    chdir("/data/responsys/");
 
     system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*;'");
     $acart_hourly_status ||= $?;
