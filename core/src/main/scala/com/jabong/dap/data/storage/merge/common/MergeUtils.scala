@@ -51,7 +51,7 @@ object MergeUtils extends MergeData {
 
     var numPart = dfBaseNew.rdd.partitions.length
 
-    val df1 = joinedDF.filter(dfIncr(primaryKey).isNull).select(dfBaseNew("*"))
+    val df1 = joinedDF.filter(joinedDF(NEW_ + primaryKey).isNull).select(dfBaseNew("*"))
 
     df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)
   }
@@ -112,10 +112,10 @@ object MergeUtils extends MergeData {
 
     dfIncrVar = Spark.getContext().broadcast(dfIncrVar).value
 
-    val dfSchema = dfIncr.schema
+    dfIncrVar = SchemaUtils.renameCols(dfIncrVar, NEW_)
 
     // join old and new data frame on primary key
-    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(primaryKey), SQL.FULL_OUTER)
+    val joinedDF = dfPrevVarFull.dropDuplicates().join(dfIncrVar, dfPrevVarFull(primaryKey) === dfIncrVar(NEW_ + primaryKey), SQL.FULL_OUTER)
 
     joinedDF
   }
