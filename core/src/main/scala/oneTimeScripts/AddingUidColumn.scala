@@ -1,5 +1,6 @@
 package oneTimeScripts
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
@@ -43,7 +44,7 @@ object AddingUidColumn {
 
     val contactList = DataReader.getDataFrame4mCsv(fullPath, "true", "|")
 
-    val cmr = DataReader.getDataFrame(READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
+    val cmr = CampaignInput.loadCustomerMasterData(date)
 
     val uid = addUId(cmr, contactList)
 

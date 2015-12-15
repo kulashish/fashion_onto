@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
@@ -76,8 +77,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     }
     dfMap.put("custEmailResPrevFull", prevFullDf)
 
-    val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
-      incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
+    val dfCmrFull = CampaignInput.loadCustomerMasterData(incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
     dfMap.put("cmrFull", dfCmrFull)
 
     val nlSubscribers = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION,
