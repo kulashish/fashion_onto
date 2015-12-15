@@ -66,30 +66,12 @@ object CampaignInput extends Logging {
     while (n < 7 && cmrData == null) {
       val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       n = n + 1
-      cmrData = getDfCmr(date)
+      cmrData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, date)
     }
 
     if (cmrData == null)
       throw new DataNotFound
     cmrData
-  }
-
-  def getDfCmr(incrDate: String): DataFrame = {
-    var df: DataFrame = null
-    try {
-      df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
-      logger.info("Reading customer master data from hdfs, incrDate: " + incrDate)
-    } catch {
-      case e: DataNotFound => {
-        logger.error("DataNotFound for date: " + incrDate)
-        return null
-      }
-      case e: AssertionError => {
-        logger.error("AssertionError for date: " + incrDate)
-        return null
-      }
-    }
-    df
   }
 
   def loadYesterdayOrderItemData() = loadOrderItemData()
@@ -143,29 +125,38 @@ object CampaignInput extends Logging {
   }
 
   /**
-   * load yesterdays itr sku simle data
-   * @param dateYesterday
+   *
+   * @param incrDate
    * @return
    */
-  def loadYesterdayItrSimpleData(dateYesterday: String = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)) = {
-    logger.info("Reading last day basic itr simple data from hdfs")
-    val itrData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, dateYesterday)
+  def loadYesterdayItrSimpleData(incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    var n = 0
+    var itrSimpleData: DataFrame = null
+    while (n < 7 && itrSimpleData == null) {
+      val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+      n = n + 1
+      itrSimpleData = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, "itr", "basic", DataSets.DAILY_MODE, date)
+    }
 
-    val filteredItr = itrData.select(itrData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
-      itrData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
-      itrData(ITR.QUANTITY) as ProductVariables.STOCK,
-      itrData(ITR.MVP) as ProductVariables.MVP,
-      itrData(ITR.GENDER) as ProductVariables.GENDER,
-      itrData(ITR.BRAND_NAME) as ProductVariables.BRAND,
-      itrData(ITR.BRICK) as ProductVariables.BRICK,
-      itrData(ITR.PRODUCT_NAME),
-      itrData(ITR.COLOR),
-      itrData(ITR.PRICE_BAND),
-      itrData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
-      itrData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
-      itrData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
+    if (itrSimpleData == null)
+      throw new DataNotFound
+
+    val filteredItr = itrSimpleData.select(itrSimpleData(ITR.SIMPLE_SKU) as ProductVariables.SKU_SIMPLE,
+      itrSimpleData(ITR.PRICE_ON_SITE) as ProductVariables.SPECIAL_PRICE,
+      itrSimpleData(ITR.QUANTITY) as ProductVariables.STOCK,
+      itrSimpleData(ITR.MVP) as ProductVariables.MVP,
+      itrSimpleData(ITR.GENDER) as ProductVariables.GENDER,
+      itrSimpleData(ITR.BRAND_NAME) as ProductVariables.BRAND,
+      itrSimpleData(ITR.BRICK) as ProductVariables.BRICK,
+      itrSimpleData(ITR.PRODUCT_NAME),
+      itrSimpleData(ITR.COLOR),
+      itrSimpleData(ITR.PRICE_BAND),
+      itrSimpleData(ITR.ACTIVATED_AT) as ProductVariables.ACTIVATED_AT,
+      itrSimpleData(ITR.ITR_DATE) as ItrVariables.CREATED_AT,
+      itrSimpleData(ITR.REPORTING_CATEGORY) as ProductVariables.CATEGORY)
 
     filteredItr
+
   }
 
   def loadYesterdayItrSkuData(date: String = TimeUtils.YESTERDAY_FOLDER) = {
