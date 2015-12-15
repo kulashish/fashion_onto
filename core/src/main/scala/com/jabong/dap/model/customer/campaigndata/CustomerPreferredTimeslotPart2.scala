@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -38,7 +39,7 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
 
     val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
 
-    val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val dfCmr = CampaignInput.loadCustomerMasterData(incrDate)
     var dfSalesOrderIncr: DataFrame = null
     var dfCPOTPart2PrevFull: DataFrame = null
 

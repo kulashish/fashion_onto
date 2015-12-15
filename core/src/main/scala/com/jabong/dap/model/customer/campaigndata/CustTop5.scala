@@ -75,7 +75,7 @@ object CustTop5 extends DataFeedsModel {
     dfMap.put("salesOrderItemIncr", salesOrderItemIncr)
     val yestItr = CampaignInput.loadYesterdayItrSimpleData(incrDate)
     dfMap.put("yestItr", yestItr)
-    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val cmrFull = CampaignInput.loadCustomerMasterData(incrDate)
     dfMap.put("cmrFull", cmrFull)
     dfMap
   }
