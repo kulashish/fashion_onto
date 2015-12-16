@@ -442,7 +442,7 @@ sub upload_acart_hourly_campaign {
 
     print "acart hourly campaigns directory is $acart_hourly_base\n";
 
-    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
+    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_LIVE_ACART_HOURLY.csv";
 
     print "hadoop fs -get /data/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 

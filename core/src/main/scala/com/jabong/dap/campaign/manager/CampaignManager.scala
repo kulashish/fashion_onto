@@ -2,15 +2,15 @@ package com.jabong.dap.campaign.manager
 
 import com.jabong.dap.campaign.calendarcampaign._
 import com.jabong.dap.campaign.campaignlist._
-import com.jabong.dap.campaign.data.{ CampaignInput, CampaignOutput }
+import com.jabong.dap.campaign.data.{CampaignInput, CampaignOutput}
 import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.OptionUtils
-import com.jabong.dap.common.constants.campaign.{ CampaignCommon, CampaignMergedFields, Recommendation }
+import com.jabong.dap.common.constants.campaign.{CampaignCommon, CampaignMergedFields, Recommendation}
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
-import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
 import com.jabong.dap.common.udf.Udf
-import com.jabong.dap.data.acq.common.{ CampaignConfig, CampaignInfo, ParamInfo }
+import com.jabong.dap.data.acq.common.{CampaignConfig, CampaignInfo, ParamInfo}
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -18,8 +18,7 @@ import grizzled.slf4j.Logging
 import net.liftweb.json.JsonParser.ParseException
 import net.liftweb.json._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
-import org.apache.spark.sql.DataFrame
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 
@@ -541,7 +540,7 @@ object CampaignManager extends Serializable with Logging {
     //    if(campaignName.equals(DataSets.ACART_HOURLY)){
     val acartHourly = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EMAIL_CAMPAIGNS, CampaignCommon.ACART_HOURLY_CAMPAIGN, DataSets.HOURLY_MODE, TimeUtils.CURRENT_HOUR_FOLDER)
 
-    val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_" + TimeUtils.getHour(TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS) + "_ACART_HOURLY"
+    val acartHourlyFileName = TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_" + TimeUtils.getHour(TimeUtils.getTodayDate(TimeConstants.DD_MMM_YYYY_HH_MM_SS), TimeConstants.DD_MMM_YYYY_HH_MM_SS) + "_LIVE_ACART_HOURLY"
 
     CampaignOutput.saveAcartHourlyFeed(acartHourly, cmr, acartHourlyFileName)
   }
