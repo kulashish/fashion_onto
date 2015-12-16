@@ -1,6 +1,6 @@
 package com.jabong.dap.data.write
 
-import java.io.{FileInputStream, BufferedInputStream, File}
+import java.io.File
 
 import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -8,9 +8,6 @@ import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, DataFrame, SaveMode}
-import org.apache.hadoop.conf.Configuration
 import org.apache.spark.sql.{ Row, DataFrame, SaveMode }
 
 /**
@@ -112,7 +109,7 @@ object DataWriter extends Logging {
     if(canWrite(saveMode, savePath)){
       map1.coalesce(1).saveAsTextFile(savePath)
       if(header)
-      map2.coalesce(1).saveAsTextFile(savePath+"\header")
+      map2.coalesce(1).saveAsTextFile(savePath+"/header")
     }
   }
 
