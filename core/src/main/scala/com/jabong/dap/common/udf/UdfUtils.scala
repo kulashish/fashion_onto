@@ -23,8 +23,8 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
  */
 object UdfUtils extends Logging {
 
-  def csvDateFormat(s: Timestamp): String = {
-    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT_MS, TimeConstants.DATE_TIME_FORMAT)
+  def csvDateFormat(s: Timestamp, fromTimeFormat:String = TimeConstants.DATE_TIME_FORMAT_MS, toTimeFormat:String = TimeConstants.DATE_TIME_FORMAT): String = {
+    return TimeUtils.changeDateFormat(s, fromTimeFormat, toTimeFormat)
   }
 
   /**
@@ -874,3 +874,4 @@ object UdfUtils extends Logging {
   }
 
 }
+

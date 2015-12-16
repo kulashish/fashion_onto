@@ -139,6 +139,9 @@ object Udf {
 
   val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
 
+  val dateCsvFormatWithArgs = udf((s: Timestamp, from:String, to:String) => UdfUtils.csvDateFormat(s: Timestamp, from:String, to:String))
+
+
   val isEquals = udf((d1: Any, d2: Any) => UdfUtils.isEquals(d1: Any, d2: Any))
 
   val dnd = udf((s: String) => UdfUtils.markDnd(s: String))
@@ -170,3 +173,4 @@ object Udf {
   val dateModeFilter = udf((created_at: Timestamp, incrDate: String, n: Int, modBase: Int) => UdfUtils.modeFilter(created_at: Timestamp, incrDate: String, n: Int, modBase: Int))
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
 }
+
