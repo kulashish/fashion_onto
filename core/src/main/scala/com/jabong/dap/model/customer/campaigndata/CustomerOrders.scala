@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
@@ -109,7 +110,7 @@ object CustomerOrders extends DataFeedsModel {
     dfMap.put("salesOrderIncrFil", salesOrderIncrFil)
     dfMap.put("salesOrderItemIncrFil", salesOrderItemIncrFil)
 
-    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val cmrFull = CampaignInput.loadCustomerMasterData(incrDate)
     dfMap.put("cmrFull", cmrFull)
 
     dfMap

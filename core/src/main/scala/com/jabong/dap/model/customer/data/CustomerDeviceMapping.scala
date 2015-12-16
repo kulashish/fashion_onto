@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.data
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, PageVisitVariables }
@@ -132,7 +133,7 @@ object CustomerDeviceMapping extends Logging {
       var customerIncr: DataFrame = null
       if (null != path) {
         if ("firstTime4Nls".equals(path)) {
-          cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+          cmrFull = CampaignInput.loadCustomerMasterData(prevDate)
             .filter(col(CustomerVariables.ID_CUSTOMER).geq(1))
           if (!SchemaUtils.isSchemaEqual(cmrFull.schema, Schema.cmr)) {
             println("correctingSchema")
@@ -143,15 +144,18 @@ object CustomerDeviceMapping extends Logging {
           nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.FULL_MERGE_MODE, curDate)
           customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.FULL_MERGE_MODE, curDate)
         } else if ("dcfUID".equals(path)) {
-          val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+          // val fileDate = TimeUtils.changeDateFormat(curDate, TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+          // val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
+          // prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
+          val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, curDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
           val cmrFullDCF = DataReader.getDataFrame4mCsv(ConfigConstants.INPUT_PATH, "dcf", "contact_list", DataSets.FULL,
-            prevDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
+            curDate, "CONTACTS_LIST_" + fileDate + ".csv", "true", "|")
             .select(
               col(ContactListMobileVars.UID),
               col(ContactListMobileVars.EMAIL)
             ).na.drop("any", Array(ContactListMobileVars.EMAIL, ContactListMobileVars.UID)).dropDuplicates()
           println("Total recs in DCF file initially: " + cmrFullDCF.count())
-          val cmrPrevFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+          val cmrPrevFull = CampaignInput.loadCustomerMasterData(prevDate)
           val cmrJoined = cmrPrevFull.join(cmrFullDCF, cmrPrevFull(CustomerVariables.EMAIL) === cmrFullDCF(ContactListMobileVars.EMAIL), SQL.FULL_OUTER)
           cmrFull = cmrJoined.select(
             cmrFullDCF(ContactListMobileVars.UID),
@@ -166,7 +170,7 @@ object CustomerDeviceMapping extends Logging {
           cmrFull = getDataFrameCsv4mDCF(path)
         }
       } else {
-        cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, prevDate)
+        cmrFull = CampaignInput.loadCustomerMasterData(prevDate)
         nlsIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION, DataSets.DAILY_MODE, curDate)
         customerIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CUSTOMER, DataSets.DAILY_MODE, curDate)
       }

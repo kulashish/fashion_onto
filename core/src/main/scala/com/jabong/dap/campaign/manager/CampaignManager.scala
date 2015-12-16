@@ -21,6 +21,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, Path }
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StringType
 
 import scala.collection.mutable.HashMap
 
@@ -452,7 +453,7 @@ object CampaignManager extends Serializable with Logging {
 
     val yestSurfSessionData = CampaignInput.loadYesterdaySurfSessionData().cache()
     val yestItrSkuData = CampaignInput.loadYesterdayItrSkuData().cache()
-    val customerMasterData = loadCustomerMasterData()
+    val customerMasterData = CampaignInput.loadCustomerMasterData()
     val fullOrderData = CampaignInput.loadFullOrderData()
     val yestOrderData = CampaignInput.loadLastNDaysTableData(1, fullOrderData, SalesOrderVariables.CREATED_AT)
     val yestOrderItemData = CampaignInput.loadYesterdayOrderItemData()
@@ -610,16 +611,6 @@ object CampaignManager extends Serializable with Logging {
     clearanceCampaign.runCampaign(fullOrderData, fullOrderItemData, mvpDiscountRecos, yesterdayItrData, incrDate)
   }
 
-  def loadCustomerMasterData(): DataFrame = {
-
-    val dateYesterday = TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER)
-    logger.info("Reading last day customer master data from hdfs")
-
-    //        val customerMasterData = DataReader.getDataFrame(ConfigConstants.OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, "2015/07/29")
-    val customerMasterData = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateYesterday)
-    customerMasterData
-  }
-
   def initCampaignsConfig(campaignJsonPath: String) = {
     var json: JValue = null
     val validated = try {
@@ -689,7 +680,7 @@ object CampaignManager extends Serializable with Logging {
       val saveMode = DataSets.OVERWRITE_SAVEMODE
       val dateFolder = TimeUtils.YESTERDAY_FOLDER
       val allCampaignsData = CampaignInput.loadAllCampaignsData(dateFolder, campaignType)
-      val cmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, dateFolder)
+      val cmr = CampaignInput.loadCustomerMasterData(dateFolder)
 
       val mergedData =
         if (DataSets.PUSH_CAMPAIGNS == campaignType) {
@@ -763,9 +754,9 @@ object CampaignManager extends Serializable with Logging {
         val expectedDF = mergedData
           .withColumn(ContactListMobileVars.UID, col(ContactListMobileVars.UID))
           .withColumn(CampaignMergedFields.CALENDAR_REF_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
-          .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
           .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
-          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK + "_1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
 
           .withColumn(CampaignMergedFields.CALENDAR_CITY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(5)))
           .withColumn(CampaignMergedFields.CALENDAR_COLOR, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
@@ -816,18 +807,75 @@ object CampaignManager extends Serializable with Logging {
     val saveMode = DataSets.OVERWRITE_SAVEMODE
     val dateFolder = TimeUtils.YESTERDAY_FOLDER
 
-    val campaignFileName = {
+    val (campaignFileName, csvDataFrame) = {
+
+      val df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
+
       if (campaignType == DataSets.EMAIL_CAMPAIGNS) {
-        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN"
+        val csvDf =
+          df.select(
+            df(ContactListMobileVars.UID),
+            df(ContactListMobileVars.EMAIL),
+            df(CampaignMergedFields.LIVE_MAIL_TYPE).cast(StringType) as CampaignMergedFields.LIVE_MAIL_TYPE,
+            df(CampaignMergedFields.LIVE_BRAND),
+            df(CampaignMergedFields.LIVE_BRICK),
+            df(CampaignMergedFields.LIVE_PROD_NAME),
+            df(CampaignMergedFields.LIVE_REF_SKU + "1"),
+            df(CampaignMergedFields.LIVE_REF_SKU + "2"),
+            df(CampaignMergedFields.LIVE_REF_SKU + "3"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "1"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "2"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "3"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "4"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "5"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "6"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "7"),
+            df(CampaignMergedFields.LIVE_REC_SKU + "8"),
+            df(CampaignMergedFields.LIVE_CART_URL),
+            df(CampaignMergedFields.LAST_UPDATED_DATE),
+            df(ContactListMobileVars.MOBILE),
+            df(CampaignMergedFields.TYPO_MOBILE_PERMISION_STATUS),
+            df(CampaignMergedFields.COUNTRY_CODE)
+          ).na.fill("")
+
+        (TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_LIVE_CAMPAIGN", csvDf)
       } else {
-        TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN"
+        val csvDf = df.select(
+          df(ContactListMobileVars.UID),
+          df(CampaignMergedFields.CALENDAR_REF_BRAND),
+          df(CampaignMergedFields.CALENDAR_REC_BRAND + "1"),
+          df(CampaignMergedFields.CALENDAR_REF_BRICK),
+          df(CampaignMergedFields.CALENDAR_REF_BRICK + "1"),
+          df(CampaignMergedFields.CALENDAR_CITY),
+          df(CampaignMergedFields.CALENDAR_COLOR),
+          df(CampaignMergedFields.CALENDAR_PRICE_POINT),
+          df(CampaignMergedFields.CALENDAR_MAIL_TYPE).cast(StringType) as CampaignMergedFields.CALENDAR_MAIL_TYPE,
+          df(CampaignMergedFields.CALENDAR_REF_SKU + "1"),
+          df(CampaignMergedFields.CALENDAR_REF_SKU + "2"),
+          df(CampaignMergedFields.CALENDAR_REF_SKU + "3"),
+          df(CampaignMergedFields.CALENDAR_REF_SKU + "4"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "1"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "2"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "3"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "4"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "5"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "6"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "7"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "8"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "9"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "10"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "11"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "12"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "13"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "14"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "15"),
+          df(CampaignMergedFields.CALENDAR_REC_SKU + "16"),
+          df(CampaignMergedFields.LAST_UPDATED_DATE)
+        ).na.fill("")
+
+        (TimeUtils.getTodayDate(TimeConstants.YYYYMMDD) + "_DCF_CAMPAIGN", csvDf)
       }
     }
-
-    val df = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder)
-    val csvDataFrame = df.drop(CampaignMergedFields.CUSTOMER_ID)
-      .drop(CampaignMergedFields.REF_SKUS)
-      .drop(CampaignMergedFields.REC_SKUS)
 
     DataWriter.writeCsv(csvDataFrame, campaignType, CampaignCommon.MERGED_CAMPAIGN, DataSets.DAILY_MODE, dateFolder, campaignFileName, saveMode, "true", ";", 1)
   }

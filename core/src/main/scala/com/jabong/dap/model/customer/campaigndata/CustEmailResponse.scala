@@ -1,5 +1,6 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, EmailResponseVariables, NewsletterVariables }
@@ -76,8 +77,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     }
     dfMap.put("custEmailResPrevFull", prevFullDf)
 
-    val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
-      incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
+    val dfCmrFull = CampaignInput.loadCustomerMasterData(incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(ContactListMobileVars.UID) isNotNull)
     dfMap.put("cmrFull", dfCmrFull)
 
     val nlSubscribers = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.NEWSLETTER_SUBSCRIPTION,
@@ -99,7 +99,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     val outputCsvFormat = udf((s: String) => TimeUtils.changeDateFormat(s: String, TimeConstants.DD_MMM_YYYY_HH_MM_SS, TimeConstants.DATE_TIME_FORMAT))
 
     val custEmailResIncr = MergeUtils.joinOldAndNewDF(aggClickData, CustEmailSchema.effectiveSchema,
-      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID, EmailResponseVariables.CUSTOMER_ID)
+      aggOpenData, CustEmailSchema.effectiveSchema, EmailResponseVariables.CUSTOMER_ID)
       .select(coalesce(col(EmailResponseVariables.CUSTOMER_ID), col(MergeUtils.NEW_ + EmailResponseVariables.CUSTOMER_ID)) as ContactListMobileVars.UID,
         outputCsvFormat(col(EmailResponseVariables.LAST_OPEN_DATE)) as EmailResponseVariables.LAST_OPEN_DATE,
         col(EmailResponseVariables.OPENS_TODAY).cast(IntegerType) as EmailResponseVariables.OPENS_TODAY,
@@ -323,7 +323,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
     }
 
     val joined_7_15 = MergeUtils.joinOldAndNewDF(effective15, CustEmailSchema.reqCsvDf,
-      effective7, CustEmailSchema.reqCsvDf, ContactListMobileVars.UID, ContactListMobileVars.UID)
+      effective7, CustEmailSchema.reqCsvDf, ContactListMobileVars.UID)
 
     val joined_7_15_summary = joined_7_15.select(
       coalesce(col(MergeUtils.NEW_ + ContactListMobileVars.UID), col(ContactListMobileVars.UID)) as ContactListMobileVars.UID,
@@ -335,7 +335,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       .withColumn(EmailResponseVariables.OPEN_15DAYS, findOpen(col(EmailResponseVariables.OPEN_15DAYS), col(EmailResponseVariables.CLICK_15DAYS)))
 
     val joined_7_15_30 = MergeUtils.joinOldAndNewDF(effective30, CustEmailSchema.reqCsvDf,
-      joined_7_15_summary, CustEmailSchema.effective7_15Schema, ContactListMobileVars.UID, ContactListMobileVars.UID)
+      joined_7_15_summary, CustEmailSchema.effective7_15Schema, ContactListMobileVars.UID)
       .na.fill(Map(
         EmailResponseVariables.CLICK_15DAYS -> 0,
         EmailResponseVariables.OPEN_15DAYS -> 0,
@@ -356,7 +356,7 @@ object CustEmailResponse extends DataFeedsModel with Logging {
       .withColumn(EmailResponseVariables.OPEN_30DAYS, findOpen(col(EmailResponseVariables.OPEN_30DAYS), col(EmailResponseVariables.CLICK_30DAYS)))
 
     val joinedIncr = MergeUtils.joinOldAndNewDF(incremental, CustEmailSchema.resCustomerEmail,
-      joined_7_15_30_summary, CustEmailSchema.resCustomerEmail, ContactListMobileVars.UID, ContactListMobileVars.UID)
+      joined_7_15_30_summary, CustEmailSchema.resCustomerEmail, ContactListMobileVars.UID)
       .na.fill(Map(
         EmailResponseVariables.CLICK_15DAYS -> 0,
         EmailResponseVariables.OPEN_15DAYS -> 0,
@@ -382,8 +382,8 @@ object CustEmailResponse extends DataFeedsModel with Logging {
 
     val prevEffDf = SchemaUtils.addColumns(full, CustEmailSchema.effective_Smry_Schema)
 
-    val incrDateFullDf = MergeUtils.joinOldAndNewDF(joinedIncrSummary, CustEmailSchema.effective_Smry_Schema, prevEffDf, CustEmailSchema.effective_Smry_Schema,
-      ContactListMobileVars.UID, ContactListMobileVars.UID)
+    val incrDateFullDf = MergeUtils.joinOldAndNewDF(joinedIncrSummary, CustEmailSchema.effective_Smry_Schema, prevEffDf,
+      CustEmailSchema.effective_Smry_Schema, ContactListMobileVars.UID)
       .na.fill(
         Map(
           EmailResponseVariables.CLICKS_LIFETIME -> 0,

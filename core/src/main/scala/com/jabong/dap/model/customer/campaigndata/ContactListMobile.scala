@@ -2,23 +2,23 @@ package com.jabong.dap.model.customer.campaigndata
 
 import java.sql.{ Date, Timestamp }
 
-import com.jabong.dap.common.schema.SchemaUtils
-import com.jabong.dap.common.{ Utils, Spark }
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
+import com.jabong.dap.common.schema.SchemaUtils
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
+import com.jabong.dap.common.{ Spark, Utils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
-import com.jabong.dap.data.storage.schema.Schema
 import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{ DataFrame, Row }
 
 import scala.collection.mutable.HashMap
 
@@ -105,7 +105,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
     val zoneCityFull = DataReader.getDataFrame4mCsv(ConfigConstants.ZONE_CITY_PINCODE_PATH, "true", ",")
     dfMap.put("zoneCityFull", zoneCityFull)
 
-    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val cmrFull = CampaignInput.loadCustomerMasterData(incrDate)
     dfMap.put("cmrFull", cmrFull)
 
     dfMap
@@ -148,6 +148,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
       val dfIncrVarBC = Spark.getContext().broadcast(dfMergedIncr).value
       println("dfMergedIncr", dfMergedIncr.count())
       val contactListMobilePrevFil = contactListMobilePrevFull.filter(col(ContactListMobileVars.UID).isNotNull)
+
       //join old and new data frame
       val joinDF = contactListMobilePrevFil.join(dfIncrVarBC, contactListMobilePrevFil(ContactListMobileVars.UID) === dfIncrVarBC(ContactListMobileVars.UID), SQL.FULL_OUTER)
 

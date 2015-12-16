@@ -1,5 +1,6 @@
 package com.jabong.dap.model.clickstream.campaignData
 
+import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables.{ CustomerVariables, SalesOrderVariables }
@@ -44,7 +45,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
   def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
     logger.info("readDF called")
     val salesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
-    val cmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val cmrFull = CampaignInput.loadCustomerMasterData(incrDate)
     val customerSessionIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, CUSTOMER_SESSION, DataSets.DAILY_MODE, incrDate)
 
     val custAppDetailsPrevFull =

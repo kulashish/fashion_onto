@@ -11,8 +11,7 @@ import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, DataFrame, SaveMode}
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs._
-import org.apache.hadoop.io.IOUtils
+import org.apache.spark.sql.{ Row, DataFrame, SaveMode }
 
 /**
  * Created by pooja on 23/7/15.
@@ -106,36 +105,22 @@ object DataWriter extends Logging {
     true
   }
 
-
-  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, numPartitions: Int=1): Unit = {
+  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, header: Boolean=true, numPartitions: Int = 1): Unit = {
     val cols = df.columns
     val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter).replace("\n", "").replace("\r", "")).coalesce(1)
     val map2 = Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter).replace("\n", "").replace("\r", "")))
     if(canWrite(saveMode, savePath)){
-      //map1.coalesce(1).saveAsTextFile(savePath)
-      map2.coalesce(1).saveAsTextFile(savePath)
-      appendToFile(savePath+"/part-00000",map1)
+      map1.coalesce(1).saveAsTextFile(savePath)
+      if(header)
+      map2.coalesce(1).saveAsTextFile(savePath+"\header")
     }
   }
 
-  val conf = new Configuration()
-  val fileSystem = FileSystem.get(conf)
-  def appendToFile(tofilepath: String, map: RDD[String]): Unit = {
-    var file = new File(tofilepath)
-    var out = fileSystem.append(new Path(file.getAbsolutePath))
-    map.collect().foreach {
-      e=>
-      out.writeChars("\n"+e)
-    }
-    out.close()
-  }
 
-
-
-  def addExtraQuotes(row: Row): Row={
+  def addExtraQuotes(row: Row): Row = {
     var s = new Array[String](row.size)
-    for(i<- 0 to (row.size-1)){
-        s(i) = "\""+row(i)+"\""
+    for (i <- 0 to (row.size - 1)) {
+      s(i) = "\"" + row(i) + "\""
     }
     Row.fromSeq(s)
   }

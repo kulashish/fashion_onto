@@ -1,5 +1,7 @@
 package com.jabong.dap.model.customer.campaigndata
 
+import com.jabong.dap.campaign.data.CampaignInput
+import com.jabong.dap.campaign.utils.CampaignUtils
 import com.jabong.dap.common.{ Utils, Spark }
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
@@ -34,11 +36,11 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
    * @param prevDate
    * @return
    */
-  def readDF(paths: String, incrDate: String, prevDate: String): HashMap[String, DataFrame] = {
+  def readDF(incrDate: String, prevDate: String, paths: String): HashMap[String, DataFrame] = {
 
     val dfMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
 
-    val dfCmr = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate)
+    val dfCmr = CampaignInput.loadCustomerMasterData(incrDate)
     var dfSalesOrderIncr: DataFrame = null
     var dfCPOTPart2PrevFull: DataFrame = null
 
@@ -83,12 +85,15 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
         col(CustomerVariables.ORDER_10),
         col(CustomerVariables.ORDER_11),
         col(CustomerVariables.PREFERRED_ORDER_TIMESLOT)
-      )
+      ).filter(CustomerVariables.CUSTOMER_ID + " is not null")
 
     val dfWrite: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
 
     if (dfCPOTPart2PrevFull != null) {
       val dfIncrVarBC = Spark.getContext().broadcast(dfInc).value
+
+      CampaignUtils.debug(dfIncrVarBC.filter(dfIncrVarBC(CustomerVariables.CUSTOMER_ID).isNull), "dfIncrVarBC")
+      CampaignUtils.debug(dfInc.filter(dfInc(CustomerVariables.CUSTOMER_ID).isNull), "dfInc")
 
       //join old and new data frame
       val joinDF = dfCPOTPart2PrevFull.join(dfIncrVarBC, dfCPOTPart2PrevFull(CustomerVariables.CUSTOMER_ID) === dfIncrVarBC(CustomerVariables.CUSTOMER_ID), SQL.FULL_OUTER)
@@ -107,6 +112,8 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
         Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_9), dfCPOTPart2PrevFull(CustomerVariables.ORDER_9)) as CustomerVariables.ORDER_9,
         Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_10), dfCPOTPart2PrevFull(CustomerVariables.ORDER_10)) as CustomerVariables.ORDER_10,
         Udf.addInt(dfIncrVarBC(CustomerVariables.ORDER_11), dfCPOTPart2PrevFull(CustomerVariables.ORDER_11)) as CustomerVariables.ORDER_11)
+
+      CampaignUtils.debug(dfFull.filter(dfFull(CustomerVariables.CUSTOMER_ID).isNull), "dfFull")
 
       val rowRDD = dfFull.map(r => (Row(
         r(0),
@@ -143,6 +150,10 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
 
       dfWrite.put("CPOTPart2Full", dfFullFinal)
       dfWrite.put("CPOTPart2Incr", dfFullFinal.except(dfCPOTPart2PrevFull))
+
+      CampaignUtils.debug(dfFullFinal.filter(dfFullFinal(CustomerVariables.CUSTOMER_ID).isNull), "dfFullFinal")
+      CampaignUtils.debug(dfCPOTPart2PrevFull.filter(dfCPOTPart2PrevFull(CustomerVariables.CUSTOMER_ID).isNull), "dfCPOTPart2PrevFull")
+
     } else {
       dfWrite.put("CPOTPart2Full", dfInc)
       dfWrite.put("CPOTPart2Incr", dfInc)
