@@ -8,7 +8,9 @@ import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
-import org.apache.spark.sql.{ Row, DataFrame, SaveMode }
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{Row, DataFrame, SaveMode}
+import sys.process._
 
 /**
  * Created by pooja on 23/7/15.
@@ -102,22 +104,43 @@ object DataWriter extends Logging {
     true
   }
 
-  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, header: Boolean=true, numPartitions: Int = 1): Unit = {
+
+  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, numPartitions: Int=1): Unit = {
     val cols = df.columns
-    val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter).replace("\n", "").replace("\r", "")).coalesce(1)
-    val map2 = Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter).replace("\n", "").replace("\r", "")))
+    val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter))
+    val map2 = {
+      Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter)))
+    }
+
+    val result =  (map2).++(map1)
     if(canWrite(saveMode, savePath)){
-      map1.coalesce(1).saveAsTextFile(savePath)
-      if(header)
-      map2.coalesce(1).saveAsTextFile(savePath+"/header")
+      result.coalesce(1).saveAsTextFile(savePath)
+    }
+
+    var csvSrcFile, csvdestFile: String = ""
+
+    if (numPartitions == 1) {
+      csvSrcFile = savePath + File.separator + "part-00000"
+      csvdestFile = savePath + File.separator + "TRIAL" + ".csv"
+      DataVerifier.rename(csvSrcFile, csvdestFile)
+    } else {
+
+
+      for (n <- 0 to numPartitions - 1) {
+        if (n > 9) {
+          csvSrcFile = savePath + File.separator + "part-000" + n
+        } else {
+          csvSrcFile = savePath + File.separator + "part-0000" + n
+        }
+        csvdestFile = savePath + File.separator + "TRIAL" + "_" + n + ".csv"
+        DataVerifier.rename(csvSrcFile, csvdestFile)
+      }
     }
   }
-
-
-  def addExtraQuotes(row: Row): Row = {
+  def addExtraQuotes(row: Row): Row={
     var s = new Array[String](row.size)
-    for (i <- 0 to (row.size - 1)) {
-      s(i) = "\"" + row(i) + "\""
+    for(i<- 0 to (row.size-1)){
+        s(i) = "\""+row(i)+"\""
     }
     Row.fromSeq(s)
   }
