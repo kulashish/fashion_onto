@@ -169,4 +169,6 @@ object Udf {
 
   val dateModeFilter = udf((created_at: Timestamp, incrDate: String, n: Int, modBase: Int) => UdfUtils.modeFilter(created_at: Timestamp, incrDate: String, n: Int, modBase: Int))
   // val mergeMap = udf((prevMap:  scala.collection.immutable.Map[String, Row], newMap: scala.collection.immutable.Map[String, Row]) => UdfUtils.mergeMaps(prevMap, newMap))
+  val addDefaultvalueForNull = udf((col: String, value: String) => UdfUtils.addDefaultvalueForNull(col: String, value: String))
+
 }
