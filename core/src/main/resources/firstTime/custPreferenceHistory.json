@@ -11,7 +11,7 @@
       "source": "custPreference",
       "fullDate": "2015/12/14",
       "incrDate": "2015/12/15",
-      "saveMode": "Ignore",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
   ]
