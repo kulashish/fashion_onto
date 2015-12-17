@@ -8,9 +8,7 @@ import com.jabong.dap.data.read.PathBuilder
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.DataVerifier
 import grizzled.slf4j.Logging
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{ Row, DataFrame, SaveMode }
-import sys.process._
 
 /**
  * Created by pooja on 23/7/15.
@@ -104,15 +102,17 @@ object DataWriter extends Logging {
     true
   }
 
-  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, numPartitions: Int = 1): Unit = {
+  def writeCsvRdd(df: DataFrame, savePath: String, delimiter: String, saveMode: String, header: Boolean=true, numPartitions: Int = 1): Unit = {
     val cols = df.columns
-    val map1 = df.map(e => (addExtraQuotes(e))).map(e => e.mkString(delimiter)).coalesce(1)
-    val map2 = Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter)))
-    if (canWrite(saveMode, savePath)) {
+    val map1 = df.map(e=> (addExtraQuotes(e))).map(e=> e.mkString(delimiter).replace("\n", "").replace("\r", "")).coalesce(1)
+    val map2 = Spark.getContext().parallelize(List(addExtraQuotes(Row.fromSeq(cols)).mkString(delimiter).replace("\n", "").replace("\r", "")))
+    if(canWrite(saveMode, savePath)){
       map1.coalesce(1).saveAsTextFile(savePath)
-      map2.coalesce(1).saveAsTextFile(savePath + "/header")
+      if(header)
+      map2.coalesce(1).saveAsTextFile(savePath+"/header")
     }
   }
+
 
   def addExtraQuotes(row: Row): Row = {
     var s = new Array[String](row.size)
