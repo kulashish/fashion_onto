@@ -380,6 +380,12 @@ sub upload_email_campaigns {
 
     $status ||= removeNull("$base/$followUp_filename");
 
+    print("zip $base/$filename.zip $base/$filename\n");
+    system("zip $base/$filename.zip $base/$filename");
+
+    print("rm $base/$filename");
+    system("rm $base/$filename");
+
     chdir("/data/responsys/");
 
     system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
@@ -412,6 +418,12 @@ sub upload_calendar_replenish_campaigns {
 
     $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
     $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
+
+    print("zip $calendar_base/$calendar_filename.zip $calendar_base/$calendar_filename\n");
+    system("zip $calendar_base/$calendar_filename.zip $calendar_base/$calendar_filename");
+
+    print("rm $calendar_base/$calendar_filename");
+    system("rm $calendar_base/$calendar_filename");
 
     #upload both files to dapshare
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
@@ -462,6 +474,7 @@ sub upload_acart_hourly_campaign {
 
     system("rm -rf /tmp/$date_with_zero");
     return $acart_hourly_status;
+
 }
 
 sub dcf_file_format_change{
