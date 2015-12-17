@@ -269,7 +269,7 @@ object SalesOrderItem {
           cancel += 1
         else if (itemMap.values.toSet subsetOf (OrderStatus.RETURN_ARRAY.toSet))
           ret += 1
-        else if (itemMap.values.toSet subsetOf (scala.collection.immutable.Set(OrderStatus.INVALID)))
+        else if (itemMap.values.toSet subsetOf (OrderStatus.INVALID_ARRAY.toSet))
           inv += 1
         else
           oth += 1
