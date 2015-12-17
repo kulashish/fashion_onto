@@ -4,7 +4,7 @@
       "source": "contactListMobile",
       "path": "first time",
       "incrDate": "2015/12/14",
-      "saveMode": "Ignore",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
