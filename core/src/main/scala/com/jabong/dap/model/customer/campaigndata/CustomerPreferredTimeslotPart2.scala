@@ -58,36 +58,13 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
   }
 
   def process(dfMap: HashMap[String, DataFrame]): HashMap[String, DataFrame] = {
-    val dfCmrFull = dfMap("cmrFull")
     val dfSalesOrderIncr = dfMap("salesOrderIncr")
     val dfCPOTPart2PrevFull = dfMap.getOrElse("CPOTPart2PrevFull", null)
 
-    val dfCPOT = Utils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
-
-    val dfCmr = dfCmrFull.select(
-      dfCmrFull(ContactListMobileVars.UID),
-      dfCmrFull(CustomerVariables.ID_CUSTOMER).cast("string") as (CustomerVariables.ID_CUSTOMER)
-    )
-
-    val dfInc = dfCPOT.join(dfCmr, dfCmr(CustomerVariables.ID_CUSTOMER) === dfCPOT(CustomerVariables.CUSTOMER_ID), SQL.LEFT_OUTER)
-      .select(
-        col(ContactListMobileVars.UID) as CustomerVariables.CUSTOMER_ID,
-        col(CustomerVariables.ORDER_0),
-        col(CustomerVariables.ORDER_1),
-        col(CustomerVariables.ORDER_2),
-        col(CustomerVariables.ORDER_3),
-        col(CustomerVariables.ORDER_4),
-        col(CustomerVariables.ORDER_5),
-        col(CustomerVariables.ORDER_6),
-        col(CustomerVariables.ORDER_7),
-        col(CustomerVariables.ORDER_8),
-        col(CustomerVariables.ORDER_9),
-        col(CustomerVariables.ORDER_10),
-        col(CustomerVariables.ORDER_11),
-        col(CustomerVariables.PREFERRED_ORDER_TIMESLOT)
-      ).filter(CustomerVariables.CUSTOMER_ID + " is not null")
+    val dfInc = Utils.getCPOT(dfSalesOrderIncr.select(SalesOrderVariables.FK_CUSTOMER, SalesOrderVariables.CREATED_AT), CustVarSchema.customersPreferredOrderTimeslotPart2, TimeConstants.DATE_TIME_FORMAT)
 
     val dfWrite: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
+    dfWrite.put("cmrFull", dfMap("cmrFull"))
 
     if (dfCPOTPart2PrevFull != null) {
       val dfIncrVarBC = Spark.getContext().broadcast(dfInc).value
@@ -170,7 +147,36 @@ object CustomerPreferredTimeslotPart2 extends DataFeedsModel with Logging {
     if (DataWriter.canWrite(saveMode, pathCustomerPreferredTimeslotPart2Incr)) {
       DataWriter.writeParquet(dfWriteMap("CPOTPart2Incr"), pathCustomerPreferredTimeslotPart2Incr, saveMode)
     }
+
+    val dfCmrFull = dfWriteMap("cmrFull")
+    val dfCmr = dfCmrFull.select(
+      dfCmrFull(ContactListMobileVars.UID),
+      dfCmrFull(CustomerVariables.ID_CUSTOMER).cast("string") as (CustomerVariables.ID_CUSTOMER)
+    )
+
+    val dfCPOTIncr = dfWriteMap("CPOTPart2Incr")
+
+    val dfCsv = dfCPOTIncr.join(dfCmr, dfCmr(CustomerVariables.ID_CUSTOMER) === dfCPOTIncr(CustomerVariables.CUSTOMER_ID), SQL.LEFT_OUTER)
+      .select(
+        col(ContactListMobileVars.UID) as CustomerVariables.CUSTOMER_ID,
+        col(CustomerVariables.ORDER_0),
+        col(CustomerVariables.ORDER_1),
+        col(CustomerVariables.ORDER_2),
+        col(CustomerVariables.ORDER_3),
+        col(CustomerVariables.ORDER_4),
+        col(CustomerVariables.ORDER_5),
+        col(CustomerVariables.ORDER_6),
+        col(CustomerVariables.ORDER_7),
+        col(CustomerVariables.ORDER_8),
+        col(CustomerVariables.ORDER_9),
+        col(CustomerVariables.ORDER_10),
+        col(CustomerVariables.ORDER_11),
+        col(CustomerVariables.PREFERRED_ORDER_TIMESLOT)
+      )
+      .filter(CustomerVariables.CUSTOMER_ID + " is not null")
+      .na.fill("")
+
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfWriteMap("CPOTPart2Incr").na.fill(""), DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
+    DataWriter.writeCsv(dfCsv, DataSets.VARIABLES, DataSets.CUSTOMER_PREFERRED_TIMESLOT_PART2, DataSets.DAILY_MODE, incrDate, fileDate + "_Customer_PREFERRED_TIMESLOT_part2", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
   }
 }
