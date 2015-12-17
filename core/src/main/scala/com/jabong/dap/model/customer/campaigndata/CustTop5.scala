@@ -157,8 +157,7 @@ object CustTop5 extends DataFeedsModel {
         custTop5Incr("COLOR_4"),
         custTop5Incr("COLOR_5")
       )
-    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate)
-    DataWriter.writeParquet(custTop5Csv, savePath, saveMode)
+
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
     DataWriter.writeCsv(custTop5Csv, DataSets.VARIABLES, DataSets.CUST_TOP5, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_TOP5", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
@@ -182,7 +181,7 @@ object CustTop5 extends DataFeedsModel {
         categoryCount("TOYS_COUNT"),
         categoryCount("BAGS_COUNT")
       )
-    savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
+    var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate)
     DataWriter.writeParquet(categoryCntCsv, savePath, saveMode)
     DataWriter.writeCsv(categoryCntCsv, DataSets.VARIABLES, DataSets.CAT_COUNT, DataSets.DAILY_MODE, incrDate, fileDate + "_CUST_CAT_PURCH_COUNT", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
