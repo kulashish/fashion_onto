@@ -2,7 +2,7 @@
   "params": [
     {
       "source": "custPreference",
-      "path": "/data/input/bob/newsletter_subscription/full/2015/10/30/24",
+      "path": "/data/input/bob/newsletter_subscription/full/2015/12/14/24",
       "incrDate": "2015/12/14",
       "saveMode": "Overwrite",
       "saveFormat": "parquet"
