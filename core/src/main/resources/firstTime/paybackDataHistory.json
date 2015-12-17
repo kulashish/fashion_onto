@@ -4,14 +4,14 @@
       "source": "paybackData",
       "path": "first time",
       "mode": "full",
-      "incrDate": "2015/10/29",
+      "incrDate": "2015/12/14",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     },
     {
       "source": "paybackData",
-      "fullDate": "2015/10/29",
-      "incrDate": "2015/10/30",
+      "fullDate": "2015/12/14",
+      "incrDate": "2015/12/15",
       "saveMode": "Ignore",
       "saveFormat": "parquet"
     }

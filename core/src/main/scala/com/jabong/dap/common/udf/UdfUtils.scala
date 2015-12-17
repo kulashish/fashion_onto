@@ -27,10 +27,10 @@ object UdfUtils extends Logging {
     return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT_MS, TimeConstants.DATE_TIME_FORMAT)
   }
 
-  def addDefaultvalueForNull(in: String, value: String): String={
-    if(null==in || in.isEmpty){
+  def addDefaultvalueForNull(in: String, value: String): String = {
+    if (null == in || in.isEmpty) {
       return value
-    } else{
+    } else {
       return in
     }
   }
