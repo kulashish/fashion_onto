@@ -41,8 +41,8 @@ object OrderStatus {
 
   /**
    * refunded_after_shipped
-rejected
-
+   * rejected
+   *
    */
   val REJECTED_ARRAY = Array(REFUNDED_AFTER_SHIPPED, REJECTED)
   val INVALID_ARRAY = Array(INVALID, CANCEL_PAYMENT_ERROR, PAYMENT_PENDING)
