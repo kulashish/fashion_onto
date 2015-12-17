@@ -19,5 +19,6 @@ object CrmTicketVariables {
   val DG_END_DATE = "DG_END_DATE"
 
   val IN_DT = "indt"
+  val UP_DT = "updt"
 
 }
