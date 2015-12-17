@@ -429,6 +429,7 @@ sub upload_calendar_replenish_campaigns {
     system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $calendar_base/$replenish_filename; bye\"");
     $calendar_status ||= $?;
 
+    system("rm -rf /tmp/$date_with_zero");
     return $calendar_status;
 }
 
@@ -442,7 +443,7 @@ sub upload_acart_hourly_campaign {
 
     print "acart hourly campaigns directory is $acart_hourly_base\n";
 
-    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
+    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_LIVE_ACART_HOURLY.csv";
 
     print "hadoop fs -get /data/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 
@@ -459,8 +460,8 @@ sub upload_acart_hourly_campaign {
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
     $acart_hourly_status ||= $?;
 
+    system("rm -rf /tmp/$date_with_zero");
     return $acart_hourly_status;
-
 }
 
 sub dcf_file_format_change{

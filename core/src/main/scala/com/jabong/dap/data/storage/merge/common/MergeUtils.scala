@@ -4,7 +4,7 @@ import com.jabong.dap.common.Spark
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.schema.SchemaUtils
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{ DataFrame, Row }
+import org.apache.spark.sql.{ Column, DataFrame, Row }
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */
@@ -99,6 +99,38 @@ object MergeUtils extends MergeData {
     joinedDF
   }
 
+  /**
+   * @param oldDF can be null
+   * @param newDF can be null
+   * @param keys tuple2 of keys pair
+   * @param joinType default is given for unambiguity
+   * @return return the result with newDF schema renamed with prefix "new_" to each field name
+   */
+  def joinOldAndNew(newDF: DataFrame, newSchema: StructType, oldDF: DataFrame, oldSchema: StructType, keys: List[(String, String)], joinType: String): DataFrame = {
+    if (keys.length < 1) return null
+
+    val oldNullSafe = if (null == oldDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], oldSchema) else oldDF.dropDuplicates().na.drop("any", (keys map (_._2.toString)).toArray)
+    val newNullSafe = if (null == newDF) Spark.getSqlContext().createDataFrame(Spark.getContext().emptyRDD[Row], newSchema) else newDF.dropDuplicates().na.drop("any", (keys map (_._1.toString)).toArray)
+    joinOldAndNewNonNull(newNullSafe, oldNullSafe, keys, joinType)
+  }
+
+  /**
+   * each Dataframes should not be null
+   * @param newNonNullDF
+   * @param oldNonNullDF
+   * @param keys
+   * @param joinType
+   * @return
+   */
+  def joinOldAndNewNonNull(newNonNullDF: DataFrame, oldNonNullDF: DataFrame, keys: List[(String, String)], joinType: String): DataFrame = {
+    assert(null != newNonNullDF && null != oldNonNullDF)
+    val bCastOldNullSafe = Spark.getContext().broadcast(oldNonNullDF).value
+    val newDFNullSafeRenamed = Spark.getContext().broadcast(SchemaUtils.renameCols(newNonNullDF, NEW_)).value
+
+    val joinExpr: Column = keys.slice(1, keys.size).foldLeft(bCastOldNullSafe(keys(0)._1) === newDFNullSafeRenamed(NEW_ + keys(0)._2))((m: Column, n: (String, String)) => m && bCastOldNullSafe(n._1) === newDFNullSafeRenamed(NEW_ + n._2))
+    val result = bCastOldNullSafe.join(newDFNullSafeRenamed, joinExpr, joinType)
+    result
+  }
   /**
    * join old and new data frame
    * @param dfIncr
