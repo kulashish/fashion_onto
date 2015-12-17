@@ -84,7 +84,6 @@ object CustTop5 extends DataFeedsModel {
     val top5MapPrevFull = dfMap.getOrElse("custTop5MapPrevFull", null)
     var salesOrderIncr = dfMap("salesOrderIncr")
     var salesOrderItemIncr = dfMap("salesOrderItemIncr")
-    val cmrFull = dfMap("cmrFull")
 
     val salesOrderNew = salesOrderIncr.na.fill(scala.collection.immutable.Map(
       SalesOrderVariables.GW_AMOUNT -> 0.0
@@ -101,7 +100,7 @@ object CustTop5 extends DataFeedsModel {
     dfWrite.put("custTop5MapFull", custTop5MapFull)
     //println("Full COUNT:-" + custTop5Full.count())
     dfWrite.put("custTop5MapPrevFull", top5MapPrevFull)
-    dfWrite.put("cmrFull", cmrFull)
+    dfWrite.put("cmrFull", dfMap("cmrFull"))
     dfWrite
   }
 

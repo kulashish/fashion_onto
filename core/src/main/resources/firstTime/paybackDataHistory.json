@@ -5,14 +5,14 @@
       "path": "first time",
       "mode": "full",
       "incrDate": "2015/12/14",
-      "saveMode": "Ignore",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
       "source": "paybackData",
       "fullDate": "2015/12/14",
       "incrDate": "2015/12/15",
-      "saveMode": "Ignore",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
   ]
