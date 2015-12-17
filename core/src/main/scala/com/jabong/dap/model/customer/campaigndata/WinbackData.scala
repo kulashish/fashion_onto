@@ -2,8 +2,8 @@ package com.jabong.dap.model.customer.campaigndata
 
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, CustomerVariables, CrmTicketVariables, SalesOrderVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, CustomerVariables, CrmTicketVariables, SalesOrderVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
@@ -11,7 +11,7 @@ import com.jabong.dap.data.write.DataWriter
 import com.jabong.dap.model.dataFeeds.DataFeedsModel
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{StringType, IntegerType}
+import org.apache.spark.sql.types.{ StringType, IntegerType }
 
 import scala.annotation.elidable
 import scala.annotation.elidable._
@@ -41,10 +41,9 @@ object WinbackData extends DataFeedsModel {
 
     val dfCmrFull = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE,
       incrDate).filter(col(CustomerVariables.EMAIL).isNotNull).filter(col(CustomerVariables.ID_CUSTOMER) isNotNull).filter(col(ContactListMobileVars.UID) isNotNull).select(
-      col(CustomerVariables.ID_CUSTOMER),
-      col(ContactListMobileVars.UID)
-    ).dropDuplicates()
-
+        col(CustomerVariables.ID_CUSTOMER),
+        col(ContactListMobileVars.UID)
+      ).dropDuplicates()
 
     val dfMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]
 
@@ -54,7 +53,6 @@ object WinbackData extends DataFeedsModel {
 
     dfMap.put("crmTicketStatLogIncr", crmTicketStatLogIncr)
     dfMap.put("cmrFull", dfCmrFull)
-
 
     println("Status Log Data")
     println(crmTicketStatLogIncr.select("ticketstatuslogid").count)
@@ -72,8 +70,8 @@ object WinbackData extends DataFeedsModel {
     result.printSchema()
     DataWriter.writeParquet(result, savePathIncr, saveMode)
 
-    val savedDf = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE,incrDate)
-    DataWriter.writeCsv(savedDf, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE,  incrDate, fileDate + "_winback_cusstomer_data", saveMode, "true", ";", 1)
+    val savedDf = DataReader.getDataFrame(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate)
+    DataWriter.writeCsv(savedDf, DataSets.VARIABLES, DataSets.WINBACK_CUSTOMER, DataSets.DAILY_MODE, incrDate, fileDate + "_winback_cusstomer_data", saveMode, "true", ";", 1)
   }
 
   override def process(dfMap: mutable.HashMap[String, DataFrame]): mutable.HashMap[String, DataFrame] = {
@@ -89,7 +87,6 @@ object WinbackData extends DataFeedsModel {
     println(crmTicketMasterFull.select(CrmTicketVariables.ISSUE_ID).count)
     crmTicketMasterFull.printSchema()
 
-
     val crmTicketDetailsFull = dfMap("crmTicketDetailsFull").select(
       col(CrmTicketVariables.ISSUE_ID),
       col(CrmTicketVariables.TICKET_ID),
@@ -97,7 +94,7 @@ object WinbackData extends DataFeedsModel {
       col(CrmTicketVariables.CUSTOMER_NO),
       col(CrmTicketVariables.ORDER_NO),
       col(SalesOrderVariables.ID_SALES_ORDER)
-//    ).where(col(CrmTicketVariables.CUSTOMER_NO).!==(0).and(col(SalesOrderVariables.ID_SALES_ORDER).isNotNull)
+    //    ).where(col(CrmTicketVariables.CUSTOMER_NO).!==(0).and(col(SalesOrderVariables.ID_SALES_ORDER).isNotNull)
     )
 
     println("Details Data")
@@ -121,7 +118,7 @@ object WinbackData extends DataFeedsModel {
         join(crmTicketStatLogIncr, crmTicketDetailsFull(CrmTicketVariables.TICKET_ID) === (crmTicketStatLogIncr(CrmTicketVariables.TICKET_ID)), SQL.INNER).
         join(crmTicketMasterFull, crmTicketMasterFull(CrmTicketVariables.ISSUE_ID) === (crmTicketDetailsFull(CrmTicketVariables.ISSUE_ID)), SQL.INNER).
         where(
-            //uniqueTicketStatLog(CrmTicketVariables.ADD_DATE).geq(yesterday).
+          //uniqueTicketStatLog(CrmTicketVariables.ADD_DATE).geq(yesterday).
           (crmTicketStatLogIncr(CrmTicketVariables.EXIT_TICKET_STATUS).cast(IntegerType) equalTo (21)).
             //and(crmTicketDetailsFull(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
             //and (crmTicketMasterFull(CrmTicketVariables.DG_END_DATE).gt(dateStr)).
@@ -129,19 +126,18 @@ object WinbackData extends DataFeedsModel {
             and(crmTicketDetailsFull(CrmTicketVariables.ORDER_NO).notEqual(0)).
             and(crmTicketDetailsFull(CrmTicketVariables.CUSTOMER_NO).notEqual(0))
         ).
-        select(
-          crmTicketDetailsFull(CrmTicketVariables.ORDER_NO) as CrmTicketVariables.ORDER_NO,
-          Udf.dateCsvFormatWithArgs(crmTicketDetailsFull(CrmTicketVariables.TICKET_CLOSE_DATE), lit(TimeConstants.DATE_TIME_FORMAT), lit(TimeConstants.DD_MMM_YYYY_HH_MM_SS))
-            as CrmTicketVariables.TICKET_CLOSE_DATE,
-          crmTicketMasterFull(CrmTicketVariables.ISSUE_ID).cast(StringType) as CrmTicketVariables.ISSUE_ID,
-          crmTicketMasterFull(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION,
-          crmTicketDetailsFull(CrmTicketVariables.CUSTOMER_NO))
+          select(
+            crmTicketDetailsFull(CrmTicketVariables.ORDER_NO) as CrmTicketVariables.ORDER_NO,
+            Udf.dateCsvFormatWithArgs(crmTicketDetailsFull(CrmTicketVariables.TICKET_CLOSE_DATE), lit(TimeConstants.DATE_TIME_FORMAT), lit(TimeConstants.DD_MMM_YYYY_HH_MM_SS))
+              as CrmTicketVariables.TICKET_CLOSE_DATE,
+            crmTicketMasterFull(CrmTicketVariables.ISSUE_ID).cast(StringType) as CrmTicketVariables.ISSUE_ID,
+            crmTicketMasterFull(CrmTicketVariables.ISSUE_DESCRIPTION) as CrmTicketVariables.ISSUE_DESCRIPTION,
+            crmTicketDetailsFull(CrmTicketVariables.CUSTOMER_NO))
 
     println("Result Log Data")
     println(crmJoin.count())
     println(crmJoin.distinct.count())
     crmJoin.printSchema()
-
 
     println(cmrFull.select(CustomerVariables.ID_CUSTOMER).count())
     println(cmrFull.select(CustomerVariables.ID_CUSTOMER).distinct.count())

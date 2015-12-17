@@ -139,8 +139,7 @@ object Udf {
 
   val dateCsvFormat = udf((s: Timestamp) => UdfUtils.csvDateFormat(s: Timestamp))
 
-  val dateCsvFormatWithArgs = udf((s: Timestamp, from:String, to:String) => UdfUtils.csvDateFormat(s: Timestamp, from:String, to:String))
-
+  val dateCsvFormatWithArgs = udf((s: Timestamp, from: String, to: String) => UdfUtils.csvDateFormat(s: Timestamp, from: String, to: String))
 
   val isEquals = udf((d1: Any, d2: Any) => UdfUtils.isEquals(d1: Any, d2: Any))
 
