@@ -3,8 +3,8 @@ package com.jabong.dap.model.customer.campaigndata
 import com.jabong.dap.campaign.data.CampaignInput
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.constants.config.ConfigConstants
-import com.jabong.dap.common.constants.variables.{ContactListMobileVars, NewsletterPreferencesVariables, NewsletterVariables}
-import com.jabong.dap.common.time.{TimeConstants, TimeUtils}
+import com.jabong.dap.common.constants.variables.{ ContactListMobileVars, NewsletterPreferencesVariables, NewsletterVariables }
+import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.MergeUtils
@@ -59,7 +59,7 @@ object CustPreference extends DataFeedsModel {
     var custPrefFull = custPrefIncr
     if (null != custPrefPrevFull) {
       custPrefFull = MergeUtils.InsertUpdateMerge(custPrefPrevFull, custPrefIncr, NewsletterPreferencesVariables.EMAIL)
-      custPrefIncr =   custPrefFull.except(custPrefPrevFull)
+      custPrefIncr = custPrefFull.except(custPrefPrevFull)
     }
     val dfWriteMap: mutable.HashMap[String, DataFrame] = new mutable.HashMap[String, DataFrame]()
     dfWriteMap.put("custPrefIncr", custPrefIncr)
