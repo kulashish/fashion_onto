@@ -21,7 +21,6 @@ import scala.collection.mutable.HashMap
 object CustomerMasterRecordFeed extends DataFeedsModel with Logging {
   val BROWSER_ID = "browserid"
   val ADD4PUSH_ID = "add4push"
-  val DEVICE_ID = "device_id"
   override def canProcess(incrDate: String, saveMode: String): Boolean = {
     return true
   }
@@ -51,10 +50,10 @@ object CustomerMasterRecordFeed extends DataFeedsModel with Logging {
 
     val dfCmrFeed = dfCmr.join(dfAd4pushId, dfCmr(BROWSER_ID) === dfAd4pushId(BROWSER_ID), SQL.LEFT_OUTER)
       .select(
-        dfCmr(CustomerVariables.ID_CUSTOMER),
+        dfCmr(CustomerVariables.ID_CUSTOMER) as "CUSTOMER_ID",
         dfCmr(ContactListMobileVars.UID),
-        dfCmr(BROWSER_ID) as DEVICE_ID,
-        dfAd4pushId(ADD4PUSH_ID)
+        dfCmr(BROWSER_ID) as "DEVICE_ID",
+        dfAd4pushId(ADD4PUSH_ID) as "ADD4PUSH_ID"
       ).na.fill("")
 
     val dfWrite: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
