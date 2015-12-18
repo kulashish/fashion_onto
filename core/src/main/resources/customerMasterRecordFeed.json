@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "customerMasterRecordFeed",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
