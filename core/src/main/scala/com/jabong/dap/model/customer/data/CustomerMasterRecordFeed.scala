@@ -40,7 +40,7 @@ object CustomerMasterRecordFeed extends DataFeedsModel with Logging {
     val dfCsv = dfWrite("dfCmrFeed")
 
     val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfCsv, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.DAILY_MODE, incrDate, fileDate + "_CID_UID_DID_AD4_ID", DataSets.IGNORE_SAVEMODE, "true", ",", 1)
+    DataWriter.writeCsv(dfCsv, DataSets.EXTRAS, DataSets.DEVICE_MAPPING, DataSets.FULL_MERGE_MODE, incrDate, fileDate + "_CUSTOMER_DEVICE_MAPPING_FEED", DataSets.IGNORE_SAVEMODE, "true", ",", 1)
 
   }
 
@@ -53,7 +53,7 @@ object CustomerMasterRecordFeed extends DataFeedsModel with Logging {
         dfCmr(CustomerVariables.ID_CUSTOMER) as "CUSTOMER_ID",
         dfCmr(ContactListMobileVars.UID),
         dfCmr(BROWSER_ID) as "DEVICE_ID",
-        dfAd4pushId(ADD4PUSH_ID) as "ADD4PUSH_ID"
+        dfAd4pushId(ADD4PUSH_ID) as "AD4PUSH_ID"
       ).na.fill("")
 
     val dfWrite: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
