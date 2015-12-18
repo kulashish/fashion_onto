@@ -14,7 +14,7 @@ import com.jabong.dap.model.city.CityData
 import com.jabong.dap.model.clickstream.campaignData.CustomerAppDetails
 import com.jabong.dap.model.clickstream.variables.{ GetSurfVariables, SurfVariablesMain }
 import com.jabong.dap.model.customer.campaigndata._
-import com.jabong.dap.model.customer.data.{ CustomerDeviceMapping, CustomerSurfAffinity, DNDMerger, SmsOptOut }
+import com.jabong.dap.model.customer.data._
 import com.jabong.dap.model.order.variables.{ SalesItemRevenue, SalesOrderAddress }
 import com.jabong.dap.model.product.itr.BasicITR
 import com.jabong.dap.model.responsys.campaigndata.CustomerPreferredTimeslotPart1
@@ -134,6 +134,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
           case DataSets.WINBACK_CUSTOMER => WinbackData.start(paramJob)
 
+          case DataSets.CUSTOMER_MASTER_RECORD_FEED => CustomerMasterRecordFeed.start(paramJob)
           case _ => logger.error("Unknown source.")
 
         }

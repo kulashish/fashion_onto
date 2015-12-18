@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "customerMasterRecordFeed",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
