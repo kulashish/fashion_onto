@@ -411,8 +411,8 @@ sub upload_customer_device_mapping_feed {
     my $filename = "$date_with_zero_today"."_CUSTOMER_DEVICE_MAPPING_FEED.csv";
     my $filenameZip = "$date_with_zero_today"."_CUSTOMER_DEVICE_MAPPING_FEED.zip";
 
-    print "hadoop fs -get /data/tmp/extras/device_mapping/full/$date/$filename $base/\n";
-    system("hadoop fs -get /data/tmp/extras/device_mapping/full/$date/$filename $base/");
+    print "hadoop fs -get /data/tmp/extras/device_mapping/full/$date/24/$filename $base/\n";
+    system("hadoop fs -get /data/tmp/extras/device_mapping/full/$date/24/$filename $base/");
 
     my $status = $?;
 
