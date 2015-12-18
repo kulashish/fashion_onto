@@ -122,7 +122,7 @@ object CustomerAppDetails extends DataFeedsModel with Logging {
     val trimmedCMR = cmrFull.select("UID", CustomerVariables.ID_CUSTOMER).withColumnRenamed("UID", UID).filter(col(UID).isNotNull && col(CustomerVariables.ID_CUSTOMER).isNotNull).withColumnRenamed(ID_CUSTOMER, TEMP_ + ID_CUSTOMER)
 
     val incrExport = incrForExportWithCustID.join(trimmedCMR, incrForExportWithCustID(ID_CUSTOMER) === trimmedCMR(TEMP_ + ID_CUSTOMER), SQL.INNER)
-                    .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
+      .select(UID, DOMAIN, CREATED_AT, FIRST_LOGIN_TIME, LAST_LOGIN_TIME, SESSION_KEY, ORDER_COUNT)
 
     val dfWriteMap: HashMap[String, DataFrame] = new HashMap[String, DataFrame]()
     dfWriteMap.put("custAppDetailsFull", updatedMaster)
