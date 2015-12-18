@@ -467,7 +467,7 @@ sub upload_calendar_replenish_campaigns {
 
     chdir("/data/responsys/");
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filename.zip;'");
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filenameZip;'");
     $calendar_status ||= $?;
 
     #rename and upload Replenish file for decryption of email

@@ -18,6 +18,8 @@
 
 0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
+0 9 * * 1 perl /opt/alchemy-core/current/bin/customerMasterRecordFeed.pl  >>/opt/alchemy-core/logs/customerMasterRecordFeed_logs.txt
+
 0 11 * * * perl /opt/alchemy-core/current/bin/ad4push_device_merger.pl  >>/opt/alchemy-core/logs/ad4pushDevices_logs.txt
 
 0 18 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
