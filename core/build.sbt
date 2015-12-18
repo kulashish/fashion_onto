@@ -1,6 +1,6 @@
 name := "Alchemy"
 
-version := "0.1.18"
+version := "0.1.19"
 
 scalaVersion := "2.10.5"
 
@@ -30,7 +30,7 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.35"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4"
 
-libraryDependencies += "com.databricks" % "spark-csv_2.10" % "1.0.3"
+libraryDependencies += "com.databricks" % "spark-csv_2.10" % "1.3.0"
 
 libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
   "org.slf4j" % "slf4j-simple" % "1.7.5",

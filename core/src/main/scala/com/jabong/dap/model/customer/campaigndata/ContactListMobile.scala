@@ -219,10 +219,10 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
         coalesce(dfIncrVarBC(ContactListMobileVars.DND), contactListMobilePrevFil(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
       )
+      println("contactListMobilePrevFull", contactListMobilePrevFull.count())
     }
     contactListMobileIncr = Utils.getOneDayData(contactListMobileFull, CustomerVariables.UPDATED_AT, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
     println("contactListMobileFull", contactListMobileFull.count())
-    println("contactListMobilePrevFull", contactListMobilePrevFull.count())
     println("contactListMobileIncr", contactListMobileIncr.count())
 
     writeMap.put("contactListMobileFull", contactListMobileFull)
