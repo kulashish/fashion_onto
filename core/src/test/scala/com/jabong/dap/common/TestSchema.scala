@@ -240,7 +240,7 @@ object TestSchema {
 
   // CUSTOMER_APP_DETAILS related Schemas
   val customerAppDetails = StructType(Array(
-    StructField(CustomerAppDetails.UID, StringType, true),
+    StructField(CustomerVariables.ID_CUSTOMER, LongType, true),
     StructField(CustomerVariables.DOMAIN, StringType, true),
     StructField(SalesOrderVariables.CREATED_AT, TimestampType, true),
     StructField(CustomerAppDetails.FIRST_LOGIN_TIME, TimestampType, true),
