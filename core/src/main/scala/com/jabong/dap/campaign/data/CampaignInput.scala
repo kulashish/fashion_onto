@@ -496,7 +496,7 @@ object CampaignInput extends Logging {
       val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
       logger.info("Reading recommendation for recommendation type %s and for date %s", recommendationType, date)
       n = n + 1
-      recommendations = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RECOMMENDATIONS, recommendationType, DataSets.DAILY_MODE, date)
+      recommendations = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.RECOMMENDATIONS, recommendationType, DataSets.DAILY_MODE, date)
     }
     recommendations
   }
