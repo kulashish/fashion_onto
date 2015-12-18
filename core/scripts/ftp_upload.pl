@@ -66,7 +66,7 @@ if ($component eq "push_campaigns") {
 } elsif ($component eq "acart_hourly_campaign") {
      $job_exit = upload_acart_hourly_campaign();
 } elsif ($component eq "customer_device_mapping_feed") {
-     $job_exit = upload__customer_device_mapping_feed();
+     $job_exit = upload_customer_device_mapping_feed();
 } else {
     print "not a valid component\n";
     $job_exit = -1;
@@ -402,7 +402,7 @@ sub upload_email_campaigns {
     return $status;
 }
 
-sub upload__customer_device_mapping_feed {
+sub upload_customer_device_mapping_feed {
     my $base = "/tmp/$date_with_zero/extras";
 
     print "extras directory is $base\n";
