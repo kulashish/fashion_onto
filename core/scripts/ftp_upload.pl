@@ -65,6 +65,8 @@ if ($component eq "push_campaigns") {
      $job_exit = upload_calendar_replenish_campaigns();
 } elsif ($component eq "acart_hourly_campaign") {
      $job_exit = upload_acart_hourly_campaign();
+} elsif ($component eq "customer_device_mapping_feed") {
+     $job_exit = upload__customer_device_mapping_feed();
 } else {
     print "not a valid component\n";
     $job_exit = -1;
@@ -400,6 +402,37 @@ sub upload_email_campaigns {
     return $status;
 }
 
+sub upload__customer_device_mapping_feed {
+    my $base = "/tmp/$date_with_zero/extras";
+
+    print "extras directory is $base\n";
+    system("mkdir -p $base");
+
+    my $filename = "$date_with_zero_today"."_CUSTOMER_DEVICE_MAPPING_FEED.csv";
+    my $filenameZip = "$date_with_zero_today"."_CUSTOMER_DEVICE_MAPPING_FEED.zip";
+
+    print "hadoop fs -get /data/tmp/extras/device_mapping/full/$date/$filename $base/\n";
+    system("hadoop fs -get /data/tmp/extras/device_mapping/full/$date/$filename $base/");
+
+    my $status = $?;
+
+    print("zip $base/$filenameZip $base/$filename\n");
+    system("zip $base/$filenameZip $base/$filename");
+
+    print("rm $base/$filename");
+    system("rm $base/$filename");
+
+    chdir("/data/responsys/");
+
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
+    $status ||= $?;
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/extras/ $base/* ; bye\"");
+    $status ||= $?;
+
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
+}
 
 sub upload_calendar_replenish_campaigns {
     my $calendar_base = "/tmp/$date_with_zero/calendar_campaigns";
