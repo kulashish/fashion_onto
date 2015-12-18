@@ -364,6 +364,8 @@ sub upload_email_campaigns {
     system("mkdir -p $base");
 
     my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
+    my $filenameZip = "$date_with_zero_today"."_LIVE_CAMPAIGN.zip";
+
 
     my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv";
 
@@ -380,8 +382,8 @@ sub upload_email_campaigns {
 
     $status ||= removeNull("$base/$followUp_filename");
 
-    print("zip $base/$filename.zip $base/$filename\n");
-    system("zip $base/$filename.zip $base/$filename");
+    print("zip $base/$filenameZip $base/$filename\n");
+    system("zip $base/$filenameZip $base/$filename");
 
     print("rm $base/$filename");
     system("rm $base/$filename");
@@ -406,6 +408,7 @@ sub upload_calendar_replenish_campaigns {
     system("mkdir -p $calendar_base");
 
     my $calendar_filename = "$date_with_zero_today"."_DCF_CAMPAIGN.csv";
+    my $calendar_filenameZip = "$date_with_zero_today"."_DCF_CAMPAIGN.zip";
 
     my $replenish_filename = "$date_with_zero_today"."_replenishment.csv";
 
@@ -419,8 +422,8 @@ sub upload_calendar_replenish_campaigns {
     $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
     $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
 
-    print("zip $calendar_base/$calendar_filename.zip $calendar_base/$calendar_filename\n");
-    system("zip $calendar_base/$calendar_filename.zip $calendar_base/$calendar_filename");
+    print("zip $calendar_base/$calendar_filenameZip $calendar_base/$calendar_filename\n");
+    system("zip $calendar_base/$calendar_filenameZip $calendar_base/$calendar_filename");
 
     print("rm $calendar_base/$calendar_filename");
     system("rm $calendar_base/$calendar_filename");
