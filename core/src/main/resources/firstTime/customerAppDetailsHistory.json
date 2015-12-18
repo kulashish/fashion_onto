@@ -4,17 +4,17 @@
       "source": "customerAppDetails",
       "path": "first time",
       "incrMode": "daily",
-      "incrDate": "2015/11/26",
-      "fullDate": "2015/11/25",
-      "saveMode": "Ignore",
+      "incrDate": "2015/12/15",
+      "fullDate": "2015/12/14",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     },
     {
       "source": "customerAppDetails",
       "incrMode": "daily",
-      "incrDate": "2015/11/27",
-      "fullDate": "2015/11/26",
-      "saveMode": "Ignore",
+      "incrDate": "2015/12/16",
+      "fullDate": "2015/12/15",
+      "saveMode": "Overwrite",
       "saveFormat": "parquet"
     }
   ]
