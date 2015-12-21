@@ -3,6 +3,7 @@ package com.jabong.dap.data.storage.merge.common
 import com.jabong.dap.common.SharedSparkContext
 import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.json.JsonUtils
+import com.jabong.dap.data.storage.merge.MergeDelegator
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.{ StructField, StringType, LongType, StructType }
 import org.scalatest.FlatSpec
@@ -15,6 +16,10 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var oldDF: DataFrame = _
   @transient var newDF: DataFrame = _
 
+  @transient var prevFullDf: DataFrame = _
+  @transient var incrDf: DataFrame = _
+
+
   override def beforeAll() {
     super.beforeAll()
 
@@ -22,6 +27,8 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     df2 = JsonUtils.readFromJson("common/merge", "2")
     oldDF = JsonUtils.readFromJson("common/merge", "mergeOld")
     newDF = JsonUtils.readFromJson("common/merge", "mergeNew")
+    prevFullDf = JsonUtils.readFromJson("common/merge", "prevFull")
+    incrDf = JsonUtils.readFromJson("common/merge", "incr")
   }
 
   "A Merged DF" should "have size 4" in {
@@ -104,6 +111,16 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
     val mergedNewNull2 = MergeUtils.joinOldAndNew(null, newSchema, oldDF, oldSchema, keys, SQL.FULL_OUTER)
     assert(mergedNewNull2.collect().size == 4)
 
-    val singleKey = MergeUtils.joinOldAndNew(newDF, newSchema, oldDF, oldSchema, List(("name","name")), SQL.FULL_OUTER)
+    val singleKey = MergeUtils.joinOldAndNew(newDF, newSchema, oldDF, oldSchema, List(("name", "name")), SQL.FULL_OUTER)
     assert(singleKey.count() == 6)
+  }
+
+  "insertUpdateMerge" should "return correct result" in {
+    val keys = List("name", "age")
+    val mergedDf = MergeUtils.InsertUpdateMerge(prevFullDf,incrDf,keys)
+    mergedDf.show(10)
+    assert(mergedDf.collect().size > 0)
+    assert(mergedDf.collect().size == 5)
+  }
+
 }

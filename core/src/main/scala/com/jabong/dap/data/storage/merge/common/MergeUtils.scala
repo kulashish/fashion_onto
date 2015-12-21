@@ -5,6 +5,9 @@ import com.jabong.dap.common.constants.SQL
 import com.jabong.dap.common.schema.SchemaUtils
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{ Column, DataFrame, Row }
+
+import scala.collection.mutable.ListBuffer
+
 /**
  * Merges the dataFrames and returns the merged dataFrame.
  */
@@ -53,6 +56,35 @@ object MergeUtils extends MergeData {
 
     val df1 = joinedDF.filter(joinedDF(NEW_ + primaryKey).isNull).select(dfBaseNew("*"))
 
+    df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)
+  }
+
+  def InsertUpdateMerge(dfBase: DataFrame, dfIncr: DataFrame, primaryKeys: List[String]): DataFrame = {
+    if (null == dfBase)
+      return dfIncr
+    else if (null == dfIncr)
+      return dfBase
+    else if (0 == dfIncr.count())
+      return dfBase
+
+    var dfBaseNew = dfBase
+    if (!SchemaUtils.isSchemaEqual(dfIncr.schema, dfBase.schema)) {
+      dfBaseNew = SchemaUtils.changeSchema(dfBase, dfIncr.schema)
+    }
+
+    var primaryKeyTupleList = new ListBuffer[(String,String)]()
+    val filterStringBuilder = StringBuilder.newBuilder
+    for(primaryKey <- primaryKeys){
+        primaryKeyTupleList.append((primaryKey,primaryKey))
+        filterStringBuilder.append(NEW_).append(primaryKey).append(" is null and ")
+    }
+
+    val lastIndex = filterStringBuilder.lastIndexOf("and")
+    val filterString = filterStringBuilder.substring(0,lastIndex).toString
+    // join on primary key
+    val joinedDF : DataFrame = joinOldAndNewNonNull(dfIncr, dfBaseNew, primaryKeyTupleList.toList, SQL.FULL_OUTER)
+    var numPart = dfBaseNew.rdd.partitions.length
+    val df1 = joinedDF.filter(filterString).select(dfBaseNew("*"))
     df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)
   }
 
