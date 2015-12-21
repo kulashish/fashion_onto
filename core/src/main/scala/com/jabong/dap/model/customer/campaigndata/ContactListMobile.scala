@@ -219,10 +219,10 @@ object ContactListMobile extends DataFeedsModel with Logging {
 
         coalesce(dfIncrVarBC(ContactListMobileVars.DND), contactListMobilePrevFil(ContactListMobileVars.DND)) as ContactListMobileVars.DND // DND
       )
+      println("contactListMobilePrevFull", contactListMobilePrevFull.count())
     }
     contactListMobileIncr = Utils.getOneDayData(contactListMobileFull, CustomerVariables.UPDATED_AT, incrDateLocal, TimeConstants.DATE_FORMAT_FOLDER)
     println("contactListMobileFull", contactListMobileFull.count())
-    println("contactListMobilePrevFull", contactListMobilePrevFull.count())
     println("contactListMobileIncr", contactListMobileIncr.count())
 
     writeMap.put("contactListMobileFull", contactListMobileFull)
@@ -279,14 +279,11 @@ object ContactListMobile extends DataFeedsModel with Logging {
         col(CustomerSegmentsVariables.DISCOUNT_SCORE).cast(StringType) as ContactListMobileVars.DISCOUNT_SCORE
       ).na.fill("")
 
-      var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate)
-      DataWriter.writeParquet(contactListMobilCsv, savePath, saveMode)
-
       val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
       DataWriter.writeCsv(contactListMobilCsv, DataSets.VARIABLES, DataSets.CONTACT_LIST_MOBILE, DataSets.DAILY_MODE, incrDate, fileDate + "_CONTACTS_LIST", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 
       val nlDataList = NewsletterDataList.getNLDataList(contactListMobileIncrCached, contactListMobilePrevFull)
-      savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate)
+      var savePath = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate)
       DataWriter.writeParquet(nlDataList, savePath, saveMode)
       DataWriter.writeCsv(nlDataList, DataSets.VARIABLES, DataSets.NL_DATA_LIST, DataSets.DAILY_MODE, incrDate, fileDate + "_NL_data_list", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
 

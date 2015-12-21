@@ -107,6 +107,7 @@ object DataSets {
   val RESPONSYS = "responsys"
 
   val DEVICE_MAPPING = "device_mapping"
+  val CUSTOMER_MASTER_RECORD_FEED = "customerMasterRecordFeed"
 
   // Data Outputs
   val USER_DEVICE_MAP_APP = "userDeviceMapApp"

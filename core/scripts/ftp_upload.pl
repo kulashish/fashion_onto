@@ -65,6 +65,8 @@ if ($component eq "push_campaigns") {
      $job_exit = upload_calendar_replenish_campaigns();
 } elsif ($component eq "acart_hourly_campaign") {
      $job_exit = upload_acart_hourly_campaign();
+} elsif ($component eq "customer_device_mapping_feed") {
+     $job_exit = upload_customer_device_mapping_feed();
 } else {
     print "not a valid component\n";
     $job_exit = -1;
@@ -275,8 +277,6 @@ sub upload_email_campaigns_decryptFeedFiles {
 
 
 sub upload_email_campaigns_feedFiles {
-    chdir("/data/responsys/");
-
     my $base = "/tmp/$date_with_zero/feedFiles";
     print "directory is $base\n";
     system("mkdir -p $base");
@@ -347,7 +347,7 @@ sub upload_email_campaigns_feedFiles {
     $folderName = "customerAppDetails";
     $status ||= fetchFeedFile($filename, $folderName, $base);
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i /data/responsys/u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/*; bye\"");
@@ -364,6 +364,8 @@ sub upload_email_campaigns {
     system("mkdir -p $base");
 
     my $filename = "$date_with_zero_today"."_LIVE_CAMPAIGN.csv";
+    my $filenameZip = "$date_with_zero_today"."_LIVE_CAMPAIGN.zip";
+
 
     my $followUp_filename = "$date_with_zero_today"."_live_campaign_followup.csv";
 
@@ -380,18 +382,51 @@ sub upload_email_campaigns {
 
     $status ||= removeNull("$base/$followUp_filename");
 
-    chdir("/data/responsys/");
+    print("zip $base/$filenameZip $base/$filename\n");
+    system("zip $base/$filenameZip $base/$filename");
 
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
+    print("rm $base/$filename");
+    system("rm $base/$filename");
+
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i /data/responsys/u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
     $status ||= $?;
 
-    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/$filename ; bye\"");
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $base/* ; bye\"");
     $status ||= $?;
 
     system("rm -rf /tmp/$date_with_zero");
     return $status;
 }
 
+sub upload_customer_device_mapping_feed {
+    my $base = "/tmp/$date_with_zero/extras";
+
+    print "extras directory is $base\n";
+    system("mkdir -p $base");
+
+    my $filename = "$date_with_zero_today"."_CUSTOMER_DEVICE_MAPPING_FEED.csv";
+    my $filenameZip = "$date_with_zero_today"."_CUSTOMER_DEVICE_MAPPING_FEED.zip";
+
+    print "hadoop fs -get /data/tmp/extras/device_mapping/full/$date/24/$filename $base/\n";
+    system("hadoop fs -get /data/tmp/extras/device_mapping/full/$date/24/$filename $base/");
+
+    my $status = $?;
+
+    print("zip $base/$filenameZip $base/$filename\n");
+    system("zip $base/$filenameZip $base/$filename");
+
+    print("rm $base/$filename");
+    system("rm $base/$filename");
+
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i /data/responsys/u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $base/*;'");
+    $status ||= $?;
+
+    system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/extras/ $base/* ; bye\"");
+    $status ||= $?;
+
+    system("rm -rf /tmp/$date_with_zero");
+    return $status;
+}
 
 sub upload_calendar_replenish_campaigns {
     my $calendar_base = "/tmp/$date_with_zero/calendar_campaigns";
@@ -400,6 +435,7 @@ sub upload_calendar_replenish_campaigns {
     system("mkdir -p $calendar_base");
 
     my $calendar_filename = "$date_with_zero_today"."_DCF_CAMPAIGN.csv";
+    my $calendar_filenameZip = "$date_with_zero_today"."_DCF_CAMPAIGN.zip";
 
     my $replenish_filename = "$date_with_zero_today"."_replenishment.csv";
 
@@ -413,13 +449,17 @@ sub upload_calendar_replenish_campaigns {
     $calendar_status ||= removeNull("$calendar_base/$calendar_filename");
     $calendar_status ||= removeNull("$calendar_base/$replenish_filename");
 
+    print("zip $calendar_base/$calendar_filenameZip $calendar_base/$calendar_filename\n");
+    system("zip $calendar_base/$calendar_filenameZip $calendar_base/$calendar_filename");
+
+    print("rm $calendar_base/$calendar_filename");
+    system("rm $calendar_base/$calendar_filename");
+
     #upload both files to dapshare
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $calendar_base/* ; bye\"");
     $calendar_status ||= $?;
 
-    chdir("/data/responsys/");
-
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filename;'");
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i /data/responsys/u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $calendar_base/$calendar_filenameZip;'");
     $calendar_status ||= $?;
 
     #rename and upload Replenish file for decryption of email
@@ -429,6 +469,7 @@ sub upload_calendar_replenish_campaigns {
     system("lftp -c \"open -u cfactory,cF\@ct0ry 54.254.101.71 ;  mput -O /responsysfrom/ $calendar_base/$replenish_filename; bye\"");
     $calendar_status ||= $?;
 
+    system("rm -rf /tmp/$date_with_zero");
     return $calendar_status;
 }
 
@@ -442,7 +483,7 @@ sub upload_acart_hourly_campaign {
 
     print "acart hourly campaigns directory is $acart_hourly_base\n";
 
-    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_ACART_HOURLY.csv";
+    my $acart_hourly_filename = "$date_with_zero_today"."_$current_hour"."_LIVE_ACART_HOURLY.csv";
 
     print "hadoop fs -get /data/tmp/email_campaigns/acart_hourly/hourly/$date_today/$current_hour/$acart_hourly_filename $acart_hourly_base/\n";
 
@@ -451,14 +492,13 @@ sub upload_acart_hourly_campaign {
 
     $acart_hourly_status ||= removeNull("$acart_hourly_base/$acart_hourly_filename");
 
-    chdir("/data/responsys/");
-
-    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i ./u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*;'");
+    system("lftp -c 'set sftp:connect-program \"ssh -a -x -i /data/responsys/u1.pem\"; connect sftp://jabong_scp:dummy\@files.dc2.responsys.net; mput -O upload/ $acart_hourly_base/*;'");
     $acart_hourly_status ||= $?;
 
     system("lftp -c \"open -u dapshare,dapshare\@12345 54.254.101.71 ;  mput -O crm/email_campaigns/ $acart_hourly_base/* ; bye\"");
     $acart_hourly_status ||= $?;
 
+    system("rm -rf /tmp/$date_with_zero");
     return $acart_hourly_status;
 
 }

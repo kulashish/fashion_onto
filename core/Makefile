@@ -20,6 +20,7 @@ package:
 	cp scripts/ad4push_reaction.pl $(BASE)/bin/
 	cp scripts/ad4push_device_merger.pl $(BASE)/bin/
 	cp scripts/responsys.pl $(BASE)/bin/
+	cp scripts/customerMasterRecordFeed.pl $(BASE)/bin/
 	cp -r oozie/* $(BASE)/workflows/
 	cp scripts/clickstream/* $(BASE)/bin/clickstream/
 	tar -zcvf $(PKGNAME) $(BASE)

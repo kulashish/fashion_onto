@@ -486,12 +486,18 @@ object CampaignInput extends Logging {
   /**
    * Load recommendation Data
    * @param recommendationType
-   * @param date
+   * @param incrDate
    * @return
    */
-  def loadRecommendationData(recommendationType: String, date: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
-    logger.info("Reading recommendation for recommendation type %s and for date %s", recommendationType, date)
-    val recommendations = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH, DataSets.RECOMMENDATIONS, recommendationType, DataSets.DAILY_MODE, date)
+  def loadRecommendationData(recommendationType: String, incrDate: String = TimeUtils.YESTERDAY_FOLDER): DataFrame = {
+    var n = 0
+    var recommendations: DataFrame = null
+    while (n < 2 && recommendations == null) {
+      val date = TimeUtils.getDateAfterNDays(-n, TimeConstants.DATE_FORMAT_FOLDER, incrDate)
+      logger.info("Reading recommendation for recommendation type %s and for date %s", recommendationType, date)
+      n = n + 1
+      recommendations = DataReader.getDataFrameOrNull(ConfigConstants.READ_OUTPUT_PATH, DataSets.RECOMMENDATIONS, recommendationType, DataSets.DAILY_MODE, date)
+    }
     recommendations
   }
 

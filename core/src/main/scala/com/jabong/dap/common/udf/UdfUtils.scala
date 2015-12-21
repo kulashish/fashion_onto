@@ -23,14 +23,14 @@ import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
  */
 object UdfUtils extends Logging {
 
-  def csvDateFormat(s: Timestamp): String = {
-    return TimeUtils.changeDateFormat(s, TimeConstants.DATE_TIME_FORMAT_MS, TimeConstants.DATE_TIME_FORMAT)
+  def csvDateFormat(s: Timestamp, fromTimeFormat: String = TimeConstants.DATE_TIME_FORMAT_MS, toTimeFormat: String = TimeConstants.DATE_TIME_FORMAT): String = {
+    return TimeUtils.changeDateFormat(s, fromTimeFormat, toTimeFormat)
   }
 
-  def addDefaultvalueForNull(in: String, value: String): String={
-    if(null==in || in.isEmpty){
+  def addDefaultvalueForNull(in: String, value: String): String = {
+    if (null == in || in.isEmpty) {
       return value
-    } else{
+    } else {
       return in
     }
   }
@@ -882,3 +882,4 @@ object UdfUtils extends Logging {
   }
 
 }
+
