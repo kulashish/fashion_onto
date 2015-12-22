@@ -7,6 +7,22 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "erp",
+      "tableName": "[JADE].[dbo].[Xerion Retail Pvt Ltd_-Live$Manifest Line]",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
+    },
+    {
+      "source": "erp",
+      "tableName": "[JADE].[dbo].[JADE eServices Pvt_ Ltd_-Live$Return Receipt Line]",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore"
     }
   ]
 }
