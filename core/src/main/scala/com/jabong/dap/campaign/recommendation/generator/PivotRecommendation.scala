@@ -30,12 +30,11 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
     require(incrDate != null, "incrDate cannot be null ")
     require(numDays != 0, "numDays cannot be zero ")
 
-
     if (RecommendationUtils.getPivotArray(pivotKey) == null) {
       logger.info(("Invalid pivotKey:- %d", pivotKey))
       throw new WrongInputException(("Invalid pivotKey:" + pivotKey))
     }
-    val lastNDaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, numDays , incrDate)
+    val lastNDaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, numDays, incrDate)
 
     val last7DaysOrderItemData = RecommendationInput.lastNdaysData(lastNDaysOrderItemData, 7, incrDate)
 
