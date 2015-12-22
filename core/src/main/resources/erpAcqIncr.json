@@ -2,12 +2,30 @@
   "acquisition": [
     {
       "source": "erp",
-      "tableName": "item_master_complete_dump",
+      "tableName": "[JADE].[dbo].[item_master_complete_dump]",
       "primaryKey": null,
       "mode": "daily",
       "saveFormat": "orc",
       "saveMode": "Ignore",
       "dateColumn": "[Last Modification Date Time]"
+    },
+    {
+      "source": "erp",
+      "tableName": "[JADE].[dbo].[Xerion Retail Pvt Ltd_-Live$Manifest Line]",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "[Manifest Date]"
+    },
+    {
+      "source": "erp",
+      "tableName": "[JADE].[dbo].[JADE eServices Pvt_ Ltd_-Live$Return Receipt Line]",
+      "primaryKey": null,
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "[Posting Date]"
     }
   ]
 }
