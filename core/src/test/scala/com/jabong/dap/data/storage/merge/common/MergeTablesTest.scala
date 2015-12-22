@@ -25,7 +25,7 @@ class MergeTablesTest extends FlatSpec with SharedSparkContext {
 
   "A Merged DF" should "have size 4" in {
     val mrgInfo = new MergeInfo(source = DataSets.BOB, tableName = DataSets.SALES_CART,
-      primaryKey = SalesCartVariables.ID_SALES_CART, mergeMode = DataSets.MONTHLY_MODE,
+      primaryKey = List(SalesCartVariables.ID_SALES_CART), mergeMode = DataSets.MONTHLY_MODE,
       dateColumn = Option.apply(SalesCartVariables.UPDATED_AT), incrDate = Option.apply("2015-07-02"),
       fullDate = Option.apply("2015-07-01"), incrMode = Option.apply(DataSets.DAILY_MODE),
       saveMode = DataSets.IGNORE_SAVEMODE)
