@@ -17,11 +17,12 @@ object PathBuilder {
   def getPath(tableInfo: TableInfo) = {
     val source = tableInfo.source
     var tableName = tableInfo.tableName
-    if (source.equals(DataSets.CRM) || source.equals(DataSets.ERP)) {
-      //adding the replaceAll for the ERP server tablenames.
-      tableName = tableName.replaceAll("\\[JADE\\]\\[dbo\\].\\[", "").replaceAll("\\]", "")
+    if (source.equals(DataSets.CRM)) {
       //adding the replaceAll for the CRM 195 server tablenames.
       tableName = tableName.replaceAll("\\[dbo\\].\\[", "").replaceAll("\\]", "")
+    } else if (source.equals(DataSets.ERP)) {
+      //adding the replaceAll for the ERP server tablenames.
+      tableName = tableName.replaceAll("\\[JADE\\].\\[dbo\\].\\[", "").replaceAll("\\]", "")
     }
     val rangeStart = OptionUtils.getOptValue(tableInfo.rangeStart)
     val rangeEnd = OptionUtils.getOptValue(tableInfo.rangeEnd)
