@@ -3,35 +3,35 @@
     {
       "source": "crm",
       "tableName": "tblProductAttributeMaster",
-      "primaryKey": "sku",
+      "primaryKey": ["sku"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblTicketDetails",
-      "primaryKey": "TicketID",
+      "primaryKey": ["TicketID"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblOrderDetails",
-      "primaryKey": "OrderNo",
+      "primaryKey": ["OrderNo"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblProductDetails",
-      "primaryKey": "ProductId",
+      "primaryKey": ["ProductId"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "tblTicketProducts",
-      "primaryKey": "TicketProductsID",
+      "primaryKey": ["TicketProductsID"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     }

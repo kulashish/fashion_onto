@@ -4,7 +4,7 @@
     {
       "source": "bob",
       "tableName": "sales_order",
-      "primaryKey": "id_sales_order",
+      "primaryKey": ["id_sales_order"],
       "mergeMode": "full",
       "incrDate": "2013-10-31",
       "fullDate": "2012/08/31",
@@ -13,7 +13,7 @@
     {
       "source": "bob",
       "tableName": "sales_order_item",
-      "primaryKey": "id_sales_order_item",
+      "primaryKey": ["id_sales_order_item"],
       "mergeMode": "full",
       "incrDate": "2012-06-30",
       "fullDate": "2012/05/31",
@@ -22,7 +22,7 @@
     {
       "source": "bob",
       "tableName": "catalog_config",
-      "primaryKey": "id_catalog_config",
+      "primaryKey": ["id_catalog_config"],
       "mergeMode": "full",
       "incrDate": "2015-02-28",
       "fullDate": "2014/11/30",
@@ -31,7 +31,7 @@
     {
       "source": "bob",
       "tableName": "catalog_simple",
-      "primaryKey": "id_catalog_simple",
+      "primaryKey": ["id_catalog_simple"],
       "mergeMode": "full",
       "incrDate": "2012-06-30",
       "fullDate": "2012/05/31",
@@ -40,7 +40,7 @@
     {
       "source": "bob",
       "tableName": "sales_order_address",
-      "primaryKey": "id_sales_order_address",
+      "primaryKey": ["id_sales_order_address"],
       "mergeMode": "full",
       "incrDate": "2012-01-31",
       "fullDate": "2011/12/31",
@@ -49,7 +49,7 @@
     {
       "source": "bob",
       "tableName": "customer",
-      "primaryKey": "id_customer",
+      "primaryKey": ["id_customer"],
       "mergeMode": "full",
       "incrDate": "2013-11-30",
       "fullDate": "2013/10/31",
@@ -58,7 +58,7 @@
     {
       "source": "bob",
       "tableName": "sales_rule",
-      "primaryKey": "id_sales_rule",
+      "primaryKey": ["id_sales_rule"],
       "mergeMode": "full",
       "incrDate": "2013-06-01",
       "fullDate": "2012/11/30",
@@ -67,7 +67,7 @@
     {
       "source": "bob",
       "tableName": "sales_order_item_status_history",
-      "primaryKey": "id_sales_order_item_status_history",
+      "primaryKey": ["id_sales_order_item_status_history"],
       "mergeMode": "full",
       "incrDate": "2012-01-01",
       "fullDate": "2011/12/31",
