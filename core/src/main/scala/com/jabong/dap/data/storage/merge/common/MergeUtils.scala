@@ -72,17 +72,17 @@ object MergeUtils extends MergeData {
       dfBaseNew = SchemaUtils.changeSchema(dfBase, dfIncr.schema)
     }
 
-    var primaryKeyTupleList = new ListBuffer[(String,String)]()
+    var primaryKeyTupleList = new ListBuffer[(String, String)]()
     val filterStringBuilder = StringBuilder.newBuilder
-    for(primaryKey <- primaryKeys){
-        primaryKeyTupleList.append((primaryKey,primaryKey))
-        filterStringBuilder.append(NEW_).append(primaryKey).append(" is null and ")
+    for (primaryKey <- primaryKeys) {
+      primaryKeyTupleList.append((primaryKey, primaryKey))
+      filterStringBuilder.append(NEW_).append(primaryKey).append(" is null and ")
     }
 
     val lastIndex = filterStringBuilder.lastIndexOf("and")
-    val filterString = filterStringBuilder.substring(0,lastIndex).toString
+    val filterString = filterStringBuilder.substring(0, lastIndex).toString
     // join on primary key
-    val joinedDF : DataFrame = joinOldAndNewNonNull(dfIncr, dfBaseNew, primaryKeyTupleList.toList, SQL.FULL_OUTER)
+    val joinedDF: DataFrame = joinOldAndNewNonNull(dfIncr, dfBaseNew, primaryKeyTupleList.toList, SQL.FULL_OUTER)
     var numPart = dfBaseNew.rdd.partitions.length
     val df1 = joinedDF.filter(filterString).select(dfBaseNew("*"))
     df1.unionAll(dfIncr).dropDuplicates().coalesce(numPart)

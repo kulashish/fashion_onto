@@ -62,7 +62,7 @@ object MergeTables extends Logging {
           .format(saveFormat)
           .load(MergePathResolver.incrementalPathResolver(pathIncr))
 
-      if(primaryKey != null && primaryKey.size > 1)
+      if (primaryKey != null && primaryKey.size > 1)
         mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
       else
         mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey(0))
