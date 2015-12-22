@@ -8,15 +8,6 @@
       "saveFormat": "orc",
       "saveMode": "Ignore",
       "dateColumn": "[Last Modification Date Time]"
-    },
-    {
-      "source": "erp",
-      "tableName": "XerionSaleMovementView",
-      "primaryKey": null,
-      "mode": "daily",
-      "saveFormat": "orc",
-      "saveMode": "Ignore",
-      "dateColumn": "GRNDate"
     }
   ]
 }
