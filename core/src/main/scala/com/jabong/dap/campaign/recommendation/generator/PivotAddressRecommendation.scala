@@ -18,12 +18,12 @@ object PivotAddressRecommendation extends CommonRecommendation with Serializable
    * @param incrDate
    * @return
    */
-  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String) = {
+  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String, numDays: Int) = {
 
     val salesAddressFullData = RecommendationInput.salesAddressFullData
     val salesOrder30DaysData = RecommendationInput.salesOrder30DaysData
 
-    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, Recommendation.ORDER_ITEM_DAYS, incrDate)
+    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, numDays, incrDate)
 
     val salesAddressFullDataWithState = addStateFromMapping(salesAddressFullData, RecommendationInput.cityZoneMapping)
 
