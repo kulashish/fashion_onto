@@ -3,7 +3,7 @@ package com.jabong.dap.data.acq.common
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import com.jabong.dap.common.OptionUtils
+import com.jabong.dap.common.{StringUtils, OptionUtils}
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
 import com.jabong.dap.data.storage.DataSets
@@ -23,6 +23,7 @@ object PathBuilder {
     } else if (source.equals(DataSets.ERP)) {
       //adding the replaceAll for the ERP server tablenames.
       tableName = tableName.replaceAll("\\[JADE\\].\\[dbo\\].\\[", "").replaceAll("\\]", "")
+      tableName = StringUtils.cleanString(tableName)
     }
     val rangeStart = OptionUtils.getOptValue(tableInfo.rangeStart)
     val rangeEnd = OptionUtils.getOptValue(tableInfo.rangeEnd)

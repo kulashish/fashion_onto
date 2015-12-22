@@ -21,4 +21,9 @@ object StringUtils {
     (!isEmpty(str)) && str.matches("^[0]*")
   }
 
+  def cleanString(str: String): String = {
+    val cleanedString = str.replaceAll("( |-|%|$)", "")
+    cleanedString.replaceAll("(/|:|\\(|\\)|\\.)", "")
+  }
+
 }
