@@ -19,7 +19,6 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
   @transient var prevFullDf: DataFrame = _
   @transient var incrDf: DataFrame = _
 
-
   override def beforeAll() {
     super.beforeAll()
 
@@ -89,7 +88,7 @@ class MergeUtilsTest extends FlatSpec with SharedSparkContext {
 
   "insertUpdateMerge" should "return correct result" in {
     val keys = List("name", "age")
-    val mergedDf = MergeUtils.InsertUpdateMerge(prevFullDf,incrDf,keys)
+    val mergedDf = MergeUtils.InsertUpdateMerge(prevFullDf, incrDf, keys)
     mergedDf.show(10)
     assert(mergedDf.collect().size > 0)
     assert(mergedDf.collect().size == 5)
