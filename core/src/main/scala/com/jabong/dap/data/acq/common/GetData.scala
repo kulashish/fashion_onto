@@ -1,6 +1,6 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.{StringUtils, Spark}
+import com.jabong.dap.common.{ StringUtils, Spark }
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
