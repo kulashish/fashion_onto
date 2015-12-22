@@ -22,7 +22,7 @@ object StringUtils {
   }
 
   def cleanString(str: String): String = {
-    val cleanedString = str.replaceAll("( |-|%|$)", "")
+    val cleanedString = str.replaceAll("( |-|%|\\$)", "")
     cleanedString.replaceAll("(/|:|\\(|\\)|\\.)", "")
   }
 
