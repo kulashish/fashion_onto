@@ -3,7 +3,7 @@
     {
       "source": "bob",
       "tableName": "sales_order",
-      "primaryKey": "id_sales_order",
+      "primaryKey": ["id_sales_order"],
       "mergeMode": "full",
       "incrDate": "2012-06-30",
       "incrMode": "monthly",
@@ -13,7 +13,7 @@
     {
       "source": "bob",
       "tableName": "sales_order",
-      "primaryKey": "id_sales_order",
+      "primaryKey": ["id_sales_order"],
       "mergeMode": "full",
       "incrDate": "2012-07-31",
       "incrMode": "monthly",
@@ -23,7 +23,7 @@
     {
       "source": "bob",
       "tableName": "sales_order",
-      "primaryKey": "id_sales_order",
+      "primaryKey": ["id_sales_order"],
       "mergeMode": "full",
       "incrDate": "2012-08-31",
       "incrMode": "monthly",
@@ -33,7 +33,7 @@
     {
       "source": "bob",
       "tableName": "catalog_config",
-      "primaryKey": "id_catalog_config",
+      "primaryKey": ["id_catalog_config"],
       "mergeMode": "full",
       "incrDate": "2014-11-30",
       "incrMode": "monthly",
@@ -43,7 +43,7 @@
     {
       "source": "bob",
       "tableName": "sales_rule",
-      "primaryKey": "id_sales_rule",
+      "primaryKey": ["id_sales_rule"],
       "mergeMode": "full",
       "incrDate": "2012-05-01",
       "incrMode": "monthly",
@@ -53,7 +53,7 @@
     {
       "source": "bob",
       "tableName": "sales_rule",
-      "primaryKey": "id_sales_rule",
+      "primaryKey": ["id_sales_rule"],
       "mergeMode": "full",
       "incrDate": "2012-06-01",
       "incrMode": "monthly",
@@ -63,7 +63,7 @@
     {
       "source": "bob",
       "tableName": "sales_rule",
-      "primaryKey": "id_sales_rule",
+      "primaryKey": ["id_sales_rule"],
       "mergeMode": "full",
       "incrDate": "2012-08-01",
       "incrMode": "monthly",
@@ -73,7 +73,7 @@
     {
       "source": "bob",
       "tableName": "sales_rule",
-      "primaryKey": "id_sales_rule",
+      "primaryKey": ["id_sales_rule"],
       "mergeMode": "full",
       "incrDate": "2012-09-01",
       "incrMode": "monthly",
@@ -83,7 +83,7 @@
     {
       "source": "bob",
       "tableName": "sales_rule",
-      "primaryKey": "id_sales_rule",
+      "primaryKey": ["id_sales_rule"],
       "mergeMode": "full",
       "incrDate": "2012-11-01",
       "incrMode": "monthly",

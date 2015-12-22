@@ -755,7 +755,7 @@ object CampaignManager extends Serializable with Logging {
           .withColumn(CampaignMergedFields.CALENDAR_REF_BRAND, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
           .withColumn(CampaignMergedFields.CALENDAR_REC_BRAND + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(1)))
           .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
-          .withColumn(CampaignMergedFields.CALENDAR_REF_BRICK + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
+          .withColumn(CampaignMergedFields.CALENDAR_REC_BRICK + "1", Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(2)))
 
           .withColumn(CampaignMergedFields.CALENDAR_CITY, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(5)))
           .withColumn(CampaignMergedFields.CALENDAR_COLOR, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(4)))
@@ -844,7 +844,7 @@ object CampaignManager extends Serializable with Logging {
           df(CampaignMergedFields.CALENDAR_REF_BRAND),
           df(CampaignMergedFields.CALENDAR_REC_BRAND + "1"),
           df(CampaignMergedFields.CALENDAR_REF_BRICK),
-          df(CampaignMergedFields.CALENDAR_REF_BRICK + "1"),
+          df(CampaignMergedFields.CALENDAR_REC_BRICK + "1"),
           df(CampaignMergedFields.CALENDAR_CITY),
           df(CampaignMergedFields.CALENDAR_COLOR),
           df(CampaignMergedFields.CALENDAR_PRICE_POINT),

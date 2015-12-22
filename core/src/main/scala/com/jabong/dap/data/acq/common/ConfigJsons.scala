@@ -61,7 +61,7 @@ case class TableInfo(
 case class MergeInfo(
   source: String,
   tableName: String,
-  primaryKey: String,
+  primaryKey: List[String],
   mergeMode: String,
   dateColumn: Option[String],
   incrDate: Option[String],

@@ -10,6 +10,7 @@ import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.storage.merge.common.PathBuilder.DataNotExist
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
+import org.apache.spark.sql.DataFrame
 
 /**
  * Used to merge the data on the basis of the merge type.
@@ -23,6 +24,7 @@ object MergeTables extends Logging {
     val source = mergeInfo.source
     val tableName = mergeInfo.tableName
     val mergeMode = mergeInfo.mergeMode
+    var mergedDF: DataFrame = null
 
     // If the incremental date is null than it is assumed that it will be yesterday's date.
     val incrDate = OptionUtils.getOptValue(mergeInfo.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
@@ -60,7 +62,10 @@ object MergeTables extends Logging {
           .format(saveFormat)
           .load(MergePathResolver.incrementalPathResolver(pathIncr))
 
-      val mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
+      if (primaryKey != null && primaryKey.size > 1)
+        mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey)
+      else
+        mergedDF = MergeUtils.InsertUpdateMerge(baseDF, incrementalDF, primaryKey(0))
 
       println("merged " + pathIncr + " with " + pathPrevData)
 

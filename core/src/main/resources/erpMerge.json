@@ -3,14 +3,7 @@
     {
       "source": "erp",
       "tableName": "item_master_complete_dump",
-      "primaryKey": "No_",
-      "mergeMode": "full",
-      "saveMode": "Ignore"
-    },
-    {
-      "source": "erp",
-      "tableName": "XerionSaleMovementView",
-      "primaryKey": "No_",
+      "primaryKey": ["No_"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     }
