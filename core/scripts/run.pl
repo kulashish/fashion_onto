@@ -407,7 +407,10 @@ if ($component eq "bobAcqFull1") {
     $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component winbackCustomer --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/winbackCustomer.json";
     $job_exit = run_component($component, $command);
-} else {
+}elsif ($component eq "mongoFeedGenerator") {
+     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component mongoFeedGenerator --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/mongoFeedGenerator.json";
+     $job_exit = run_component($component, $command);
+ }  else {
     print "not a valid component\n";
     $job_exit = -1;
 }

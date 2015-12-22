@@ -8,6 +8,7 @@ import com.jabong.dap.data.acq.common._
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.export.SkuData
 import com.jabong.dap.export.dcf.DcfFeedGenerator
+import com.jabong.dap.export.mongo.MongoFeedGenerator
 import com.jabong.dap.model.ad4push.data.Ad4pushDeviceMerger
 import com.jabong.dap.model.ad4push.variables.DevicesReactions
 import com.jabong.dap.model.city.CityData
@@ -133,6 +134,8 @@ class ComponentExecutor extends Serializable with Logging {
           // miscellaneous data
           case DataSets.CITY_WISE_DATA => CityData.start(paramJob)
           case DataSets.WINBACK_CUSTOMER => WinbackData.start(paramJob)
+
+          case DataSets.MONGO_FEED_GENERATOR => MongoFeedGenerator.start(paramJob)
 
           case DataSets.CUSTOMER_MASTER_RECORD_FEED => CustomerMasterRecordFeed.start(paramJob)
           case _ => logger.error("Unknown source.")

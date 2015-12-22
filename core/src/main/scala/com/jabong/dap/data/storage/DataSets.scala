@@ -211,6 +211,8 @@ object DataSets {
   val CITY_WISE_DATA = "cityWiseData"
   val WINBACK_CUSTOMER = "winbackCustomer"
 
+  val MONGO_FEED_GENERATOR = "mongoFeedGenerator"
+
   //CRM tables
   val CRM_TicketDetails = "CRM_TicketDetails"
   val CRM_TicketMaster = "CRM_TicketMaster"
