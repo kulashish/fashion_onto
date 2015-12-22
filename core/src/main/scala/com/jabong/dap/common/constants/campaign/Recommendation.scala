@@ -14,6 +14,9 @@ object Recommendation {
   val LAST_SOLD_DATE = "last_sold_date"
 
   val NUM_RECOMMENDATIONS = 20
+
+  val SEARCH_NUM_RECOMMENDATIONS = 100
+
   val BRICK_MVP_SUB_TYPE = "brick_mvp"
 
   val BRAND_MVP_SUB_TYPE = "brand_mvp"
@@ -48,6 +51,9 @@ object Recommendation {
   val BRAND_MVP_STATE_PIVOT = Array(ProductVariables.BRAND, ProductVariables.MVP, Recommendation.RECOMMENDATION_STATE)
 
   val ORDER_ITEM_DAYS = 30
+
+  val SEARCH_RECOMMENDATION_ORDER_ITEM_DAYS = 180
+
 
   val NUM_REC_SKU_REF_SKU = 8
 

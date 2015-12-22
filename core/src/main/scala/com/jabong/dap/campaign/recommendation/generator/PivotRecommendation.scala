@@ -22,24 +22,26 @@ object PivotRecommendation extends CommonRecommendation with Serializable {
   @throws(classOf[IllegalArgumentException])
   @throws(classOf[NullInputException])
   @throws(classOf[WrongInputException])
-  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String) {
+  override def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String, numDays: Int) {
     require(orderItemFullData != null, "order item full data cannot be null ")
     require(yesterdayItrData != null, "yesterdayItrData  cannot be null ")
     require(pivotKey != null, "pivotKey cannot be null ")
     require(numRecs != 0, "numRecs cannot be zero ")
     require(incrDate != null, "incrDate cannot be null ")
+    require(numDays != 0, "numDays cannot be zero ")
+
 
     if (RecommendationUtils.getPivotArray(pivotKey) == null) {
       logger.info(("Invalid pivotKey:- %d", pivotKey))
       throw new WrongInputException(("Invalid pivotKey:" + pivotKey))
     }
-    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, Recommendation.ORDER_ITEM_DAYS, incrDate)
+    val lastNDaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, numDays , incrDate)
 
-    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(last30DaysOrderItemData, 7, incrDate)
+    val last7DaysOrderItemData = RecommendationInput.lastNdaysData(lastNDaysOrderItemData, 7, incrDate)
 
     // FIXME: optimize logic for next 3 steps
 
-    val varProductsWithCountSold = productsWithCountSold(last30DaysOrderItemData)
+    val varProductsWithCountSold = productsWithCountSold(lastNDaysOrderItemData)
 
     // create list of (sku, avg count sold in last 7 days) : only for skus sold in last 7 days
     val orderItem7DaysWithWeeklySale = createWeeklyAverageSales(last7DaysOrderItemData)
