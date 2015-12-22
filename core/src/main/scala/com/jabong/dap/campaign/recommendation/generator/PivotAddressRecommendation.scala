@@ -23,7 +23,7 @@ object PivotAddressRecommendation extends CommonRecommendation with Serializable
     val salesAddressFullData = RecommendationInput.salesAddressFullData
     val salesOrder30DaysData = RecommendationInput.salesOrder30DaysData
 
-    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, numDays,  incrDate)
+    val last30DaysOrderItemData = RecommendationInput.lastNdaysData(orderItemFullData, numDays, incrDate)
 
     val salesAddressFullDataWithState = addStateFromMapping(salesAddressFullData, RecommendationInput.cityZoneMapping)
 
