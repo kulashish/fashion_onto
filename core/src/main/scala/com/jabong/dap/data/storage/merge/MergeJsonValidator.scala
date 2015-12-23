@@ -13,7 +13,7 @@ object MergeJsonValidator {
   private def validateRequiredFields(mergeJob: MergeInfo) = {
     require(mergeJob.source != null && mergeJob.source.length() != 0, "Source cannot be null or empty.")
     require(mergeJob.tableName != null && mergeJob.tableName.length() != 0, "Table Name cannot be null or empty.")
-    require(mergeJob.primaryKey != null && mergeJob.primaryKey.length() != 0, "Primary Key cannot be null or empty.")
+    require(mergeJob.primaryKey != null && mergeJob.primaryKey.size != 0, "Primary Key cannot be null or empty.")
     require(mergeJob.mergeMode != null && mergeJob.mergeMode.length() != 0, "Merge Mode cannot be null or empty.")
     require(mergeJob.saveMode != null && mergeJob.saveMode.length() != 0, "Save Mode cannot be null or empty.")
   }

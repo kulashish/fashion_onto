@@ -1,5 +1,7 @@
 package com.jabong.dap.common.json
 
+import com.jabong.dap.data.acq.common.{ MergeJobConfig, MergeJobInfo }
+import com.jabong.dap.data.storage.merge.MergeJsonValidator
 import net.liftweb.json.JsonParser.ParseException
 import org.scalatest.{ FlatSpec, Matchers }
 
@@ -17,5 +19,11 @@ class ParserTest extends FlatSpec with Matchers {
     a[ParseException] should be thrownBy {
       Parser.parseJson[TestSchema](JsonUtils.TEST_RESOURCES + "/common/json/parserTest2.json")
     }
+  }
+
+  "Parser" should "successfully parse a list value" in {
+    MergeJobConfig.mergeJobInfo = Parser.parseJson[MergeJobInfo](JsonUtils.TEST_RESOURCES + "/common/json/example.json")
+    MergeJsonValidator.validate(MergeJobConfig.mergeJobInfo)
+
   }
 }

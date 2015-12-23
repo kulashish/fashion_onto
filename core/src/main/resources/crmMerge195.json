@@ -3,42 +3,42 @@
     {
       "source": "crm",
       "tableName": "CRM_tblProductAttributeMaster",
-      "primaryKey": "sku",
+      "primaryKey": ["sku"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "CRM_TicketDetails",
-      "primaryKey": "TicketID",
+      "primaryKey": ["TicketID"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "CRM_OrderDetails",
-      "primaryKey": "OrderNo",
+      "primaryKey": ["OrderNo"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "CRM_ProductDetails",
-      "primaryKey": "ProductId",
+      "primaryKey": ["ProductId"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "CRM_TicketProducts",
-      "primaryKey": "TicketProductsID",
+      "primaryKey": ["TicketProductsID"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "crm",
       "tableName": "CRM_TicketStatusLog",
-      "primaryKey": "TicketStatusLogID",
+      "primaryKey": ["TicketStatusLogID"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     }

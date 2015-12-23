@@ -4,28 +4,28 @@
       "source": "unicommerce",
       "tableName": "facilityitemmaster",
       "primaryKey": null,
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "`Updated On`"
+      "filterCondition": "`Updated On` <= '2015-12-19 23:59:59'"
     },
     {
       "source": "unicommerce",
       "tableName": "vendors",
       "primaryKey": null,
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "Updated"
+      "filterCondition": "Updated <= '2015-12-19 23:59:59'"
     },
     {
       "source": "unicommerce",
       "tableName": "vendoritemmaster",
       "primaryKey": null,
-      "mode": "daily",
+      "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "dateColumn": "Updated"
+      "filterCondition": "Updated <= '2015-12-19 23:59:59'"
     }
   ]
 }
