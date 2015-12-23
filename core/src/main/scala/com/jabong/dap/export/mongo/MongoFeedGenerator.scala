@@ -21,7 +21,7 @@ object MongoFeedGenerator  extends Logging {
   def   start(params: ParamInfo) {
     logger.info("mongo feed generation process started")
     val executeDate = OptionUtils.getOptValue(params.incrDate, TimeUtils.getDateAfterNDays(-1, TimeConstants.DATE_FORMAT_FOLDER))
-    val options = Map("host" -> "172.16.90.53:27017", "user"->"reco", "pass" ->"xD8b6jG72", "database" -> "reco", "collection" -> "poc")
+    val options = Map("host" -> "172.16.90.53:27017", "credentials" ->"reco,reco,xD8b6jG72", "database" -> "reco", "collection" -> "poc")
     val brickMvpSearchRecommendations = DataReader.getDataFrame(ConfigConstants.READ_OUTPUT_PATH,DataSets.RECOMMENDATIONS,DataSets.BRICK_MVP_SEARCH_RECOMMENDATIONS,DataSets.DAILY_MODE,executeDate)
     // df4.write.format("org.apache.spark.sql.cassandra").mode(SaveMode.Overwrite).options(Map( "table" -> "poc", "keyspace" -> "reco")).save()
     brickMvpSearchRecommendations.write.format("com.stratio.datasource.mongodb").mode(SaveMode.Overwrite).options(options).save()
