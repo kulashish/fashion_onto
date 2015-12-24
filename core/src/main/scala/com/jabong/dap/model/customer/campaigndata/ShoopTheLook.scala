@@ -167,9 +167,9 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)),
       (CampaignUtils.checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))),
-        t(t.fieldIndex(REF_SKU)).toString,
+        t(t.fieldIndex(REF_SKU)).asInstanceOf[String],
         t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
-        t(t.fieldIndex(REC_SKU)).toString)))
+        t(t.fieldIndex(REC_SKU)).asInstanceOf[String])))
 
     val dfGroup = skuMap.groupByKey().map { case (key, data) => (key, genListSkus(data.toList)) }
       .map(x => (x._1, splitRefRecSkus(x._2)))
