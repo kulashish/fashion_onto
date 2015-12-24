@@ -27,7 +27,7 @@ abstract class CommonRecommendation extends Logging {
    * @param incrDate
    * @return
    */
-  def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String)
+  def generateRecommendation(orderItemFullData: DataFrame, yesterdayItrData: DataFrame, pivotKey: String, numRecs: Int, incrDate: String, numDays: Int)
 
   /**
    * top product sold in last 30days

@@ -19,10 +19,15 @@ object RecommendationGenerator extends Logging {
   def start(paramInfo: ParamInfo) {
     val incrDate = OptionUtils.getOptValue(paramInfo.incrDate, TimeUtils.YESTERDAY_FOLDER)
     val pivotKey = OptionUtils.getOptValue(paramInfo.subType, Recommendation.BRICK_MVP_SUB_TYPE)
+    val numberDays = Recommendation.ORDER_ITEM_DAYS
+
     logger.info("Recommendation Process has started for pivotkey:-" + pivotKey + " date::-" + incrDate)
     RecommendationInput.loadCommonDataSets(incrDate)
-    PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, pivotKey, Recommendation.NUM_RECOMMENDATIONS, incrDate)
-    PivotAddressRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRAND_MVP_CITY_STATE, Recommendation.NUM_RECOMMENDATIONS, incrDate)
+    PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, pivotKey, Recommendation.NUM_RECOMMENDATIONS, incrDate, numberDays)
+    // Added for search recommendation
+    PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.SEARCH_NUM_RECOMMENDATIONS, incrDate, Recommendation.SEARCH_RECOMMENDATION_ORDER_ITEM_DAYS)
+
+    PivotAddressRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRAND_MVP_CITY_STATE, Recommendation.NUM_RECOMMENDATIONS, incrDate, numberDays)
     logger.info("Recommendation successfully generated for pivotkey:-" + pivotKey + " date::-" + incrDate)
   }
 

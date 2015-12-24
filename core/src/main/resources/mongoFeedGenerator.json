@@ -1,0 +1,9 @@
+{
+  "params": [
+    {
+      "source": "mongoFeedGenerator",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}
