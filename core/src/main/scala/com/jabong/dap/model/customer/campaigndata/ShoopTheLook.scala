@@ -117,7 +117,6 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       SQL.INNER
     ).select(
         dfSO(SalesOrderVariables.FK_CUSTOMER),
-        dfSO(SalesOrderVariables.CUSTOMER_EMAIL) as CustomerVariables.EMAIL,
         dfSOI(SalesOrderItemVariables.SKU) as ProductVariables.SKU_SIMPLE,
         dfSOI(SalesOrderItemVariables.PAID_PRICE)
       )
@@ -128,7 +127,6 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     val joindDf = skuInCSLD.join(skuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === skuNotInCSLD(FK_CATALOG_SHOP_LOOK), SQL.LEFT_OUTER)
       .select(
         skuInCSLD(SalesOrderVariables.FK_CUSTOMER),
-        //        skuInCSLD(CustomerVariables.EMAIL),
         skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
         skuNotInCSLD(ProductVariables.SKU_SIMPLE) as REC_SKU,
