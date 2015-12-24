@@ -145,6 +145,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
         dfCSLD(ProductVariables.SKU_SIMPLE) as REC_SKU,
         dfCSLD(ProductVariables.SPECIAL_PRICE)
       )
+    CampaignUtils.debug(dfSkuNotInCSLD, "dfSkuNotInCSLD")
 
     val skuNotInCSLD = dfSkuNotInCSLD.filter(REF_SKU + " is null")
       .select(
@@ -152,6 +153,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
         dfSkuNotInCSLD(REC_SKU),
         dfSkuNotInCSLD(ProductVariables.SPECIAL_PRICE)
       )
+    CampaignUtils.debug(skuNotInCSLD, "skuNotInCSLD")
 
     val joindDf = skuInCSLD.join(skuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === skuNotInCSLD(FK_CATALOG_SHOP_LOOK), SQL.LEFT_OUTER)
       .select(
