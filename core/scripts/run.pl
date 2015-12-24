@@ -402,7 +402,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerMasterRecordFeed --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerMasterRecordFeed.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "shopTheLook") {
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component shopTheLook --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/shopTheLook.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component shopTheLook --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/shopTheLook.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "winbackCustomer") {
     $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
