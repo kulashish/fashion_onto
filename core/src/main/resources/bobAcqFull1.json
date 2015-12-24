@@ -255,6 +255,14 @@
       "mode": "full",
       "saveFormat": "parquet",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "bob",
+      "tableName": "agent_campaign_order",
+      "primaryKey": null,
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore"
     }
   ]
 }

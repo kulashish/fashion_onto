@@ -1,6 +1,6 @@
 package com.jabong.dap.data.acq.common
 
-import com.jabong.dap.common.Spark
+import com.jabong.dap.common.{ StringUtils, Spark }
 import com.jabong.dap.data.write.DataWriter
 import grizzled.slf4j.Logging
 import org.apache.spark.sql.DataFrame
@@ -9,11 +9,6 @@ import org.apache.spark.sql.DataFrame
  * Gets the data for a given DbConnection
  */
 object GetData extends Logging {
-
-  def cleanString(str: String): String = {
-    val cleanedString = str.replaceAll("( |-|%)", "")
-    cleanedString.replaceAll("(/|:|\\(|\\)|\\.)", "")
-  }
 
   def getData(dbConn: DbConnection, tableInfo: TableInfo): Any = {
     val savePath = PathBuilder.getPath(tableInfo)
@@ -60,7 +55,7 @@ object GetData extends Logging {
 
     //    jdbcDF.printSchema()
     val columnList = jdbcDF.columns
-    val newColumnList = columnList.map(cleanString)
+    val newColumnList = columnList.map(StringUtils.cleanString)
     val newJdbcDF = jdbcDF.toDF(newColumnList: _*)
 
     newJdbcDF.write.format(saveFormat).mode(saveMode).save(savePath)
