@@ -142,7 +142,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       .select(
         skuInCSLD(FK_CATALOG_SHOP_LOOK),
         skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
-        dfCSLD(ProductVariables.SKU_SIMPLE) as REC_SKU,
+        dfCSLD(ProductVariables.SKU) as REC_SKU,
         dfCSLD(ProductVariables.SPECIAL_PRICE)
       )
     CampaignUtils.debug(dfSkuNotInCSLD, "dfSkuNotInCSLD")
