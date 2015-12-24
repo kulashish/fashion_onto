@@ -157,7 +157,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val joindDf = skuInCSLD.join(skuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === skuNotInCSLD(FK_CATALOG_SHOP_LOOK), SQL.LEFT_OUTER)
       .select(
-        skuInCSLD(SalesOrderVariables.FK_CUSTOMER),
+        skuInCSLD(SalesOrderVariables.FK_CUSTOMER).cast("string") as SalesOrderVariables.FK_CUSTOMER,
         skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
         skuNotInCSLD(REC_SKU),
@@ -165,7 +165,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       ).filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
     CampaignUtils.debug(joindDf, "joindDf")
 
-    val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)).asInstanceOf[String],
+    val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)),
       (CampaignUtils.checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))),
         t(t.fieldIndex(REF_SKU)).toString,
         t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
