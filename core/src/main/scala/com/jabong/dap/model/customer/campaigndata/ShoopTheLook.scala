@@ -207,7 +207,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     val listSize = refList.size
     var list = List[(Double, String, Double, String)]()
     for (a <- 0 until listSize) {
-      list ::= (refList(a)._1, refList(a)._2, recList(a)._3, refList(a)._4)
+      list ::= (refList(a))
     }
     return list
   }
@@ -219,12 +219,12 @@ object ShoopTheLook extends DataFeedsModel with Logging {
    */
   def splitRefRecSkus(refRecSKusList: List[(Double, String, Double, String)]): Tuple10[String, String, String, String, String, String, String, String, String, String] = {
     val listSize = refRecSKusList.size
-    val list = List[(String)]()
+    var list = List[(String)]()
     for (a <- 0 until listSize if a < NUMBER_REF_SKUS) {
-      list ::: List(refRecSKusList(a)._1, refRecSKusList(a)._3)
+      list = List(refRecSKusList(a)._2.asInstanceOf[String], refRecSKusList(a)._4.asInstanceOf[String]).:::(list)
     }
-    for (a <- listSize to NUMBER_REF_SKUS) {
-      list ::: List(null, null)
+    for (a <- listSize until NUMBER_REF_SKUS) {
+      list = List(null.asInstanceOf[String], null.asInstanceOf[String]).:::(list)
     }
 
     return Tuple10(list(0), list(1), list(2), list(3), list(4), list(5), list(6), list(7), list(8), list(9))
