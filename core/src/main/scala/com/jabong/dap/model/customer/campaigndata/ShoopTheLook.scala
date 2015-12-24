@@ -235,7 +235,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       .filter(CustomerVariables.UID + " is not null")
       .na.fill("")
 
-    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
-    DataWriter.writeCsv(dfCsv, DataSets.EMAIL_CAMPAIGNS, DataSets.SHOP_THE_LOOK, DataSets.DAILY_MODE, incrDate, fileDate + "_ShoptheLook_data", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
+    //    val fileDate = TimeUtils.changeDateFormat(TimeUtils.getDateAfterNDays(1, TimeConstants.DATE_FORMAT_FOLDER, incrDate), TimeConstants.DATE_FORMAT_FOLDER, TimeConstants.YYYYMMDD)
+    //    DataWriter.writeCsv(dfCsv, DataSets.EMAIL_CAMPAIGNS, DataSets.SHOP_THE_LOOK, DataSets.DAILY_MODE, incrDate, fileDate + "_ShoptheLook_data", DataSets.IGNORE_SAVEMODE, "true", ";", 1)
   }
 }
