@@ -34,6 +34,13 @@
       "primaryKey": ["TicketProductsID"],
       "mergeMode": "full",
       "saveMode": "Ignore"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketStatusLog",
+      "primaryKey": ["TicketStatusLogID"],
+      "mergeMode": "full",
+      "saveMode": "Ignore"
     }
   ]
 }
