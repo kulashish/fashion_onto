@@ -30,6 +30,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
   val REC_SKU = "recsku"
   val FK_CATALOG_SHOP_LOOK = "fk_catalog_shop_look"
   val NUMBER_REF_SKUS = 5
+  val IS_ACTIVE = "is_active"
 
   /**
    *
@@ -97,8 +98,9 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     )
     val CSLD = dfCatalogShopLookDetailFull.select(
       FK_CATALOG_SHOP_LOOK,
-      SalesOrderItemVariables.SKU
-    )
+      SalesOrderItemVariables.SKU,
+      IS_ACTIVE
+    ).filter(IS_ACTIVE + " = 1")
     val dfItrData = yesterdayItrData.select(
       ProductVariables.SKU_SIMPLE,
       ProductVariables.SPECIAL_PRICE
