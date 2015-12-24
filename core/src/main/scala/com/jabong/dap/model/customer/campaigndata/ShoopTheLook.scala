@@ -10,6 +10,7 @@ import com.jabong.dap.common.constants.campaign.CampaignMergedFields
 import com.jabong.dap.common.constants.config.ConfigConstants
 import com.jabong.dap.common.constants.variables._
 import com.jabong.dap.common.time.{ TimeConstants, TimeUtils }
+import com.jabong.dap.common.udf.Udf
 import com.jabong.dap.data.read.DataReader
 import com.jabong.dap.data.storage.DataSets
 import com.jabong.dap.data.write.DataWriter
@@ -95,9 +96,9 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     CampaignUtils.debug(dfSO, "dfSO")
 
     val dfSOI = dfSalesOrderItemIncr.select(
-      SalesOrderItemVariables.FK_SALES_ORDER,
-      SalesOrderItemVariables.SKU,
-      SalesOrderItemVariables.PAID_PRICE
+      col(SalesOrderItemVariables.FK_SALES_ORDER),
+      Udf.skuFromSimpleSku(col(SalesOrderItemVariables.SKU)) as SalesOrderItemVariables.SKU,
+      col(SalesOrderItemVariables.PAID_PRICE)
     ).distinct
     CampaignUtils.debug(dfSOI, "dfSOI")
 
@@ -109,8 +110,8 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     CampaignUtils.debug(CSLD, "CSLD")
 
     val dfItrData = yesterdayItrData.select(
-      ProductVariables.SKU_SIMPLE,
-      ProductVariables.SPECIAL_PRICE
+      Udf.skuFromSimpleSku(col(ProductVariables.SKU_SIMPLE)) as ProductVariables.SKU_SIMPLE,
+      col(ProductVariables.SPECIAL_PRICE)
     ).distinct
     CampaignUtils.debug(dfItrData, "dfItrData")
 
