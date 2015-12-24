@@ -57,7 +57,6 @@ object Recommendation {
 
   val SEARCH_RECOMMENDATION_ORDER_ITEM_DAYS = 180
 
-
   val NUM_REC_SKU_REF_SKU = 8
 
   val DISCOUNT_THRESHOLD = 35

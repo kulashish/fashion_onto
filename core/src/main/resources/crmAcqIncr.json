@@ -44,6 +44,15 @@
       "saveFormat": "orc",
       "saveMode": "Ignore",
       "dateColumn": "UpdateDate"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketStatusLog",
+      "primaryKey": "TicketStatusLogID",
+      "mode": "daily",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "dateColumn": "AddDate"
     }
   ]
 }
