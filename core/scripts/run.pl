@@ -395,7 +395,7 @@ if ($component eq "bobAcqFull1") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component cityWiseData --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/cityWiseData.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "acartHourlyFeed") {
-    my $AMMUNITION = "--num-executors 5 --executor-memory 400M";
+    my $AMMUNITION = "--num-executors 5 --executor-memory 1G";
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component acartHourlyFeed --config $HDFS_CONF/config.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "customerMasterRecordFeed") {
