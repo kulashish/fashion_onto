@@ -58,7 +58,6 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     val dfSalesOrderIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER, DataSets.DAILY_MODE, incrDate)
     val dfSalesOrderItemIncr = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.SALES_ORDER_ITEM, DataSets.DAILY_MODE, incrDate)
     val dfCatalogShopLookDetailFull = DataReader.getDataFrame(ConfigConstants.INPUT_PATH, DataSets.BOB, DataSets.CATALOG_SHOP_LOOK_DETAIL, DataSets.FULL_MERGE_MODE, incrDate)
-    val hiveContext = Spark.getHiveContext()
     val itrSkuSimpleYesterdayData = CampaignInput.loadYesterdayItrSimpleData(incrDate)
 
     dfMap.put("cmrFull", dfCmr)
