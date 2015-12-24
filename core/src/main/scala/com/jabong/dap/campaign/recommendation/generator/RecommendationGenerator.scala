@@ -25,7 +25,7 @@ object RecommendationGenerator extends Logging {
     RecommendationInput.loadCommonDataSets(incrDate)
     PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, pivotKey, Recommendation.NUM_RECOMMENDATIONS, incrDate, numberDays)
     // Added for search recommendation
-    PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRICK_MVP_SUB_TYPE, Recommendation.SEARCH_NUM_RECOMMENDATIONS, incrDate, Recommendation.SEARCH_RECOMMENDATION_ORDER_ITEM_DAYS)
+    PivotRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRICK_MVP_SEARCH_SUB_TYPE, Recommendation.SEARCH_NUM_RECOMMENDATIONS, incrDate, Recommendation.SEARCH_RECOMMENDATION_ORDER_ITEM_DAYS)
 
     PivotAddressRecommendation.generateRecommendation(RecommendationInput.orderItemFullData, RecommendationInput.lastdayItrData, Recommendation.BRAND_MVP_CITY_STATE, Recommendation.NUM_RECOMMENDATIONS, incrDate, numberDays)
     logger.info("Recommendation successfully generated for pivotkey:-" + pivotKey + " date::-" + incrDate)
