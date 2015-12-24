@@ -186,12 +186,12 @@ object ShoopTheLook extends DataFeedsModel with Logging {
    */
   def splitRefRecSkus(refRecSKusList: List[(Double, String, Double, String)]): Tuple10[String, String, String, String, String, String, String, String, String, String] = {
     val listSize = refRecSKusList.size
-    var list = List[(String)]()
+    val list = List[(String)]()
     for (a <- 0 until listSize if a < NUMBER_REF_SKUS) {
-      list ::= (refRecSKusList(a)._1, refRecSKusList(a)._3)
+      list ::: List(refRecSKusList(a)._1, refRecSKusList(a)._3)
     }
     for (a <- listSize to NUMBER_REF_SKUS) {
-      list ::= (null.asInstanceOf[String], null.asInstanceOf[String])
+      list ::: List(null.asInstanceOf[String], null.asInstanceOf[String])
     }
 
     return Tuple10(list(0), list(1), list(2), list(3), list(4), list(5), list(6), list(7), list(8), list(9))
