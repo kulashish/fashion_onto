@@ -173,21 +173,21 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val dfGroup = skuMap.groupByKey().map { case (key, data) => (key, genListSkus(data.toList)) }
       .map(x => (x._1, splitRefRecSkus(x._2)))
-      .map(x => (x._1.asInstanceOf[String], x._2._1, x._2._2, x._2._3, x._2._4, x._2._5, x._2._6, x._2._7, x._2._8, x._2._9, x._2._10))
+      .map(x => (x._1.asInstanceOf[String], x._2._1, x._2._3, x._2._5, x._2._7, x._2._9, x._2._2, x._2._4, x._2._6, x._2._8, x._2._10))
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
     val grouped = dfGroup.toDF(
       CustomerVariables.CUSTOMER_ID,
       REF_SKU + "1",
-      REC_SKU + "1",
       REF_SKU + "2",
-      REC_SKU + "2",
       REF_SKU + "3",
-      REC_SKU + "3",
       REF_SKU + "4",
-      REC_SKU + "4",
       REF_SKU + "5",
+      REC_SKU + "1",
+      REC_SKU + "2",
+      REC_SKU + "3",
+      REC_SKU + "4",
       REC_SKU + "5")
 
     CampaignUtils.debug(grouped, "grouped")
