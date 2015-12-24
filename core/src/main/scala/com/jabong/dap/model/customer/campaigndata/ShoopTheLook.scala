@@ -207,7 +207,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     val listSize = refList.size
     var list = List[(Double, String, Double, String)]()
     for (a <- 0 until listSize) {
-      list ::= (refList(a))
+      list ::= (refList(a)._1, refList(a)._2, recList(a)._3, recList(a)._4)
     }
     return list
   }
@@ -240,9 +240,6 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val dfShopTheLookIncr = dfWriteMap("dfShopTheLookIncr")
     val pathShopTheLookIncr = DataWriter.getWritePath(ConfigConstants.WRITE_OUTPUT_PATH, DataSets.EMAIL_CAMPAIGNS, DataSets.SHOP_THE_LOOK, DataSets.DAILY_MODE, incrDate)
-    println("show dataframe dfShopTheLookIncr" + ":-" + dfShopTheLookIncr.show(10) + "\n")
-    dfShopTheLookIncr.printSchema()
-
     if (DataWriter.canWrite(saveMode, pathShopTheLookIncr)) {
       DataWriter.writeParquet(dfShopTheLookIncr, pathShopTheLookIncr, saveMode)
     }
