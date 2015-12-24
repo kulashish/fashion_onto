@@ -193,6 +193,15 @@
       "saveFormat": "parquet",
       "saveMode": "Ignore",
       "dateColumn": "updated_at"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_vendor_discount",
+      "primaryKey": "id_sales_order_item_vendor_discount",
+      "mode": "daily",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "dateColumn": "created_at"
     }
   ]
 }

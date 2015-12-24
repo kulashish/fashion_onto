@@ -62,6 +62,24 @@
       "saveFormat": "parquet",
       "saveMode": "Overwrite",
       "filterCondition": "updated_at <= '2015-10-30 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "catalog_shop_look_detail",
+      "primaryKey": "id_catalog_shop_look_detail",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "filterCondition": "updated_at <= '2015-12-23 23:59:59'"
+    },
+    {
+      "source": "bob",
+      "tableName": "sales_order_item_vendor_discount",
+      "primaryKey": "id_sales_order_item_vendor_discount",
+      "mode": "full",
+      "saveFormat": "parquet",
+      "saveMode": "Ignore",
+      "filterCondition": "created_at <= '2015-12-23 23:59:59'"
     }
   ]
 }
