@@ -202,11 +202,11 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     var fkCustomer = ""
 
     for (a <- 0 until skusList.size) {
-      if (skusList(a)._2 != null) {
-        refSkusList = refSkusList :+ (skusList(a)._2, skusList(a)._3)
-        fkCustomer = skusList(a)._1
-      } else {
+      if (skusList(a)._3 == null) {
         recSkusList = recSkusList :+ (skusList(a)._4, skusList(a)._5)
+      } else {
+        fkCustomer = skusList(a)._1
+        refSkusList = refSkusList :+ (skusList(a)._2, skusList(a)._3)
       }
     }
 
