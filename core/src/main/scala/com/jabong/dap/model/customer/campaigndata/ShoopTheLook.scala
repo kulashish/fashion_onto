@@ -136,33 +136,16 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val skuInCSLD = joinedSoSoi.join(dfCSLD, joinedSoSoi(ProductVariables.SKU_SIMPLE) === dfCSLD(SalesOrderItemVariables.SKU), SQL.INNER)
     CampaignUtils.debug(skuInCSLD, "skuInCSLD")
-    //    val skuNotInCSLD = joinedSoSoi.join(dfCSLD, joinedSoSoi(ProductVariables.SKU_SIMPLE).notEqual(dfCSLD(SalesOrderItemVariables.SKU)), SQL.INNER)
-    //    CampaignUtils.debug(skuNotInCSLD, "skuNotInCSLD")
-    val dfSkuNotInCSLD = skuInCSLD.join(dfCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfCSLD(FK_CATALOG_SHOP_LOOK), SQL.INNER)
-      .select(
-        skuInCSLD(FK_CATALOG_SHOP_LOOK),
-        skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
-        dfCSLD(ProductVariables.SKU) as REC_SKU,
-        dfCSLD(ProductVariables.SPECIAL_PRICE)
-      )
-    CampaignUtils.debug(dfSkuNotInCSLD, "dfSkuNotInCSLD")
 
-    val skuNotInCSLD = dfSkuNotInCSLD.filter(REF_SKU + " is null")
-      .select(
-        dfSkuNotInCSLD(FK_CATALOG_SHOP_LOOK),
-        dfSkuNotInCSLD(REC_SKU),
-        dfSkuNotInCSLD(ProductVariables.SPECIAL_PRICE)
-      )
-    CampaignUtils.debug(skuNotInCSLD, "skuNotInCSLD")
-
-    val joindDf = skuInCSLD.join(skuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === skuNotInCSLD(FK_CATALOG_SHOP_LOOK), SQL.LEFT_OUTER)
+    val joindDf = skuInCSLD.join(dfCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfCSLD(FK_CATALOG_SHOP_LOOK), SQL.INNER)
       .select(
         skuInCSLD(SalesOrderVariables.FK_CUSTOMER).cast("string") as SalesOrderVariables.FK_CUSTOMER,
         skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
-        skuNotInCSLD(REC_SKU),
-        skuNotInCSLD(ProductVariables.SPECIAL_PRICE)
+        dfCSLD(ProductVariables.SKU) as REC_SKU,
+        dfCSLD(ProductVariables.SPECIAL_PRICE)
       ).filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
+
     CampaignUtils.debug(joindDf, "joindDf")
 
     val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)),
@@ -202,29 +185,41 @@ object ShoopTheLook extends DataFeedsModel with Logging {
   def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, Double, String)]): List[(Double, String, Double, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
-    val refList = refSKusList.sortBy(-_._1).distinct
-    val recList = refSKusList.sortBy(-_._3).distinct
-    val listSize = refList.size
-    var list = List[(Double, String, Double, String)]()
-    for (a <- 0 until listSize) {
-      list ::= (refList(a)._1, refList(a)._2, recList(a)._3, recList(a)._4)
-    }
-    return list
+    return refSKusList
   }
 
   /**
    *
-   * @param refRecSKusList
+   * @param skusList
    * @return
    */
-  def splitRefRecSkus(refRecSKusList: List[(Double, String, Double, String)]): Tuple10[String, String, String, String, String, String, String, String, String, String] = {
-    val listSize = refRecSKusList.size
-    var list = List[(String)]()
-    for (a <- 0 until listSize if a < NUMBER_REF_SKUS) {
-      list = List(refRecSKusList(a)._2.asInstanceOf[String], refRecSKusList(a)._4.asInstanceOf[String]).:::(list)
+  def splitRefRecSkus(skusList: List[(Double, String, Double, String)]): Tuple10[String, String, String, String, String, String, String, String, String, String] = {
+    var refSkusList = List[(Double, String)]()
+    var recSkusList = List[(Double, String)]()
+
+    for (a <- 0 until skusList.size) {
+      if (skusList(a)._2 == null) {
+        recSkusList ::= (skusList(a)._3, skusList(a)._4)
+      } else {
+        refSkusList ::= (skusList(a)._1, skusList(a)._2)
+      }
     }
-    for (a <- listSize until NUMBER_REF_SKUS) {
-      list = List(null.asInstanceOf[String], null.asInstanceOf[String]).:::(list)
+    val refList = refSkusList.sortBy(-_._1).distinct
+    val recList = recSkusList.sortBy(-_._1).distinct
+    var list = List[(String)]()
+
+    for (a <- 0 until refList.size if a < NUMBER_REF_SKUS) {
+      list = List(refList(a)._2.asInstanceOf[String]).:::(list)
+    }
+    for (a <- refList.size until NUMBER_REF_SKUS) {
+      list = List(null.asInstanceOf[String]).:::(list)
+    }
+
+    for (a <- 0 until recList.size if a < NUMBER_REF_SKUS) {
+      list = List(recList(a)._2.asInstanceOf[String]).:::(list)
+    }
+    for (a <- recList.size until NUMBER_REF_SKUS) {
+      list = List(null.asInstanceOf[String]).:::(list)
     }
 
     return Tuple10(list(0), list(1), list(2), list(3), list(4), list(5), list(6), list(7), list(8), list(9))
