@@ -145,7 +145,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
         dfCSLD(ProductVariables.SKU) as REC_SKU,
         dfCSLD(ProductVariables.SPECIAL_PRICE)
-      ).filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
+      )
 
     CampaignUtils.debug(joindDf, "joindDf")
 
