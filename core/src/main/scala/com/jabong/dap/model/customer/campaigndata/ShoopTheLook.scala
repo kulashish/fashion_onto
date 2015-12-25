@@ -156,11 +156,11 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val dfGroup = skuMap.groupByKey().map { case (key, data) => (key, genListSkus(data.toList)) }
       .map(x => (x._1, splitRefRecSkus(x._2)))
-      .map(x => (x._1.asInstanceOf[String], x._2._1, x._2._3, x._2._5, x._2._7, x._2._9, x._2._2, x._2._4, x._2._6, x._2._8, x._2._10))
+      .map(x => (x._1.asInstanceOf[String], x._2._1, x._2._2, x._2._3, x._2._4, x._2._5, x._2._6, x._2._7, x._2._8, x._2._9, x._2._10))
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
-    val grouped = dfGroup.toDF(
+    val dfShopTheLookIncr = dfGroup.toDF(
       CustomerVariables.CUSTOMER_ID,
       REF_SKU + "1",
       REF_SKU + "2",
@@ -173,8 +173,8 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       REC_SKU + "4",
       REC_SKU + "5")
 
-    CampaignUtils.debug(grouped, "grouped")
-    grouped
+    CampaignUtils.debug(dfShopTheLookIncr, "dfShopTheLookIncr")
+    dfShopTheLookIncr
   }
 
   /**
@@ -199,30 +199,35 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     for (a <- 0 until skusList.size) {
       if (skusList(a)._2 == null) {
-        recSkusList ::= (skusList(a)._3, skusList(a)._4)
+        recSkusList = recSkusList :+ (skusList(a)._3, skusList(a)._4)
       } else {
-        refSkusList ::= (skusList(a)._1, skusList(a)._2)
+        refSkusList = refSkusList :+ (skusList(a)._1, skusList(a)._2)
       }
     }
-    val refList = refSkusList.sortBy(-_._1).distinct
-    val recList = recSkusList.sortBy(-_._1).distinct
-    var list = List[(String)]()
 
-    for (a <- 0 until refList.size if a < NUMBER_REF_SKUS) {
-      list = List(refList(a)._2.asInstanceOf[String]).:::(list)
-    }
-    for (a <- refList.size until NUMBER_REF_SKUS) {
-      list = List(null.asInstanceOf[String]).:::(list)
-    }
-
-    for (a <- 0 until recList.size if a < NUMBER_REF_SKUS) {
-      list = List(recList(a)._2.asInstanceOf[String]).:::(list)
-    }
-    for (a <- recList.size until NUMBER_REF_SKUS) {
-      list = List(null.asInstanceOf[String]).:::(list)
-    }
+    val list = addSku(refSkusList) ::: addSku(recSkusList)
 
     return Tuple10(list(0), list(1), list(2), list(3), list(4), list(5), list(6), list(7), list(8), list(9))
+  }
+
+  /**
+   *
+   * @param listSkus
+   * @return
+   */
+  def addSku(listSkus: List[(Double, String)]): List[(String)] = {
+    var result = List[(String)]()
+    val list = listSkus.sortBy(-_._1).distinct
+
+    for (a <- 0 until list.size if a < NUMBER_REF_SKUS) {
+      result = result :+ list(a)._2.asInstanceOf[String]
+    }
+
+    result = result.distinct
+    for (a <- result.size until NUMBER_REF_SKUS) {
+      result = result :+ null.asInstanceOf[String]
+    }
+    result
   }
 
   /**
