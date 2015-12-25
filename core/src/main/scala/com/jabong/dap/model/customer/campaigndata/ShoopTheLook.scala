@@ -92,7 +92,6 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       SalesOrderVariables.ID_SALES_ORDER,
       SalesOrderVariables.FK_CUSTOMER
     ).distinct
-
     CampaignUtils.debug(dfSO, "dfSO")
 
     val dfSOI = dfSalesOrderItemIncr.select(
@@ -107,6 +106,10 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       SalesOrderItemVariables.SKU,
       IS_ACTIVE
     ).distinct.filter(IS_ACTIVE + " = 1")
+      .select(
+        FK_CATALOG_SHOP_LOOK,
+        SalesOrderItemVariables.SKU
+      )
     CampaignUtils.debug(CSLD, "CSLD")
 
     val dfItrData = yesterdayItrData.select(
@@ -114,14 +117,6 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       col(ProductVariables.SPECIAL_PRICE)
     ).distinct
     CampaignUtils.debug(dfItrData, "dfItrData")
-
-    val dfCSLD = CSLD.join(dfItrData, CSLD(SalesOrderItemVariables.SKU) === dfItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
-      .select(
-        FK_CATALOG_SHOP_LOOK,
-        SalesOrderItemVariables.SKU,
-        ProductVariables.SPECIAL_PRICE
-      ).distinct
-    CampaignUtils.debug(dfCSLD, "dfCSLD")
 
     val joinedSoSoi = dfSO.join(
       dfSOI,
@@ -134,18 +129,32 @@ object ShoopTheLook extends DataFeedsModel with Logging {
       )
     CampaignUtils.debug(joinedSoSoi, "joinedSoSoi")
 
-    val skuInCSLD = joinedSoSoi.join(dfCSLD, joinedSoSoi(ProductVariables.SKU_SIMPLE) === dfCSLD(SalesOrderItemVariables.SKU), SQL.INNER)
+    val skuInCSLD = joinedSoSoi.join(CSLD, joinedSoSoi(ProductVariables.SKU_SIMPLE) === CSLD(SalesOrderItemVariables.SKU), SQL.INNER)
+      .select(
+        SalesOrderVariables.FK_CUSTOMER,
+        FK_CATALOG_SHOP_LOOK,
+        SalesOrderItemVariables.SKU,
+        SalesOrderItemVariables.PAID_PRICE
+      )
     CampaignUtils.debug(skuInCSLD, "skuInCSLD")
 
-    val joindDf = skuInCSLD.join(dfCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfCSLD(FK_CATALOG_SHOP_LOOK), SQL.INNER)
+    val skuNotInCSLD = CSLD.except(skuInCSLD.select(FK_CATALOG_SHOP_LOOK, SalesOrderItemVariables.SKU))
+    val dfskuNotInCSLD = skuNotInCSLD.join(dfItrData, skuNotInCSLD(SalesOrderItemVariables.SKU) === dfItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
+      .select(
+        FK_CATALOG_SHOP_LOOK,
+        SalesOrderItemVariables.SKU,
+        ProductVariables.SPECIAL_PRICE
+      ).distinct
+    CampaignUtils.debug(dfskuNotInCSLD, "dfskuNotInCSLD")
+
+    val joindDf = skuInCSLD.join(dfskuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfskuNotInCSLD(FK_CATALOG_SHOP_LOOK), SQL.INNER)
       .select(
         skuInCSLD(SalesOrderVariables.FK_CUSTOMER).cast("string") as SalesOrderVariables.FK_CUSTOMER,
-        skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
-        dfCSLD(ProductVariables.SKU) as REC_SKU,
-        dfCSLD(ProductVariables.SPECIAL_PRICE)
+        skuInCSLD(SalesOrderItemVariables.SKU) as REF_SKU,
+        dfskuNotInCSLD(ProductVariables.SPECIAL_PRICE),
+        dfskuNotInCSLD(ProductVariables.SKU) as REC_SKU
       ).filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
-
     CampaignUtils.debug(joindDf, "joindDf")
 
     val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)),
@@ -198,11 +207,8 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     var recSkusList = List[(Double, String)]()
 
     for (a <- 0 until skusList.size) {
-      if (skusList(a)._2 == null) {
-        recSkusList = recSkusList :+ (skusList(a)._3, skusList(a)._4)
-      } else {
-        refSkusList = refSkusList :+ (skusList(a)._1, skusList(a)._2)
-      }
+      refSkusList = refSkusList :+ (skusList(a)._1, skusList(a)._2)
+      recSkusList = recSkusList :+ (skusList(a)._3, skusList(a)._4)
     }
 
     val list = addSku(refSkusList) ::: addSku(recSkusList)
