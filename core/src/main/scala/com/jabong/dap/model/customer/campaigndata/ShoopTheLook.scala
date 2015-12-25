@@ -32,6 +32,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
   val FK_CATALOG_SHOP_LOOK = "fk_catalog_shop_look"
   val NUMBER_REF_SKUS = 5
   val IS_ACTIVE = "is_active"
+  val NOT_IN = "_not_in"
 
   /**
    *
@@ -131,31 +132,32 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     val skuInCSLD = joinedSoSoi.join(CSLD, joinedSoSoi(ProductVariables.SKU_SIMPLE) === CSLD(SalesOrderItemVariables.SKU), SQL.INNER)
       .select(
-        SalesOrderVariables.FK_CUSTOMER,
-        FK_CATALOG_SHOP_LOOK,
-        SalesOrderItemVariables.SKU,
-        SalesOrderItemVariables.PAID_PRICE
+        joinedSoSoi(SalesOrderVariables.FK_CUSTOMER),
+        CSLD(FK_CATALOG_SHOP_LOOK),
+        CSLD(SalesOrderItemVariables.SKU),
+        joinedSoSoi(SalesOrderItemVariables.PAID_PRICE)
       )
     CampaignUtils.debug(skuInCSLD, "skuInCSLD")
 
     val skuNotInCSLD = CSLD.except(skuInCSLD.select(FK_CATALOG_SHOP_LOOK, SalesOrderItemVariables.SKU))
+
     CampaignUtils.debug(skuNotInCSLD, "skuNotInCSLD")
 
     val dfskuNotInCSLD = skuNotInCSLD.join(dfItrData, skuNotInCSLD(SalesOrderItemVariables.SKU) === dfItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(
-        FK_CATALOG_SHOP_LOOK,
-        ProductVariables.SKU,
-        ProductVariables.SPECIAL_PRICE
+        skuNotInCSLD(FK_CATALOG_SHOP_LOOK) as FK_CATALOG_SHOP_LOOK + NOT_IN,
+        skuNotInCSLD(ProductVariables.SKU) as ProductVariables.SKU + NOT_IN,
+        dfItrData(ProductVariables.SPECIAL_PRICE)
       ).distinct
     CampaignUtils.debug(dfskuNotInCSLD, "dfskuNotInCSLD")
 
-    val joindDf = skuInCSLD.join(dfskuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfskuNotInCSLD(FK_CATALOG_SHOP_LOOK), SQL.INNER)
+    val joindDf = skuInCSLD.join(dfskuNotInCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfskuNotInCSLD(FK_CATALOG_SHOP_LOOK + NOT_IN), SQL.INNER)
       .select(
         skuInCSLD(SalesOrderVariables.FK_CUSTOMER).cast("string") as SalesOrderVariables.FK_CUSTOMER,
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
         skuInCSLD(SalesOrderItemVariables.SKU) as REF_SKU,
         dfskuNotInCSLD(ProductVariables.SPECIAL_PRICE),
-        dfskuNotInCSLD(ProductVariables.SKU) as REC_SKU
+        dfskuNotInCSLD(ProductVariables.SKU + NOT_IN) as REC_SKU
       )
     CampaignUtils.debug(joindDf, "joindDf")
 
