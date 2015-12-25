@@ -137,8 +137,9 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     val skuInCSLD = joinedSoSoi.join(dfCSLD, joinedSoSoi(ProductVariables.SKU_SIMPLE) === dfCSLD(SalesOrderItemVariables.SKU), SQL.INNER)
     CampaignUtils.debug(skuInCSLD, "skuInCSLD")
 
-    val joindDf = skuInCSLD.join(dfCSLD, skuInCSLD(FK_CATALOG_SHOP_LOOK) === dfCSLD(FK_CATALOG_SHOP_LOOK), SQL.INNER)
+    val joindDf = dfCSLD.join(skuInCSLD, dfCSLD(FK_CATALOG_SHOP_LOOK) === skuInCSLD(FK_CATALOG_SHOP_LOOK) && dfCSLD(ProductVariables.SKU) === skuInCSLD(ProductVariables.SKU_SIMPLE), SQL.LEFT_OUTER)
       .select(
+        dfCSLD(FK_CATALOG_SHOP_LOOK).cast("string") as FK_CATALOG_SHOP_LOOK,
         skuInCSLD(SalesOrderVariables.FK_CUSTOMER).cast("string") as SalesOrderVariables.FK_CUSTOMER,
         skuInCSLD(ProductVariables.SKU_SIMPLE) as REF_SKU,
         skuInCSLD(SalesOrderItemVariables.PAID_PRICE),
@@ -148,15 +149,17 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
     CampaignUtils.debug(joindDf, "joindDf")
 
-    val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)),
-      (CampaignUtils.checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))),
+    val skuMap = joindDf.map(t => (
+      t(t.fieldIndex(FK_CATALOG_SHOP_LOOK)),
+      (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)).asInstanceOf[String],
+        CampaignUtils.checkNullBigDecimalToDouble(t(t.fieldIndex(SalesOrderItemVariables.PAID_PRICE))),
         t(t.fieldIndex(REF_SKU)).asInstanceOf[String],
         t(t.fieldIndex(ProductVariables.SPECIAL_PRICE)).asInstanceOf[BigDecimal].doubleValue(),
         t(t.fieldIndex(REC_SKU)).asInstanceOf[String])))
 
     val dfGroup = skuMap.groupByKey().map { case (key, data) => (key, genListSkus(data.toList)) }
       .map(x => (x._1, splitRefRecSkus(x._2)))
-      .map(x => (x._1.asInstanceOf[String], x._2._1, x._2._2, x._2._3, x._2._4, x._2._5, x._2._6, x._2._7, x._2._8, x._2._9, x._2._10))
+      .map(x => (x._2._1, x._2._2, x._2._3, x._2._4, x._2._5, x._2._6, x._2._7, x._2._8, x._2._9, x._2._10, x._2._11))
 
     val sqlContext = Spark.getSqlContext()
     import sqlContext.implicits._
@@ -182,7 +185,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
    * @param refSKusList
    * @return
    */
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, Double, String)]): List[(Double, String, Double, String)] = {
+  def genListSkus(refSKusList: scala.collection.immutable.List[(String, Double, String, Double, String)]): List[(String, Double, String, Double, String)] = {
     require(refSKusList != null, "refSkusList cannot be null")
     require(refSKusList.size != 0, "refSkusList cannot be empty")
     return refSKusList
@@ -193,21 +196,23 @@ object ShoopTheLook extends DataFeedsModel with Logging {
    * @param skusList
    * @return
    */
-  def splitRefRecSkus(skusList: List[(Double, String, Double, String)]): Tuple10[String, String, String, String, String, String, String, String, String, String] = {
+  def splitRefRecSkus(skusList: List[(String, Double, String, Double, String)]): Tuple11[String, String, String, String, String, String, String, String, String, String, String] = {
     var refSkusList = List[(Double, String)]()
     var recSkusList = List[(Double, String)]()
+    var fkCustomer = ""
 
     for (a <- 0 until skusList.size) {
-      if (skusList(a)._2 == null) {
-        recSkusList = recSkusList :+ (skusList(a)._3, skusList(a)._4)
+      if (skusList(a)._2 != null) {
+        refSkusList = refSkusList :+ (skusList(a)._2, skusList(a)._3)
+        fkCustomer = skusList(a)._1
       } else {
-        refSkusList = refSkusList :+ (skusList(a)._1, skusList(a)._2)
+        recSkusList = recSkusList :+ (skusList(a)._4, skusList(a)._5)
       }
     }
 
     val list = addSku(refSkusList) ::: addSku(recSkusList)
 
-    return Tuple10(list(0), list(1), list(2), list(3), list(4), list(5), list(6), list(7), list(8), list(9))
+    return Tuple11(fkCustomer, list(0), list(1), list(2), list(3), list(4), list(5), list(6), list(7), list(8), list(9))
   }
 
   /**
