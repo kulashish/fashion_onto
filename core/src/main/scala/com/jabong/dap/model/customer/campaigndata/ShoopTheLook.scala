@@ -139,10 +139,12 @@ object ShoopTheLook extends DataFeedsModel with Logging {
     CampaignUtils.debug(skuInCSLD, "skuInCSLD")
 
     val skuNotInCSLD = CSLD.except(skuInCSLD.select(FK_CATALOG_SHOP_LOOK, SalesOrderItemVariables.SKU))
+    CampaignUtils.debug(skuNotInCSLD, "skuNotInCSLD")
+
     val dfskuNotInCSLD = skuNotInCSLD.join(dfItrData, skuNotInCSLD(SalesOrderItemVariables.SKU) === dfItrData(ProductVariables.SKU_SIMPLE), SQL.INNER)
       .select(
         FK_CATALOG_SHOP_LOOK,
-        SalesOrderItemVariables.SKU,
+        ProductVariables.SKU,
         ProductVariables.SPECIAL_PRICE
       ).distinct
     CampaignUtils.debug(dfskuNotInCSLD, "dfskuNotInCSLD")
@@ -154,7 +156,7 @@ object ShoopTheLook extends DataFeedsModel with Logging {
         skuInCSLD(SalesOrderItemVariables.SKU) as REF_SKU,
         dfskuNotInCSLD(ProductVariables.SPECIAL_PRICE),
         dfskuNotInCSLD(ProductVariables.SKU) as REC_SKU
-      ).filter(CustomerVariables.FK_CUSTOMER + " != 0  and " + CustomerVariables.FK_CUSTOMER + " is not null")
+      )
     CampaignUtils.debug(joindDf, "joindDf")
 
     val skuMap = joindDf.map(t => (t(t.fieldIndex(SalesOrderVariables.FK_CUSTOMER)),
@@ -188,13 +190,13 @@ object ShoopTheLook extends DataFeedsModel with Logging {
 
   /**
    *
-   * @param refSKusList
+   * @param sKusList
    * @return
    */
-  def genListSkus(refSKusList: scala.collection.immutable.List[(Double, String, Double, String)]): List[(Double, String, Double, String)] = {
-    require(refSKusList != null, "refSkusList cannot be null")
-    require(refSKusList.size != 0, "refSkusList cannot be empty")
-    return refSKusList
+  def genListSkus(sKusList: scala.collection.immutable.List[(Double, String, Double, String)]): List[(Double, String, Double, String)] = {
+    require(sKusList != null, "sKusList cannot be null")
+    require(sKusList.size != 0, "sKusList cannot be empty")
+    return sKusList
   }
 
   /**
