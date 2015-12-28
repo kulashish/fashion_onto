@@ -3,21 +3,21 @@
     {
       "source": "unicommerce",
       "tableName": "facilityitemmaster",
-      "primaryKey": ["productcode","facility"],
+      "primaryKey": ["ProductCode","Facility"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "unicommerce",
       "tableName": "vendors",
-      "primaryKey": ["facility","vendorcode"],
+      "primaryKey": ["Facility","VendorCode"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     },
     {
       "source": "unicommerce",
       "tableName": "vendoritemmaster",
-      "primaryKey": ["productcode","facility","vendorcode"],
+      "primaryKey": ["ProductCode","Facility","VendorCode"],
       "mergeMode": "full",
       "saveMode": "Ignore"
     }

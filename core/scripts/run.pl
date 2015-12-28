@@ -191,11 +191,11 @@ if ($component eq "bobAcqFull1") {
 #unicommerce acquisition
 } elsif($component eq "unicommerceAcqIncr") {
    $AMMUNITION = "--num-executors 3 --executor-memory 18G";
-   my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/unicommerceAcqIncr.json";
+   my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/unicommerceAcqIncr.json";
    $job_exit = run_component($component, $command);
 } elsif($component eq "unicommerceMerge") {
    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
-   my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/unicommerceMerge.json";
+   my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/unicommerceMerge.json";
    $job_exit = run_component($component, $command);
 #responsys files merger
 } elsif ($component eq "dndMerger") {
