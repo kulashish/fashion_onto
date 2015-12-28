@@ -51,7 +51,7 @@ for (my $day = 1; $day < 2; $day++) {
 
     my %config = (
      's3_bucket' => "jabong-events-input",
-     's3_file_format' => "$date_for_raw_files-*_ip-*_com.jabong.$app.log.gz",
+     's3_file_format' => "$date_for_raw_files*com.jabong.$app.log.gz",
      's3_profile' => "adjust",
      'raw_files_download_path' => "/data/adjust/rawData/$date_for_dirs/",
      'hdfs_files_input_path' => "/data/input/adjust/$date_for_dirs/",
