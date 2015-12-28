@@ -14,7 +14,13 @@
 
 40 3 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/campaigns/job.properties -run
 
-0 6 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/crmAcq/job.properties -run
+0 7 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c email_campaigns >>/opt/alchemy-core/logs/email_campaigns.txt
+
+0 8 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c feedFiles >>/opt/alchemy-core/logs/feedFiles.txt
+
+0 9 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c calendar_campaigns >>/opt/alchemy-core/logs/calendar_campaigns.txt
+
+20 * * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c acart_hourly_campaign >>/opt/alchemy-core/logs/acart_hourly_campaign.txt
 
 0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
@@ -25,8 +31,4 @@
 0 18 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
 
 # CRM Tables
-# 15 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqFull >>/opt/alchemy-core/logs/crmAcqFull_logs.txt
-
-# 50 2 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmAcqIncr >>/opt/alchemy-core/logs/crmAcqIncr_logs.txt
-
-# 0 10 * * * perl /opt/alchemy-core/current/bin/run.pl -t PROD -c crmMerge >>/opt/alchemy-core/logs/crmMerge_logs.txt
+0 2 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/crmUniAcq/job.properties -run

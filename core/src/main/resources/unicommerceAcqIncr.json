@@ -5,7 +5,7 @@
       "tableName": "facilityitemmaster",
       "primaryKey": null,
       "mode": "daily",
-      "saveFormat": "orc",
+      "saveFormat": "parquet",
       "saveMode": "Ignore",
       "dateColumn": "`Updated On`"
     },
@@ -14,7 +14,7 @@
       "tableName": "vendors",
       "primaryKey": null,
       "mode": "daily",
-      "saveFormat": "orc",
+      "saveFormat": "parquet",
       "saveMode": "Ignore",
       "dateColumn": "Updated"
     },
@@ -23,7 +23,7 @@
       "tableName": "vendoritemmaster",
       "primaryKey": null,
       "mode": "daily",
-      "saveFormat": "orc",
+      "saveFormat": "parquet",
       "saveMode": "Ignore",
       "dateColumn": "Updated"
     }

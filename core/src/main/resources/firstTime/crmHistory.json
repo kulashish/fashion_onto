@@ -7,7 +7,7 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "[Last Modification Date Time] <= '2015-10-11 23:59:59'"
+      "filterCondition": "[Last Modification Date Time] <= '2015-12-26 23:59:59.9'"
     },
     {
       "source": "crm",
@@ -16,7 +16,7 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "UpdateDate <= '2015-10-11 23:59:59'"
+      "filterCondition": "UpdateDate <= '2015-12-26 23:59:59.9'"
     },
     {
       "source": "crm",
@@ -25,7 +25,7 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "UpdateDate <= '2015-10-11 23:59:59'"
+      "filterCondition": "UpdateDate <= '2015-12-26 23:59:59.9'"
     },
     {
       "source": "crm",
@@ -34,7 +34,7 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "LastUpdatedAt <= '2015-10-11 23:59:59'"
+      "filterCondition": "LastUpdatedAt <= '2015-12-26 23:59:59.9'"
     },
     {
       "source": "crm",
@@ -43,7 +43,16 @@
       "mode": "full",
       "saveFormat": "orc",
       "saveMode": "Ignore",
-      "filterCondition": "UpdateDate <= '2015-10-11 23:59:59'"
+      "filterCondition": "UpdateDate <= '2015-12-26 23:59:59.9'"
+    },
+    {
+      "source": "crm",
+      "tableName": "tblTicketStatusLog",
+      "primaryKey": "TicketStatusLogID",
+      "mode": "full",
+      "saveFormat": "orc",
+      "saveMode": "Ignore",
+      "filterCondition": "AddDate <= '2015-12-26 23:59:59.9'"
     }
   ]
 }

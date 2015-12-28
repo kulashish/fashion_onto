@@ -13,6 +13,11 @@
     <start to='acquisition' />
 
     <fork name="acquisition">
+        <path start="crmAcq" />
+        <path start="uniAcqIncr" />
+    </fork>
+
+    <fork name="crmAcq">
         <path start="crmAcqIncr" />
         <path start="crmAcqFull" />
     </fork>
@@ -65,7 +70,41 @@
         <error to="fail"/>
     </action>
 
-    <join name="crmJoin" to="end"/>
+    <join name="crmJoin" to="acqJoin"/>
+
+    <action name="uniAcqIncr">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>unicommerceAcqIncr</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="uniMerge"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="uniMerge">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>run.pl</exec>
+            <argument>-t</argument>
+            <argument>${jobEnv}</argument>
+            <argument>-c</argument>
+            <argument>unicommerceMerge</argument>
+            <env-var>YARN_CONF_DIR=/etc/hadoop/conf</env-var>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>${scriptHome}/run.pl#run.pl</file>
+            <capture-output/>
+        </shell>
+        <ok to="acqJoin"/>
+        <error to="fail"/>
+    </action>
+
+    <join name="acqJoin" to="end"/>
 
     <kill name="fail">
         <message>Workflow failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>

@@ -190,18 +190,12 @@ if ($component eq "bobAcqFull1") {
     $job_exit = run_component($component, $command);
 #unicommerce acquisition
 } elsif($component eq "unicommerceAcqIncr") {
-   $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
-   $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
-   $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
    $AMMUNITION = "--num-executors 3 --executor-memory 18G";
-   my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/unicommerceAcqIncr.json";
+   my $command = "$BASE_SPARK_SUBMIT $DRIVER_CLASS_PATH $AMMUNITION $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/unicommerceAcqIncr.json";
    $job_exit = run_component($component, $command);
 } elsif($component eq "unicommerceMerge") {
-   $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
-   $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
-   $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
    $AMMUNITION = "--num-executors 9 --executor-memory 18G";
-   my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/unicommerceMerge.json";
+   my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/unicommerceMerge.json";
    $job_exit = run_component($component, $command);
 #responsys files merger
 } elsif ($component eq "dndMerger") {
