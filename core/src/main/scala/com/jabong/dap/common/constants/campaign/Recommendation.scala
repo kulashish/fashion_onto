@@ -21,7 +21,6 @@ object Recommendation {
 
   val BRICK_MVP_SEARCH_SUB_TYPE = "brick_mvp_search"
 
-
   val BRAND_MVP_SUB_TYPE = "brand_mvp"
 
   val BRAND_MVP_CITY_STATE = "brand_mvp_city_state"
