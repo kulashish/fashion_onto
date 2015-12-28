@@ -1,0 +1,10 @@
+{
+  "params": [
+    {
+      "source": "shopTheLook",
+      "incrMode": "daily",
+      "saveMode": "Ignore",
+      "saveFormat": "parquet"
+    }
+  ]
+}

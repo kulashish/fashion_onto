@@ -401,6 +401,10 @@ if ($component eq "bobAcqFull1") {
 } elsif ($component eq "customerMasterRecordFeed") {
     my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $CORE_JAR --component customerMasterRecordFeed --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/customerMasterRecordFeed.json";
     $job_exit = run_component($component, $command);
+} elsif ($component eq "shopTheLook") {
+    $AMMUNITION = "--num-executors 10 --executor-memory 4G";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component shopTheLook --config $HDFS_CONF/config.json --paramJson $HDFS_CONF/shopTheLook.json";
+    $job_exit = run_component($component, $command);
 } elsif ($component eq "winbackCustomer") {
     $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
     $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";

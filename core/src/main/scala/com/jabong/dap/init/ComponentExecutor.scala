@@ -88,7 +88,6 @@ class ComponentExecutor extends Serializable with Logging {
 
           // all pushCampaign quality checks
           case DataSets.CAMPAIGN_QUALITY => CampaignQualityEntry.start(paramJob)
-
           //email campaign feed files.
           case DataSets.CUST_WELCOME_VOUCHER => CustWelcomeVoucher.start(paramJob)
           case DataSets.CUST_PREFERENCE => CustPreference.start(paramJob)
@@ -101,6 +100,7 @@ class ComponentExecutor extends Serializable with Logging {
           case DataSets.SALES_ORDER_ADDR_FAV => SalesOrderAddress.start(paramJob)
           case DataSets.SALES_ITEM_REVENUE => SalesItemRevenue.start(paramJob)
           case DataSets.CUSTOMER_APP_DETAILS => CustomerAppDetails.start(paramJob)
+          case DataSets.SHOP_THE_LOOK => ShoopTheLook.start(paramJob)
           //CUSTOMER_SURF_AFFINITY from surf data
           case DataSets.CUSTOMER_SURF_AFFINITY => CustomerSurfAffinity.start(paramJob)
 

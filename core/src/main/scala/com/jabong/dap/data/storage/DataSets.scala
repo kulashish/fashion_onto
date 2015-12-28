@@ -11,6 +11,7 @@ object DataSets {
   val SALES_RULE = "sales_rule"
   val SALES_CART = "sales_cart"
   val SALES_RULE_SET = "sales_rule_set"
+  val CATALOG_SHOP_LOOK_DETAIL = "catalog_shop_look_detail"
 
   val PAYMENT_PREPAID_TRANSACTION_DATA = "payment_prepaid_transaction_data"
   val PAYMENT_BANK_PRIORITY = "payment_bank_priority"
@@ -169,6 +170,7 @@ object DataSets {
   val DND_MERGER = "dndMerger"
   val SMS_OPT_OUT_MERGER = "smsOptOutMerger"
   val SOLUTIONS_INFINITI = "solutionsInfiniti"
+  val SHOP_THE_LOOK = "shopTheLook"
 
   // type of campaigns
   val PUSH_CAMPAIGNS = "push_campaigns"
