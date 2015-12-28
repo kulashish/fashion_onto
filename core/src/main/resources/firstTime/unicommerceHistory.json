@@ -5,27 +5,27 @@
       "tableName": "facilityitemmaster",
       "primaryKey": null,
       "mode": "full",
-      "saveFormat": "orc",
+      "saveFormat": "parquet",
       "saveMode": "Ignore",
-      "filterCondition": "`Updated On` <= '2015-12-19 23:59:59'"
+      "filterCondition": "`Updated On` <= '2015-12-26 23:59:59'"
     },
     {
       "source": "unicommerce",
       "tableName": "vendors",
       "primaryKey": null,
       "mode": "full",
-      "saveFormat": "orc",
+      "saveFormat": "parquet",
       "saveMode": "Ignore",
-      "filterCondition": "Updated <= '2015-12-19 23:59:59'"
+      "filterCondition": "Updated <= '2015-12-26 23:59:59'"
     },
     {
       "source": "unicommerce",
       "tableName": "vendoritemmaster",
       "primaryKey": null,
       "mode": "full",
-      "saveFormat": "orc",
+      "saveFormat": "parquet",
       "saveMode": "Ignore",
-      "filterCondition": "Updated <= '2015-12-19 23:59:59'"
+      "filterCondition": "Updated <= '2015-12-26 23:59:59'"
     }
   ]
 }
