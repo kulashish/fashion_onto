@@ -20,6 +20,8 @@
 
 0 9 * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c calendar_campaigns >>/opt/alchemy-core/logs/calendar_campaigns.txt
 
+20 * * * * perl /opt/alchemy-core/current/bin/ftp_upload.pl -t PROD -c acart_hourly_campaign >>/opt/alchemy-core/logs/acart_hourly_campaign.txt
+
 0 7 * * * perl /opt/alchemy-core/current/bin/responsys.pl >>/opt/alchemy-core/logs/responsys.txt
 
 0 9 * * 1 perl /opt/alchemy-core/current/bin/customerMasterRecordFeed.pl  >>/opt/alchemy-core/logs/customerMasterRecordFeed_logs.txt
