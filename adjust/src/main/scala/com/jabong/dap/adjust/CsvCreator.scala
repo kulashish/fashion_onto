@@ -44,6 +44,7 @@ object CsvCreator {
     //TODO: merge all replace in one
     val lineArr = sc.textFile(args(0))
       .map(line => line.replace('&', ',')
+	.replace("=event", "=XXX")
         .replace('=', ',')
         .replace("/v1/events", ",")
         .replace("transaction_ID", "transaction_id")
