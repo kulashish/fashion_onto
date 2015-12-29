@@ -260,7 +260,7 @@ object ContactListMobile extends DataFeedsModel with Logging {
         col(ContactListMobileVars.COUNTRY),
         col(CustomerVariables.FIRST_NAME) as ContactListMobileVars.FIRST_NAME,
         col(CustomerVariables.LAST_NAME) as ContactListMobileVars.LAST_NAME,
-        col(ContactListMobileVars.DOB),
+        Udf.addString(col(ContactListMobileVars.DOB), lit(" 00:00:00")) as ContactListMobileVars.DOB,
         col(ContactListMobileVars.MVP_TYPE).cast(StringType) as ContactListMobileVars.MVP_TYPE,
         col(ContactListMobileVars.NET_ORDERS).cast(StringType) as ContactListMobileVars.NET_ORDERS,
         Udf.dateCsvFormat(col(ContactListMobileVars.LAST_ORDER_DATE)) as ContactListMobileVars.LAST_ORDER_DATE,

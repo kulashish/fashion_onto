@@ -906,7 +906,7 @@ object CampaignUtils extends Logging {
 
     val replenishmentData = CampaignProcessor.mapEmailCampaignWithCMR(cmr, input.withColumn(CampaignCommon.PRIORITY, lit("")))
     val replenishmentOutData = replenishmentData
-      .withColumn(ContactListMobileVars.EMAIL, Udf.addString(col(CampaignMergedFields.EMAIL), lit("**")))
+      .withColumn(ContactListMobileVars.EMAIL, Udf.maskForDecrypt(col(CampaignMergedFields.EMAIL), lit("**")))
       .withColumn(CampaignMergedFields.PURCHASED_DATE, lit(""))
       .withColumn(CampaignMergedFields.LIVE_REF, Udf.getElementInTupleArray(col(CampaignMergedFields.REF_SKUS), lit(0), lit(0)))
       .withColumn(CampaignMergedFields.CATEGORY, lit(""))
