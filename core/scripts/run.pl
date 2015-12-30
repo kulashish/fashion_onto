@@ -171,14 +171,14 @@ if ($component eq "bobAcqFull1") {
     $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 3 --executor-memory 18G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqIncr195.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqIncr.json";
     $job_exit = run_component($component, $command);
 } elsif ($component eq "crmAcqFull") {
     $SPARK_HOME = "/ext/spark-1.5.1-bin-hadoop2.6";
     $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 3 --executor-memory 9G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqFull195.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component acquisition --config $HDFS_CONF/config.json --tablesJson $HDFS_CONF/crmAcqFull.json";
     $job_exit = run_component($component, $command);
 #crm Merge
 } elsif ($component eq "crmMerge") {
@@ -186,7 +186,7 @@ if ($component eq "bobAcqFull1") {
     $BASE_SPARK_SUBMIT = "$SPARK_HOME/bin/spark-submit --class \"com.jabong.dap.init.Init\" --master yarn-cluster --name $component";
     $HIVE_JARS = "--jars $SPARK_HOME/lib/datanucleus-api-jdo-3.2.6.jar,$SPARK_HOME/lib/datanucleus-core-3.2.10.jar,$SPARK_HOME/lib/datanucleus-rdbms-3.2.9.jar --files $SPARK_HOME/conf/hive-site.xml";
     $AMMUNITION = "--num-executors 9 --executor-memory 18G";
-    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/crmMerge195.json";
+    my $command = "$BASE_SPARK_SUBMIT $AMMUNITION $HIVE_JARS $CORE_JAR --component merge --config $HDFS_CONF/config.json --mergeJson $HDFS_CONF/crmMerge.json";
     $job_exit = run_component($component, $command);
 #unicommerce acquisition
 } elsif($component eq "unicommerceAcqIncr") {
