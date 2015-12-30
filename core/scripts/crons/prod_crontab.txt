@@ -31,4 +31,4 @@
 0 18 * * * perl /opt/alchemy-core/current/bin/ad4push_reaction.pl  >>/opt/alchemy-core/logs/ad4pushReaction_logs.txt
 
 # CRM Tables
-0 2 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/crmUniAcq/job.properties -run
+15 2 * * * oozie job -oozie http://dataplatform-master.jabong.com:11000/oozie -config /opt/alchemy-core/current/workflows/prod/crmUniAcq/job.properties -run
