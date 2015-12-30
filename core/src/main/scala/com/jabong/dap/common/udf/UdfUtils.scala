@@ -683,7 +683,7 @@ object UdfUtils extends Logging {
   }
 
   def addString(value: String, constant: String): String = {
-    if (value == null) return null else constant + value + constant
+    if (null == value) return null else value + constant
   }
 
   def addInt(i1: Int, i2: Int): Int = {
